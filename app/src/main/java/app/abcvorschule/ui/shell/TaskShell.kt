@@ -29,12 +29,12 @@ import app.abcvorschule.session.AppScreen
 import app.abcvorschule.session.SessionUiState
 import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.session.SuccessPhase
-import app.abcvorschule.ui.components.AbcContinueButton
 import app.abcvorschule.ui.components.AbcNavChevron
 import app.abcvorschule.ui.components.AbcProgressBar
 import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.exercise.TrainerCallbacks
 import app.abcvorschule.ui.exercise.TrainerHost
+import app.abcvorschule.ui.path.PathScreen
 import app.abcvorschule.ui.rewards.SuccessBurst
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.NightInk
@@ -90,20 +90,16 @@ fun TaskShell(
                 )
             }
             state.screen == AppScreen.Path -> {
-                // Task 4 replaces this with PathScreen(...).
-                Column(
-                    Modifier.fillMaxSize().padding(24.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    val first = viewModel.highlightedLessonId()
-                    AbcContinueButton(
-                        onClick = { first?.let(viewModel::openLesson) },
-                        label = "Start",
-                        centered = true,
-                        enabled = first != null,
-                    )
-                }
+                PathScreen(
+                    lessons = viewModel.pathLessons(),
+                    states = viewModel.lessonStates(),
+                    highlightedLessonId = viewModel.highlightedLessonId(),
+                    points = state.points,
+                    onOpenLesson = { viewModel.openLesson(it) },
+                    onLockedTap = { if (ttsAvailable) onSpeak(viewModel.lockedLessonCue()) },
+                    onParentGateUnlocked = viewModel::openDifficultySheet,
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
             else -> PracticeBody(
                 state = state,
