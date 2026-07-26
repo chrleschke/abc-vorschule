@@ -41,16 +41,19 @@ fun DifficultySheet(
                 style = MaterialTheme.typography.headlineMedium,
             )
             ModeRow(
+                glyph = "~",
                 label = stringResource(R.string.mode_auto),
                 selected = current == ParentMode.Auto,
                 onClick = { onSelect(ParentMode.Auto) },
             )
             ModeRow(
+                glyph = "+",
                 label = stringResource(R.string.mode_beginner),
                 selected = current == ParentMode.Beginner,
                 onClick = { onSelect(ParentMode.Beginner) },
             )
             ModeRow(
+                glyph = "=",
                 label = stringResource(R.string.mode_advanced),
                 selected = current == ParentMode.Advanced,
                 onClick = { onSelect(ParentMode.Advanced) },
@@ -61,6 +64,7 @@ fun DifficultySheet(
 
 @Composable
 private fun ModeRow(
+    glyph: String,
     label: String,
     selected: Boolean,
     onClick: () -> Unit,
@@ -70,7 +74,7 @@ private fun ModeRow(
         modifier = Modifier.fillMaxWidth(),
     ) {
         Text(
-            text = if (selected) "✓ $label" else label,
+            text = if (selected) "[$glyph] $label" else " $glyph  $label",
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.fillMaxWidth(),

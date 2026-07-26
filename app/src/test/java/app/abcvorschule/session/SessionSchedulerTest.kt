@@ -3,7 +3,7 @@ package app.abcvorschule.session
 import app.abcvorschule.content.ContentRepository
 import app.abcvorschule.content.Domain
 import app.abcvorschule.content.TaskType
-import app.abcvorschule.progress.AtomStats
+import app.abcvorschule.progress.SkillStats
 import app.abcvorschule.progress.LearnerProgress
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -15,6 +15,52 @@ class SessionSchedulerTest {
     private val scheduler = SessionScheduler(Random(1))
 
     @Test
+    fun freshSessionPrefersLettersBeforeMama() {
+        val fresh = LearnerProgress()
+        val session = scheduler.buildSession(pack, fresh, size = 5)
+        assertFalse(session.any { it.id.contains("mama") || it.id.contains("oma") })
+        assertFalse(session.any { it.type == TaskType.sentence_cloze })
+        assertTrue(session.any { it.tier == "letter" || it.domain != Domain.reading })
+    }
+
+    @Test
+    fun syllableNotEligibleBeforeLetters() {
+        val fresh = LearnerProgress()
+        assertFalse(
+            scheduler.isEligible(
+                pack.tasks.first { it.id == "r-syll-ma" },
+                pack,
+                fresh,
+            ),
+        )
+    }
+
+    @Test
+    fun composeMamaEligibleAfterLettersAndSyllable() {
+        val practiced = LearnerProgress(
+            atomStats = mapOf(
+                "letter-m" to SkillStats(attempts = 1, correct = 1),
+                "letter-a" to SkillStats(attempts = 1, correct = 1),
+                "ma" to SkillStats(attempts = 1, correct = 1),
+            ),
+        )
+        assertTrue(
+            scheduler.isEligible(
+                pack.tasks.first { it.id == "r-compose-mama" },
+                pack,
+                practiced,
+            ),
+        )
+        assertFalse(
+            scheduler.isEligible(
+                pack.tasks.first { it.id == "r-word-mama" },
+                pack,
+                practiced,
+            ),
+        )
+    }
+
+    @Test
     fun sentenceNotDrawnBeforeSyllablePractice() {
         val fresh = LearnerProgress()
         val session = scheduler.buildSession(pack, fresh, size = 5)
@@ -24,7 +70,11 @@ class SessionSchedulerTest {
     @Test
     fun sentenceStillIneligibleAfterOnlySyllablePractice() {
         val onlyMa = LearnerProgress(
-            atomStats = mapOf("ma" to AtomStats(attempts = 1, correct = 1)),
+            atomStats = mapOf(
+                "letter-m" to SkillStats(attempts = 1, correct = 1),
+                "letter-a" to SkillStats(attempts = 1, correct = 1),
+                "ma" to SkillStats(attempts = 1, correct = 1),
+            ),
         )
         assertFalse(
             scheduler.isEligible(
@@ -41,13 +91,20 @@ class SessionSchedulerTest {
     fun fiveDrawsSpanDomainsWhenPossible() {
         val practiced = LearnerProgress(
             atomStats = mapOf(
-                "ma" to AtomStats(attempts = 1, correct = 1),
-                "mama" to AtomStats(attempts = 1, correct = 1),
-                "haus" to AtomStats(attempts = 1, correct = 1),
-                "ist" to AtomStats(attempts = 1, correct = 1),
-                "im" to AtomStats(attempts = 1, correct = 1),
-                "gehen" to AtomStats(attempts = 1, correct = 1),
-                "gegangen" to AtomStats(attempts = 1, correct = 1),
+                "letter-m" to SkillStats(attempts = 1, correct = 1),
+                "letter-a" to SkillStats(attempts = 1, correct = 1),
+                "letter-o" to SkillStats(attempts = 1, correct = 1),
+                "letter-h" to SkillStats(attempts = 1, correct = 1),
+                "letter-u" to SkillStats(attempts = 1, correct = 1),
+                "letter-s" to SkillStats(attempts = 1, correct = 1),
+                "ma" to SkillStats(attempts = 1, correct = 1),
+                "mama" to SkillStats(attempts = 1, correct = 1),
+                "oma" to SkillStats(attempts = 1, correct = 1),
+                "haus" to SkillStats(attempts = 1, correct = 1),
+                "ist" to SkillStats(attempts = 1, correct = 1),
+                "im" to SkillStats(attempts = 1, correct = 1),
+                "gehen" to SkillStats(attempts = 1, correct = 1),
+                "gegangen" to SkillStats(attempts = 1, correct = 1),
             ),
         )
         val session = scheduler.buildSession(pack, practiced, size = 5)
@@ -61,7 +118,7 @@ class SessionSchedulerTest {
     fun unfinishedSessionIdsRemainResolvable() {
         val progress = LearnerProgress(
             unfinishedSession = app.abcvorschule.progress.SessionSnapshot(
-                taskIds = listOf("r-syll-ma", "m-blumen-1-3", "sp-haus"),
+                taskIds = listOf("r-letter-m", "m-blumen-1-3", "sp-haus"),
                 index = 1,
                 pointsEarned = 1,
                 packId = pack.manifest.packId,
@@ -73,13 +130,32 @@ class SessionSchedulerTest {
     }
 
     @Test
+    fun afterAllLettersOfferedReadingCanIncludeSyllable() {
+        val lettersPracticed = LearnerProgress(
+            atomStats = mapOf(
+                "letter-m" to SkillStats(attempts = 1, correct = 1),
+                "letter-a" to SkillStats(attempts = 1, correct = 1),
+                "letter-o" to SkillStats(attempts = 1, correct = 1),
+                "letter-h" to SkillStats(attempts = 1, correct = 1),
+                "letter-u" to SkillStats(attempts = 1, correct = 1),
+                "letter-s" to SkillStats(attempts = 1, correct = 1),
+            ),
+        )
+        assertTrue(scheduler.isEligible(pack.tasks.first { it.id == "r-syll-ma" }, pack, lettersPracticed))
+        val sessions = (1..12).map { scheduler.buildSession(pack, lettersPracticed, size = 5) }
+        assertTrue(sessions.any { session -> session.any { it.tier == "syllable" || it.tier == "compose" } })
+    }
+
+    @Test
     fun continuePrefersLowMasteryAfterIntro() {
         val progress = LearnerProgress(
             packIntroCompleted = true,
             atomStats = mapOf(
-                "ma" to AtomStats(attempts = 10, correct = 10),
-                "mama" to AtomStats(attempts = 1, correct = 0),
-                "haus" to AtomStats(attempts = 1, correct = 0),
+                "letter-m" to SkillStats(attempts = 10, correct = 10),
+                "letter-a" to SkillStats(attempts = 10, correct = 10),
+                "ma" to SkillStats(attempts = 10, correct = 10),
+                "mama" to SkillStats(attempts = 1, correct = 0),
+                "haus" to SkillStats(attempts = 1, correct = 0),
             ),
         )
         val session = scheduler.buildSession(pack, progress, size = 5, preferLowMastery = true)

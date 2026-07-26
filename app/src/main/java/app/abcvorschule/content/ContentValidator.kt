@@ -47,10 +47,17 @@ object ContentValidator {
                     issues += ValidationIssue("task ${task.id} missing sentence $sid")
                 }
             }
-            (task.slots + task.gapAtomIds).forEach { id ->
+            (task.slots + task.gapAtomIds + task.composeParts).forEach { id ->
                 if (id !in atomIds) {
                     issues += ValidationIssue("task ${task.id} slot/gap missing atom $id")
                 }
+            }
+            if (task.composeDisplays.isNotEmpty() &&
+                task.composeDisplays.size != task.composeParts.size
+            ) {
+                issues += ValidationIssue(
+                    "task ${task.id} composeDisplays size must match composeParts",
+                )
             }
             if (task.domain == Domain.math && task.answer == null) {
                 issues += ValidationIssue("math task ${task.id} needs answer")

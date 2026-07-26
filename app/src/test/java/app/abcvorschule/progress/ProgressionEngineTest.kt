@@ -39,7 +39,7 @@ class ProgressionEngineTest {
     fun resolveCountsAsMissForDownshiftWithoutMastery() {
         var progress = LearnerProgress(
             atomStats = mapOf(
-                "haus" to AtomStats(
+                "haus" to SkillStats(
                     autoScaffold = ScaffoldLevel.Advanced,
                     consecutiveCorrect = 0,
                 ),

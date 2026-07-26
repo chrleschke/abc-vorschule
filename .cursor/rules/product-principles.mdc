@@ -1,0 +1,25 @@
+---
+description: ABC-Vorschul App product and UX principles for all work
+alwaysApply: true
+---
+
+# Product principles (always on)
+
+Full source: `docs/PRODUCT_PRINCIPLES.md`. Follow it for every change.
+
+## Non-negotiables
+
+- Primary user is a preschooler (4–7). **Do not require reading for chrome/instructions.**
+- Action controls may keep a short German word but **must include a clear vector/ASCII icon** (no emoji in buttons). Continue trailing-aligned.
+- Practice chrome: back/forward chevrons above progress bar; speaker in the task area above the title; safe-area insets + extra bottom padding.
+- Success: speak answer → star in upper third → wait for audio before next task. No speak-only “Sag…” screens with only Continue.
+- No decorative pack titles or “Sprich mit!”-style instruction headlines in the practice shell.
+- Fibel order: letters (upper+lower as two frames) → syllables → compose words from syllables → whole words → sentences.
+- Letter TTS: “Finde den Buchstaben {a}.” — not “Aa”. Puzzle tiles without emoji icons; muted “ABC” watermark only.
+- No fake wrong-answer distractors; freeware, ad-free, offline-capable core.
+- Exercise layout: prompt upper-center, answers bottom-center (`ExerciseStage`).
+- Math: exactly 3 choices; miss feedback spoken only; prefer tasks including quantity 1 (singular/plural language).
+
+## When principles conflict with older plan text
+
+Prefer `docs/PRODUCT_PRINCIPLES.md` and explicit user decisions in the current session. Document the drift; do not silently ignore the principles.

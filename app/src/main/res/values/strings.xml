@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ABC-Vorschul App</string>
-    <string name="speak_cue">Sprich mit!</string>
     <string name="try_again">Versuch es noch einmal</string>
     <string name="try_other">Probiere eine andere Antwort</string>
     <string name="near_hint">Du bist nah dran, denk noch einmal nach</string>

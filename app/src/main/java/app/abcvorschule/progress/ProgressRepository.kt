@@ -25,29 +25,31 @@ class ProgressRepository(
     private val key = stringPreferencesKey("learner_progress_v1")
 
     val progressFlow: Flow<LearnerProgress> = dataStore.data.map { prefs ->
-        prefs[key]?.let { decode(it) } ?: LearnerProgress()
+        currentFrom(prefs)
     }
 
     suspend fun current(): LearnerProgress = progressFlow.first()
 
-    suspend fun update(transform: (LearnerProgress) -> LearnerProgress) {
+    suspend fun update(transform: (LearnerProgress) -> LearnerProgress): LearnerProgress {
+        var result = LearnerProgress()
         dataStore.edit { prefs ->
-            val current = prefs[key]?.let { decode(it) } ?: LearnerProgress()
-            prefs[key] = json.encodeToString(transform(current))
+            result = transform(currentFrom(prefs))
+            prefs[key] = json.encodeToString(result)
         }
+        return result
     }
 
-    suspend fun setParentMode(mode: ParentMode) {
+    suspend fun setParentMode(mode: ParentMode): LearnerProgress =
         update { it.copy(parentMode = mode) }
-    }
 
-    suspend fun saveSession(snapshot: SessionSnapshot?) {
+    suspend fun saveSession(snapshot: SessionSnapshot?): LearnerProgress =
         update { it.copy(unfinishedSession = snapshot) }
-    }
 
-    suspend fun markPackIntroCompleted() {
+    suspend fun markPackIntroCompleted(): LearnerProgress =
         update { it.copy(packIntroCompleted = true) }
-    }
+
+    private fun currentFrom(prefs: Preferences): LearnerProgress =
+        prefs[key]?.let { decode(it) } ?: LearnerProgress()
 
     private fun decode(raw: String): LearnerProgress =
         runCatching { json.decodeFromString<LearnerProgress>(raw) }.getOrDefault(LearnerProgress())

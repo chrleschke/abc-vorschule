@@ -3,10 +3,10 @@ package app.abcvorschule.ui.exercise
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.theme.NightElevated
 import app.abcvorschule.ui.theme.SoftSand
 
@@ -28,36 +30,87 @@ fun VisualQuantityBoard(
     choices: List<Int>,
     onChoose: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    missCount: Int = 0,
+    onResolve: (() -> Unit)? = null,
+    ttsAvailable: Boolean = false,
+    speaking: Boolean = false,
+    onSpeakPrompt: () -> Unit = {},
 ) {
-    Column(
+    ExerciseStage(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = List(left) { emoji }.joinToString(" ") + "  +  " + List(right) { emoji }.joinToString(" "),
-            style = MaterialTheme.typography.headlineMedium,
-            color = SoftSand,
-        )
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            choices.forEach { value ->
-                Box(
-                    modifier = Modifier
-                        .background(NightElevated, RoundedCornerShape(18.dp))
-                        .clickable { onChoose(value) }
-                        .padding(horizontal = 20.dp, vertical = 14.dp)
-                        .testTag("math_choice_$value"),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = List(value) { emoji }.joinToString(""),
-                        style = MaterialTheme.typography.titleLarge,
-                    )
+        prompt = {
+            TaskPromptChrome(
+                title = null,
+                ttsAvailable = ttsAvailable,
+                speaking = speaking,
+                onSpeakPrompt = onSpeakPrompt,
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                QuantityCluster(emoji = emoji, count = left, emojiSizeSp = 44)
+                Text(
+                    text = "+",
+                    style = MaterialTheme.typography.displayMedium,
+                    color = SoftSand,
+                )
+                QuantityCluster(emoji = emoji, count = right, emojiSizeSp = 44)
+            }
+        },
+        answers = {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                choices.forEach { value ->
+                    Column(
+                        modifier = Modifier
+                            .background(NightElevated, RoundedCornerShape(18.dp))
+                            .clickable { onChoose(value) }
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                            .testTag("math_choice_$value"),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        QuantityCluster(emoji = emoji, count = value, emojiSizeSp = 28, showNumber = true)
+                    }
                 }
             }
+            if (missCount >= 2 && onResolve != null) {
+                AbcResolveButton(onClick = onResolve)
+            }
+        },
+    )
+}
+
+@Composable
+fun QuantityCluster(
+    emoji: String,
+    count: Int,
+    emojiSizeSp: Int,
+    modifier: Modifier = Modifier,
+    showNumber: Boolean = true,
+) {
+    val clusters = QuantityGrouping.clusters(count)
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        clusters.forEach { size ->
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                repeat(size) {
+                    Text(text = emoji, fontSize = emojiSizeSp.sp)
+                }
+            }
+        }
+        if (showNumber) {
+            Text(
+                text = count.toString(),
+                style = MaterialTheme.typography.headlineMedium,
+                color = SoftSand,
+            )
         }
     }
 }

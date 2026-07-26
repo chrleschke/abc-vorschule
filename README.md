@@ -1,13 +1,22 @@
 # ABC-Vorschul App
 
-Free, ad-free Android preschool app (ages 4–7) for German reading, speaking, and math practice.
-Dark-only UI, offline after install, mixed five-task sessions over a shared content graph.
+Kostenlose, werbefreie Android-Vorschul-App (ca. 4–7 Jahre) für Lesen, Sprechen und Rechnen auf Deutsch.
+Dunkles UI, offline nach Installation, gemischte Kurz-Sessions über einen gemeinsamen Content-Graphen.
+
+## Dokumentation
+
+| Dokument | Inhalt |
+|----------|--------|
+| [`docs/PRODUCT_PRINCIPLES.md`](docs/PRODUCT_PRINCIPLES.md) | Produkt- und UX-Grundprinzipien (verbindlich) |
+| [`AGENTS.md`](AGENTS.md) | Wie Agents arbeiten sollen (brainstorm → … → doc update) |
+| [`docs/plans/`](docs/plans/) | Unified Plans / Product Contracts |
+| `.cursor/rules/` | Immer aktive Cursor-Regeln |
 
 ## Requirements
 
 - JDK 17+
 - Android SDK (compileSdk 36)
-- Android emulator or device (German TTS voice recommended)
+- Emulator oder Gerät (deutsche TTS-Stimme empfohlen)
 
 ## Build
 
@@ -24,16 +33,17 @@ Install:
 
 ## Manual offline session smoke
 
-1. Enable airplane mode.
-2. Launch **ABC-Vorschul App** — dark home/practice shell appears.
-3. Complete a five-task session spanning reading, speech (“Sprich mit!” cue), and math.
-4. Long-press **⋯** (~1.5s) → switch to **Mit Hilfe**, confirm scaffolds/silhouettes.
-5. Force a wrong math answer twice → **Auflösen** → no points for resolve.
-6. Background mid-session and reopen → session resumes at the next task index.
-7. Finish session → reward summary → **Weiter** starts a new mix.
+1. Flugmodus an.
+2. **ABC-Vorschul App** starten — Practice-Shell ohne Pack-Titel-Zeile.
+3. Fünf Aufgaben: Lesen beginnt mit Buchstaben; Sprechen zeigt großen Sprech-Impuls (Icon) + **➡️ Weiter**; Rechnen mit gruppierten Mengen.
+4. Ab der zweiten Session: bekannte Kacheln erscheinen als Distraktoren im Antwort-Tray; falsche Kachel → gesprochener Hinweis. Drag neben einen Slot → Kachel schnappt zurück.
+5. Langes Drücken auf **⋯** (~1,5 s) → **Mit Hilfe**.
+6. Mathe zweimal falsch → **Auflösen** → keine Punkte für Resolve.
+7. App mid-session in den Hintergrund → wieder öffnen → Session setzt fort.
+8. Sessionende → Belohnung → **Weiter** startet neuen Mix.
 
 ## Product notes
 
-- No ads, no network permission required for core practice.
-- Parent difficulty: Auto / Mit Hilfe / Ohne Hilfe behind the long-press gate.
-- Content pack: `app/src/main/assets/content/`.
+- Keine Werbung, keine Netz-Permission für die Kernpraxis.
+- Eltern-Hilfestufe: Auto / Mit Hilfe / Ohne Hilfe hinter Long-Press-Gate.
+- Content-Pack: `app/src/main/assets/content/` (Fibel: Buchstabe → Silbe → Wortbau → Wort → Satz).

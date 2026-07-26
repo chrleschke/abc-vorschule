@@ -58,6 +58,7 @@ fun AbcApp(onFinish: () -> Unit = {}) {
         ttsAvailable = ttsAvailable,
         speaking = speaking,
         onSpeak = speech::speak,
+        onSpeakAndAwait = speech::speakAndAwait,
         onStopSpeak = speech::stop,
     )
 }

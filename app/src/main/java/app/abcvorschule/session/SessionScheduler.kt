@@ -5,6 +5,7 @@ import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.Domain
 import app.abcvorschule.content.TaskTemplate
 import app.abcvorschule.content.TaskType
+import app.abcvorschule.content.tierRank
 import app.abcvorschule.progress.LearnerProgress
 import app.abcvorschule.progress.ProgressionEngine
 import kotlin.random.Random
@@ -24,7 +25,25 @@ class SessionScheduler(
         val byDomain = Domain.entries.associateWith { domain ->
             val list = eligible.filter { it.domain == domain }.toMutableList()
             list.shuffle(random)
-            if (preferLowMastery) {
+            if (domain == Domain.reading) {
+                // Focus the lowest tier that still has unoffered tasks so letters
+                // don't starve syllables/compose forever after first practice.
+                val focusTier = list.map { it.tierRank() }.distinct().sorted()
+                val focus = focusTier.firstOrNull { rank ->
+                    list.any { it.tierRank() == rank && !taskOffered(it, progress) }
+                }
+                if (focus != null) {
+                    list.sortWith(
+                        compareBy<TaskTemplate> { if (it.tierRank() == focus) 0 else 1 }
+                            .thenBy { it.tierRank() }
+                            .thenBy { if (preferLowMastery) masteryFor(it, progress) else 0.0 },
+                    )
+                } else if (preferLowMastery) {
+                    list.sortBy { masteryFor(it, progress) }
+                } else {
+                    list.sortBy { it.tierRank() }
+                }
+            } else if (preferLowMastery) {
                 list.sortBy { masteryFor(it, progress) }
             }
             list
@@ -70,12 +89,25 @@ class SessionScheduler(
             }
             TaskType.speech_cloze -> {
                 val atomId = task.targetAtomId ?: task.atomId ?: return false
-                // Speech may interleave once prerequisites were offered.
                 atomReady(pack.atom(atomId), progress)
             }
             TaskType.cloze -> {
                 val atomId = task.atomId ?: return false
-                atomReady(pack.atom(atomId), progress)
+                val atom = pack.atom(atomId)
+                when (task.tier) {
+                    "letter" -> true
+                    "syllable" -> atomReady(atom, progress)
+                    "compose" -> atomReady(atom, progress) &&
+                        task.composeParts.distinct().all { it == atomId || offered(it, progress) }
+                    "word" -> {
+                        val hasComposeIntro = pack.tasks.any {
+                            it.tier == "compose" && it.atomId == atomId
+                        }
+                        // Words with a compose intro unlock after that practice; others after prereqs.
+                        if (hasComposeIntro) offered(atomId, progress) else atomReady(atom, progress)
+                    }
+                    else -> atomReady(atom, progress)
+                }
             }
             TaskType.visual_add, TaskType.number_entry -> true
         }
@@ -83,6 +115,11 @@ class SessionScheduler(
 
     private fun offered(atomId: String, progress: LearnerProgress): Boolean =
         (progress.atomStats[atomId]?.attempts ?: 0) > 0
+
+    private fun taskOffered(task: TaskTemplate, progress: LearnerProgress): Boolean {
+        val id = task.atomId ?: task.targetAtomId ?: return false
+        return offered(id, progress)
+    }
 
     private fun atomReady(atom: Atom, progress: LearnerProgress): Boolean {
         if (atom.prerequisites.isEmpty()) return true
@@ -93,18 +130,13 @@ class SessionScheduler(
         return when (task.domain) {
             Domain.reading, Domain.speech -> {
                 val id = task.targetAtomId ?: task.atomId ?: task.gapAtomIds.firstOrNull()
+                    ?: task.composeParts.firstOrNull()
                 val stats = id?.let { progress.atomStats[it] } ?: return 0.0
                 ProgressionEngine.masteryScore(stats)
             }
             Domain.math -> {
-                val key = ProgressionEngine.mathKey(
-                    operation = task.operation ?: "add",
-                    left = task.left ?: 0,
-                    right = task.right ?: 0,
-                    band = task.difficultyBand,
-                )
-                val stats = progress.mathStats[key] ?: return 0.0
-                if (stats.attempts == 0) 0.0 else stats.correct.toDouble() / stats.attempts
+                val stats = progress.mathStats[ProgressionEngine.mathKey(task)] ?: return 0.0
+                ProgressionEngine.masteryScore(stats)
             }
         }
     }

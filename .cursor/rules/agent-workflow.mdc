@@ -1,0 +1,27 @@
+---
+description: Required agent workflow and self-updating documentation
+alwaysApply: true
+---
+
+# Agent workflow
+
+Canonical guide: `AGENTS.md`.
+
+## Default pipeline for meaningful work
+
+1. brainstorm → 2. plan → 3. doc-review → 4. work → 5. code-review → 6. simplify-code → 7. doc update
+
+Skip early steps only for tiny, well-scoped fixes. **Never skip documentation updates when product/UX/process rules changed.**
+
+## Self-update documentation
+
+Proactively update (without waiting to be asked):
+
+- `docs/PRODUCT_PRINCIPLES.md`
+- `AGENTS.md`
+- `README.md`
+- `.cursor/rules/*`
+
+when behavior, pedagogy, UX chrome rules, or the working process change.
+
+Do not use plan files as a progress log; progress lives in git.

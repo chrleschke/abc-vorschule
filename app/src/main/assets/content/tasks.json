@@ -1,13 +1,87 @@
 {
   "tasks": [
     {
+      "id": "r-letter-m",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "letter-m",
+      "promptTts": "Finde den Buchstaben m.",
+      "slots": ["letter-m"],
+      "tier": "letter"
+    },
+    {
+      "id": "r-letter-a",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "letter-a",
+      "promptTts": "Finde den Buchstaben a.",
+      "slots": ["letter-a"],
+      "tier": "letter"
+    },
+    {
+      "id": "r-letter-o",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "letter-o",
+      "promptTts": "Finde den Buchstaben o.",
+      "slots": ["letter-o"],
+      "tier": "letter"
+    },
+    {
+      "id": "r-letter-h",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "letter-h",
+      "promptTts": "Finde den Buchstaben h.",
+      "slots": ["letter-h"],
+      "tier": "letter"
+    },
+    {
+      "id": "r-letter-u",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "letter-u",
+      "promptTts": "Finde den Buchstaben u.",
+      "slots": ["letter-u"],
+      "tier": "letter"
+    },
+    {
+      "id": "r-letter-s",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "letter-s",
+      "promptTts": "Finde den Buchstaben s.",
+      "slots": ["letter-s"],
+      "tier": "letter"
+    },
+    {
       "id": "r-syll-ma",
       "domain": "reading",
       "type": "cloze",
       "atomId": "ma",
-      "promptTts": "Lege die Silbe ma.",
+      "promptTts": "M und A ergeben die Silbe ma. Lege ma.",
       "slots": ["ma"],
       "tier": "syllable"
+    },
+    {
+      "id": "r-compose-oma",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "oma",
+      "promptTts": "Baue das Wort Oma aus O und ma.",
+      "composeParts": ["letter-o", "ma"],
+      "composeDisplays": ["O", "ma"],
+      "tier": "compose"
+    },
+    {
+      "id": "r-compose-mama",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "mama",
+      "promptTts": "Baue das Wort Mama aus Ma und ma.",
+      "composeParts": ["ma", "ma"],
+      "composeDisplays": ["Ma", "ma"],
+      "tier": "compose"
     },
     {
       "id": "r-word-mama",
@@ -28,6 +102,33 @@
       "tier": "word"
     },
     {
+      "id": "r-word-haus",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "haus",
+      "promptTts": "Lege das Wort Haus.",
+      "slots": ["haus"],
+      "tier": "word"
+    },
+    {
+      "id": "r-word-ist",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "ist",
+      "promptTts": "Lege das Wort ist.",
+      "slots": ["ist"],
+      "tier": "word"
+    },
+    {
+      "id": "r-word-im",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "im",
+      "promptTts": "Lege das Wort im.",
+      "slots": ["im"],
+      "tier": "word"
+    },
+    {
       "id": "r-sent-mama-haus",
       "domain": "reading",
       "type": "sentence_cloze",
@@ -42,7 +143,7 @@
       "type": "speech_cloze",
       "atomId": "gegangen",
       "sentenceId": "s-mama-gegangen",
-      "promptTts": "Mama ist nach Hause gegangen. Sag: gegangen.",
+      "promptTts": "Mama ist nach Hause gegangen. Lege das Wort gegangen.",
       "targetAtomId": "gegangen",
       "slots": ["gegangen"]
     },
@@ -51,18 +152,32 @@
       "domain": "speech",
       "type": "speech_cloze",
       "atomId": "mama",
-      "promptTts": "Sag: Mama.",
+      "promptTts": "Bilde das Wort Mama.",
       "targetAtomId": "mama",
-      "slots": ["mama"]
+      "composeParts": ["ma", "ma"],
+      "composeDisplays": ["Ma", "ma"]
     },
     {
       "id": "sp-haus",
       "domain": "speech",
       "type": "speech_cloze",
       "atomId": "haus",
-      "promptTts": "Sag: Haus.",
+      "promptTts": "Bilde das Wort Haus.",
       "targetAtomId": "haus",
-      "slots": ["haus"]
+      "composeParts": ["letter-h", "letter-a", "letter-u", "letter-s"],
+      "composeDisplays": ["H", "a", "u", "s"],
+      "tier": "spell"
+    },
+    {
+      "id": "m-blumen-1-1",
+      "domain": "math",
+      "type": "visual_add",
+      "atomId": "blume",
+      "promptTts": "Eine Blume und eine Blume. Wie viele Blumen?",
+      "left": 1,
+      "right": 1,
+      "answer": 2,
+      "operation": "add"
     },
     {
       "id": "m-blumen-1-3",
@@ -76,6 +191,17 @@
       "operation": "add"
     },
     {
+      "id": "m-hunde-1-2",
+      "domain": "math",
+      "type": "visual_add",
+      "atomId": "hund",
+      "promptTts": "Ein Hund und zwei Hunde. Wie viele Hunde?",
+      "left": 1,
+      "right": 2,
+      "answer": 3,
+      "operation": "add"
+    },
+    {
       "id": "m-hunde-2-2",
       "domain": "math",
       "type": "visual_add",
@@ -84,6 +210,17 @@
       "left": 2,
       "right": 2,
       "answer": 4,
+      "operation": "add"
+    },
+    {
+      "id": "m-baeume-1-4",
+      "domain": "math",
+      "type": "visual_add",
+      "atomId": "baum",
+      "promptTts": "Ein Baum und vier Bäume. Wie viele Bäume?",
+      "left": 1,
+      "right": 4,
+      "answer": 5,
       "operation": "add"
     },
     {
@@ -108,6 +245,17 @@
       "left": 1,
       "right": 1,
       "answer": 2,
+      "operation": "add"
+    },
+    {
+      "id": "m-maedchen-1-2",
+      "domain": "math",
+      "type": "visual_add",
+      "atomId": "maedchen",
+      "promptTts": "Ein Mädchen und zwei Mädchen. Wie viele Mädchen?",
+      "left": 1,
+      "right": 2,
+      "answer": 3,
       "operation": "add"
     }
   ]

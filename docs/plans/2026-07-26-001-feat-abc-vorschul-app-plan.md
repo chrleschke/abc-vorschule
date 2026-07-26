@@ -44,7 +44,7 @@ Existing language apps often rely on wrong-answer distractors and English-first 
 - **German-only v1; localization later.** `(session-settled: user-directed — chosen over multi-language v1: confirmed at synthesis)`
 - **No child profiles in v1.** `(session-settled: user-directed — chosen over multi-profile v1: confirmed at synthesis)`
 - **Plan all three modules from the start; first shippable value is a mini content pack (not a path UI).** `(session-settled: user-directed — chosen over single-module MVP: plan everything; mini path as first value)`
-- **Session UX is a simple task mix; no path/map screen.** `(session-settled: user-directed — chosen over guided path screen: "einfacher Mix… kein Pfad screen nötig")`
+- **Session UX is a simple task mix; no path/map screen.** `(session-settled: user-directed — chosen over guided path screen: "einfacher Mix… kein Pfad screen nötig")` **⚠ Superseded 2026-07-26 — see Addendum A1 below: a Start-Index path screen is now planned as the v1 entry point.**
 - **Content as reusable atoms in a content repository/graph** (e.g. Haus + image used across sentences and task types). `(session-settled: user-directed — chosen over duplicated per-exercise content: explicit content-repo requirement)`
 - **Correct German capitalization from first words/sentences;** syllables building toward words prefer lowercase, composed words/sentences use normal orthography. `(session-settled: user-approved — chosen over all-caps-first curriculum: agent pedagogical recommendation accepted via "entscheide")`
 - **Difficulty control is a three-state ⋯ menu (Auto / Beginner / Advanced) behind a lightweight parent gate;** when Beginner or Advanced is forced, auto pauses until Auto is selected again. `(session-settled: user-directed — chosen over auto-only or child-only control; doc-review clarified Auto as explicit state + parent gate)`
@@ -189,7 +189,7 @@ Existing language apps often rely on wrong-answer distractors and English-first 
 - Custom family names/words
 - Localization beyond German
 - Child profiles / multi-child switching
-- Path/map/campaign screens
+- ~~Path/map/campaign screens~~ → **promoted to in-scope for the next unit, see Addendum A1** (2026-07-26)
 - Custom recorded voice packs (beyond system TTS)
 - Full illustrated asset pipeline beyond emoji/simple images
 - Microphone-based pronunciation scoring / speech recognition
@@ -491,3 +491,51 @@ docs/plans/2026-07-26-001-feat-abc-vorschul-app-plan.md
 - Mini pack validates and schedules balanced sessions.
 - README documents how to run tests and the offline smoke script.
 - No blocking open questions remain.
+
+---
+
+## Addendum A1 (2026-07-26): Start-Index Path Screen
+
+**Status:** Planned, not implemented. This addendum is the planning deliverable requested by the user ("Plane eine Start-Index Seite…") — no code was written for it in this session.
+
+**Supersedes:** The Key Decision "Session UX is a simple task mix; no path/map screen" and the Scope Boundary "Path/map/campaign screens" (both above). User confirmed (2026-07-26, choice among three options): **the path replaces the current direct-to-mix entry** — the app opens on the path; tapping a node starts a focused mini-session for that node instead of the domain-rotating 5-task mix.
+
+### Goal
+
+A calm, winding path (Duolingo-style S-curve) as the app's start screen. Each node's label is minimal — a single letter (`A`), a syllable (`ma`), or a word/word-pair for atoms introduced together (`Oma / Mama`) — never an instruction sentence, matching the "no reading required to act" principle.
+
+### Node model
+
+- One node per **reading atom**, in Fibel tier order (`tierRank`: letter → syllable → compose → word → sentence) — reusing the existing content-graph order, not a new curriculum.
+- Atoms introduced together via the same compose task (e.g. `Oma`/`Mama` both unlock off `ma` + `letter-o`) render as one combined node with both labels, since they become available at the same moment.
+- Node label = `Atom.display` (or the combined pair joined with " / "); no emoji, Vektor dot/line only for the path itself (dark theme, `SoftMint`/`NightElevated` palette, consistent with existing components).
+
+### Node state (derived, no new persistence)
+
+Reuses `LearnerProgress.atomStats` and `SessionScheduler.isEligible` / `ProgressionEngine.masteryScore` — no new DataStore fields needed:
+
+- **Locked** — prerequisites not yet offered (`atomReady` false).
+- **Available** — eligible, not yet attempted.
+- **In progress** — attempted, mastery below threshold.
+- **Mastered** — mastery at/above threshold (reuses existing scaffold-upgrade threshold as a first pass; may need its own threshold later).
+
+### Interaction
+
+- Tap an unlocked node → start a short session (3–5 tasks) scoped to *that* node's atom (and its directly dependent compose/word/sentence tasks that are already eligible), instead of `SessionScheduler.buildSession`'s full domain rotation.
+- Locked nodes are tappable only for a "not yet" audio cue (no silent no-op — preschoolers need feedback that a tap registered).
+- Back from a focused session returns to the path; the next newly-unlocked node gets a visual highlight.
+
+### Open question (blocking before implementation, not before this plan)
+
+**Math and speech don't fit a linear atom path.** The path above only covers reading's Fibel order. Two options for the next planning round:
+1. Keep a secondary "Freies Üben" entry (button on/near the path) that runs the existing domain-mixed session for math/speech practice.
+2. Give math and speech their own short, non-blocking node rows alongside the reading path (e.g. a horizontal strip per domain).
+This needs a user decision before U9 is scoped as an implementation unit — flagged here rather than decided unilaterally, since it changes the path's shape.
+
+### Suggested implementation unit (U9, not yet scoped/started)
+
+- **Goal:** Ship the path as the new app entry point per the model above.
+- **Depends on:** U2 (content graph), U3 (progress/mastery), U4 (session scheduler — needs a new `buildFocusedSession(atomId, pack, progress)` alongside the existing `buildSession`).
+- **New files (proposed):** `ui/path/PathScreen.kt`, `ui/path/PathViewModel.kt`, `ui/path/PathModels.kt`.
+- **Modified:** `MainActivity.kt`/`AbcApp` (new top-level screen before `TaskShell`), `SessionScheduler.kt` (focused-session builder), `SessionViewModel.kt` (accept an optional focus atom on session start).
+- **Not started:** this is scope for a future brainstorm → plan → work cycle once the math/speech open question above is resolved.

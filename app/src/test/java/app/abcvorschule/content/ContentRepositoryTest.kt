@@ -18,7 +18,8 @@ class ContentRepositoryTest {
         }
         val speech = pack.tasks.first { it.id == "sp-gegangen" }
         assertNotNull(pack.atom(speech.targetAtomId!!))
-        assertTrue(pack.atom("ma").prerequisites.isEmpty())
+        assertEquals(listOf("letter-m", "letter-a"), pack.atom("ma").prerequisites)
         assertEquals(listOf("ma"), pack.atom("mama").prerequisites)
+        assertTrue(pack.tasks.any { it.id == "r-compose-mama" && it.composeParts == listOf("ma", "ma") })
     }
 }

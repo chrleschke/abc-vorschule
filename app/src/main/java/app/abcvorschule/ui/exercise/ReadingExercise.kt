@@ -1,11 +1,10 @@
 package app.abcvorschule.ui.exercise
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,12 +15,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.content.Atom
+import app.abcvorschule.content.AtomKind
 import app.abcvorschule.content.Sentence
-import app.abcvorschule.content.TaskTemplate
-import app.abcvorschule.content.TaskType
+import app.abcvorschule.content.composePartsFor
+import app.abcvorschule.content.isComposeTask
+import app.abcvorschule.content.isLetterTask
+import app.abcvorschule.content.isSpellTask
+import app.abcvorschule.content.isSyllableTask
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.session.ScheduledTask
-import app.abcvorschule.ui.theme.SoftSand
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -29,74 +31,100 @@ fun ReadingExercise(
     task: ScheduledTask,
     atoms: Map<String, Atom>,
     sentence: Sentence?,
+    ttsAvailable: Boolean,
+    speaking: Boolean,
+    onSpeakPrompt: () -> Unit,
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
+    onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val template = task.template
-    val gapIds = gapAtomIds(template)
+    val atom = template.atomId?.let { atoms[it] }
+    val parts = template.composePartsFor(atom)
+    val atomIds = parts.map { it.atomId }
+    // Letter frames map upper/lowercase to screen position, not recall — always show
+    // the silhouette so the child knows where each case goes, regardless of mastery.
+    val scaffoldsForGaps = if (template.isLetterTask()) {
+        task.scaffolds.mapValues { ScaffoldLevel.Beginner }
+    } else {
+        task.scaffolds
+    }
     val gaps = ScaffoldMapping.gaps(
-        atomIds = gapIds,
-        displays = gapIds.associateWith { atoms[it]?.display ?: it },
-        emojis = gapIds.associateWith { atoms[it]?.emoji ?: "🔤" },
-        scaffolds = task.scaffolds,
+        parts = parts,
+        displays = atomIds.associateWith { atoms[it]?.display ?: it },
+        emojis = atomIds.associateWith { atoms[it]?.emoji.orEmpty() },
+        scaffolds = scaffoldsForGaps,
     )
     var misses by remember(template.id) { mutableIntStateOf(0) }
+    val scoredIds = remember(template.id, parts) {
+        (atomIds + listOfNotNull(template.atomId)).distinct()
+    }
+    val literacyFocus = template.isLetterTask() || template.isSyllableTask() ||
+        atom?.kind == AtomKind.letter || atom?.kind == AtomKind.syllable
+    val spell = template.isSpellTask()
+    val wordTitle = atom?.display.takeIf {
+        template.isComposeTask() || spell || atom?.kind == AtomKind.word
+    }
+    val title = when {
+        sentence != null -> null
+        wordTitle != null -> wordTitle
+        literacyFocus -> "ABC"
+        else -> atom?.display
+    }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        if (sentence != null) {
-            val gapSet = gapIds.toSet()
-            val displays = sentence.displayOverride
-                ?: sentence.atomIds.map { atoms[it]?.display ?: it }
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                sentence.atomIds.forEachIndexed { index, atomId ->
-                    val shown = displays.getOrElse(index) { atoms[atomId]?.display ?: atomId }
-                    if (atomId in gapSet) {
-                        Text(
-                            text = "____",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = SoftSand.copy(alpha = 0.55f),
-                        )
-                    } else {
-                        Text(
-                            text = shown,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+    DragSlotBoard(
+        gaps = gaps,
+        distractors = task.distractors.map {
+            TrayTile(key = "dx-${it.atomId}-${it.display}", display = it.display, atomId = it.atomId, isDistractor = true)
+        },
+        missCount = misses,
+        showSyllableDots = template.isComposeTask() && !template.isLetterTask() && !spell,
+        arrangeSlotsInRow = literacyFocus || template.isComposeTask() || spell || parts.size > 1,
+        largeTypography = literacyFocus || template.isComposeTask() || spell,
+        // Sentence gaps render inline in the sentence text below, not as a separate row.
+        showDefaultGapRow = sentence == null,
+        onSpeakText = onSpeak,
+        modifier = modifier.fillMaxSize(),
+        prompt = {
+            TaskPromptChrome(
+                title = title,
+                ttsAvailable = ttsAvailable,
+                speaking = speaking,
+                onSpeakPrompt = onSpeakPrompt,
+                mutedTitle = title == "ABC",
+                onTitleSpeak = { label -> if (label != "ABC") onSpeak(label) else onSpeakPrompt() },
+            )
+            if (sentence != null) {
+                val displays = sentence.displayOverride
+                    ?: sentence.atomIds.map { atoms[it]?.display ?: it }
+                // Consume gaps in sentence order; supports an atom repeated in one sentence.
+                val gapQueue = gaps.groupBy { it.atomId }.mapValues { it.value.toMutableList() }
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    sentence.atomIds.forEachIndexed { index, atomId ->
+                        val shown = displays.getOrElse(index) { atoms[atomId]?.display ?: atomId }
+                        val gap = gapQueue[atomId]?.removeFirstOrNull()
+                        if (gap != null) {
+                            GapTarget(gap)
+                        } else {
+                            Text(
+                                text = shown,
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.clickable { onSpeak(shown) },
+                            )
+                        }
                     }
                 }
             }
-        } else {
-            Text(
-                text = atoms[template.atomId]?.emoji ?: "📖",
-                style = MaterialTheme.typography.displayLarge,
-            )
-        }
-        DragSlotBoard(
-            gaps = gaps,
-            missCount = misses,
-            onCorrect = { onResult(true, false, gapIds) },
-            onMiss = { atomId ->
-                misses += 1
-                onResult(false, false, listOf(atomId))
-            },
-            onResolve = { onResult(false, true, gapIds) },
-        )
-    }
+        },
+        onCorrect = { onResult(true, false, scoredIds) },
+        onMiss = { atomId ->
+            misses += 1
+            onResult(false, false, listOf(atomId))
+        },
+        onResolve = { onResult(false, true, scoredIds) },
+    )
 }
-
-fun gapAtomIds(template: TaskTemplate): List<String> = when (template.type) {
-    TaskType.sentence_cloze -> template.gapAtomIds
-    TaskType.cloze, TaskType.speech_cloze -> template.slots.ifEmpty {
-        listOfNotNull(template.targetAtomId ?: template.atomId)
-    }
-    else -> emptyList()
-}
-
-fun mixedScaffoldExample(
-    scaffolds: Map<String, ScaffoldLevel>,
-): Boolean = scaffolds.values.toSet().size > 1

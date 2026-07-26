@@ -7,7 +7,7 @@ import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.ContentRepository
 import app.abcvorschule.content.Domain
 import app.abcvorschule.content.TaskTemplate
-import app.abcvorschule.content.TaskType
+import app.abcvorschule.content.composePartsFor
 import app.abcvorschule.progress.AttemptOutcome
 import app.abcvorschule.progress.LearnerProgress
 import app.abcvorschule.progress.ParentMode
@@ -15,11 +15,14 @@ import app.abcvorschule.progress.ProgressRepository
 import app.abcvorschule.progress.ProgressionEngine
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.progress.SessionSnapshot
+import app.abcvorschule.ui.exercise.MathHinting
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SessionViewModel(
     private val contentRepository: ContentRepository,
@@ -39,7 +42,7 @@ class SessionViewModel(
 
     private suspend fun bootstrap() {
         runCatching {
-            pack = contentRepository.load()
+            pack = withContext(Dispatchers.IO) { contentRepository.load() }
             progress = progressRepository.current()
             val snapshot = progress.unfinishedSession
             if (snapshot != null && snapshot.packId == pack.manifest.packId && snapshot.taskIds.isNotEmpty()) {
@@ -63,8 +66,6 @@ class SessionViewModel(
             points = progress.points,
             sessionPoints = 0,
             ready = true,
-            speechUnlocked = false,
-            packTitle = pack.manifest.title,
         )
         persistSnapshot()
     }
@@ -72,30 +73,54 @@ class SessionViewModel(
     private fun restore(snapshot: SessionSnapshot) {
         val templates = snapshot.taskIds.mapNotNull { id -> pack.tasks.find { it.id == id } }
         val scheduled = templates.map { schedule(it, progress) }
+        val idx = snapshot.index.coerceIn(0, scheduled.lastIndex.coerceAtLeast(0))
         _ui.value = SessionUiState(
             screen = AppScreen.Practice,
             tasks = scheduled,
-            index = snapshot.index.coerceIn(0, scheduled.lastIndex.coerceAtLeast(0)),
+            index = idx,
             points = progress.points,
             sessionPoints = snapshot.pointsEarned,
             ready = true,
-            speechUnlocked = false,
-            packTitle = pack.manifest.title,
         )
     }
 
     fun contentPack(): ContentPack? = if (this::pack.isInitialized) pack else null
 
     private fun schedule(template: TaskTemplate, progress: LearnerProgress): ScheduledTask {
-        val gapIds = when (template.type) {
-            TaskType.sentence_cloze -> template.gapAtomIds
-            TaskType.cloze, TaskType.speech_cloze -> template.slots.ifEmpty {
-                listOfNotNull(template.targetAtomId ?: template.atomId)
-            }
-            else -> emptyList()
+        val atom = template.atomId?.let { pack.atoms[it] }
+        val parts = template.composePartsFor(atom)
+        val scaffolds = parts.map { it.atomId }.distinct()
+            .associateWith { ProgressionEngine.scaffoldForAtom(progress, it) }
+        val distractors = DistractorPicker.pick(template, parts, pack, progress)
+        return ScheduledTask(template, scaffolds, distractors)
+    }
+
+    fun goPreviousTask() {
+        _ui.update { state ->
+            if (!state.canGoPrevious || state.successPhase != SuccessPhase.Idle) state
+            else state.copy(
+                index = state.index - 1,
+                speakCue = null,
+                successPhase = SuccessPhase.Idle,
+                successSpeakText = null,
+            )
         }
-        val scaffolds = gapIds.associateWith { ProgressionEngine.scaffoldForAtom(progress, it) }
-        return ScheduledTask(template, scaffolds)
+    }
+
+    fun goNextTask() {
+        _ui.update { state ->
+            if (!state.canGoNext || state.successPhase != SuccessPhase.Idle) state
+            else state.copy(
+                index = state.index + 1,
+                speakCue = null,
+                successPhase = SuccessPhase.Idle,
+                successSpeakText = null,
+            )
+        }
+    }
+
+    fun clearSpeakCue() {
+        _ui.update { it.copy(speakCue = null) }
     }
 
     fun onSpeakerFallbackNeeded(): Boolean {
@@ -112,8 +137,38 @@ class SessionViewModel(
         }
     }
 
-    fun unlockSpeech() {
-        _ui.update { it.copy(speechUnlocked = true) }
+    fun successSpeakTextForCurrent(): String {
+        val task = _ui.value.current?.template ?: return ""
+        return when (task.domain) {
+            Domain.math -> (task.answer ?: ((task.left ?: 0) + (task.right ?: 0))).toString()
+            Domain.reading, Domain.speech -> {
+                val id = task.atomId ?: task.targetAtomId
+                pack.atoms[id]?.display
+                    ?: task.composeDisplays.joinToString("").ifBlank { task.promptTts }
+            }
+        }
+    }
+
+    fun onSuccessSpeechFinished() {
+        _ui.update {
+            if (it.successPhase != SuccessPhase.SpeakAnswer) it
+            else it.copy(
+                successPhase = SuccessPhase.ShowBurst,
+                successSpeakText = null,
+            )
+        }
+    }
+
+    fun onSuccessBurstFinished() {
+        viewModelScope.launch {
+            _ui.update {
+                it.copy(
+                    successPhase = SuccessPhase.Idle,
+                    successSpeakText = null,
+                )
+            }
+            advance()
+        }
     }
 
     fun openDifficultySheet() {
@@ -126,8 +181,7 @@ class SessionViewModel(
 
     fun setParentMode(mode: ParentMode) {
         viewModelScope.launch {
-            progressRepository.setParentMode(mode)
-            progress = progressRepository.current()
+            progress = progressRepository.setParentMode(mode)
             _ui.update { state ->
                 // F7: mid-task difficulty changes apply to subsequent tasks only.
                 val updated = state.tasks.mapIndexed { i, scheduled ->
@@ -169,18 +223,11 @@ class SessionViewModel(
         }
     }
 
-    fun clearFeedback() {
-        _ui.update { it.copy(feedback = null, lastSuccess = false) }
-    }
-
     fun submitReadingAnswer(correct: Boolean, resolved: Boolean, atomIds: List<String>) {
         viewModelScope.launch {
-            val outcome = when {
-                resolved -> AttemptOutcome.Resolve
-                correct -> AttemptOutcome.Correct
-                else -> AttemptOutcome.Miss
-            }
-            progressRepository.update { current ->
+            if (_ui.value.successPhase != SuccessPhase.Idle) return@launch
+            val outcome = outcomeFor(correct = correct, resolved = resolved)
+            progress = progressRepository.update { current ->
                 var next = current
                 atomIds.forEach { id ->
                     next = ProgressionEngine.recordAtomAttempt(next, id, outcome)
@@ -190,82 +237,77 @@ class SessionViewModel(
                 }
                 next
             }
-            progress = progressRepository.current()
             afterAttempt(correct = correct && !resolved, resolved = resolved, missHint = !correct && !resolved)
         }
     }
 
     fun submitMathAnswer(distance: Int?, resolved: Boolean, correct: Boolean) {
         viewModelScope.launch {
+            if (_ui.value.successPhase != SuccessPhase.Idle) return@launch
             val task = _ui.value.current?.template ?: return@launch
-            val key = ProgressionEngine.mathKey(
-                operation = task.operation ?: "add",
-                left = task.left ?: 0,
-                right = task.right ?: 0,
-                band = task.difficultyBand,
-            )
-            val outcome = when {
-                resolved -> AttemptOutcome.Resolve
-                correct -> AttemptOutcome.Correct
-                else -> AttemptOutcome.Miss
-            }
-            progressRepository.update { current ->
+            val key = ProgressionEngine.mathKey(task)
+            val outcome = outcomeFor(correct = correct, resolved = resolved)
+            progress = progressRepository.update { current ->
                 var next = ProgressionEngine.recordMathAttempt(current, key, outcome)
                 if (correct && !resolved) {
                     next = ProgressionEngine.awardPoints(next, POINTS_PER_CORRECT)
                 }
                 next
             }
-            progress = progressRepository.current()
-            val feedback = when {
-                resolved -> null
-                correct -> null
-                distance == null -> "Versuch es noch einmal"
-                distance in 1..2 -> "Du bist nah dran, denk noch einmal nach"
-                else -> "Schau noch einmal genau hin"
+            // Preschool: speak miss hints; never show error sentences as readable chrome.
+            val spoken = when {
+                resolved || correct -> null
+                else -> MathHinting.missFeedback(distance)
             }
             afterAttempt(
                 correct = correct && !resolved,
                 resolved = resolved,
                 missHint = !correct && !resolved,
-                feedbackOverride = feedback,
+                speakOverride = spoken,
             )
         }
+    }
+
+    private fun outcomeFor(correct: Boolean, resolved: Boolean): AttemptOutcome = when {
+        resolved -> AttemptOutcome.Resolve
+        correct -> AttemptOutcome.Correct
+        else -> AttemptOutcome.Miss
     }
 
     private suspend fun afterAttempt(
         correct: Boolean,
         resolved: Boolean,
         missHint: Boolean,
-        feedbackOverride: String? = null,
+        speakOverride: String? = null,
     ) {
         if (correct) {
+            val phrase = successSpeakTextForCurrent()
             _ui.update {
                 it.copy(
                     points = progress.points,
                     sessionPoints = it.sessionPoints + POINTS_PER_CORRECT,
-                    feedback = null,
+                    speakCue = null,
+                    successSpeakText = phrase,
+                    successPhase = SuccessPhase.SpeakAnswer,
                 )
             }
-            advance(showSuccess = true)
             return
         }
         if (resolved) {
-            advance(showSuccess = false)
+            advance()
             return
         }
         if (missHint) {
             _ui.update {
                 it.copy(
-                    feedback = feedbackOverride ?: "Probiere eine andere Antwort",
-                    lastSuccess = false,
+                    speakCue = speakOverride ?: "Probiere eine andere Antwort",
                     points = progress.points,
                 )
             }
         }
     }
 
-    private suspend fun advance(showSuccess: Boolean) {
+    private suspend fun advance() {
         val state = _ui.value
         val nextIndex = state.index + 1
         if (nextIndex >= state.tasks.size) {
@@ -275,9 +317,9 @@ class SessionViewModel(
                 it.copy(
                     screen = AppScreen.RewardSummary,
                     index = state.tasks.lastIndex.coerceAtLeast(0),
-                    speechUnlocked = false,
-                    feedback = null,
-                    lastSuccess = showSuccess,
+                    speakCue = null,
+                    successPhase = SuccessPhase.Idle,
+                    successSpeakText = null,
                     points = progress.points,
                 )
             }
@@ -285,11 +327,13 @@ class SessionViewModel(
             _ui.update {
                 it.copy(
                     index = nextIndex,
-                    speechUnlocked = false,
-                    feedback = null,
-                    lastSuccess = showSuccess,
+                    speakCue = null,
+                    successPhase = SuccessPhase.Idle,
+                    successSpeakText = null,
                     points = progress.points,
-                    tasks = it.tasks.map { task -> schedule(task.template, progress) },
+                    tasks = it.tasks.mapIndexed { i, task ->
+                        if (i < nextIndex) task else schedule(task.template, progress)
+                    },
                 )
             }
             persistSnapshot()
@@ -311,13 +355,7 @@ class SessionViewModel(
 
     fun effectiveMathScaffold(): ScaffoldLevel {
         val task = _ui.value.current?.template ?: return ScaffoldLevel.Beginner
-        val key = ProgressionEngine.mathKey(
-            operation = task.operation ?: "add",
-            left = task.left ?: 0,
-            right = task.right ?: 0,
-            band = task.difficultyBand,
-        )
-        return ProgressionEngine.scaffoldForMath(progress, key)
+        return ProgressionEngine.scaffoldForMath(progress, ProgressionEngine.mathKey(task))
     }
 
     fun parentMode(): ParentMode = progress.parentMode
