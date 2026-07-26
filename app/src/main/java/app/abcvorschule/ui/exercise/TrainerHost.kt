@@ -1,8 +1,6 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import app.abcvorschule.content.ContentPack
@@ -16,7 +14,6 @@ import app.abcvorschule.content.WordBuildRound
 import app.abcvorschule.progress.ProgressionEngine
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.session.ScheduledTrainer
-import app.abcvorschule.ui.components.AbcContinueButton
 
 /** Callbacks every trainer reports through, so the ViewModel owns all sequencing. */
 data class TrainerCallbacks(
@@ -79,7 +76,22 @@ fun TrainerHost(
             onResult = callbacks.onResult,
             modifier = modifier.fillMaxSize(),
         )
-        is SentenceOrderRound -> TrainerPlaceholder("Trainer 5", modifier, callbacks)
+        is SentenceOrderRound -> {
+            val sentence = pack.sentence(round.sentenceId)
+            SentenceOrderTrainer(
+                round = round,
+                words = pack.sentenceWords(sentence),
+                atomIds = sentence.atomIds,
+                illustrationEmoji = round.illustrationAtomId?.let { pack.atom(it).emoji },
+                scaffoldFor = scaffoldFor,
+                ttsAvailable = ttsAvailable,
+                speaking = speaking,
+                onSpeakPrompt = callbacks.onSpeakPrompt,
+                onSpeak = callbacks.onSpeak,
+                onResult = callbacks.onResult,
+                modifier = modifier.fillMaxSize(),
+            )
+        }
         is CountAddRound -> MathExercise(
             trainer = trainer,
             round = round,
@@ -94,24 +106,5 @@ fun TrainerHost(
             onResult = callbacks.onMathResult,
             modifier = modifier.fillMaxSize(),
         )
-        else -> TrainerPlaceholder("Trainer", modifier, callbacks)
     }
-}
-
-/** Temporary scaffolding, replaced trainer-by-trainer in later tasks. */
-@Composable
-private fun TrainerPlaceholder(
-    label: String,
-    modifier: Modifier,
-    callbacks: TrainerCallbacks,
-) {
-    ExerciseStage(
-        modifier = modifier.fillMaxSize(),
-        prompt = {
-            Text(label, style = MaterialTheme.typography.headlineMedium)
-        },
-        answers = {
-            AbcContinueButton(onClick = { callbacks.onResult(true, false, emptyList()) })
-        },
-    )
 }
