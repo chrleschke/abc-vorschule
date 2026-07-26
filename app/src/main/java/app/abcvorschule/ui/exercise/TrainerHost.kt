@@ -68,7 +68,17 @@ fun TrainerHost(
             onResult = callbacks.onResult,
             modifier = modifier.fillMaxSize(),
         )
-        is WordBuildRound -> TrainerPlaceholder("Trainer 4", modifier, callbacks)
+        is WordBuildRound -> WordBuildTrainer(
+            round = round,
+            target = pack.atom(round.targetAtomId),
+            scaffoldFor = scaffoldFor,
+            ttsAvailable = ttsAvailable,
+            speaking = speaking,
+            onSpeakPrompt = callbacks.onSpeakPrompt,
+            onSpeak = callbacks.onSpeak,
+            onResult = callbacks.onResult,
+            modifier = modifier.fillMaxSize(),
+        )
         is SentenceOrderRound -> TrainerPlaceholder("Trainer 5", modifier, callbacks)
         is CountAddRound -> MathExercise(
             trainer = trainer,
