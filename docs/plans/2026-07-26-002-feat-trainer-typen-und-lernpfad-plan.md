@@ -119,6 +119,7 @@ Der vorherige Plan [`2026-07-26-001-feat-abc-vorschul-app-plan.md`](2026-07-26-0
   - Runden: `SoundPositionRound`, `LetterTraceRound`, `SyllableMergeRound`, `WordBuildRound`, `SentenceOrderRound`, `CountAddRound`, alle `: TrainerRound` mit `val promptTts: String`
   - `data class WordBlock(val atomId: String, val display: String)`
   - `enum class TrainerKind { sound_position, letter_trace, syllable_merge, word_build, sentence_order, count_add }`, `val TaskSpec.kind: TrainerKind`, `val TaskSpec.roundCount: Int`, `fun TaskSpec.round(index: Int): TrainerRound`
+  - `fun CountAddRound.spokenAnswer(icon: Atom?): String` — "1 Ameise" / "2 Ameisen"
   - `enum class LessonStatus { authored, planned }`
   - `data class Lesson(id, index, phase, title, nodeLabel, status, focusAtomIds, taskIds)`
   - `data class ContentPack(manifest, atoms, sentences, tasks: Map<String, TaskSpec>, lessons: List<Lesson>)` mit `atom(id)`, `sentence(id)`, `task(id)`, `lesson(id)`, `tasksOf(lesson)`, `authoredLessons`
@@ -618,6 +619,19 @@ val TaskSpec.roundCount: Int get() = rounds.size
 
 fun TaskSpec.round(index: Int): TrainerRound? = rounds.getOrNull(index)
 
+/**
+ * Spoken answer for a counting round: "1 Ameise" / "2 Ameisen" — never a bare
+ * number. Rechnen shows no words, so the plural is carried entirely by speech.
+ */
+fun CountAddRound.spokenAnswer(icon: Atom?): String {
+    val noun = when {
+        icon == null -> ""
+        answer == 1 -> icon.display
+        else -> icon.pluralDisplay ?: icon.display
+    }
+    return "$answer $noun".trim()
+}
+
 /** Atom ids a round scores against, used for per-atom stats and scaffolds. */
 fun TrainerRound.scoredAtomIds(): List<String> = when (this) {
     is SoundPositionRound -> listOf(atomId)
@@ -690,6 +704,11 @@ object ContentValidator {
     )
 
     private const val MinSoundPositionRounds = 2
+
+    /** Authored-distractor budget: preschoolers must be able to scan the tray. */
+    private const val MaxDistractorsPerRound = 2
+    private const val MaxWordTrayTiles = 5
+    private const val MaxSentenceTrayTiles = 6
 
     fun validate(pack: ContentPack): List<ValidationIssue> {
         val issues = mutableListOf<ValidationIssue>()
@@ -795,6 +814,17 @@ object ContentValidator {
                             "task $id distractors duplicate solution blocks $duplicate",
                         )
                     }
+                    if (round.distractors.size > MaxDistractorsPerRound) {
+                        issues += ValidationIssue(
+                            "task $id has ${round.distractors.size} distractors; max is $MaxDistractorsPerRound",
+                        )
+                    }
+                    val tray = round.blocks.size + round.distractors.size
+                    if (tray > MaxWordTrayTiles) {
+                        issues += ValidationIssue(
+                            "task $id tray holds $tray tiles; max is $MaxWordTrayTiles",
+                        )
+                    }
                 }
                 is SentenceOrderSpec -> spec.rounds.forEach { round ->
                     val sentence = pack.sentences[round.sentenceId]
@@ -811,13 +841,30 @@ object ContentValidator {
                             )
                         }
                     }
+                    if (round.distractors.size > MaxDistractorsPerRound) {
+                        issues += ValidationIssue(
+                            "task $id has ${round.distractors.size} distractors; max is $MaxDistractorsPerRound",
+                        )
+                    }
+                    val tray = (sentence?.atomIds?.size ?: 0) + round.distractors.size
+                    if (tray > MaxSentenceTrayTiles) {
+                        issues += ValidationIssue(
+                            "task $id tray holds $tray tiles; max is $MaxSentenceTrayTiles",
+                        )
+                    }
                 }
                 is CountAddSpec -> spec.rounds.forEach { round ->
                     requireAtom("task $id", round.iconAtomId)
                     if (round.left < 0 || round.right < 0) {
                         issues += ValidationIssue("task $id has a negative operand")
                     }
-                    if (round.operation == "add" && round.left + round.right != round.answer) {
+                    // Only addition exists in v1; an unknown operation must not slip
+                    // past the sum check unvalidated.
+                    if (round.operation != "add") {
+                        issues += ValidationIssue(
+                            "task $id uses unsupported operation '${round.operation}'",
+                        )
+                    } else if (round.left + round.right != round.answer) {
                         issues += ValidationIssue(
                             "task $id answer ${round.answer} does not match ${round.left}+${round.right}",
                         )
@@ -1630,7 +1677,7 @@ git status --short
 - Consumes: alles aus Task 1 und 2.
 - Produces:
   - `sealed interface AppScreen { Path; Practice; RewardSummary }` (`Pause` entfällt — Back auf der Practice-Ebene führt jetzt zurück zum Pfad)
-  - `data class ScheduledTrainer(spec: TaskSpec, scaffolds: Map<String, ScaffoldLevel>, mathScaffold: ScaffoldLevel)`
+  - `data class ScheduledTrainer(spec: TaskSpec, scaffolds: Map<String, ScaffoldLevel>, mathScaffolds: Map<String, ScaffoldLevel>)` — `mathScaffolds` is keyed by `ProgressionEngine.mathKey(round)`, one entry per `CountAddRound`, so each arithmetic fact keeps its own scaffold
   - `data class SessionUiState(screen, lessonId, trainers, trainerIndex, roundIndex, points, sessionPoints, ready, showDifficultySheet, speakCue, successPhase, successSpeakText, error)` mit `current`, `currentRound`, `trainerProgressLabel`, `roundProgressLabel`, `canGoPrevious`, `canGoNext`
   - `SessionViewModel`: `openLesson(lessonId)`, `backToPath()`, `submitRoundResult(correct, resolved, atomIds)`, `submitMathResult(distance, resolved, correct)`, `scaffoldFor(atomId)`, `lessonStates()`, `pathLessons()`
   - `object SessionProgression { fun next(trainerIndex, roundIndex, roundCounts): SessionStep? }` — reine Fortschrittsrechnung
@@ -1771,8 +1818,14 @@ data class ScheduledTrainer(
     val spec: TaskSpec,
     /** Per-atom scaffold for slot-based trainers (word_build, sentence_order). */
     val scaffolds: Map<String, ScaffoldLevel> = emptyMap(),
-    /** Rechnen: Beginner = visual choices, Advanced = number entry. */
-    val mathScaffold: ScaffoldLevel = ScaffoldLevel.Beginner,
+    /**
+     * Rechnen scaffold per arithmetic fact, keyed by [ProgressionEngine.mathKey].
+     * A count_add trainer holds several facts with independent mastery, so one
+     * scaffold for the whole trainer would drive the wrong UI for later rounds.
+     * Cached at schedule time so a mid-round parent-mode change only takes
+     * effect from the next trainer on (F7).
+     */
+    val mathScaffolds: Map<String, ScaffoldLevel> = emptyMap(),
 )
 
 data class SessionUiState(
@@ -1952,13 +2005,13 @@ class SessionViewModel(
         val atomIds = spec.rounds.flatMap { round ->
             round.scoredAtomIds() + sentenceAtomIds(round)
         }.distinct()
-        val mathRound = spec.rounds.filterIsInstance<CountAddRound>().firstOrNull()
         return ScheduledTrainer(
             spec = spec,
             scaffolds = atomIds.associateWith { ProgressionEngine.scaffoldForAtom(progress, it) },
-            mathScaffold = mathRound
-                ?.let { ProgressionEngine.scaffoldForMath(progress, ProgressionEngine.mathKey(it)) }
-                ?: ScaffoldLevel.Beginner,
+            mathScaffolds = spec.rounds.filterIsInstance<CountAddRound>().associate { round ->
+                val key = ProgressionEngine.mathKey(round)
+                key to ProgressionEngine.scaffoldForMath(progress, key)
+            },
         )
     }
 
@@ -2020,7 +2073,8 @@ class SessionViewModel(
     }
 
     fun successSpeakTextForCurrent(): String = when (val round = _ui.value.currentRound) {
-        is CountAddRound -> round.answer.toString()
+        // Speak the counted objects, not a bare number: "zwei Ameisen".
+        is CountAddRound -> round.spokenAnswer(pack.atoms[round.iconAtomId])
         is SyllableMergeRound -> round.resultDisplay
         is WordBuildRound -> pack.atoms[round.targetAtomId]?.display ?: round.promptTts
         is SentenceOrderRound -> pack.sentence(round.sentenceId).tts
@@ -2295,7 +2349,8 @@ fun TrainerHost(
             trainer = trainer,
             round = round,
             icon = pack.atom(round.iconAtomId).emoji,
-            scaffold = trainer.mathScaffold,
+            scaffold = trainer.mathScaffolds[ProgressionEngine.mathKey(round)]
+                ?: ScaffoldLevel.Beginner,
             showSymbolPrompt = !ttsAvailable,
             ttsAvailable = ttsAvailable,
             speaking = speaking,
@@ -5609,6 +5664,25 @@ class LessonCoverageTest {
     }
 
     @Test
+    fun rechnenIconsCarryAPluralFormForTheSpokenAnswer() {
+        // The success readout says "2 Ameisen", so every counted atom needs a plural.
+        pack.authoredLessons.forEach { lesson ->
+            val math = pack.tasksOf(lesson).filterIsInstance<CountAddSpec>().single()
+            math.rounds.forEach { round ->
+                val icon = pack.atom(round.iconAtomId)
+                assertTrue(
+                    "${icon.id} needs pluralDisplay for the spoken answer",
+                    !icon.pluralDisplay.isNullOrBlank(),
+                )
+                assertEquals(
+                    "${round.answer} ${icon.pluralDisplay}",
+                    round.spokenAnswer(icon),
+                )
+            }
+        }
+    }
+
+    @Test
     fun wordBuilderNeverOffersAnUntaughtGrapheme() {
         // A block may only use graphemes/syllables introduced in this or an earlier lesson.
         val introduced = mutableSetOf<String>()
@@ -6203,7 +6277,8 @@ Abschnitt 8 („Mathematik-Visuals") um die Nutzerentscheidung ergänzen:
 - Rechnen läuft in **jeder** Lektion, mit den Bild-Ikonen derselben Lektion (kontextnah, aber
   nicht zwingend — Kinder erkennen die Icons ohnehin).
 - Im Rechen-Trainer gibt es **keine Wörter zum Lesen oder Schreiben**. Singular/Plural wird
-  ausschließlich im gesprochenen Prompt geübt.
+  ausschließlich gesprochen geübt — im Prompt *und* in der vorgesprochenen Antwort:
+  „zwei Ameisen", nicht nur „zwei". Bei Ergebnis 1 die Singularform.
 ```
 
 Abschnitt 11 („Was bewusst nicht in v1 gehört") ergänzen:
