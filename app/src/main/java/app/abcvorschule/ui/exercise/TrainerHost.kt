@@ -59,7 +59,15 @@ fun TrainerHost(
             onResult = callbacks.onResult,
             modifier = modifier.fillMaxSize(),
         )
-        is SyllableMergeRound -> TrainerPlaceholder("Trainer 3", modifier, callbacks)
+        is SyllableMergeRound -> SyllableMergeTrainer(
+            round = round,
+            ttsAvailable = ttsAvailable,
+            speaking = speaking,
+            onSpeakPrompt = callbacks.onSpeakPrompt,
+            onSpeak = callbacks.onSpeak,
+            onResult = callbacks.onResult,
+            modifier = modifier.fillMaxSize(),
+        )
         is WordBuildRound -> TrainerPlaceholder("Trainer 4", modifier, callbacks)
         is SentenceOrderRound -> TrainerPlaceholder("Trainer 5", modifier, callbacks)
         is CountAddRound -> MathExercise(
