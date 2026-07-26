@@ -35,6 +35,18 @@ class WordBuildTrayTest {
     }
 
     @Test
+    fun identicalDisplaysLeaveTheTrayOneAtATime() {
+        // The Mama/Mimi fixtures differ in case ("Ma" vs "ma"), so they cannot tell a
+        // remove-one implementation from a remove-every-match one. Two blocks spelling
+        // the *same* display can: placing one must leave exactly one behind.
+        val doubled = mama.copy(
+            blocks = listOf(WordBlock("ba", "ba"), WordBlock("ba", "ba")),
+        )
+        assertEquals(listOf("ba"), WordBuildTray.tiles(doubled, listOf("ba")).map { it.display })
+        assertTrue(WordBuildTray.tiles(doubled, listOf("ba", "ba")).isEmpty())
+    }
+
+    @Test
     fun distractorsAreAppendedAndTrayStaysSmall() {
         val withDistractors = mama.copy(
             distractors = listOf(

@@ -4887,6 +4887,18 @@ class WordBuildTrayTest {
     }
 
     @Test
+    fun identicalDisplaysLeaveTheTrayOneAtATime() {
+        // The Mama/Mimi fixtures differ in case ("Ma" vs "ma"), so they cannot tell a
+        // remove-one implementation from a remove-every-match one. Two blocks spelling
+        // the *same* display can: placing one must leave exactly one behind.
+        val doubled = mama.copy(
+            blocks = listOf(WordBlock("ba", "ba"), WordBlock("ba", "ba")),
+        )
+        assertEquals(listOf("ba"), WordBuildTray.tiles(doubled, listOf("ba")).map { it.display })
+        assertTrue(WordBuildTray.tiles(doubled, listOf("ba", "ba")).isEmpty())
+    }
+
+    @Test
     fun distractorsAreAppendedAndTrayStaysSmall() {
         val withDistractors = mama.copy(
             distractors = listOf(
@@ -4956,6 +4968,13 @@ import app.abcvorschule.ui.theme.NightElevated
 import app.abcvorschule.ui.theme.NightInk
 import app.abcvorschule.ui.theme.SoftMint
 import app.abcvorschule.ui.theme.SoftSand
+
+/**
+ * Frames sit in one row and a word can need four of them (N·e·s·t), so they are
+ * deliberately narrower than [AbcDimens.letterFrame], which is sized for a single
+ * standalone glyph and would overflow a narrow screen here.
+ */
+private val WordFrameMin = 84.dp
 
 object WordBuildTray {
     /** Preschoolers must be able to scan the whole tray at a glance. */
@@ -5130,7 +5149,7 @@ private fun Frame(
         key = WordBuildTray.frameKey(index),
         onTap = onTap,
         modifier = Modifier
-            .defaultMinSize(minWidth = 84.dp, minHeight = 84.dp)
+            .defaultMinSize(minWidth = WordFrameMin, minHeight = WordFrameMin)
             .background(
                 color = if (armed) SoftMint.copy(alpha = 0.22f) else NightElevated,
                 shape = RoundedCornerShape(22.dp),
