@@ -109,7 +109,7 @@
     {
       "trainer": "sound_position", "id": "l02-t1", "phonemeTts": "Ooo",
       "rounds": [
-        { "promptTts": "Wir suchen das Ooo. Wo versteckt sich das Ooo?", "atomId": "ofen", "slot": "start", "missTts": "Ooo - fen. Hörst du das Ooo am Anfang?" },
+        { "promptTts": "Wir suchen das Ooo. Wo versteckt sich das Ooo?", "atomId": "ohr", "slot": "start", "missTts": "Ooo - hr. Hörst du das Ooo am Anfang?" },
         { "promptTts": "Wo versteckt sich das Ooo?", "atomId": "radio", "slot": "end", "missTts": "Radi - Ooo. Hörst du das Ooo am Ende?" },
         { "promptTts": "Wo versteckt sich das Ooo?", "atomId": "sonne", "slot": "middle", "missTts": "S - Ooo - nne. Hörst du das Ooo in der Mitte?" }
       ]
@@ -118,7 +118,7 @@
       "trainer": "letter_trace", "id": "l02-t2",
       "rounds": [
         { "promptTts": "Spure das große I nach und sammle alle Sterne.", "atomId": "letter-i", "glyph": "I", "rewardTts": "I wie Igel.", "rewardEmoji": "🦔" },
-        { "promptTts": "Spure das große O nach und sammle alle Sterne.", "atomId": "letter-o", "glyph": "O", "rewardTts": "O wie Ofen.", "rewardEmoji": "🔥" }
+        { "promptTts": "Spure das große O nach und sammle alle Sterne.", "atomId": "letter-o", "glyph": "O", "rewardTts": "O wie Ohr.", "rewardEmoji": "👂" }
       ]
     },
     {

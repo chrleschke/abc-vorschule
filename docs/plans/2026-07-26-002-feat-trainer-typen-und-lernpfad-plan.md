@@ -1018,7 +1018,8 @@ class ContentRepository(
     {
       "id": "letter-m", "lemma": "M", "display": "M", "emoji": "", "kind": "letter",
       "strokes": [
-        { "points": [[0.12, 0.92], [0.12, 0.08], [0.5, 0.62], [0.88, 0.08], [0.88, 0.92]] }
+        { "points": [[0.12, 0.08], [0.12, 0.92]] },
+        { "points": [[0.12, 0.08], [0.5, 0.62], [0.88, 0.08], [0.88, 0.92]] }
       ]
     },
     {
@@ -5868,7 +5869,7 @@ Expected: FAIL — nur `l01` ist `authored`.
 {
   "atoms": [
     { "id": "letter-m", "lemma": "M", "display": "M", "emoji": "", "kind": "letter",
-      "strokes": [ { "points": [[0.12,0.92],[0.12,0.08],[0.5,0.62],[0.88,0.08],[0.88,0.92]] } ] },
+      "strokes": [ { "points": [[0.12,0.08],[0.12,0.92]] }, { "points": [[0.12,0.08],[0.5,0.62],[0.88,0.08],[0.88,0.92]] } ] },
     { "id": "letter-a", "lemma": "A", "display": "A", "emoji": "", "kind": "letter",
       "strokes": [ { "points": [[0.5,0.08],[0.14,0.92]] }, { "points": [[0.5,0.08],[0.86,0.92]] }, { "points": [[0.26,0.66],[0.74,0.66]] } ] },
     { "id": "letter-i", "lemma": "I", "display": "I", "emoji": "", "kind": "letter",
@@ -5876,7 +5877,7 @@ Expected: FAIL — nur `l01` ist `authored`.
     { "id": "letter-o", "lemma": "O", "display": "O", "emoji": "", "kind": "letter",
       "strokes": [ { "points": [[0.500,0.080],[0.362,0.112],[0.245,0.203],[0.167,0.339],[0.140,0.500],[0.167,0.661],[0.245,0.797],[0.362,0.888],[0.500,0.920],[0.638,0.888],[0.755,0.797],[0.833,0.661],[0.860,0.500],[0.833,0.339],[0.755,0.203],[0.638,0.112],[0.500,0.080]] } ] },
     { "id": "letter-p", "lemma": "P", "display": "P", "emoji": "", "kind": "letter",
-      "strokes": [ { "points": [[0.22,0.92],[0.22,0.08]] }, { "points": [[0.22,0.08],[0.62,0.10],[0.76,0.22],[0.76,0.38],[0.62,0.50],[0.22,0.52]] } ] },
+      "strokes": [ { "points": [[0.22,0.08],[0.22,0.92]] }, { "points": [[0.22,0.08],[0.62,0.10],[0.76,0.22],[0.76,0.38],[0.62,0.50],[0.22,0.52]] } ] },
     { "id": "letter-t", "lemma": "T", "display": "T", "emoji": "", "kind": "letter",
       "strokes": [ { "points": [[0.14,0.10],[0.86,0.10]] }, { "points": [[0.5,0.10],[0.5,0.92]] } ] },
     { "id": "letter-l", "lemma": "L", "display": "L", "emoji": "", "kind": "letter",
@@ -5886,15 +5887,15 @@ Expected: FAIL — nur `l01` ist `authored`.
     { "id": "letter-u", "lemma": "U", "display": "U", "emoji": "", "kind": "letter",
       "strokes": [ { "points": [[0.18,0.08],[0.18,0.62],[0.26,0.82],[0.40,0.91],[0.60,0.91],[0.74,0.82],[0.82,0.62],[0.82,0.08]] } ] },
     { "id": "letter-r", "lemma": "R", "display": "R", "emoji": "", "kind": "letter",
-      "strokes": [ { "points": [[0.22,0.92],[0.22,0.08]] }, { "points": [[0.22,0.08],[0.62,0.10],[0.74,0.22],[0.74,0.36],[0.62,0.48],[0.22,0.50]] }, { "points": [[0.44,0.50],[0.80,0.92]] } ] },
+      "strokes": [ { "points": [[0.22,0.08],[0.22,0.92]] }, { "points": [[0.22,0.08],[0.62,0.10],[0.74,0.22],[0.74,0.36],[0.62,0.48],[0.22,0.50]] }, { "points": [[0.44,0.50],[0.80,0.92]] } ] },
     { "id": "letter-n", "lemma": "N", "display": "N", "emoji": "", "kind": "letter",
-      "strokes": [ { "points": [[0.16,0.92],[0.16,0.08],[0.84,0.92],[0.84,0.08]] } ] },
+      "strokes": [ { "points": [[0.16,0.08],[0.16,0.92]] }, { "points": [[0.16,0.08],[0.84,0.92]] }, { "points": [[0.84,0.08],[0.84,0.92]] } ] },
     { "id": "letter-s", "lemma": "S", "display": "S", "emoji": "", "kind": "letter",
       "strokes": [ { "points": [[0.78,0.18],[0.66,0.09],[0.44,0.08],[0.28,0.15],[0.26,0.30],[0.38,0.42],[0.60,0.52],[0.74,0.64],[0.72,0.82],[0.54,0.92],[0.32,0.91],[0.20,0.80]] } ] },
     { "id": "letter-e", "lemma": "E", "display": "E", "emoji": "", "kind": "letter",
       "strokes": [ { "points": [[0.22,0.08],[0.22,0.92]] }, { "points": [[0.22,0.10],[0.78,0.10]] }, { "points": [[0.22,0.50],[0.68,0.50]] }, { "points": [[0.22,0.92],[0.78,0.92]] } ] },
     { "id": "letter-d", "lemma": "D", "display": "D", "emoji": "", "kind": "letter",
-      "strokes": [ { "points": [[0.22,0.92],[0.22,0.08]] }, { "points": [[0.22,0.08],[0.56,0.10],[0.74,0.26],[0.78,0.50],[0.74,0.74],[0.56,0.90],[0.22,0.92]] } ] },
+      "strokes": [ { "points": [[0.22,0.08],[0.22,0.92]] }, { "points": [[0.22,0.08],[0.56,0.10],[0.74,0.26],[0.78,0.50],[0.74,0.74],[0.56,0.90],[0.22,0.92]] } ] },
 
     { "id": "ma", "lemma": "ma", "display": "ma", "emoji": "", "kind": "syllable" },
     { "id": "mi", "lemma": "mi", "display": "mi", "emoji": "", "kind": "syllable" },
@@ -5931,6 +5932,7 @@ Expected: FAIL — nur `l01` ist `authored`.
     { "id": "maus", "lemma": "Maus", "display": "Maus", "emoji": "🐭", "kind": "other", "pluralDisplay": "Mäuse" },
     { "id": "baum", "lemma": "Baum", "display": "Baum", "emoji": "🌳", "kind": "other", "pluralDisplay": "Bäume" },
     { "id": "igel", "lemma": "Igel", "display": "Igel", "emoji": "🦔", "kind": "other", "pluralDisplay": "Igel" },
+    { "id": "ohr", "lemma": "Ohr", "display": "Ohr", "emoji": "👂", "kind": "other", "pluralDisplay": "Ohren" },
     { "id": "ofen", "lemma": "Ofen", "display": "Ofen", "emoji": "🔥", "kind": "other", "pluralDisplay": "Öfen" },
     { "id": "radio", "lemma": "Radio", "display": "Radio", "emoji": "📻", "kind": "other", "pluralDisplay": "Radios" },
     { "id": "sonne", "lemma": "Sonne", "display": "Sonne", "emoji": "☀️", "kind": "other", "pluralDisplay": "Sonnen" },
@@ -6034,7 +6036,7 @@ Ersetze die fünf Zeilen l02–l06; l01 und l07–l16 bleiben unverändert:
     {
       "trainer": "sound_position", "id": "l02-t1", "phonemeTts": "Ooo",
       "rounds": [
-        { "promptTts": "Wir suchen das Ooo. Wo versteckt sich das Ooo?", "atomId": "ofen", "slot": "start", "missTts": "Ooo - fen. Hörst du das Ooo am Anfang?" },
+        { "promptTts": "Wir suchen das Ooo. Wo versteckt sich das Ooo?", "atomId": "ohr", "slot": "start", "missTts": "Ooo - hr. Hörst du das Ooo am Anfang?" },
         { "promptTts": "Wo versteckt sich das Ooo?", "atomId": "radio", "slot": "end", "missTts": "Radi - Ooo. Hörst du das Ooo am Ende?" },
         { "promptTts": "Wo versteckt sich das Ooo?", "atomId": "sonne", "slot": "middle", "missTts": "S - Ooo - nne. Hörst du das Ooo in der Mitte?" }
       ]
@@ -6043,7 +6045,7 @@ Ersetze die fünf Zeilen l02–l06; l01 und l07–l16 bleiben unverändert:
       "trainer": "letter_trace", "id": "l02-t2",
       "rounds": [
         { "promptTts": "Spure das große I nach und sammle alle Sterne.", "atomId": "letter-i", "glyph": "I", "rewardTts": "I wie Igel.", "rewardEmoji": "🦔" },
-        { "promptTts": "Spure das große O nach und sammle alle Sterne.", "atomId": "letter-o", "glyph": "O", "rewardTts": "O wie Ofen.", "rewardEmoji": "🔥" }
+        { "promptTts": "Spure das große O nach und sammle alle Sterne.", "atomId": "letter-o", "glyph": "O", "rewardTts": "O wie Ohr.", "rewardEmoji": "👂" }
       ]
     },
     {
