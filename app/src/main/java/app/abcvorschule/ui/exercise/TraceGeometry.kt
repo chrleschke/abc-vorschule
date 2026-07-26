@@ -1,7 +1,10 @@
 package app.abcvorschule.ui.exercise
 
 import app.abcvorschule.content.GlyphStroke
+import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.hypot
+import kotlin.math.sin
 
 /** A point in glyph-box pixels, y growing downwards. */
 data class TracePoint(val x: Float, val y: Float)
@@ -46,6 +49,30 @@ object TraceGeometry {
     fun starPositions(points: List<TracePoint>, count: Int): List<TracePoint> {
         if (count < 1) return listOf(points.lastOrNull() ?: TracePoint(0f, 0f))
         return (1..count).map { i -> pointAtFraction(points, i.toFloat() / count) }
+    }
+
+    /**
+     * Outline of a [spikes]-pointed star, alternating outer and inner vertices and
+     * starting at the top point. The prompt promises stars, so the collectibles are
+     * drawn as stars — this is the geometry the canvas turns into a path.
+     */
+    fun starPoints(
+        center: TracePoint,
+        outerRadius: Float,
+        innerRadius: Float,
+        spikes: Int = 5,
+    ): List<TracePoint> {
+        if (spikes < 2) return emptyList()
+        val step = PI / spikes
+        return (0 until spikes * 2).map { i ->
+            val radius = if (i % 2 == 0) outerRadius else innerRadius
+            // -PI/2 puts the first spike straight up rather than out to the right.
+            val angle = -PI / 2 + i * step
+            TracePoint(
+                x = center.x + (cos(angle) * radius).toFloat(),
+                y = center.y + (sin(angle) * radius).toFloat(),
+            )
+        }
     }
 
     fun distanceToSegment(p: TracePoint, a: TracePoint, b: TracePoint): Float {

@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.components.IconChevronRight
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.SoftMint
+import app.abcvorschule.ui.theme.SoftSand
+import app.abcvorschule.ui.theme.SoftSky
 
 /**
  * Numeric answer field backed by the device's own keyboard (number mode) —
@@ -44,6 +46,8 @@ import app.abcvorschule.ui.theme.SoftMint
 fun NumberPad(
     onSubmit: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    /** True once the typed number turned out to be the answer — the field confirms in green. */
+    solved: Boolean = false,
 ) {
     var value by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
@@ -56,6 +60,11 @@ fun NumberPad(
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
         keyboardController?.show()
+    }
+    LaunchedEffect(solved) {
+        // Without closing the IME the green confirmation sits behind the keyboard —
+        // exactly the thing it is supposed to show.
+        if (solved) keyboardController?.hide()
     }
 
     Row(
@@ -72,11 +81,15 @@ fun NumberPad(
                 .testTag("number_input"),
             textStyle = MaterialTheme.typography.displayLarge.copy(textAlign = TextAlign.Center),
             singleLine = true,
+            readOnly = solved,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { submit() }),
+            // Neutral while typing so that green means one thing only: correct.
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = SoftMint,
-                unfocusedBorderColor = SoftMint.copy(alpha = 0.5f),
+                focusedBorderColor = if (solved) SoftMint else SoftSky,
+                unfocusedBorderColor = if (solved) SoftMint else SoftSky.copy(alpha = 0.5f),
+                focusedTextColor = if (solved) SoftMint else SoftSand,
+                unfocusedTextColor = if (solved) SoftMint else SoftSand,
             ),
         )
         Spacer(Modifier.width(16.dp))

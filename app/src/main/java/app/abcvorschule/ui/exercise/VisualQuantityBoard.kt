@@ -14,11 +14,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.theme.NightElevated
+import app.abcvorschule.ui.theme.NightInk
+import app.abcvorschule.ui.theme.SoftMint
 import app.abcvorschule.ui.theme.SoftSand
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -30,6 +33,8 @@ fun VisualQuantityBoard(
     choices: List<Int>,
     onChoose: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    /** The chosen value once it turned out to be correct — that tile turns green. */
+    solved: Int? = null,
     missCount: Int = 0,
     locked: Boolean = false,
     onResolve: (() -> Unit)? = null,
@@ -65,16 +70,29 @@ fun VisualQuantityBoard(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 choices.forEach { value ->
+                    // The picked tile confirms itself in green, so the child sees *which*
+                    // answer was right while it is being spoken. A wrong pick is never
+                    // marked red — misses stay spoken-only feedback.
+                    val correct = solved == value
                     Column(
                         modifier = Modifier
-                            .background(NightElevated, RoundedCornerShape(18.dp))
+                            .background(
+                                color = if (correct) SoftMint else NightElevated,
+                                shape = RoundedCornerShape(18.dp),
+                            )
                             .clickable { onChoose(value) }
                             .padding(horizontal = 16.dp, vertical = 12.dp)
                             .testTag("math_choice_$value"),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
-                        QuantityCluster(emoji = emoji, count = value, emojiSizeSp = 28, showNumber = true)
+                        QuantityCluster(
+                            emoji = emoji,
+                            count = value,
+                            emojiSizeSp = 28,
+                            showNumber = true,
+                            numberColor = if (correct) NightInk else SoftSand,
+                        )
                     }
                 }
             }
@@ -92,6 +110,7 @@ fun QuantityCluster(
     emojiSizeSp: Int,
     modifier: Modifier = Modifier,
     showNumber: Boolean = true,
+    numberColor: Color = SoftSand,
 ) {
     val clusters = QuantityGrouping.clusters(count)
     Column(
@@ -110,7 +129,7 @@ fun QuantityCluster(
             Text(
                 text = count.toString(),
                 style = MaterialTheme.typography.headlineMedium,
-                color = SoftSand,
+                color = numberColor,
             )
         }
     }

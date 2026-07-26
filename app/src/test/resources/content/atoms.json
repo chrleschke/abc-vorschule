@@ -73,7 +73,7 @@
     { "id": "hut", "lemma": "Hut", "display": "Hut", "emoji": "🎩", "kind": "other", "pluralDisplay": "Hüte" },
     { "id": "salat", "lemma": "Salat", "display": "Salat", "emoji": "🥗", "kind": "other", "pluralDisplay": "Salate" },
     { "id": "insel", "lemma": "Insel", "display": "Insel", "emoji": "🏝️", "kind": "other", "pluralDisplay": "Inseln" },
-    { "id": "uhr", "lemma": "Uhr", "display": "Uhr", "emoji": "⏰", "kind": "other", "pluralDisplay": "Uhren" },
+    { "id": "uhr", "lemma": "Uhr", "display": "Uhr", "emoji": "⌚️", "kind": "other", "pluralDisplay": "Uhren" },
     { "id": "karotte", "lemma": "Karotte", "display": "Karotte", "emoji": "🥕", "kind": "other", "pluralDisplay": "Karotten" },
     { "id": "nase", "lemma": "Nase", "display": "Nase", "emoji": "👃", "kind": "other", "pluralDisplay": "Nasen" },
     { "id": "haus", "lemma": "Haus", "display": "Haus", "emoji": "🏠", "kind": "other", "pluralDisplay": "Häuser" },

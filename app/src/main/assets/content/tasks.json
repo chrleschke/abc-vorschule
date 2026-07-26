@@ -3,31 +3,50 @@
     {
       "trainer": "sound_position",
       "id": "l01-t1",
-      "phonemeTts": "Mmm",
+      "phonemeTts": "M",
       "rounds": [
         {
-          "promptTts": "Wir suchen das Mmm. Wo versteckt sich das Mmm?",
+          "promptTts": "Wir suchen das M. Wo versteckt sich das M?",
           "atomId": "ameise",
           "slot": "middle",
-          "missTts": "A - Mmm - eise. Hörst du das Mmm in der Mitte?"
+          "missTts": "A - M - eise. Hörst du das M in der Mitte?"
         },
         {
-          "promptTts": "Wo versteckt sich das Mmm?",
+          "promptTts": "Wo versteckt sich das M?",
           "atomId": "maus",
           "slot": "start",
-          "missTts": "Mmm - aus. Hörst du das Mmm am Anfang?"
+          "missTts": "M - aus. Hörst du das M am Anfang?"
         },
         {
-          "promptTts": "Wo versteckt sich das Mmm?",
+          "promptTts": "Wo versteckt sich das M?",
           "atomId": "baum",
           "slot": "end",
-          "missTts": "Bau - Mmm. Hörst du das Mmm am Ende?"
+          "missTts": "Bau - M. Hörst du das M am Ende?"
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l01-t2",
+      "phonemeTts": "A",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das A. Wo versteckt sich das A?",
+          "atomId": "ampel",
+          "slot": "start",
+          "missTts": "A - mpel."
+        },
+        {
+          "promptTts": "Wo versteckt sich das A?",
+          "atomId": "salat",
+          "slot": "middle",
+          "missTts": "Sa - l - A - t."
         }
       ]
     },
     {
       "trainer": "letter_trace",
-      "id": "l01-t2",
+      "id": "l01-t3",
       "rounds": [
         {
           "promptTts": "Spure das große M nach und sammle alle Sterne.",
@@ -35,7 +54,13 @@
           "glyph": "M",
           "rewardTts": "M wie Mond.",
           "rewardEmoji": "🌙"
-        },
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l01-t4",
+      "rounds": [
         {
           "promptTts": "Spure das große A nach und sammle alle Sterne.",
           "atomId": "letter-a",
@@ -47,40 +72,72 @@
     },
     {
       "trainer": "syllable_merge",
-      "id": "l01-t3",
+      "id": "l01-t5",
       "rounds": [
         {
-          "promptTts": "Lass die Buchstaben zusammenrutschen, damit sie ein Lied singen.",
+          "promptTts": "Schiebe die Buchstaben zusammen, damit sie ein Lied singen.",
           "leftAtomId": "letter-m",
           "leftDisplay": "m",
           "rightAtomId": "letter-a",
           "rightDisplay": "a",
           "resultAtomId": "ma",
           "resultDisplay": "ma",
-          "stretchTts": "Mmmmm"
+          "stretchTts": "M"
         }
       ]
     },
     {
       "trainer": "word_build",
-      "id": "l01-t4",
+      "id": "l01-t6",
       "rounds": [
         {
           "promptTts": "Kannst du das Wort Mama bauen? Suche die passenden Bausteine.",
           "targetAtomId": "mama",
           "blocks": [
-            { "atomId": "ma", "display": "Ma" },
-            { "atomId": "ma", "display": "ma" }
+            {
+              "atomId": "ma",
+              "display": "Ma"
+            },
+            {
+              "atomId": "ma",
+              "display": "ma"
+            }
+          ],
+          "distractors": [
+            {
+              "atomId": "ma",
+              "display": "mi"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l01-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue nun das kleine Wort ma.",
+          "targetAtomId": "ma",
+          "blocks": [
+            {
+              "atomId": "letter-m",
+              "display": "m"
+            },
+            {
+              "atomId": "letter-a",
+              "display": "a"
+            }
           ]
         }
       ]
     },
     {
       "trainer": "sentence_order",
-      "id": "l01-t5",
+      "id": "l01-t8",
       "rounds": [
         {
-          "promptTts": "Mama. Hänge das Wort zum Bild.",
+          "promptTts": "Mama. Ordne das Wort zum Bild.",
           "sentenceId": "s-mama",
           "illustrationAtomId": "mama"
         }
@@ -88,7 +145,7 @@
     },
     {
       "trainer": "count_add",
-      "id": "l01-t6",
+      "id": "l01-t9",
       "rounds": [
         {
           "promptTts": "Eine Ameise und eine Ameise. Wie viele Ameisen?",
@@ -96,7 +153,13 @@
           "left": 1,
           "right": 1,
           "answer": 2
-        },
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l01-t10",
+      "rounds": [
         {
           "promptTts": "Zwei Ameisen und eine Ameise. Wie viele Ameisen?",
           "iconAtomId": "ameise",
@@ -107,242 +170,2716 @@
       ]
     },
     {
-      "trainer": "sound_position", "id": "l02-t1", "phonemeTts": "Ooo",
+      "trainer": "sound_position",
+      "id": "l02-t1",
+      "phonemeTts": "I",
       "rounds": [
-        { "promptTts": "Wir suchen das Ooo. Wo versteckt sich das Ooo?", "atomId": "ohr", "slot": "start", "missTts": "Ooo - hr. Hörst du das Ooo am Anfang?" },
-        { "promptTts": "Wo versteckt sich das Ooo?", "atomId": "radio", "slot": "end", "missTts": "Radi - Ooo. Hörst du das Ooo am Ende?" },
-        { "promptTts": "Wo versteckt sich das Ooo?", "atomId": "sonne", "slot": "middle", "missTts": "S - Ooo - nne. Hörst du das Ooo in der Mitte?" }
+        {
+          "promptTts": "Wir suchen das I. Wo versteckt sich das I?",
+          "atomId": "igel",
+          "slot": "start",
+          "missTts": "I - gel."
+        },
+        {
+          "promptTts": "Wo versteckt sich das I?",
+          "atomId": "insel",
+          "slot": "start",
+          "missTts": "I - nsel."
+        }
       ]
     },
     {
-      "trainer": "letter_trace", "id": "l02-t2",
+      "trainer": "sound_position",
+      "id": "l02-t2",
+      "phonemeTts": "O",
       "rounds": [
-        { "promptTts": "Spure das große I nach und sammle alle Sterne.", "atomId": "letter-i", "glyph": "I", "rewardTts": "I wie Igel.", "rewardEmoji": "🦔" },
-        { "promptTts": "Spure das große O nach und sammle alle Sterne.", "atomId": "letter-o", "glyph": "O", "rewardTts": "O wie Ohr.", "rewardEmoji": "👂" }
+        {
+          "promptTts": "Wir suchen das O.",
+          "atomId": "ohr",
+          "slot": "start",
+          "missTts": "O - hr."
+        },
+        {
+          "promptTts": "Wo versteckt sich das O?",
+          "atomId": "radio",
+          "slot": "end",
+          "missTts": "Radi - O."
+        }
       ]
     },
     {
-      "trainer": "syllable_merge", "id": "l02-t3",
+      "trainer": "letter_trace",
+      "id": "l02-t3",
       "rounds": [
-        { "promptTts": "Lass die Buchstaben zusammenrutschen.", "leftAtomId": "letter-m", "leftDisplay": "m", "rightAtomId": "letter-i", "rightDisplay": "i", "resultAtomId": "mi", "resultDisplay": "mi", "stretchTts": "Mmmmm" },
-        { "promptTts": "Und jetzt mit dem O.", "leftAtomId": "letter-m", "leftDisplay": "m", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "mo", "resultDisplay": "mo", "stretchTts": "Mmmmm" }
+        {
+          "promptTts": "Spure das große I nach.",
+          "atomId": "letter-i",
+          "glyph": "I",
+          "rewardTts": "I wie Igel.",
+          "rewardEmoji": "🦔"
+        }
       ]
     },
     {
-      "trainer": "word_build", "id": "l02-t4",
+      "trainer": "letter_trace",
+      "id": "l02-t4",
       "rounds": [
-        { "promptTts": "Kannst du das Wort Oma bauen?", "targetAtomId": "oma",
-          "blocks": [ { "atomId": "letter-o", "display": "O" }, { "atomId": "ma", "display": "ma" } ],
-          "distractors": [ { "atomId": "mi", "display": "Mi" } ] },
-        { "promptTts": "Die Katze heißt Mimi. Baue Mimi.", "targetAtomId": "mimi",
-          "blocks": [ { "atomId": "mi", "display": "Mi" }, { "atomId": "mi", "display": "mi" } ],
-          "distractors": [ { "atomId": "ma", "display": "Ma" } ] }
+        {
+          "promptTts": "Spure das große O nach.",
+          "atomId": "letter-o",
+          "glyph": "O",
+          "rewardTts": "O wie Ohr.",
+          "rewardEmoji": "👂"
+        }
       ]
     },
     {
-      "trainer": "sentence_order", "id": "l02-t5",
+      "trainer": "syllable_merge",
+      "id": "l02-t5",
       "rounds": [
-        { "promptTts": "Oma. Hänge das Wort zum Bild.", "sentenceId": "s-oma", "illustrationAtomId": "oma",
-          "distractors": [ { "atomId": "mama", "display": "Mama" } ] }
+        {
+          "promptTts": "Lass M und I zusammenrutschen.",
+          "leftAtomId": "letter-m",
+          "leftDisplay": "m",
+          "rightAtomId": "letter-i",
+          "rightDisplay": "i",
+          "resultAtomId": "mi",
+          "resultDisplay": "mi",
+          "stretchTts": "M"
+        }
       ]
     },
     {
-      "trainer": "count_add", "id": "l02-t6",
+      "trainer": "syllable_merge",
+      "id": "l02-t6",
       "rounds": [
-        { "promptTts": "Eine Oma und zwei Omas. Wie viele Omas?", "iconAtomId": "oma", "left": 1, "right": 2, "answer": 3 },
-        { "promptTts": "Zwei Omas und zwei Omas. Wie viele Omas?", "iconAtomId": "oma", "left": 2, "right": 2, "answer": 4 }
+        {
+          "promptTts": "Und jetzt M und O.",
+          "leftAtomId": "letter-m",
+          "leftDisplay": "m",
+          "rightAtomId": "letter-o",
+          "rightDisplay": "o",
+          "resultAtomId": "mo",
+          "resultDisplay": "mo",
+          "stretchTts": "M"
+        }
       ]
     },
     {
-      "trainer": "sound_position", "id": "l03-t1", "phonemeTts": "T",
+      "trainer": "word_build",
+      "id": "l02-t7",
       "rounds": [
-        { "promptTts": "Wir suchen das T. Wo versteckt sich das T?", "atomId": "tomate", "slot": "start", "missTts": "T - omate. Hörst du das T am Anfang?" },
-        { "promptTts": "Wo versteckt sich das T?", "atomId": "ente", "slot": "middle", "missTts": "En - T - e. Hörst du das T in der Mitte?" },
-        { "promptTts": "Wo versteckt sich das T?", "atomId": "hut", "slot": "end", "missTts": "Hu - T. Hörst du das T am Ende?" }
+        {
+          "promptTts": "Baue das Wort Oma.",
+          "targetAtomId": "oma",
+          "blocks": [
+            {
+              "atomId": "letter-o",
+              "display": "O"
+            },
+            {
+              "atomId": "ma",
+              "display": "ma"
+            }
+          ]
+        }
       ]
     },
     {
-      "trainer": "letter_trace", "id": "l03-t2",
+      "trainer": "word_build",
+      "id": "l02-t8",
       "rounds": [
-        { "promptTts": "Spure das große P nach und sammle alle Sterne.", "atomId": "letter-p", "glyph": "P", "rewardTts": "P wie Paket.", "rewardEmoji": "📦" },
-        { "promptTts": "Spure das große T nach und sammle alle Sterne.", "atomId": "letter-t", "glyph": "T", "rewardTts": "T wie Tomate.", "rewardEmoji": "🍅" }
+        {
+          "promptTts": "Baue Mimi.",
+          "targetAtomId": "mimi",
+          "blocks": [
+            {
+              "atomId": "mi",
+              "display": "Mi"
+            },
+            {
+              "atomId": "mi",
+              "display": "mi"
+            }
+          ]
+        }
       ]
     },
     {
-      "trainer": "syllable_merge", "id": "l03-t3",
+      "trainer": "sentence_order",
+      "id": "l02-t9",
       "rounds": [
-        { "promptTts": "Lass die Buchstaben zusammenrutschen.", "leftAtomId": "letter-p", "leftDisplay": "p", "rightAtomId": "letter-a", "rightDisplay": "a", "resultAtomId": "pa", "resultDisplay": "pa", "stretchTts": "P" },
-        { "promptTts": "Und jetzt T und O.", "leftAtomId": "letter-t", "leftDisplay": "t", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "to", "resultDisplay": "to", "stretchTts": "T" }
+        {
+          "promptTts": "Oma.",
+          "sentenceId": "s-oma",
+          "illustrationAtomId": "oma"
+        }
       ]
     },
     {
-      "trainer": "word_build", "id": "l03-t4",
+      "trainer": "count_add",
+      "id": "l02-t10",
       "rounds": [
-        { "promptTts": "Kannst du das Wort Papa bauen?", "targetAtomId": "papa",
-          "blocks": [ { "atomId": "pa", "display": "Pa" }, { "atomId": "pa", "display": "pa" } ],
-          "distractors": [ { "atomId": "ma", "display": "Ma" } ] },
-        { "promptTts": "Und jetzt das Wort Opa.", "targetAtomId": "opa",
-          "blocks": [ { "atomId": "letter-o", "display": "O" }, { "atomId": "pa", "display": "pa" } ],
-          "distractors": [ { "atomId": "ma", "display": "Ma" } ] }
+        {
+          "promptTts": "Eine Oma und zwei Omas. Wie viele?",
+          "iconAtomId": "oma",
+          "left": 1,
+          "right": 2,
+          "answer": 3
+        }
       ]
     },
     {
-      "trainer": "sentence_order", "id": "l03-t5",
+      "trainer": "sound_position",
+      "id": "l03-t1",
+      "phonemeTts": "P",
       "rounds": [
-        { "promptTts": "Papa am Tor. Hänge die Wörter auf.", "sentenceId": "s-papa-am-tor", "illustrationAtomId": "tor",
-          "distractors": [ { "atomId": "mama", "display": "Mama" } ],
-          "holisticAtomIds": ["tor"] }
+        {
+          "promptTts": "Wir suchen das P.",
+          "atomId": "paket",
+          "slot": "start",
+          "missTts": "P - aket."
+        }
       ]
     },
     {
-      "trainer": "count_add", "id": "l03-t6",
+      "trainer": "sound_position",
+      "id": "l03-t2",
+      "phonemeTts": "T",
       "rounds": [
-        { "promptTts": "Eine Tomate und drei Tomaten. Wie viele Tomaten?", "iconAtomId": "tomate", "left": 1, "right": 3, "answer": 4 },
-        { "promptTts": "Drei Tomaten und zwei Tomaten. Wie viele Tomaten?", "iconAtomId": "tomate", "left": 3, "right": 2, "answer": 5 }
+        {
+          "promptTts": "Wir suchen das T.",
+          "atomId": "tomate",
+          "slot": "start",
+          "missTts": "T - omate."
+        }
       ]
     },
     {
-      "trainer": "sound_position", "id": "l04-t1", "phonemeTts": "Lll",
+      "trainer": "letter_trace",
+      "id": "l03-t3",
       "rounds": [
-        { "promptTts": "Wir suchen das Lll. Wo versteckt sich das Lll?", "atomId": "lama", "slot": "start", "missTts": "Lll - ama. Hörst du das Lll am Anfang?" },
-        { "promptTts": "Wo versteckt sich das Lll?", "atomId": "salat", "slot": "middle", "missTts": "Sa - Lll - at. Hörst du das Lll in der Mitte?" },
-        { "promptTts": "Wo versteckt sich das Lll?", "atomId": "insel", "slot": "end", "missTts": "Inse - Lll. Hörst du das Lll am Ende?" }
+        {
+          "promptTts": "Spure das große P nach.",
+          "atomId": "letter-p",
+          "glyph": "P",
+          "rewardTts": "P wie Paket.",
+          "rewardEmoji": "📦"
+        }
       ]
     },
     {
-      "trainer": "letter_trace", "id": "l04-t2",
+      "trainer": "letter_trace",
+      "id": "l03-t4",
       "rounds": [
-        { "promptTts": "Spure das große L nach und sammle alle Sterne.", "atomId": "letter-l", "glyph": "L", "rewardTts": "L wie Lama.", "rewardEmoji": "🦙" },
-        { "promptTts": "Spure das große H nach und sammle alle Sterne.", "atomId": "letter-h", "glyph": "H", "rewardTts": "H wie Hut.", "rewardEmoji": "🎩" }
+        {
+          "promptTts": "Spure das große T nach.",
+          "atomId": "letter-t",
+          "glyph": "T",
+          "rewardTts": "T wie Tomate.",
+          "rewardEmoji": "🍅"
+        }
       ]
     },
     {
-      "trainer": "syllable_merge", "id": "l04-t3",
+      "trainer": "syllable_merge",
+      "id": "l03-t5",
       "rounds": [
-        { "promptTts": "Lass die Buchstaben zusammenrutschen.", "leftAtomId": "letter-l", "leftDisplay": "l", "rightAtomId": "letter-a", "rightDisplay": "a", "resultAtomId": "la", "resultDisplay": "la", "stretchTts": "Llllll" },
-        { "promptTts": "Das H ist nur ein Hauch. H und O.", "leftAtomId": "letter-h", "leftDisplay": "h", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "ho", "resultDisplay": "ho", "stretchTts": "Hhh" }
+        {
+          "promptTts": "Mache die Silbe pa.",
+          "leftAtomId": "letter-p",
+          "leftDisplay": "p",
+          "rightAtomId": "letter-a",
+          "rightDisplay": "a",
+          "resultAtomId": "pa",
+          "resultDisplay": "pa",
+          "stretchTts": "P"
+        }
       ]
     },
     {
-      "trainer": "word_build", "id": "l04-t4",
+      "trainer": "syllable_merge",
+      "id": "l03-t6",
       "rounds": [
-        { "promptTts": "Kannst du das Wort Lama bauen?", "targetAtomId": "lama",
-          "blocks": [ { "atomId": "la", "display": "La" }, { "atomId": "ma", "display": "ma" } ],
-          "distractors": [ { "atomId": "pa", "display": "Pa" }, { "atomId": "ho", "display": "ho" } ] }
+        {
+          "promptTts": "Mache die Silbe to.",
+          "leftAtomId": "letter-t",
+          "leftDisplay": "t",
+          "rightAtomId": "letter-o",
+          "rightDisplay": "o",
+          "resultAtomId": "to",
+          "resultDisplay": "to",
+          "stretchTts": "T"
+        }
       ]
     },
     {
-      "trainer": "sentence_order", "id": "l04-t5",
+      "trainer": "word_build",
+      "id": "l03-t7",
       "rounds": [
-        { "promptTts": "Hallo Lama! Hänge die Wörter auf.", "sentenceId": "s-hallo-lama", "illustrationAtomId": "lama",
-          "distractors": [ { "atomId": "mama", "display": "Mama" } ],
-          "holisticAtomIds": ["hallo"] }
+        {
+          "promptTts": "Baue das Wort Papa.",
+          "targetAtomId": "papa",
+          "blocks": [
+            {
+              "atomId": "pa",
+              "display": "Pa"
+            },
+            {
+              "atomId": "pa",
+              "display": "pa"
+            }
+          ]
+        }
       ]
     },
     {
-      "trainer": "count_add", "id": "l04-t6",
+      "trainer": "word_build",
+      "id": "l03-t8",
       "rounds": [
-        { "promptTts": "Ein Lama und ein Lama. Wie viele Lamas?", "iconAtomId": "lama", "left": 1, "right": 1, "answer": 2 },
-        { "promptTts": "Vier Lamas und zwei Lamas. Wie viele Lamas?", "iconAtomId": "lama", "left": 4, "right": 2, "answer": 6 }
+        {
+          "promptTts": "Baue das Wort Opa.",
+          "targetAtomId": "opa",
+          "blocks": [
+            {
+              "atomId": "letter-o",
+              "display": "O"
+            },
+            {
+              "atomId": "pa",
+              "display": "pa"
+            }
+          ]
+        }
       ]
     },
     {
-      "trainer": "sound_position", "id": "l05-t1", "phonemeTts": "Rrr",
+      "trainer": "word_build",
+      "id": "l03-t9",
       "rounds": [
-        { "promptTts": "Wir suchen das Rrr. Wo versteckt sich das Rrr?", "atomId": "rose", "slot": "start", "missTts": "Rrr - ose. Hörst du das Rrr am Anfang?" },
-        { "promptTts": "Wo versteckt sich das Rrr?", "atomId": "karotte", "slot": "middle", "missTts": "Ka - Rrr - otte. Hörst du das Rrr in der Mitte?" },
-        { "promptTts": "Wo versteckt sich das Rrr?", "atomId": "uhr", "slot": "end", "missTts": "Uh - Rrr. Hörst du das Rrr am Ende?" }
+        {
+          "promptTts": "Baue Tom.",
+          "targetAtomId": "tom",
+          "blocks": [
+            {
+              "atomId": "letter-t",
+              "display": "T"
+            },
+            {
+              "atomId": "letter-o",
+              "display": "o"
+            },
+            {
+              "atomId": "letter-m",
+              "display": "m"
+            }
+          ]
+        }
       ]
     },
     {
-      "trainer": "letter_trace", "id": "l05-t2",
+      "trainer": "count_add",
+      "id": "l03-t10",
       "rounds": [
-        { "promptTts": "Spure das große U nach und sammle alle Sterne.", "atomId": "letter-u", "glyph": "U", "rewardTts": "U wie Uhr.", "rewardEmoji": "⏰" },
-        { "promptTts": "Spure das große R nach und sammle alle Sterne.", "atomId": "letter-r", "glyph": "R", "rewardTts": "R wie Rose.", "rewardEmoji": "🌹" }
+        {
+          "promptTts": "Eine Tomate und drei Tomaten. Wie viele?",
+          "iconAtomId": "tomate",
+          "left": 1,
+          "right": 3,
+          "answer": 4
+        }
       ]
     },
     {
-      "trainer": "syllable_merge", "id": "l05-t3",
+      "trainer": "sound_position",
+      "id": "l04-t1",
+      "phonemeTts": "L",
       "rounds": [
-        { "promptTts": "Lass die Buchstaben zusammenrutschen.", "leftAtomId": "letter-r", "leftDisplay": "r", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "ro", "resultDisplay": "ro", "stretchTts": "Rrrrr" },
-        { "promptTts": "Und jetzt R und U.", "leftAtomId": "letter-r", "leftDisplay": "r", "rightAtomId": "letter-u", "rightDisplay": "u", "resultAtomId": "ru", "resultDisplay": "ru", "stretchTts": "Rrrrr" }
+        {
+          "promptTts": "Wir suchen das L.",
+          "atomId": "lama",
+          "slot": "start",
+          "missTts": "L - ama."
+        }
       ]
     },
     {
-      "trainer": "word_build", "id": "l05-t4",
+      "trainer": "sound_position",
+      "id": "l04-t2",
+      "phonemeTts": "H",
       "rounds": [
-        { "promptTts": "Kannst du das Wort Tor bauen?", "targetAtomId": "tor",
-          "blocks": [ { "atomId": "letter-t", "display": "T" }, { "atomId": "letter-o", "display": "o" }, { "atomId": "letter-r", "display": "r" } ],
-          "distractors": [ { "atomId": "letter-u", "display": "u" } ] },
-        { "promptTts": "Und jetzt das Wort rot.", "targetAtomId": "rot",
-          "blocks": [ { "atomId": "letter-r", "display": "r" }, { "atomId": "letter-o", "display": "o" }, { "atomId": "letter-t", "display": "t" } ],
-          "distractors": [ { "atomId": "letter-u", "display": "u" } ] }
+        {
+          "promptTts": "Wir suchen das H.",
+          "atomId": "hut",
+          "slot": "start",
+          "missTts": "H - ut."
+        }
       ]
     },
     {
-      "trainer": "sentence_order", "id": "l05-t5",
+      "trainer": "letter_trace",
+      "id": "l04-t3",
       "rounds": [
-        { "promptTts": "Tom ruft Opa. Hänge die Wörter auf.", "sentenceId": "s-tom-ruft-opa", "illustrationAtomId": "tom",
-          "distractors": [ { "atomId": "mama", "display": "Mama" } ],
-          "holisticAtomIds": ["tom"] }
+        {
+          "promptTts": "Spure das große L nach.",
+          "atomId": "letter-l",
+          "glyph": "L",
+          "rewardTts": "L wie Lama.",
+          "rewardEmoji": "🦙"
+        }
       ]
     },
     {
-      "trainer": "count_add", "id": "l05-t6",
+      "trainer": "letter_trace",
+      "id": "l04-t4",
       "rounds": [
-        { "promptTts": "Zwei Uhren und drei Uhren. Wie viele Uhren?", "iconAtomId": "uhr", "left": 2, "right": 3, "answer": 5 },
-        { "promptTts": "Fünf Uhren und zwei Uhren. Wie viele Uhren?", "iconAtomId": "uhr", "left": 5, "right": 2, "answer": 7 }
+        {
+          "promptTts": "Spure das große H nach.",
+          "atomId": "letter-h",
+          "glyph": "H",
+          "rewardTts": "H wie Hut.",
+          "rewardEmoji": "🎩"
+        }
       ]
     },
     {
-      "trainer": "sound_position", "id": "l06-t1", "phonemeTts": "Sss",
+      "trainer": "syllable_merge",
+      "id": "l04-t5",
       "rounds": [
-        { "promptTts": "Wir suchen das Sss. Wo versteckt sich das Sss?", "atomId": "sonne", "slot": "start", "missTts": "Sss - onne. Hörst du das Sss am Anfang?" },
-        { "promptTts": "Wo versteckt sich das Sss?", "atomId": "nase", "slot": "middle", "missTts": "Na - Sss - e. Hörst du das Sss in der Mitte?" },
-        { "promptTts": "Wo versteckt sich das Sss?", "atomId": "haus", "slot": "end", "missTts": "Hau - Sss. Hörst du das Sss am Ende?" }
+        {
+          "promptTts": "Verbinde L und A.",
+          "leftAtomId": "letter-l",
+          "leftDisplay": "l",
+          "rightAtomId": "letter-a",
+          "rightDisplay": "a",
+          "resultAtomId": "la",
+          "resultDisplay": "la",
+          "stretchTts": "L"
+        }
       ]
     },
     {
-      "trainer": "letter_trace", "id": "l06-t2",
+      "trainer": "syllable_merge",
+      "id": "l04-t6",
       "rounds": [
-        { "promptTts": "Spure das große N nach und sammle alle Sterne.", "atomId": "letter-n", "glyph": "N", "rewardTts": "N wie Nase.", "rewardEmoji": "👃" },
-        { "promptTts": "Spure das große S nach und sammle alle Sterne.", "atomId": "letter-s", "glyph": "S", "rewardTts": "S wie Sonne.", "rewardEmoji": "☀️" },
-        { "promptTts": "Spure das große E nach und sammle alle Sterne.", "atomId": "letter-e", "glyph": "E", "rewardTts": "E wie Ente.", "rewardEmoji": "🦆" },
-        { "promptTts": "Spure das große D nach und sammle alle Sterne.", "atomId": "letter-d", "glyph": "D", "rewardTts": "D wie Dose.", "rewardEmoji": "🥫" }
+        {
+          "promptTts": "Verbinde H und O.",
+          "leftAtomId": "letter-h",
+          "leftDisplay": "h",
+          "rightAtomId": "letter-o",
+          "rightDisplay": "o",
+          "resultAtomId": "ho",
+          "resultDisplay": "ho",
+          "stretchTts": "H"
+        }
       ]
     },
     {
-      "trainer": "syllable_merge", "id": "l06-t3",
+      "trainer": "word_build",
+      "id": "l04-t7",
       "rounds": [
-        { "promptTts": "Lass die Buchstaben zusammenrutschen.", "leftAtomId": "letter-s", "leftDisplay": "s", "rightAtomId": "letter-e", "rightDisplay": "e", "resultAtomId": "se", "resultDisplay": "se", "stretchTts": "Sssss" },
-        { "promptTts": "Und jetzt D und O.", "leftAtomId": "letter-d", "leftDisplay": "d", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "do", "resultDisplay": "do", "stretchTts": "D" }
+        {
+          "promptTts": "Baue das Wort Lama.",
+          "targetAtomId": "lama",
+          "blocks": [
+            {
+              "atomId": "la",
+              "display": "La"
+            },
+            {
+              "atomId": "ma",
+              "display": "ma"
+            }
+          ]
+        }
       ]
     },
     {
-      "trainer": "word_build", "id": "l06-t4",
+      "trainer": "word_build",
+      "id": "l04-t8",
       "rounds": [
-        { "promptTts": "Kannst du das Wort Dose bauen?", "targetAtomId": "dose",
-          "blocks": [ { "atomId": "do", "display": "Do" }, { "atomId": "se", "display": "se" } ],
-          "distractors": [ { "atomId": "ro", "display": "ro" }, { "atomId": "ma", "display": "Ma" } ] },
-        { "promptTts": "Und jetzt das Wort Nest.", "targetAtomId": "nest",
-          "blocks": [ { "atomId": "letter-n", "display": "N" }, { "atomId": "letter-e", "display": "e" }, { "atomId": "letter-s", "display": "s" }, { "atomId": "letter-t", "display": "t" } ],
-          "distractors": [ { "atomId": "letter-o", "display": "o" } ] }
+        {
+          "promptTts": "Baue das Wort Hallo.",
+          "targetAtomId": "hallo",
+          "blocks": [
+            {
+              "atomId": "letter-h",
+              "display": "Ha"
+            },
+            {
+              "atomId": "letter-l",
+              "display": "l"
+            },
+            {
+              "atomId": "letter-l",
+              "display": "l"
+            },
+            {
+              "atomId": "letter-o",
+              "display": "o"
+            }
+          ]
+        }
       ]
     },
     {
-      "trainer": "sentence_order", "id": "l06-t5",
+      "trainer": "sentence_order",
+      "id": "l04-t9",
       "rounds": [
-        { "promptTts": "Oma ist da. Hänge die Wörter auf.", "sentenceId": "s-oma-ist-da", "illustrationAtomId": "oma",
-          "distractors": [ { "atomId": "mama", "display": "Mama" } ] },
-        { "promptTts": "Das Lama ist rot. Hänge die Wörter auf.", "sentenceId": "s-das-lama-ist-rot", "illustrationAtomId": "lama",
-          "distractors": [ { "atomId": "papa", "display": "Papa" } ] }
+        {
+          "promptTts": "Hallo Lama!",
+          "sentenceId": "s-hallo-lama",
+          "illustrationAtomId": "lama"
+        }
       ]
     },
     {
-      "trainer": "count_add", "id": "l06-t6",
+      "trainer": "count_add",
+      "id": "l04-t10",
       "rounds": [
-        { "promptTts": "Eine Rose und vier Rosen. Wie viele Rosen?", "iconAtomId": "rose", "left": 1, "right": 4, "answer": 5 },
-        { "promptTts": "Vier Rosen und vier Rosen. Wie viele Rosen?", "iconAtomId": "rose", "left": 4, "right": 4, "answer": 8 }
+        {
+          "promptTts": "Ein Lama und ein Lama. Wie viele?",
+          "iconAtomId": "lama",
+          "left": 1,
+          "right": 1,
+          "answer": 2
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l05-t1",
+      "phonemeTts": "F",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das F.",
+          "atomId": "fuchs",
+          "slot": "start",
+          "missTts": "F - uchs."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l05-t2",
+      "phonemeTts": "U",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das U.",
+          "atomId": "uhu",
+          "slot": "start",
+          "missTts": "U - hu."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l05-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das große F nach.",
+          "atomId": "letter-f",
+          "glyph": "F",
+          "rewardTts": "F wie Fuchs.",
+          "rewardEmoji": "🦊"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l05-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große U nach.",
+          "atomId": "letter-u",
+          "glyph": "U",
+          "rewardTts": "U wie Uhu.",
+          "rewardEmoji": "🦉"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l05-t5",
+      "rounds": [
+        {
+          "promptTts": "Verbinde F und U.",
+          "leftAtomId": "letter-f",
+          "leftDisplay": "f",
+          "rightAtomId": "letter-u",
+          "rightDisplay": "u",
+          "resultAtomId": "fu",
+          "resultDisplay": "fu",
+          "stretchTts": "F"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l05-t6",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Hut.",
+          "targetAtomId": "hut",
+          "blocks": [
+            {
+              "atomId": "letter-h",
+              "display": "H"
+            },
+            {
+              "atomId": "letter-u",
+              "display": "u"
+            },
+            {
+              "atomId": "letter-t",
+              "display": "t"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l05-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Ufo.",
+          "targetAtomId": "ufo",
+          "blocks": [
+            {
+              "atomId": "letter-u",
+              "display": "U"
+            },
+            {
+              "atomId": "letter-f",
+              "display": "f"
+            },
+            {
+              "atomId": "letter-o",
+              "display": "o"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l05-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort hat.",
+          "targetAtomId": "hat",
+          "blocks": [
+            {
+              "atomId": "letter-h",
+              "display": "h"
+            },
+            {
+              "atomId": "letter-a",
+              "display": "a"
+            },
+            {
+              "atomId": "letter-t",
+              "display": "t"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l05-t9",
+      "rounds": [
+        {
+          "promptTts": "Oma hat Lama.",
+          "sentenceId": "s-oma-hat-lama",
+          "illustrationAtomId": "lama"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l05-t10",
+      "rounds": [
+        {
+          "promptTts": "Zwei Hüte und zwei Hüte. Wie viele Hüte?",
+          "iconAtomId": "hut",
+          "left": 2,
+          "right": 2,
+          "answer": 4
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l06-t1",
+      "phonemeTts": "R",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das R.",
+          "atomId": "rose",
+          "slot": "start",
+          "missTts": "R - ose."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l06-t2",
+      "phonemeTts": "N",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das N.",
+          "atomId": "nase",
+          "slot": "start",
+          "missTts": "N - ase."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l06-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das große R nach.",
+          "atomId": "letter-r",
+          "glyph": "R",
+          "rewardTts": "R wie Rose.",
+          "rewardEmoji": "🌹"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l06-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große N nach.",
+          "atomId": "letter-n",
+          "glyph": "N",
+          "rewardTts": "N wie Nase.",
+          "rewardEmoji": "👃"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l06-t5",
+      "rounds": [
+        {
+          "promptTts": "Verbinde R und O.",
+          "leftAtomId": "letter-r",
+          "leftDisplay": "r",
+          "rightAtomId": "letter-o",
+          "rightDisplay": "o",
+          "resultAtomId": "ro",
+          "resultDisplay": "ro",
+          "stretchTts": "R"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l06-t6",
+      "rounds": [
+        {
+          "promptTts": "Verbinde N und A.",
+          "leftAtomId": "letter-n",
+          "leftDisplay": "n",
+          "rightAtomId": "letter-a",
+          "rightDisplay": "a",
+          "resultAtomId": "na",
+          "resultDisplay": "na",
+          "stretchTts": "N"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l06-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort rot.",
+          "targetAtomId": "rot",
+          "blocks": [
+            {
+              "atomId": "letter-r",
+              "display": "r"
+            },
+            {
+              "atomId": "letter-o",
+              "display": "o"
+            },
+            {
+              "atomId": "letter-t",
+              "display": "t"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l06-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Tor.",
+          "targetAtomId": "tor",
+          "blocks": [
+            {
+              "atomId": "letter-t",
+              "display": "T"
+            },
+            {
+              "atomId": "letter-o",
+              "display": "o"
+            },
+            {
+              "atomId": "letter-r",
+              "display": "r"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l06-t9",
+      "rounds": [
+        {
+          "promptTts": "Tom ruft Opa.",
+          "sentenceId": "s-tom-ruft-opa",
+          "illustrationAtomId": "tom"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l06-t10",
+      "rounds": [
+        {
+          "promptTts": "Ein Tor und zwei Tore. Wie viele Tore?",
+          "iconAtomId": "tor",
+          "left": 1,
+          "right": 2,
+          "answer": 3
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l07-t1",
+      "phonemeTts": "S",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das S.",
+          "atomId": "sonne",
+          "slot": "start",
+          "missTts": "S - onne."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l07-t2",
+      "phonemeTts": "E",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das E.",
+          "atomId": "ente",
+          "slot": "start",
+          "missTts": "E - nte."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l07-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das große S nach.",
+          "atomId": "letter-s",
+          "glyph": "S",
+          "rewardTts": "S wie Sonne.",
+          "rewardEmoji": "☀️"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l07-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große E nach.",
+          "atomId": "letter-e",
+          "glyph": "E",
+          "rewardTts": "E wie Ente.",
+          "rewardEmoji": "🦆"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l07-t5",
+      "rounds": [
+        {
+          "promptTts": "Verbinde S und E.",
+          "leftAtomId": "letter-s",
+          "leftDisplay": "s",
+          "rightAtomId": "letter-e",
+          "rightDisplay": "e",
+          "resultAtomId": "se",
+          "resultDisplay": "se",
+          "stretchTts": "S"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l07-t6",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Nest.",
+          "targetAtomId": "nest",
+          "blocks": [
+            {
+              "atomId": "letter-n",
+              "display": "N"
+            },
+            {
+              "atomId": "letter-e",
+              "display": "e"
+            },
+            {
+              "atomId": "letter-s",
+              "display": "s"
+            },
+            {
+              "atomId": "letter-t",
+              "display": "t"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l07-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Rose.",
+          "targetAtomId": "rose",
+          "blocks": [
+            {
+              "atomId": "letter-r",
+              "display": "Ro"
+            },
+            {
+              "atomId": "se",
+              "display": "se"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l07-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort ist.",
+          "targetAtomId": "ist",
+          "blocks": [
+            {
+              "atomId": "letter-i",
+              "display": "i"
+            },
+            {
+              "atomId": "letter-s",
+              "display": "s"
+            },
+            {
+              "atomId": "letter-t",
+              "display": "t"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l07-t9",
+      "rounds": [
+        {
+          "promptTts": "Lama ist rot.",
+          "sentenceId": "s-lama-ist-rot",
+          "illustrationAtomId": "lama"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l07-t10",
+      "rounds": [
+        {
+          "promptTts": "Zwei Rosen und drei Rosen. Wie viele?",
+          "iconAtomId": "rose",
+          "left": 2,
+          "right": 3,
+          "answer": 5
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l08-t1",
+      "phonemeTts": "D",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das D.",
+          "atomId": "dose",
+          "slot": "start",
+          "missTts": "D - ose."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l08-t2",
+      "phonemeTts": "K",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das K.",
+          "atomId": "keks",
+          "slot": "start",
+          "missTts": "K - eks."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l08-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das große D nach.",
+          "atomId": "letter-d",
+          "glyph": "D",
+          "rewardTts": "D wie Dose.",
+          "rewardEmoji": "🥫"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l08-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große K nach.",
+          "atomId": "letter-k",
+          "glyph": "K",
+          "rewardTts": "K wie Keks.",
+          "rewardEmoji": "🍪"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l08-t5",
+      "rounds": [
+        {
+          "promptTts": "Verbinde D und O.",
+          "leftAtomId": "letter-d",
+          "leftDisplay": "d",
+          "rightAtomId": "letter-o",
+          "rightDisplay": "o",
+          "resultAtomId": "do",
+          "resultDisplay": "do",
+          "stretchTts": "D"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l08-t6",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Dose.",
+          "targetAtomId": "dose",
+          "blocks": [
+            {
+              "atomId": "do",
+              "display": "Do"
+            },
+            {
+              "atomId": "se",
+              "display": "se"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l08-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Keks.",
+          "targetAtomId": "keks",
+          "blocks": [
+            {
+              "atomId": "letter-k",
+              "display": "K"
+            },
+            {
+              "atomId": "letter-e",
+              "display": "e"
+            },
+            {
+              "atomId": "letter-k",
+              "display": "k"
+            },
+            {
+              "atomId": "letter-s",
+              "display": "s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l08-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort das.",
+          "targetAtomId": "das",
+          "blocks": [
+            {
+              "atomId": "letter-d",
+              "display": "d"
+            },
+            {
+              "atomId": "letter-a",
+              "display": "a"
+            },
+            {
+              "atomId": "letter-s",
+              "display": "s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l08-t9",
+      "rounds": [
+        {
+          "promptTts": "Oma ist da.",
+          "sentenceId": "s-oma-ist-da",
+          "illustrationAtomId": "oma"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l08-t10",
+      "rounds": [
+        {
+          "promptTts": "Eine Dose und eine Dose. Wie viele?",
+          "iconAtomId": "dose",
+          "left": 1,
+          "right": 1,
+          "answer": 2
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l09-t1",
+      "phonemeTts": "Ei",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das Ei.",
+          "atomId": "eis",
+          "slot": "start",
+          "missTts": "Ei - s."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l09-t2",
+      "phonemeTts": "W",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das W.",
+          "atomId": "wolke",
+          "slot": "start",
+          "missTts": "W - olke."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l09-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Ei nach.",
+          "atomId": "letter-ei",
+          "glyph": "Ei",
+          "rewardTts": "Ei wie Eis.",
+          "rewardEmoji": "🍦"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l09-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große W nach.",
+          "atomId": "letter-w",
+          "glyph": "W",
+          "rewardTts": "W wie Weg.",
+          "rewardEmoji": "🛣️"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l09-t5",
+      "rounds": [
+        {
+          "promptTts": "Verbinde M und Ei.",
+          "leftAtomId": "letter-m",
+          "leftDisplay": "m",
+          "rightAtomId": "letter-ei",
+          "rightDisplay": "ei",
+          "resultAtomId": "mei",
+          "resultDisplay": "mei",
+          "stretchTts": "M"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l09-t6",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Eis.",
+          "targetAtomId": "eis",
+          "blocks": [
+            {
+              "atomId": "letter-ei",
+              "display": "Ei"
+            },
+            {
+              "atomId": "letter-s",
+              "display": "s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l09-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort mein.",
+          "targetAtomId": "mein",
+          "blocks": [
+            {
+              "atomId": "letter-m",
+              "display": "m"
+            },
+            {
+              "atomId": "letter-ei",
+              "display": "ei"
+            },
+            {
+              "atomId": "letter-n",
+              "display": "n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l09-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort wir.",
+          "targetAtomId": "wir",
+          "blocks": [
+            {
+              "atomId": "letter-w",
+              "display": "w"
+            },
+            {
+              "atomId": "letter-i",
+              "display": "i"
+            },
+            {
+              "atomId": "letter-r",
+              "display": "r"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l09-t9",
+      "rounds": [
+        {
+          "promptTts": "Das ist mein Papa.",
+          "sentenceId": "s-das-ist-mein-papa",
+          "illustrationAtomId": "papa"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l09-t10",
+      "rounds": [
+        {
+          "promptTts": "Ein Eis und zwei Eis. Wie viele?",
+          "iconAtomId": "eis",
+          "left": 1,
+          "right": 2,
+          "answer": 3
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l10-t1",
+      "phonemeTts": "G",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das G.",
+          "atomId": "gabel",
+          "slot": "start",
+          "missTts": "G - abel."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l10-t2",
+      "phonemeTts": "Ch",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das Ch.",
+          "atomId": "dach",
+          "slot": "end",
+          "missTts": "Da - ch."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l10-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das große G nach.",
+          "atomId": "letter-g",
+          "glyph": "G",
+          "rewardTts": "G wie Gabel.",
+          "rewardEmoji": "🍴"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l10-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Ch nach.",
+          "atomId": "letter-ch",
+          "glyph": "Ch",
+          "rewardTts": "Ch wie Dach.",
+          "rewardEmoji": "🏠"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l10-t5",
+      "rounds": [
+        {
+          "promptTts": "Verbinde G und E.",
+          "leftAtomId": "letter-g",
+          "leftDisplay": "g",
+          "rightAtomId": "letter-e",
+          "rightDisplay": "e",
+          "resultAtomId": "ge",
+          "resultDisplay": "ge",
+          "stretchTts": "G"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l10-t6",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Weg.",
+          "targetAtomId": "weg",
+          "blocks": [
+            {
+              "atomId": "letter-w",
+              "display": "W"
+            },
+            {
+              "atomId": "letter-e",
+              "display": "e"
+            },
+            {
+              "atomId": "letter-g",
+              "display": "g"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l10-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Dach.",
+          "targetAtomId": "dach",
+          "blocks": [
+            {
+              "atomId": "letter-d",
+              "display": "Da"
+            },
+            {
+              "atomId": "letter-ch",
+              "display": "ch"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l10-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue ich.",
+          "targetAtomId": "ich",
+          "blocks": [
+            {
+              "atomId": "letter-i",
+              "display": "i"
+            },
+            {
+              "atomId": "letter-ch",
+              "display": "ch"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l10-t9",
+      "rounds": [
+        {
+          "promptTts": "Wir gehen den Weg.",
+          "sentenceId": "s-wir-gehen",
+          "illustrationAtomId": "weg"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l10-t10",
+      "rounds": [
+        {
+          "promptTts": "Zwei Wege und zwei Wege. Wie viele?",
+          "iconAtomId": "weg",
+          "left": 2,
+          "right": 2,
+          "answer": 4
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l11-t1",
+      "phonemeTts": "Au",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das Au.",
+          "atomId": "haus",
+          "slot": "middle",
+          "missTts": "H - Au - s."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l11-t2",
+      "phonemeTts": "B",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das B.",
+          "atomId": "ball",
+          "slot": "start",
+          "missTts": "B - all."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l11-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das große B nach.",
+          "atomId": "letter-b",
+          "glyph": "B",
+          "rewardTts": "B wie Ball.",
+          "rewardEmoji": "⚽"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l11-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Au nach.",
+          "atomId": "letter-au",
+          "glyph": "Au",
+          "rewardTts": "Au wie Auto.",
+          "rewardEmoji": "🚗"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l11-t5",
+      "rounds": [
+        {
+          "promptTts": "Verbinde B und Au.",
+          "leftAtomId": "letter-b",
+          "leftDisplay": "b",
+          "rightAtomId": "letter-au",
+          "rightDisplay": "au",
+          "resultAtomId": "bau",
+          "resultDisplay": "bau",
+          "stretchTts": "B"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l11-t6",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Haus.",
+          "targetAtomId": "haus",
+          "blocks": [
+            {
+              "atomId": "letter-h",
+              "display": "H"
+            },
+            {
+              "atomId": "letter-au",
+              "display": "au"
+            },
+            {
+              "atomId": "letter-s",
+              "display": "s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l11-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Baum.",
+          "targetAtomId": "baum",
+          "blocks": [
+            {
+              "atomId": "letter-b",
+              "display": "B"
+            },
+            {
+              "atomId": "letter-au",
+              "display": "au"
+            },
+            {
+              "atomId": "letter-m",
+              "display": "m"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l11-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort bei.",
+          "targetAtomId": "bei",
+          "blocks": [
+            {
+              "atomId": "letter-b",
+              "display": "b"
+            },
+            {
+              "atomId": "letter-ei",
+              "display": "ei"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l11-t9",
+      "rounds": [
+        {
+          "promptTts": "Mama ist im Haus.",
+          "sentenceId": "s-mama-im-haus",
+          "illustrationAtomId": "haus"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l11-t10",
+      "rounds": [
+        {
+          "promptTts": "Ein Haus und drei Häuser. Wie viele Häuser?",
+          "iconAtomId": "haus",
+          "left": 1,
+          "right": 3,
+          "answer": 4
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l12-t1",
+      "phonemeTts": "Ä",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das Ä.",
+          "atomId": "kaese",
+          "slot": "middle",
+          "missTts": "K - Ä - se."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l12-t2",
+      "phonemeTts": "Ö",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das Ö.",
+          "atomId": "ofen",
+          "slot": "start",
+          "missTts": "Ö - fen."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l12-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Ä nach.",
+          "atomId": "letter-ae",
+          "glyph": "Ä",
+          "rewardTts": "Ä wie Ähre.",
+          "rewardEmoji": "🌾"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l12-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Ö nach.",
+          "atomId": "letter-oe",
+          "glyph": "Ö",
+          "rewardTts": "Ö wie Öfen.",
+          "rewardEmoji": "🔥"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l12-t5",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Ü nach.",
+          "atomId": "letter-ue",
+          "glyph": "Ü",
+          "rewardTts": "Ü wie Überraschung.",
+          "rewardEmoji": "🎁"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l12-t6",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Häuser.",
+          "targetAtomId": "haeusser",
+          "blocks": [
+            {
+              "atomId": "letter-ae",
+              "display": "Hä"
+            },
+            {
+              "atomId": "letter-u",
+              "display": "u"
+            },
+            {
+              "atomId": "letter-s",
+              "display": "s"
+            },
+            {
+              "atomId": "letter-e",
+              "display": "e"
+            },
+            {
+              "atomId": "letter-r",
+              "display": "r"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l12-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Bäume.",
+          "targetAtomId": "baeume",
+          "blocks": [
+            {
+              "atomId": "letter-b",
+              "display": "Bä"
+            },
+            {
+              "atomId": "letter-u",
+              "display": "u"
+            },
+            {
+              "atomId": "letter-m",
+              "display": "m"
+            },
+            {
+              "atomId": "letter-e",
+              "display": "e"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l12-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Rübe.",
+          "targetAtomId": "ruebe",
+          "blocks": [
+            {
+              "atomId": "letter-r",
+              "display": "Rü"
+            },
+            {
+              "atomId": "letter-b",
+              "display": "b"
+            },
+            {
+              "atomId": "letter-e",
+              "display": "e"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l12-t9",
+      "rounds": [
+        {
+          "promptTts": "Hier sind Häuser.",
+          "sentenceId": "s-viele-haeuser",
+          "illustrationAtomId": "haus"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l12-t10",
+      "rounds": [
+        {
+          "promptTts": "Ein Ofen und zwei Öfen. Wie viele Öfen?",
+          "iconAtomId": "ofen",
+          "left": 1,
+          "right": 2,
+          "answer": 3
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l13-t1",
+      "phonemeTts": "Sch",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das Sch.",
+          "atomId": "schule",
+          "slot": "start",
+          "missTts": "Sch - ule."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l13-t2",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Sch nach.",
+          "atomId": "letter-sch",
+          "glyph": "Sch",
+          "rewardTts": "Sch wie Schule.",
+          "rewardEmoji": "🏫"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l13-t3",
+      "rounds": [
+        {
+          "promptTts": "Verbinde Sch und U.",
+          "leftAtomId": "letter-sch",
+          "leftDisplay": "sch",
+          "rightAtomId": "letter-u",
+          "rightDisplay": "u",
+          "resultAtomId": "schu",
+          "resultDisplay": "schu",
+          "stretchTts": "Sch"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l13-t4",
+      "rounds": [
+        {
+          "promptTts": "Verbinde Sch und A.",
+          "leftAtomId": "letter-sch",
+          "leftDisplay": "sch",
+          "rightAtomId": "letter-a",
+          "rightDisplay": "a",
+          "resultAtomId": "scha",
+          "resultDisplay": "scha",
+          "stretchTts": "Sch"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l13-t5",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Schuh.",
+          "targetAtomId": "schuh",
+          "blocks": [
+            {
+              "atomId": "schu",
+              "display": "Schu"
+            },
+            {
+              "atomId": "letter-h",
+              "display": "h"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l13-t6",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Fisch.",
+          "targetAtomId": "fisch",
+          "blocks": [
+            {
+              "atomId": "letter-f",
+              "display": "F"
+            },
+            {
+              "atomId": "letter-i",
+              "display": "i"
+            },
+            {
+              "atomId": "letter-sch",
+              "display": "sch"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l13-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Schaf.",
+          "targetAtomId": "schaf",
+          "blocks": [
+            {
+              "atomId": "letter-sch",
+              "display": "Sch"
+            },
+            {
+              "atomId": "letter-a",
+              "display": "a"
+            },
+            {
+              "atomId": "letter-f",
+              "display": "f"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l13-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Schule.",
+          "targetAtomId": "schule",
+          "blocks": [
+            {
+              "atomId": "schu",
+              "display": "Schu"
+            },
+            {
+              "atomId": "letter-l",
+              "display": "le"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l13-t9",
+      "rounds": [
+        {
+          "promptTts": "Der Fisch schwimmt.",
+          "sentenceId": "s-fisch-schwimmt",
+          "illustrationAtomId": "fisch"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l13-t10",
+      "rounds": [
+        {
+          "promptTts": "Ein Fisch und vier Fische. Wie viele Fische?",
+          "iconAtomId": "fisch",
+          "left": 1,
+          "right": 4,
+          "answer": 5
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l14-t1",
+      "phonemeTts": "Z",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das Z.",
+          "atomId": "zebra",
+          "slot": "start",
+          "missTts": "Z - ebra."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l14-t2",
+      "phonemeTts": "Eu",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das Eu.",
+          "atomId": "eule",
+          "slot": "start",
+          "missTts": "Eu - le."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l14-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das große J nach.",
+          "atomId": "letter-j",
+          "glyph": "J",
+          "rewardTts": "J wie Jacke.",
+          "rewardEmoji": "🧥"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l14-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Z nach.",
+          "atomId": "letter-z",
+          "glyph": "Z",
+          "rewardTts": "Z wie Zebra.",
+          "rewardEmoji": "🦓"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l14-t5",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Eu nach.",
+          "atomId": "letter-eu",
+          "glyph": "Eu",
+          "rewardTts": "Eu wie Eule.",
+          "rewardEmoji": "🦉"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l14-t6",
+      "rounds": [
+        {
+          "promptTts": "Verbinde Z und E.",
+          "leftAtomId": "letter-z",
+          "leftDisplay": "z",
+          "rightAtomId": "letter-e",
+          "rightDisplay": "e",
+          "resultAtomId": "ze",
+          "resultDisplay": "ze",
+          "stretchTts": "Z"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l14-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Zebra.",
+          "targetAtomId": "zebra",
+          "blocks": [
+            {
+              "atomId": "ze",
+              "display": "Ze"
+            },
+            {
+              "atomId": "letter-b",
+              "display": "b"
+            },
+            {
+              "atomId": "letter-r",
+              "display": "ra"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l14-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Eule.",
+          "targetAtomId": "eule",
+          "blocks": [
+            {
+              "atomId": "letter-eu",
+              "display": "Eu"
+            },
+            {
+              "atomId": "letter-l",
+              "display": "le"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l14-t9",
+      "rounds": [
+        {
+          "promptTts": "Die Eule fliegt.",
+          "sentenceId": "s-eule-fliegt",
+          "illustrationAtomId": "eule"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l14-t10",
+      "rounds": [
+        {
+          "promptTts": "Eine Eule und zwei Eulen. Wie viele Eulen?",
+          "iconAtomId": "eule",
+          "left": 1,
+          "right": 2,
+          "answer": 3
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l15-t1",
+      "phonemeTts": "ß",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das ß.",
+          "atomId": "fuss",
+          "slot": "end",
+          "missTts": "Fu - ß."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l15-t2",
+      "phonemeTts": "V",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das V.",
+          "atomId": "vogel",
+          "slot": "start",
+          "missTts": "V - ogel."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l15-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das scharfe ß nach.",
+          "atomId": "letter-sz",
+          "glyph": "ß",
+          "rewardTts": "ß wie Fuß.",
+          "rewardEmoji": "🦶"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l15-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große V nach.",
+          "atomId": "letter-v",
+          "glyph": "V",
+          "rewardTts": "V wie Vogel.",
+          "rewardEmoji": "🐦"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l15-t5",
+      "rounds": [
+        {
+          "promptTts": "Verbinde V und O.",
+          "leftAtomId": "letter-v",
+          "leftDisplay": "v",
+          "rightAtomId": "letter-o",
+          "rightDisplay": "o",
+          "resultAtomId": "vo",
+          "resultDisplay": "vo",
+          "stretchTts": "V"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l15-t6",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Fuß.",
+          "targetAtomId": "fuss",
+          "blocks": [
+            {
+              "atomId": "letter-f",
+              "display": "Fu"
+            },
+            {
+              "atomId": "letter-sz",
+              "display": "ß"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l15-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Vogel.",
+          "targetAtomId": "vogel",
+          "blocks": [
+            {
+              "atomId": "vo",
+              "display": "Vo"
+            },
+            {
+              "atomId": "letter-g",
+              "display": "gel"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l15-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Vase.",
+          "targetAtomId": "vase",
+          "blocks": [
+            {
+              "atomId": "letter-v",
+              "display": "Va"
+            },
+            {
+              "atomId": "letter-s",
+              "display": "se"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l15-t9",
+      "rounds": [
+        {
+          "promptTts": "Der Fuß ist groß.",
+          "sentenceId": "s-fuss-ist-gross",
+          "illustrationAtomId": "fuss"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l15-t10",
+      "rounds": [
+        {
+          "promptTts": "Ein Fuß und ein Fuß. Wie viele Füße?",
+          "iconAtomId": "fuss",
+          "left": 1,
+          "right": 1,
+          "answer": 2
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l16-t1",
+      "phonemeTts": "ck",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das ck.",
+          "atomId": "sack",
+          "slot": "end",
+          "missTts": "Sa - ck."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l16-t2",
+      "phonemeTts": "Pf",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das Pf.",
+          "atomId": "pferd",
+          "slot": "start",
+          "missTts": "Pf - erd."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l16-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das kleine ck nach.",
+          "atomId": "letter-ck",
+          "glyph": "ck",
+          "rewardTts": "ck wie Sack.",
+          "rewardEmoji": "🛍️"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l16-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Pf nach.",
+          "atomId": "letter-pf",
+          "glyph": "Pf",
+          "rewardTts": "Pf wie Pferd.",
+          "rewardEmoji": "🐎"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l16-t5",
+      "rounds": [
+        {
+          "promptTts": "Verbinde Pf und A.",
+          "leftAtomId": "letter-pf",
+          "leftDisplay": "pf",
+          "rightAtomId": "letter-a",
+          "rightDisplay": "a",
+          "resultAtomId": "pfa",
+          "resultDisplay": "pfa",
+          "stretchTts": "Pf"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l16-t6",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Sack.",
+          "targetAtomId": "sack",
+          "blocks": [
+            {
+              "atomId": "letter-s",
+              "display": "Sa"
+            },
+            {
+              "atomId": "letter-ck",
+              "display": "ck"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l16-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Apfel.",
+          "targetAtomId": "apfel",
+          "blocks": [
+            {
+              "atomId": "letter-a",
+              "display": "A"
+            },
+            {
+              "atomId": "letter-pf",
+              "display": "pfe"
+            },
+            {
+              "atomId": "letter-l",
+              "display": "l"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l16-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Pferd.",
+          "targetAtomId": "pferd",
+          "blocks": [
+            {
+              "atomId": "letter-pf",
+              "display": "Pfe"
+            },
+            {
+              "atomId": "letter-r",
+              "display": "r"
+            },
+            {
+              "atomId": "letter-d",
+              "display": "d"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l16-t9",
+      "rounds": [
+        {
+          "promptTts": "Das Pferd läuft.",
+          "sentenceId": "s-pferd-laeuft",
+          "illustrationAtomId": "pferd"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l16-t10",
+      "rounds": [
+        {
+          "promptTts": "Ein Sack und drei Säcke. Wie viele Säcke?",
+          "iconAtomId": "sack",
+          "left": 1,
+          "right": 3,
+          "answer": 4
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l17-t1",
+      "phonemeTts": "St",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das St.",
+          "atomId": "stern",
+          "slot": "start",
+          "missTts": "St - ern."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l17-t2",
+      "phonemeTts": "Sp",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das Sp.",
+          "atomId": "spinne",
+          "slot": "start",
+          "missTts": "Sp - inne."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l17-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das große St nach.",
+          "atomId": "letter-st",
+          "glyph": "St",
+          "rewardTts": "St wie Stern.",
+          "rewardEmoji": "⭐"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l17-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Sp nach.",
+          "atomId": "letter-sp",
+          "glyph": "Sp",
+          "rewardTts": "Sp wie Spinne.",
+          "rewardEmoji": "🕷️"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l17-t5",
+      "rounds": [
+        {
+          "promptTts": "Verbinde St und E.",
+          "leftAtomId": "letter-st",
+          "leftDisplay": "st",
+          "rightAtomId": "letter-e",
+          "rightDisplay": "e",
+          "resultAtomId": "ste",
+          "resultDisplay": "ste",
+          "stretchTts": "St"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l17-t6",
+      "rounds": [
+        {
+          "promptTts": "Verbinde Sp und I.",
+          "leftAtomId": "letter-sp",
+          "leftDisplay": "sp",
+          "rightAtomId": "letter-i",
+          "rightDisplay": "i",
+          "resultAtomId": "spi",
+          "resultDisplay": "spi",
+          "stretchTts": "Sp"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l17-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Stern.",
+          "targetAtomId": "stern",
+          "blocks": [
+            {
+              "atomId": "letter-st",
+              "display": "Ster"
+            },
+            {
+              "atomId": "letter-n",
+              "display": "n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l17-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Spinne.",
+          "targetAtomId": "spinne",
+          "blocks": [
+            {
+              "atomId": "spi",
+              "display": "Spin"
+            },
+            {
+              "atomId": "letter-n",
+              "display": "ne"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l17-t9",
+      "rounds": [
+        {
+          "promptTts": "Die Spinne spielt.",
+          "sentenceId": "s-spinne-spielt",
+          "illustrationAtomId": "spinne"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l17-t10",
+      "rounds": [
+        {
+          "promptTts": "Eine Spinne and eine Spinne. Wie viele Spinnen?",
+          "iconAtomId": "spinne",
+          "left": 1,
+          "right": 1,
+          "answer": 2
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l18-t1",
+      "phonemeTts": "X",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das X.",
+          "atomId": "taxi",
+          "slot": "middle",
+          "missTts": "Ta - x - i."
+        }
+      ]
+    },
+    {
+      "trainer": "sound_position",
+      "id": "l18-t2",
+      "phonemeTts": "Qu",
+      "rounds": [
+        {
+          "promptTts": "Wir suchen das Qu.",
+          "atomId": "qualle",
+          "slot": "start",
+          "missTts": "Qu - alle."
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l18-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Y nach.",
+          "atomId": "letter-y",
+          "glyph": "Y",
+          "rewardTts": "Y wie Yacht.",
+          "rewardEmoji": "⛵"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l18-t4",
+      "rounds": [
+        {
+          "promptTts": "Spure das große Qu nach.",
+          "atomId": "letter-qu",
+          "glyph": "Qu",
+          "rewardTts": "Qu wie Qualle.",
+          "rewardEmoji": "🪼"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l18-t5",
+      "rounds": [
+        {
+          "promptTts": "Verbinde Qu und A.",
+          "leftAtomId": "letter-qu",
+          "leftDisplay": "qu",
+          "rightAtomId": "letter-a",
+          "rightDisplay": "a",
+          "resultAtomId": "qua",
+          "resultDisplay": "qua",
+          "stretchTts": "Qu"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l18-t6",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Qualle.",
+          "targetAtomId": "qualle",
+          "blocks": [
+            {
+              "atomId": "qua",
+              "display": "Qua"
+            },
+            {
+              "atomId": "letter-l",
+              "display": "l"
+            },
+            {
+              "atomId": "letter-l",
+              "display": "le"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l18-t7",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Taxi.",
+          "targetAtomId": "taxi",
+          "blocks": [
+            {
+              "atomId": "letter-t",
+              "display": "Ta"
+            },
+            {
+              "atomId": "letter-x",
+              "display": "x"
+            },
+            {
+              "atomId": "letter-i",
+              "display": "i"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l18-t8",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Pony.",
+          "targetAtomId": "pony",
+          "blocks": [
+            {
+              "atomId": "letter-p",
+              "display": "Po"
+            },
+            {
+              "atomId": "letter-n",
+              "display": "ny"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l18-t9",
+      "rounds": [
+        {
+          "promptTts": "Das Taxi ist rot.",
+          "sentenceId": "s-taxi-ist-rot",
+          "illustrationAtomId": "taxi"
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l18-t10",
+      "rounds": [
+        {
+          "promptTts": "Ein Taxi und zwei Taxis. Wie viele Taxis?",
+          "iconAtomId": "taxi",
+          "left": 1,
+          "right": 2,
+          "answer": 3
+        }
       ]
     }
   ]

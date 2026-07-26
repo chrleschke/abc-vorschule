@@ -3,25 +3,25 @@
     {
       "trainer": "sound_position",
       "id": "l01-t1",
-      "phonemeTts": "Mmm",
+      "phonemeTts": "M",
       "rounds": [
         {
-          "promptTts": "Wir suchen das Mmm. Wo versteckt sich das Mmm?",
+          "promptTts": "Wir suchen das M. Wo versteckt sich das M?",
           "atomId": "ameise",
           "slot": "middle",
-          "missTts": "A - Mmm - eise. Hörst du das Mmm in der Mitte?"
+          "missTts": "A - M - eise. Hörst du das M in der Mitte?"
         },
         {
-          "promptTts": "Wo versteckt sich das Mmm?",
+          "promptTts": "Wo versteckt sich das M?",
           "atomId": "maus",
           "slot": "start",
-          "missTts": "Mmm - aus. Hörst du das Mmm am Anfang?"
+          "missTts": "M - aus. Hörst du das M am Anfang?"
         },
         {
-          "promptTts": "Wo versteckt sich das Mmm?",
+          "promptTts": "Wo versteckt sich das M?",
           "atomId": "baum",
           "slot": "end",
-          "missTts": "Bau - Mmm. Hörst du das Mmm am Ende?"
+          "missTts": "Bau - M. Hörst du das M am Ende?"
         }
       ]
     },
@@ -30,14 +30,14 @@
       "id": "l01-t2",
       "rounds": [
         {
-          "promptTts": "Spure das große M nach und sammle alle Sterne.",
+          "promptTts": "Zeichne das große M nach und sammle alle Sterne.",
           "atomId": "letter-m",
           "glyph": "M",
           "rewardTts": "M wie Mond.",
           "rewardEmoji": "🌙"
         },
         {
-          "promptTts": "Spure das große A nach und sammle alle Sterne.",
+          "promptTts": "Zeichne das große A nach und sammle alle Sterne.",
           "atomId": "letter-a",
           "glyph": "A",
           "rewardTts": "A wie Ampel.",
@@ -50,14 +50,14 @@
       "id": "l01-t3",
       "rounds": [
         {
-          "promptTts": "Lass die Buchstaben zusammenrutschen, damit sie ein Lied singen.",
+          "promptTts": "Kombiniere die Buchstaben, damit sie ein Lied singen.",
           "leftAtomId": "letter-m",
           "leftDisplay": "m",
           "rightAtomId": "letter-a",
           "rightDisplay": "a",
           "resultAtomId": "ma",
           "resultDisplay": "ma",
-          "stretchTts": "Mmmmm"
+          "stretchTts": "M"
         }
       ]
     },
@@ -80,7 +80,7 @@
       "id": "l01-t5",
       "rounds": [
         {
-          "promptTts": "Mama. Hänge das Wort zum Bild.",
+          "promptTts": "Mama. Ordne das Wort zum Bild.",
           "sentenceId": "s-mama",
           "illustrationAtomId": "mama"
         }
@@ -107,25 +107,25 @@
       ]
     },
     {
-      "trainer": "sound_position", "id": "l02-t1", "phonemeTts": "Ooo",
+      "trainer": "sound_position", "id": "l02-t1", "phonemeTts": "O",
       "rounds": [
-        { "promptTts": "Wir suchen das Ooo. Wo versteckt sich das Ooo?", "atomId": "ohr", "slot": "start", "missTts": "Ooo - hr. Hörst du das Ooo am Anfang?" },
-        { "promptTts": "Wo versteckt sich das Ooo?", "atomId": "radio", "slot": "end", "missTts": "Radi - Ooo. Hörst du das Ooo am Ende?" },
-        { "promptTts": "Wo versteckt sich das Ooo?", "atomId": "sonne", "slot": "middle", "missTts": "S - Ooo - nne. Hörst du das Ooo in der Mitte?" }
+        { "promptTts": "Wir suchen das O. Wo versteckt sich das O?", "atomId": "ohr", "slot": "start", "missTts": "O - hr. Hörst du das O am Anfang?" },
+        { "promptTts": "Wo versteckt sich das O?", "atomId": "radio", "slot": "end", "missTts": "Radi - O. Hörst du das O am Ende?" },
+        { "promptTts": "Wo versteckt sich das O?", "atomId": "sonne", "slot": "middle", "missTts": "S - O - nne. Hörst du das O in der Mitte?" }
       ]
     },
     {
       "trainer": "letter_trace", "id": "l02-t2",
       "rounds": [
-        { "promptTts": "Spure das große I nach und sammle alle Sterne.", "atomId": "letter-i", "glyph": "I", "rewardTts": "I wie Igel.", "rewardEmoji": "🦔" },
-        { "promptTts": "Spure das große O nach und sammle alle Sterne.", "atomId": "letter-o", "glyph": "O", "rewardTts": "O wie Ohr.", "rewardEmoji": "👂" }
+        { "promptTts": "Zeichne das große I nach und sammle alle Sterne.", "atomId": "letter-i", "glyph": "I", "rewardTts": "I wie Igel.", "rewardEmoji": "🦔" },
+        { "promptTts": "Zeichne das große O nach und sammle alle Sterne.", "atomId": "letter-o", "glyph": "O", "rewardTts": "O wie Ohr.", "rewardEmoji": "👂" }
       ]
     },
     {
       "trainer": "syllable_merge", "id": "l02-t3",
       "rounds": [
-        { "promptTts": "Lass die Buchstaben zusammenrutschen.", "leftAtomId": "letter-m", "leftDisplay": "m", "rightAtomId": "letter-i", "rightDisplay": "i", "resultAtomId": "mi", "resultDisplay": "mi", "stretchTts": "Mmmmm" },
-        { "promptTts": "Und jetzt mit dem O.", "leftAtomId": "letter-m", "leftDisplay": "m", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "mo", "resultDisplay": "mo", "stretchTts": "Mmmmm" }
+        { "promptTts": "Kombiniere die Buchstaben.", "leftAtomId": "letter-m", "leftDisplay": "m", "rightAtomId": "letter-i", "rightDisplay": "i", "resultAtomId": "mi", "resultDisplay": "mi", "stretchTts": "M" },
+        { "promptTts": "Und jetzt mit dem O.", "leftAtomId": "letter-m", "leftDisplay": "m", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "mo", "resultDisplay": "mo", "stretchTts": "M" }
       ]
     },
     {
@@ -142,7 +142,7 @@
     {
       "trainer": "sentence_order", "id": "l02-t5",
       "rounds": [
-        { "promptTts": "Oma. Hänge das Wort zum Bild.", "sentenceId": "s-oma", "illustrationAtomId": "oma",
+        { "promptTts": "Oma. Ordne das Wort zum Bild.", "sentenceId": "s-oma", "illustrationAtomId": "oma",
           "distractors": [ { "atomId": "mama", "display": "Mama" } ] }
       ]
     },
@@ -164,14 +164,14 @@
     {
       "trainer": "letter_trace", "id": "l03-t2",
       "rounds": [
-        { "promptTts": "Spure das große P nach und sammle alle Sterne.", "atomId": "letter-p", "glyph": "P", "rewardTts": "P wie Paket.", "rewardEmoji": "📦" },
-        { "promptTts": "Spure das große T nach und sammle alle Sterne.", "atomId": "letter-t", "glyph": "T", "rewardTts": "T wie Tomate.", "rewardEmoji": "🍅" }
+        { "promptTts": "Zeichne das große P nach und sammle alle Sterne.", "atomId": "letter-p", "glyph": "P", "rewardTts": "P wie Paket.", "rewardEmoji": "📦" },
+        { "promptTts": "Zeichne das große T nach und sammle alle Sterne.", "atomId": "letter-t", "glyph": "T", "rewardTts": "T wie Tomate.", "rewardEmoji": "🍅" }
       ]
     },
     {
       "trainer": "syllable_merge", "id": "l03-t3",
       "rounds": [
-        { "promptTts": "Lass die Buchstaben zusammenrutschen.", "leftAtomId": "letter-p", "leftDisplay": "p", "rightAtomId": "letter-a", "rightDisplay": "a", "resultAtomId": "pa", "resultDisplay": "pa", "stretchTts": "P" },
+        { "promptTts": "Kombiniere die Buchstaben.", "leftAtomId": "letter-p", "leftDisplay": "p", "rightAtomId": "letter-a", "rightDisplay": "a", "resultAtomId": "pa", "resultDisplay": "pa", "stretchTts": "P" },
         { "promptTts": "Und jetzt T und O.", "leftAtomId": "letter-t", "leftDisplay": "t", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "to", "resultDisplay": "to", "stretchTts": "T" }
       ]
     },
@@ -189,7 +189,7 @@
     {
       "trainer": "sentence_order", "id": "l03-t5",
       "rounds": [
-        { "promptTts": "Papa am Tor. Hänge die Wörter auf.", "sentenceId": "s-papa-am-tor", "illustrationAtomId": "tor",
+        { "promptTts": "Papa am Tor. Ordne die Wörter zu.", "sentenceId": "s-papa-am-tor", "illustrationAtomId": "tor",
           "distractors": [ { "atomId": "mama", "display": "Mama" } ],
           "holisticAtomIds": ["tor"] }
       ]
@@ -202,25 +202,25 @@
       ]
     },
     {
-      "trainer": "sound_position", "id": "l04-t1", "phonemeTts": "Lll",
+      "trainer": "sound_position", "id": "l04-t1", "phonemeTts": "L",
       "rounds": [
-        { "promptTts": "Wir suchen das Lll. Wo versteckt sich das Lll?", "atomId": "lama", "slot": "start", "missTts": "Lll - ama. Hörst du das Lll am Anfang?" },
-        { "promptTts": "Wo versteckt sich das Lll?", "atomId": "salat", "slot": "middle", "missTts": "Sa - Lll - at. Hörst du das Lll in der Mitte?" },
-        { "promptTts": "Wo versteckt sich das Lll?", "atomId": "insel", "slot": "end", "missTts": "Inse - Lll. Hörst du das Lll am Ende?" }
+        { "promptTts": "Wir suchen das L. Wo versteckt sich das L?", "atomId": "lama", "slot": "start", "missTts": "L - ama. Hörst du das L am Anfang?" },
+        { "promptTts": "Wo versteckt sich das L?", "atomId": "salat", "slot": "middle", "missTts": "Sa - L - at. Hörst du das L in der Mitte?" },
+        { "promptTts": "Wo versteckt sich das L?", "atomId": "insel", "slot": "end", "missTts": "Inse - L. Hörst du das L am Ende?" }
       ]
     },
     {
       "trainer": "letter_trace", "id": "l04-t2",
       "rounds": [
-        { "promptTts": "Spure das große L nach und sammle alle Sterne.", "atomId": "letter-l", "glyph": "L", "rewardTts": "L wie Lama.", "rewardEmoji": "🦙" },
-        { "promptTts": "Spure das große H nach und sammle alle Sterne.", "atomId": "letter-h", "glyph": "H", "rewardTts": "H wie Hut.", "rewardEmoji": "🎩" }
+        { "promptTts": "Zeichne das große L nach und sammle alle Sterne.", "atomId": "letter-l", "glyph": "L", "rewardTts": "L wie Lama.", "rewardEmoji": "🦙" },
+        { "promptTts": "Zeichne das große H nach und sammle alle Sterne.", "atomId": "letter-h", "glyph": "H", "rewardTts": "H wie Hut.", "rewardEmoji": "🎩" }
       ]
     },
     {
       "trainer": "syllable_merge", "id": "l04-t3",
       "rounds": [
-        { "promptTts": "Lass die Buchstaben zusammenrutschen.", "leftAtomId": "letter-l", "leftDisplay": "l", "rightAtomId": "letter-a", "rightDisplay": "a", "resultAtomId": "la", "resultDisplay": "la", "stretchTts": "Llllll" },
-        { "promptTts": "Das H ist nur ein Hauch. H und O.", "leftAtomId": "letter-h", "leftDisplay": "h", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "ho", "resultDisplay": "ho", "stretchTts": "Hhh" }
+        { "promptTts": "Kombiniere die Buchstaben.", "leftAtomId": "letter-l", "leftDisplay": "l", "rightAtomId": "letter-a", "rightDisplay": "a", "resultAtomId": "la", "resultDisplay": "la", "stretchTts": "L" },
+        { "promptTts": "Das H ist nur ein Hauch. H und O.", "leftAtomId": "letter-h", "leftDisplay": "h", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "ho", "resultDisplay": "ho", "stretchTts": "H" }
       ]
     },
     {
@@ -234,7 +234,7 @@
     {
       "trainer": "sentence_order", "id": "l04-t5",
       "rounds": [
-        { "promptTts": "Hallo Lama! Hänge die Wörter auf.", "sentenceId": "s-hallo-lama", "illustrationAtomId": "lama",
+        { "promptTts": "Hallo Lama! Ordne die Wörter zu.", "sentenceId": "s-hallo-lama", "illustrationAtomId": "lama",
           "distractors": [ { "atomId": "mama", "display": "Mama" } ],
           "holisticAtomIds": ["hallo"] }
       ]
@@ -247,25 +247,25 @@
       ]
     },
     {
-      "trainer": "sound_position", "id": "l05-t1", "phonemeTts": "Rrr",
+      "trainer": "sound_position", "id": "l05-t1", "phonemeTts": "R",
       "rounds": [
-        { "promptTts": "Wir suchen das Rrr. Wo versteckt sich das Rrr?", "atomId": "rose", "slot": "start", "missTts": "Rrr - ose. Hörst du das Rrr am Anfang?" },
-        { "promptTts": "Wo versteckt sich das Rrr?", "atomId": "karotte", "slot": "middle", "missTts": "Ka - Rrr - otte. Hörst du das Rrr in der Mitte?" },
-        { "promptTts": "Wo versteckt sich das Rrr?", "atomId": "uhr", "slot": "end", "missTts": "Uh - Rrr. Hörst du das Rrr am Ende?" }
+        { "promptTts": "Wir suchen das R. Wo versteckt sich das R?", "atomId": "rose", "slot": "start", "missTts": "R - ose. Hörst du das R am Anfang?" },
+        { "promptTts": "Wo versteckt sich das R?", "atomId": "karotte", "slot": "middle", "missTts": "Ka - R - otte. Hörst du das R in der Mitte?" },
+        { "promptTts": "Wo versteckt sich das R?", "atomId": "uhr", "slot": "end", "missTts": "Uh - R. Hörst du das R am Ende?" }
       ]
     },
     {
       "trainer": "letter_trace", "id": "l05-t2",
       "rounds": [
-        { "promptTts": "Spure das große U nach und sammle alle Sterne.", "atomId": "letter-u", "glyph": "U", "rewardTts": "U wie Uhr.", "rewardEmoji": "⏰" },
-        { "promptTts": "Spure das große R nach und sammle alle Sterne.", "atomId": "letter-r", "glyph": "R", "rewardTts": "R wie Rose.", "rewardEmoji": "🌹" }
+        { "promptTts": "Zeichne das große U nach und sammle alle Sterne.", "atomId": "letter-u", "glyph": "U", "rewardTts": "U wie Uhr.", "rewardEmoji": "⏰" },
+        { "promptTts": "Zeichne das große R nach und sammle alle Sterne.", "atomId": "letter-r", "glyph": "R", "rewardTts": "R wie Rose.", "rewardEmoji": "🌹" }
       ]
     },
     {
       "trainer": "syllable_merge", "id": "l05-t3",
       "rounds": [
-        { "promptTts": "Lass die Buchstaben zusammenrutschen.", "leftAtomId": "letter-r", "leftDisplay": "r", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "ro", "resultDisplay": "ro", "stretchTts": "Rrrrr" },
-        { "promptTts": "Und jetzt R und U.", "leftAtomId": "letter-r", "leftDisplay": "r", "rightAtomId": "letter-u", "rightDisplay": "u", "resultAtomId": "ru", "resultDisplay": "ru", "stretchTts": "Rrrrr" }
+        { "promptTts": "Kombiniere die Buchstaben.", "leftAtomId": "letter-r", "leftDisplay": "r", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "ro", "resultDisplay": "ro", "stretchTts": "R" },
+        { "promptTts": "Und jetzt R und U.", "leftAtomId": "letter-r", "leftDisplay": "r", "rightAtomId": "letter-u", "rightDisplay": "u", "resultAtomId": "ru", "resultDisplay": "ru", "stretchTts": "R" }
       ]
     },
     {
@@ -282,7 +282,7 @@
     {
       "trainer": "sentence_order", "id": "l05-t5",
       "rounds": [
-        { "promptTts": "Tom ruft Opa. Hänge die Wörter auf.", "sentenceId": "s-tom-ruft-opa", "illustrationAtomId": "tom",
+        { "promptTts": "Tom ruft Opa. Ordne die Wörter zu.", "sentenceId": "s-tom-ruft-opa", "illustrationAtomId": "tom",
           "distractors": [ { "atomId": "mama", "display": "Mama" } ],
           "holisticAtomIds": ["tom"] }
       ]
@@ -295,26 +295,26 @@
       ]
     },
     {
-      "trainer": "sound_position", "id": "l06-t1", "phonemeTts": "Sss",
+      "trainer": "sound_position", "id": "l06-t1", "phonemeTts": "S",
       "rounds": [
-        { "promptTts": "Wir suchen das Sss. Wo versteckt sich das Sss?", "atomId": "sonne", "slot": "start", "missTts": "Sss - onne. Hörst du das Sss am Anfang?" },
-        { "promptTts": "Wo versteckt sich das Sss?", "atomId": "nase", "slot": "middle", "missTts": "Na - Sss - e. Hörst du das Sss in der Mitte?" },
-        { "promptTts": "Wo versteckt sich das Sss?", "atomId": "haus", "slot": "end", "missTts": "Hau - Sss. Hörst du das Sss am Ende?" }
+        { "promptTts": "Wir suchen das S. Wo versteckt sich das S?", "atomId": "sonne", "slot": "start", "missTts": "S - onne. Hörst du das S am Anfang?" },
+        { "promptTts": "Wo versteckt sich das S?", "atomId": "nase", "slot": "middle", "missTts": "Na - S - e. Hörst du das S in der Mitte?" },
+        { "promptTts": "Wo versteckt sich das S?", "atomId": "haus", "slot": "end", "missTts": "Hau - S. Hörst du das S am Ende?" }
       ]
     },
     {
       "trainer": "letter_trace", "id": "l06-t2",
       "rounds": [
-        { "promptTts": "Spure das große N nach und sammle alle Sterne.", "atomId": "letter-n", "glyph": "N", "rewardTts": "N wie Nase.", "rewardEmoji": "👃" },
-        { "promptTts": "Spure das große S nach und sammle alle Sterne.", "atomId": "letter-s", "glyph": "S", "rewardTts": "S wie Sonne.", "rewardEmoji": "☀️" },
-        { "promptTts": "Spure das große E nach und sammle alle Sterne.", "atomId": "letter-e", "glyph": "E", "rewardTts": "E wie Ente.", "rewardEmoji": "🦆" },
-        { "promptTts": "Spure das große D nach und sammle alle Sterne.", "atomId": "letter-d", "glyph": "D", "rewardTts": "D wie Dose.", "rewardEmoji": "🥫" }
+        { "promptTts": "Zeichne das große N nach und sammle alle Sterne.", "atomId": "letter-n", "glyph": "N", "rewardTts": "N wie Nase.", "rewardEmoji": "👃" },
+        { "promptTts": "Zeichne das große S nach und sammle alle Sterne.", "atomId": "letter-s", "glyph": "S", "rewardTts": "S wie Sonne.", "rewardEmoji": "☀️" },
+        { "promptTts": "Zeichne das große E nach und sammle alle Sterne.", "atomId": "letter-e", "glyph": "E", "rewardTts": "E wie Ente.", "rewardEmoji": "🦆" },
+        { "promptTts": "Zeichne das große D nach und sammle alle Sterne.", "atomId": "letter-d", "glyph": "D", "rewardTts": "D wie Dose.", "rewardEmoji": "🥫" }
       ]
     },
     {
       "trainer": "syllable_merge", "id": "l06-t3",
       "rounds": [
-        { "promptTts": "Lass die Buchstaben zusammenrutschen.", "leftAtomId": "letter-s", "leftDisplay": "s", "rightAtomId": "letter-e", "rightDisplay": "e", "resultAtomId": "se", "resultDisplay": "se", "stretchTts": "Sssss" },
+        { "promptTts": "Kombiniere die Buchstaben.", "leftAtomId": "letter-s", "leftDisplay": "s", "rightAtomId": "letter-e", "rightDisplay": "e", "resultAtomId": "se", "resultDisplay": "se", "stretchTts": "S" },
         { "promptTts": "Und jetzt D und O.", "leftAtomId": "letter-d", "leftDisplay": "d", "rightAtomId": "letter-o", "rightDisplay": "o", "resultAtomId": "do", "resultDisplay": "do", "stretchTts": "D" }
       ]
     },
@@ -332,9 +332,9 @@
     {
       "trainer": "sentence_order", "id": "l06-t5",
       "rounds": [
-        { "promptTts": "Oma ist da. Hänge die Wörter auf.", "sentenceId": "s-oma-ist-da", "illustrationAtomId": "oma",
+        { "promptTts": "Oma ist da. Ordne die Wörter zu.", "sentenceId": "s-oma-ist-da", "illustrationAtomId": "oma",
           "distractors": [ { "atomId": "mama", "display": "Mama" } ] },
-        { "promptTts": "Das Lama ist rot. Hänge die Wörter auf.", "sentenceId": "s-das-lama-ist-rot", "illustrationAtomId": "lama",
+        { "promptTts": "Das Lama ist rot. Ordne die Wörter zu.", "sentenceId": "s-das-lama-ist-rot", "illustrationAtomId": "lama",
           "distractors": [ { "atomId": "papa", "display": "Papa" } ] }
       ]
     },

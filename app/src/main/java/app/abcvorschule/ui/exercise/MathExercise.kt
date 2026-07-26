@@ -42,6 +42,9 @@ fun MathExercise(
     val roundKey = "${trainer.spec.id}#$roundIndex-${round.left}+${round.right}"
     var misses by remember(roundKey) { mutableIntStateOf(0) }
     var locked by remember(roundKey) { mutableStateOf(false) }
+    // Tracked apart from `locked`, which a resolve also sets: giving up must not
+    // light up the green confirmation meant for a correct answer.
+    var solved by remember(roundKey) { mutableStateOf<Int?>(null) }
     val usePad = MathHinting.usesNumberPad(scaffold)
     val choices = remember(roundKey) { MathHinting.threeChoices(round.answer).shuffled() }
 
@@ -49,6 +52,7 @@ fun MathExercise(
         if (locked) return
         if (guess == round.answer) {
             locked = true
+            solved = guess
             onResult(0, false, true)
         } else {
             onSpeak(guess.toString())
@@ -90,7 +94,7 @@ fun MathExercise(
                 }
             },
             answers = {
-                NumberPad(onSubmit = { handleGuess(it) })
+                NumberPad(onSubmit = { handleGuess(it) }, solved = solved != null)
                 if (misses >= 2 && !locked) {
                     AbcResolveButton(onClick = ::resolve)
                 }
@@ -103,6 +107,7 @@ fun MathExercise(
             right = round.right,
             choices = choices,
             onChoose = { handleGuess(it) },
+            solved = solved,
             missCount = misses,
             locked = locked,
             onResolve = ::resolve,

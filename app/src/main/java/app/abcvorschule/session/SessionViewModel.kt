@@ -26,6 +26,7 @@ import app.abcvorschule.progress.ProgressionEngine
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.progress.SessionSnapshot
 import app.abcvorschule.ui.exercise.MathHinting
+import app.abcvorschule.ui.rewards.PraisePhrases
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -235,9 +236,17 @@ class SessionViewModel(
         return if (round is CountAddRound) "${round.left} + ${round.right} = ?" else round.promptTts
     }
 
-    fun successSpeakTextForCurrent(): String = when (val round = _ui.value.currentRound) {
-        // Speak the counted objects, not a bare number: "zwei Ameisen".
-        is CountAddRound -> round.spokenAnswer(pack.atoms[round.iconAtomId])
+    /**
+     * @param praise Whether to lead with a random word of praise. Only Rechnen gets it,
+     * and only for an answer the child actually found — a resolve is not a success.
+     */
+    fun successSpeakTextForCurrent(praise: Boolean): String = when (val round = _ui.value.currentRound) {
+        // Speak the counted objects, not a bare number: "zwei Ameisen". The praise goes
+        // first so the quantity — the didactically relevant part — is heard last.
+        is CountAddRound -> {
+            val answer = round.spokenAnswer(pack.atoms[round.iconAtomId])
+            if (praise) "${PraisePhrases.pick()}! $answer" else answer
+        }
         is SyllableMergeRound -> round.resultDisplay
         is WordBuildRound -> pack.atoms[round.targetAtomId]?.display ?: round.promptTts
         is SentenceOrderRound -> pack.sentence(round.sentenceId).tts
@@ -367,7 +376,7 @@ class SessionViewModel(
         speakOverride: String? = null,
     ) {
         if (correct) {
-            val phrase = successSpeakTextForCurrent()
+            val phrase = successSpeakTextForCurrent(praise = true)
             _ui.update {
                 it.copy(
                     points = progress.points,
@@ -386,7 +395,7 @@ class SessionViewModel(
             _ui.update {
                 it.copy(
                     successPhase = SuccessPhase.RevealAnswer,
-                    successSpeakText = successSpeakTextForCurrent(),
+                    successSpeakText = successSpeakTextForCurrent(praise = false),
                 )
             }
             return

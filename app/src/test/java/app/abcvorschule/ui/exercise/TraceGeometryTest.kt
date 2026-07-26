@@ -4,6 +4,7 @@ import app.abcvorschule.content.GlyphStroke
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.math.hypot
 
 class TraceGeometryTest {
     private val horizontal = listOf(TracePoint(0f, 0f), TracePoint(100f, 0f))
@@ -50,6 +51,26 @@ class TraceGeometryTest {
     @Test
     fun starCountBelowOneYieldsTheStrokeEndOnly() {
         assertEquals(listOf(TracePoint(100f, 0f)), TraceGeometry.starPositions(horizontal, 0))
+    }
+
+    @Test
+    fun starOutlineAlternatesRadiiAndStartsAtTheTop() {
+        val center = TracePoint(50f, 50f)
+        val points = TraceGeometry.starPoints(center, outerRadius = 10f, innerRadius = 4f)
+        assertEquals(10, points.size)
+        // First spike points straight up, so it sits directly above the centre.
+        assertEquals(center.x, points[0].x, 0.01f)
+        assertEquals(center.y - 10f, points[0].y, 0.01f)
+        points.forEachIndexed { i, p ->
+            val expected = if (i % 2 == 0) 10f else 4f
+            val radius = hypot(p.x - center.x, p.y - center.y)
+            assertEquals("vertex $i", expected, radius, 0.01f)
+        }
+    }
+
+    @Test
+    fun starWithTooFewSpikesHasNoOutline() {
+        assertTrue(TraceGeometry.starPoints(TracePoint(0f, 0f), 10f, 4f, spikes = 1).isEmpty())
     }
 
     @Test

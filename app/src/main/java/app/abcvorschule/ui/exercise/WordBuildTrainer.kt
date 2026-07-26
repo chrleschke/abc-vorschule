@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
@@ -40,7 +39,7 @@ import app.abcvorschule.ui.theme.SoftMint
 import app.abcvorschule.ui.theme.SoftSand
 
 /**
- * Frames sit in one row and a word can need four of them (N·e·s·t), so they are
+ * Frames sit in one row and a word can need four of them (e.g. Nest), so they are
  * deliberately narrower than [AbcDimens.letterFrame], which is sized for a single
  * standalone glyph and would overflow a narrow screen here.
  */
@@ -132,13 +131,6 @@ fun WordBuildTrainer(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 solution.forEachIndexed { index, expected ->
-                    if (index > 0) {
-                        Text(
-                            text = "·",
-                            style = MaterialTheme.typography.displayLarge,
-                            color = SoftSand.copy(alpha = 0.55f),
-                        )
-                    }
                     val filled = if (resolved) expected else placed[index]
                     val atomId = round.blocks[index].atomId
                     Frame(

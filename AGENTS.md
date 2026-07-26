@@ -56,10 +56,10 @@ Plan nur anfassen, wenn der Contract selbst falsch oder unvollständig ist.
 - Sechs Trainer pro Lektion in fester Reihenfolge: Auditiver Finder · Spurensucher · Verschmelzer · Wort-Bauer · Satz-Architekt · Rechnen.
 - Pfad-Screen ist der Einstieg; gesperrte Knoten antworten mit gesprochenem Hinweis, nie stumm.
 - Trainer 1: Lok mit Anfang/Mitte/Ende-Waggon; Miss spielt das segmentierte Wort (`missTts`).
-- Trainer 2: Straße aus autorierten `Atom.strokes`; Sterne nur in Strichreihenfolge; Korridor-Verlassen stoppt das Fahrzeug (haptisch), zählt aber nicht als Fehlversuch.
+- Trainer 2: Straße aus autorierten `Atom.strokes`; gelbe Sterne nur in Strichreihenfolge (aktiver Balken leuchtend, kommende blass), Haptik-Tick pro Stern; fertiger Balken füllt sich ease-in und übergibt das Fahrzeug an den nächsten Startpunkt; Korridor-Verlassen stoppt das Fahrzeug (langes Rumpeln), zählt aber nicht als Fehlversuch. Nach dem letzten Stern 500 ms Standbild, dann Belohnungsseite (Bild + Wortzeile, Graphem fett).
 - Trainer 3: Verschmelzen erst nahe am Vokal; kurzer Zug rutscht straffrei zurück; Tap-Alternative Pflicht.
 - Trainer 4/5: Rahmen bzw. Wäscheleine tragen das Gerüst pro Atom (Silhouette/Ghost vs. leer); Distraktoren sind **im Content autoriert**, Tray ≤ 5 (Wort) bzw. ≤ 6 (Satz).
-- Rechnen: 3 Antworten (visuell) bzw. System-Zahlentastatur + CTA-Absenden-Pfeil; in jeder Lektion; keine Lesewörter; Miss-Feedback nur gesprochen.
+- Rechnen: 3 Antworten (visuell) bzw. System-Zahlentastatur + CTA-Absenden-Pfeil; in jeder Lektion; keine Lesewörter; Miss-Feedback nur gesprochen; korrekte Antwort bestätigt sich grün (kein Rot bei Miss, kein Grün beim Auflösen); Erfolg wird mit zufälligem Lob aus `PraisePhrases` **vorgesprochen**, nie angezeigt.
 - Drag committet nur bei echtem Zonentreffer (größte Überlappung), sonst Snap-back.
 - Vor/Zurück zwischen Runden ist immer aktiv, unabhängig von Punkten/Fortschritt.
 - Aufgabe oben mittig, Antworten unten mittig (`ExerciseStage` / Design-Komponenten).
