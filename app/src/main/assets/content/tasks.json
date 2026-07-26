@@ -102,12 +102,6 @@
               "atomId": "ma",
               "display": "ma"
             }
-          ],
-          "distractors": [
-            {
-              "atomId": "ma",
-              "display": "mi"
-            }
           ]
         }
       ]
