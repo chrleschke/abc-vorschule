@@ -1,7 +1,8 @@
 # ABC-Vorschul App
 
-Kostenlose, werbefreie Android-Vorschul-App (ca. 4–7 Jahre) für Lesen, Sprechen und Rechnen auf Deutsch.
-Dunkles UI, offline nach Installation, gemischte Kurz-Sessions über einen gemeinsamen Content-Graphen.
+Kostenlose, werbefreie Android-Vorschul-App (ca. 4–7 Jahre) für Lesen und Rechnen auf Deutsch.
+Dunkles UI, offline nach Installation. Ein Fibel-Pfad aus 16 Lektionen; jede Lektion läuft
+sechs Trainer in fester didaktischer Reihenfolge über einen gemeinsamen Content-Graphen.
 
 ## Dokumentation
 
@@ -31,19 +32,47 @@ Install:
 ./gradlew :app:installDebug
 ```
 
-## Manual offline session smoke
+## Content-Pack (Schema v2)
 
-1. Flugmodus an.
-2. **ABC-Vorschul App** starten — Practice-Shell ohne Pack-Titel-Zeile.
-3. Fünf Aufgaben: Lesen beginnt mit Buchstaben; Sprechen zeigt großen Sprech-Impuls (Icon) + **➡️ Weiter**; Rechnen mit gruppierten Mengen.
-4. Ab der zweiten Session: bekannte Kacheln erscheinen als Distraktoren im Antwort-Tray; falsche Kachel → gesprochener Hinweis. Drag neben einen Slot → Kachel schnappt zurück.
-5. Langes Drücken auf **⋯** (~1,5 s) → **Mit Hilfe**.
-6. Mathe zweimal falsch → **Auflösen** → keine Punkte für Resolve.
-7. App mid-session in den Hintergrund → wieder öffnen → Session setzt fort.
-8. Sessionende → Belohnung → **Weiter** startet neuen Mix.
+`app/src/main/assets/content/`
+
+| Datei | Inhalt |
+|-------|--------|
+| `pack.manifest.json` | `schemaVersion`, `packId`, Titel, Locale |
+| `atoms.json` | Buchstaben (mit Strichdaten für den Spurensucher), Silben, Wörter, Bildwörter |
+| `sentences.json` | Sätze als Atom-Folgen |
+| `tasks.json` | Ein Eintrag pro Trainer, `trainer`-Feld als Typ-Diskriminator, 1..n Runden |
+| `lessons.json` | 16 Lektionen in Fibel-Reihenfolge; `authored` = spielbar, `planned` = Knoten gesperrt |
+
+Autoriert: Lektionen 1–6 (Phase 1+2). Lektionen 7–16 sind als gesperrte Pfad-Knoten angelegt und
+brauchen nur noch Content — keinen Code.
+
+Der Validator lehnt ein Pack ab, wenn eine autorierte Lektion nicht genau die sechs Trainer in
+Reihenfolge enthält, Kachelfolgen das Zielwort nicht buchstabieren, eine Summe nicht stimmt,
+Strichdaten fehlen oder Referenzen ins Leere zeigen.
+
+## Offline-Smoke-Skript (manuell)
+
+1. `./gradlew :app:installDebug`, Gerät in den Flugmodus.
+2. App öffnen → **Pfad-Screen** erscheint, Lektion 1 pulsiert, Lektionen 2–16 sind gesperrt.
+3. Gesperrten Knoten antippen → gesprochener Hinweis, kein stummes No-Op.
+4. Lektion 1 öffnen und alle sechs Trainer durchspielen:
+   Waggon-Zuordnung · Buchstaben nachspuren (Korridor verlassen → Fahrzeug stoppt) ·
+   Silbe verschmelzen · Mama bauen · Wortschild aufhängen · zwei Rechenaufgaben.
+   Bei Wort-Bauer und Satz-Architekt beide Bedienwege prüfen: eine Kachel per Ziehen platzieren
+   (die gezogene Kachel liegt sichtbar über den Zielfeldern, nie darunter) und eine per Tippen
+   (Tap-Alternative: Kachel antippen, dann Zielfeld antippen).
+5. Bei jeder richtigen Antwort: Antwort wird vorgesprochen → Stern oben → dann nächste Runde.
+6. Eine Rechenaufgabe zweimal falsch beantworten → gesprochener Hinweis, danach **Auflösen** nutzen:
+   keine Punkte, Session läuft weiter.
+7. Langer Druck auf ⋯ → Hilfestufe **Ohne Hilfe** erzwingen → nächste Rechenrunde zeigt die
+   System-Zahlentastatur; **Mit Hilfe** → drei visuelle Antworten.
+8. Mitten in der Lektion App killen und neu öffnen → dieselbe Lektion, dieselbe Runde.
+9. Lektion beenden → Belohnungszusammenfassung → Weiter → zurück auf dem Pfad, Lektion 1
+   als gemeistert markiert, Lektion 2 freigeschaltet.
+10. Back auf dem Pfad verlässt die App; erneutes Öffnen zeigt den Fortschritt unverändert.
 
 ## Product notes
 
 - Keine Werbung, keine Netz-Permission für die Kernpraxis.
 - Eltern-Hilfestufe: Auto / Mit Hilfe / Ohne Hilfe hinter Long-Press-Gate.
-- Content-Pack: `app/src/main/assets/content/` (Fibel: Buchstabe → Silbe → Wortbau → Wort → Satz).

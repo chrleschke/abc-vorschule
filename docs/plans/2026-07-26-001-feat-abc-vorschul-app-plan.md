@@ -539,3 +539,36 @@ This needs a user decision before U9 is scoped as an implementation unit — fla
 - **New files (proposed):** `ui/path/PathScreen.kt`, `ui/path/PathViewModel.kt`, `ui/path/PathModels.kt`.
 - **Modified:** `MainActivity.kt`/`AbcApp` (new top-level screen before `TaskShell`), `SessionScheduler.kt` (focused-session builder), `SessionViewModel.kt` (accept an optional focus atom on session start).
 - **Not started:** this is scope for a future brainstorm → plan → work cycle once the math/speech open question above is resolved.
+
+---
+
+## Addendum A2 (2026-07-26): Trainer-Neuschnitt und implementierter Lernpfad
+
+**Status:** Umgesetzt durch [`2026-07-26-002-feat-trainer-typen-und-lernpfad-plan.md`](2026-07-26-002-feat-trainer-typen-und-lernpfad-plan.md).
+Dieses Artefakt bleibt als Produkt-Contract gültig, mit folgenden ausdrücklichen Änderungen:
+
+- **R5 ersetzt.** Cloze/Wortfolge als Lese-Mechanik weicht den fünf didaktischen Trainern
+  (Auditiver Finder, Visueller Spurensucher, Silben-Verschmelzer, Wort-Bauer, Satz-Architekt).
+  Gerüste pro Atom, „nur Lösungskacheln" und die Tap-Alternative bleiben unverändert gültig.
+- **R6 zurückgezogen.** Die Sprech-Domäne inklusive „Sprich mit!"-Cue und `speech_cloze` entfällt.
+  Das didaktische Konzept kennt keinen eigenen Sprech-Trainer; System-TTS bleibt für Prompts,
+  Vorlesen und Fehler-Feedback. AE7 entfällt damit ebenfalls.
+- **R16 / F1 ersetzt.** Statt eines domänenrotierenden Fünfer-Mix läuft pro Lektion eine
+  Session aus genau sechs Trainern in fester didaktischer Reihenfolge. Punktevergabe,
+  Resolve-Semantik (R10), Fortschrittsspeicherung und die Belohnungszusammenfassung bleiben.
+- **R4 präzisiert.** Die Fibel-Reihenfolge lebt jetzt in `lessons.json` (16 Lektionen, 5 Phasen)
+  statt in atomaren Prerequisites; `Atom.prerequisites` ist entfallen. Die Reihenfolge wird
+  durch Lektions-Freischaltung plus Validator-Regeln erzwungen.
+- **Addendum A1 umgesetzt und in einem Punkt korrigiert.** Der Pfad ist der Einstieg, wie in A1
+  entschieden — aber die Knoten sind **Lektionen**, nicht einzelne Lese-Atome. Damit ist A1s
+  blockierende offene Frage („Math und Speech passen nicht in einen linearen Atom-Pfad") gelöst:
+  Rechnen ist Trainer 6 in *jeder* Lektion, Sprechen entfällt. Kein „Freies Üben"-Zweitmodus,
+  kein separater Rechen-Strang.
+- **Rechnen ohne Lesewörter.** Nutzerentscheidung: Trainer 5 Variante B (Mathe-Plural mit
+  „Haus"/„Häuser"-Wortkarten) aus dem didaktischen Konzept wird **nicht** gebaut. Der
+  Rechen-Trainer zeigt nur Icons und Ziffern; Singular/Plural wird gesprochen geübt.
+- **AE-Abdeckung neu:** AE1/AE2 → Wort-Bauer- und Satz-Architekt-Gerüste; AE3/AE8 →
+  `ProgressionEngineTest`; AE5 → Resolve-Semantik in allen Trainern; AE6 → geteilte Atome
+  über Trainer hinweg; AE7 entfällt; AE9 → `SessionSnapshot(lessonId, trainerIndex, roundIndex)`;
+  AE10 → `LessonCoverageTest` + Lektions-Freischaltung; AE11 → Ziffern-Prompt im Rechen-Trainer;
+  AE12 → unverändert offline.

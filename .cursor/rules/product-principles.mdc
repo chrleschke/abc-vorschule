@@ -13,12 +13,11 @@ Full source: `docs/PRODUCT_PRINCIPLES.md`. Follow it for every change.
 - Action controls may keep a short German word but **must include a clear vector/ASCII icon** (no emoji in buttons). Continue trailing-aligned.
 - Practice chrome: back/forward chevrons above progress bar; speaker in the task area above the title; safe-area insets + extra bottom padding.
 - Success: speak answer → star in upper third → wait for audio before next task. No speak-only “Sag…” screens with only Continue.
-- No decorative pack titles or “Sprich mit!”-style instruction headlines in the practice shell.
-- Fibel order: letters (upper+lower as two frames) → syllables → compose words from syllables → whole words → sentences.
-- Letter TTS: “Finde den Buchstaben {a}.” — not “Aa”. Puzzle tiles without emoji icons; muted “ABC” watermark only.
-- No fake wrong-answer distractors; freeware, ad-free, offline-capable core.
+- No decorative pack titles or instruction headlines in the practice shell.
+- Sechs Trainer pro Lektion in fester Reihenfolge: Auditiver Finder · Spurensucher · Verschmelzer · Wort-Bauer · Satz-Architekt · Rechnen. Pfad-Screen ist der Einstieg; gesperrte Knoten antworten mit gesprochenem Hinweis, nie stumm.
+- No fake wrong-answer distractors — only authored, already-practiced atoms (max. 2 per round, tray ≤ 5 word / ≤ 6 sentence); freeware, ad-free, offline-capable core.
 - Exercise layout: prompt upper-center, answers bottom-center (`ExerciseStage`).
-- Math: exactly 3 choices; miss feedback spoken only; prefer tasks including quantity 1 (singular/plural language).
+- Rechnen: 3 Antworten (visuell) bzw. System-Zahlentastatur + CTA-Absenden-Pfeil; in jeder Lektion; keine Lesewörter; Miss-Feedback nur gesprochen.
 
 ## When principles conflict with older plan text
 

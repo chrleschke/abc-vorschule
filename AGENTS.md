@@ -53,17 +53,15 @@ Plan nur anfassen, wenn der Contract selbst falsch oder unvollständig ist.
 
 ## Kind-UI-Regeln (Kurz)
 
-- Keine Anweisungs-Headlines, die Lesekompetenz voraussetzen.
-- Aktionsbuttons: Text optional, **Vektor-/ASCII-Icon Pflicht** (keine Emojis in Buttons); Weiter rechts.
-- Practice-Chrome: Chevrons über Fortschrittsbalken; Speaker im Aufgabenbereich über dem Titel; Safe-Area + Extra-Abstand unten.
-- Buchstaben: zwei Frames Groß/Klein, TTS „Finde den Buchstaben {a}.“; Puzzle ohne Icons; ausgegrautes „ABC“.
-- Wort-Spell: Titel = Wort; ein Frame pro Buchstabe; Erfolg = Antwort-TTS → Stern oben → dann weiter.
-- Rechnen: 3 Antworten (visuell) bzw. System-Zahlentastatur + CTA-Absenden-Pfeil (Zahlen-Eingabe); Miss-Feedback nur gesprochen.
-- Antwort-Tray: bekannte Atome als Distraktoren (max. 2, Tray ≤ 5); erste Begegnung distraktorfrei; Drag committet nur bei Slot-Treffer, sonst Snap-back.
-- Buchstaben-Frames zeigen die Silhouette immer (kein Ausblenden nach Scaffold-Aufstieg).
-- Lückentext-Sätze: Antwortlücken inline im Satztext, nicht als separate Kachelreihe.
-- Vor/Zurück zwischen Aufgaben ist immer aktiv, unabhängig von Punkten/Fortschritt.
-- Keine Speak-only-Screens mit nur Weiter.
+- Sechs Trainer pro Lektion in fester Reihenfolge: Auditiver Finder · Spurensucher · Verschmelzer · Wort-Bauer · Satz-Architekt · Rechnen.
+- Pfad-Screen ist der Einstieg; gesperrte Knoten antworten mit gesprochenem Hinweis, nie stumm.
+- Trainer 1: Lok mit Anfang/Mitte/Ende-Waggon; Miss spielt das segmentierte Wort (`missTts`).
+- Trainer 2: Straße aus autorierten `Atom.strokes`; Sterne nur in Strichreihenfolge; Korridor-Verlassen stoppt das Fahrzeug (haptisch), zählt aber nicht als Fehlversuch.
+- Trainer 3: Verschmelzen erst nahe am Vokal; kurzer Zug rutscht straffrei zurück; Tap-Alternative Pflicht.
+- Trainer 4/5: Rahmen bzw. Wäscheleine tragen das Gerüst pro Atom (Silhouette/Ghost vs. leer); Distraktoren sind **im Content autoriert**, Tray ≤ 5 (Wort) bzw. ≤ 6 (Satz).
+- Rechnen: 3 Antworten (visuell) bzw. System-Zahlentastatur + CTA-Absenden-Pfeil; in jeder Lektion; keine Lesewörter; Miss-Feedback nur gesprochen.
+- Drag committet nur bei echtem Zonentreffer (größte Überlappung), sonst Snap-back.
+- Vor/Zurück zwischen Runden ist immer aktiv, unabhängig von Punkten/Fortschritt.
 - Aufgabe oben mittig, Antworten unten mittig (`ExerciseStage` / Design-Komponenten).
 
 ## Technik-Kurzüberblick
@@ -71,6 +69,8 @@ Plan nur anfassen, wenn der Contract selbst falsch oder unvollständig ist.
 - Kotlin + Jetpack Compose, dark-only
 - Content: versioniertes JSON unter `app/src/main/assets/content/`
 - Progress: DataStore
+- Content-Schema v2: ein polymorpher `TaskSpec` pro Trainer (`trainer`-Diskriminator), Lektionen in `lessons.json`
+- Lektions-Freischaltung wird aus `taskStats` abgeleitet (`progress/LessonGating.kt`) — keine Extra-Persistenz
 - Tests: `./gradlew :app:testDebugUnitTest`
 - Build: `./gradlew :app:assembleDebug`
 
