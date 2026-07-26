@@ -17,3 +17,6 @@ bin/
 gen/
 out/
 .kotlin/
+
+# Superpowers SDD scratch (ledger, briefs, review packages)
+.superpowers/
