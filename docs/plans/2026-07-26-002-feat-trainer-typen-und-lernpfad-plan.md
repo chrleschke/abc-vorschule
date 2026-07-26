@@ -3068,13 +3068,14 @@ Vier der sechs Trainer (1, 3, 4, 5) sind Drag-&-Drop mit Tap-Alternative. Diese 
 - Create: `app/src/main/java/app/abcvorschule/ui/exercise/OrderedPlacement.kt`
 - Test: `app/src/test/java/app/abcvorschule/ui/exercise/drag/DragHitTestTest.kt`
 - Test: `app/src/test/java/app/abcvorschule/ui/exercise/OrderedPlacementTest.kt`
+- Test: `app/src/test/java/app/abcvorschule/ui/exercise/drag/DragFieldStateTest.kt`
 
 **Interfaces:**
-- Consumes: `ScaffoldLevel` (bestehend).
+- Consumes: nichts aus dem bestehenden Code — diese Primitive sind eigenständig und werden erst von Task 6/8/9/10 konsumiert.
 - Produces:
   - `data class DragRect(left: Float, top: Float, right: Float, bottom: Float)` mit `width`, `height`, `area`
   - `object DragHitTest { const val MinCommitPx = 24f; fun overlapArea(a, b): Float; fun bestZone(card: DragRect, zones: Map<String, DragRect>): String?; fun shouldCommit(dragDistancePx: Float): Boolean }`
-  - `class DragFieldState` mit `selectedKey`, `draggingKey`, `dragOffset`, `putCard(key, Rect)`, `putZone(key, Rect)`, `endDrag(key): String?`, `select(key)`, `reset()`
+  - `class DragFieldState` mit `selectedKey`, `draggingKey`, `dragOffset`, `putCard(key, Rect)`, `putZone(key, Rect)`, `removeCard(key)`, `removeZone(key)`, `endDrag(key): String?`, `select(key)`, `reset()`
   - `@Composable fun rememberDragFieldState(vararg keys: Any?): DragFieldState`
   - `@Composable fun DragCard(state: DragFieldState, key: String, onTap: () -> Unit, onDropped: (zoneKey: String?) -> Unit, modifier: Modifier, content: @Composable BoxScope.() -> Unit)`
   - `@Composable fun DropZone(state: DragFieldState, key: String, onTap: () -> Unit, modifier: Modifier, content: @Composable BoxScope.() -> Unit)`
@@ -3281,6 +3282,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -3317,6 +3319,19 @@ class DragFieldState {
 
     fun putZone(key: String, bounds: Rect) {
         zones[key] = bounds
+    }
+
+    /**
+     * Bounds must not outlive their composable. A trainer that stops composing a
+     * filled slot or a placed tile would otherwise leave a phantom landing zone
+     * behind, and a later drop would resolve against something nobody can see.
+     */
+    fun removeCard(key: String) {
+        cards.remove(key)
+    }
+
+    fun removeZone(key: String) {
+        zones.remove(key)
     }
 
     fun select(key: String?) {
@@ -3376,6 +3391,9 @@ fun DragCard(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val dragging = state.draggingKey == key
+    DisposableEffect(key) {
+        onDispose { state.removeCard(key) }
+    }
     Box(
         modifier = modifier
             .zIndex(if (dragging) 1f else 0f)
@@ -3410,6 +3428,9 @@ fun DropZone(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
+    DisposableEffect(key) {
+        onDispose { state.removeZone(key) }
+    }
     Box(
         modifier = modifier
             .onGloballyPositioned { state.putZone(key, it.boundsInRoot()) }
@@ -6350,18 +6371,22 @@ Strichdaten fehlen oder Referenzen ins Leere zeigen.
 1. `./gradlew :app:installDebug`, Gerät in den Flugmodus.
 2. App öffnen → **Pfad-Screen** erscheint, Lektion 1 pulsiert, Lektionen 2–16 sind gesperrt.
 3. Gesperrten Knoten antippen → gesprochener Hinweis, kein stummes No-Op.
-4. Lektion 1 öffnen und alle sechs Trainer durchspielen:
+4. **Drag-/Tap-Koexistenz prüfen** (statisch nicht verifizierbar): in einem Drag-Trainer
+   erst eine Kachel *antippen* (muss sie auswählen und vorlesen, nicht als Drag zählen),
+   dann eine Kachel *ziehen* (muss ziehen, nicht als Tap feuern), und beim Ziehen prüfen,
+   dass die Kachel **über** den Zielrahmen gezeichnet wird (z-Order).
+5. Lektion 1 öffnen und alle sechs Trainer durchspielen:
    Waggon-Zuordnung · Buchstaben nachspuren (Korridor verlassen → Fahrzeug stoppt) ·
    Silbe verschmelzen · Mama bauen · Wortschild aufhängen · zwei Rechenaufgaben.
-5. Bei jeder richtigen Antwort: Antwort wird vorgesprochen → Stern oben → dann nächste Runde.
-6. Eine Rechenaufgabe zweimal falsch beantworten → gesprochener Hinweis, danach **Auflösen** nutzen:
+6. Bei jeder richtigen Antwort: Antwort wird vorgesprochen → Stern oben → dann nächste Runde.
+7. Eine Rechenaufgabe zweimal falsch beantworten → gesprochener Hinweis, danach **Auflösen** nutzen:
    keine Punkte, Session läuft weiter.
-7. Langer Druck auf ⋯ → Hilfestufe **Ohne Hilfe** erzwingen → nächste Rechenrunde zeigt die
+8. Langer Druck auf ⋯ → Hilfestufe **Ohne Hilfe** erzwingen → nächste Rechenrunde zeigt die
    System-Zahlentastatur; **Mit Hilfe** → drei visuelle Antworten.
-8. Mitten in der Lektion App killen und neu öffnen → dieselbe Lektion, dieselbe Runde.
-9. Lektion beenden → Belohnungszusammenfassung → Weiter → zurück auf dem Pfad, Lektion 1
+9. Mitten in der Lektion App killen und neu öffnen → dieselbe Lektion, dieselbe Runde.
+10. Lektion beenden → Belohnungszusammenfassung → Weiter → zurück auf dem Pfad, Lektion 1
    als gemeistert markiert, Lektion 2 freigeschaltet.
-10. Back auf dem Pfad verlässt die App; erneutes Öffnen zeigt den Fortschritt unverändert.
+11. Back auf dem Pfad verlässt die App; erneutes Öffnen zeigt den Fortschritt unverändert.
 ```
 
 - [ ] **Step 5: Addendum A2 an den alten Plan anhängen**

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,19 @@ class DragFieldState {
 
     fun putZone(key: String, bounds: Rect) {
         zones[key] = bounds
+    }
+
+    /**
+     * Bounds must not outlive their composable. A trainer that stops composing a
+     * filled slot or a placed tile would otherwise leave a phantom landing zone
+     * behind, and a later drop would resolve against something nobody can see.
+     */
+    fun removeCard(key: String) {
+        cards.remove(key)
+    }
+
+    fun removeZone(key: String) {
+        zones.remove(key)
     }
 
     fun select(key: String?) {
@@ -101,6 +115,9 @@ fun DragCard(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val dragging = state.draggingKey == key
+    DisposableEffect(key) {
+        onDispose { state.removeCard(key) }
+    }
     Box(
         modifier = modifier
             .zIndex(if (dragging) 1f else 0f)
@@ -135,6 +152,9 @@ fun DropZone(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
+    DisposableEffect(key) {
+        onDispose { state.removeZone(key) }
+    }
     Box(
         modifier = modifier
             .onGloballyPositioned { state.putZone(key, it.boundsInRoot()) }
