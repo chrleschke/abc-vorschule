@@ -2,6 +2,8 @@ package app.abcvorschule.ui.exercise
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -19,7 +21,9 @@ import app.abcvorschule.content.TaskTemplate
 import app.abcvorschule.content.TaskType
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.session.ScheduledTask
+import app.abcvorschule.ui.theme.SoftSand
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ReadingExercise(
     task: ScheduledTask,
@@ -45,12 +49,27 @@ fun ReadingExercise(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         if (sentence != null) {
-            val words = sentence.displayOverride ?: sentence.atomIds.map { atoms[it]?.display ?: it }
-            Text(
-                text = words.joinToString(" "),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            val gapSet = gapIds.toSet()
+            val displays = sentence.displayOverride
+                ?: sentence.atomIds.map { atoms[it]?.display ?: it }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                sentence.atomIds.forEachIndexed { index, atomId ->
+                    val shown = displays.getOrElse(index) { atoms[atomId]?.display ?: atomId }
+                    if (atomId in gapSet) {
+                        Text(
+                            text = "____",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = SoftSand.copy(alpha = 0.55f),
+                        )
+                    } else {
+                        Text(
+                            text = shown,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
         } else {
             Text(
                 text = atoms[template.atomId]?.emoji ?: "📖",
@@ -61,9 +80,9 @@ fun ReadingExercise(
             gaps = gaps,
             missCount = misses,
             onCorrect = { onResult(true, false, gapIds) },
-            onMiss = {
+            onMiss = { atomId ->
                 misses += 1
-                onResult(false, false, gapIds)
+                onResult(false, false, listOf(atomId))
             },
             onResolve = { onResult(false, true, gapIds) },
         )

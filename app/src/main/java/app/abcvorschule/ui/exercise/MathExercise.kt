@@ -54,7 +54,7 @@ fun MathExercise(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        if (showSymbolPrompt || template.promptSymbols != null) {
+        if (showSymbolPrompt) {
             Text(
                 text = template.promptSymbols ?: "$left + $right = ?",
                 style = MaterialTheme.typography.displayLarge,

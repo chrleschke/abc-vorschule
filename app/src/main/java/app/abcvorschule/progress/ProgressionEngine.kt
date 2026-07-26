@@ -64,6 +64,20 @@ object ProgressionEngine {
         outcome: AttemptOutcome,
         mode: ParentMode,
     ): AtomStats {
+        // Forced parent mode freezes Auto streaks (AE3/AE8).
+        if (mode != ParentMode.Auto) {
+            return when (outcome) {
+                AttemptOutcome.Correct -> stats.copy(
+                    attempts = stats.attempts + 1,
+                    correct = stats.correct + 1,
+                )
+                AttemptOutcome.Miss -> stats.copy(attempts = stats.attempts + 1)
+                AttemptOutcome.Resolve -> stats.copy(
+                    attempts = stats.attempts + 1,
+                    resolves = stats.resolves + 1,
+                )
+            }
+        }
         val base = when (outcome) {
             AttemptOutcome.Correct -> stats.copy(
                 attempts = stats.attempts + 1,
@@ -83,7 +97,6 @@ object ProgressionEngine {
                 consecutiveMiss = stats.consecutiveMiss + 1,
             )
         }
-        if (mode != ParentMode.Auto) return base
         return base.copy(autoScaffold = nextScaffold(base.autoScaffold, base.consecutiveCorrect, base.consecutiveMiss))
     }
 
@@ -92,6 +105,19 @@ object ProgressionEngine {
         outcome: AttemptOutcome,
         mode: ParentMode,
     ): MathStats {
+        if (mode != ParentMode.Auto) {
+            return when (outcome) {
+                AttemptOutcome.Correct -> stats.copy(
+                    attempts = stats.attempts + 1,
+                    correct = stats.correct + 1,
+                )
+                AttemptOutcome.Miss -> stats.copy(attempts = stats.attempts + 1)
+                AttemptOutcome.Resolve -> stats.copy(
+                    attempts = stats.attempts + 1,
+                    resolves = stats.resolves + 1,
+                )
+            }
+        }
         val base = when (outcome) {
             AttemptOutcome.Correct -> stats.copy(
                 attempts = stats.attempts + 1,
@@ -111,7 +137,6 @@ object ProgressionEngine {
                 consecutiveMiss = stats.consecutiveMiss + 1,
             )
         }
-        if (mode != ParentMode.Auto) return base
         return base.copy(autoScaffold = nextScaffold(base.autoScaffold, base.consecutiveCorrect, base.consecutiveMiss))
     }
 

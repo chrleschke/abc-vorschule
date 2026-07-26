@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -24,14 +23,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AbcTheme {
-                AbcApp()
+                AbcApp(onFinish = { finish() })
             }
         }
     }
 }
 
 @Composable
-fun AbcApp() {
+fun AbcApp(onFinish: () -> Unit = {}) {
     val context = LocalContext.current
     val app = context.applicationContext as AbcApplication
     val speech = remember { SpeechController(context) }
@@ -46,12 +45,10 @@ fun AbcApp() {
     val ttsAvailable by speech.available.collectAsStateWithLifecycle()
     val speaking by speech.speaking.collectAsStateWithLifecycle()
 
-    // Force dark visual language regardless of system theme flag reads.
-    @Suppress("UNUSED_VARIABLE")
-    val dark = isSystemInDarkTheme()
-
     BackHandler {
-        viewModel.onBackPressed()
+        if (viewModel.onBackPressed()) {
+            onFinish()
+        }
     }
 
     TaskShell(

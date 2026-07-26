@@ -22,6 +22,22 @@ class SessionSchedulerTest {
     }
 
     @Test
+    fun sentenceStillIneligibleAfterOnlySyllablePractice() {
+        val onlyMa = LearnerProgress(
+            atomStats = mapOf("ma" to AtomStats(attempts = 1, correct = 1)),
+        )
+        assertFalse(
+            scheduler.isEligible(
+                pack.tasks.first { it.id == "r-sent-mama-haus" },
+                pack,
+                onlyMa,
+            ),
+        )
+        val session = scheduler.buildSession(pack, onlyMa, size = 5)
+        assertFalse(session.any { it.type == TaskType.sentence_cloze })
+    }
+
+    @Test
     fun fiveDrawsSpanDomainsWhenPossible() {
         val practiced = LearnerProgress(
             atomStats = mapOf(

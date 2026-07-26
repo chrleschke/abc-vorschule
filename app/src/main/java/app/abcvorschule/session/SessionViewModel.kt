@@ -129,17 +129,22 @@ class SessionViewModel(
             progressRepository.setParentMode(mode)
             progress = progressRepository.current()
             _ui.update { state ->
+                // F7: mid-task difficulty changes apply to subsequent tasks only.
+                val updated = state.tasks.mapIndexed { i, scheduled ->
+                    if (i <= state.index) scheduled else schedule(scheduled.template, progress)
+                }
                 state.copy(
                     showDifficultySheet = false,
-                    tasks = state.tasks.map { schedule(it.template, progress) },
+                    tasks = updated,
                 )
             }
         }
     }
 
-    fun onBackPressed() {
+    /** @return true when the Activity should finish (Back from summary/pause). */
+    fun onBackPressed(): Boolean {
         val state = _ui.value
-        when (state.screen) {
+        return when (state.screen) {
             AppScreen.Practice -> {
                 if (state.index == 0 && state.sessionPoints == 0) {
                     _ui.update { it.copy(screen = AppScreen.Pause) }
@@ -147,10 +152,9 @@ class SessionViewModel(
                     _ui.update { it.copy(screen = AppScreen.RewardSummary) }
                     viewModelScope.launch { progressRepository.saveSession(null) }
                 }
+                false
             }
-            AppScreen.RewardSummary, AppScreen.Pause -> {
-                // stay; UI handles finish
-            }
+            AppScreen.RewardSummary, AppScreen.Pause -> true
         }
     }
 

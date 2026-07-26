@@ -43,9 +43,9 @@ fun SpeechExercise(
                 gaps = gaps,
                 missCount = misses,
                 onCorrect = { onResult(true, false, gapIds) },
-                onMiss = {
+                onMiss = { atomId ->
                     misses += 1
-                    onResult(false, false, gapIds)
+                    onResult(false, false, listOf(atomId))
                 },
                 onResolve = { onResult(false, true, gapIds) },
             )

@@ -64,10 +64,13 @@ class SessionScheduler(
         return when (task.type) {
             TaskType.sentence_cloze -> {
                 val sentence = pack.sentences[task.sentenceId] ?: return false
-                sentence.atomIds.all { atomReady(pack.atom(it), progress) }
+                // R4/AE10: every sentence atom must itself have been offered.
+                sentence.atomIds.all { offered(it, progress) } &&
+                    task.gapAtomIds.all { offered(it, progress) }
             }
             TaskType.speech_cloze -> {
                 val atomId = task.targetAtomId ?: task.atomId ?: return false
+                // Speech may interleave once prerequisites were offered.
                 atomReady(pack.atom(atomId), progress)
             }
             TaskType.cloze -> {
@@ -78,16 +81,12 @@ class SessionScheduler(
         }
     }
 
-    /**
-     * An atom is ready when every prerequisite has been practiced at least once,
-     * or the prerequisite itself has no prerequisites (bootstrapping Fibel intros).
-     */
+    private fun offered(atomId: String, progress: LearnerProgress): Boolean =
+        (progress.atomStats[atomId]?.attempts ?: 0) > 0
+
     private fun atomReady(atom: Atom, progress: LearnerProgress): Boolean {
         if (atom.prerequisites.isEmpty()) return true
-        return atom.prerequisites.all { preId ->
-            val practiced = (progress.atomStats[preId]?.attempts ?: 0) > 0
-            practiced
-        }
+        return atom.prerequisites.all { offered(it, progress) }
     }
 
     private fun masteryFor(task: TaskTemplate, progress: LearnerProgress): Double {

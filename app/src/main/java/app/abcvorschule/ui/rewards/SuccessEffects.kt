@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,16 +57,8 @@ fun playSuccessTone() {
             ToneGenerator.TONE_PROP_PROMPT,
         )[Random.nextInt(3)]
         tone.startTone(type, 180)
-        // Release after tone window
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
             runCatching { tone.release() }
         }, 250)
-    }
-}
-
-@Composable
-fun RememberToneCleanup() {
-    DisposableEffect(Unit) {
-        onDispose { }
     }
 }

@@ -45,7 +45,7 @@ import kotlin.math.roundToInt
 fun DragSlotBoard(
     gaps: List<GapSlot>,
     onCorrect: () -> Unit,
-    onMiss: () -> Unit,
+    onMiss: (atomId: String) -> Unit,
     onResolve: () -> Unit,
     missCount: Int,
     modifier: Modifier = Modifier,
@@ -65,7 +65,7 @@ fun DragSlotBoard(
             if (filled.size == gaps.size) onCorrect()
         } else {
             selectedTile = null
-            onMiss()
+            onMiss(gap.atomId)
         }
     }
 
@@ -120,7 +120,7 @@ fun DragSlotBoard(
                             if (match != null) {
                                 place(gap.display, match)
                             } else {
-                                onMiss()
+                                onMiss(empty.firstOrNull()?.atomId ?: gap.atomId)
                             }
                         }
                         dragId = null

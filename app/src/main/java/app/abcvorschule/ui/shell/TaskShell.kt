@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.Domain
-import app.abcvorschule.content.TaskType
 import app.abcvorschule.session.AppScreen
 import app.abcvorschule.session.SessionUiState
 import app.abcvorschule.session.SessionViewModel
@@ -130,8 +129,12 @@ private fun PracticeBody(
     onStopSpeak: () -> Unit,
 ) {
     val task = state.current
-    LaunchedEffect(task?.template?.id) {
+    LaunchedEffect(task?.template?.id, ttsAvailable) {
         onStopSpeak()
+        if (ttsAvailable && task != null) {
+            // AE7/F4/F5: auto-play prompt when a task starts (speech cue follows).
+            onSpeak(viewModel.currentPromptText(ttsAvailable = true))
+        }
     }
 
     Column(
@@ -206,7 +209,7 @@ private fun PracticeBody(
                     task = task,
                     atom = task.template.atomId?.let { pack.atoms[it] },
                     scaffold = viewModel.effectiveMathScaffold(),
-                    showSymbolPrompt = !ttsAvailable || task.template.type == TaskType.number_entry,
+                    showSymbolPrompt = !ttsAvailable,
                     onResult = viewModel::submitMathAnswer,
                 )
             }
