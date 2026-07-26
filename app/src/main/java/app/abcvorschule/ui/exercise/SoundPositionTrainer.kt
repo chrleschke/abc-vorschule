@@ -114,12 +114,15 @@ fun SoundPositionTrainer(
             ) {
                 LocomotiveHead(steam = steam)
                 SoundPositionLogic.SlotOrder.forEach { slot ->
+                    val armed = field.selectedKey != null && landedSlot == null && !revealed
                     Wagon(
                         slot = slot,
                         filledEmoji = if (landedSlot == slot) atom.emoji else null,
                         revealed = revealed && round.slot == slot,
-                        armed = field.selectedKey != null && landedSlot == null,
-                        onTap = { place(slot) },
+                        armed = armed,
+                        // An exploratory tap must never burn a miss. Only a wagon tap
+                        // that follows picking the picture up counts as a placement.
+                        onTap = { if (armed) place(slot) },
                         registerWith = field,
                     )
                 }
