@@ -39,7 +39,16 @@ fun TrainerHost(
     modifier: Modifier = Modifier,
 ) {
     when (round) {
-        is SoundPositionRound -> TrainerPlaceholder("Trainer 1", modifier, callbacks)
+        is SoundPositionRound -> SoundPositionTrainer(
+            round = round,
+            atom = pack.atom(round.atomId),
+            ttsAvailable = ttsAvailable,
+            speaking = speaking,
+            onSpeakPrompt = callbacks.onSpeakPrompt,
+            onSpeak = callbacks.onSpeak,
+            onResult = callbacks.onResult,
+            modifier = modifier.fillMaxSize(),
+        )
         is LetterTraceRound -> TrainerPlaceholder("Trainer 2", modifier, callbacks)
         is SyllableMergeRound -> TrainerPlaceholder("Trainer 3", modifier, callbacks)
         is WordBuildRound -> TrainerPlaceholder("Trainer 4", modifier, callbacks)
