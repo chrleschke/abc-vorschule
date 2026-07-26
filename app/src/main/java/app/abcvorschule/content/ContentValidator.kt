@@ -16,6 +16,12 @@ object ContentValidator {
         TrainerKind.count_add,
     )
 
+    /** Rank of each kind within [TrainerOrder] — the source of truth for "does this
+     * sequence ever go backward", now that authored lessons may repeat or skip a
+     * kind instead of holding exactly one of each. */
+    private val TrainerRank: Map<TrainerKind, Int> =
+        TrainerOrder.withIndex().associate { (index, kind) -> kind to index }
+
     private const val MinSoundPositionRounds = 2
 
     /** Authored-distractor budget: preschoolers must be able to scan the tray. */
@@ -199,9 +205,15 @@ object ContentValidator {
             when (lesson.status) {
                 LessonStatus.authored -> {
                     val kinds = lesson.taskIds.mapNotNull { pack.tasks[it]?.kind }
-                    if (kinds != TrainerOrder) {
+                    val ranks = kinds.map { TrainerRank.getValue(it) }
+                    val monotonic = ranks.zipWithNext().all { (a, b) -> a <= b }
+                    val startsAndEndsRight = kinds.firstOrNull() == TrainerKind.sound_position &&
+                        kinds.lastOrNull() == TrainerKind.count_add
+                    if (kinds.isEmpty() || !monotonic || !startsAndEndsRight) {
                         issues += ValidationIssue(
-                            "authored lesson ${lesson.id} must hold $TrainerOrder but holds $kinds",
+                            "authored lesson ${lesson.id} must hold trainer kinds in " +
+                                "non-decreasing $TrainerOrder rank, starting with sound_position " +
+                                "and ending with count_add, but holds $kinds",
                         )
                     }
                     if (lesson.focusAtomIds.isEmpty()) {
