@@ -3661,12 +3661,15 @@ fun SoundPositionTrainer(
             ) {
                 LocomotiveHead(steam = steam)
                 SoundPositionLogic.SlotOrder.forEach { slot ->
+                    val armed = field.selectedKey != null && landedSlot == null && !revealed
                     Wagon(
                         slot = slot,
                         filledEmoji = if (landedSlot == slot) atom.emoji else null,
                         revealed = revealed && round.slot == slot,
-                        armed = field.selectedKey != null && landedSlot == null,
-                        onTap = { place(slot) },
+                        armed = armed,
+                        // An exploratory tap must never burn a miss. Only a wagon tap
+                        // that follows picking the picture up counts as a placement.
+                        onTap = { if (armed) place(slot) },
                         registerWith = field,
                     )
                 }
@@ -4188,12 +4191,16 @@ Am Dateiende von `app/src/main/java/app/abcvorschule/ui/rewards/SuccessEffects.k
 fun playStarBlip(step: Int) {
     val scale = listOf(523.25, 587.33, 659.25, 698.46, 783.99, 880.0, 987.77, 1046.50)
     val freq = scale[step.coerceAtLeast(0) % scale.size]
-    playTone(listOf(freq), noteMs = 70)
+    playTone(listOf(freq), noteMs = 70, gapMs = 0)
 }
 
-private fun playTone(freqsHz: List<Double>, noteMs: Int) {
+/**
+ * [gapMs] defaults to buildArpeggio's original spacing so routing the existing
+ * success chime through this shared path does not change how it sounds.
+ */
+private fun playTone(freqsHz: List<Double>, noteMs: Int, gapMs: Int = 15) {
     runCatching {
-        val samples = buildArpeggio(freqsHz, noteMs = noteMs, gapMs = 0)
+        val samples = buildArpeggio(freqsHz, noteMs = noteMs, gapMs = gapMs)
         val track = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
@@ -4227,7 +4234,7 @@ private fun playTone(freqsHz: List<Double>, noteMs: Int) {
 }
 ```
 
-Ändere zusätzlich `playSuccessChime()` so, dass es `playTone(notes, noteMs = 90)` aufruft, damit die AudioTrack-Verdrahtung nur einmal existiert.
+Ändere zusätzlich `playSuccessChime()` so, dass es `playTone(notes, noteMs = 90)` aufruft, damit die AudioTrack-Verdrahtung nur einmal existiert. Der `gapMs`-Default von 15 ms muss dabei erhalten bleiben — sonst laufen die vier Töne des bestehenden Erfolgs-Chimes ohne Pause ineinander.
 
 - [ ] **Step 6: `LetterTraceTrainer.kt` anlegen**
 
@@ -4292,6 +4299,7 @@ fun LetterTraceTrainer(
     var vehicle by remember(roundKey) { mutableStateOf<TracePoint?>(null) }
     var starsCollected by remember(roundKey) { mutableIntStateOf(0) }
     var offRoadCount by remember(roundKey) { mutableIntStateOf(0) }
+    var wasOffCorridor by remember(roundKey) { mutableStateOf(false) }
     var done by remember(roundKey) { mutableStateOf(false) }
     var resolved by remember(roundKey) { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
@@ -4323,10 +4331,17 @@ fun LetterTraceTrainer(
                             if (done || resolved) return@TraceCanvas
                             val update = TraceProgress.update(state, finger, strokes, stars, boxSize)
                             if (update.offCorridor) {
-                                offRoadCount += 1
-                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                // Edge-triggered: one short nudge per excursion, never one per
+                                // pointer sample. Otherwise the device buzzes continuously and a
+                                // single stray drag exhausts the resolve threshold at once.
+                                if (!wasOffCorridor) {
+                                    wasOffCorridor = true
+                                    offRoadCount += 1
+                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                }
                                 return@TraceCanvas
                             }
+                            wasOffCorridor = false
                             vehicle = finger
                             if (update.collectedStar) {
                                 playStarBlip(starsCollected)
