@@ -42,6 +42,22 @@ class ContentValidatorTest {
         }
     }
 
+    /** Builds fake task ids for [kinds], each pairing a fresh id with an existing
+     * [TaskSpec] instance of that kind from [lesson], and returns a mutated pack
+     * whose [lesson] holds exactly those tasks in that order. */
+    private fun packWithLessonKinds(lesson: Lesson, kinds: List<TrainerKind>): ContentPack {
+        val fakeTaskIds = kinds.mapIndexed { i, kind ->
+            val original = pack.tasksOf(lesson).first { it.kind == kind }
+            "fake-$i" to original
+        }
+        return pack.copy(
+            tasks = pack.tasks + fakeTaskIds,
+            lessons = pack.lessons.map { l ->
+                if (l.id == lesson.id) l.copy(taskIds = fakeTaskIds.map { (id, _) -> id }) else l
+            },
+        )
+    }
+
     @Test
     fun monotonicOrderAcceptsRepeatedAndSkippedKinds() {
         val lesson = pack.authoredLessons.first()
@@ -52,37 +68,24 @@ class ContentValidatorTest {
             TrainerKind.word_build,
             TrainerKind.count_add,
         )
-        val fakeTaskIds = repeatedAndSkipped.mapIndexed { i, kind ->
-            val original = pack.tasksOf(lesson).first { it.kind == kind }
-            "fake-$i" to original
-        }
-        val issues = issuesOf {
-            it.copy(
-                tasks = it.tasks + fakeTaskIds,
-                lessons = it.lessons.map { l ->
-                    if (l.id == lesson.id) l.copy(taskIds = fakeTaskIds.map { (id, _) -> id }) else l
-                },
-            )
-        }
+        val issues = ContentValidator.validate(packWithLessonKinds(lesson, repeatedAndSkipped)).map { it.message }
         assertTrue(issues.none { it.contains("must hold trainer kinds") })
     }
 
     @Test
     fun backwardJumpInTrainerKindsIsRejected() {
+        // Correct start (sound_position) and correct end (count_add) so this test
+        // isolates the monotonic-rank check: rank 3 (word_build) -> rank 1
+        // (letter_trace) is a genuine mid-sequence backward jump, not a start/end
+        // violation. If the monotonic check were dropped, this would slip through.
         val lesson = pack.authoredLessons.first()
-        val backward = listOf(TrainerKind.word_build, TrainerKind.sound_position, TrainerKind.count_add)
-        val fakeTaskIds = backward.mapIndexed { i, kind ->
-            val original = pack.tasksOf(lesson).first { it.kind == kind }
-            "fake-$i" to original
-        }
-        val issues = issuesOf {
-            it.copy(
-                tasks = it.tasks + fakeTaskIds,
-                lessons = it.lessons.map { l ->
-                    if (l.id == lesson.id) l.copy(taskIds = fakeTaskIds.map { (id, _) -> id }) else l
-                },
-            )
-        }
+        val dipsBackwardInTheMiddle = listOf(
+            TrainerKind.sound_position,
+            TrainerKind.word_build,
+            TrainerKind.letter_trace,
+            TrainerKind.count_add,
+        )
+        val issues = ContentValidator.validate(packWithLessonKinds(lesson, dipsBackwardInTheMiddle)).map { it.message }
         assertTrue(issues.any { it.contains("must hold trainer kinds") })
     }
 

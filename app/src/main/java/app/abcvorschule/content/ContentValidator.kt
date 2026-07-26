@@ -209,7 +209,7 @@ object ContentValidator {
                     val monotonic = ranks.zipWithNext().all { (a, b) -> a <= b }
                     val startsAndEndsRight = kinds.firstOrNull() == TrainerKind.sound_position &&
                         kinds.lastOrNull() == TrainerKind.count_add
-                    if (kinds.isEmpty() || !monotonic || !startsAndEndsRight) {
+                    if (!monotonic || !startsAndEndsRight) {
                         issues += ValidationIssue(
                             "authored lesson ${lesson.id} must hold trainer kinds in " +
                                 "non-decreasing $TrainerOrder rank, starting with sound_position " +
