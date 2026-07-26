@@ -84,9 +84,20 @@ private const val SampleRate = 44100
 
 /** Short ascending major arpeggio (C-E-G-C) — a cheerful "ta-da" chime, synthesized on-device. */
 fun playSuccessChime() {
+    val notes = listOf(523.25, 659.25, 783.99, 1046.50)
+    playTone(notes, noteMs = 90)
+}
+
+/** One rising scale step per collected trace star (C major, wrapping after an octave). */
+fun playStarBlip(step: Int) {
+    val scale = listOf(523.25, 587.33, 659.25, 698.46, 783.99, 880.0, 987.77, 1046.50)
+    val freq = scale[step.coerceAtLeast(0) % scale.size]
+    playTone(listOf(freq), noteMs = 70)
+}
+
+private fun playTone(freqsHz: List<Double>, noteMs: Int) {
     runCatching {
-        val notes = listOf(523.25, 659.25, 783.99, 1046.50)
-        val samples = buildArpeggio(notes)
+        val samples = buildArpeggio(freqsHz, noteMs = noteMs, gapMs = 0)
         val track = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
