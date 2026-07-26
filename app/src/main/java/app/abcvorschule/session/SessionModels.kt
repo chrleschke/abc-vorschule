@@ -50,8 +50,14 @@ data class ScheduledTrainer(
     val spec: TaskSpec,
     /** Per-atom scaffold for slot-based trainers (word_build, sentence_order). */
     val scaffolds: Map<String, ScaffoldLevel> = emptyMap(),
-    /** Rechnen: Beginner = visual choices, Advanced = number entry. */
-    val mathScaffold: ScaffoldLevel = ScaffoldLevel.Beginner,
+    /**
+     * Rechnen scaffold per arithmetic fact, keyed by [ProgressionEngine.mathKey].
+     * A count_add trainer holds several facts with independent mastery, so one
+     * scaffold for the whole trainer would drive the wrong UI for later rounds.
+     * Cached at schedule time so a mid-round parent-mode change only takes
+     * effect from the next trainer on (F7).
+     */
+    val mathScaffolds: Map<String, ScaffoldLevel> = emptyMap(),
 )
 
 data class SessionUiState(

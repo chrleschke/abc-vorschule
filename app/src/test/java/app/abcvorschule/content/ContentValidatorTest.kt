@@ -93,6 +93,68 @@ class ContentValidatorTest {
     }
 
     @Test
+    fun countAddOperationOtherThanAddIsRejected() {
+        val spec = pack.tasks.values.filterIsInstance<CountAddSpec>().first()
+        val broken = spec.copy(rounds = spec.rounds.map { it.copy(operation = "sub") })
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.any { it.contains("unsupported operation") })
+    }
+
+    @Test
+    fun wordBuildRoundWithTooManyDistractorsIsRejected() {
+        val spec = pack.tasks.values.filterIsInstance<WordBuildSpec>().first()
+        val broken = spec.copy(
+            rounds = spec.rounds.map { round ->
+                round.copy(
+                    distractors = listOf(
+                        WordBlock("letter-m", "M"),
+                        WordBlock("letter-a", "A"),
+                        WordBlock("baum", "Baum"),
+                    ),
+                )
+            },
+        )
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.any { it.contains("distractors") && it.contains("max is 2") })
+    }
+
+    @Test
+    fun wordBuildTrayOverflowIsRejected() {
+        val spec = pack.tasks.values.filterIsInstance<WordBuildSpec>().first()
+        val broken = spec.copy(
+            rounds = spec.rounds.map { round ->
+                round.copy(
+                    blocks = round.blocks + WordBlock("baum", "Baum") + WordBlock("maus", "Maus"),
+                    distractors = listOf(WordBlock("letter-m", "M"), WordBlock("letter-a", "A")),
+                )
+            },
+        )
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.any { it.contains("tray holds") && it.contains("max is 5") })
+    }
+
+    @Test
+    fun sentenceOrderTrayOverflowIsRejected() {
+        val spec = pack.tasks.values.filterIsInstance<SentenceOrderSpec>().first()
+        val broken = spec.copy(
+            rounds = spec.rounds.map { round ->
+                round.copy(
+                    distractors = listOf(
+                        WordBlock("letter-m", "M"),
+                        WordBlock("letter-a", "A"),
+                        WordBlock("ma", "ma"),
+                        WordBlock("ameise", "Ameise"),
+                        WordBlock("maus", "Maus"),
+                        WordBlock("baum", "Baum"),
+                    ),
+                )
+            },
+        )
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.any { it.contains("tray holds") && it.contains("max is 6") })
+    }
+
+    @Test
     fun lessonIndicesAreContiguousFromOne() {
         assertEquals((1..pack.lessons.size).toList(), pack.lessons.map { it.index })
     }

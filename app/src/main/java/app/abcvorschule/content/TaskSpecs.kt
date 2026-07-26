@@ -193,6 +193,19 @@ val TaskSpec.roundCount: Int get() = rounds.size
 
 fun TaskSpec.round(index: Int): TrainerRound? = rounds.getOrNull(index)
 
+/**
+ * Spoken answer for a counting round: "1 Ameise" / "2 Ameisen" — never a bare
+ * number. Rechnen shows no words, so the plural is carried entirely by speech.
+ */
+fun CountAddRound.spokenAnswer(icon: Atom?): String {
+    val noun = when {
+        icon == null -> ""
+        answer == 1 -> icon.display
+        else -> icon.pluralDisplay ?: icon.display
+    }
+    return "$answer $noun".trim()
+}
+
 /** Atom ids a round scores against, used for per-atom stats and scaffolds. */
 fun TrainerRound.scoredAtomIds(): List<String> = when (this) {
     is SoundPositionRound -> listOf(atomId)

@@ -18,6 +18,11 @@ object ContentValidator {
 
     private const val MinSoundPositionRounds = 2
 
+    /** Authored-distractor budget: preschoolers must be able to scan the tray. */
+    private const val MaxDistractorsPerRound = 2
+    private const val MaxWordTrayTiles = 5
+    private const val MaxSentenceTrayTiles = 6
+
     fun validate(pack: ContentPack): List<ValidationIssue> {
         val issues = mutableListOf<ValidationIssue>()
         val atomIds = pack.atoms.keys
@@ -122,6 +127,17 @@ object ContentValidator {
                             "task $id distractors duplicate solution blocks $duplicate",
                         )
                     }
+                    if (round.distractors.size > MaxDistractorsPerRound) {
+                        issues += ValidationIssue(
+                            "task $id has ${round.distractors.size} distractors; max is $MaxDistractorsPerRound",
+                        )
+                    }
+                    val tray = round.blocks.size + round.distractors.size
+                    if (tray > MaxWordTrayTiles) {
+                        issues += ValidationIssue(
+                            "task $id tray holds $tray tiles; max is $MaxWordTrayTiles",
+                        )
+                    }
                 }
                 is SentenceOrderSpec -> spec.rounds.forEach { round ->
                     val sentence = pack.sentences[round.sentenceId]
@@ -138,13 +154,30 @@ object ContentValidator {
                             )
                         }
                     }
+                    if (round.distractors.size > MaxDistractorsPerRound) {
+                        issues += ValidationIssue(
+                            "task $id has ${round.distractors.size} distractors; max is $MaxDistractorsPerRound",
+                        )
+                    }
+                    val tray = (sentence?.atomIds?.size ?: 0) + round.distractors.size
+                    if (tray > MaxSentenceTrayTiles) {
+                        issues += ValidationIssue(
+                            "task $id tray holds $tray tiles; max is $MaxSentenceTrayTiles",
+                        )
+                    }
                 }
                 is CountAddSpec -> spec.rounds.forEach { round ->
                     requireAtom("task $id", round.iconAtomId)
                     if (round.left < 0 || round.right < 0) {
                         issues += ValidationIssue("task $id has a negative operand")
                     }
-                    if (round.operation == "add" && round.left + round.right != round.answer) {
+                    // Only addition exists in v1; an unknown operation must not slip
+                    // past the sum check unvalidated.
+                    if (round.operation != "add") {
+                        issues += ValidationIssue(
+                            "task $id uses unsupported operation '${round.operation}'",
+                        )
+                    } else if (round.left + round.right != round.answer) {
                         issues += ValidationIssue(
                             "task $id answer ${round.answer} does not match ${round.left}+${round.right}",
                         )

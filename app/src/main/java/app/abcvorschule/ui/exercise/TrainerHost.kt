@@ -13,6 +13,7 @@ import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.TrainerRound
 import app.abcvorschule.content.WordBuildRound
+import app.abcvorschule.progress.ProgressionEngine
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.session.ScheduledTrainer
 import app.abcvorschule.ui.components.AbcContinueButton
@@ -47,7 +48,8 @@ fun TrainerHost(
             trainer = trainer,
             round = round,
             icon = pack.atom(round.iconAtomId).emoji,
-            scaffold = trainer.mathScaffold,
+            scaffold = trainer.mathScaffolds[ProgressionEngine.mathKey(round)]
+                ?: ScaffoldLevel.Beginner,
             showSymbolPrompt = !ttsAvailable,
             ttsAvailable = ttsAvailable,
             speaking = speaking,

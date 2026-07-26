@@ -15,6 +15,7 @@ import app.abcvorschule.content.TaskSpec
 import app.abcvorschule.content.WordBuildRound
 import app.abcvorschule.content.rounds
 import app.abcvorschule.content.scoredAtomIds
+import app.abcvorschule.content.spokenAnswer
 import app.abcvorschule.progress.AttemptOutcome
 import app.abcvorschule.progress.LearnerProgress
 import app.abcvorschule.progress.LessonGating
@@ -137,13 +138,13 @@ class SessionViewModel(
         val atomIds = spec.rounds.flatMap { round ->
             round.scoredAtomIds() + sentenceAtomIds(round)
         }.distinct()
-        val mathRound = spec.rounds.filterIsInstance<CountAddRound>().firstOrNull()
         return ScheduledTrainer(
             spec = spec,
             scaffolds = atomIds.associateWith { ProgressionEngine.scaffoldForAtom(progress, it) },
-            mathScaffold = mathRound
-                ?.let { ProgressionEngine.scaffoldForMath(progress, ProgressionEngine.mathKey(it)) }
-                ?: ScaffoldLevel.Beginner,
+            mathScaffolds = spec.rounds.filterIsInstance<CountAddRound>().associate { round ->
+                val key = ProgressionEngine.mathKey(round)
+                key to ProgressionEngine.scaffoldForMath(progress, key)
+            },
         )
     }
 
@@ -205,7 +206,8 @@ class SessionViewModel(
     }
 
     fun successSpeakTextForCurrent(): String = when (val round = _ui.value.currentRound) {
-        is CountAddRound -> round.answer.toString()
+        // Speak the counted objects, not a bare number: "zwei Ameisen".
+        is CountAddRound -> round.spokenAnswer(pack.atoms[round.iconAtomId])
         is SyllableMergeRound -> round.resultDisplay
         is WordBuildRound -> pack.atoms[round.targetAtomId]?.display ?: round.promptTts
         is SentenceOrderRound -> pack.sentence(round.sentenceId).tts
