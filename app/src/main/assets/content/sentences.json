@@ -1,5 +1,11 @@
 {
   "sentences": [
-    { "id": "s-mama", "atomIds": ["mama"], "tts": "Mama." }
+    { "id": "s-mama", "atomIds": ["mama"], "tts": "Mama." },
+    { "id": "s-oma", "atomIds": ["oma"], "tts": "Oma." },
+    { "id": "s-papa-am-tor", "atomIds": ["papa", "am", "tor"], "tts": "Papa am Tor." },
+    { "id": "s-hallo-lama", "atomIds": ["hallo", "lama"], "tts": "Hallo Lama!" },
+    { "id": "s-tom-ruft-opa", "atomIds": ["tom", "ruft", "opa"], "tts": "Tom ruft Opa." },
+    { "id": "s-oma-ist-da", "atomIds": ["oma", "ist", "da"], "tts": "Oma ist da." },
+    { "id": "s-das-lama-ist-rot", "atomIds": ["das", "lama", "ist", "rot"], "tts": "Das Lama ist rot." }
   ]
 }

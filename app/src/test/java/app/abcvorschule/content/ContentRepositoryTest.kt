@@ -11,9 +11,8 @@ class ContentRepositoryTest {
     @Test
     fun packLoadsAllSixteenLessons() {
         assertEquals(16, pack.lessons.size)
-        // Only lesson 1 is authored in this block; lessons 2-6 are added by a later task
-        // (the brief's own Step 12 note: "Task 12 ergänzt hier die Lektionen 2-6").
-        assertEquals(1, pack.authoredLessons.size)
+        // Lessons 1-6 (phase 1 + 2) are authored; 7-16 stay planned until later tasks.
+        assertEquals(6, pack.authoredLessons.size)
     }
 
     @Test

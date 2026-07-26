@@ -5,11 +5,32 @@
       "status": "authored", "focusAtomIds": ["letter-m", "letter-a"],
       "taskIds": ["l01-t1", "l01-t2", "l01-t3", "l01-t4", "l01-t5", "l01-t6"]
     },
-    { "id": "l02", "index": 2, "phase": 1, "title": "I & O", "nodeLabel": "I o", "status": "planned" },
-    { "id": "l03", "index": 3, "phase": 2, "title": "P & T", "nodeLabel": "P t", "status": "planned" },
-    { "id": "l04", "index": 4, "phase": 2, "title": "L & H", "nodeLabel": "L h", "status": "planned" },
-    { "id": "l05", "index": 5, "phase": 2, "title": "U & R", "nodeLabel": "U r", "status": "planned" },
-    { "id": "l06", "index": 6, "phase": 2, "title": "N, S, E, D", "nodeLabel": "N s e d", "status": "planned" },
+    {
+      "id": "l02", "index": 2, "phase": 1, "title": "I & O", "nodeLabel": "I o",
+      "status": "authored", "focusAtomIds": ["letter-i", "letter-o"],
+      "taskIds": ["l02-t1", "l02-t2", "l02-t3", "l02-t4", "l02-t5", "l02-t6"]
+    },
+    {
+      "id": "l03", "index": 3, "phase": 2, "title": "P & T", "nodeLabel": "P t",
+      "status": "authored", "focusAtomIds": ["letter-p", "letter-t"],
+      "taskIds": ["l03-t1", "l03-t2", "l03-t3", "l03-t4", "l03-t5", "l03-t6"]
+    },
+    {
+      "id": "l04", "index": 4, "phase": 2, "title": "L & H", "nodeLabel": "L h",
+      "status": "authored", "focusAtomIds": ["letter-l", "letter-h"],
+      "taskIds": ["l04-t1", "l04-t2", "l04-t3", "l04-t4", "l04-t5", "l04-t6"]
+    },
+    {
+      "id": "l05", "index": 5, "phase": 2, "title": "U & R", "nodeLabel": "U r",
+      "status": "authored", "focusAtomIds": ["letter-u", "letter-r"],
+      "taskIds": ["l05-t1", "l05-t2", "l05-t3", "l05-t4", "l05-t5", "l05-t6"]
+    },
+    {
+      "id": "l06", "index": 6, "phase": 2, "title": "N, S, E, D", "nodeLabel": "N s e d",
+      "status": "authored",
+      "focusAtomIds": ["letter-n", "letter-s", "letter-e", "letter-d"],
+      "taskIds": ["l06-t1", "l06-t2", "l06-t3", "l06-t4", "l06-t5", "l06-t6"]
+    },
     { "id": "l07", "index": 7, "phase": 3, "title": "K & Ei", "nodeLabel": "K ei", "status": "planned" },
     { "id": "l08", "index": 8, "phase": 3, "title": "W, Ch, G", "nodeLabel": "W ch g", "status": "planned" },
     { "id": "l09", "index": 9, "phase": 3, "title": "Au & B", "nodeLabel": "Au b", "status": "planned" },
