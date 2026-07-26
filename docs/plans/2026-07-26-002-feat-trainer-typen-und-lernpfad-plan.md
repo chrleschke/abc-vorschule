@@ -431,8 +431,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
-/** One playable step inside a trainer. Every round carries its own spoken prompt. */
-interface TrainerRound {
+/**
+ * One playable step inside a trainer. Every round carries its own spoken prompt.
+ * Sealed so that `when` over round types is exhaustive: adding a seventh trainer
+ * must break the build at every dispatch site rather than silently no-op.
+ */
+sealed interface TrainerRound {
     val promptTts: String
 }
 
@@ -638,8 +642,10 @@ fun TrainerRound.scoredAtomIds(): List<String> = when (this) {
     is LetterTraceRound -> listOf(atomId)
     is SyllableMergeRound -> listOf(leftAtomId, rightAtomId, resultAtomId).distinct()
     is WordBuildRound -> (blocks.map { it.atomId } + targetAtomId).distinct()
-    is SentenceOrderRound -> emptyList() // filled by the trainer from the sentence
-    else -> emptyList()
+    // Sentence atom ids are only resolvable via the pack, so SessionViewModel fills
+    // them in; count_add scores against a math key, not against atoms.
+    is SentenceOrderRound -> emptyList()
+    is CountAddRound -> emptyList()
 }
 ```
 
@@ -3079,7 +3085,37 @@ Vier der sechs Trainer (1, 3, 4, 5) sind Drag-&-Drop mit Tap-Alternative. Diese 
   - `@Composable fun rememberDragFieldState(vararg keys: Any?): DragFieldState`
   - `@Composable fun DragCard(state: DragFieldState, key: String, onTap: () -> Unit, onDropped: (zoneKey: String?) -> Unit, modifier: Modifier, content: @Composable BoxScope.() -> Unit)`
   - `@Composable fun DropZone(state: DragFieldState, key: String, onTap: () -> Unit, modifier: Modifier, content: @Composable BoxScope.() -> Unit)`
-  - `object OrderedPlacement { fun isCorrectPlacement(index: Int, display: String, solution: List<String>): Boolean; fun isSolved(placed: Map<Int, String>, solution: List<String>): Boolean; fun nextEmptyIndex(placed: Map<Int, String>, size: Int): Int? }`
+  - `/**
+ * Presentation order for answer tiles.
+ *
+ * A tray that hands the child the solution already in reading order removes the
+ * whole task — the sentence can be dragged left to right without reading it. But
+ * the order must also stay stable across recompositions, so it is derived from a
+ * per-round seed rather than from [kotlin.random.Random].
+ */
+object TrayOrder {
+    fun <T> arrange(items: List<T>, seed: Int, displayOf: (T) -> String): List<T> {
+        if (items.size < 2) return items
+        val ordered = items.sortedBy { mix(displayOf(it).hashCode(), seed) }
+        // A seeded sort can legitimately reproduce the input order; swapping the first
+        // two guarantees the offered order is never exactly the solution order.
+        if (ordered.map(displayOf) != items.map(displayOf)) return ordered
+        return ordered.toMutableList().apply {
+            val first = this[0]
+            this[0] = this[1]
+            this[1] = first
+        }
+    }
+
+    private fun mix(hash: Int, seed: Int): Int {
+        var h = hash * 31 + seed
+        h = h xor (h ushr 15)
+        h *= 0x2545F491
+        return h xor (h ushr 13)
+    }
+}
+
+object OrderedPlacement { fun isCorrectPlacement(index: Int, display: String, solution: List<String>): Boolean; fun isSolved(placed: Map<Int, String>, solution: List<String>): Boolean; fun nextEmptyIndex(placed: Map<Int, String>, size: Int): Int? }`
 
 ---
 
@@ -4980,14 +5016,24 @@ object WordBuildTray {
     /** Preschoolers must be able to scan the whole tray at a glance. */
     const val MaxTrayTiles = 5
 
+    /**
+     * Solution blocks come first for the budget so a round always stays solvable,
+     * then the whole tray is arranged once per round — not per placement — so the
+     * remaining tiles never jump around as the child works.
+     */
     fun tiles(round: WordBuildRound, placedDisplays: List<String>): List<WordBlock> {
-        val remaining = round.blocks.toMutableList()
+        val capped = (round.blocks + round.distractors).take(MaxTrayTiles)
+        val arranged = TrayOrder.arrange(capped, round.targetAtomId.hashCode()) { it.display }
+        val remaining = arranged.toMutableList()
         placedDisplays.forEach { display ->
             val hit = remaining.indexOfFirst { it.display == display }
             if (hit >= 0) remaining.removeAt(hit)
         }
-        if (remaining.isEmpty()) return emptyList()
-        return (remaining + round.distractors).take(MaxTrayTiles)
+        return if (remaining.none { block -> round.blocks.any { it.display == block.display } }) {
+            emptyList()
+        } else {
+            remaining
+        }
     }
 
     fun frameKey(index: Int): String = "frame-$index"
@@ -5229,7 +5275,7 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 **Interfaces:**
 - Consumes: `SentenceOrderRound`, `Sentence`, `WordBlock` (Task 1); `OrderedPlacement`, Drag-Primitive (Task 5); `ContentPack.sentenceWords` (Task 1).
 - Produces:
-  - `object SentenceOrderTray { const val MaxTrayTiles = 6; fun cards(words: List<String>, atomIds: List<String>, distractors: List<WordBlock>, placedDisplays: List<String>): List<WordBlock>; fun pegKey(index: Int): String; fun pegIndex(key: String): Int? }`
+  - `object SentenceOrderTray { const val MaxTrayTiles = 6; fun cards(words: List<String>, atomIds: List<String>, distractors: List<WordBlock>, placedDisplays: List<String>, seed: Int): List<WordBlock>; fun pegKey(index: Int): String; fun pegIndex(key: String): Int? }`
   - `@Composable fun SentenceOrderTrainer(round: SentenceOrderRound, words: List<String>, atomIds: List<String>, illustrationEmoji: String?, scaffoldFor: (String) -> ScaffoldLevel, ttsAvailable: Boolean, speaking: Boolean, onSpeakPrompt: () -> Unit, onSpeak: (String) -> Unit, onResult: (Boolean, Boolean, List<String>) -> Unit, modifier: Modifier)`
 
 ---
@@ -5359,21 +5405,33 @@ object SentenceOrderTray {
     /** A sentence can need more cards than a word, but the tray stays scannable. */
     const val MaxTrayTiles = 6
 
+    /**
+     * Sentence words come first for the budget so the round always stays solvable,
+     * then the whole tray is arranged once per round — never in solution order, and
+     * never reshuffled as the child hangs cards.
+     */
     fun cards(
         words: List<String>,
         atomIds: List<String>,
         distractors: List<WordBlock>,
         placedDisplays: List<String>,
+        seed: Int,
     ): List<WordBlock> {
-        val remaining = words.mapIndexed { index, word ->
+        val solution = words.mapIndexed { index, word ->
             WordBlock(atomId = atomIds.getOrElse(index) { word }, display = word)
-        }.toMutableList()
+        }
+        val capped = (solution + distractors).take(MaxTrayTiles)
+        val arranged = TrayOrder.arrange(capped, seed) { it.display }
+        val remaining = arranged.toMutableList()
         placedDisplays.forEach { display ->
             val hit = remaining.indexOfFirst { it.display == display }
             if (hit >= 0) remaining.removeAt(hit)
         }
-        if (remaining.isEmpty()) return emptyList()
-        return (remaining + distractors).take(MaxTrayTiles)
+        return if (remaining.none { card -> words.any { it == card.display } }) {
+            emptyList()
+        } else {
+            remaining
+        }
     }
 
     fun pegKey(index: Int): String = "peg-$index"
@@ -5408,7 +5466,13 @@ fun SentenceOrderTrainer(
     var misses by remember(roundKey) { mutableIntStateOf(0) }
     var resolved by remember(roundKey) { mutableStateOf(false) }
     val scoredIds = remember(roundKey) { atomIds.distinct() }
-    val cards = SentenceOrderTray.cards(words, atomIds, round.distractors, placed.values.toList())
+    val cards = SentenceOrderTray.cards(
+        words = words,
+        atomIds = atomIds,
+        distractors = round.distractors,
+        placedDisplays = placed.values.toList(),
+        seed = round.sentenceId.hashCode(),
+    )
 
     fun place(index: Int, card: WordBlock) {
         if (resolved || placed[index] != null) return

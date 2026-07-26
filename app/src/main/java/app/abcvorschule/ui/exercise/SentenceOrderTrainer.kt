@@ -53,16 +53,23 @@ object SentenceOrderTray {
         atomIds: List<String>,
         distractors: List<WordBlock>,
         placedDisplays: List<String>,
+        seed: Int,
     ): List<WordBlock> {
-        val remaining = words.mapIndexed { index, word ->
+        val solution = words.mapIndexed { index, word ->
             WordBlock(atomId = atomIds.getOrElse(index) { word }, display = word)
-        }.toMutableList()
+        }
+        val capped = (solution + distractors).take(MaxTrayTiles)
+        val arranged = TrayOrder.arrange(capped, seed) { it.display }
+        val remaining = arranged.toMutableList()
         placedDisplays.forEach { display ->
             val hit = remaining.indexOfFirst { it.display == display }
             if (hit >= 0) remaining.removeAt(hit)
         }
-        if (remaining.isEmpty()) return emptyList()
-        return (remaining + distractors).take(MaxTrayTiles)
+        return if (remaining.none { card -> words.any { it == card.display } }) {
+            emptyList()
+        } else {
+            remaining
+        }
     }
 
     fun pegKey(index: Int): String = "peg-$index"
@@ -97,7 +104,13 @@ fun SentenceOrderTrainer(
     var misses by remember(roundKey) { mutableIntStateOf(0) }
     var resolved by remember(roundKey) { mutableStateOf(false) }
     val scoredIds = remember(roundKey) { atomIds.distinct() }
-    val cards = SentenceOrderTray.cards(words, atomIds, round.distractors, placed.values.toList())
+    val cards = SentenceOrderTray.cards(
+        words,
+        atomIds,
+        round.distractors,
+        placed.values.toList(),
+        seed = round.sentenceId.hashCode(),
+    )
 
     fun place(index: Int, card: WordBlock) {
         if (resolved || placed[index] != null) return

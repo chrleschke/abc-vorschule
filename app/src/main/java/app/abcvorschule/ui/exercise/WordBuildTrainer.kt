@@ -50,14 +50,19 @@ object WordBuildTray {
     /** Preschoolers must be able to scan the whole tray at a glance. */
     const val MaxTrayTiles = 5
 
-    fun tiles(round: WordBuildRound, placedDisplays: List<String>): List<WordBlock> {
-        val remaining = round.blocks.toMutableList()
+    fun tiles(round: WordBuildRound, placedDisplays: List<String>, seed: Int): List<WordBlock> {
+        val capped = (round.blocks + round.distractors).take(MaxTrayTiles)
+        val arranged = TrayOrder.arrange(capped, seed) { it.display }
+        val remaining = arranged.toMutableList()
         placedDisplays.forEach { display ->
             val hit = remaining.indexOfFirst { it.display == display }
             if (hit >= 0) remaining.removeAt(hit)
         }
-        if (remaining.isEmpty()) return emptyList()
-        return (remaining + round.distractors).take(MaxTrayTiles)
+        return if (remaining.none { block -> round.blocks.any { it.display == block.display } }) {
+            emptyList()
+        } else {
+            remaining
+        }
     }
 
     fun frameKey(index: Int): String = "frame-$index"
@@ -92,7 +97,7 @@ fun WordBuildTrainer(
     val scoredIds = remember(roundKey) {
         (round.blocks.map { it.atomId } + round.targetAtomId).distinct()
     }
-    val tiles = WordBuildTray.tiles(round, placed.values.toList())
+    val tiles = WordBuildTray.tiles(round, placed.values.toList(), seed = round.targetAtomId.hashCode())
 
     fun place(index: Int, block: WordBlock) {
         if (resolved || placed[index] != null) return

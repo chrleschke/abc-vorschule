@@ -5,8 +5,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
-/** One playable step inside a trainer. Every round carries its own spoken prompt. */
-interface TrainerRound {
+/**
+ * One playable step inside a trainer. Every round carries its own spoken prompt.
+ * Sealed so that `when` over round types is exhaustive: adding a seventh trainer
+ * must break the build at every dispatch site rather than silently no-op.
+ */
+sealed interface TrainerRound {
     val promptTts: String
 }
 
@@ -212,6 +216,8 @@ fun TrainerRound.scoredAtomIds(): List<String> = when (this) {
     is LetterTraceRound -> listOf(atomId)
     is SyllableMergeRound -> listOf(leftAtomId, rightAtomId, resultAtomId).distinct()
     is WordBuildRound -> (blocks.map { it.atomId } + targetAtomId).distinct()
-    is SentenceOrderRound -> emptyList() // filled by the trainer from the sentence
-    else -> emptyList()
+    // Sentence atom ids are only resolvable via the pack, so SessionViewModel fills
+    // them in; count_add scores against a math key, not against atoms.
+    is SentenceOrderRound -> emptyList()
+    is CountAddRound -> emptyList()
 }
