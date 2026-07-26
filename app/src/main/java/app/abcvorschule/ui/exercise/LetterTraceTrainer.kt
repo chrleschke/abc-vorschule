@@ -60,6 +60,7 @@ fun LetterTraceTrainer(
     var vehicle by remember(roundKey) { mutableStateOf<TracePoint?>(null) }
     var starsCollected by remember(roundKey) { mutableIntStateOf(0) }
     var offRoadCount by remember(roundKey) { mutableIntStateOf(0) }
+    var wasOffCorridor by remember(roundKey) { mutableStateOf(false) }
     var done by remember(roundKey) { mutableStateOf(false) }
     var resolved by remember(roundKey) { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
@@ -91,10 +92,17 @@ fun LetterTraceTrainer(
                             if (done || resolved) return@TraceCanvas
                             val update = TraceProgress.update(state, finger, strokes, stars, boxSize)
                             if (update.offCorridor) {
-                                offRoadCount += 1
-                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                // Edge-triggered: one short nudge per excursion, never one per
+                                // pointer sample. Otherwise the device buzzes continuously and a
+                                // single stray drag exhausts the resolve threshold at once.
+                                if (!wasOffCorridor) {
+                                    wasOffCorridor = true
+                                    offRoadCount += 1
+                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                }
                                 return@TraceCanvas
                             }
+                            wasOffCorridor = false
                             vehicle = finger
                             if (update.collectedStar) {
                                 playStarBlip(starsCollected)

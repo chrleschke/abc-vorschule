@@ -92,12 +92,16 @@ fun playSuccessChime() {
 fun playStarBlip(step: Int) {
     val scale = listOf(523.25, 587.33, 659.25, 698.46, 783.99, 880.0, 987.77, 1046.50)
     val freq = scale[step.coerceAtLeast(0) % scale.size]
-    playTone(listOf(freq), noteMs = 70)
+    playTone(listOf(freq), noteMs = 70, gapMs = 0)
 }
 
-private fun playTone(freqsHz: List<Double>, noteMs: Int) {
+/**
+ * [gapMs] defaults to buildArpeggio's original spacing so routing the existing
+ * success chime through this shared path does not change how it sounds.
+ */
+private fun playTone(freqsHz: List<Double>, noteMs: Int, gapMs: Int = 15) {
     runCatching {
-        val samples = buildArpeggio(freqsHz, noteMs = noteMs, gapMs = 0)
+        val samples = buildArpeggio(freqsHz, noteMs = noteMs, gapMs = gapMs)
         val track = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
