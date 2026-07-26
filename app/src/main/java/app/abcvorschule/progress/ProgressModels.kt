@@ -28,8 +28,11 @@ data class SkillStats(
 
 @Serializable
 data class SessionSnapshot(
-    val taskIds: List<String> = emptyList(),
-    val index: Int = 0,
+    val lessonId: String = "",
+    /** Index into the lesson's six trainers. */
+    val trainerIndex: Int = 0,
+    /** Index into the current trainer's rounds. */
+    val roundIndex: Int = 0,
     val pointsEarned: Int = 0,
     val packId: String = "",
 )
@@ -38,10 +41,13 @@ data class SessionSnapshot(
 data class LearnerProgress(
     val parentMode: ParentMode = ParentMode.Auto,
     val points: Int = 0,
+    /** Per-atom stats drive per-slot scaffolds. */
     val atomStats: Map<String, SkillStats> = emptyMap(),
+    /** Per-fact stats drive the Rechnen scaffold (visual choices vs. number entry). */
     val mathStats: Map<String, SkillStats> = emptyMap(),
+    /** Per-trainer stats drive lesson state on the path. */
+    val taskStats: Map<String, SkillStats> = emptyMap(),
     val unfinishedSession: SessionSnapshot? = null,
-    val packIntroCompleted: Boolean = false,
 )
 
 sealed interface AttemptOutcome {

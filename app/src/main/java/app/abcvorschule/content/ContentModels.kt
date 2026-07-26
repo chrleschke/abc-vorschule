@@ -1,7 +1,6 @@
 package app.abcvorschule.content
 
 import kotlinx.serialization.Serializable
-import java.util.Locale
 
 @Serializable
 data class PackManifest(
@@ -13,11 +12,32 @@ data class PackManifest(
 
 @Serializable
 enum class AtomKind {
+    /** Single grapheme, upper/lower case pair (M, A). */
     letter,
+
+    /** Multi-letter grapheme spoken as one sound (Ei, Au, Sch, ck). */
+    digraph,
     syllable,
     word,
+
+    /** Picture-only vocabulary used for listening/counting, never read or spelled. */
     other,
 }
+
+/** Where a phoneme sits inside a spoken word. */
+@Serializable
+enum class SoundSlot {
+    start,
+    middle,
+    end,
+}
+
+/**
+ * One pen stroke of a glyph, as normalized points in a 0..1 box, y pointing down.
+ * Stroke order and point order encode the writing direction taught in Trainer 2.
+ */
+@Serializable
+data class GlyphStroke(val points: List<List<Double>>)
 
 @Serializable
 data class Atom(
@@ -26,9 +46,10 @@ data class Atom(
     val display: String,
     val emoji: String,
     val kind: AtomKind = AtomKind.word,
-    val prerequisites: List<String> = emptyList(),
     val pluralDisplay: String? = null,
     val pluralHighlight: String? = null,
+    /** Uppercase glyph strokes; required for atoms used by a letter_trace round. */
+    val strokes: List<GlyphStroke> = emptyList(),
 )
 
 @Serializable
@@ -39,132 +60,33 @@ data class Sentence(
     val id: String,
     val atomIds: List<String>,
     val tts: String,
+    /** Rendered word forms when they differ from the atom display (inflection, punctuation). */
     val displayOverride: List<String>? = null,
 )
 
 @Serializable
 data class SentencesFile(val sentences: List<Sentence>)
 
-@Serializable
-enum class Domain {
-    reading,
-    speech,
-    math,
-}
-
-@Serializable
-enum class TaskType {
-    cloze,
-    sentence_cloze,
-    speech_cloze,
-    visual_add,
-    number_entry,
-}
-
-@Serializable
-data class TaskTemplate(
-    val id: String,
-    val domain: Domain,
-    val type: TaskType,
-    val atomId: String? = null,
-    val sentenceId: String? = null,
-    val promptTts: String,
-    val promptSymbols: String? = null,
-    val slots: List<String> = emptyList(),
-    val gapAtomIds: List<String> = emptyList(),
-    /** Ordered atom ids for syllable/letter composition (supports duplicates, e.g. Ma⋅ma). */
-    val composeParts: List<String> = emptyList(),
-    /** Optional per-part display overrides aligned with [composeParts] (e.g. Ma, ma). */
-    val composeDisplays: List<String> = emptyList(),
-    val targetAtomId: String? = null,
-    val tier: String? = null,
-    val left: Int? = null,
-    val right: Int? = null,
-    val answer: Int? = null,
-    val operation: String? = null,
-    val difficultyBand: String? = null,
-)
-
-@Serializable
-data class TasksFile(val tasks: List<TaskTemplate>)
-
-data class ComposePart(
-    val slotKey: String,
-    val atomId: String,
-    val display: String?,
-)
-
-fun TaskTemplate.resolvedGapAtomIds(): List<String> = when {
-    composeParts.isNotEmpty() -> composeParts
-    type == TaskType.sentence_cloze -> gapAtomIds
-    type == TaskType.cloze || type == TaskType.speech_cloze -> slots.ifEmpty {
-        listOfNotNull(targetAtomId ?: atomId)
-    }
-    else -> emptyList()
-}
-
-fun TaskTemplate.composePartsResolved(): List<ComposePart> {
-    val ids = resolvedGapAtomIds()
-    return ids.mapIndexed { index, atomId ->
-        ComposePart(
-            slotKey = "$atomId#$index",
-            atomId = atomId,
-            display = composeDisplays.getOrNull(index),
-        )
-    }
-}
-
-/** Letter tasks expose uppercase + lowercase as two slots/pieces. */
-fun TaskTemplate.composePartsFor(atom: Atom?): List<ComposePart> {
-    if (composeParts.isNotEmpty()) return composePartsResolved()
-    if (tier == "letter" && atom != null && atom.kind == AtomKind.letter) {
-        val (upper, lower) = atom.casePair()
-        return listOf(
-            ComposePart(slotKey = "${atom.id}#U", atomId = atom.id, display = upper),
-            ComposePart(slotKey = "${atom.id}#L", atomId = atom.id, display = lower),
-        )
-    }
-    return composePartsResolved()
-}
-
-fun Atom.casePair(): Pair<String, String> {
-    val ch = lemma.trim().firstOrNull()?.toString() ?: display.trim().firstOrNull()?.toString() ?: "?"
-    val locale = Locale.GERMAN
-    return ch.uppercase(locale) to ch.lowercase(locale)
-}
-
-fun TaskTemplate.isComposeTask(): Boolean = composeParts.isNotEmpty() || tier == "compose"
-
-/** Word built from individual letter frames (e.g. H·a·u·s). */
-fun TaskTemplate.isSpellTask(): Boolean =
-    tier == "spell" ||
-        (
-            composeParts.isNotEmpty() &&
-                composeParts.all { it.startsWith("letter-") }
-            )
-
-fun TaskTemplate.isLetterTask(): Boolean = tier == "letter"
-
-fun TaskTemplate.isSyllableTask(): Boolean = tier == "syllable"
-
-fun TaskTemplate.tierRank(): Int = when (tier) {
-    "letter" -> 0
-    "syllable" -> 1
-    "compose" -> 2
-    "word" -> 3
-    "sentence" -> 4
-    else -> 5
-}
-
 data class ContentPack(
     val manifest: PackManifest,
     val atoms: Map<String, Atom>,
     val sentences: Map<String, Sentence>,
-    val tasks: List<TaskTemplate>,
+    val tasks: Map<String, TaskSpec>,
+    val lessons: List<Lesson>,
 ) {
+    val authoredLessons: List<Lesson> = lessons.filter { it.status == LessonStatus.authored }
+
     fun atom(id: String): Atom = atoms.getValue(id)
 
     fun sentence(id: String): Sentence = sentences.getValue(id)
 
-    fun tasksFor(domain: Domain): List<TaskTemplate> = tasks.filter { it.domain == domain }
+    fun task(id: String): TaskSpec = tasks.getValue(id)
+
+    fun lesson(id: String): Lesson = lessons.first { it.id == id }
+
+    fun tasksOf(lesson: Lesson): List<TaskSpec> = lesson.taskIds.map { task(it) }
+
+    /** Rendered words of a sentence, aligned with [Sentence.atomIds]. */
+    fun sentenceWords(sentence: Sentence): List<String> =
+        sentence.displayOverride ?: sentence.atomIds.map { atom(it).display }
 }

@@ -1,6 +1,6 @@
 package app.abcvorschule.progress
 
-import app.abcvorschule.content.TaskTemplate
+import app.abcvorschule.content.CountAddRound
 
 object ProgressionEngine {
     const val UpThreshold = 3
@@ -24,11 +24,11 @@ object ProgressionEngine {
         return "$operation|$bandPart|$left+$right"
     }
 
-    fun mathKey(task: TaskTemplate): String = mathKey(
-        operation = task.operation ?: "add",
-        left = task.left ?: 0,
-        right = task.right ?: 0,
-        band = task.difficultyBand,
+    fun mathKey(round: CountAddRound): String = mathKey(
+        operation = round.operation,
+        left = round.left,
+        right = round.right,
+        band = round.difficultyBand,
     )
 
     fun bandFor(sum: Int): String = when {
@@ -53,6 +53,16 @@ object ProgressionEngine {
     ): LearnerProgress {
         val updated = apply(progress.mathStats[mathKey] ?: SkillStats(), outcome, progress.parentMode)
         return progress.copy(mathStats = progress.mathStats + (mathKey to updated))
+    }
+
+    /** Trainer-level tally; feeds LessonGating, never scaffold selection. */
+    fun recordTaskAttempt(
+        progress: LearnerProgress,
+        taskId: String,
+        outcome: AttemptOutcome,
+    ): LearnerProgress {
+        val updated = apply(progress.taskStats[taskId] ?: SkillStats(), outcome, progress.parentMode)
+        return progress.copy(taskStats = progress.taskStats + (taskId to updated))
     }
 
     fun awardPoints(progress: LearnerProgress, amount: Int): LearnerProgress =

@@ -5,11 +5,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.ContentRepository
-import app.abcvorschule.content.Domain
-import app.abcvorschule.content.TaskTemplate
-import app.abcvorschule.content.composePartsFor
+import app.abcvorschule.content.CountAddRound
+import app.abcvorschule.content.LetterTraceRound
+import app.abcvorschule.content.Lesson
+import app.abcvorschule.content.SentenceOrderRound
+import app.abcvorschule.content.SoundPositionRound
+import app.abcvorschule.content.SyllableMergeRound
+import app.abcvorschule.content.TaskSpec
+import app.abcvorschule.content.WordBuildRound
+import app.abcvorschule.content.rounds
+import app.abcvorschule.content.scoredAtomIds
 import app.abcvorschule.progress.AttemptOutcome
 import app.abcvorschule.progress.LearnerProgress
+import app.abcvorschule.progress.LessonGating
+import app.abcvorschule.progress.LessonState
 import app.abcvorschule.progress.ParentMode
 import app.abcvorschule.progress.ProgressRepository
 import app.abcvorschule.progress.ProgressionEngine
@@ -27,7 +36,6 @@ import kotlinx.coroutines.withContext
 class SessionViewModel(
     private val contentRepository: ContentRepository,
     private val progressRepository: ProgressRepository,
-    private val scheduler: SessionScheduler = SessionScheduler(),
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow(SessionUiState())
@@ -45,77 +53,142 @@ class SessionViewModel(
             pack = withContext(Dispatchers.IO) { contentRepository.load() }
             progress = progressRepository.current()
             val snapshot = progress.unfinishedSession
-            if (snapshot != null && snapshot.packId == pack.manifest.packId && snapshot.taskIds.isNotEmpty()) {
-                restore(snapshot)
+            val resumable = snapshot != null &&
+                snapshot.packId == pack.manifest.packId &&
+                pack.lessons.any { it.id == snapshot.lessonId }
+            if (resumable) {
+                openLesson(snapshot!!.lessonId, snapshot.trainerIndex, snapshot.roundIndex, snapshot.pointsEarned)
             } else {
-                startFreshSession()
+                _ui.value = SessionUiState(
+                    screen = AppScreen.Path,
+                    points = progress.points,
+                    ready = true,
+                )
             }
         }.onFailure { error ->
-            _ui.update { it.copy(error = error.message ?: "Inhalt konnte nicht geladen werden", ready = false) }
+            _ui.update {
+                it.copy(error = error.message ?: "Inhalt konnte nicht geladen werden", ready = false)
+            }
         }
-    }
-
-    private suspend fun startFreshSession() {
-        progress = progressRepository.current()
-        val templates = scheduler.buildSession(pack, progress)
-        val scheduled = templates.map { schedule(it, progress) }
-        _ui.value = SessionUiState(
-            screen = AppScreen.Practice,
-            tasks = scheduled,
-            index = 0,
-            points = progress.points,
-            sessionPoints = 0,
-            ready = true,
-        )
-        persistSnapshot()
-    }
-
-    private fun restore(snapshot: SessionSnapshot) {
-        val templates = snapshot.taskIds.mapNotNull { id -> pack.tasks.find { it.id == id } }
-        val scheduled = templates.map { schedule(it, progress) }
-        val idx = snapshot.index.coerceIn(0, scheduled.lastIndex.coerceAtLeast(0))
-        _ui.value = SessionUiState(
-            screen = AppScreen.Practice,
-            tasks = scheduled,
-            index = idx,
-            points = progress.points,
-            sessionPoints = snapshot.pointsEarned,
-            ready = true,
-        )
     }
 
     fun contentPack(): ContentPack? = if (this::pack.isInitialized) pack else null
 
-    private fun schedule(template: TaskTemplate, progress: LearnerProgress): ScheduledTask {
-        val atom = template.atomId?.let { pack.atoms[it] }
-        val parts = template.composePartsFor(atom)
-        val scaffolds = parts.map { it.atomId }.distinct()
-            .associateWith { ProgressionEngine.scaffoldForAtom(progress, it) }
-        val distractors = DistractorPicker.pick(template, parts, pack, progress)
-        return ScheduledTask(template, scaffolds, distractors)
-    }
+    fun pathLessons(): List<Lesson> = if (this::pack.isInitialized) pack.lessons else emptyList()
 
-    fun goPreviousTask() {
-        _ui.update { state ->
-            if (!state.canGoPrevious || state.successPhase != SuccessPhase.Idle) state
-            else state.copy(
-                index = state.index - 1,
-                speakCue = null,
-                successPhase = SuccessPhase.Idle,
-                successSpeakText = null,
+    fun lessonStates(): Map<String, LessonState> =
+        if (this::pack.isInitialized) LessonGating.states(pack, progress) else emptyMap()
+
+    fun highlightedLessonId(): String? =
+        if (this::pack.isInitialized) LessonGating.nextPlayable(pack, progress)?.id else null
+
+    /** Spoken cue for a locked/planned node — a tap must always produce feedback. */
+    fun lockedLessonCue(): String = "Das üben wir später."
+
+    fun openLesson(
+        lessonId: String,
+        trainerIndex: Int = 0,
+        roundIndex: Int = 0,
+        sessionPoints: Int = 0,
+    ) {
+        viewModelScope.launch {
+            progress = progressRepository.current()
+            val lesson = pack.lessons.firstOrNull { it.id == lessonId } ?: return@launch
+            if (!LessonGating.isPlayable(LessonGating.stateOf(pack, progress, lessonId))) return@launch
+            val trainers = pack.tasksOf(lesson).map { schedule(it) }
+            val counts = trainers.map { it.spec.rounds.size }
+            val safeTrainer = trainerIndex.coerceIn(0, (trainers.size - 1).coerceAtLeast(0))
+            val safeRound = roundIndex.coerceIn(0, (counts.getOrElse(safeTrainer) { 1 } - 1).coerceAtLeast(0))
+            _ui.value = SessionUiState(
+                screen = AppScreen.Practice,
+                lessonId = lessonId,
+                trainers = trainers,
+                trainerIndex = safeTrainer,
+                roundIndex = safeRound,
+                points = progress.points,
+                sessionPoints = sessionPoints,
+                ready = true,
             )
+            persistSnapshot()
         }
     }
 
-    fun goNextTask() {
+    fun backToPath() {
+        viewModelScope.launch {
+            progressRepository.saveSession(null)
+            _ui.update {
+                it.copy(
+                    screen = AppScreen.Path,
+                    lessonId = null,
+                    trainers = emptyList(),
+                    trainerIndex = 0,
+                    roundIndex = 0,
+                    sessionPoints = 0,
+                    speakCue = null,
+                    successPhase = SuccessPhase.Idle,
+                    successSpeakText = null,
+                    points = progress.points,
+                )
+            }
+        }
+    }
+
+    private fun schedule(spec: TaskSpec): ScheduledTrainer {
+        val atomIds = spec.rounds.flatMap { round ->
+            round.scoredAtomIds() + sentenceAtomIds(round)
+        }.distinct()
+        val mathRound = spec.rounds.filterIsInstance<CountAddRound>().firstOrNull()
+        return ScheduledTrainer(
+            spec = spec,
+            scaffolds = atomIds.associateWith { ProgressionEngine.scaffoldForAtom(progress, it) },
+            mathScaffold = mathRound
+                ?.let { ProgressionEngine.scaffoldForMath(progress, ProgressionEngine.mathKey(it)) }
+                ?: ScaffoldLevel.Beginner,
+        )
+    }
+
+    private fun sentenceAtomIds(round: app.abcvorschule.content.TrainerRound): List<String> =
+        if (round is SentenceOrderRound) pack.sentence(round.sentenceId).atomIds else emptyList()
+
+    fun goPreviousRound() {
         _ui.update { state ->
-            if (!state.canGoNext || state.successPhase != SuccessPhase.Idle) state
-            else state.copy(
-                index = state.index + 1,
-                speakCue = null,
-                successPhase = SuccessPhase.Idle,
-                successSpeakText = null,
+            val step = SessionProgression.previous(
+                state.trainerIndex,
+                state.roundIndex,
+                state.trainers.map { it.spec.rounds.size },
             )
+            if (step == null || state.successPhase != SuccessPhase.Idle) {
+                state
+            } else {
+                state.copy(
+                    trainerIndex = step.trainerIndex,
+                    roundIndex = step.roundIndex,
+                    speakCue = null,
+                    successPhase = SuccessPhase.Idle,
+                    successSpeakText = null,
+                )
+            }
+        }
+    }
+
+    fun goNextRound() {
+        _ui.update { state ->
+            val step = SessionProgression.next(
+                state.trainerIndex,
+                state.roundIndex,
+                state.trainers.map { it.spec.rounds.size },
+            )
+            if (step == null || state.successPhase != SuccessPhase.Idle) {
+                state
+            } else {
+                state.copy(
+                    trainerIndex = step.trainerIndex,
+                    roundIndex = step.roundIndex,
+                    speakCue = null,
+                    successPhase = SuccessPhase.Idle,
+                    successSpeakText = null,
+                )
+            }
         }
     }
 
@@ -123,50 +196,37 @@ class SessionViewModel(
         _ui.update { it.copy(speakCue = null) }
     }
 
-    fun onSpeakerFallbackNeeded(): Boolean {
-        val task = _ui.value.current?.template ?: return false
-        return task.domain == Domain.math && !task.promptSymbols.isNullOrBlank()
-    }
-
     fun currentPromptText(ttsAvailable: Boolean): String {
-        val task = _ui.value.current?.template ?: return ""
-        return if (!ttsAvailable && !task.promptSymbols.isNullOrBlank()) {
-            task.promptSymbols
-        } else {
-            task.promptTts
-        }
+        val state = _ui.value
+        val round = state.currentRound ?: return ""
+        if (ttsAvailable) return round.promptTts
+        // No German voice: Rechnen falls back to a numeral prompt, others keep the text.
+        return if (round is CountAddRound) "${round.left} + ${round.right} = ?" else round.promptTts
     }
 
-    fun successSpeakTextForCurrent(): String {
-        val task = _ui.value.current?.template ?: return ""
-        return when (task.domain) {
-            Domain.math -> (task.answer ?: ((task.left ?: 0) + (task.right ?: 0))).toString()
-            Domain.reading, Domain.speech -> {
-                val id = task.atomId ?: task.targetAtomId
-                pack.atoms[id]?.display
-                    ?: task.composeDisplays.joinToString("").ifBlank { task.promptTts }
-            }
-        }
+    fun successSpeakTextForCurrent(): String = when (val round = _ui.value.currentRound) {
+        is CountAddRound -> round.answer.toString()
+        is SyllableMergeRound -> round.resultDisplay
+        is WordBuildRound -> pack.atoms[round.targetAtomId]?.display ?: round.promptTts
+        is SentenceOrderRound -> pack.sentence(round.sentenceId).tts
+        is LetterTraceRound -> round.rewardTts
+        is SoundPositionRound -> pack.atoms[round.atomId]?.lemma ?: round.promptTts
+        else -> ""
     }
 
     fun onSuccessSpeechFinished() {
         _ui.update {
-            if (it.successPhase != SuccessPhase.SpeakAnswer) it
-            else it.copy(
-                successPhase = SuccessPhase.ShowBurst,
-                successSpeakText = null,
-            )
+            if (it.successPhase != SuccessPhase.SpeakAnswer) {
+                it
+            } else {
+                it.copy(successPhase = SuccessPhase.ShowBurst, successSpeakText = null)
+            }
         }
     }
 
     fun onSuccessBurstFinished() {
         viewModelScope.launch {
-            _ui.update {
-                it.copy(
-                    successPhase = SuccessPhase.Idle,
-                    successSpeakText = null,
-                )
-            }
+            _ui.update { it.copy(successPhase = SuccessPhase.Idle, successSpeakText = null) }
             advance()
         }
     }
@@ -183,87 +243,70 @@ class SessionViewModel(
         viewModelScope.launch {
             progress = progressRepository.setParentMode(mode)
             _ui.update { state ->
-                // F7: mid-task difficulty changes apply to subsequent tasks only.
-                val updated = state.tasks.mapIndexed { i, scheduled ->
-                    if (i <= state.index) scheduled else schedule(scheduled.template, progress)
+                // F7: a mid-round change applies from the next round on.
+                val updated = state.trainers.mapIndexed { i, trainer ->
+                    if (i <= state.trainerIndex) trainer else schedule(trainer.spec)
                 }
-                state.copy(
-                    showDifficultySheet = false,
-                    tasks = updated,
-                )
+                state.copy(showDifficultySheet = false, trainers = updated)
             }
         }
     }
 
-    /** @return true when the Activity should finish (Back from summary/pause). */
-    fun onBackPressed(): Boolean {
-        val state = _ui.value
-        return when (state.screen) {
-            AppScreen.Practice -> {
-                if (state.index == 0 && state.sessionPoints == 0) {
-                    _ui.update { it.copy(screen = AppScreen.Pause) }
-                } else {
-                    _ui.update { it.copy(screen = AppScreen.RewardSummary) }
-                    viewModelScope.launch { progressRepository.saveSession(null) }
-                }
-                false
+    /** @return true when the Activity should finish. */
+    fun onBackPressed(): Boolean = when (_ui.value.screen) {
+        AppScreen.Path -> true
+        AppScreen.Practice -> {
+            if (_ui.value.sessionPoints > 0) {
+                _ui.update { it.copy(screen = AppScreen.RewardSummary) }
+            } else {
+                backToPath()
             }
-            AppScreen.RewardSummary, AppScreen.Pause -> true
+            false
         }
-    }
-
-    fun resumeFromPause() {
-        _ui.update { it.copy(screen = AppScreen.Practice) }
+        AppScreen.RewardSummary -> {
+            backToPath()
+            false
+        }
     }
 
     fun continueAfterSummary() {
-        viewModelScope.launch {
-            progressRepository.markPackIntroCompleted()
-            startFreshSession()
-        }
+        backToPath()
     }
 
-    fun submitReadingAnswer(correct: Boolean, resolved: Boolean, atomIds: List<String>) {
+    fun submitRoundResult(correct: Boolean, resolved: Boolean, atomIds: List<String>) {
         viewModelScope.launch {
             if (_ui.value.successPhase != SuccessPhase.Idle) return@launch
-            val outcome = outcomeFor(correct = correct, resolved = resolved)
+            val taskId = _ui.value.current?.spec?.id ?: return@launch
+            val outcome = outcomeFor(correct, resolved)
             progress = progressRepository.update { current ->
                 var next = current
-                atomIds.forEach { id ->
-                    next = ProgressionEngine.recordAtomAttempt(next, id, outcome)
-                }
-                if (correct && !resolved) {
-                    next = ProgressionEngine.awardPoints(next, POINTS_PER_CORRECT)
-                }
+                atomIds.distinct().forEach { next = ProgressionEngine.recordAtomAttempt(next, it, outcome) }
+                next = ProgressionEngine.recordTaskAttempt(next, taskId, outcome)
+                if (correct && !resolved) next = ProgressionEngine.awardPoints(next, POINTS_PER_CORRECT)
                 next
             }
-            afterAttempt(correct = correct && !resolved, resolved = resolved, missHint = !correct && !resolved)
+            afterAttempt(correct && !resolved, resolved, !correct && !resolved)
         }
     }
 
-    fun submitMathAnswer(distance: Int?, resolved: Boolean, correct: Boolean) {
+    fun submitMathResult(distance: Int?, resolved: Boolean, correct: Boolean) {
         viewModelScope.launch {
             if (_ui.value.successPhase != SuccessPhase.Idle) return@launch
-            val task = _ui.value.current?.template ?: return@launch
-            val key = ProgressionEngine.mathKey(task)
-            val outcome = outcomeFor(correct = correct, resolved = resolved)
+            val trainer = _ui.value.current ?: return@launch
+            val round = _ui.value.currentRound as? CountAddRound ?: return@launch
+            val key = ProgressionEngine.mathKey(round)
+            val outcome = outcomeFor(correct, resolved)
             progress = progressRepository.update { current ->
                 var next = ProgressionEngine.recordMathAttempt(current, key, outcome)
-                if (correct && !resolved) {
-                    next = ProgressionEngine.awardPoints(next, POINTS_PER_CORRECT)
-                }
+                next = ProgressionEngine.recordTaskAttempt(next, trainer.spec.id, outcome)
+                if (correct && !resolved) next = ProgressionEngine.awardPoints(next, POINTS_PER_CORRECT)
                 next
-            }
-            // Preschool: speak miss hints; never show error sentences as readable chrome.
-            val spoken = when {
-                resolved || correct -> null
-                else -> MathHinting.missFeedback(distance)
             }
             afterAttempt(
                 correct = correct && !resolved,
                 resolved = resolved,
                 missHint = !correct && !resolved,
-                speakOverride = spoken,
+                speakOverride = if (resolved || correct) null else MathHinting.missFeedback(distance),
             )
         }
     }
@@ -300,63 +343,71 @@ class SessionViewModel(
         if (missHint) {
             _ui.update {
                 it.copy(
-                    speakCue = speakOverride ?: "Probiere eine andere Antwort",
+                    speakCue = speakOverride ?: missCueForCurrent(),
                     points = progress.points,
                 )
             }
         }
+    }
+
+    /** Miss feedback is spoken; content authors supply the didactic re-reading. */
+    private fun missCueForCurrent(): String = when (val round = _ui.value.currentRound) {
+        is SoundPositionRound -> round.missTts
+        else -> "Probiere eine andere Antwort"
     }
 
     private suspend fun advance() {
         val state = _ui.value
-        val nextIndex = state.index + 1
-        if (nextIndex >= state.tasks.size) {
+        val step = SessionProgression.next(
+            state.trainerIndex,
+            state.roundIndex,
+            state.trainers.map { it.spec.rounds.size },
+        )
+        if (step == null) {
             progressRepository.saveSession(null)
-            progressRepository.markPackIntroCompleted()
             _ui.update {
                 it.copy(
                     screen = AppScreen.RewardSummary,
-                    index = state.tasks.lastIndex.coerceAtLeast(0),
                     speakCue = null,
                     successPhase = SuccessPhase.Idle,
                     successSpeakText = null,
                     points = progress.points,
                 )
             }
-        } else {
-            _ui.update {
-                it.copy(
-                    index = nextIndex,
-                    speakCue = null,
-                    successPhase = SuccessPhase.Idle,
-                    successSpeakText = null,
-                    points = progress.points,
-                    tasks = it.tasks.mapIndexed { i, task ->
-                        if (i < nextIndex) task else schedule(task.template, progress)
-                    },
-                )
-            }
-            persistSnapshot()
+            return
         }
+        _ui.update {
+            it.copy(
+                trainerIndex = step.trainerIndex,
+                roundIndex = step.roundIndex,
+                speakCue = null,
+                successPhase = SuccessPhase.Idle,
+                successSpeakText = null,
+                points = progress.points,
+                trainers = it.trainers.mapIndexed { i, trainer ->
+                    if (i < step.trainerIndex) trainer else schedule(trainer.spec)
+                },
+            )
+        }
+        persistSnapshot()
     }
 
     private suspend fun persistSnapshot() {
         val state = _ui.value
-        if (state.tasks.isEmpty()) return
+        val lessonId = state.lessonId ?: return
         progressRepository.saveSession(
             SessionSnapshot(
-                taskIds = state.tasks.map { it.template.id },
-                index = state.index,
+                lessonId = lessonId,
+                trainerIndex = state.trainerIndex,
+                roundIndex = state.roundIndex,
                 pointsEarned = state.sessionPoints,
                 packId = pack.manifest.packId,
             ),
         )
     }
 
-    fun effectiveMathScaffold(): ScaffoldLevel {
-        val task = _ui.value.current?.template ?: return ScaffoldLevel.Beginner
-        return ProgressionEngine.scaffoldForMath(progress, ProgressionEngine.mathKey(task))
-    }
+    fun scaffoldFor(atomId: String): ScaffoldLevel =
+        _ui.value.current?.scaffolds?.get(atomId) ?: ScaffoldLevel.Beginner
 
     fun parentMode(): ParentMode = progress.parentMode
 
@@ -368,9 +419,8 @@ class SessionViewModel(
             progressRepository: ProgressRepository,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return SessionViewModel(contentRepository, progressRepository) as T
-            }
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                SessionViewModel(contentRepository, progressRepository) as T
         }
     }
 }

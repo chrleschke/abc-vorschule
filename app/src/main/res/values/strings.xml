@@ -11,7 +11,15 @@
     <string name="mode_auto">Auto</string>
     <string name="mode_beginner">Mit Hilfe</string>
     <string name="mode_advanced">Ohne Hilfe</string>
-    <string name="pause_resume">Weiterüben</string>
     <string name="speaker">Vorlesen</string>
     <string name="resolve">Auflösen</string>
+    <string name="nav_back">Zurück</string>
+    <string name="nav_forward">Weiter</string>
+    <string name="wagon_start">Anfang</string>
+    <string name="wagon_middle">Mitte</string>
+    <string name="wagon_end">Ende</string>
+    <string name="lesson_locked">Noch gesperrt</string>
+    <string name="lesson_available">Bereit</string>
+    <string name="lesson_mastered">Geschafft</string>
+    <string name="path_node">Lektion</string>
 </resources>

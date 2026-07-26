@@ -1,5 +1,6 @@
 package app.abcvorschule.ui.exercise
 
+import app.abcvorschule.progress.ScaffoldLevel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -16,9 +17,9 @@ class MathHintingTest {
     }
 
     @Test
-    fun forcedBeginnerBlocksNumberPad() {
-        assertFalse(MathHinting.usesNumberPad(scaffoldBeginnerForced = true, preferVisual = false))
-        assertTrue(MathHinting.usesNumberPad(scaffoldBeginnerForced = false, preferVisual = false))
+    fun numberPadOnlyOnAdvancedScaffold() {
+        assertTrue(MathHinting.usesNumberPad(ScaffoldLevel.Advanced))
+        assertFalse(MathHinting.usesNumberPad(ScaffoldLevel.Beginner))
     }
 
     @Test

@@ -45,9 +45,6 @@ class ProgressRepository(
     suspend fun saveSession(snapshot: SessionSnapshot?): LearnerProgress =
         update { it.copy(unfinishedSession = snapshot) }
 
-    suspend fun markPackIntroCompleted(): LearnerProgress =
-        update { it.copy(packIntroCompleted = true) }
-
     private fun currentFrom(prefs: Preferences): LearnerProgress =
         prefs[key]?.let { decode(it) } ?: LearnerProgress()
 

@@ -1,0 +1,24 @@
+{
+  "lessons": [
+    {
+      "id": "l01", "index": 1, "phase": 1, "title": "M & A", "nodeLabel": "M a",
+      "status": "authored", "focusAtomIds": ["letter-m", "letter-a"],
+      "taskIds": ["l01-t1", "l01-t2", "l01-t3", "l01-t4", "l01-t5", "l01-t6"]
+    },
+    { "id": "l02", "index": 2, "phase": 1, "title": "I & O", "nodeLabel": "I o", "status": "planned" },
+    { "id": "l03", "index": 3, "phase": 2, "title": "P & T", "nodeLabel": "P t", "status": "planned" },
+    { "id": "l04", "index": 4, "phase": 2, "title": "L & H", "nodeLabel": "L h", "status": "planned" },
+    { "id": "l05", "index": 5, "phase": 2, "title": "U & R", "nodeLabel": "U r", "status": "planned" },
+    { "id": "l06", "index": 6, "phase": 2, "title": "N, S, E, D", "nodeLabel": "N s e d", "status": "planned" },
+    { "id": "l07", "index": 7, "phase": 3, "title": "K & Ei", "nodeLabel": "K ei", "status": "planned" },
+    { "id": "l08", "index": 8, "phase": 3, "title": "W, Ch, G", "nodeLabel": "W ch g", "status": "planned" },
+    { "id": "l09", "index": 9, "phase": 3, "title": "Au & B", "nodeLabel": "Au b", "status": "planned" },
+    { "id": "l10", "index": 10, "phase": 3, "title": "Umlaut-Rätsel", "nodeLabel": "ä ö ü", "status": "planned" },
+    { "id": "l11", "index": 11, "phase": 4, "title": "Sch", "nodeLabel": "Sch", "status": "planned" },
+    { "id": "l12", "index": 12, "phase": 4, "title": "J, Z, Eu, ß, V", "nodeLabel": "J z eu ß v", "status": "planned" },
+    { "id": "l13", "index": 13, "phase": 5, "title": "Ä, Ö, Ü", "nodeLabel": "Ä Ö Ü", "status": "planned" },
+    { "id": "l14", "index": 14, "phase": 5, "title": "ck & Pf", "nodeLabel": "ck pf", "status": "planned" },
+    { "id": "l15", "index": 15, "phase": 5, "title": "St & Sp", "nodeLabel": "St sp", "status": "planned" },
+    { "id": "l16", "index": 16, "phase": 5, "title": "C, Y, X, Qu", "nodeLabel": "C y x qu", "status": "planned" }
+  ]
+}

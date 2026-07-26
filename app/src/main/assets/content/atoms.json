@@ -1,22 +1,23 @@
 {
   "atoms": [
-    { "id": "letter-m", "lemma": "M", "display": "Mm", "emoji": "🔤", "kind": "letter", "prerequisites": [] },
-    { "id": "letter-a", "lemma": "A", "display": "Aa", "emoji": "🔤", "kind": "letter", "prerequisites": [] },
-    { "id": "letter-o", "lemma": "O", "display": "Oo", "emoji": "🔤", "kind": "letter", "prerequisites": [] },
-    { "id": "letter-h", "lemma": "H", "display": "Hh", "emoji": "🔤", "kind": "letter", "prerequisites": [] },
-    { "id": "letter-u", "lemma": "U", "display": "Uu", "emoji": "🔤", "kind": "letter", "prerequisites": [] },
-    { "id": "letter-s", "lemma": "S", "display": "Ss", "emoji": "🔤", "kind": "letter", "prerequisites": [] },
-    { "id": "ma", "lemma": "ma", "display": "ma", "emoji": "🗣️", "kind": "syllable", "prerequisites": ["letter-m", "letter-a"] },
-    { "id": "mama", "lemma": "Mama", "display": "Mama", "emoji": "👩", "kind": "word", "prerequisites": ["ma"] },
-    { "id": "oma", "lemma": "Oma", "display": "Oma", "emoji": "👵", "kind": "word", "prerequisites": ["ma", "letter-o"] },
-    { "id": "haus", "lemma": "Haus", "display": "Haus", "emoji": "🏠", "kind": "word", "prerequisites": ["letter-h", "letter-a", "letter-u", "letter-s"] },
-    { "id": "ist", "lemma": "ist", "display": "ist", "emoji": "✓", "kind": "word", "prerequisites": ["letter-s"] },
-    { "id": "im", "lemma": "im", "display": "im", "emoji": "➡️", "kind": "word", "prerequisites": ["letter-m"] },
-    { "id": "blume", "lemma": "Blume", "display": "Blume", "emoji": "🌸", "kind": "word", "prerequisites": [], "pluralDisplay": "Blumen", "pluralHighlight": "n" },
-    { "id": "hund", "lemma": "Hund", "display": "Hund", "emoji": "🐶", "kind": "word", "prerequisites": [], "pluralDisplay": "Hunde", "pluralHighlight": "e" },
-    { "id": "maedchen", "lemma": "Mädchen", "display": "Mädchen", "emoji": "👧", "kind": "word", "prerequisites": [], "pluralDisplay": "Mädchen", "pluralHighlight": "" },
-    { "id": "baum", "lemma": "Baum", "display": "Baum", "emoji": "🌳", "kind": "word", "prerequisites": [], "pluralDisplay": "Bäume", "pluralHighlight": "äe" },
-    { "id": "gehen", "lemma": "gehen", "display": "gehen", "emoji": "🚶", "kind": "word", "prerequisites": ["mama"] },
-    { "id": "gegangen", "lemma": "gegangen", "display": "gegangen", "emoji": "🏡", "kind": "word", "prerequisites": ["gehen"] }
+    {
+      "id": "letter-m", "lemma": "M", "display": "M", "emoji": "", "kind": "letter",
+      "strokes": [
+        { "points": [[0.12, 0.92], [0.12, 0.08], [0.5, 0.62], [0.88, 0.08], [0.88, 0.92]] }
+      ]
+    },
+    {
+      "id": "letter-a", "lemma": "A", "display": "A", "emoji": "", "kind": "letter",
+      "strokes": [
+        { "points": [[0.5, 0.08], [0.14, 0.92]] },
+        { "points": [[0.5, 0.08], [0.86, 0.92]] },
+        { "points": [[0.26, 0.66], [0.74, 0.66]] }
+      ]
+    },
+    { "id": "ma", "lemma": "ma", "display": "ma", "emoji": "", "kind": "syllable" },
+    { "id": "mama", "lemma": "Mama", "display": "Mama", "emoji": "👩", "kind": "word" },
+    { "id": "ameise", "lemma": "Ameise", "display": "Ameise", "emoji": "🐜", "kind": "other", "pluralDisplay": "Ameisen" },
+    { "id": "maus", "lemma": "Maus", "display": "Maus", "emoji": "🐭", "kind": "other", "pluralDisplay": "Mäuse" },
+    { "id": "baum", "lemma": "Baum", "display": "Baum", "emoji": "🌳", "kind": "other", "pluralDisplay": "Bäume" }
   ]
 }

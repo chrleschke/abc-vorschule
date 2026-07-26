@@ -25,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
 import app.abcvorschule.content.ContentPack
-import app.abcvorschule.content.Domain
 import app.abcvorschule.session.AppScreen
 import app.abcvorschule.session.SessionUiState
 import app.abcvorschule.session.SessionViewModel
@@ -34,9 +33,8 @@ import app.abcvorschule.ui.components.AbcContinueButton
 import app.abcvorschule.ui.components.AbcNavChevron
 import app.abcvorschule.ui.components.AbcProgressBar
 import app.abcvorschule.ui.components.IconStar
-import app.abcvorschule.ui.exercise.MathExercise
-import app.abcvorschule.ui.exercise.ReadingExercise
-import app.abcvorschule.ui.exercise.SpeechExercise
+import app.abcvorschule.ui.exercise.TrainerCallbacks
+import app.abcvorschule.ui.exercise.TrainerHost
 import app.abcvorschule.ui.rewards.SuccessBurst
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.NightInk
@@ -91,20 +89,19 @@ fun TaskShell(
                     onContinue = viewModel::continueAfterSummary,
                 )
             }
-            state.screen == AppScreen.Pause -> {
+            state.screen == AppScreen.Path -> {
+                // Task 4 replaces this with PathScreen(...).
                 Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(24.dp),
+                    Modifier.fillMaxSize().padding(24.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text("Pause", style = MaterialTheme.typography.headlineMedium)
-                    Spacer(Modifier.height(16.dp))
+                    val first = viewModel.highlightedLessonId()
                     AbcContinueButton(
-                        onClick = viewModel::resumeFromPause,
-                        label = stringResource(R.string.pause_resume),
+                        onClick = { first?.let(viewModel::openLesson) },
+                        label = "Start",
                         centered = true,
+                        enabled = first != null,
                     )
                 }
             }
@@ -147,11 +144,12 @@ private fun PracticeBody(
     onStopSpeak: () -> Unit,
 ) {
     val task = state.current
+    val round = state.currentRound
     val speakPrompt = {
         onSpeak(viewModel.currentPromptText(ttsAvailable))
     }
 
-    LaunchedEffect(task?.template?.id, ttsAvailable) {
+    LaunchedEffect(task?.spec?.id, state.roundIndex, ttsAvailable) {
         if (state.successPhase != SuccessPhase.Idle) return@LaunchedEffect
         onStopSpeak()
         if (ttsAvailable && task != null) {
@@ -210,23 +208,23 @@ private fun PracticeBody(
             AbcNavChevron(
                 forward = false,
                 enabled = state.canGoPrevious && state.successPhase == SuccessPhase.Idle,
-                onClick = viewModel::goPreviousTask,
-                contentDescription = "Zurueck",
+                onClick = viewModel::goPreviousRound,
+                contentDescription = stringResource(R.string.nav_back),
             )
             Spacer(Modifier.width(36.dp))
             AbcNavChevron(
                 forward = true,
                 enabled = state.canGoNext && state.successPhase == SuccessPhase.Idle,
-                onClick = viewModel::goNextTask,
-                contentDescription = "Weiter",
+                onClick = viewModel::goNextRound,
+                contentDescription = stringResource(R.string.nav_forward),
             )
         }
 
         Spacer(Modifier.height(8.dp))
-        AbcProgressBar(index = state.index, total = state.tasks.size)
+        AbcProgressBar(index = state.trainerIndex, total = state.trainers.size)
         Spacer(Modifier.height(4.dp))
         Text(
-            text = state.progressLabel,
+            text = state.trainerProgressLabel,
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -234,47 +232,23 @@ private fun PracticeBody(
 
         Spacer(Modifier.height(10.dp))
 
-        if (task != null) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-            ) {
-                when (task.template.domain) {
-                    Domain.reading -> ReadingExercise(
-                        task = task,
-                        atoms = pack.atoms,
-                        sentence = task.template.sentenceId?.let { pack.sentences[it] },
-                        ttsAvailable = ttsAvailable,
-                        speaking = speaking,
-                        onSpeakPrompt = speakPrompt,
-                        onResult = viewModel::submitReadingAnswer,
+        if (task != null && round != null) {
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                TrainerHost(
+                    trainer = task,
+                    round = round,
+                    pack = pack,
+                    scaffoldFor = viewModel::scaffoldFor,
+                    ttsAvailable = ttsAvailable,
+                    speaking = speaking,
+                    callbacks = TrainerCallbacks(
+                        onResult = viewModel::submitRoundResult,
+                        onMathResult = viewModel::submitMathResult,
                         onSpeak = onSpeak,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    Domain.speech -> SpeechExercise(
-                        task = task,
-                        atoms = pack.atoms,
-                        ttsAvailable = ttsAvailable,
-                        speaking = speaking,
                         onSpeakPrompt = speakPrompt,
-                        onResult = viewModel::submitReadingAnswer,
-                        onSpeak = onSpeak,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    Domain.math -> MathExercise(
-                        task = task,
-                        atom = task.template.atomId?.let { pack.atoms[it] },
-                        scaffold = viewModel.effectiveMathScaffold(),
-                        showSymbolPrompt = !ttsAvailable,
-                        ttsAvailable = ttsAvailable,
-                        speaking = speaking,
-                        onSpeakPrompt = speakPrompt,
-                        onSpeak = onSpeak,
-                        onResult = viewModel::submitMathAnswer,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
+                    ),
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
         }
     }

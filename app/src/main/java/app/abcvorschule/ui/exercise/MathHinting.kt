@@ -1,5 +1,7 @@
 package app.abcvorschule.ui.exercise
 
+import app.abcvorschule.progress.ScaffoldLevel
+
 object MathHinting {
     const val NearDistanceMax = 2
 
@@ -37,6 +39,6 @@ object MathHinting {
         else -> "Schau noch einmal genau hin"
     }
 
-    fun usesNumberPad(scaffoldBeginnerForced: Boolean, preferVisual: Boolean): Boolean =
-        !scaffoldBeginnerForced && !preferVisual
+    /** Advanced = type the result; Beginner = pick from three labeled quantities. */
+    fun usesNumberPad(scaffold: ScaffoldLevel): Boolean = scaffold == ScaffoldLevel.Advanced
 }
