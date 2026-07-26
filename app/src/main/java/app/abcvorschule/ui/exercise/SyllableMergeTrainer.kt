@@ -63,6 +63,7 @@ private val FloeGap = 96.dp
 @Composable
 fun SyllableMergeTrainer(
     round: SyllableMergeRound,
+    roundIndex: Int,
     ttsAvailable: Boolean,
     speaking: Boolean,
     onSpeakPrompt: () -> Unit,
@@ -70,7 +71,7 @@ fun SyllableMergeTrainer(
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val roundKey = "${round.leftAtomId}-${round.rightAtomId}"
+    val roundKey = "$roundIndex-${round.leftAtomId}-${round.rightAtomId}"
     val density = LocalDensity.current
     val travelPx = with(density) { FloeGap.toPx() }
     var dragX by remember(roundKey) { mutableFloatStateOf(0f) }

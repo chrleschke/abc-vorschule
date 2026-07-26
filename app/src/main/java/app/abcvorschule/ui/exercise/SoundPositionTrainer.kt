@@ -67,6 +67,7 @@ private val WagonSize = 96.dp
 @Composable
 fun SoundPositionTrainer(
     round: SoundPositionRound,
+    roundIndex: Int,
     atom: Atom,
     ttsAvailable: Boolean,
     speaking: Boolean,
@@ -75,7 +76,7 @@ fun SoundPositionTrainer(
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val roundKey = "${round.atomId}-${round.slot}"
+    val roundKey = "$roundIndex-${round.atomId}-${round.slot}"
     val field = rememberDragFieldState(roundKey)
     var misses by remember(roundKey) { mutableIntStateOf(0) }
     var landedSlot by remember(roundKey) { mutableStateOf<SoundSlot?>(null) }

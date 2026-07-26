@@ -17,6 +17,8 @@ enum class SuccessPhase {
     Idle,
     SpeakAnswer,
     ShowBurst,
+    /** Resolve was tapped: briefly reveal the answer, award nothing, then advance. */
+    RevealAnswer,
 }
 
 /** Position inside a lesson session: which trainer, which round. */
@@ -54,8 +56,10 @@ data class ScheduledTrainer(
      * Rechnen scaffold per arithmetic fact, keyed by [ProgressionEngine.mathKey].
      * A count_add trainer holds several facts with independent mastery, so one
      * scaffold for the whole trainer would drive the wrong UI for later rounds.
-     * Cached at schedule time so a mid-round parent-mode change only takes
-     * effect from the next trainer on (F7).
+     * Cached at schedule time: [SessionViewModel.advance] re-schedules the
+     * trainer on every round transition, so a mid-round parent-mode change
+     * takes effect from the very next round on — even within the same
+     * trainer, not only once the next trainer starts (F7).
      */
     val mathScaffolds: Map<String, ScaffoldLevel> = emptyMap(),
 )

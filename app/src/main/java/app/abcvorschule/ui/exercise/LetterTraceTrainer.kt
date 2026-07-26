@@ -3,6 +3,7 @@ package app.abcvorschule.ui.exercise
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -47,6 +48,7 @@ private val GlyphBox = 260.dp
 @Composable
 fun LetterTraceTrainer(
     round: LetterTraceRound,
+    roundIndex: Int,
     atom: Atom,
     ttsAvailable: Boolean,
     speaking: Boolean,
@@ -55,7 +57,7 @@ fun LetterTraceTrainer(
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val roundKey = round.atomId
+    val roundKey = "$roundIndex-${round.atomId}"
     var state by remember(roundKey) { mutableStateOf(TraceState()) }
     var vehicle by remember(roundKey) { mutableStateOf<TracePoint?>(null) }
     var starsCollected by remember(roundKey) { mutableIntStateOf(0) }
@@ -179,19 +181,34 @@ private fun TraceCanvas(
     val layout = remember(atom.id, boxSizePx) { buildTraceLayout(atom, boxSizePx) }
 
     Canvas(
-        modifier = modifier.pointerInput(atom.id) {
-            detectDragGestures(
-                onDrag = { change, _ ->
-                    change.consume()
-                    onFinger(
-                        TracePoint(change.position.x, change.position.y),
-                        layout.boxSize,
-                        layout.strokes,
-                        layout.stars,
-                    )
-                },
-            )
-        },
+        modifier = modifier
+            .pointerInput(atom.id) {
+                detectDragGestures(
+                    onDrag = { change, _ ->
+                        change.consume()
+                        onFinger(
+                            TracePoint(change.position.x, change.position.y),
+                            layout.boxSize,
+                            layout.strokes,
+                            layout.stars,
+                        )
+                    },
+                )
+            }
+            // Tap alternative to the drag (R15): a child who taps instead of dragging
+            // must still make progress. Each tap collects exactly the next expected
+            // star, so repeated taps trace the glyph in stroke order. Keyed on `state`
+            // so a fresh gesture recognizer always sees the current stroke/star index.
+            .pointerInput(atom.id, state) {
+                detectTapGestures(
+                    onTap = {
+                        val target = layout.stars.getOrNull(state.strokeIndex)
+                            ?.getOrNull(state.starIndex)
+                            ?: return@detectTapGestures
+                        onFinger(target, layout.boxSize, layout.strokes, layout.stars)
+                    },
+                )
+            },
     ) {
         val corridor = layout.boxSize * TraceProgress.CorridorFraction
 

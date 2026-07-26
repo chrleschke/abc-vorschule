@@ -96,6 +96,14 @@ fun playStarBlip(step: Int) {
 }
 
 /**
+ * Short low tone for negative/blocked feedback (a locked node, a miss) so a tap
+ * without German TTS is never a silent no-op.
+ */
+fun playBlockedBlip() {
+    playTone(listOf(220.0), noteMs = 120)
+}
+
+/**
  * [gapMs] defaults to buildArpeggio's original spacing so routing the existing
  * success chime through this shared path does not change how it sounds.
  */

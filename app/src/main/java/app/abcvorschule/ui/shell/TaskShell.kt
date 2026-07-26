@@ -15,12 +15,15 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
@@ -36,8 +39,11 @@ import app.abcvorschule.ui.exercise.TrainerCallbacks
 import app.abcvorschule.ui.exercise.TrainerHost
 import app.abcvorschule.ui.path.PathScreen
 import app.abcvorschule.ui.rewards.SuccessBurst
+import app.abcvorschule.ui.rewards.playBlockedBlip
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.MutedText
 import app.abcvorschule.ui.theme.NightInk
+import app.abcvorschule.ui.theme.SoftMint
 import kotlinx.coroutines.delay
 
 @Composable
@@ -52,6 +58,7 @@ fun TaskShell(
     onStopSpeak: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val haptics = LocalHapticFeedback.current
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -96,7 +103,12 @@ fun TaskShell(
                     highlightedLessonId = viewModel.highlightedLessonId(),
                     points = state.points,
                     onOpenLesson = { viewModel.openLesson(it) },
-                    onLockedTap = { if (ttsAvailable) onSpeak(viewModel.lockedLessonCue()) },
+                    onLockedTap = {
+                        // A tap must never be a silent no-op, with or without TTS.
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        playBlockedBlip()
+                        if (ttsAvailable) onSpeak(viewModel.lockedLessonCue())
+                    },
                     onParentGateUnlocked = viewModel::openDifficultySheet,
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -141,6 +153,7 @@ private fun PracticeBody(
 ) {
     val task = state.current
     val round = state.currentRound
+    val haptics = LocalHapticFeedback.current
     val speakPrompt = {
         onSpeak(viewModel.currentPromptText(ttsAvailable))
     }
@@ -156,6 +169,10 @@ private fun PracticeBody(
         val cue = state.speakCue ?: return@LaunchedEffect
         if (ttsAvailable) {
             onSpeak(cue)
+        } else {
+            // No German voice: a miss must still be perceivable.
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            playBlockedBlip()
         }
         viewModel.clearSpeakCue()
     }
@@ -168,6 +185,17 @@ private fun PracticeBody(
             delay(350)
         }
         viewModel.onSuccessSpeechFinished()
+    }
+    LaunchedEffect(state.successPhase, state.successSpeakText) {
+        if (state.successPhase != SuccessPhase.RevealAnswer) return@LaunchedEffect
+        val phrase = state.successSpeakText
+        if (ttsAvailable && !phrase.isNullOrBlank()) {
+            onSpeakAndAwait(phrase)
+            delay(900)
+        } else {
+            delay(1400)
+        }
+        viewModel.onRevealFinished()
     }
 
     Column(
@@ -225,6 +253,14 @@ private fun PracticeBody(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(Alignment.CenterHorizontally),
         )
+        if (state.roundCount > 1) {
+            Spacer(Modifier.height(6.dp))
+            RoundProgressDots(
+                roundCount = state.roundCount,
+                roundIndex = state.roundIndex,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
+        }
 
         Spacer(Modifier.height(10.dp))
 
@@ -233,6 +269,7 @@ private fun PracticeBody(
                 TrainerHost(
                     trainer = task,
                     round = round,
+                    roundIndex = state.roundIndex,
                     pack = pack,
                     scaffoldFor = viewModel::scaffoldFor,
                     ttsAvailable = ttsAvailable,
@@ -246,6 +283,37 @@ private fun PracticeBody(
                     modifier = Modifier.fillMaxSize(),
                 )
             }
+        }
+    }
+}
+
+private val RoundDotSize = 8.dp
+
+/**
+ * Sub-progress within the current trainer: one dot per round, filled up to and
+ * including the current one. Shapes only — no text, no emoji.
+ */
+@Composable
+private fun RoundProgressDots(
+    roundCount: Int,
+    roundIndex: Int,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        repeat(roundCount) { i ->
+            val filled = i <= roundIndex
+            Box(
+                modifier = Modifier
+                    .size(RoundDotSize)
+                    .background(
+                        color = if (filled) SoftMint else MutedText.copy(alpha = 0.3f),
+                        shape = CircleShape,
+                    ),
+            )
         }
     }
 }

@@ -79,6 +79,7 @@ object WordBuildTray {
 @Composable
 fun WordBuildTrainer(
     round: WordBuildRound,
+    roundIndex: Int,
     target: Atom,
     scaffoldFor: (String) -> ScaffoldLevel,
     ttsAvailable: Boolean,
@@ -88,7 +89,7 @@ fun WordBuildTrainer(
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val roundKey = "${round.targetAtomId}-${round.blocks.size}"
+    val roundKey = "$roundIndex-${round.targetAtomId}-${round.blocks.size}"
     val field = rememberDragFieldState(roundKey)
     val placed = remember(roundKey) { mutableStateMapOf<Int, String>() }
     var misses by remember(roundKey) { mutableIntStateOf(0) }
@@ -110,7 +111,9 @@ fun WordBuildTrainer(
             }
         } else {
             misses += 1
-            onResult(false, false, listOf(block.atomId))
+            // Score against the slot being practiced, not the tile the child grabbed —
+            // misplacing a distractor must not downgrade the distractor's own scaffold.
+            onResult(false, false, listOf(round.blocks[index].atomId))
         }
     }
 

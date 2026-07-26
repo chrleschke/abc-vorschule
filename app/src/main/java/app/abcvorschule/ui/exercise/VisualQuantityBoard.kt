@@ -31,6 +31,7 @@ fun VisualQuantityBoard(
     onChoose: (Int) -> Unit,
     modifier: Modifier = Modifier,
     missCount: Int = 0,
+    locked: Boolean = false,
     onResolve: (() -> Unit)? = null,
     ttsAvailable: Boolean = false,
     speaking: Boolean = false,
@@ -77,7 +78,7 @@ fun VisualQuantityBoard(
                     }
                 }
             }
-            if (missCount >= 2 && onResolve != null) {
+            if (missCount >= 2 && onResolve != null && !locked) {
                 AbcResolveButton(onClick = onResolve)
             }
         },

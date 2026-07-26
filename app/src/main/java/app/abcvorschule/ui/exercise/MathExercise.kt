@@ -28,6 +28,7 @@ import app.abcvorschule.ui.theme.SoftSand
 fun MathExercise(
     trainer: ScheduledTrainer,
     round: CountAddRound,
+    roundIndex: Int,
     icon: String,
     scaffold: ScaffoldLevel,
     showSymbolPrompt: Boolean,
@@ -38,7 +39,7 @@ fun MathExercise(
     onResult: (distance: Int?, resolved: Boolean, correct: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val roundKey = "${trainer.spec.id}#${round.left}+${round.right}"
+    val roundKey = "${trainer.spec.id}#$roundIndex-${round.left}+${round.right}"
     var misses by remember(roundKey) { mutableIntStateOf(0) }
     var locked by remember(roundKey) { mutableStateOf(false) }
     val usePad = MathHinting.usesNumberPad(scaffold)
@@ -90,7 +91,7 @@ fun MathExercise(
             },
             answers = {
                 NumberPad(onSubmit = { handleGuess(it) })
-                if (misses >= 2) {
+                if (misses >= 2 && !locked) {
                     AbcResolveButton(onClick = ::resolve)
                 }
             },
@@ -103,6 +104,7 @@ fun MathExercise(
             choices = choices,
             onChoose = { handleGuess(it) },
             missCount = misses,
+            locked = locked,
             onResolve = ::resolve,
             ttsAvailable = ttsAvailable,
             speaking = speaking,

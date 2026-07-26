@@ -87,6 +87,7 @@ object SentenceOrderTray {
 @Composable
 fun SentenceOrderTrainer(
     round: SentenceOrderRound,
+    roundIndex: Int,
     words: List<String>,
     atomIds: List<String>,
     illustrationEmoji: String?,
@@ -98,7 +99,7 @@ fun SentenceOrderTrainer(
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val roundKey = round.sentenceId
+    val roundKey = "$roundIndex-${round.sentenceId}"
     val field = rememberDragFieldState(roundKey)
     val placed = remember(roundKey) { mutableStateMapOf<Int, String>() }
     var misses by remember(roundKey) { mutableIntStateOf(0) }
@@ -123,7 +124,9 @@ fun SentenceOrderTrainer(
             }
         } else {
             misses += 1
-            onResult(false, false, listOf(card.atomId))
+            // Score against the peg being practiced, not the card the child grabbed —
+            // misplacing a distractor must not downgrade the distractor's own scaffold.
+            onResult(false, false, listOf(atomIds.getOrElse(index) { card.atomId }))
         }
     }
 

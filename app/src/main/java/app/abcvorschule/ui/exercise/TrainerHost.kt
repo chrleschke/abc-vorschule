@@ -28,6 +28,7 @@ data class TrainerCallbacks(
 fun TrainerHost(
     trainer: ScheduledTrainer,
     round: TrainerRound,
+    roundIndex: Int,
     pack: ContentPack,
     scaffoldFor: (String) -> ScaffoldLevel,
     ttsAvailable: Boolean,
@@ -38,6 +39,7 @@ fun TrainerHost(
     when (round) {
         is SoundPositionRound -> SoundPositionTrainer(
             round = round,
+            roundIndex = roundIndex,
             atom = pack.atom(round.atomId),
             ttsAvailable = ttsAvailable,
             speaking = speaking,
@@ -48,6 +50,7 @@ fun TrainerHost(
         )
         is LetterTraceRound -> LetterTraceTrainer(
             round = round,
+            roundIndex = roundIndex,
             atom = pack.atom(round.atomId),
             ttsAvailable = ttsAvailable,
             speaking = speaking,
@@ -58,6 +61,7 @@ fun TrainerHost(
         )
         is SyllableMergeRound -> SyllableMergeTrainer(
             round = round,
+            roundIndex = roundIndex,
             ttsAvailable = ttsAvailable,
             speaking = speaking,
             onSpeakPrompt = callbacks.onSpeakPrompt,
@@ -67,6 +71,7 @@ fun TrainerHost(
         )
         is WordBuildRound -> WordBuildTrainer(
             round = round,
+            roundIndex = roundIndex,
             target = pack.atom(round.targetAtomId),
             scaffoldFor = scaffoldFor,
             ttsAvailable = ttsAvailable,
@@ -80,6 +85,7 @@ fun TrainerHost(
             val sentence = pack.sentence(round.sentenceId)
             SentenceOrderTrainer(
                 round = round,
+                roundIndex = roundIndex,
                 words = pack.sentenceWords(sentence),
                 atomIds = sentence.atomIds,
                 illustrationEmoji = round.illustrationAtomId?.let { pack.atom(it).emoji },
@@ -95,6 +101,7 @@ fun TrainerHost(
         is CountAddRound -> MathExercise(
             trainer = trainer,
             round = round,
+            roundIndex = roundIndex,
             icon = pack.atom(round.iconAtomId).emoji,
             scaffold = trainer.mathScaffolds[ProgressionEngine.mathKey(round)]
                 ?: ScaffoldLevel.Beginner,

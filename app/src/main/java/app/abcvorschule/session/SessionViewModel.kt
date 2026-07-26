@@ -56,10 +56,15 @@ class SessionViewModel(
             val snapshot = progress.unfinishedSession
             val resumable = snapshot != null &&
                 snapshot.packId == pack.manifest.packId &&
-                pack.lessons.any { it.id == snapshot.lessonId }
+                pack.lessons.any { it.id == snapshot.lessonId } &&
+                LessonGating.isPlayable(LessonGating.stateOf(pack, progress, snapshot.lessonId))
             if (resumable) {
                 openLesson(snapshot!!.lessonId, snapshot.trainerIndex, snapshot.roundIndex, snapshot.pointsEarned)
             } else {
+                // A stale snapshot (e.g. a content edit changed the lesson's taskIds
+                // without bumping packId) must not strand the app on the loading
+                // screen forever — clear it and fall through to the Path.
+                if (snapshot != null) progressRepository.saveSession(null)
                 _ui.value = SessionUiState(
                     screen = AppScreen.Path,
                     points = progress.points,
@@ -93,30 +98,55 @@ class SessionViewModel(
         sessionPoints: Int = 0,
     ) {
         viewModelScope.launch {
-            progress = progressRepository.current()
-            val lesson = pack.lessons.firstOrNull { it.id == lessonId } ?: return@launch
-            if (!LessonGating.isPlayable(LessonGating.stateOf(pack, progress, lessonId))) return@launch
-            val trainers = pack.tasksOf(lesson).map { schedule(it) }
-            val counts = trainers.map { it.spec.rounds.size }
-            val safeTrainer = trainerIndex.coerceIn(0, (trainers.size - 1).coerceAtLeast(0))
-            val safeRound = roundIndex.coerceIn(0, (counts.getOrElse(safeTrainer) { 1 } - 1).coerceAtLeast(0))
-            _ui.value = SessionUiState(
-                screen = AppScreen.Practice,
-                lessonId = lessonId,
-                trainers = trainers,
-                trainerIndex = safeTrainer,
-                roundIndex = safeRound,
-                points = progress.points,
-                sessionPoints = sessionPoints,
-                ready = true,
-            )
-            persistSnapshot()
+            runCatching {
+                progress = progressRepository.current()
+                val lesson = pack.lessons.firstOrNull { it.id == lessonId }
+                val playable = lesson != null &&
+                    LessonGating.isPlayable(LessonGating.stateOf(pack, progress, lessonId))
+                if (lesson == null || !playable) {
+                    // Never leave the UI hanging on the loading screen: a lesson that
+                    // turned out not to be playable (e.g. a stale resume snapshot)
+                    // must fall back to the Path, not a silent no-op.
+                    progressRepository.saveSession(null)
+                    _ui.value = SessionUiState(
+                        screen = AppScreen.Path,
+                        points = progress.points,
+                        ready = true,
+                    )
+                    return@runCatching
+                }
+                val trainers = pack.tasksOf(lesson).map { schedule(it) }
+                val counts = trainers.map { it.spec.rounds.size }
+                val safeTrainer = trainerIndex.coerceIn(0, (trainers.size - 1).coerceAtLeast(0))
+                val safeRound = roundIndex.coerceIn(0, (counts.getOrElse(safeTrainer) { 1 } - 1).coerceAtLeast(0))
+                _ui.value = SessionUiState(
+                    screen = AppScreen.Practice,
+                    lessonId = lessonId,
+                    trainers = trainers,
+                    trainerIndex = safeTrainer,
+                    roundIndex = safeRound,
+                    points = progress.points,
+                    sessionPoints = sessionPoints,
+                    ready = true,
+                )
+                persistSnapshot()
+            }.onFailure { error ->
+                _ui.update {
+                    it.copy(error = error.message ?: "Inhalt konnte nicht geladen werden", ready = false)
+                }
+            }
         }
     }
 
-    fun backToPath() {
+    /**
+     * @param clearSnapshot Whether to discard the resume snapshot. An unfinished
+     * lesson resumes where the child left off, so a hardware-back exit keeps it;
+     * only a genuine finish (already cleared in [advance]) or an explicit
+     * [continueAfterSummary] ends the session for good.
+     */
+    fun backToPath(clearSnapshot: Boolean) {
         viewModelScope.launch {
-            progressRepository.saveSession(null)
+            if (clearSnapshot) progressRepository.saveSession(null)
             _ui.update {
                 it.copy(
                     screen = AppScreen.Path,
@@ -233,6 +263,14 @@ class SessionViewModel(
         }
     }
 
+    fun onRevealFinished() {
+        viewModelScope.launch {
+            if (_ui.value.successPhase != SuccessPhase.RevealAnswer) return@launch
+            _ui.update { it.copy(successPhase = SuccessPhase.Idle, successSpeakText = null) }
+            advance()
+        }
+    }
+
     fun openDifficultySheet() {
         _ui.update { it.copy(showDifficultySheet = true) }
     }
@@ -261,18 +299,21 @@ class SessionViewModel(
             if (_ui.value.sessionPoints > 0) {
                 _ui.update { it.copy(screen = AppScreen.RewardSummary) }
             } else {
-                backToPath()
+                // Backing out mid-lesson: keep the resume snapshot.
+                backToPath(clearSnapshot = false)
             }
             false
         }
         AppScreen.RewardSummary -> {
-            backToPath()
+            // Backing out of the summary is still a mid-lesson exit unless the lesson
+            // actually finished, in which case advance() already cleared the snapshot.
+            backToPath(clearSnapshot = false)
             false
         }
     }
 
     fun continueAfterSummary() {
-        backToPath()
+        backToPath(clearSnapshot = true)
     }
 
     fun submitRoundResult(correct: Boolean, resolved: Boolean, atomIds: List<String>) {
@@ -339,7 +380,15 @@ class SessionViewModel(
             return
         }
         if (resolved) {
-            advance()
+            // Briefly reveal the answer instead of jumping straight to the next round —
+            // the one moment a stuck child asks for help must actually teach something.
+            // No points are awarded for a resolve.
+            _ui.update {
+                it.copy(
+                    successPhase = SuccessPhase.RevealAnswer,
+                    successSpeakText = successSpeakTextForCurrent(),
+                )
+            }
             return
         }
         if (missHint) {
