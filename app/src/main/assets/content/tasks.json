@@ -1,0 +1,114 @@
+{
+  "tasks": [
+    {
+      "id": "r-syll-ma",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "ma",
+      "promptTts": "Lege die Silbe ma.",
+      "slots": ["ma"],
+      "tier": "syllable"
+    },
+    {
+      "id": "r-word-mama",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "mama",
+      "promptTts": "Lege das Wort Mama.",
+      "slots": ["mama"],
+      "tier": "word"
+    },
+    {
+      "id": "r-word-oma",
+      "domain": "reading",
+      "type": "cloze",
+      "atomId": "oma",
+      "promptTts": "Lege das Wort Oma.",
+      "slots": ["oma"],
+      "tier": "word"
+    },
+    {
+      "id": "r-sent-mama-haus",
+      "domain": "reading",
+      "type": "sentence_cloze",
+      "sentenceId": "s-mama-haus",
+      "promptTts": "Mama ist im Haus.",
+      "gapAtomIds": ["mama", "haus"],
+      "tier": "sentence"
+    },
+    {
+      "id": "sp-gegangen",
+      "domain": "speech",
+      "type": "speech_cloze",
+      "atomId": "gegangen",
+      "sentenceId": "s-mama-gegangen",
+      "promptTts": "Mama ist nach Hause gegangen. Sag: gegangen.",
+      "targetAtomId": "gegangen",
+      "slots": ["gegangen"]
+    },
+    {
+      "id": "sp-mama",
+      "domain": "speech",
+      "type": "speech_cloze",
+      "atomId": "mama",
+      "promptTts": "Sag: Mama.",
+      "targetAtomId": "mama",
+      "slots": ["mama"]
+    },
+    {
+      "id": "sp-haus",
+      "domain": "speech",
+      "type": "speech_cloze",
+      "atomId": "haus",
+      "promptTts": "Sag: Haus.",
+      "targetAtomId": "haus",
+      "slots": ["haus"]
+    },
+    {
+      "id": "m-blumen-1-3",
+      "domain": "math",
+      "type": "visual_add",
+      "atomId": "blume",
+      "promptTts": "Eine Blume und drei Blumen. Wie viele Blumen?",
+      "left": 1,
+      "right": 3,
+      "answer": 4,
+      "operation": "add"
+    },
+    {
+      "id": "m-hunde-2-2",
+      "domain": "math",
+      "type": "visual_add",
+      "atomId": "hund",
+      "promptTts": "Zwei Hunde und zwei Hunde. Wie viele Hunde?",
+      "left": 2,
+      "right": 2,
+      "answer": 4,
+      "operation": "add"
+    },
+    {
+      "id": "m-baeume-5-3",
+      "domain": "math",
+      "type": "number_entry",
+      "atomId": "baum",
+      "promptTts": "Fünf Bäume plus drei Bäume. Wie viele Bäume?",
+      "promptSymbols": "5 + 3 = ?",
+      "left": 5,
+      "right": 3,
+      "answer": 8,
+      "operation": "add",
+      "difficultyBand": "medium"
+    },
+    {
+      "id": "m-maedchen-1-1",
+      "domain": "math",
+      "type": "visual_add",
+      "atomId": "maedchen",
+      "promptTts": "Ein Mädchen und ein Mädchen. Wie viele Mädchen?",
+      "left": 1,
+      "right": 1,
+      "answer": 2,
+      "operation": "add"
+    }
+  ]
+}

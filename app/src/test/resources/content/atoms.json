@@ -1,0 +1,16 @@
+{
+  "atoms": [
+    { "id": "ma", "lemma": "ma", "display": "ma", "emoji": "🗣️", "kind": "syllable", "prerequisites": [] },
+    { "id": "mama", "lemma": "Mama", "display": "Mama", "emoji": "👩", "kind": "word", "prerequisites": ["ma"] },
+    { "id": "oma", "lemma": "Oma", "display": "Oma", "emoji": "👵", "kind": "word", "prerequisites": ["ma"] },
+    { "id": "haus", "lemma": "Haus", "display": "Haus", "emoji": "🏠", "kind": "word", "prerequisites": [] },
+    { "id": "ist", "lemma": "ist", "display": "ist", "emoji": "✓", "kind": "word", "prerequisites": [] },
+    { "id": "im", "lemma": "im", "display": "im", "emoji": "➡️", "kind": "word", "prerequisites": [] },
+    { "id": "blume", "lemma": "Blume", "display": "Blume", "emoji": "🌸", "kind": "word", "prerequisites": [], "pluralDisplay": "Blumen", "pluralHighlight": "n" },
+    { "id": "hund", "lemma": "Hund", "display": "Hund", "emoji": "🐶", "kind": "word", "prerequisites": [], "pluralDisplay": "Hunde", "pluralHighlight": "e" },
+    { "id": "maedchen", "lemma": "Mädchen", "display": "Mädchen", "emoji": "👧", "kind": "word", "prerequisites": [], "pluralDisplay": "Mädchen", "pluralHighlight": "" },
+    { "id": "baum", "lemma": "Baum", "display": "Baum", "emoji": "🌳", "kind": "word", "prerequisites": [], "pluralDisplay": "Bäume", "pluralHighlight": "äe" },
+    { "id": "gehen", "lemma": "gehen", "display": "gehen", "emoji": "🚶", "kind": "word", "prerequisites": ["mama"] },
+    { "id": "gegangen", "lemma": "gegangen", "display": "gegangen", "emoji": "🏡", "kind": "word", "prerequisites": ["gehen"] }
+  ]
+}

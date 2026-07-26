@@ -1,0 +1,15 @@
+{
+  "sentences": [
+    {
+      "id": "s-mama-haus",
+      "atomIds": ["mama", "ist", "im", "haus"],
+      "tts": "Mama ist im Haus."
+    },
+    {
+      "id": "s-mama-gegangen",
+      "atomIds": ["mama", "ist", "gegangen"],
+      "tts": "Mama ist nach Hause gegangen.",
+      "displayOverride": ["Mama", "ist", "gegangen"]
+    }
+  ]
+}
