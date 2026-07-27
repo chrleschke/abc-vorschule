@@ -55,19 +55,19 @@ Mindestens prüfen/aktualisieren:
 **Nicht** den Plan-Body als Fortschrittslog missbrauchen (Fortschritt lebt in Git).
 Plan nur anfassen, wenn der Contract selbst falsch oder unvollständig ist.
 
-## Kind-UI-Regeln (Kurz)
+## Kind-UI-Regeln & Trainer-Typen
 
-- Sechs Trainer-**Typen** pro Lektion in fester Rangfolge: Auditiver Finder · Spurensucher · Verschmelzer · Wort-Bauer · Satz-Architekt · Rechnen. Ein Typ kann sich wiederholen oder fehlen, die Reihenfolge geht nie zurück; jede Lektion startet mit Auditiver Finder und endet mit Rechnen (`ContentValidator` erzwingt das).
-- Pfad-Screen ist der Einstieg; gesperrte Knoten antworten mit gesprochenem Hinweis, nie stumm.
-- Trainer 1: Lok mit Anfang/Mitte/Ende-Waggon; Miss spielt das segmentierte Wort (`missTts`).
-- Trainer 2: Straße aus autorierten `Atom.strokes`; gelbe Sterne nur in Strichreihenfolge (aktiver Balken leuchtend, kommende blass), Haptik-Tick pro Stern; fertiger Balken füllt sich ease-in und übergibt das Fahrzeug an den nächsten Startpunkt; Korridor-Verlassen stoppt das Fahrzeug (langes Rumpeln), zählt aber nicht als Fehlversuch. Nach dem letzten Stern 500 ms Standbild, dann Belohnungsseite (Bild + Wortzeile, Graphem fett).
-- Trainer 3: Verschmelzen erst nahe am Vokal; kurzer Zug rutscht straffrei zurück; Tap-Alternative Pflicht.
-- Trainer 4/5: Rahmen bzw. Wäscheleine tragen das Gerüst pro Atom (Silhouette/Ghost vs. leer); Distraktoren sind **im Content autoriert**, Tray ≤ 5 (Wort) bzw. ≤ 6 (Satz).
-- Buchstaben-/Silben-Jagd (bis zu zwei Schritte je Lektion, nach Spurensucher bzw. Verschmelzer, sofern die Lektion den jeweiligen Trainer führt): **kein autorierter Content** — Runden werden zur Laufzeit aus den letter_trace-/syllable_merge-Runden derselben Lektion abgeleitet (`SymbolHuntInsertion`). Kacheln verstreuen sich über den Aufgabenbereich (Ausnahme zu Prinzip 9), die 3-5-Segment-Batterie sitzt im Antwortbereich; Fehltipp mischt neu ohne Batterieverlust, meldet aber genau einmal pro Runde einen Fehlversuch; nach 6 aufeinanderfolgenden Fehltipps: Auflösen. Batterie voll → lokaler „Weiter"-Button, erst danach die normale Erfolgs-Pipeline.
-- Rechnen: 3 Antworten (visuell) bzw. System-Zahlentastatur + CTA-Absenden-Pfeil; in jeder Lektion; keine Lesewörter; Miss-Feedback nur gesprochen; korrekte Antwort bestätigt sich grün (kein Rot bei Miss, kein Grün beim Auflösen); Erfolg wird mit zufälligem Lob aus `PraisePhrases` **vorgesprochen**, nie angezeigt.
-- Drag committet nur bei echtem Zonentreffer (größte Überlappung), sonst Snap-back.
-- Vor/Zurück zwischen Runden ist immer aktiv, unabhängig von Punkten/Fortschritt.
-- Aufgabe oben mittig, Antworten unten mittig (`ExerciseStage` / Design-Komponenten).
+**Vollständige, verbindliche Details:** [`docs/PRODUCT_PRINCIPLES.md` → Abschnitte 2–10](docs/PRODUCT_PRINCIPLES.md)
+
+Kernpunkte (Kurzfassung):
+
+- **Sechs Trainer-Typen** pro Lektion in fester Rangfolge (Auditiver Finder → Rechnen). Reihenfolge fällt nicht zurück; `ContentValidator` erzwingt Struktur.
+- **Buchstaben-/Silben-Jagd**: Optional bis zu 2× pro Lektion, keine separaten Autorierungen — wird zur Laufzeit aus letter_trace/syllable_merge abgeleitet (`SymbolHuntInsertion`).
+- **Distraktoren**: Im autorieren Content (Tray ≤ 5–6), oder verstreut im Hunt-Feld (bis 6, mit Wiederholungen).
+- **Session-Modell**: Pfad-Screen → freigeschaltete Knoten starten Trainer-Sequenz → Fortschritt persistent, Vor/Zurück immer möglich.
+- **Audio-First**: Kinder lesen nicht. Bilder, Icons, Layout, Sprache. Lesbare Labels nur wo nötig (Atom-Namen sind Aufgabe selbst).
+- **Drag & Drop**: Committet bei echtem Treffer, sonst Snap-back. Keine Strafen.
+- **Rechnen**: Icons (keine Wörter), 3 Optionen (visuell) oder System-Zahlentastatur; Erfolg vorgesprochen (kein sichtbarer Text), Miss gesprochenes Feedback.
 
 
 
