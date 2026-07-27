@@ -320,6 +320,13 @@
           "left": 1,
           "right": 2,
           "answer": 3
+        },
+        {
+          "promptTts": "Zwei Omas und eine Oma. Wie viele?",
+          "iconAtomId": "oma",
+          "left": 2,
+          "right": 1,
+          "answer": 3
         }
       ]
     },
@@ -493,6 +500,13 @@
           "left": 1,
           "right": 3,
           "answer": 4
+        },
+        {
+          "promptTts": "Drei Tomaten und eine Tomate. Wie viele?",
+          "iconAtomId": "tomate",
+          "left": 3,
+          "right": 1,
+          "answer": 4
         }
       ]
     },
@@ -661,6 +675,13 @@
           "left": 1,
           "right": 1,
           "answer": 2
+        },
+        {
+          "promptTts": "Zwei Lamas und ein Lama. Wie viele?",
+          "iconAtomId": "lama",
+          "left": 2,
+          "right": 1,
+          "answer": 3
         }
       ]
     },
@@ -837,6 +858,13 @@
           "left": 2,
           "right": 2,
           "answer": 4
+        },
+        {
+          "promptTts": "Ein Hut und zwei Hüte. Wie viele Hüte?",
+          "iconAtomId": "hut",
+          "left": 1,
+          "right": 2,
+          "answer": 3
         }
       ]
     },
@@ -1004,6 +1032,13 @@
           "iconAtomId": "tor",
           "left": 1,
           "right": 2,
+          "answer": 3
+        },
+        {
+          "promptTts": "Zwei Tore und ein Tor. Wie viele Tore?",
+          "iconAtomId": "tor",
+          "left": 2,
+          "right": 1,
           "answer": 3
         }
       ]
@@ -1181,6 +1216,13 @@
           "left": 2,
           "right": 3,
           "answer": 5
+        },
+        {
+          "promptTts": "Drei Rosen und zwei Rosen. Wie viele?",
+          "iconAtomId": "rose",
+          "left": 3,
+          "right": 2,
+          "answer": 5
         }
       ]
     },
@@ -1357,6 +1399,13 @@
           "left": 1,
           "right": 1,
           "answer": 2
+        },
+        {
+          "promptTts": "Zwei Dosen und eine Dose. Wie viele?",
+          "iconAtomId": "dose",
+          "left": 2,
+          "right": 1,
+          "answer": 3
         }
       ]
     },
@@ -1529,6 +1578,13 @@
           "left": 1,
           "right": 2,
           "answer": 3
+        },
+        {
+          "promptTts": "Zwei Eis und ein Eis. Wie viele?",
+          "iconAtomId": "eis",
+          "left": 2,
+          "right": 1,
+          "answer": 3
         }
       ]
     },
@@ -1696,6 +1752,13 @@
           "iconAtomId": "weg",
           "left": 2,
           "right": 2,
+          "answer": 4
+        },
+        {
+          "promptTts": "Ein Weg und drei Wege. Wie viele?",
+          "iconAtomId": "weg",
+          "left": 1,
+          "right": 3,
           "answer": 4
         }
       ]
@@ -1868,6 +1931,13 @@
           "iconAtomId": "haus",
           "left": 1,
           "right": 3,
+          "answer": 4
+        },
+        {
+          "promptTts": "Drei Häuser und ein Haus. Wie viele Häuser?",
+          "iconAtomId": "haus",
+          "left": 3,
+          "right": 1,
           "answer": 4
         }
       ]
@@ -2054,6 +2124,13 @@
           "left": 1,
           "right": 2,
           "answer": 3
+        },
+        {
+          "promptTts": "Zwei Öfen und ein Ofen. Wie viele Öfen?",
+          "iconAtomId": "ofen",
+          "left": 2,
+          "right": 1,
+          "answer": 3
         }
       ]
     },
@@ -2230,6 +2307,13 @@
           "left": 1,
           "right": 4,
           "answer": 5
+        },
+        {
+          "promptTts": "Vier Fische und ein Fisch. Wie viele Fische?",
+          "iconAtomId": "fisch",
+          "left": 4,
+          "right": 1,
+          "answer": 5
         }
       ]
     },
@@ -2390,6 +2474,13 @@
           "iconAtomId": "eule",
           "left": 1,
           "right": 2,
+          "answer": 3
+        },
+        {
+          "promptTts": "Zwei Eulen und eine Eule. Wie viele Eulen?",
+          "iconAtomId": "eule",
+          "left": 2,
+          "right": 1,
           "answer": 3
         }
       ]
@@ -2555,6 +2646,13 @@
           "left": 1,
           "right": 1,
           "answer": 2
+        },
+        {
+          "promptTts": "Zwei Füße und ein Fuß. Wie viele Füße?",
+          "iconAtomId": "fuss",
+          "left": 2,
+          "right": 1,
+          "answer": 3
         }
       ]
     },
@@ -2727,6 +2825,13 @@
           "left": 1,
           "right": 3,
           "answer": 4
+        },
+        {
+          "promptTts": "Drei Säcke und ein Sack. Wie viele Säcke?",
+          "iconAtomId": "sack",
+          "left": 3,
+          "right": 1,
+          "answer": 4
         }
       ]
     },
@@ -2887,6 +2992,13 @@
           "left": 1,
           "right": 1,
           "answer": 2
+        },
+        {
+          "promptTts": "Zwei Spinnen und eine Spinne. Wie viele Spinnen?",
+          "iconAtomId": "spinne",
+          "left": 2,
+          "right": 1,
+          "answer": 3
         }
       ]
     },
@@ -2930,7 +3042,7 @@
     },
     {
       "trainer": "letter_trace",
-      "id": "l18-t3",
+      "id": "l18-t4",
       "rounds": [
         {
           "promptTts": "Spure das große Y nach.",
@@ -2943,7 +3055,7 @@
     },
     {
       "trainer": "letter_trace",
-      "id": "l18-t4",
+      "id": "l18-t6",
       "rounds": [
         {
           "promptTts": "Spure das große Qu nach.",
@@ -2956,7 +3068,7 @@
     },
     {
       "trainer": "syllable_merge",
-      "id": "l18-t5",
+      "id": "l18-t7",
       "rounds": [
         {
           "promptTts": "Verbinde Qu und A.",
@@ -2972,7 +3084,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l18-t6",
+      "id": "l18-t8",
       "rounds": [
         {
           "promptTts": "Baue das Wort Qualle.",
@@ -2996,7 +3108,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l18-t7",
+      "id": "l18-t9",
       "rounds": [
         {
           "promptTts": "Baue das Wort Taxi.",
@@ -3020,7 +3132,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l18-t8",
+      "id": "l18-t10",
       "rounds": [
         {
           "promptTts": "Baue das Wort Pony.",
@@ -3040,7 +3152,7 @@
     },
     {
       "trainer": "sentence_order",
-      "id": "l18-t9",
+      "id": "l18-t11",
       "rounds": [
         {
           "promptTts": "Das Taxi ist rot.",
@@ -3051,7 +3163,7 @@
     },
     {
       "trainer": "count_add",
-      "id": "l18-t10",
+      "id": "l18-t12",
       "rounds": [
         {
           "promptTts": "Ein Taxi und zwei Taxis. Wie viele Taxis?",
@@ -3059,6 +3171,39 @@
           "left": 1,
           "right": 2,
           "answer": 3
+        },
+        {
+          "promptTts": "Zwei Taxis und ein Taxi. Wie viele Taxis?",
+          "iconAtomId": "taxi",
+          "left": 2,
+          "right": 1,
+          "answer": 3
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l18-t3",
+      "rounds": [
+        {
+          "promptTts": "Spure das große C nach und sammle alle Sterne.",
+          "atomId": "letter-c",
+          "glyph": "C",
+          "rewardTts": "C wie Clown.",
+          "rewardEmoji": "🤡"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l18-t5",
+      "rounds": [
+        {
+          "promptTts": "Spure das große X nach und sammle alle Sterne.",
+          "atomId": "letter-x",
+          "glyph": "X",
+          "rewardTts": "X wie Xylophon.",
+          "rewardEmoji": "🎵"
         }
       ]
     }
