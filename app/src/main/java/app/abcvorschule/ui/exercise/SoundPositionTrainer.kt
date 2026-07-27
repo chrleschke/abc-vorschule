@@ -138,11 +138,17 @@ fun SoundPositionTrainer(
                     )
                 }
             }
-            Text(
-                text = colouredWord(atom.display),
-                fontSize = 34.sp,
-                modifier = Modifier.testTag("sound_word"),
-            )
+            Box(
+                modifier = Modifier
+                    .width(SyllableFrameSizing.widthDp(atom.display).dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = colouredWord(atom.display),
+                    fontSize = 34.sp,
+                    modifier = Modifier.testTag("sound_word"),
+                )
+            }
         },
         answers = {
             if (landedSlot == null && !revealed) {

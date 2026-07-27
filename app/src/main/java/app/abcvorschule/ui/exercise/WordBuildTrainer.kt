@@ -142,7 +142,13 @@ fun WordBuildTrainer(
                     label = "word_complete",
                 ) { isComplete ->
                     if (isComplete) {
-                        Text(solution.joinToString(""), fontSize = glyphSp.sp, color = SoftSand, modifier = Modifier.testTag("completed_word"))
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(solution.joinToString(""), fontSize = glyphSp.sp, color = SoftSand, modifier = Modifier.testTag("completed_word"))
+                        }
                     } else Row(
                         horizontalArrangement = Arrangement.spacedBy(gap.dp, Alignment.CenterHorizontally),
                         verticalAlignment = Alignment.CenterVertically,
