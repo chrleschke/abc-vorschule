@@ -70,6 +70,10 @@ fun SymbolHuntTrainer(
     var state by remember(roundKey) {
         mutableStateOf(SymbolHuntProgress.initialState(round, seed = roundKey.hashCode().toLong()))
     }
+    // Captured once, before any tap can shrink state.tiles — the scatter layout
+    // must stay keyed on the round's original tile count, not the shrinking list,
+    // so surviving tiles keep their position/color across a correct tap.
+    val initialTileCount = remember(roundKey) { state.tiles.size }
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var batteryFull by remember(roundKey) { mutableStateOf(false) }
 
@@ -107,7 +111,9 @@ fun SymbolHuntTrainer(
             if (!resolved) {
                 SymbolHuntField(
                     state = state,
+                    initialTileCount = initialTileCount,
                     pack = pack,
+                    enabled = !batteryFull,
                     onTap = ::handleTap,
                     modifier = Modifier.fillMaxSize().alpha(fieldAlpha),
                 )
@@ -137,7 +143,9 @@ fun SymbolHuntTrainer(
 @Composable
 private fun SymbolHuntField(
     state: SymbolHuntState,
+    initialTileCount: Int,
     pack: ContentPack,
+    enabled: Boolean = true,
     onTap: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -145,22 +153,29 @@ private fun SymbolHuntField(
         val density = LocalDensity.current
         val widthPx = with(density) { maxWidth.toPx() }
         val heightPx = with(density) { maxHeight.toPx() }
-        val positions = remember(state.seed, state.tiles.size, widthPx, heightPx) {
-            SymbolHuntLayout.scatter(state.seed, state.tiles.size, widthPx, heightPx)
+        // Keyed on the round's original tile count (never on state.tiles.size,
+        // which shrinks on every hit) so a correct tap — which does not touch
+        // state.seed — cannot reshuffle the surviving tiles. A wrong tap DOES
+        // bump state.seed, which is the intended "mix the field" reshuffle.
+        val positions = remember(state.seed, initialTileCount, widthPx, heightPx) {
+            SymbolHuntLayout.scatter(state.seed, initialTileCount, widthPx, heightPx)
         }
-        state.tiles.forEachIndexed { index, tile ->
-            val position = positions.getOrNull(index) ?: return@forEachIndexed
+        state.tiles.forEach { tile ->
+            // Indexed by the tile's stable instanceId (its index in the original,
+            // pre-shrink tile list) rather than its position in the current
+            // (shrinking) list, so a surviving tile keeps the same slot/color.
+            val position = positions.getOrNull(tile.instanceId) ?: return@forEach
             val tileDp = TileSize * position.scale
             val offsetX = with(density) { position.x.toDp() } - tileDp / 2
             val offsetY = with(density) { position.y.toDp() } - tileDp / 2
-            val color = TilePalette[index % TilePalette.size]
+            val color = TilePalette[tile.instanceId % TilePalette.size]
             Box(
                 modifier = Modifier
                     .offset(x = offsetX, y = offsetY)
                     .size(tileDp)
                     .background(color = color.copy(alpha = 0.22f), shape = CircleShape)
                     .border(width = 3.dp, color = color, shape = CircleShape)
-                    .clickable { onTap(tile.instanceId) }
+                    .clickable(enabled = enabled) { onTap(tile.instanceId) }
                     .testTag("hunt_tile_${tile.instanceId}"),
                 contentAlignment = Alignment.Center,
             ) {
@@ -181,16 +196,25 @@ private fun SymbolHuntBattery(
     celebrate: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "battery_glow")
-    val glow by infiniteTransition.animateFloat(
-        initialValue = 0.5f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 500, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "battery_glow_value",
-    )
+    // The infinite pulse transition is only ever visible while celebrating (the
+    // very end of a round), so it's only created/started then — otherwise it
+    // would tick continuously for the entire round's lifetime for no visible
+    // effect, wasting battery/CPU.
+    val glow = if (celebrate) {
+        val infiniteTransition = rememberInfiniteTransition(label = "battery_glow")
+        val animatedGlow by infiniteTransition.animateFloat(
+            initialValue = 0.5f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 500, easing = LinearEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+            label = "battery_glow_value",
+        )
+        animatedGlow
+    } else {
+        1f
+    }
     Row(
         modifier = modifier.fillMaxWidth().testTag("hunt_battery"),
         horizontalArrangement = Arrangement.Center,
