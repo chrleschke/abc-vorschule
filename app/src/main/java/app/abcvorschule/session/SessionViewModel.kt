@@ -415,9 +415,18 @@ class SessionViewModel(
             return
         }
         if (missHint) {
+            // SymbolHuntTrainer already speaks the tapped tile's lemma synchronously,
+            // in the Composable, before onResult ever reaches here. Setting speakCue
+            // would queue the generic miss phrase right behind it, and SpeechController
+            // flushes its queue on every speak() call — so the tile name would get cut
+            // off and replaced before the child ever heard it. Every other round type
+            // has no such synchronous speech, so this only special-cases SymbolHuntRound
+            // by leaving speakCue untouched; everything else keeps setting it exactly
+            // as before.
+            val isSymbolHuntMiss = _ui.value.currentRound is SymbolHuntRound
             _ui.update {
                 it.copy(
-                    speakCue = speakOverride ?: missCueForCurrent(),
+                    speakCue = if (isSymbolHuntMiss) it.speakCue else speakOverride ?: missCueForCurrent(),
                     points = progress.points,
                 )
             }
