@@ -59,7 +59,8 @@ Strichdaten fehlen oder Referenzen ins Leere zeigen.
 3. Gesperrten Knoten antippen → gesprochener Hinweis, kein stummes No-Op.
 4. Lektion 1 öffnen und die Trainer der Reihenfolge nach durchspielen:
    Auditiver Finder (Waggon-Zuordnung) · Visueller Spurensucher (Buchstaben nachspuren) ·
-   optional Buchstaben-Jagd · Silben-Verschmelzer · optional Silben-Jagd ·
+   optional Buchstaben-Jagd (Batterie voll → Feier, automatisch weiter, kein Weiter-Button) ·
+   Silben-Verschmelzer · optional Silben-Jagd ·
    Wort-Bauer (Mama bauen) · Satz-Architekt (Wortschild aufhängen) · zwei Rechenaufgaben.
    Bei Wort-Bauer und Satz-Architekt beide Bedienwege prüfen: eine Kachel per Ziehen platzieren
    (die gezogene Kachel liegt sichtbar über den Zielfeldern, nie darunter) und eine per Tippen

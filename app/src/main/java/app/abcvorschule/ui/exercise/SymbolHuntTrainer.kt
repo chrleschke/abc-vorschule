@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,9 +36,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.SymbolHuntRound
-import app.abcvorschule.ui.components.AbcContinueButton
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.NightElevated
@@ -52,6 +53,14 @@ import app.abcvorschule.ui.theme.SoftSky
 // at 64dp — comfortably above the design spec's 56dp hit-box floor.
 private val TileSize = AbcDimens.kidTouch
 private val TilePalette = listOf(SoftMint, SoftCoral, SoftSky, SoftGold, SoftSand)
+
+/**
+ * How long the full battery celebrates before the round hands off. Covers the
+ * 400 ms field fade plus roughly one pulse of the golden battery, so the child
+ * sees the win land instead of the screen cutting away mid-animation. Mirrors
+ * LetterTraceTrainer's RewardHoldMs, which solves the same problem.
+ */
+private const val CelebrationHoldMs = 900L
 
 /**
  * Buchstaben-/Silben-Jagd: tiles scatter across the whole task area under a
@@ -114,6 +123,16 @@ fun SymbolHuntTrainer(
         label = "hunt_field_fade",
     )
 
+    // Auto-proceed: the battery filling up IS the success signal, so a "Weiter"
+    // tap only added a dead end for a child who cannot read the button. The delay
+    // sits in front of onResult because reporting the result starts the spoken
+    // success phase, which must not talk over the celebration.
+    LaunchedEffect(batteryFull) {
+        if (!batteryFull) return@LaunchedEffect
+        delay(CelebrationHoldMs)
+        onResult(true, false, listOf(round.targetAtomId))
+    }
+
     ExerciseStage(
         modifier = modifier,
         prompt = {
@@ -143,12 +162,6 @@ fun SymbolHuntTrainer(
                         state = SymbolHuntProgress.resolve(state)
                         onResult(false, true, listOf(round.targetAtomId))
                     },
-                )
-            }
-            if (batteryFull) {
-                AbcContinueButton(
-                    onClick = { onResult(true, false, listOf(round.targetAtomId)) },
-                    centered = true,
                 )
             }
         },
