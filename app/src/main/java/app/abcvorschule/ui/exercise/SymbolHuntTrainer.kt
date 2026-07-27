@@ -29,7 +29,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +39,7 @@ import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.ui.components.AbcContinueButton
 import app.abcvorschule.ui.components.AbcResolveButton
+import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.NightElevated
 import app.abcvorschule.ui.theme.SoftCoral
 import app.abcvorschule.ui.theme.SoftGold
@@ -44,7 +47,10 @@ import app.abcvorschule.ui.theme.SoftMint
 import app.abcvorschule.ui.theme.SoftSand
 import app.abcvorschule.ui.theme.SoftSky
 
-private val TileSize = 64.dp
+// Matches AbcDimens.kidTouch (the app-wide minimum touch target for 4-6-year-olds)
+// so that even the smallest scattered tile (scale 0.8, see SymbolHuntLayout) renders
+// at 64dp — comfortably above the design spec's 56dp hit-box floor.
+private val TileSize = AbcDimens.kidTouch
 private val TilePalette = listOf(SoftMint, SoftCoral, SoftSky, SoftGold, SoftSand)
 
 /**
@@ -76,6 +82,7 @@ fun SymbolHuntTrainer(
     val initialTileCount = remember(roundKey) { state.tiles.size }
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var batteryFull by remember(roundKey) { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
 
     fun handleTap(instanceId: Int) {
         if (resolved || batteryFull) return
@@ -84,10 +91,18 @@ fun SymbolHuntTrainer(
         val result = SymbolHuntProgress.tap(state, instanceId)
         state = result.state
         when (result.outcome) {
-            SymbolHuntTapOutcome.Miss -> onResult(false, false, listOf(round.targetAtomId))
+            SymbolHuntTapOutcome.Miss -> {
+                // Nudge on every wrong tap the child makes (matching the
+                // reshuffle-every-time behavior, not just the first-reported miss),
+                // following the same haptic pattern as LetterTraceTrainer's
+                // off-corridor excursion feedback.
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                onResult(false, false, listOf(round.targetAtomId))
+            }
+            SymbolHuntTapOutcome.MissAlreadyReported ->
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
             SymbolHuntTapOutcome.RoundComplete -> batteryFull = true
             SymbolHuntTapOutcome.Collected,
-            SymbolHuntTapOutcome.MissAlreadyReported,
             SymbolHuntTapOutcome.Ignored,
             -> Unit
         }

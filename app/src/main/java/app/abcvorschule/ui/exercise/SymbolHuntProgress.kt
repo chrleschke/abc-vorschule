@@ -2,6 +2,7 @@ package app.abcvorschule.ui.exercise
 
 import app.abcvorschule.content.SymbolHuntDerivation
 import app.abcvorschule.content.SymbolHuntRound
+import kotlin.random.Random
 
 /** One collectible/decoy instance in the scatter field. Distinct instances can
  * share the same underlying atom — a distractor letter repeats as several tiles
@@ -34,6 +35,13 @@ data class SymbolHuntTapResult(val state: SymbolHuntState, val outcome: SymbolHu
 object SymbolHuntProgress {
     const val ResolveThreshold = 6
 
+    // XOR salt so the distractor-selection shuffle is a distinct deterministic
+    // stream from the scatter-layout shuffle, which reuses the same base `seed`
+    // directly (see SymbolHuntField). Both derive from the same round seed, so
+    // both stay fully deterministic for a given round; the salt just keeps them
+    // from picking the exact same permutation as each other.
+    private const val DistractorShuffleSalt = 0x5EEDL
+
     fun initialState(round: SymbolHuntRound, seed: Long): SymbolHuntState {
         val (hitCount, distractorCount) = requireNotNull(
             SymbolHuntDerivation.tileCounts(round.distractorPool.size),
@@ -41,8 +49,14 @@ object SymbolHuntProgress {
         val hits = (0 until hitCount).map { i ->
             SymbolHuntTile(instanceId = i, atomId = round.targetAtomId, isTarget = true)
         }
+        // Shuffle the pool deterministically per round instead of always taking its
+        // first `distractorCount` entries (curriculum-introduction order) — without
+        // this, every hunt from roughly lesson 3 onward showed the identical first-N
+        // distractors, since the pool only ever grows. Same round + same seed always
+        // produces the same shuffle (design relies on determinism for testability).
+        val shuffledPool = round.distractorPool.shuffled(Random(seed xor DistractorShuffleSalt))
         val distractors = (0 until distractorCount).map { i ->
-            val atomId = round.distractorPool[i % round.distractorPool.size]
+            val atomId = shuffledPool[i % shuffledPool.size]
             SymbolHuntTile(instanceId = hitCount + i, atomId = atomId, isTarget = false)
         }
         return SymbolHuntState(tiles = hits + distractors, targetHitCount = hitCount, seed = seed)

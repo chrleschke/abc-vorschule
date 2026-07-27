@@ -115,4 +115,55 @@ class SymbolHuntProgressTest {
         assertEquals(5, resolved.collected)
         assertTrue(resolved.tiles.isEmpty())
     }
+
+    // A pool bigger than the fixed 6-tile distractor budget (distractorCount for any
+    // pool > 2 is always 6, per SymbolHuntDerivation.tileCounts), so only a subset of
+    // the pool ever becomes tiles — the case where "which subset" can actually vary.
+    private val roundWithLargeDistractorPool = SymbolHuntRound(
+        promptTts = "Finde alle Buchstaben A!",
+        targetAtomId = "letter-a",
+        mode = SymbolHuntMode.letter,
+        distractorPool = listOf(
+            "letter-m", "letter-i", "letter-o", "letter-t", "letter-l",
+            "letter-e", "letter-s", "letter-u", "letter-r", "letter-n",
+        ),
+    )
+
+    @Test
+    fun distractorSelectionIsDeterministicForAFixedSeed() {
+        val first = SymbolHuntProgress.initialState(roundWithLargeDistractorPool, seed = 42L)
+        val second = SymbolHuntProgress.initialState(roundWithLargeDistractorPool, seed = 42L)
+        assertEquals(
+            first.tiles.filter { !it.isTarget }.map { it.atomId },
+            second.tiles.filter { !it.isTarget }.map { it.atomId },
+        )
+    }
+
+    @Test
+    fun distractorSelectionVariesAcrossDifferentSeedsWhenThePoolIsLargeEnough() {
+        val a = SymbolHuntProgress.initialState(roundWithLargeDistractorPool, seed = 1L)
+        val b = SymbolHuntProgress.initialState(roundWithLargeDistractorPool, seed = 2L)
+        val distractorsA = a.tiles.filter { !it.isTarget }.map { it.atomId }.toSet()
+        val distractorsB = b.tiles.filter { !it.isTarget }.map { it.atomId }.toSet()
+        assertTrue(
+            "expected different seeds to select different distractor subsets from a pool " +
+                "larger than the distractor tile budget",
+            distractorsA != distractorsB,
+        )
+    }
+
+    @Test
+    fun distractorSelectionIsNotAlwaysTheFirstNPoolEntriesInOrder() {
+        // Regression guard for the original bug: taking round.distractorPool[i %
+        // size] always yielded the pool's first `distractorCount` entries in
+        // curriculum-introduction order. At least one seed must diverge from that.
+        val firstSixInOrder = roundWithLargeDistractorPool.distractorPool.take(6)
+        val seeds = listOf(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L)
+        val anyDiffers = seeds.any { seed ->
+            val state = SymbolHuntProgress.initialState(roundWithLargeDistractorPool, seed = seed)
+            val distractorIds = state.tiles.filter { !it.isTarget }.map { it.atomId }
+            distractorIds != firstSixInOrder
+        }
+        assertTrue("expected at least one seed to pick a different subset than the first six", anyDiffers)
+    }
 }
