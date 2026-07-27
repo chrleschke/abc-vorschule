@@ -97,4 +97,34 @@ class SymbolHuntInsertionTest {
                 }
         }
     }
+
+    // Pins the feature's actual promise across the real pack, independent of the
+    // conditional checks above: gateEveryAuthoredLessonProducesAValidInsertion and
+    // SymbolHuntDerivationTest.everyBuildableRoundAcrossTheWholePackHasANonEmptyPool
+    // both only assert *inside* a conditional/filter — if a regression made
+    // derivation return null/empty for every lesson, both would still pass, since
+    // there'd be nothing to iterate over. These counts were computed directly from
+    // the real 18-lesson pack in app/src/test/resources/content/ (l01 and l12 are
+    // the two lessons without a syllable_merge trainer to derive a syllable-hunt
+    // from, so they're the only ones missing a syllable hunt).
+    @Test
+    fun theWholePackProducesTheExpectedNumberOfLetterAndSyllableHunts() {
+        assertEquals(18, pack.authoredLessons.size)
+        val letterHuntLessons = pack.authoredLessons.count { lesson ->
+            val trainers = scheduledTrainersFor(lesson.id)
+            SymbolHuntInsertion.insertSymbolHunts(trainers, pack, lesson.id, lesson.index)
+                .any { it.spec is SymbolHuntSpec && it.spec.id.endsWith(":letter") }
+        }
+        val syllableHuntLessons = pack.authoredLessons.count { lesson ->
+            val trainers = scheduledTrainersFor(lesson.id)
+            SymbolHuntInsertion.insertSymbolHunts(trainers, pack, lesson.id, lesson.index)
+                .any { it.spec is SymbolHuntSpec && it.spec.id.endsWith(":syllable") }
+        }
+        assertEquals("expected every authored lesson to get a letter-hunt", 18, letterHuntLessons)
+        assertEquals(
+            "expected all but l01 and l12 (no syllable_merge trainer) to get a syllable-hunt",
+            16,
+            syllableHuntLessons,
+        )
+    }
 }

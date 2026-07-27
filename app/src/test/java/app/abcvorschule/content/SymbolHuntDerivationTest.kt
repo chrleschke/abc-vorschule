@@ -69,18 +69,41 @@ class SymbolHuntDerivationTest {
     fun everyBuildableRoundAcrossTheWholePackHasANonEmptyPool() {
         // Gate: no round that insertSymbolHunts would keep ever has an empty pool
         // (buildRound already filters those out by returning null).
+        //
+        // The `if (hunt != null)` checks only assert *inside* a conditional — if a
+        // regression made buildRound return null for every single round in the
+        // whole pack, this test would still report green with nothing actually
+        // checked. The counts below, computed directly against the real pack in
+        // app/src/test/resources/content/, pin that buildRound actually succeeds
+        // for (nearly) every round it's asked about: all 39 letter_trace rounds
+        // build a hunt, and 22 of the 23 syllable_merge rounds do (l01's "ma" is
+        // the one exception — its own pool, excluding itself, is empty on lesson 1).
+        var letterRoundsChecked = 0
+        var letterHuntsBuilt = 0
+        var syllableRoundsChecked = 0
+        var syllableHuntsBuilt = 0
         pack.authoredLessons.forEach { lesson ->
             pack.tasksOf(lesson).filterIsInstance<LetterTraceSpec>().flatMap { it.rounds }.forEach { round ->
+                letterRoundsChecked++
                 val hunt = SymbolHuntDerivation.buildRound(pack, lesson.index, SymbolHuntMode.letter, round.atomId)
-                if (hunt != null) assertTrue(hunt.distractorPool.isNotEmpty())
+                if (hunt != null) {
+                    letterHuntsBuilt++
+                    assertTrue(hunt.distractorPool.isNotEmpty())
+                }
             }
             pack.tasksOf(lesson).filterIsInstance<SyllableMergeSpec>().flatMap { it.rounds }.forEach { round ->
+                syllableRoundsChecked++
                 val hunt = SymbolHuntDerivation.buildRound(pack, lesson.index, SymbolHuntMode.syllable, round.resultAtomId)
                 if (hunt != null) {
+                    syllableHuntsBuilt++
                     assertTrue(hunt.distractorPool.isNotEmpty())
                     assertEquals(AtomKind.syllable, pack.atom(round.resultAtomId).kind)
                 }
             }
         }
+        assertEquals(39, letterRoundsChecked)
+        assertEquals(39, letterHuntsBuilt)
+        assertEquals(23, syllableRoundsChecked)
+        assertEquals(22, syllableHuntsBuilt)
     }
 }
