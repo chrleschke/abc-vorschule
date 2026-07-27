@@ -114,8 +114,16 @@ fun TrainerHost(
             onResult = callbacks.onMathResult,
             modifier = modifier.fillMaxSize(),
         )
-        // TODO(task 10): symbol_hunt is only synthesized at runtime by SessionViewModel's
-        // SymbolHuntInsertion; no screen wires it up yet, so this branch is unreachable today.
-        is SymbolHuntRound -> Unit
+        is SymbolHuntRound -> SymbolHuntTrainer(
+            round = round,
+            roundIndex = roundIndex,
+            pack = pack,
+            ttsAvailable = ttsAvailable,
+            speaking = speaking,
+            onSpeakPrompt = callbacks.onSpeakPrompt,
+            onSpeak = callbacks.onSpeak,
+            onResult = callbacks.onResult,
+            modifier = modifier.fillMaxSize(),
+        )
     }
 }
