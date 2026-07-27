@@ -31,8 +31,10 @@ object WordFrameSizing {
     /** Below this a preschooler cannot read the block reliably. */
     const val MinGlyphSp = 20f
 
-    /** Rough advance width of one glyph, as a fraction of its font size. */
-    const val GlyphAspect = 0.62f
+    /** Rough advance width of one glyph, as a fraction of its font size — a little
+     * over the typical Roboto average-case advance, so real-font rendering has
+     * some headroom against the estimate rather than sitting right at the edge. */
+    const val GlyphAspect = 0.72f
 
     /**
      * Frames win over whitespace: the gap only tightens once the comfortable gap

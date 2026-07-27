@@ -170,9 +170,16 @@ fun DropZone(
         onDispose { state.removeZone(key) }
     }
     Box(
-        modifier = modifier
+        // onGloballyPositioned/clickable wrap the caller's styled modifier chain
+        // (background/border/padding) so the registered bounds and the tappable
+        // area are the FULL frame box, not just the padded-in content area —
+        // otherwise a frame at the 56dp touch-target floor with 8dp padding on
+        // each side only had a ~40dp tappable center, silently dropping taps in
+        // an 8dp dead ring around every frame.
+        modifier = Modifier
             .onGloballyPositioned { state.putZone(key, it.boundsInRoot()) }
-            .clickable { onTap() },
+            .clickable { onTap() }
+            .then(modifier),
         contentAlignment = Alignment.Center,
         content = content,
     )

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -262,7 +263,8 @@ private fun Peg(
         key = SentenceOrderTray.pegKey(index),
         onTap = onTap,
         modifier = Modifier
-            .defaultMinSize(minWidth = pegWidthDp.dp, minHeight = 64.dp)
+            .width(pegWidthDp.dp)
+            .defaultMinSize(minHeight = 64.dp)
             .background(
                 color = if (armed) SoftMint.copy(alpha = 0.22f) else NightElevated,
                 shape = RoundedCornerShape(16.dp),
@@ -272,7 +274,10 @@ private fun Peg(
                 color = if (filled != null) SoftMint.copy(alpha = 0.7f) else SoftSand.copy(alpha = 0.32f),
                 shape = RoundedCornerShape(16.dp),
             )
-            .padding(horizontal = 10.dp, vertical = 8.dp)
+            .padding(
+                horizontal = WordFrameSizing.FramePaddingDp.dp,
+                vertical = WordFrameSizing.FramePaddingDp.dp,
+            )
             .testTag("peg_$index"),
     ) {
         when {

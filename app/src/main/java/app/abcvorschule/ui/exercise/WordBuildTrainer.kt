@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -230,7 +231,8 @@ private fun Frame(
         key = WordBuildTray.frameKey(index),
         onTap = onTap,
         modifier = Modifier
-            .defaultMinSize(minWidth = frameWidthDp.dp, minHeight = frameWidthDp.dp)
+            .width(frameWidthDp.dp)
+            .defaultMinSize(minHeight = frameWidthDp.dp)
             .background(
                 color = if (armed) SoftMint.copy(alpha = 0.22f) else NightElevated,
                 shape = RoundedCornerShape(22.dp),
