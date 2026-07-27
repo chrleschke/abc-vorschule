@@ -94,7 +94,11 @@ fun MathExercise(
                 }
             },
             answers = {
-                NumberPad(onSubmit = { handleGuess(it) }, solved = solved != null)
+                NumberPad(
+                    onSubmit = { handleGuess(it) },
+                    resetToken = NumberPadInput.resetToken(roundKey, misses),
+                    solved = solved != null,
+                )
                 if (misses >= 2 && !locked) {
                     AbcResolveButton(onClick = ::resolve)
                 }
