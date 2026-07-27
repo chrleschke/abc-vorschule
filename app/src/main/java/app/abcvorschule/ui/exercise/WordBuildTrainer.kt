@@ -3,10 +3,12 @@ package app.abcvorschule.ui.exercise
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -37,13 +39,6 @@ import app.abcvorschule.ui.theme.NightElevated
 import app.abcvorschule.ui.theme.NightInk
 import app.abcvorschule.ui.theme.SoftMint
 import app.abcvorschule.ui.theme.SoftSand
-
-/**
- * Frames sit in one row and a word can need four of them (e.g. Nest), so they are
- * deliberately narrower than [AbcDimens.letterFrame], which is sized for a single
- * standalone glyph and would overflow a narrow screen here.
- */
-private val WordFrameMin = 84.dp
 
 object WordBuildTray {
     /** Preschoolers must be able to scan the whole tray at a glance. */
@@ -126,27 +121,41 @@ fun WordBuildTrainer(
                 onSpeakPrompt = onSpeakPrompt,
             )
             Text(text = target.emoji, fontSize = 84.sp)
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                solution.forEachIndexed { index, expected ->
-                    val filled = if (resolved) expected else placed[index]
-                    val atomId = round.blocks[index].atomId
-                    Frame(
-                        expected = expected,
-                        filled = filled,
-                        showSilhouette = scaffoldFor(atomId) == ScaffoldLevel.Beginner,
-                        armed = field.selectedKey != null && filled == null,
-                        onTap = {
-                            val selected = field.selectedKey
-                            val block = tiles.firstOrNull { blockKey(it) == selected }
-                            if (block != null) place(index, block)
-                            if (filled != null) onSpeak(filled)
-                        },
-                        registerWith = field,
-                        index = index,
-                    )
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val frameWidth = WordFrameSizing.frameWidthDp(maxWidth.value, solution.size)
+                val gap = WordFrameSizing.gapDp(maxWidth.value, solution.size)
+                val glyphSp = WordFrameSizing.glyphSp(
+                    frameWidth,
+                    solution.maxOfOrNull { it.length } ?: 1,
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(
+                        gap.dp,
+                        Alignment.CenterHorizontally,
+                    ),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    solution.forEachIndexed { index, expected ->
+                        val filled = if (resolved) expected else placed[index]
+                        val atomId = round.blocks[index].atomId
+                        Frame(
+                            expected = expected,
+                            filled = filled,
+                            showSilhouette = scaffoldFor(atomId) == ScaffoldLevel.Beginner,
+                            armed = field.selectedKey != null && filled == null,
+                            onTap = {
+                                val selected = field.selectedKey
+                                val block = tiles.firstOrNull { blockKey(it) == selected }
+                                if (block != null) place(index, block)
+                                if (filled != null) onSpeak(filled)
+                            },
+                            registerWith = field,
+                            index = index,
+                            frameWidthDp = frameWidth,
+                            glyphSp = glyphSp,
+                        )
+                    }
                 }
             }
         },
@@ -213,13 +222,15 @@ private fun Frame(
     onTap: () -> Unit,
     registerWith: DragFieldState,
     index: Int,
+    frameWidthDp: Float,
+    glyphSp: Float,
 ) {
     DropZone(
         state = registerWith,
         key = WordBuildTray.frameKey(index),
         onTap = onTap,
         modifier = Modifier
-            .defaultMinSize(minWidth = WordFrameMin, minHeight = WordFrameMin)
+            .defaultMinSize(minWidth = frameWidthDp.dp, minHeight = frameWidthDp.dp)
             .background(
                 color = if (armed) SoftMint.copy(alpha = 0.22f) else NightElevated,
                 shape = RoundedCornerShape(22.dp),
@@ -229,21 +240,26 @@ private fun Frame(
                 color = if (filled != null) SoftMint.copy(alpha = 0.7f) else SoftSand.copy(alpha = 0.35f),
                 shape = RoundedCornerShape(22.dp),
             )
-            .padding(horizontal = 14.dp, vertical = 10.dp)
+            .padding(
+                horizontal = WordFrameSizing.FramePaddingDp.dp,
+                vertical = WordFrameSizing.FramePaddingDp.dp,
+            )
             .testTag("frame_$index"),
     ) {
         when {
-            filled != null -> Text(text = filled, fontSize = AbcDimens.syllableSp, color = SoftSand)
+            filled != null -> Text(text = filled, fontSize = glyphSp.sp, color = SoftSand, maxLines = 1)
             showSilhouette -> Text(
                 text = expected,
-                fontSize = AbcDimens.syllableSp,
+                fontSize = glyphSp.sp,
                 color = SoftSand,
+                maxLines = 1,
                 modifier = Modifier.alpha(0.22f),
             )
             else -> Text(
                 text = "_",
-                fontSize = AbcDimens.syllableSp,
+                fontSize = glyphSp.sp,
                 color = SoftSand.copy(alpha = 0.45f),
+                maxLines = 1,
             )
         }
     }
