@@ -2,7 +2,8 @@
 
 Kostenlose, werbefreie Android-Vorschul-App (ca. 4–7 Jahre) für Lesen und Rechnen auf Deutsch.
 Dunkles UI, offline nach Installation. Ein Fibel-Pfad aus 16 Lektionen; jede Lektion läuft
-sechs Trainer in fester didaktischer Reihenfolge über einen gemeinsamen Content-Graphen.
+sechs Trainer-Typen in fester didaktischer Reihenfolge über einen gemeinsamen Content-Graphen.
+Optional: Buchstaben-/Silben-Jagd als Übungselement zwischen den Trainern.
 
 ## Dokumentation
 
@@ -56,9 +57,10 @@ Strichdaten fehlen oder Referenzen ins Leere zeigen.
 1. `./gradlew :app:installDebug`, Gerät in den Flugmodus.
 2. App öffnen → **Pfad-Screen** erscheint, Lektion 1 pulsiert, Lektionen 2–16 sind gesperrt.
 3. Gesperrten Knoten antippen → gesprochener Hinweis, kein stummes No-Op.
-4. Lektion 1 öffnen und alle sechs Trainer durchspielen:
-   Waggon-Zuordnung · Buchstaben nachspuren (Korridor verlassen → Fahrzeug stoppt) ·
-   Silbe verschmelzen · Mama bauen · Wortschild aufhängen · zwei Rechenaufgaben.
+4. Lektion 1 öffnen und die Trainer der Reihenfolge nach durchspielen:
+   Auditiver Finder (Waggon-Zuordnung) · Visueller Spurensucher (Buchstaben nachspuren) ·
+   optional Buchstaben-Jagd · Silben-Verschmelzer · optional Silben-Jagd ·
+   Wort-Bauer (Mama bauen) · Satz-Architekt (Wortschild aufhängen) · zwei Rechenaufgaben.
    Bei Wort-Bauer und Satz-Architekt beide Bedienwege prüfen: eine Kachel per Ziehen platzieren
    (die gezogene Kachel liegt sichtbar über den Zielfeldern, nie darunter) und eine per Tippen
    (Tap-Alternative: Kachel antippen, dann Zielfeld antippen).
