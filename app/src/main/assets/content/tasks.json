@@ -343,9 +343,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das P?",
-          "atomId": "pinguin",
-          "slot": "start",
-          "missTts": "P - inguin."
+          "atomId": "suppe",
+          "slot": "middle",
+          "missTts": "Su - p - pe."
         }
       ]
     },
@@ -523,9 +523,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das L?",
-          "atomId": "lampe",
-          "slot": "start",
-          "missTts": "L - ampe."
+          "atomId": "himmel",
+          "slot": "end",
+          "missTts": "Himme - l."
         }
       ]
     },
@@ -698,9 +698,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das F?",
-          "atomId": "feder",
-          "slot": "start",
-          "missTts": "F - eder."
+          "atomId": "elefant",
+          "slot": "middle",
+          "missTts": "Ele - f - ant."
         }
       ]
     },
@@ -881,9 +881,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das R?",
-          "atomId": "radio",
-          "slot": "start",
-          "missTts": "R - adio."
+          "atomId": "ohr",
+          "slot": "end",
+          "missTts": "Oh - r."
         }
       ]
     },
@@ -1056,9 +1056,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das S?",
-          "atomId": "sofa",
-          "slot": "start",
-          "missTts": "S - ofa."
+          "atomId": "gras",
+          "slot": "end",
+          "missTts": "Gra - s."
         }
       ]
     },
@@ -1239,9 +1239,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das D?",
-          "atomId": "dino",
-          "slot": "start",
-          "missTts": "D - ino."
+          "atomId": "rad",
+          "slot": "end",
+          "missTts": "Ra - d."
         }
       ]
     },
@@ -1422,9 +1422,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das Ei?",
-          "atomId": "eimer",
-          "slot": "start",
-          "missTts": "Ei - mer."
+          "atomId": "kleid",
+          "slot": "middle",
+          "missTts": "Kl - Ei - d."
         }
       ]
     },
@@ -1601,9 +1601,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das G?",
-          "atomId": "gans",
-          "slot": "start",
-          "missTts": "G - ans."
+          "atomId": "tag",
+          "slot": "end",
+          "missTts": "Ta - g."
         }
       ]
     },
@@ -1795,9 +1795,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das B?",
-          "atomId": "biene",
-          "slot": "start",
-          "missTts": "B - iene."
+          "atomId": "taube",
+          "slot": "middle",
+          "missTts": "Tau - b - e."
         }
       ]
     },
@@ -2147,9 +2147,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das Sch?",
-          "atomId": "schaf",
-          "slot": "start",
-          "missTts": "Sch - af."
+          "atomId": "fisch",
+          "slot": "end",
+          "missTts": "Fi - sch."
         }
       ]
     },
@@ -2330,9 +2330,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das Z?",
-          "atomId": "zahn",
-          "slot": "start",
-          "missTts": "Z - ahn."
+          "atomId": "blitz",
+          "slot": "end",
+          "missTts": "Bli - tz."
         }
       ]
     },
@@ -2517,9 +2517,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das V?",
-          "atomId": "vase",
-          "slot": "start",
-          "missTts": "V - ase."
+          "atomId": "klavier",
+          "slot": "middle",
+          "missTts": "Kla - v - ier."
         }
       ]
     },
@@ -2848,9 +2848,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das St?",
-          "atomId": "stuhl",
-          "slot": "start",
-          "missTts": "St - uhl."
+          "atomId": "fenster",
+          "slot": "middle",
+          "missTts": "Fen - st - er."
         }
       ]
     },
@@ -2867,9 +2867,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das Sp?",
-          "atomId": "spiegel",
-          "slot": "start",
-          "missTts": "Sp - iegel."
+          "atomId": "wespe",
+          "slot": "middle",
+          "missTts": "We - sp - e."
         }
       ]
     },
@@ -2987,7 +2987,7 @@
       "id": "l17-t10",
       "rounds": [
         {
-          "promptTts": "Eine Spinne and eine Spinne. Wie viele Spinnen?",
+          "promptTts": "Eine Spinne und eine Spinne. Wie viele Spinnen?",
           "iconAtomId": "spinne",
           "left": 1,
           "right": 1,
@@ -3015,9 +3015,9 @@
         },
         {
           "promptTts": "Wo versteckt sich das X?",
-          "atomId": "hexe",
-          "slot": "middle",
-          "missTts": "He - x - e."
+          "atomId": "fuchs",
+          "slot": "end",
+          "missTts": "Fu - x."
         }
       ]
     },
@@ -3186,7 +3186,7 @@
       "id": "l18-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große C nach und sammle alle Sterne.",
+          "promptTts": "Spure das große C nach.",
           "atomId": "letter-c",
           "glyph": "C",
           "rewardTts": "C wie Clown.",
@@ -3199,7 +3199,7 @@
       "id": "l18-t5",
       "rounds": [
         {
-          "promptTts": "Spure das große X nach und sammle alle Sterne.",
+          "promptTts": "Spure das große X nach.",
           "atomId": "letter-x",
           "glyph": "X",
           "rewardTts": "X wie Xylophon.",

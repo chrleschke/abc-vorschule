@@ -1212,24 +1212,24 @@
         {
           "points": [
             [
-              0.38,
-              0.06
+              0.36,
+              0.04
             ],
             [
-              0.4,
-              0.08
+              0.42,
+              0.1
             ]
           ]
         },
         {
           "points": [
             [
-              0.6,
-              0.06
+              0.58,
+              0.04
             ],
             [
-              0.62,
-              0.08
+              0.64,
+              0.1
             ]
           ]
         }
@@ -1309,24 +1309,24 @@
         {
           "points": [
             [
-              0.38,
-              0.06
+              0.36,
+              0.04
             ],
             [
-              0.4,
-              0.08
+              0.42,
+              0.1
             ]
           ]
         },
         {
           "points": [
             [
-              0.6,
-              0.06
+              0.58,
+              0.04
             ],
             [
-              0.62,
-              0.08
+              0.64,
+              0.1
             ]
           ]
         }
@@ -1378,24 +1378,24 @@
         {
           "points": [
             [
-              0.38,
-              0.06
+              0.36,
+              0.04
             ],
             [
-              0.4,
-              0.08
+              0.42,
+              0.1
             ]
           ]
         },
         {
           "points": [
             [
-              0.6,
-              0.06
+              0.58,
+              0.04
             ],
             [
-              0.62,
-              0.08
+              0.64,
+              0.1
             ]
           ]
         }
@@ -3605,7 +3605,7 @@
     {
       "id": "tiger",
       "lemma": "Tiger",
-      "display": "🐯",
+      "display": "Tiger",
       "emoji": "🐯",
       "kind": "other",
       "pluralDisplay": "Tiger"
@@ -3613,7 +3613,7 @@
     {
       "id": "lampe",
       "lemma": "Lampe",
-      "display": "💡",
+      "display": "Lampe",
       "emoji": "💡",
       "kind": "other",
       "pluralDisplay": "Lampen"
@@ -3621,7 +3621,7 @@
     {
       "id": "hase",
       "lemma": "Hase",
-      "display": "🐰",
+      "display": "Hase",
       "emoji": "🐰",
       "kind": "other",
       "pluralDisplay": "Hasen"
@@ -3629,7 +3629,7 @@
     {
       "id": "feder",
       "lemma": "Feder",
-      "display": "🪶",
+      "display": "Feder",
       "emoji": "🪶",
       "kind": "other",
       "pluralDisplay": "Federn"
@@ -3637,7 +3637,7 @@
     {
       "id": "nuss",
       "lemma": "Nuss",
-      "display": "🌰",
+      "display": "Nuss",
       "emoji": "🌰",
       "kind": "other",
       "pluralDisplay": "Nüsse"
@@ -3645,7 +3645,7 @@
     {
       "id": "sofa",
       "lemma": "Sofa",
-      "display": "🛋️",
+      "display": "Sofa",
       "emoji": "🛋️",
       "kind": "other",
       "pluralDisplay": "Sofas"
@@ -3653,7 +3653,7 @@
     {
       "id": "erdbeere",
       "lemma": "Erdbeere",
-      "display": "🍓",
+      "display": "Erdbeere",
       "emoji": "🍓",
       "kind": "other",
       "pluralDisplay": "Erdbeeren"
@@ -3661,7 +3661,7 @@
     {
       "id": "dino",
       "lemma": "Dino",
-      "display": "🦕",
+      "display": "Dino",
       "emoji": "🦕",
       "kind": "other",
       "pluralDisplay": "Dinos"
@@ -3669,7 +3669,7 @@
     {
       "id": "eimer",
       "lemma": "Eimer",
-      "display": "🪣",
+      "display": "Eimer",
       "emoji": "🪣",
       "kind": "other",
       "pluralDisplay": "Eimer"
@@ -3677,7 +3677,7 @@
     {
       "id": "gans",
       "lemma": "Gans",
-      "display": "🦢",
+      "display": "Gans",
       "emoji": "🦢",
       "kind": "other",
       "pluralDisplay": "Gänse"
@@ -3685,7 +3685,7 @@
     {
       "id": "buch",
       "lemma": "Buch",
-      "display": "📖",
+      "display": "Buch",
       "emoji": "📖",
       "kind": "other",
       "pluralDisplay": "Bücher"
@@ -3693,7 +3693,7 @@
     {
       "id": "biene",
       "lemma": "Biene",
-      "display": "🐝",
+      "display": "Biene",
       "emoji": "🐝",
       "kind": "other",
       "pluralDisplay": "Bienen"
@@ -3701,7 +3701,7 @@
     {
       "id": "baer",
       "lemma": "Bär",
-      "display": "🐻",
+      "display": "Bär",
       "emoji": "🐻",
       "kind": "other",
       "pluralDisplay": "Bären"
@@ -3709,7 +3709,7 @@
     {
       "id": "loeffel",
       "lemma": "Löffel",
-      "display": "🥄",
+      "display": "Löffel",
       "emoji": "🥄",
       "kind": "other",
       "pluralDisplay": "Löffel"
@@ -3717,7 +3717,7 @@
     {
       "id": "zahn",
       "lemma": "Zahn",
-      "display": "🦷",
+      "display": "Zahn",
       "emoji": "🦷",
       "kind": "other",
       "pluralDisplay": "Zähne"
@@ -3725,7 +3725,7 @@
     {
       "id": "feuer",
       "lemma": "Feuer",
-      "display": "🔥",
+      "display": "Feuer",
       "emoji": "🔥",
       "kind": "other",
       "pluralDisplay": "Feuer"
@@ -3733,7 +3733,7 @@
     {
       "id": "zucker",
       "lemma": "Zucker",
-      "display": "🍬",
+      "display": "Zucker",
       "emoji": "🍬",
       "kind": "other",
       "pluralDisplay": "Zucker"
@@ -3741,7 +3741,7 @@
     {
       "id": "stuhl",
       "lemma": "Stuhl",
-      "display": "🪑",
+      "display": "Stuhl",
       "emoji": "🪑",
       "kind": "other",
       "pluralDisplay": "Stühle"
@@ -3749,7 +3749,7 @@
     {
       "id": "hexe",
       "lemma": "Hexe",
-      "display": "🧙",
+      "display": "Hexe",
       "emoji": "🧙",
       "kind": "other",
       "pluralDisplay": "Hexen"
@@ -3757,26 +3757,103 @@
     {
       "id": "quelle",
       "lemma": "Quelle",
-      "display": "💧",
+      "display": "Quelle",
       "emoji": "💧",
       "kind": "other",
       "pluralDisplay": "Quellen"
     },
     {
-      "id": "clown",
-      "lemma": "Clown",
-      "display": "Clown",
-      "emoji": "🤡",
+      "id": "suppe",
+      "lemma": "Suppe",
+      "display": "Suppe",
+      "emoji": "🍲",
       "kind": "other",
-      "pluralDisplay": "Clowns"
+      "pluralDisplay": "Suppen"
     },
     {
-      "id": "xylophon",
-      "lemma": "Xylophon",
-      "display": "Xylophon",
-      "emoji": "🎵",
+      "id": "himmel",
+      "lemma": "Himmel",
+      "display": "Himmel",
+      "emoji": "🌌",
+      "kind": "other"
+    },
+    {
+      "id": "elefant",
+      "lemma": "Elefant",
+      "display": "Elefant",
+      "emoji": "🐘",
       "kind": "other",
-      "pluralDisplay": "Xylophone"
+      "pluralDisplay": "Elefanten"
+    },
+    {
+      "id": "gras",
+      "lemma": "Gras",
+      "display": "Gras",
+      "emoji": "🌱",
+      "kind": "other"
+    },
+    {
+      "id": "rad",
+      "lemma": "Rad",
+      "display": "Rad",
+      "emoji": "🚲",
+      "kind": "other",
+      "pluralDisplay": "Räder"
+    },
+    {
+      "id": "kleid",
+      "lemma": "Kleid",
+      "display": "Kleid",
+      "emoji": "👗",
+      "kind": "other",
+      "pluralDisplay": "Kleider"
+    },
+    {
+      "id": "tag",
+      "lemma": "Tag",
+      "display": "Tag",
+      "emoji": "📅",
+      "kind": "other",
+      "pluralDisplay": "Tage"
+    },
+    {
+      "id": "taube",
+      "lemma": "Taube",
+      "display": "Taube",
+      "emoji": "🕊️",
+      "kind": "other",
+      "pluralDisplay": "Tauben"
+    },
+    {
+      "id": "blitz",
+      "lemma": "Blitz",
+      "display": "Blitz",
+      "emoji": "⚡",
+      "kind": "other",
+      "pluralDisplay": "Blitze"
+    },
+    {
+      "id": "klavier",
+      "lemma": "Klavier",
+      "display": "Klavier",
+      "emoji": "🎹",
+      "kind": "other",
+      "pluralDisplay": "Klaviere"
+    },
+    {
+      "id": "fenster",
+      "lemma": "Fenster",
+      "display": "Fenster",
+      "emoji": "🪟",
+      "kind": "other"
+    },
+    {
+      "id": "wespe",
+      "lemma": "Wespe",
+      "display": "Wespe",
+      "emoji": "🐝",
+      "kind": "other",
+      "pluralDisplay": "Wespen"
     }
   ]
 }

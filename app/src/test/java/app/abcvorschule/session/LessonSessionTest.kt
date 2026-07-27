@@ -60,7 +60,7 @@ class LessonSessionTest {
     }
 
     @Test
-    fun mathScaffoldsAreIndependentPerFactWithinOneCountAddTrainer() {
+    fun mathScaffoldsAreIndependentPerFactAcrossACountAddTrainer() {
         // A lesson's count_add rounds carry several arithmetic facts (lesson 1 has
         // 1+1 and 2+1, split across two count_add tasks in the expanded pack); each
         // fact must carry its own scaffold instead of sharing a single one computed
