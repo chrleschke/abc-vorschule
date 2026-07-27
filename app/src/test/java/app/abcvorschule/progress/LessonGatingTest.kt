@@ -2,6 +2,7 @@ package app.abcvorschule.progress
 
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.ContentRepository
+import app.abcvorschule.content.Lesson
 import app.abcvorschule.content.LessonStatus
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -29,10 +30,22 @@ class LessonGatingTest {
 
     @Test
     fun plannedLessonsReportPlannedRegardlessOfProgress() {
-        val planned = pack.lessons.first { it.status == LessonStatus.planned }
+        // The shipped pack has zero planned lessons at the moment (all 18 are
+        // authored) — this business rule still needs coverage independent of the
+        // current curriculum state, so it builds its own synthetic planned lesson
+        // rather than relying on one existing in the real pack.
+        val planned = Lesson(
+            id = "l-synthetic-planned",
+            index = pack.lessons.size + 1,
+            phase = 5,
+            title = "Synthetic Planned",
+            nodeLabel = "?",
+            status = LessonStatus.planned,
+        )
+        val syntheticPack = pack.copy(lessons = pack.lessons + planned)
         assertEquals(
             LessonState.Planned,
-            LessonGating.stateOf(pack, mastering(first.id), planned.id),
+            LessonGating.stateOf(syntheticPack, mastering(first.id), planned.id),
         )
         assertFalse(LessonGating.isPlayable(LessonState.Planned))
     }

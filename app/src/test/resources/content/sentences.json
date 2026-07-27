@@ -1,11 +1,223 @@
 {
   "sentences": [
-    { "id": "s-mama", "atomIds": ["mama"], "tts": "Mama." },
-    { "id": "s-oma", "atomIds": ["oma"], "tts": "Oma." },
-    { "id": "s-papa-am-tor", "atomIds": ["papa", "am", "tor"], "tts": "Papa am Tor." },
-    { "id": "s-hallo-lama", "atomIds": ["hallo", "lama"], "tts": "Hallo Lama!" },
-    { "id": "s-tom-ruft-opa", "atomIds": ["tom", "ruft", "opa"], "tts": "Tom ruft Opa." },
-    { "id": "s-oma-ist-da", "atomIds": ["oma", "ist", "da"], "tts": "Oma ist da." },
-    { "id": "s-das-lama-ist-rot", "atomIds": ["das", "lama", "ist", "rot"], "tts": "Das Lama ist rot." }
+    {
+      "id": "s-mama",
+      "atomIds": [
+        "mama"
+      ],
+      "tts": "Mama."
+    },
+    {
+      "id": "s-oma",
+      "atomIds": [
+        "oma"
+      ],
+      "tts": "Oma."
+    },
+    {
+      "id": "s-papa-am-tor",
+      "atomIds": [
+        "papa",
+        "am",
+        "tor"
+      ],
+      "tts": "Papa am Tor."
+    },
+    {
+      "id": "s-hallo-lama",
+      "atomIds": [
+        "hallo",
+        "lama"
+      ],
+      "tts": "Hallo Lama!"
+    },
+    {
+      "id": "s-tom-ruft-opa",
+      "atomIds": [
+        "tom",
+        "ruft",
+        "opa"
+      ],
+      "tts": "Tom ruft Opa."
+    },
+    {
+      "id": "s-oma-hat-lama",
+      "atomIds": [
+        "oma",
+        "hat",
+        "lama"
+      ],
+      "tts": "Oma hat Lama."
+    },
+    {
+      "id": "s-tom-hol-papa",
+      "atomIds": [
+        "tom",
+        "hol",
+        "papa"
+      ],
+      "tts": "Tom hol Papa."
+    },
+    {
+      "id": "s-lama-im-sand",
+      "atomIds": [
+        "lama",
+        "im",
+        "sand"
+      ],
+      "tts": "Lama im Sand."
+    },
+    {
+      "id": "s-lama-ist-rot",
+      "atomIds": [
+        "lama",
+        "ist",
+        "rot"
+      ],
+      "tts": "Lama ist rot."
+    },
+    {
+      "id": "s-oma-ist-da",
+      "atomIds": [
+        "oma",
+        "ist",
+        "da"
+      ],
+      "tts": "Oma ist da."
+    },
+    {
+      "id": "s-das-lama-ist-rot",
+      "atomIds": [
+        "das",
+        "lama",
+        "ist",
+        "rot"
+      ],
+      "tts": "Das Lama ist rot."
+    },
+    {
+      "id": "s-mein-eis",
+      "atomIds": [
+        "mein",
+        "eis",
+        "ist",
+        "rot"
+      ],
+      "tts": "Mein Eis ist rot."
+    },
+    {
+      "id": "s-das-ist-mein-papa",
+      "atomIds": [
+        "das",
+        "ist",
+        "mein",
+        "papa"
+      ],
+      "tts": "Das ist mein Papa."
+    },
+    {
+      "id": "s-wir-gehen",
+      "atomIds": [
+        "wir",
+        "gehen",
+        "den",
+        "weg"
+      ],
+      "tts": "Wir gehen den Weg."
+    },
+    {
+      "id": "s-mama-im-haus",
+      "atomIds": [
+        "mama",
+        "ist",
+        "im",
+        "haus"
+      ],
+      "tts": "Mama ist im Haus."
+    },
+    {
+      "id": "s-mama-bei-oma",
+      "atomIds": [
+        "mama",
+        "ist",
+        "bei",
+        "oma"
+      ],
+      "tts": "Mama ist bei Oma."
+    },
+    {
+      "id": "s-viele-haeuser",
+      "atomIds": [
+        "hier",
+        "sind",
+        "haeusser"
+      ],
+      "tts": "Hier sind Häuser."
+    },
+    {
+      "id": "s-fisch-schwimmt",
+      "atomIds": [
+        "der",
+        "fisch",
+        "schwimmt"
+      ],
+      "tts": "Der Fisch schwimmt."
+    },
+    {
+      "id": "s-eule-fliegt",
+      "atomIds": [
+        "die",
+        "eule",
+        "fliegt"
+      ],
+      "tts": "Die Eule fliegt."
+    },
+    {
+      "id": "s-vogel-singt",
+      "atomIds": [
+        "der",
+        "vogel",
+        "singt"
+      ],
+      "tts": "Der Vogel singt."
+    },
+    {
+      "id": "s-fuss-ist-gross",
+      "atomIds": [
+        "der",
+        "fuss",
+        "ist",
+        "gross"
+      ],
+      "tts": "Der Fuß ist groß."
+    },
+    {
+      "id": "s-pferd-laeuft",
+      "atomIds": [
+        "das",
+        "pferd",
+        "laeuft"
+      ],
+      "tts": "Das Pferd läuft."
+    },
+    {
+      "id": "s-spinne-spielt",
+      "atomIds": [
+        "die",
+        "spinne",
+        "spielt"
+      ],
+      "tts": "Die Spinne spielt."
+    },
+    {
+      "id": "s-taxi-ist-rot",
+      "atomIds": [
+        "das",
+        "taxi",
+        "ist",
+        "rot"
+      ],
+      "tts": "Das Taxi ist rot."
+    }
   ]
 }

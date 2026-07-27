@@ -17,10 +17,10 @@ class LessonSessionTest {
     private val pack = ContentRepository.fromClasspath().load()
 
     @Test
-    fun lessonSessionIsTheSixTrainersInAuthoredOrder() {
+    fun lessonSessionIsItsAuthoredTasksInOrder() {
         val lesson = pack.authoredLessons.first()
         assertEquals(lesson.taskIds, pack.tasksOf(lesson).map { it.id })
-        assertEquals(6, pack.tasksOf(lesson).size)
+        assertTrue(pack.tasksOf(lesson).isNotEmpty())
     }
 
     @Test
@@ -53,20 +53,23 @@ class LessonSessionTest {
 
     @Test
     fun roundCountsMatchTheAuthoredPack() {
-        val counts = pack.tasksOf(pack.authoredLessons.first()).map { it.roundCount }
-        assertEquals(6, counts.size)
+        val lesson = pack.authoredLessons.first()
+        val counts = pack.tasksOf(lesson).map { it.roundCount }
+        assertEquals(lesson.taskIds.size, counts.size)
         assertEquals(emptyList<Int>(), counts.filter { it <= 0 })
     }
 
     @Test
     fun mathScaffoldsAreIndependentPerFactWithinOneCountAddTrainer() {
-        // A count_add trainer holds several rounds with different arithmetic facts
-        // (lesson 1 has 1+1 and 2+1); each fact must carry its own scaffold instead
-        // of the trainer sharing a single one computed from its first round.
-        val spec = pack.tasksOf(pack.authoredLessons.first())
+        // A lesson's count_add rounds carry several arithmetic facts (lesson 1 has
+        // 1+1 and 2+1, split across two count_add tasks in the expanded pack); each
+        // fact must carry its own scaffold instead of sharing a single one computed
+        // from the first round. Flattened across every count_add task in the
+        // lesson rather than just the first, since ProgressionEngine.scaffoldForMath
+        // is a pure function over rounds regardless of which task they came from.
+        val rounds = pack.tasksOf(pack.authoredLessons.first())
             .filterIsInstance<CountAddSpec>()
-            .first()
-        val rounds = spec.rounds
+            .flatMap { it.rounds }
         assertTrue("need at least two count_add rounds to prove independence", rounds.size >= 2)
         val firstKey = ProgressionEngine.mathKey(rounds[0])
         val secondKey = ProgressionEngine.mathKey(rounds[1])

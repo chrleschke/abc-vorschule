@@ -1,45 +1,441 @@
 {
   "lessons": [
     {
-      "id": "l01", "index": 1, "phase": 1, "title": "M & A", "nodeLabel": "M a",
-      "status": "authored", "focusAtomIds": ["letter-m", "letter-a"],
-      "taskIds": ["l01-t1", "l01-t2", "l01-t3", "l01-t4", "l01-t5", "l01-t6"]
-    },
-    {
-      "id": "l02", "index": 2, "phase": 1, "title": "I & O", "nodeLabel": "I o",
-      "status": "authored", "focusAtomIds": ["letter-i", "letter-o"],
-      "taskIds": ["l02-t1", "l02-t2", "l02-t3", "l02-t4", "l02-t5", "l02-t6"]
-    },
-    {
-      "id": "l03", "index": 3, "phase": 2, "title": "P & T", "nodeLabel": "P t",
-      "status": "authored", "focusAtomIds": ["letter-p", "letter-t"],
-      "taskIds": ["l03-t1", "l03-t2", "l03-t3", "l03-t4", "l03-t5", "l03-t6"]
-    },
-    {
-      "id": "l04", "index": 4, "phase": 2, "title": "L & H", "nodeLabel": "L h",
-      "status": "authored", "focusAtomIds": ["letter-l", "letter-h"],
-      "taskIds": ["l04-t1", "l04-t2", "l04-t3", "l04-t4", "l04-t5", "l04-t6"]
-    },
-    {
-      "id": "l05", "index": 5, "phase": 2, "title": "U & R", "nodeLabel": "U r",
-      "status": "authored", "focusAtomIds": ["letter-u", "letter-r"],
-      "taskIds": ["l05-t1", "l05-t2", "l05-t3", "l05-t4", "l05-t5", "l05-t6"]
-    },
-    {
-      "id": "l06", "index": 6, "phase": 2, "title": "N, S, E, D", "nodeLabel": "N s e d",
+      "id": "l01",
+      "index": 1,
+      "phase": 1,
+      "title": "M & A (Die Ur-Silbe)",
+      "nodeLabel": "M a",
       "status": "authored",
-      "focusAtomIds": ["letter-n", "letter-s", "letter-e", "letter-d"],
-      "taskIds": ["l06-t1", "l06-t2", "l06-t3", "l06-t4", "l06-t5", "l06-t6"]
+      "focusAtomIds": [
+        "letter-m",
+        "letter-a"
+      ],
+      "taskIds": [
+        "l01-t1",
+        "l01-t2",
+        "l01-t3",
+        "l01-t4",
+        "l01-t5",
+        "l01-t6",
+        "l01-t7",
+        "l01-t8",
+        "l01-t9",
+        "l01-t10"
+      ]
     },
-    { "id": "l07", "index": 7, "phase": 3, "title": "K & Ei", "nodeLabel": "K ei", "status": "planned" },
-    { "id": "l08", "index": 8, "phase": 3, "title": "W, Ch, G", "nodeLabel": "W ch g", "status": "planned" },
-    { "id": "l09", "index": 9, "phase": 3, "title": "Au & B", "nodeLabel": "Au b", "status": "planned" },
-    { "id": "l10", "index": 10, "phase": 3, "title": "Umlaut-Rätsel", "nodeLabel": "ä ö ü", "status": "planned" },
-    { "id": "l11", "index": 11, "phase": 4, "title": "Sch", "nodeLabel": "Sch", "status": "planned" },
-    { "id": "l12", "index": 12, "phase": 4, "title": "J, Z, Eu, ß, V", "nodeLabel": "J z eu ß v", "status": "planned" },
-    { "id": "l13", "index": 13, "phase": 5, "title": "Ä, Ö, Ü", "nodeLabel": "Ä Ö Ü", "status": "planned" },
-    { "id": "l14", "index": 14, "phase": 5, "title": "ck & Pf", "nodeLabel": "ck pf", "status": "planned" },
-    { "id": "l15", "index": 15, "phase": 5, "title": "St & Sp", "nodeLabel": "St sp", "status": "planned" },
-    { "id": "l16", "index": 16, "phase": 5, "title": "C, Y, X, Qu", "nodeLabel": "C y x qu", "status": "planned" }
+    {
+      "id": "l02",
+      "index": 2,
+      "phase": 1,
+      "title": "I & O (Der Familien-Kreis)",
+      "nodeLabel": "I o",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-i",
+        "letter-o"
+      ],
+      "taskIds": [
+        "l02-t1",
+        "l02-t2",
+        "l02-t3",
+        "l02-t4",
+        "l02-t5",
+        "l02-t6",
+        "l02-t7",
+        "l02-t8",
+        "l02-t9",
+        "l02-t10"
+      ]
+    },
+    {
+      "id": "l03",
+      "index": 3,
+      "phase": 2,
+      "title": "P & T (Die Plosivlaute)",
+      "nodeLabel": "P t",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-p",
+        "letter-t"
+      ],
+      "taskIds": [
+        "l03-t1",
+        "l03-t2",
+        "l03-t3",
+        "l03-t4",
+        "l03-t5",
+        "l03-t6",
+        "l03-t7",
+        "l03-t8",
+        "l03-t9",
+        "l03-t10"
+      ]
+    },
+    {
+      "id": "l04",
+      "index": 4,
+      "phase": 2,
+      "title": "L & H (Das weiche Fließen)",
+      "nodeLabel": "L h",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-l",
+        "letter-h"
+      ],
+      "taskIds": [
+        "l04-t1",
+        "l04-t2",
+        "l04-t3",
+        "l04-t4",
+        "l04-t5",
+        "l04-t6",
+        "l04-t7",
+        "l04-t8",
+        "l04-t9",
+        "l04-t10"
+      ]
+    },
+    {
+      "id": "l05",
+      "index": 5,
+      "phase": 2,
+      "title": "F & U (Erste Abenteuer)",
+      "nodeLabel": "F u",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-f",
+        "letter-u"
+      ],
+      "taskIds": [
+        "l05-t1",
+        "l05-t2",
+        "l05-t3",
+        "l05-t4",
+        "l05-t5",
+        "l05-t6",
+        "l05-t7",
+        "l05-t8",
+        "l05-t9",
+        "l05-t10"
+      ]
+    },
+    {
+      "id": "l06",
+      "index": 6,
+      "phase": 2,
+      "title": "R & N (Die Rollenden Laute)",
+      "nodeLabel": "R n",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-r",
+        "letter-n"
+      ],
+      "taskIds": [
+        "l06-t1",
+        "l06-t2",
+        "l06-t3",
+        "l06-t4",
+        "l06-t5",
+        "l06-t6",
+        "l06-t7",
+        "l06-t8",
+        "l06-t9",
+        "l06-t10"
+      ]
+    },
+    {
+      "id": "l07",
+      "index": 7,
+      "phase": 2,
+      "title": "S & E (Das leise Zischen)",
+      "nodeLabel": "S e",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-s",
+        "letter-e"
+      ],
+      "taskIds": [
+        "l07-t1",
+        "l07-t2",
+        "l07-t3",
+        "l07-t4",
+        "l07-t5",
+        "l07-t6",
+        "l07-t7",
+        "l07-t8",
+        "l07-t9",
+        "l07-t10"
+      ]
+    },
+    {
+      "id": "l08",
+      "index": 8,
+      "phase": 2,
+      "title": "D & K (Die Satz-Bauer)",
+      "nodeLabel": "D k",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-d",
+        "letter-k"
+      ],
+      "taskIds": [
+        "l08-t1",
+        "l08-t2",
+        "l08-t3",
+        "l08-t4",
+        "l08-t5",
+        "l08-t6",
+        "l08-t7",
+        "l08-t8",
+        "l08-t9",
+        "l08-t10"
+      ]
+    },
+    {
+      "id": "l09",
+      "index": 9,
+      "phase": 3,
+      "title": "Ei & W (Der erste Doppellaut)",
+      "nodeLabel": "Ei w",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-ei",
+        "letter-w"
+      ],
+      "taskIds": [
+        "l09-t1",
+        "l09-t2",
+        "l09-t3",
+        "l09-t4",
+        "l09-t5",
+        "l09-t6",
+        "l09-t7",
+        "l09-t8",
+        "l09-t9",
+        "l09-t10"
+      ]
+    },
+    {
+      "id": "l10",
+      "index": 10,
+      "phase": 3,
+      "title": "G & Ch (Weiche Übergänge)",
+      "nodeLabel": "G ch",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-g",
+        "letter-ch"
+      ],
+      "taskIds": [
+        "l10-t1",
+        "l10-t2",
+        "l10-t3",
+        "l10-t4",
+        "l10-t5",
+        "l10-t6",
+        "l10-t7",
+        "l10-t8",
+        "l10-t9",
+        "l10-t10"
+      ]
+    },
+    {
+      "id": "l11",
+      "index": 11,
+      "phase": 3,
+      "title": "Au & B (Das Haus-Szenario)",
+      "nodeLabel": "Au b",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-au",
+        "letter-b"
+      ],
+      "taskIds": [
+        "l11-t1",
+        "l11-t2",
+        "l11-t4",
+        "l11-t3",
+        "l11-t5",
+        "l11-t6",
+        "l11-t7",
+        "l11-t8",
+        "l11-t9",
+        "l11-t10"
+      ]
+    },
+    {
+      "id": "l12",
+      "index": 12,
+      "phase": 3,
+      "title": "Umlaut-Rätsel (Mathematisch)",
+      "nodeLabel": "ä ö ü",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-ae",
+        "letter-oe",
+        "letter-ue"
+      ],
+      "taskIds": [
+        "l12-t1",
+        "l12-t2",
+        "l12-t3",
+        "l12-t4",
+        "l12-t5",
+        "l12-t6",
+        "l12-t7",
+        "l12-t8",
+        "l12-t9",
+        "l12-t10"
+      ]
+    },
+    {
+      "id": "l13",
+      "index": 13,
+      "phase": 4,
+      "title": "Sch (Der Dreifachlaut)",
+      "nodeLabel": "Sch",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-sch"
+      ],
+      "taskIds": [
+        "l13-t1",
+        "l13-t2",
+        "l13-t3",
+        "l13-t4",
+        "l13-t5",
+        "l13-t6",
+        "l13-t7",
+        "l13-t8",
+        "l13-t9",
+        "l13-t10"
+      ]
+    },
+    {
+      "id": "l14",
+      "index": 14,
+      "phase": 4,
+      "title": "J, Z & Eu (Die Wilden)",
+      "nodeLabel": "J z eu",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-j",
+        "letter-z",
+        "letter-eu"
+      ],
+      "taskIds": [
+        "l14-t1",
+        "l14-t2",
+        "l14-t3",
+        "l14-t4",
+        "l14-t5",
+        "l14-t6",
+        "l14-t7",
+        "l14-t8",
+        "l14-t9",
+        "l14-t10"
+      ]
+    },
+    {
+      "id": "l15",
+      "index": 15,
+      "phase": 4,
+      "title": "ß & V (Spezielle Zeichen)",
+      "nodeLabel": "ß v",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-sz",
+        "letter-v"
+      ],
+      "taskIds": [
+        "l15-t1",
+        "l15-t2",
+        "l15-t3",
+        "l15-t4",
+        "l15-t5",
+        "l15-t6",
+        "l15-t7",
+        "l15-t8",
+        "l15-t9",
+        "l15-t10"
+      ]
+    },
+    {
+      "id": "l16",
+      "index": 16,
+      "phase": 5,
+      "title": "ck & Pf (Scharfe Laute)",
+      "nodeLabel": "ck pf",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-ck",
+        "letter-pf"
+      ],
+      "taskIds": [
+        "l16-t1",
+        "l16-t2",
+        "l16-t3",
+        "l16-t4",
+        "l16-t5",
+        "l16-t6",
+        "l16-t7",
+        "l16-t8",
+        "l16-t9",
+        "l16-t10"
+      ]
+    },
+    {
+      "id": "l17",
+      "index": 17,
+      "phase": 5,
+      "title": "St & Sp (Die Sch-Stolperer)",
+      "nodeLabel": "St sp",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-st",
+        "letter-sp"
+      ],
+      "taskIds": [
+        "l17-t1",
+        "l17-t2",
+        "l17-t3",
+        "l17-t4",
+        "l17-t5",
+        "l17-t6",
+        "l17-t7",
+        "l17-t8",
+        "l17-t9",
+        "l17-t10"
+      ]
+    },
+    {
+      "id": "l18",
+      "index": 18,
+      "phase": 5,
+      "title": "C, Y, X & Qu (Die Seltenen)",
+      "nodeLabel": "C y x qu",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-c",
+        "letter-y",
+        "letter-x",
+        "letter-qu"
+      ],
+      "taskIds": [
+        "l18-t1",
+        "l18-t2",
+        "l18-t3",
+        "l18-t4",
+        "l18-t5",
+        "l18-t6",
+        "l18-t7",
+        "l18-t8",
+        "l18-t9",
+        "l18-t10",
+        "l18-t11",
+        "l18-t12"
+      ]
+    }
   ]
 }
