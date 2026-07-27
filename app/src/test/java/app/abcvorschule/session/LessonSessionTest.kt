@@ -52,6 +52,38 @@ class LessonSessionTest {
     }
 
     @Test
+    fun resumeSafeRestartsWhenTrainerShapeChanged() {
+        assertEquals(
+            SessionStep(0, 0),
+            SessionProgression.resumeSafe(expectedCount = 6, actualCount = 8, trainerIndex = 4, roundIndex = 1),
+        )
+    }
+
+    @Test
+    fun resumeSafeKeepsPositionWhenShapeMatches() {
+        assertEquals(
+            SessionStep(4, 1),
+            SessionProgression.resumeSafe(expectedCount = 8, actualCount = 8, trainerIndex = 4, roundIndex = 1),
+        )
+    }
+
+    @Test
+    fun resumeSafeIgnoresShapeCheckWhenExpectedCountIsNull() {
+        assertEquals(
+            SessionStep(2, 0),
+            SessionProgression.resumeSafe(expectedCount = null, actualCount = 8, trainerIndex = 2, roundIndex = 0),
+        )
+    }
+
+    @Test
+    fun resumeSafeClampsOutOfBoundsTrainerIndex() {
+        assertEquals(
+            SessionStep(7, 0),
+            SessionProgression.resumeSafe(expectedCount = null, actualCount = 8, trainerIndex = 99, roundIndex = 0),
+        )
+    }
+
+    @Test
     fun roundCountsMatchTheAuthoredPack() {
         val lesson = pack.authoredLessons.first()
         val counts = pack.tasksOf(lesson).map { it.roundCount }

@@ -11,6 +11,7 @@ import app.abcvorschule.content.Lesson
 import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SyllableMergeRound
+import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.content.TaskSpec
 import app.abcvorschule.content.WordBuildRound
 import app.abcvorschule.content.rounds
@@ -60,7 +61,13 @@ class SessionViewModel(
                 pack.lessons.any { it.id == snapshot.lessonId } &&
                 LessonGating.isPlayable(LessonGating.stateOf(pack, progress, snapshot.lessonId))
             if (resumable) {
-                openLesson(snapshot!!.lessonId, snapshot.trainerIndex, snapshot.roundIndex, snapshot.pointsEarned)
+                openLesson(
+                    snapshot!!.lessonId,
+                    snapshot.trainerIndex,
+                    snapshot.roundIndex,
+                    snapshot.pointsEarned,
+                    expectedTrainerCount = snapshot.trainerCount,
+                )
             } else {
                 // A stale snapshot (e.g. a content edit changed the lesson's taskIds
                 // without bumping packId) must not strand the app on the loading
@@ -97,6 +104,7 @@ class SessionViewModel(
         trainerIndex: Int = 0,
         roundIndex: Int = 0,
         sessionPoints: Int = 0,
+        expectedTrainerCount: Int? = null,
     ) {
         viewModelScope.launch {
             runCatching {
@@ -116,15 +124,20 @@ class SessionViewModel(
                     )
                     return@runCatching
                 }
-                val trainers = pack.tasksOf(lesson).map { schedule(it) }
+                val trainers = SymbolHuntInsertion.insertSymbolHunts(
+                    pack.tasksOf(lesson).map { schedule(it) },
+                    pack,
+                    lesson.id,
+                    lesson.index,
+                )
+                val step = SessionProgression.resumeSafe(expectedTrainerCount, trainers.size, trainerIndex, roundIndex)
                 val counts = trainers.map { it.spec.rounds.size }
-                val safeTrainer = trainerIndex.coerceIn(0, (trainers.size - 1).coerceAtLeast(0))
-                val safeRound = roundIndex.coerceIn(0, (counts.getOrElse(safeTrainer) { 1 } - 1).coerceAtLeast(0))
+                val safeRound = step.roundIndex.coerceIn(0, (counts.getOrElse(step.trainerIndex) { 1 } - 1).coerceAtLeast(0))
                 _ui.value = SessionUiState(
                     screen = AppScreen.Practice,
                     lessonId = lessonId,
                     trainers = trainers,
-                    trainerIndex = safeTrainer,
+                    trainerIndex = step.trainerIndex,
                     roundIndex = safeRound,
                     points = progress.points,
                     sessionPoints = sessionPoints,
@@ -252,6 +265,7 @@ class SessionViewModel(
         is SentenceOrderRound -> pack.sentence(round.sentenceId).tts
         is LetterTraceRound -> round.rewardTts
         is SoundPositionRound -> pack.atoms[round.atomId]?.lemma ?: round.promptTts
+        is SymbolHuntRound -> pack.atoms[round.targetAtomId]?.lemma ?: round.promptTts
         else -> ""
     }
 
@@ -462,6 +476,7 @@ class SessionViewModel(
                 roundIndex = state.roundIndex,
                 pointsEarned = state.sessionPoints,
                 packId = pack.manifest.packId,
+                trainerCount = state.trainers.size,
             ),
         )
     }

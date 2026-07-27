@@ -46,6 +46,25 @@ object SessionProgression {
         }
         return null
     }
+
+    /**
+     * Guards against resuming into a shifted position when the scheduled trainer
+     * list's shape changed since the snapshot was saved, even though the content
+     * pack's id did not (e.g. this app version starts inserting synthetic hunt
+     * trainers a previous version didn't). [expectedCount] is the trainer count
+     * recorded at snapshot time; null means "no resume in progress, don't shape-check"
+     * (a fresh lesson open always starts at trainer 0 anyway).
+     */
+    fun resumeSafe(
+        expectedCount: Int?,
+        actualCount: Int,
+        trainerIndex: Int,
+        roundIndex: Int,
+    ): SessionStep {
+        if (expectedCount != null && expectedCount != actualCount) return SessionStep(0, 0)
+        val safeTrainer = trainerIndex.coerceIn(0, (actualCount - 1).coerceAtLeast(0))
+        return SessionStep(safeTrainer, roundIndex.coerceAtLeast(0))
+    }
 }
 
 data class ScheduledTrainer(
