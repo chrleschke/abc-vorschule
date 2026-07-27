@@ -189,6 +189,7 @@ object ContentValidator {
                         )
                     }
                 }
+                is SymbolHuntSpec -> Unit // synthetic-only; never appears in authored content
             }
         }
 

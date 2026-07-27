@@ -32,6 +32,7 @@ enum class TrainerKind {
     word_build,
     sentence_order,
     count_add,
+    symbol_hunt,
 }
 
 // --- Trainer 1: Auditiver Finder --------------------------------------------
@@ -170,6 +171,30 @@ data class CountAddRound(
     val difficultyBand: String? = null,
 ) : TrainerRound
 
+// --- Buchstaben-/Silben-Jagd — derived at runtime, never authored --------------
+
+enum class SymbolHuntMode { letter, syllable }
+
+/**
+ * Never appears in authored JSON — [SessionViewModel]'s SymbolHuntInsertion
+ * derives instances at runtime from a lesson's own letter_trace/syllable_merge
+ * rounds (design doc §2). Still `@Serializable`/`@SerialName` because TaskSpec
+ * is a kotlinx.serialization sealed hierarchy — every member needs both for the
+ * polymorphic parent to compile, even members that are never deserialized.
+ */
+@Serializable
+@SerialName("symbol_hunt")
+data class SymbolHuntSpec(override val id: String, val rounds: List<SymbolHuntRound>) : TaskSpec
+
+@Serializable
+data class SymbolHuntRound(
+    override val promptTts: String,
+    val targetAtomId: String,
+    val mode: SymbolHuntMode,
+    /** Resolved once at derivation time — see SymbolHuntDerivation.distractorPool. */
+    val distractorPool: List<String>,
+) : TrainerRound
+
 @Serializable
 data class TasksFile(val tasks: List<TaskSpec>)
 
@@ -181,6 +206,7 @@ val TaskSpec.kind: TrainerKind
         is WordBuildSpec -> TrainerKind.word_build
         is SentenceOrderSpec -> TrainerKind.sentence_order
         is CountAddSpec -> TrainerKind.count_add
+        is SymbolHuntSpec -> TrainerKind.symbol_hunt
     }
 
 val TaskSpec.rounds: List<TrainerRound>
@@ -191,6 +217,7 @@ val TaskSpec.rounds: List<TrainerRound>
         is WordBuildSpec -> rounds
         is SentenceOrderSpec -> rounds
         is CountAddSpec -> rounds
+        is SymbolHuntSpec -> rounds
     }
 
 val TaskSpec.roundCount: Int get() = rounds.size
@@ -220,4 +247,5 @@ fun TrainerRound.scoredAtomIds(): List<String> = when (this) {
     // them in; count_add scores against a math key, not against atoms.
     is SentenceOrderRound -> emptyList()
     is CountAddRound -> emptyList()
+    is SymbolHuntRound -> listOf(targetAtomId)
 }

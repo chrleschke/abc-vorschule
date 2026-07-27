@@ -8,6 +8,7 @@ import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SoundPositionRound
+import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.TrainerRound
 import app.abcvorschule.content.WordBuildRound
@@ -113,5 +114,8 @@ fun TrainerHost(
             onResult = callbacks.onMathResult,
             modifier = modifier.fillMaxSize(),
         )
+        // TODO(task 7): symbol_hunt is only synthesized at runtime by SessionViewModel's
+        // SymbolHuntInsertion; no screen wires it up yet, so this branch is unreachable today.
+        is SymbolHuntRound -> Unit
     }
 }
