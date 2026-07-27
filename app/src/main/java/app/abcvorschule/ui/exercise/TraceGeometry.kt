@@ -107,13 +107,33 @@ data class TraceUpdate(
  * shortcut and the writing direction is actually practiced.
  */
 object TraceProgress {
-    const val StarsPerStroke = 4
+    /** Even the shortest tick (an umlaut dot) is worth exactly one star. */
+    const val MinStars = 1
+
+    /** Upper bound so a long closed loop stays a game, not a chore. */
+    const val MaxStars = 10
+
+    /**
+     * Nominal gap between two stars, as a fraction of the glyph box. Deliberately
+     * larger than [StarHitFraction]: two stars closer than the pick-up radius sit
+     * inside one another and cannot be aimed at separately, which is what made the
+     * umlaut ticks of Ä/Ö/Ü collect all four of their stars in a single swipe.
+     */
+    const val StarSpacingFraction = 0.28f
 
     /** Corridor half-width as a fraction of the glyph box. */
     const val CorridorFraction = 0.16f
 
     /** Star pick-up radius as a fraction of the glyph box. */
     const val StarHitFraction = 0.12f
+
+    /** Stars scale with how much road there actually is to drive. */
+    fun starCountFor(strokeLength: Float, boxSize: Float): Int {
+        if (boxSize <= 0f) return MinStars
+        val spacing = boxSize * StarSpacingFraction
+        if (spacing <= 0f) return MinStars
+        return (strokeLength / spacing).toInt().coerceIn(MinStars, MaxStars)
+    }
 
     fun update(
         state: TraceState,

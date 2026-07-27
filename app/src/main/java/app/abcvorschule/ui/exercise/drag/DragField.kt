@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -101,6 +102,9 @@ private fun Rect.toDragRect() = DragRect(left, top, right, bottom)
 fun rememberDragFieldState(vararg keys: Any?): DragFieldState =
     remember(*keys) { DragFieldState() }
 
+/** Slight enlargement while a tile is airborne, so it reads as lifted off the board. */
+private const val DragLiftScale = 1.08f
+
 /**
  * A draggable answer tile with a mandatory tap-to-place alternative (R15).
  * [onDropped] receives the resolved zone key, or null when the tile snapped back.
@@ -119,12 +123,22 @@ fun DragCard(
         onDispose { state.removeCard(key) }
     }
     Box(
-        modifier = modifier
+        // zIndex/offset/scale sit BEFORE the caller's modifier on purpose: a later
+        // `offset` would only move the content, leaving the caller's background and
+        // border painted at the tile's resting position — which made the dragged
+        // tile look like bare (near-black) text floating over the board.
+        modifier = Modifier
             .zIndex(if (dragging) 1f else 0f)
             .offset {
                 val o = if (dragging) state.dragOffset else Offset.Zero
                 IntOffset(o.x.roundToInt(), o.y.roundToInt())
             }
+            .graphicsLayer {
+                val scale = if (dragging) DragLiftScale else 1f
+                scaleX = scale
+                scaleY = scale
+            }
+            .then(modifier)
             .onGloballyPositioned { state.putCard(key, it.boundsInRoot()) }
             .pointerInput(key) {
                 detectDragGestures(
@@ -156,9 +170,16 @@ fun DropZone(
         onDispose { state.removeZone(key) }
     }
     Box(
-        modifier = modifier
+        // onGloballyPositioned/clickable wrap the caller's styled modifier chain
+        // (background/border/padding) so the registered bounds and the tappable
+        // area are the FULL frame box, not just the padded-in content area —
+        // otherwise a frame at the 56dp touch-target floor with 8dp padding on
+        // each side only had a ~40dp tappable center, silently dropping taps in
+        // an 8dp dead ring around every frame.
+        modifier = Modifier
             .onGloballyPositioned { state.putZone(key, it.boundsInRoot()) }
-            .clickable { onTap() },
+            .clickable { onTap() }
+            .then(modifier),
         contentAlignment = Alignment.Center,
         content = content,
     )

@@ -230,7 +230,9 @@ private data class TraceLayout(
 
 private fun buildTraceLayout(atom: Atom, boxSize: Float): TraceLayout {
     val strokes = TraceGeometry.toPixels(atom.strokes, boxSize, TracePoint(0f, 0f))
-    val stars = strokes.map { TraceGeometry.starPositions(it, TraceProgress.StarsPerStroke) }
+    val stars = strokes.map {
+        TraceGeometry.starPositions(it, TraceProgress.starCountFor(TraceGeometry.polylineLength(it), boxSize))
+    }
     return TraceLayout(boxSize, strokes, stars)
 }
 

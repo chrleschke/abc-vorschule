@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -157,27 +159,38 @@ fun SentenceOrderTrainer(
                         cap = StrokeCap.Round,
                     )
                 }
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.Top,
-                ) {
-                    words.forEachIndexed { index, expected ->
-                        val filled = if (resolved) expected else placed[index]
-                        val atomId = atomIds.getOrElse(index) { expected }
-                        Peg(
-                            index = index,
-                            expected = expected,
-                            filled = filled,
-                            showGhost = scaffoldFor(atomId) == ScaffoldLevel.Beginner,
-                            armed = field.selectedKey != null && filled == null,
-                            onTap = {
-                                val selected = field.selectedKey
-                                val card = cards.firstOrNull { cardKey(it) == selected }
-                                if (card != null) place(index, card)
-                                if (filled != null) onSpeak(filled)
-                            },
-                            registerWith = field,
-                        )
+                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                    val pegWidth = WordFrameSizing.frameWidthDp(maxWidth.value, words.size)
+                    val gap = WordFrameSizing.gapDp(maxWidth.value, words.size)
+                    val glyphSp = WordFrameSizing.glyphSp(
+                        pegWidth,
+                        words.maxOfOrNull { it.length } ?: 1,
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(gap.dp, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.Top,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        words.forEachIndexed { index, expected ->
+                            val filled = if (resolved) expected else placed[index]
+                            val atomId = atomIds.getOrElse(index) { expected }
+                            Peg(
+                                index = index,
+                                expected = expected,
+                                filled = filled,
+                                showGhost = scaffoldFor(atomId) == ScaffoldLevel.Beginner,
+                                armed = field.selectedKey != null && filled == null,
+                                onTap = {
+                                    val selected = field.selectedKey
+                                    val card = cards.firstOrNull { cardKey(it) == selected }
+                                    if (card != null) place(index, card)
+                                    if (filled != null) onSpeak(filled)
+                                },
+                                registerWith = field,
+                                pegWidthDp = pegWidth,
+                                glyphSp = glyphSp,
+                            )
+                        }
                     }
                 }
             }
@@ -242,13 +255,16 @@ private fun Peg(
     armed: Boolean,
     onTap: () -> Unit,
     registerWith: app.abcvorschule.ui.exercise.drag.DragFieldState,
+    pegWidthDp: Float,
+    glyphSp: Float,
 ) {
     DropZone(
         state = registerWith,
         key = SentenceOrderTray.pegKey(index),
         onTap = onTap,
         modifier = Modifier
-            .defaultMinSize(minWidth = 76.dp, minHeight = 64.dp)
+            .width(pegWidthDp.dp)
+            .defaultMinSize(minHeight = 64.dp)
             .background(
                 color = if (armed) SoftMint.copy(alpha = 0.22f) else NightElevated,
                 shape = RoundedCornerShape(16.dp),
@@ -258,25 +274,31 @@ private fun Peg(
                 color = if (filled != null) SoftMint.copy(alpha = 0.7f) else SoftSand.copy(alpha = 0.32f),
                 shape = RoundedCornerShape(16.dp),
             )
-            .padding(horizontal = 10.dp, vertical = 8.dp)
+            .padding(
+                horizontal = WordFrameSizing.FramePaddingDp.dp,
+                vertical = WordFrameSizing.FramePaddingDp.dp,
+            )
             .testTag("peg_$index"),
     ) {
         when {
             filled != null -> Text(
                 text = filled,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.headlineSmall.copy(fontSize = glyphSp.sp),
                 color = SoftSand,
+                maxLines = 1,
             )
             showGhost -> Text(
                 text = expected,
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.headlineSmall.copy(fontSize = glyphSp.sp),
                 color = SoftSand,
+                maxLines = 1,
                 modifier = Modifier.alpha(0.22f),
             )
             else -> Text(
                 text = "_",
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.headlineSmall.copy(fontSize = glyphSp.sp),
                 color = SoftSand.copy(alpha = 0.45f),
+                maxLines = 1,
             )
         }
     }

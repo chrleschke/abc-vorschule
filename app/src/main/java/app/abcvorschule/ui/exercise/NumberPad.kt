@@ -45,11 +45,13 @@ import app.abcvorschule.ui.theme.SoftSky
 @Composable
 fun NumberPad(
     onSubmit: (Int) -> Unit,
+    /** Changing this clears the field — a new round, or another wrong try. */
+    resetToken: String,
     modifier: Modifier = Modifier,
     /** True once the typed number turned out to be the answer — the field confirms in green. */
     solved: Boolean = false,
 ) {
-    var value by remember { mutableStateOf("") }
+    var value by remember(resetToken) { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -74,7 +76,7 @@ fun NumberPad(
     ) {
         OutlinedTextField(
             value = value,
-            onValueChange = { input -> value = input.filter(Char::isDigit).take(3) },
+            onValueChange = { input -> value = NumberPadInput.sanitize(input) },
             modifier = Modifier
                 .width(140.dp)
                 .focusRequester(focusRequester)

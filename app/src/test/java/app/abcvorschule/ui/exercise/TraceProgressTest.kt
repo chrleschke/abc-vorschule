@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.math.hypot
 
 class TraceProgressTest {
     private val boxSize = 200f
@@ -78,5 +79,39 @@ class TraceProgressTest {
         val offset = TracePoint(10f, 20f)
         assertFalse(TraceProgress.update(TraceState(), offset, strokes, stars, 400f).offCorridor)
         assertTrue(TraceProgress.update(TraceState(), offset, strokes, stars, 60f).offCorridor)
+    }
+
+    @Test
+    fun aVeryShortStrokeGetsASingleStar() {
+        // The umlaut ticks of Ä/Ö/Ü are ~0.085 of the glyph box. Four stars there
+        // would all sit inside one another's pick-up radius.
+        val stars = TraceProgress.starCountFor(strokeLength = 0.085f * 200f, boxSize = 200f)
+        assertEquals(1, stars)
+    }
+
+    @Test
+    fun aLongClosedStrokeGetsManyStars() {
+        // letter-o is a closed loop roughly 2.2 box lengths around.
+        val stars = TraceProgress.starCountFor(strokeLength = 2.2f * 200f, boxSize = 200f)
+        assertTrue("expected more than the old fixed 4, was $stars", stars > 4)
+        assertTrue("must stay bounded, was $stars", stars <= TraceProgress.MaxStars)
+    }
+
+    @Test
+    fun starCountNeverDropsBelowOneEvenForADegenerateStroke() {
+        assertEquals(TraceProgress.MinStars, TraceProgress.starCountFor(0f, 200f))
+    }
+
+    @Test
+    fun consecutiveStarsStayFurtherApartThanThePickUpRadius() {
+        val stroke = listOf(TracePoint(0f, 0f), TracePoint(200f, 0f))
+        val boxSize = 200f
+        val length = TraceGeometry.polylineLength(stroke)
+        val stars = TraceGeometry.starPositions(stroke, TraceProgress.starCountFor(length, boxSize))
+        val radius = boxSize * TraceProgress.StarHitFraction
+        stars.zipWithNext().forEach { (a, b) ->
+            val gap = hypot(b.x - a.x, b.y - a.y)
+            assertTrue("stars $a and $b are only $gap apart (radius $radius)", gap > radius)
+        }
     }
 }

@@ -59,7 +59,8 @@ Strichdaten fehlen oder Referenzen ins Leere zeigen.
 3. Gesperrten Knoten antippen → gesprochener Hinweis, kein stummes No-Op.
 4. Lektion 1 öffnen und die Trainer der Reihenfolge nach durchspielen:
    Auditiver Finder (Waggon-Zuordnung) · Visueller Spurensucher (Buchstaben nachspuren) ·
-   optional Buchstaben-Jagd · Silben-Verschmelzer · optional Silben-Jagd ·
+   optional Buchstaben-Jagd (Batterie voll → Feier, automatisch weiter, kein Weiter-Button) ·
+   Silben-Verschmelzer · optional Silben-Jagd ·
    Wort-Bauer (Mama bauen) · Satz-Architekt (Wortschild aufhängen) · zwei Rechenaufgaben.
    Bei Wort-Bauer und Satz-Architekt beide Bedienwege prüfen: eine Kachel per Ziehen platzieren
    (die gezogene Kachel liegt sichtbar über den Zielfeldern, nie darunter) und eine per Tippen
@@ -79,9 +80,3 @@ Strichdaten fehlen oder Referenzen ins Leere zeigen.
 - Keine Werbung, keine Netz-Permission für die Kernpraxis.
 - Eltern-Hilfestufe: Auto / Mit Hilfe / Ohne Hilfe hinter Long-Press-Gate.
 
-## Open Issues
-- Rechnen: Zahlenpad löscht die Vorherige Eingabe nicht
-- Buchstaben schreiben: Die Pfade sind nicht immer korrekt.
-- Buchstaben-Jagd: Entferne den Weiter-Button; Auto-Proceed; Füge Erfolgs-Message hinzu.
-- Word Builder: Lange Wörter passen nicht auf den Bildschirm; Mache die Platzhalter dynamisch kleiner
-- allgemein bei Drag&Drop der Antworten ist bei der Animation nur der Text animiert. dieser ist aber schwarz und kaum Sichtbar. Animiere auch einen Hintergrund bei Drag&Drop
