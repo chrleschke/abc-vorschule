@@ -24,7 +24,9 @@ data class Lesson(
     val nodeLabel: String,
     val status: LessonStatus,
     val focusAtomIds: List<String> = emptyList(),
-    /** Exactly the six trainers in ContentValidator.TrainerOrder when authored. */
+    /** Trainer kinds in non-decreasing ContentValidator.TrainerOrder rank when
+     * authored — a kind may repeat or be skipped, but the sequence never goes
+     * backward, always starts with sound_position, and always ends with count_add. */
     val taskIds: List<String> = emptyList(),
 )
 

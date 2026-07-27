@@ -1,7 +1,7 @@
 # Agent Guide — ABC-Vorschul App
 
 Dieses Repo wird mit Compound-Engineering-Workflows und Cursor-Agents bearbeitet.
-Lies zuerst [`docs/PRODUCT_PRINCIPLES.md`](docs/PRODUCT_PRINCIPLES.md).
+Lies zuerst `[docs/PRODUCT_PRINCIPLES.md](docs/PRODUCT_PRINCIPLES.md)`.
 
 ## Verbindliche Produktquelle
 
@@ -17,18 +17,22 @@ Plan-Artefakte nicht stillschweigend umbiegen — Abweichungen dokumentieren.
 Für Feature- oder größere Änderungsarbeit diese Reihenfolge einhalten
 (entsprechende CE-/Cursor-Skills nutzen, wenn verfügbar):
 
-| Schritt | Skill / Aktion | Zweck |
-|---------|----------------|-------|
-| 1 | **brainstorm** | Problem, Alternativen, Entscheidung mit Nutzer klären |
-| 2 | **plan** | Unified Plan / Contract schreiben oder aktualisieren |
-| 3 | **doc-review** | Plan/Doku gegen Prinzipien und Lücken prüfen |
-| 4 | **work** | Implementieren (Tests + Build grün) |
-| 5 | **code-review** | Multi-Agent-Review vor Merge/Übergabe |
-| 6 | **simplify-code** | Verhaltenstreue Vereinfachung der Branch-Diffs |
-| 7 | **doc update** | Doku und Regeln an den Ist-Stand anpassen |
+
+| Schritt | Skill / Aktion    | Zweck                                                 |
+| ------- | ----------------- | ----------------------------------------------------- |
+| 1       | **brainstorm**    | Problem, Alternativen, Entscheidung mit Nutzer klären |
+| 2       | **plan**          | Unified Plan / Contract schreiben oder aktualisieren  |
+| 3       | **doc-review**    | Plan/Doku gegen Prinzipien und Lücken prüfen          |
+| 4       | **work**          | Implementieren (Tests + Build grün)                   |
+| 5       | **code-review**   | Multi-Agent-Review vor Merge/Übergabe                 |
+| 6       | **simplify-code** | Verhaltenstreue Vereinfachung der Branch-Diffs        |
+| 7       | **doc update**    | Doku und Regeln an den Ist-Stand anpassen             |
+
 
 Kleine, klar begrenzte Fixes dürfen Schritte 1–3 überspringen, **müssen aber Schritt 7 erfüllen**,
 wenn sich UX-, Content- oder Prozessregeln ändern.
+
+Nutze /superpowers:subagent-driven-development o.ä. um große Tasks sinvoll zu splitten.
 
 ## Dokumentation selbstständig aktualisieren
 
@@ -53,7 +57,7 @@ Plan nur anfassen, wenn der Contract selbst falsch oder unvollständig ist.
 
 ## Kind-UI-Regeln (Kurz)
 
-- Sechs Trainer pro Lektion in fester Reihenfolge: Auditiver Finder · Spurensucher · Verschmelzer · Wort-Bauer · Satz-Architekt · Rechnen.
+- Sechs Trainer-**Typen** pro Lektion in fester Rangfolge: Auditiver Finder · Spurensucher · Verschmelzer · Wort-Bauer · Satz-Architekt · Rechnen. Ein Typ kann sich wiederholen oder fehlen, die Reihenfolge geht nie zurück; jede Lektion startet mit Auditiver Finder und endet mit Rechnen (`ContentValidator` erzwingt das).
 - Pfad-Screen ist der Einstieg; gesperrte Knoten antworten mit gesprochenem Hinweis, nie stumm.
 - Trainer 1: Lok mit Anfang/Mitte/Ende-Waggon; Miss spielt das segmentierte Wort (`missTts`).
 - Trainer 2: Straße aus autorierten `Atom.strokes`; gelbe Sterne nur in Strichreihenfolge (aktiver Balken leuchtend, kommende blass), Haptik-Tick pro Stern; fertiger Balken füllt sich ease-in und übergibt das Fahrzeug an den nächsten Startpunkt; Korridor-Verlassen stoppt das Fahrzeug (langes Rumpeln), zählt aber nicht als Fehlversuch. Nach dem letzten Stern 500 ms Standbild, dann Belohnungsseite (Bild + Wortzeile, Graphem fett).
@@ -63,6 +67,8 @@ Plan nur anfassen, wenn der Contract selbst falsch oder unvollständig ist.
 - Drag committet nur bei echtem Zonentreffer (größte Überlappung), sonst Snap-back.
 - Vor/Zurück zwischen Runden ist immer aktiv, unabhängig von Punkten/Fortschritt.
 - Aufgabe oben mittig, Antworten unten mittig (`ExerciseStage` / Design-Komponenten).
+
+
 
 ## Technik-Kurzüberblick
 
@@ -74,9 +80,12 @@ Plan nur anfassen, wenn der Contract selbst falsch oder unvollständig ist.
 - Tests: `./gradlew :app:testDebugUnitTest`
 - Build: `./gradlew :app:assembleDebug`
 
+
+
 ## Definition of Done (Agent)
 
 - Verhalten entspricht den Produktprinzipien
 - Relevante Unit-Tests grün
 - Doku/Rules bei Regeländerungen mitgezogen
 - Keine Secrets committen; keine Force-Pushes ohne explizite Nutzeranweisung
+

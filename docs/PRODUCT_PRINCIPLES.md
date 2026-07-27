@@ -27,7 +27,7 @@ Bei Konflikten mit Implementierungsdetails oder älteren Planabschnitten gelten 
 
 ## 3. Lernprogression (Fibel-Lernpfad)
 
-Der Lehrplan besteht aus 16 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede Lektion führt **genau sechs Trainer in fester Reihenfolge** durch:
+Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede Lektion führt die sechs Trainer-**Typen** unten in fester Rangfolge durch — ein Typ kann sich wiederholen oder ganz fehlen (z. B. keine Satzrunde in einer Lektion), die Reihenfolge geht aber nie zurück; jede Lektion beginnt mit dem Auditiven Finder und endet mit Rechnen:
 
 1. **Auditiver Finder** — Laut im gesprochenen Wort verorten (Lok mit Anfang/Mitte/Ende-Waggon).
 2. **Visueller Spurensucher** — Graphem nachzeichnen („Zeichne das große T nach …"), gelbe Sterne in
