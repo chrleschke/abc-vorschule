@@ -55,7 +55,7 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
 
 ## 4. Content-Graph
 
-- Atome (Buchstabe / Silbe / Wort + Emoji) sind wiederverwendbar über alle sechs Trainer einer Lektion.
+- Atome (Buchstabe / Silbe / Wort + Emoji) sind wiederverwendbar über alle sechs Trainer-Typen einer Lektion.
 - Tasks referenzieren Atom-IDs; Validierung verhindert tote Referenzen.
 - Orthografie: Silben eher klein; zusammengesetzte Wörter/Sätze korrekt großgeschrieben.
 - Rechnen nutzt die Bild-Ikonen derselben Lektion; Details zu Singular/Plural siehe Abschnitt 8.
@@ -67,7 +67,7 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
 - **Pfad-Screen ist der Einstieg** (winkende S-Kurve, ein Knoten pro Lektion, Label = Graphem).
 Gesperrte und noch nicht autorierte Knoten reagieren auf Tippen mit einem gesprochenen Hinweis —
 niemals mit einem stummen No-Op.
-- Tippen auf einen freigeschalteten Knoten startet die Sechs-Trainer-Session dieser Lektion.
+- Tippen auf einen freigeschalteten Knoten startet die Sechs-Trainer-Typen-Session dieser Lektion.
 - Kein Domänen-Mix, keine Zufallsrotation: die Trainer-Reihenfolge ist didaktisch fix.
 - Vor/Zurück zwischen Runden ist **immer** möglich, unabhängig von Punkten/Fortschritt.
 - Fortschritt speichern nach jeder Antwort; unfertige Lektion wird beim Öffnen fortgesetzt.
@@ -151,7 +151,7 @@ Wenn eine Änderung vorgeschlagen wird, prüfen:
 | Buttons mit Emoji?                                                  | Nein → Vektor/ASCII                  |
 | Zeigt der Wort-Bauer ein noch nicht eingeführtes Graphem?           | Nein → Fibel-Reihenfolge             |
 | Enthält der Rechen-Trainer Lesewörter?                              | Nein → nur Icons und Ziffern         |
-| Hat jede autorierte Lektion genau die sechs Trainer in Reihenfolge? | Ja → Validator prüft das             |
+| Hält jede autorierte Lektion die sechs Trainer-Typen in nicht-fallender Rangfolge (Start Auditiver Finder, Ende Rechnen)? | Ja → Validator prüft das             |
 
 
 Siehe auch `[AGENTS.md](../AGENTS.md)` für den Arbeitsprozess und Dokumentationspflichten.

@@ -103,7 +103,7 @@ data class SessionUiState(
     val currentRound: TrainerRound? = current?.spec?.round(roundIndex)
     private val roundCounts: List<Int> = trainers.map { it.spec.rounds.size }
 
-    /** "3/6" — which of the six trainers the child is on. */
+    /** "3/8" — which scheduled trainer the child is on, out of however many this lesson has. */
     val trainerProgressLabel: String =
         if (trainers.isEmpty()) "" else "${trainerIndex + 1}/${trainers.size}"
 
