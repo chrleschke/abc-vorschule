@@ -22,8 +22,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,7 +36,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.ui.components.AbcResolveButton
@@ -47,6 +46,7 @@ import app.abcvorschule.ui.theme.SoftGold
 import app.abcvorschule.ui.theme.SoftMint
 import app.abcvorschule.ui.theme.SoftSand
 import app.abcvorschule.ui.theme.SoftSky
+import kotlinx.coroutines.delay
 
 // Matches AbcDimens.kidTouch (the app-wide minimum touch target for 4-6-year-olds)
 // so that even the smallest scattered tile (scale 0.8, see SymbolHuntLayout) renders
@@ -66,8 +66,9 @@ private const val CelebrationHoldMs = 900L
  * Buchstaben-/Silben-Jagd: tiles scatter across the whole task area under a
  * fixed speaker strip (deliberate exception to Prinzip 9 — design doc §4), the
  * battery lives in the answer area (also an exception). A wrong tap reshuffles
- * without losing battery progress; the battery-full moment gates on a local
- * "Weiter" tap before handing off to the shared success pipeline (design doc §5).
+ * without losing battery progress; when the battery fills, a short celebration
+ * plays (400 ms field fade + golden pulse), then auto-proceeds after CelebrationHoldMs
+ * to the shared success pipeline — no "Weiter" tap needed (design doc §5).
  */
 @Composable
 fun SymbolHuntTrainer(
