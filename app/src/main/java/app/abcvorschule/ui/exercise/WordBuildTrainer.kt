@@ -13,6 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -89,6 +94,7 @@ fun WordBuildTrainer(
     val placed = remember(roundKey) { mutableStateMapOf<Int, String>() }
     var misses by remember(roundKey) { mutableIntStateOf(0) }
     var resolved by remember(roundKey) { mutableStateOf(false) }
+    var completed by remember(roundKey) { mutableStateOf(false) }
     val solution = remember(roundKey) { round.blocks.map { it.display } }
     val scoredIds = remember(roundKey) {
         (round.blocks.map { it.atomId } + round.targetAtomId).distinct()
@@ -102,6 +108,7 @@ fun WordBuildTrainer(
             placed[index] = block.display
             onSpeak(block.display)
             if (OrderedPlacement.isSolved(placed.toMap(), solution)) {
+                completed = true
                 onResult(true, false, scoredIds)
             }
         } else {
@@ -129,33 +136,27 @@ fun WordBuildTrainer(
                     frameWidth,
                     solution.maxOfOrNull { it.length } ?: 1,
                 )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(
-                        gap.dp,
-                        Alignment.CenterHorizontally,
-                    ),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    solution.forEachIndexed { index, expected ->
-                        val filled = if (resolved) expected else placed[index]
-                        val atomId = round.blocks[index].atomId
-                        Frame(
-                            expected = expected,
-                            filled = filled,
-                            showSilhouette = scaffoldFor(atomId) == ScaffoldLevel.Beginner,
-                            armed = field.selectedKey != null && filled == null,
-                            onTap = {
+                AnimatedContent(
+                    targetState = completed,
+                    transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(140)) },
+                    label = "word_complete",
+                ) { isComplete ->
+                    if (isComplete) {
+                        Text(solution.joinToString(""), fontSize = glyphSp.sp, color = SoftSand, modifier = Modifier.testTag("completed_word"))
+                    } else Row(
+                        horizontalArrangement = Arrangement.spacedBy(gap.dp, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        solution.forEachIndexed { index, expected ->
+                            val filled = if (resolved) expected else placed[index]
+                            val atomId = round.blocks[index].atomId
+                            Frame(expected, filled, scaffoldFor(atomId) == ScaffoldLevel.Beginner, field.selectedKey != null && filled == null, {
                                 val selected = field.selectedKey
-                                val block = tiles.firstOrNull { blockKey(it) == selected }
-                                if (block != null) place(index, block)
+                                tiles.firstOrNull { blockKey(it) == selected }?.let { place(index, it) }
                                 if (filled != null) onSpeak(filled)
-                            },
-                            registerWith = field,
-                            index = index,
-                            frameWidthDp = frameWidth,
-                            glyphSp = glyphSp,
-                        )
+                            }, field, index, frameWidth, glyphSp)
+                        }
                     }
                 }
             }
@@ -166,7 +167,7 @@ fun WordBuildTrainer(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
                 modifier = Modifier.testTag("word_tray"),
             ) {
-                if (!resolved) {
+                if (!resolved && !completed) {
                     tiles.forEach { block ->
                         val key = blockKey(block)
                         DragCard(

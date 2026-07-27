@@ -39,7 +39,8 @@ fun MathExercise(
     onResult: (distance: Int?, resolved: Boolean, correct: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val roundKey = "${trainer.spec.id}#$roundIndex-${round.left}+${round.right}"
+    val operation = MathOperation.fromWireName(round.operation) ?: MathOperation.Add
+    val roundKey = "${trainer.spec.id}#$roundIndex-${round.operation}-${round.left}-${round.right}"
     var misses by remember(roundKey) { mutableIntStateOf(0) }
     var locked by remember(roundKey) { mutableStateOf(false) }
     // Tracked apart from `locked`, which a resolve also sets: giving up must not
@@ -79,7 +80,7 @@ fun MathExercise(
                 )
                 if (showSymbolPrompt) {
                     Text(
-                        text = "${round.left} + ${round.right} = ?",
+                        text = "${round.left} ${operation.symbol} ${round.right} = ?",
                         style = MaterialTheme.typography.displayLarge,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -88,9 +89,7 @@ fun MathExercise(
                     horizontalArrangement = Arrangement.spacedBy(20.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    QuantityCluster(emoji = icon, count = round.left, emojiSizeSp = 40)
-                    Text("+", style = MaterialTheme.typography.displayMedium, color = SoftSand)
-                    QuantityCluster(emoji = icon, count = round.right, emojiSizeSp = 40)
+                    MathQuantityPrompt(icon, round.left, round.right, operation, emojiSizeSp = 40)
                 }
             },
             answers = {
@@ -109,6 +108,7 @@ fun MathExercise(
             emoji = icon,
             left = round.left,
             right = round.right,
+            operation = operation,
             choices = choices,
             onChoose = { handleGuess(it) },
             solved = solved,

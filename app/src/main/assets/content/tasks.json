@@ -1573,18 +1573,18 @@
       "id": "l09-t10",
       "rounds": [
         {
-          "promptTts": "Ein Eis und zwei Eis. Wie viele?",
-          "iconAtomId": "eis",
-          "left": 1,
-          "right": 2,
-          "answer": 3
-        },
-        {
-          "promptTts": "Zwei Eis und ein Eis. Wie viele?",
+          "promptTts": "Zwei Eis und drei Eis. Wie viele Eis sind das zusammen?",
           "iconAtomId": "eis",
           "left": 2,
-          "right": 1,
-          "answer": 3
+          "right": 3,
+          "answer": 5
+        },
+        {
+          "promptTts": "Drei Eis und drei Eis. Wie viele Eis sind das zusammen?",
+          "iconAtomId": "eis",
+          "left": 3,
+          "right": 3,
+          "answer": 6
         }
       ]
     },
@@ -1748,18 +1748,18 @@
       "id": "l10-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Wege und zwei Wege. Wie viele?",
+          "promptTts": "Drei Wege treffen auf vier Wege. Wie viele Wege sind es?",
           "iconAtomId": "weg",
-          "left": 2,
-          "right": 2,
-          "answer": 4
+          "left": 3,
+          "right": 4,
+          "answer": 7
         },
         {
-          "promptTts": "Ein Weg und drei Wege. Wie viele?",
+          "promptTts": "Vier Wege treffen auf vier Wege. Wie viele Wege sind es?",
           "iconAtomId": "weg",
-          "left": 1,
-          "right": 3,
-          "answer": 4
+          "left": 4,
+          "right": 4,
+          "answer": 8
         }
       ]
     },
@@ -1927,18 +1927,18 @@
       "id": "l11-t10",
       "rounds": [
         {
-          "promptTts": "Ein Haus und drei Häuser. Wie viele Häuser?",
+          "promptTts": "In einer Straße stehen vier Häuser, daneben fünf Häuser. Wie viele Häuser sind es?",
           "iconAtomId": "haus",
-          "left": 1,
-          "right": 3,
-          "answer": 4
+          "left": 4,
+          "right": 5,
+          "answer": 9
         },
         {
-          "promptTts": "Drei Häuser und ein Haus. Wie viele Häuser?",
+          "promptTts": "Fünf Häuser stehen hier und fünf Häuser dort. Wie viele Häuser sind es?",
           "iconAtomId": "haus",
-          "left": 3,
-          "right": 1,
-          "answer": 4
+          "left": 5,
+          "right": 5,
+          "answer": 10
         }
       ]
     },
@@ -2119,18 +2119,20 @@
       "id": "l12-t10",
       "rounds": [
         {
-          "promptTts": "Ein Ofen und zwei Öfen. Wie viele Öfen?",
+          "promptTts": "In der Backstube sind acht Öfen warm. Drei Öfen gehen aus. Wie viele Öfen bleiben warm?",
           "iconAtomId": "ofen",
-          "left": 1,
-          "right": 2,
-          "answer": 3
+          "left": 8,
+          "right": 3,
+          "answer": 5,
+          "operation": "subtract"
         },
         {
-          "promptTts": "Zwei Öfen und ein Ofen. Wie viele Öfen?",
+          "promptTts": "Neun Öfen sind warm. Vier Öfen gehen aus. Wie viele Öfen bleiben warm?",
           "iconAtomId": "ofen",
-          "left": 2,
-          "right": 1,
-          "answer": 3
+          "left": 9,
+          "right": 4,
+          "answer": 5,
+          "operation": "subtract"
         }
       ]
     },
@@ -2302,18 +2304,19 @@
       "id": "l13-t10",
       "rounds": [
         {
-          "promptTts": "Ein Fisch und vier Fische. Wie viele Fische?",
+          "promptTts": "In einem großen Aquarium schwimmen sechs Fische. Fünf Fische schwimmen dazu. Wie viele Fische sind es?",
           "iconAtomId": "fisch",
-          "left": 1,
-          "right": 4,
-          "answer": 5
+          "left": 6,
+          "right": 5,
+          "answer": 11
         },
         {
-          "promptTts": "Vier Fische und ein Fisch. Wie viele Fische?",
+          "promptTts": "Zwölf Fische schwimmen im Aquarium. Vier Fische schwimmen weg. Wie viele bleiben?",
           "iconAtomId": "fisch",
-          "left": 4,
-          "right": 1,
-          "answer": 5
+          "left": 12,
+          "right": 4,
+          "answer": 8,
+          "operation": "subtract"
         }
       ]
     },
@@ -2470,18 +2473,19 @@
       "id": "l14-t10",
       "rounds": [
         {
-          "promptTts": "Eine Eule und zwei Eulen. Wie viele Eulen?",
+          "promptTts": "Sieben Eulen sitzen im Baum. Sechs Eulen fliegen dazu. Wie viele Eulen sind es?",
           "iconAtomId": "eule",
-          "left": 1,
-          "right": 2,
-          "answer": 3
+          "left": 7,
+          "right": 6,
+          "answer": 13
         },
         {
-          "promptTts": "Zwei Eulen und eine Eule. Wie viele Eulen?",
+          "promptTts": "Vierzehn Eulen sitzen im Baum. Fünf Eulen fliegen weg. Wie viele bleiben?",
           "iconAtomId": "eule",
-          "left": 2,
-          "right": 1,
-          "answer": 3
+          "left": 14,
+          "right": 5,
+          "answer": 9,
+          "operation": "subtract"
         }
       ]
     },
@@ -2641,18 +2645,20 @@
       "id": "l15-t10",
       "rounds": [
         {
-          "promptTts": "Ein Fuß und ein Fuß. Wie viele Füße?",
-          "iconAtomId": "fuss",
-          "left": 1,
-          "right": 1,
-          "answer": 2
-        },
-        {
-          "promptTts": "Zwei Füße und ein Fuß. Wie viele Füße?",
+          "promptTts": "Zwei Gruppen mit je drei Füßen. Wie viele Füße sind es?",
           "iconAtomId": "fuss",
           "left": 2,
-          "right": 1,
-          "answer": 3
+          "right": 3,
+          "answer": 6,
+          "operation": "multiply"
+        },
+        {
+          "promptTts": "Drei Gruppen mit je drei Füßen. Wie viele Füße sind es?",
+          "iconAtomId": "fuss",
+          "left": 3,
+          "right": 3,
+          "answer": 9,
+          "operation": "multiply"
         }
       ]
     },
@@ -2820,18 +2826,20 @@
       "id": "l16-t10",
       "rounds": [
         {
-          "promptTts": "Ein Sack und drei Säcke. Wie viele Säcke?",
-          "iconAtomId": "sack",
-          "left": 1,
-          "right": 3,
-          "answer": 4
-        },
-        {
-          "promptTts": "Drei Säcke und ein Sack. Wie viele Säcke?",
+          "promptTts": "Drei Reihen mit je vier Säcken. Wie viele Säcke sind es?",
           "iconAtomId": "sack",
           "left": 3,
-          "right": 1,
-          "answer": 4
+          "right": 4,
+          "answer": 12,
+          "operation": "multiply"
+        },
+        {
+          "promptTts": "Vier Reihen mit je drei Säcken. Wie viele Säcke sind es?",
+          "iconAtomId": "sack",
+          "left": 4,
+          "right": 3,
+          "answer": 12,
+          "operation": "multiply"
         }
       ]
     },
@@ -2987,18 +2995,20 @@
       "id": "l17-t10",
       "rounds": [
         {
-          "promptTts": "Eine Spinne und eine Spinne. Wie viele Spinnen?",
+          "promptTts": "Fünfzehn Spinnen sitzen im Garten. Sechs krabbeln weg. Wie viele bleiben?",
           "iconAtomId": "spinne",
-          "left": 1,
-          "right": 1,
-          "answer": 2
+          "left": 15,
+          "right": 6,
+          "answer": 9,
+          "operation": "subtract"
         },
         {
-          "promptTts": "Zwei Spinnen und eine Spinne. Wie viele Spinnen?",
+          "promptTts": "Vierzehn Spinnen sitzen im Garten. Fünf krabbeln weg. Wie viele bleiben?",
           "iconAtomId": "spinne",
-          "left": 2,
-          "right": 1,
-          "answer": 3
+          "left": 14,
+          "right": 5,
+          "answer": 9,
+          "operation": "subtract"
         }
       ]
     },
@@ -3166,18 +3176,20 @@
       "id": "l18-t12",
       "rounds": [
         {
-          "promptTts": "Ein Taxi und zwei Taxis. Wie viele Taxis?",
+          "promptTts": "Drei Reihen mit je vier Taxis. Wie viele Taxis warten?",
           "iconAtomId": "taxi",
-          "left": 1,
-          "right": 2,
-          "answer": 3
+          "left": 3,
+          "right": 4,
+          "answer": 12,
+          "operation": "multiply"
         },
         {
-          "promptTts": "Zwei Taxis und ein Taxi. Wie viele Taxis?",
+          "promptTts": "Vier Reihen mit je vier Taxis. Wie viele Taxis warten?",
           "iconAtomId": "taxi",
-          "left": 2,
-          "right": 1,
-          "answer": 3
+          "left": 4,
+          "right": 4,
+          "answer": 16,
+          "operation": "multiply"
         }
       ]
     },

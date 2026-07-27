@@ -17,6 +17,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -106,6 +111,7 @@ fun SentenceOrderTrainer(
     val placed = remember(roundKey) { mutableStateMapOf<Int, String>() }
     var misses by remember(roundKey) { mutableIntStateOf(0) }
     var resolved by remember(roundKey) { mutableStateOf(false) }
+    var completed by remember(roundKey) { mutableStateOf(false) }
     val scoredIds = remember(roundKey) { atomIds.distinct() }
     val cards = SentenceOrderTray.cards(
         words,
@@ -122,6 +128,7 @@ fun SentenceOrderTrainer(
             placed[index] = card.display
             onSpeak(card.display)
             if (OrderedPlacement.isSolved(placed.toMap(), words)) {
+                completed = true
                 onResult(true, false, scoredIds)
             }
         } else {
@@ -144,7 +151,13 @@ fun SentenceOrderTrainer(
             if (!illustrationEmoji.isNullOrBlank()) {
                 Text(text = illustrationEmoji, fontSize = 84.sp)
             }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            AnimatedContent(
+                targetState = completed,
+                transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(140)) },
+                label = "sentence_complete",
+            ) { isComplete -> if (isComplete) {
+                Text(words.joinToString(" "), style = MaterialTheme.typography.headlineSmall, color = SoftSand, modifier = Modifier.testTag("completed_sentence"))
+            } else Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Canvas(
                     Modifier
                         .fillMaxWidth()
@@ -193,7 +206,7 @@ fun SentenceOrderTrainer(
                         }
                     }
                 }
-            }
+            }}
         },
         answers = {
             FlowRow(
@@ -201,7 +214,7 @@ fun SentenceOrderTrainer(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.testTag("sentence_tray"),
             ) {
-                if (!resolved) {
+                if (!resolved && !completed) {
                     cards.forEach { card ->
                         val key = cardKey(card)
                         DragCard(

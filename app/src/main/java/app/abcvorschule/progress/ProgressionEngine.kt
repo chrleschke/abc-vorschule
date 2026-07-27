@@ -20,7 +20,10 @@ object ProgressionEngine {
         }
 
     fun mathKey(operation: String, left: Int, right: Int, band: String?): String {
-        val bandPart = band ?: bandFor(left + right)
+        val answer = app.abcvorschule.ui.exercise.MathOperation.fromWireName(operation)
+            ?.answer(left, right)
+            ?: left + right
+        val bandPart = band ?: bandFor(answer)
         return "$operation|$bandPart|$left+$right"
     }
 

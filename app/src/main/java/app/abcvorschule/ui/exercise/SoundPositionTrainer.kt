@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -69,6 +72,7 @@ fun SoundPositionTrainer(
     round: SoundPositionRound,
     roundIndex: Int,
     atom: Atom,
+    targetPhoneme: String,
     ttsAvailable: Boolean,
     speaking: Boolean,
     onSpeakPrompt: () -> Unit,
@@ -109,6 +113,12 @@ fun SoundPositionTrainer(
                 speaking = speaking,
                 onSpeakPrompt = onSpeakPrompt,
             )
+            Text(
+                text = targetPhoneme,
+                fontSize = 42.sp,
+                color = SoftSand,
+                modifier = Modifier.testTag("sound_target"),
+            )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.Bottom,
@@ -128,6 +138,11 @@ fun SoundPositionTrainer(
                     )
                 }
             }
+            Text(
+                text = colouredWord(atom.display),
+                fontSize = 34.sp,
+                modifier = Modifier.testTag("sound_word"),
+            )
         },
         answers = {
             if (landedSlot == null && !revealed) {
@@ -164,6 +179,20 @@ fun SoundPositionTrainer(
     )
 }
 
+private fun wagonColor(index: Int): Color = when (index % 3) {
+    0 -> SoftCoral
+    1 -> SoftSand
+    else -> SoftSky
+}
+
+private fun colouredWord(word: String): AnnotatedString = buildAnnotatedString {
+    SoundWordSegments.split(word).forEachIndexed { index, segment ->
+        pushStyle(SpanStyle(color = wagonColor(index)))
+        append(segment)
+        pop()
+    }
+}
+
 @Composable
 private fun Wagon(
     slot: SoundSlot,
@@ -173,11 +202,7 @@ private fun Wagon(
     onTap: () -> Unit,
     registerWith: DragFieldState,
 ) {
-    val accent = when (slot) {
-        SoundSlot.start -> SoftCoral
-        SoundSlot.middle -> SoftSand
-        SoundSlot.end -> SoftSky
-    }
+    val accent = wagonColor(SoundPositionLogic.SlotOrder.indexOf(slot))
     val desc = stringResource(
         when (slot) {
             SoundSlot.start -> R.string.wagon_start

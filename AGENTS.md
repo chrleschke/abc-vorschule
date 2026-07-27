@@ -67,7 +67,7 @@ Kernpunkte (Kurzfassung):
 - **Session-Modell**: Pfad-Screen → freigeschaltete Knoten starten Trainer-Sequenz → Fortschritt persistent, Vor/Zurück immer möglich.
 - **Audio-First**: Kinder lesen nicht. Bilder, Icons, Layout, Sprache. Lesbare Labels nur wo nötig (Atom-Namen sind Aufgabe selbst).
 - **Drag & Drop**: Committet bei echtem Treffer, sonst Snap-back. Keine Strafen.
-- **Rechnen**: Icons (keine Wörter), 3 Optionen (visuell) oder System-Zahlentastatur; Erfolg vorgesprochen (kein sichtbarer Text), Miss gesprochenes Feedback.
+- **Rechnen**: Icons (keine Wörter), 3 Optionen (visuell) oder System-Zahlentastatur; Erfolg vorgesprochen (kein sichtbarer Text), Miss gesprochenes Feedback. Ab 11 Mengen nur als Symbol + Ziffer; Progression Plus → Wegnehmen → gleiche Gruppen.
 
 
 
@@ -89,4 +89,3 @@ Kernpunkte (Kurzfassung):
 - Relevante Unit-Tests grün
 - Doku/Rules bei Regeländerungen mitgezogen
 - Keine Secrets committen; keine Force-Pushes ohne explizite Nutzeranweisung
-

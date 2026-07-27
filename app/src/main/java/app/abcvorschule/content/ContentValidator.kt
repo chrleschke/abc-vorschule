@@ -177,15 +177,18 @@ object ContentValidator {
                     if (round.left < 0 || round.right < 0) {
                         issues += ValidationIssue("task $id has a negative operand")
                     }
-                    // Only addition exists in v1; an unknown operation must not slip
-                    // past the sum check unvalidated.
-                    if (round.operation != "add") {
+                    val operation = app.abcvorschule.ui.exercise.MathOperation.fromWireName(round.operation)
+                    if (operation == null) {
                         issues += ValidationIssue(
                             "task $id uses unsupported operation '${round.operation}'",
                         )
-                    } else if (round.left + round.right != round.answer) {
+                    } else if (operation == app.abcvorschule.ui.exercise.MathOperation.Subtract &&
+                        round.left < round.right
+                    ) {
+                        issues += ValidationIssue("task $id subtracts a larger amount than it starts with")
+                    } else if (operation.answer(round.left, round.right) != round.answer) {
                         issues += ValidationIssue(
-                            "task $id answer ${round.answer} does not match ${round.left}+${round.right}",
+                            "task $id answer ${round.answer} does not match ${round.operation} operands",
                         )
                     }
                 }

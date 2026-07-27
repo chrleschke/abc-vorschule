@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -187,7 +187,8 @@ private fun Floe(
 ) {
     Box(
         modifier = modifier
-            .size(AbcDimens.letterFrame)
+            .width(SyllableFrameSizing.widthDp(label).dp)
+            .height(AbcDimens.letterFrame)
             .background(
                 color = if (frozen) SoftMint.copy(alpha = 0.22f) else NightElevated,
                 shape = RoundedCornerShape(26.dp),

@@ -141,11 +141,20 @@ class ContentValidatorTest {
     }
 
     @Test
-    fun countAddOperationOtherThanAddIsRejected() {
+    fun unsupportedCountOperationIsRejected() {
         val spec = pack.tasks.values.filterIsInstance<CountAddSpec>().first()
-        val broken = spec.copy(rounds = spec.rounds.map { it.copy(operation = "sub") })
+        val broken = spec.copy(rounds = spec.rounds.map { it.copy(operation = "divide") })
         val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
         assertTrue(issues.any { it.contains("unsupported operation") })
+    }
+
+    @Test
+    fun subtractionAndMultiplicationAreValidatedWithTheirOwnArithmetic() {
+        val spec = pack.tasks.values.filterIsInstance<CountAddSpec>().first()
+        val subtraction = spec.copy(rounds = listOf(spec.rounds.first().copy(left = 8, right = 3, answer = 5, operation = "subtract")))
+        val multiplication = spec.copy(rounds = listOf(spec.rounds.first().copy(left = 3, right = 4, answer = 12, operation = "multiply")))
+        assertTrue(ContentValidator.validate(pack.copy(tasks = pack.tasks + (subtraction.id to subtraction))).none { it.message.contains("answer") })
+        assertTrue(ContentValidator.validate(pack.copy(tasks = pack.tasks + (multiplication.id to multiplication))).none { it.message.contains("answer") })
     }
 
     @Test

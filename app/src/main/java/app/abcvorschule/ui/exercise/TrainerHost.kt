@@ -8,6 +8,7 @@ import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SoundPositionRound
+import app.abcvorschule.content.SoundPositionSpec
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.TrainerRound
@@ -42,6 +43,7 @@ fun TrainerHost(
             round = round,
             roundIndex = roundIndex,
             atom = pack.atom(round.atomId),
+            targetPhoneme = (trainer.spec as? SoundPositionSpec)?.phonemeTts.orEmpty(),
             ttsAvailable = ttsAvailable,
             speaking = speaking,
             onSpeakPrompt = callbacks.onSpeakPrompt,

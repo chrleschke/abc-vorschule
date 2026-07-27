@@ -49,7 +49,7 @@
       "id": "l01-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große M nach und sammle alle Sterne.",
+          "promptTts": "Zeichne das große M nach und sammle alle Sterne.",
           "atomId": "letter-m",
           "glyph": "M",
           "rewardTts": "M wie Mond.",
@@ -62,7 +62,7 @@
       "id": "l01-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große A nach und sammle alle Sterne.",
+          "promptTts": "Zeichne das große A nach und sammle alle Sterne.",
           "atomId": "letter-a",
           "glyph": "A",
           "rewardTts": "A wie Ampel.",
@@ -206,7 +206,7 @@
       "id": "l02-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große I nach.",
+          "promptTts": "Zeichne das große I nach.",
           "atomId": "letter-i",
           "glyph": "I",
           "rewardTts": "I wie Igel.",
@@ -219,7 +219,7 @@
       "id": "l02-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große O nach.",
+          "promptTts": "Zeichne das große O nach.",
           "atomId": "letter-o",
           "glyph": "O",
           "rewardTts": "O wie Ohr.",
@@ -373,7 +373,7 @@
       "id": "l03-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große P nach.",
+          "promptTts": "Zeichne das große P nach.",
           "atomId": "letter-p",
           "glyph": "P",
           "rewardTts": "P wie Paket.",
@@ -386,7 +386,7 @@
       "id": "l03-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große T nach.",
+          "promptTts": "Zeichne das große T nach.",
           "atomId": "letter-t",
           "glyph": "T",
           "rewardTts": "T wie Tomate.",
@@ -553,7 +553,7 @@
       "id": "l04-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große L nach.",
+          "promptTts": "Zeichne das große L nach.",
           "atomId": "letter-l",
           "glyph": "L",
           "rewardTts": "L wie Lama.",
@@ -566,7 +566,7 @@
       "id": "l04-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große H nach.",
+          "promptTts": "Zeichne das große H nach.",
           "atomId": "letter-h",
           "glyph": "H",
           "rewardTts": "H wie Hut.",
@@ -728,7 +728,7 @@
       "id": "l05-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große F nach.",
+          "promptTts": "Zeichne das große F nach.",
           "atomId": "letter-f",
           "glyph": "F",
           "rewardTts": "F wie Fuchs.",
@@ -741,7 +741,7 @@
       "id": "l05-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große U nach.",
+          "promptTts": "Zeichne das große U nach.",
           "atomId": "letter-u",
           "glyph": "U",
           "rewardTts": "U wie Uhu.",
@@ -911,7 +911,7 @@
       "id": "l06-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große R nach.",
+          "promptTts": "Zeichne das große R nach.",
           "atomId": "letter-r",
           "glyph": "R",
           "rewardTts": "R wie Rose.",
@@ -924,7 +924,7 @@
       "id": "l06-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große N nach.",
+          "promptTts": "Zeichne das große N nach.",
           "atomId": "letter-n",
           "glyph": "N",
           "rewardTts": "N wie Nase.",
@@ -1086,7 +1086,7 @@
       "id": "l07-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große S nach.",
+          "promptTts": "Zeichne das große S nach.",
           "atomId": "letter-s",
           "glyph": "S",
           "rewardTts": "S wie Sonne.",
@@ -1099,7 +1099,7 @@
       "id": "l07-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große E nach.",
+          "promptTts": "Zeichne das große E nach.",
           "atomId": "letter-e",
           "glyph": "E",
           "rewardTts": "E wie Ente.",
@@ -1269,7 +1269,7 @@
       "id": "l08-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große D nach.",
+          "promptTts": "Zeichne das große D nach.",
           "atomId": "letter-d",
           "glyph": "D",
           "rewardTts": "D wie Dose.",
@@ -1282,7 +1282,7 @@
       "id": "l08-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große K nach.",
+          "promptTts": "Zeichne das große K nach.",
           "atomId": "letter-k",
           "glyph": "K",
           "rewardTts": "K wie Keks.",
@@ -1452,7 +1452,7 @@
       "id": "l09-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große Ei nach.",
+          "promptTts": "Zeichne das große Ei nach.",
           "atomId": "letter-ei",
           "glyph": "Ei",
           "rewardTts": "Ei wie Eis.",
@@ -1465,7 +1465,7 @@
       "id": "l09-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große W nach.",
+          "promptTts": "Zeichne das große W nach.",
           "atomId": "letter-w",
           "glyph": "W",
           "rewardTts": "W wie Weg.",
@@ -1573,18 +1573,18 @@
       "id": "l09-t10",
       "rounds": [
         {
-          "promptTts": "Ein Eis und zwei Eis. Wie viele?",
-          "iconAtomId": "eis",
-          "left": 1,
-          "right": 2,
-          "answer": 3
-        },
-        {
-          "promptTts": "Zwei Eis und ein Eis. Wie viele?",
+          "promptTts": "Zwei Eis und drei Eis. Wie viele Eis sind das zusammen?",
           "iconAtomId": "eis",
           "left": 2,
-          "right": 1,
-          "answer": 3
+          "right": 3,
+          "answer": 5
+        },
+        {
+          "promptTts": "Drei Eis und drei Eis. Wie viele Eis sind das zusammen?",
+          "iconAtomId": "eis",
+          "left": 3,
+          "right": 3,
+          "answer": 6
         }
       ]
     },
@@ -1631,7 +1631,7 @@
       "id": "l10-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große G nach.",
+          "promptTts": "Zeichne das große G nach.",
           "atomId": "letter-g",
           "glyph": "G",
           "rewardTts": "G wie Gabel.",
@@ -1644,7 +1644,7 @@
       "id": "l10-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große Ch nach.",
+          "promptTts": "Zeichne das große Ch nach.",
           "atomId": "letter-ch",
           "glyph": "Ch",
           "rewardTts": "Ch wie Dach.",
@@ -1748,18 +1748,18 @@
       "id": "l10-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Wege und zwei Wege. Wie viele?",
+          "promptTts": "Drei Wege treffen auf vier Wege. Wie viele Wege sind es?",
           "iconAtomId": "weg",
-          "left": 2,
-          "right": 2,
-          "answer": 4
+          "left": 3,
+          "right": 4,
+          "answer": 7
         },
         {
-          "promptTts": "Ein Weg und drei Wege. Wie viele?",
+          "promptTts": "Vier Wege treffen auf vier Wege. Wie viele Wege sind es?",
           "iconAtomId": "weg",
-          "left": 1,
-          "right": 3,
-          "answer": 4
+          "left": 4,
+          "right": 4,
+          "answer": 8
         }
       ]
     },
@@ -1806,7 +1806,7 @@
       "id": "l11-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große B nach.",
+          "promptTts": "Zeichne das große B nach.",
           "atomId": "letter-b",
           "glyph": "B",
           "rewardTts": "B wie Ball.",
@@ -1819,7 +1819,7 @@
       "id": "l11-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große Au nach.",
+          "promptTts": "Zeichne das große Au nach.",
           "atomId": "letter-au",
           "glyph": "Au",
           "rewardTts": "Au wie Auto.",
@@ -1927,18 +1927,18 @@
       "id": "l11-t10",
       "rounds": [
         {
-          "promptTts": "Ein Haus und drei Häuser. Wie viele Häuser?",
+          "promptTts": "In einer Straße stehen vier Häuser, daneben fünf Häuser. Wie viele Häuser sind es?",
           "iconAtomId": "haus",
-          "left": 1,
-          "right": 3,
-          "answer": 4
+          "left": 4,
+          "right": 5,
+          "answer": 9
         },
         {
-          "promptTts": "Drei Häuser und ein Haus. Wie viele Häuser?",
+          "promptTts": "Fünf Häuser stehen hier und fünf Häuser dort. Wie viele Häuser sind es?",
           "iconAtomId": "haus",
-          "left": 3,
-          "right": 1,
-          "answer": 4
+          "left": 5,
+          "right": 5,
+          "answer": 10
         }
       ]
     },
@@ -1985,7 +1985,7 @@
       "id": "l12-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große Ä nach.",
+          "promptTts": "Zeichne das große Ä nach.",
           "atomId": "letter-ae",
           "glyph": "Ä",
           "rewardTts": "Ä wie Ähre.",
@@ -1998,7 +1998,7 @@
       "id": "l12-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große Ö nach.",
+          "promptTts": "Zeichne das große Ö nach.",
           "atomId": "letter-oe",
           "glyph": "Ö",
           "rewardTts": "Ö wie Öfen.",
@@ -2011,7 +2011,7 @@
       "id": "l12-t5",
       "rounds": [
         {
-          "promptTts": "Spure das große Ü nach.",
+          "promptTts": "Zeichne das große Ü nach.",
           "atomId": "letter-ue",
           "glyph": "Ü",
           "rewardTts": "Ü wie Überraschung.",
@@ -2119,18 +2119,20 @@
       "id": "l12-t10",
       "rounds": [
         {
-          "promptTts": "Ein Ofen und zwei Öfen. Wie viele Öfen?",
+          "promptTts": "In der Backstube sind acht Öfen warm. Drei Öfen gehen aus. Wie viele Öfen bleiben warm?",
           "iconAtomId": "ofen",
-          "left": 1,
-          "right": 2,
-          "answer": 3
+          "left": 8,
+          "right": 3,
+          "answer": 5,
+          "operation": "subtract"
         },
         {
-          "promptTts": "Zwei Öfen und ein Ofen. Wie viele Öfen?",
+          "promptTts": "Neun Öfen sind warm. Vier Öfen gehen aus. Wie viele Öfen bleiben warm?",
           "iconAtomId": "ofen",
-          "left": 2,
-          "right": 1,
-          "answer": 3
+          "left": 9,
+          "right": 4,
+          "answer": 5,
+          "operation": "subtract"
         }
       ]
     },
@@ -2158,7 +2160,7 @@
       "id": "l13-t2",
       "rounds": [
         {
-          "promptTts": "Spure das große Sch nach.",
+          "promptTts": "Zeichne das große Sch nach.",
           "atomId": "letter-sch",
           "glyph": "Sch",
           "rewardTts": "Sch wie Schule.",
@@ -2302,18 +2304,19 @@
       "id": "l13-t10",
       "rounds": [
         {
-          "promptTts": "Ein Fisch und vier Fische. Wie viele Fische?",
+          "promptTts": "In einem großen Aquarium schwimmen sechs Fische. Fünf Fische schwimmen dazu. Wie viele Fische sind es?",
           "iconAtomId": "fisch",
-          "left": 1,
-          "right": 4,
-          "answer": 5
+          "left": 6,
+          "right": 5,
+          "answer": 11
         },
         {
-          "promptTts": "Vier Fische und ein Fisch. Wie viele Fische?",
+          "promptTts": "Zwölf Fische schwimmen im Aquarium. Vier Fische schwimmen weg. Wie viele bleiben?",
           "iconAtomId": "fisch",
-          "left": 4,
-          "right": 1,
-          "answer": 5
+          "left": 12,
+          "right": 4,
+          "answer": 8,
+          "operation": "subtract"
         }
       ]
     },
@@ -2360,7 +2363,7 @@
       "id": "l14-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große J nach.",
+          "promptTts": "Zeichne das große J nach.",
           "atomId": "letter-j",
           "glyph": "J",
           "rewardTts": "J wie Jacke.",
@@ -2373,7 +2376,7 @@
       "id": "l14-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große Z nach.",
+          "promptTts": "Zeichne das große Z nach.",
           "atomId": "letter-z",
           "glyph": "Z",
           "rewardTts": "Z wie Zebra.",
@@ -2386,7 +2389,7 @@
       "id": "l14-t5",
       "rounds": [
         {
-          "promptTts": "Spure das große Eu nach.",
+          "promptTts": "Zeichne das große Eu nach.",
           "atomId": "letter-eu",
           "glyph": "Eu",
           "rewardTts": "Eu wie Eule.",
@@ -2470,18 +2473,19 @@
       "id": "l14-t10",
       "rounds": [
         {
-          "promptTts": "Eine Eule und zwei Eulen. Wie viele Eulen?",
+          "promptTts": "Sieben Eulen sitzen im Baum. Sechs Eulen fliegen dazu. Wie viele Eulen sind es?",
           "iconAtomId": "eule",
-          "left": 1,
-          "right": 2,
-          "answer": 3
+          "left": 7,
+          "right": 6,
+          "answer": 13
         },
         {
-          "promptTts": "Zwei Eulen und eine Eule. Wie viele Eulen?",
+          "promptTts": "Vierzehn Eulen sitzen im Baum. Fünf Eulen fliegen weg. Wie viele bleiben?",
           "iconAtomId": "eule",
-          "left": 2,
-          "right": 1,
-          "answer": 3
+          "left": 14,
+          "right": 5,
+          "answer": 9,
+          "operation": "subtract"
         }
       ]
     },
@@ -2528,7 +2532,7 @@
       "id": "l15-t3",
       "rounds": [
         {
-          "promptTts": "Spure das scharfe ß nach.",
+          "promptTts": "Zeichne das scharfe ß nach.",
           "atomId": "letter-sz",
           "glyph": "ß",
           "rewardTts": "ß wie Fuß.",
@@ -2541,7 +2545,7 @@
       "id": "l15-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große V nach.",
+          "promptTts": "Zeichne das große V nach.",
           "atomId": "letter-v",
           "glyph": "V",
           "rewardTts": "V wie Vogel.",
@@ -2641,18 +2645,20 @@
       "id": "l15-t10",
       "rounds": [
         {
-          "promptTts": "Ein Fuß und ein Fuß. Wie viele Füße?",
-          "iconAtomId": "fuss",
-          "left": 1,
-          "right": 1,
-          "answer": 2
-        },
-        {
-          "promptTts": "Zwei Füße und ein Fuß. Wie viele Füße?",
+          "promptTts": "Zwei Gruppen mit je drei Füßen. Wie viele Füße sind es?",
           "iconAtomId": "fuss",
           "left": 2,
-          "right": 1,
-          "answer": 3
+          "right": 3,
+          "answer": 6,
+          "operation": "multiply"
+        },
+        {
+          "promptTts": "Drei Gruppen mit je drei Füßen. Wie viele Füße sind es?",
+          "iconAtomId": "fuss",
+          "left": 3,
+          "right": 3,
+          "answer": 9,
+          "operation": "multiply"
         }
       ]
     },
@@ -2699,7 +2705,7 @@
       "id": "l16-t3",
       "rounds": [
         {
-          "promptTts": "Spure das kleine ck nach.",
+          "promptTts": "Zeichne das kleine ck nach.",
           "atomId": "letter-ck",
           "glyph": "ck",
           "rewardTts": "ck wie Sack.",
@@ -2712,7 +2718,7 @@
       "id": "l16-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große Pf nach.",
+          "promptTts": "Zeichne das große Pf nach.",
           "atomId": "letter-pf",
           "glyph": "Pf",
           "rewardTts": "Pf wie Pferd.",
@@ -2820,18 +2826,20 @@
       "id": "l16-t10",
       "rounds": [
         {
-          "promptTts": "Ein Sack und drei Säcke. Wie viele Säcke?",
-          "iconAtomId": "sack",
-          "left": 1,
-          "right": 3,
-          "answer": 4
-        },
-        {
-          "promptTts": "Drei Säcke und ein Sack. Wie viele Säcke?",
+          "promptTts": "Drei Reihen mit je vier Säcken. Wie viele Säcke sind es?",
           "iconAtomId": "sack",
           "left": 3,
-          "right": 1,
-          "answer": 4
+          "right": 4,
+          "answer": 12,
+          "operation": "multiply"
+        },
+        {
+          "promptTts": "Vier Reihen mit je drei Säcken. Wie viele Säcke sind es?",
+          "iconAtomId": "sack",
+          "left": 4,
+          "right": 3,
+          "answer": 12,
+          "operation": "multiply"
         }
       ]
     },
@@ -2878,7 +2886,7 @@
       "id": "l17-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große St nach.",
+          "promptTts": "Zeichne das große St nach.",
           "atomId": "letter-st",
           "glyph": "St",
           "rewardTts": "St wie Stern.",
@@ -2891,7 +2899,7 @@
       "id": "l17-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große Sp nach.",
+          "promptTts": "Zeichne das große Sp nach.",
           "atomId": "letter-sp",
           "glyph": "Sp",
           "rewardTts": "Sp wie Spinne.",
@@ -2987,18 +2995,20 @@
       "id": "l17-t10",
       "rounds": [
         {
-          "promptTts": "Eine Spinne und eine Spinne. Wie viele Spinnen?",
+          "promptTts": "Fünfzehn Spinnen sitzen im Garten. Sechs krabbeln weg. Wie viele bleiben?",
           "iconAtomId": "spinne",
-          "left": 1,
-          "right": 1,
-          "answer": 2
+          "left": 15,
+          "right": 6,
+          "answer": 9,
+          "operation": "subtract"
         },
         {
-          "promptTts": "Zwei Spinnen und eine Spinne. Wie viele Spinnen?",
+          "promptTts": "Vierzehn Spinnen sitzen im Garten. Fünf krabbeln weg. Wie viele bleiben?",
           "iconAtomId": "spinne",
-          "left": 2,
-          "right": 1,
-          "answer": 3
+          "left": 14,
+          "right": 5,
+          "answer": 9,
+          "operation": "subtract"
         }
       ]
     },
@@ -3045,7 +3055,7 @@
       "id": "l18-t4",
       "rounds": [
         {
-          "promptTts": "Spure das große Y nach.",
+          "promptTts": "Zeichne das große Y nach.",
           "atomId": "letter-y",
           "glyph": "Y",
           "rewardTts": "Y wie Yacht.",
@@ -3058,7 +3068,7 @@
       "id": "l18-t6",
       "rounds": [
         {
-          "promptTts": "Spure das große Qu nach.",
+          "promptTts": "Zeichne das große Qu nach.",
           "atomId": "letter-qu",
           "glyph": "Qu",
           "rewardTts": "Qu wie Qualle.",
@@ -3166,18 +3176,20 @@
       "id": "l18-t12",
       "rounds": [
         {
-          "promptTts": "Ein Taxi und zwei Taxis. Wie viele Taxis?",
+          "promptTts": "Drei Reihen mit je vier Taxis. Wie viele Taxis warten?",
           "iconAtomId": "taxi",
-          "left": 1,
-          "right": 2,
-          "answer": 3
+          "left": 3,
+          "right": 4,
+          "answer": 12,
+          "operation": "multiply"
         },
         {
-          "promptTts": "Zwei Taxis und ein Taxi. Wie viele Taxis?",
+          "promptTts": "Vier Reihen mit je vier Taxis. Wie viele Taxis warten?",
           "iconAtomId": "taxi",
-          "left": 2,
-          "right": 1,
-          "answer": 3
+          "left": 4,
+          "right": 4,
+          "answer": 16,
+          "operation": "multiply"
         }
       ]
     },
@@ -3186,7 +3198,7 @@
       "id": "l18-t3",
       "rounds": [
         {
-          "promptTts": "Spure das große C nach.",
+          "promptTts": "Zeichne das große C nach.",
           "atomId": "letter-c",
           "glyph": "C",
           "rewardTts": "C wie Clown.",
@@ -3199,7 +3211,7 @@
       "id": "l18-t5",
       "rounds": [
         {
-          "promptTts": "Spure das große X nach.",
+          "promptTts": "Zeichne das große X nach.",
           "atomId": "letter-x",
           "glyph": "X",
           "rewardTts": "X wie Xylophon.",

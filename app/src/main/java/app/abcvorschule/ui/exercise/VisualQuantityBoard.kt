@@ -30,6 +30,7 @@ fun VisualQuantityBoard(
     emoji: String,
     left: Int,
     right: Int,
+    operation: MathOperation,
     choices: List<Int>,
     onChoose: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -55,13 +56,7 @@ fun VisualQuantityBoard(
                 horizontalArrangement = Arrangement.spacedBy(20.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                QuantityCluster(emoji = emoji, count = left, emojiSizeSp = 44)
-                Text(
-                    text = "+",
-                    style = MaterialTheme.typography.displayMedium,
-                    color = SoftSand,
-                )
-                QuantityCluster(emoji = emoji, count = right, emojiSizeSp = 44)
+                MathQuantityPrompt(emoji, left, right, operation, emojiSizeSp = 44)
             }
         },
         answers = {
@@ -112,6 +107,17 @@ fun QuantityCluster(
     showNumber: Boolean = true,
     numberColor: Color = SoftSand,
 ) {
+    if (QuantityRepresentation.isSymbolic(count)) {
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(text = emoji, fontSize = emojiSizeSp.sp)
+            if (showNumber) Text(text = count.toString(), style = MaterialTheme.typography.headlineMedium, color = numberColor)
+        }
+        return
+    }
     val clusters = QuantityGrouping.clusters(count)
     Column(
         modifier = modifier,
@@ -131,6 +137,33 @@ fun QuantityCluster(
                 style = MaterialTheme.typography.headlineMedium,
                 color = numberColor,
             )
+        }
+    }
+}
+
+/** One visual equation. Multiplication deliberately shows equal groups, not a giant total. */
+@Composable
+fun MathQuantityPrompt(
+    emoji: String,
+    left: Int,
+    right: Int,
+    operation: MathOperation,
+    emojiSizeSp: Int,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (operation == MathOperation.Multiply) {
+            QuantityCluster(emoji = emoji, count = right, emojiSizeSp = emojiSizeSp)
+        } else {
+            QuantityCluster(emoji = emoji, count = left, emojiSizeSp = emojiSizeSp)
+        }
+        Text(operation.symbol, style = MaterialTheme.typography.displayMedium, color = SoftSand)
+        if (operation == MathOperation.Multiply) {
+            Text(left.toString(), style = MaterialTheme.typography.headlineMedium, color = SoftSand)
+        } else {
+            QuantityCluster(emoji = emoji, count = right, emojiSizeSp = emojiSizeSp)
         }
     }
 }

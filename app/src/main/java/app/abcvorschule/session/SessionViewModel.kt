@@ -246,7 +246,10 @@ class SessionViewModel(
         val round = state.currentRound ?: return ""
         if (ttsAvailable) return round.promptTts
         // No German voice: Rechnen falls back to a numeral prompt, others keep the text.
-        return if (round is CountAddRound) "${round.left} + ${round.right} = ?" else round.promptTts
+        return if (round is CountAddRound) {
+            val symbol = app.abcvorschule.ui.exercise.MathOperation.fromWireName(round.operation)?.symbol ?: "+"
+            "${round.left} $symbol ${round.right} = ?"
+        } else round.promptTts
     }
 
     /**
