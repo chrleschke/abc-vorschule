@@ -16,7 +16,7 @@ data class Lesson(
     val id: String,
     /** 1-based position in the Fibel order; also the path node order. */
     val index: Int,
-    /** Curriculum phase 1..5, used for path grouping only. */
+    /** Curriculum phase 1..7, used for path grouping (units). */
     val phase: Int,
     /** Parent-facing label, e.g. "M & A". Never read aloud to the child as an instruction. */
     val title: String,

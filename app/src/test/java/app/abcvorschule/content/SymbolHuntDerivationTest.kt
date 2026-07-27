@@ -73,11 +73,11 @@ class SymbolHuntDerivationTest {
         // The `if (hunt != null)` checks only assert *inside* a conditional — if a
         // regression made buildRound return null for every single round in the
         // whole pack, this test would still report green with nothing actually
-        // checked. The counts below, computed directly against the real pack in
-        // app/src/test/resources/content/, pin that buildRound actually succeeds
-        // for (nearly) every round it's asked about: all 39 letter_trace rounds
-        // build a hunt, and 22 of the 23 syllable_merge rounds do (l01's "ma" is
-        // the one exception — its own pool, excluding itself, is empty on lesson 1).
+        // checked. The counts below, computed directly against the real pack:
+        // - Letter traces: l01-l18 (36 single + 3 for l18) + l19-l26 review (16) = 55 total, all build hunts.
+        // - Syllable merges: l01-l11 (11) + l13-l24 (12) + l25-l26 review (4) = 27 total.
+        //   39 total syllable_merge tasks across all lessons (some lessons have 2).
+        //   38 build hunts (l01's "ma" is degenerate — its pool, excluding itself, is empty).
         var letterRoundsChecked = 0
         var letterHuntsBuilt = 0
         var syllableRoundsChecked = 0
@@ -101,9 +101,9 @@ class SymbolHuntDerivationTest {
                 }
             }
         }
-        assertEquals(39, letterRoundsChecked)
-        assertEquals(39, letterHuntsBuilt)
-        assertEquals(23, syllableRoundsChecked)
-        assertEquals(22, syllableHuntsBuilt)
+        assertEquals(55, letterRoundsChecked)
+        assertEquals(55, letterHuntsBuilt)
+        assertEquals(39, syllableRoundsChecked)
+        assertEquals(37, syllableHuntsBuilt)
     }
 }

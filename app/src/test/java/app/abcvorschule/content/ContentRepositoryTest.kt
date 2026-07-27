@@ -9,9 +9,9 @@ class ContentRepositoryTest {
     private val pack = ContentRepository.fromClasspath().load()
 
     @Test
-    fun packLoadsEighteenAuthoredLessons() {
-        assertEquals(18, pack.lessons.size)
-        assertEquals(18, pack.authoredLessons.size)
+    fun packLoadsTwentySixAuthoredLessons() {
+        assertEquals(26, pack.lessons.size)
+        assertEquals(26, pack.authoredLessons.size)
     }
 
     @Test

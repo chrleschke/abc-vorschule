@@ -15,15 +15,6 @@
       "tts": "Oma."
     },
     {
-      "id": "s-papa-am-tor",
-      "atomIds": [
-        "papa",
-        "am",
-        "tor"
-      ],
-      "tts": "Papa am Tor."
-    },
-    {
       "id": "s-hallo-lama",
       "atomIds": [
         "hallo",
@@ -41,40 +32,23 @@
       "tts": "Tom ruft Opa."
     },
     {
-      "id": "s-oma-hat-lama",
+      "id": "s-oma-hat-hut",
       "atomIds": [
         "oma",
         "hat",
-        "lama"
+        "einen",
+        "hut"
       ],
-      "tts": "Oma hat Lama."
+      "tts": "Oma hat einen Hut."
     },
     {
-      "id": "s-tom-hol-papa",
-      "atomIds": [
-        "tom",
-        "hol",
-        "papa"
-      ],
-      "tts": "Tom hol Papa."
-    },
-    {
-      "id": "s-lama-im-sand",
-      "atomIds": [
-        "lama",
-        "im",
-        "sand"
-      ],
-      "tts": "Lama im Sand."
-    },
-    {
-      "id": "s-lama-ist-rot",
+      "id": "s-lama-ist-da",
       "atomIds": [
         "lama",
         "ist",
-        "rot"
+        "da"
       ],
-      "tts": "Lama ist rot."
+      "tts": "Lama ist da."
     },
     {
       "id": "s-oma-ist-da",
@@ -84,26 +58,6 @@
         "da"
       ],
       "tts": "Oma ist da."
-    },
-    {
-      "id": "s-das-lama-ist-rot",
-      "atomIds": [
-        "das",
-        "lama",
-        "ist",
-        "rot"
-      ],
-      "tts": "Das Lama ist rot."
-    },
-    {
-      "id": "s-mein-eis",
-      "atomIds": [
-        "mein",
-        "eis",
-        "ist",
-        "rot"
-      ],
-      "tts": "Mein Eis ist rot."
     },
     {
       "id": "s-das-ist-mein-papa",
@@ -136,16 +90,6 @@
       "tts": "Mama ist im Haus."
     },
     {
-      "id": "s-mama-bei-oma",
-      "atomIds": [
-        "mama",
-        "ist",
-        "bei",
-        "oma"
-      ],
-      "tts": "Mama ist bei Oma."
-    },
-    {
       "id": "s-viele-haeuser",
       "atomIds": [
         "hier",
@@ -171,15 +115,6 @@
         "fliegt"
       ],
       "tts": "Die Eule fliegt."
-    },
-    {
-      "id": "s-vogel-singt",
-      "atomIds": [
-        "der",
-        "vogel",
-        "singt"
-      ],
-      "tts": "Der Vogel singt."
     },
     {
       "id": "s-fuss-ist-gross",
@@ -210,14 +145,105 @@
       "tts": "Die Spinne spielt."
     },
     {
-      "id": "s-taxi-ist-rot",
+      "id": "s-taxi-ist-gelb",
       "atomIds": [
         "das",
         "taxi",
         "ist",
+        "gelb"
+      ],
+      "tts": "Das Taxi ist gelb."
+    },
+    {
+      "id": "s-das-ist-mein-ei",
+      "atomIds": [
+        "das",
+        "ist",
+        "mein",
+        "ei"
+      ],
+      "tts": "Das ist mein Ei."
+    },
+    {
+      "id": "s-hase-im-sand",
+      "atomIds": [
+        "der",
+        "hase",
+        "ist",
+        "im",
+        "sand"
+      ],
+      "tts": "Der Hase ist im Sand."
+    },
+    {
+      "id": "s-das-auto-ist-gelb",
+      "atomIds": [
+        "das",
+        "auto",
+        "ist",
+        "gelb"
+      ],
+      "tts": "Das Auto ist gelb."
+    },
+    {
+      "id": "s-der-loewe-ist-da",
+      "atomIds": [
+        "der",
+        "loewe",
+        "ist",
+        "da"
+      ],
+      "tts": "Der Löwe ist da."
+    },
+    {
+      "id": "s-das-ist-mein-brot",
+      "atomIds": [
+        "das",
+        "ist",
+        "mein",
+        "brot"
+      ],
+      "tts": "Das ist mein Brot."
+    },
+    {
+      "id": "s-der-kreis-ist-blau",
+      "atomIds": [
+        "der",
+        "kreis",
+        "ist",
+        "blau"
+      ],
+      "tts": "Der Kreis ist blau."
+    },
+    {
+      "id": "s-das-quadrat-ist-gelb",
+      "atomIds": [
+        "das",
+        "quadrat",
+        "ist",
+        "gelb"
+      ],
+      "tts": "Das Quadrat ist gelb."
+    },
+    {
+      "id": "s-das-dreieck-ist-rot",
+      "atomIds": [
+        "das",
+        "dreieck",
+        "ist",
         "rot"
       ],
-      "tts": "Das Taxi ist rot."
+      "tts": "Das Dreieck ist rot."
+    },
+    {
+      "id": "s-das-herz-ist-rot",
+      "atomIds": [
+        "das",
+        "herz",
+        "ist",
+        "rot"
+      ],
+      "tts": "Das Herz ist rot."
     }
   ]
 }

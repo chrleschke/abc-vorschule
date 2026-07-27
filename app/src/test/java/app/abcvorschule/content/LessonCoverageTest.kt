@@ -8,9 +8,9 @@ class LessonCoverageTest {
     private val pack = ContentRepository.fromClasspath().load()
 
     @Test
-    fun allEighteenLessonsAreAuthoredInPhaseOrder() {
+    fun allTwentySixLessonsAreAuthoredInPhaseOrder() {
         assertEquals(
-            (1..18).map { "l%02d".format(it) },
+            (1..26).map { "l%02d".format(it) },
             pack.authoredLessons.map { it.id },
         )
     }

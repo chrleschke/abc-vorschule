@@ -436,6 +436,198 @@
         "l18-t11",
         "l18-t12"
       ]
+    },
+    {
+      "id": "l19",
+      "index": 19,
+      "phase": 6,
+      "title": "M & A Wiederholung",
+      "nodeLabel": "M a+",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-m",
+        "letter-a"
+      ],
+      "taskIds": [
+        "l19-t1",
+        "l19-t2",
+        "l19-t3",
+        "l19-t4",
+        "l19-t5",
+        "l19-t6",
+        "l19-t7",
+        "l19-t8",
+        "l19-t9",
+        "l19-t10"
+      ]
+    },
+    {
+      "id": "l20",
+      "index": 20,
+      "phase": 6,
+      "title": "I & O Wiederholung",
+      "nodeLabel": "I o+",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-i",
+        "letter-o"
+      ],
+      "taskIds": [
+        "l20-t1",
+        "l20-t2",
+        "l20-t3",
+        "l20-t4",
+        "l20-t5",
+        "l20-t6",
+        "l20-t7",
+        "l20-t8",
+        "l20-t9",
+        "l20-t10"
+      ]
+    },
+    {
+      "id": "l21",
+      "index": 21,
+      "phase": 6,
+      "title": "P & T Wiederholung",
+      "nodeLabel": "P t+",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-p",
+        "letter-t"
+      ],
+      "taskIds": [
+        "l21-t1",
+        "l21-t2",
+        "l21-t3",
+        "l21-t4",
+        "l21-t5",
+        "l21-t6",
+        "l21-t7",
+        "l21-t8",
+        "l21-t9",
+        "l21-t10"
+      ]
+    },
+    {
+      "id": "l22",
+      "index": 22,
+      "phase": 6,
+      "title": "Ei & Au Wiederholung",
+      "nodeLabel": "Ei au+",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-ei",
+        "letter-au"
+      ],
+      "taskIds": [
+        "l22-t1",
+        "l22-t2",
+        "l22-t3",
+        "l22-t4",
+        "l22-t5",
+        "l22-t6",
+        "l22-t7",
+        "l22-t8",
+        "l22-t9",
+        "l22-t10"
+      ]
+    },
+    {
+      "id": "l23",
+      "index": 23,
+      "phase": 6,
+      "title": "Sch & Ch Wiederholung",
+      "nodeLabel": "Sch ch+",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-sch",
+        "letter-ch"
+      ],
+      "taskIds": [
+        "l23-t1",
+        "l23-t2",
+        "l23-t3",
+        "l23-t4",
+        "l23-t5",
+        "l23-t6",
+        "l23-t7",
+        "l23-t8",
+        "l23-t9",
+        "l23-t10"
+      ]
+    },
+    {
+      "id": "l24",
+      "index": 24,
+      "phase": 6,
+      "title": "St & Sp Wiederholung",
+      "nodeLabel": "St sp+",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-st",
+        "letter-sp"
+      ],
+      "taskIds": [
+        "l24-t1",
+        "l24-t2",
+        "l24-t3",
+        "l24-t4",
+        "l24-t5",
+        "l24-t6",
+        "l24-t7",
+        "l24-t8",
+        "l24-t9",
+        "l24-t10"
+      ]
+    },
+    {
+      "id": "l25",
+      "index": 25,
+      "phase": 7,
+      "title": "Ö & Ü Wiederholung",
+      "nodeLabel": "Ö ü+",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-oe",
+        "letter-ue"
+      ],
+      "taskIds": [
+        "l25-t1",
+        "l25-t2",
+        "l25-t3",
+        "l25-t4",
+        "l25-t5",
+        "l25-t6",
+        "l25-t7",
+        "l25-t8",
+        "l25-t9",
+        "l25-t10"
+      ]
+    },
+    {
+      "id": "l26",
+      "index": 26,
+      "phase": 7,
+      "title": "Qu & X Wiederholung",
+      "nodeLabel": "Qu x+",
+      "status": "authored",
+      "focusAtomIds": [
+        "letter-qu",
+        "letter-x"
+      ],
+      "taskIds": [
+        "l26-t1",
+        "l26-t2",
+        "l26-t3",
+        "l26-t4",
+        "l26-t5",
+        "l26-t6",
+        "l26-t7",
+        "l26-t8",
+        "l26-t9",
+        "l26-t10"
+      ]
     }
   ]
 }

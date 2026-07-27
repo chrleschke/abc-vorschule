@@ -8,7 +8,28 @@
       "kind": "letter",
       "strokes": [
         {
-          "points": [[0.12, 0.92], [0.12, 0.08], [0.5, 0.62], [0.88, 0.08], [0.88, 0.92]]
+          "points": [
+            [
+              0.12,
+              0.92
+            ],
+            [
+              0.12,
+              0.08
+            ],
+            [
+              0.5,
+              0.62
+            ],
+            [
+              0.88,
+              0.08
+            ],
+            [
+              0.88,
+              0.92
+            ]
+          ]
         }
       ]
     },
@@ -470,7 +491,24 @@
       "kind": "letter",
       "strokes": [
         {
-          "points": [[0.16, 0.92], [0.16, 0.08], [0.84, 0.92], [0.84, 0.08]]
+          "points": [
+            [
+              0.16,
+              0.92
+            ],
+            [
+              0.16,
+              0.08
+            ],
+            [
+              0.84,
+              0.92
+            ],
+            [
+              0.84,
+              0.08
+            ]
+          ]
         }
       ]
     },
@@ -2586,13 +2624,6 @@
       "kind": "word"
     },
     {
-      "id": "ma",
-      "lemma": "ma",
-      "display": "ma",
-      "emoji": "",
-      "kind": "syllable"
-    },
-    {
       "id": "oma",
       "lemma": "Oma",
       "display": "Oma",
@@ -2915,7 +2946,7 @@
       "id": "ofen",
       "lemma": "Ofen",
       "display": "Ofen",
-      "emoji": "🔥",
+      "emoji": "",
       "kind": "word",
       "pluralDisplay": "Öfen",
       "pluralHighlight": "Umlaut"
@@ -3115,7 +3146,7 @@
       "id": "markt",
       "lemma": "Markt",
       "display": "Markt",
-      "emoji": "🎪",
+      "emoji": "",
       "kind": "word",
       "pluralDisplay": "Märkte"
     },
@@ -3145,7 +3176,7 @@
       "id": "salami",
       "lemma": "Salami",
       "display": "Salami",
-      "emoji": "🍕",
+      "emoji": "",
       "kind": "word"
     },
     {
@@ -3351,7 +3382,7 @@
       "id": "quark",
       "lemma": "Quark",
       "display": "Quark",
-      "emoji": "🥛",
+      "emoji": "",
       "kind": "word"
     },
     {
@@ -3792,6 +3823,302 @@
       "emoji": "🐝",
       "kind": "other",
       "pluralDisplay": "Wespen"
+    },
+    {
+      "id": "ei",
+      "lemma": "Ei",
+      "display": "Ei",
+      "emoji": "🥚",
+      "kind": "word",
+      "pluralDisplay": "Eier",
+      "pluralHighlight": "er"
+    },
+    {
+      "id": "eier",
+      "lemma": "Eier",
+      "display": "Eier",
+      "emoji": "🥚🥚",
+      "kind": "word"
+    },
+    {
+      "id": "blatt",
+      "lemma": "Blatt",
+      "display": "Blatt",
+      "emoji": "🍃",
+      "kind": "word",
+      "pluralDisplay": "Blätter",
+      "pluralHighlight": "Umlaut"
+    },
+    {
+      "id": "pflanze",
+      "lemma": "Pflanze",
+      "display": "Pflanze",
+      "emoji": "🌱",
+      "kind": "word",
+      "pluralDisplay": "Pflanzen",
+      "pluralHighlight": "n"
+    },
+    {
+      "id": "gelb",
+      "lemma": "gelb",
+      "display": "gelb",
+      "emoji": "🟨",
+      "kind": "word"
+    },
+    {
+      "id": "kuh",
+      "lemma": "Kuh",
+      "display": "Kuh",
+      "emoji": "🐄",
+      "kind": "word",
+      "pluralDisplay": "Kühe",
+      "pluralHighlight": "Umlaut"
+    },
+    {
+      "id": "hahn",
+      "lemma": "Hahn",
+      "display": "Hahn",
+      "emoji": "🐓",
+      "kind": "word",
+      "pluralDisplay": "Hähne",
+      "pluralHighlight": "Umlaut"
+    },
+    {
+      "id": "pilz",
+      "lemma": "Pilz",
+      "display": "Pilz",
+      "emoji": "🍄",
+      "kind": "word",
+      "pluralDisplay": "Pilze",
+      "pluralHighlight": "e"
+    },
+    {
+      "id": "bus",
+      "lemma": "Bus",
+      "display": "Bus",
+      "emoji": "🚌",
+      "kind": "word",
+      "pluralDisplay": "Busse",
+      "pluralHighlight": "se"
+    },
+    {
+      "id": "affe",
+      "lemma": "Affe",
+      "display": "Affe",
+      "emoji": "🐵",
+      "kind": "word",
+      "pluralDisplay": "Affen",
+      "pluralHighlight": "n"
+    },
+    {
+      "id": "brot",
+      "lemma": "Brot",
+      "display": "Brot",
+      "emoji": "🍞",
+      "kind": "word",
+      "pluralDisplay": "Brote",
+      "pluralHighlight": "e"
+    },
+    {
+      "id": "tisch",
+      "lemma": "Tisch",
+      "display": "Tisch",
+      "emoji": "",
+      "kind": "word",
+      "pluralDisplay": "Tische",
+      "pluralHighlight": "e"
+    },
+    {
+      "id": "bahn",
+      "lemma": "Bahn",
+      "display": "Bahn",
+      "emoji": "🚄",
+      "kind": "word",
+      "pluralDisplay": "Bahnen",
+      "pluralHighlight": "en"
+    },
+    {
+      "id": "ha",
+      "lemma": "ha",
+      "display": "ha",
+      "emoji": "",
+      "kind": "syllable"
+    },
+    {
+      "id": "ta",
+      "lemma": "ta",
+      "display": "ta",
+      "emoji": "",
+      "kind": "syllable"
+    },
+    {
+      "id": "zu",
+      "lemma": "zu",
+      "display": "zu",
+      "emoji": "",
+      "kind": "syllable"
+    },
+    {
+      "id": "loe",
+      "lemma": "lö",
+      "display": "lö",
+      "emoji": "",
+      "kind": "syllable"
+    },
+    {
+      "id": "fi",
+      "lemma": "fi",
+      "display": "fi",
+      "emoji": "",
+      "kind": "syllable"
+    },
+    {
+      "id": "br",
+      "lemma": "br",
+      "display": "br",
+      "emoji": "",
+      "kind": "syllable"
+    },
+    {
+      "id": "ke",
+      "lemma": "ke",
+      "display": "ke",
+      "emoji": "",
+      "kind": "syllable"
+    },
+    {
+      "id": "gu",
+      "lemma": "gu",
+      "display": "gu",
+      "emoji": "",
+      "kind": "syllable"
+    },
+    {
+      "id": "spielen",
+      "lemma": "spielen",
+      "display": "spielen",
+      "emoji": "",
+      "kind": "word"
+    },
+    {
+      "id": "lachen",
+      "lemma": "lachen",
+      "display": "lachen",
+      "emoji": "😄",
+      "kind": "word"
+    },
+    {
+      "id": "und",
+      "lemma": "und",
+      "display": "und",
+      "emoji": "",
+      "kind": "word"
+    },
+    {
+      "id": "gut",
+      "lemma": "gut",
+      "display": "gut",
+      "emoji": "👍",
+      "kind": "word"
+    },
+    {
+      "id": "blau",
+      "lemma": "blau",
+      "display": "blau",
+      "emoji": "🟦",
+      "kind": "word"
+    },
+    {
+      "id": "gruen",
+      "lemma": "grün",
+      "display": "grün",
+      "emoji": "🟩",
+      "kind": "word"
+    },
+    {
+      "id": "orange",
+      "lemma": "orange",
+      "display": "orange",
+      "emoji": "🟧",
+      "kind": "word"
+    },
+    {
+      "id": "lila",
+      "lemma": "lila",
+      "display": "lila",
+      "emoji": "🟪",
+      "kind": "word"
+    },
+    {
+      "id": "braun",
+      "lemma": "braun",
+      "display": "braun",
+      "emoji": "🟫",
+      "kind": "word"
+    },
+    {
+      "id": "kreis",
+      "lemma": "Kreis",
+      "display": "Kreis",
+      "emoji": "🔵",
+      "kind": "word",
+      "pluralDisplay": "Kreise",
+      "pluralHighlight": "e"
+    },
+    {
+      "id": "quadrat",
+      "lemma": "Quadrat",
+      "display": "Quadrat",
+      "emoji": "🟨",
+      "kind": "word",
+      "pluralDisplay": "Quadrate",
+      "pluralHighlight": "e"
+    },
+    {
+      "id": "dreieck",
+      "lemma": "Dreieck",
+      "display": "Dreieck",
+      "emoji": "🔺",
+      "kind": "word",
+      "pluralDisplay": "Dreiecke",
+      "pluralHighlight": "e"
+    },
+    {
+      "id": "herz",
+      "lemma": "Herz",
+      "display": "Herz",
+      "emoji": "❤️",
+      "kind": "word",
+      "pluralDisplay": "Herzen",
+      "pluralHighlight": "en"
+    },
+    {
+      "id": "einen",
+      "lemma": "einen",
+      "display": "einen",
+      "emoji": "",
+      "kind": "word"
+    },
+    {
+      "id": "rue",
+      "lemma": "rü",
+      "display": "rü",
+      "emoji": "",
+      "kind": "syllable"
+    },
+    {
+      "id": "st",
+      "lemma": "st",
+      "display": "st",
+      "emoji": "",
+      "kind": "syllable"
+    },
+    {
+      "id": "sp",
+      "lemma": "sp",
+      "display": "sp",
+      "emoji": "",
+      "kind": "syllable"
     }
   ]
 }

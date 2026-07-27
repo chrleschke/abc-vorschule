@@ -30,7 +30,7 @@ class LessonGatingTest {
 
     @Test
     fun plannedLessonsReportPlannedRegardlessOfProgress() {
-        // The shipped pack has zero planned lessons at the moment (all 18 are
+        // The shipped pack has zero planned lessons at the moment (all 26 are
         // authored) — this business rule still needs coverage independent of the
         // current curriculum state, so it builds its own synthetic planned lesson
         // rather than relying on one existing in the real pack.
