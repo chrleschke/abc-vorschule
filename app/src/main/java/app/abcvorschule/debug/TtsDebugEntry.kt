@@ -1,0 +1,91 @@
+package app.abcvorschule.debug
+
+import app.abcvorschule.content.ContentPack
+import app.abcvorschule.content.LetterTraceRound
+import app.abcvorschule.content.SoundPositionRound
+import app.abcvorschule.content.SoundPositionSpec
+import app.abcvorschule.content.SyllableMergeRound
+import app.abcvorschule.content.rounds
+
+enum class TtsDebugGroup { Atom, Sentence, Task }
+
+/** One content-authored string the app can pass to `SpeechController.speak`. */
+data class TtsDebugEntry(
+    val id: String,
+    val group: TtsDebugGroup,
+    val label: String,
+    val originalText: String,
+    val sourceFile: String,
+)
+
+fun ContentPack.ttsDebugEntries(): List<TtsDebugEntry> {
+    val entries = mutableListOf<TtsDebugEntry>()
+
+    atoms.values.sortedBy { it.id }.forEach { atom ->
+        entries += TtsDebugEntry(
+            id = "atom:${atom.id}:lemma",
+            group = TtsDebugGroup.Atom,
+            label = "${atom.display} (${atom.kind})",
+            originalText = atom.lemma,
+            sourceFile = "atoms.json",
+        )
+    }
+
+    sentences.values.sortedBy { it.id }.forEach { sentence ->
+        entries += TtsDebugEntry(
+            id = "sentence:${sentence.id}:tts",
+            group = TtsDebugGroup.Sentence,
+            label = sentence.id,
+            originalText = sentence.tts,
+            sourceFile = "sentences.json",
+        )
+    }
+
+    tasks.values.sortedBy { it.id }.forEach { task ->
+        if (task is SoundPositionSpec) {
+            entries += TtsDebugEntry(
+                id = "task:${task.id}:phonemeTts",
+                group = TtsDebugGroup.Task,
+                label = "${task.id} · phonemeTts",
+                originalText = task.phonemeTts,
+                sourceFile = "tasks.json",
+            )
+        }
+        task.rounds.forEachIndexed { index, round ->
+            val roundNumber = index + 1
+            entries += TtsDebugEntry(
+                id = "task:${task.id}:round:$index:promptTts",
+                group = TtsDebugGroup.Task,
+                label = "${task.id} · round $roundNumber · promptTts",
+                originalText = round.promptTts,
+                sourceFile = "tasks.json",
+            )
+            when (round) {
+                is SoundPositionRound -> entries += TtsDebugEntry(
+                    id = "task:${task.id}:round:$index:missTts",
+                    group = TtsDebugGroup.Task,
+                    label = "${task.id} · round $roundNumber · missTts",
+                    originalText = round.missTts,
+                    sourceFile = "tasks.json",
+                )
+                is LetterTraceRound -> entries += TtsDebugEntry(
+                    id = "task:${task.id}:round:$index:rewardTts",
+                    group = TtsDebugGroup.Task,
+                    label = "${task.id} · round $roundNumber · rewardTts",
+                    originalText = round.rewardTts,
+                    sourceFile = "tasks.json",
+                )
+                is SyllableMergeRound -> entries += TtsDebugEntry(
+                    id = "task:${task.id}:round:$index:stretchTts",
+                    group = TtsDebugGroup.Task,
+                    label = "${task.id} · round $roundNumber · stretchTts",
+                    originalText = round.stretchTts,
+                    sourceFile = "tasks.json",
+                )
+                else -> Unit
+            }
+        }
+    }
+
+    return entries
+}
