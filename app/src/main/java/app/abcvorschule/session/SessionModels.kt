@@ -91,6 +91,12 @@ data class SessionUiState(
     val roundIndex: Int = 0,
     val points: Int = 0,
     val sessionPoints: Int = 0,
+    /**
+     * Das Finale der abgeschlossenen Lektion — gesetzt **nur** beim echten Abschluss.
+     * Ein Abbruch mit Punkten zeigt dieselbe Route, aber ohne Satz: der Satz belohnt
+     * Durchhalten und nutzt sich sonst ab (PRODUCT_PRINCIPLES.md Abschnitt 5).
+     */
+    val completedFinaleId: String? = null,
     val ready: Boolean = false,
     val showDifficultySheet: Boolean = false,
     /** Spoken-only miss/hint text — never rendered as chrome. */

@@ -169,6 +169,7 @@ class SessionViewModel(
                     trainerIndex = 0,
                     roundIndex = 0,
                     sessionPoints = 0,
+                    completedFinaleId = null,
                     speakCue = null,
                     successPhase = SuccessPhase.Idle,
                     successSpeakText = null,
@@ -451,9 +452,11 @@ class SessionViewModel(
         )
         if (step == null) {
             progressRepository.saveSession(null)
+            val finaleId = state.lessonId?.let { pack.finaleIdOf(it) }
             _ui.update {
                 it.copy(
                     screen = AppScreen.RewardSummary,
+                    completedFinaleId = finaleId,
                     speakCue = null,
                     successPhase = SuccessPhase.Idle,
                     successSpeakText = null,

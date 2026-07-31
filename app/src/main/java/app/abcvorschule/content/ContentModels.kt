@@ -107,6 +107,13 @@ data class ContentPack(
 
     fun lesson(id: String): Lesson = lessons.first { it.id == id }
 
+    /**
+     * Das Finale einer Lektion, oder null. Bewusst tolerant, wo [lesson] wirft: ein
+     * veralteter Resume-Snapshot darf den Abschluss-Übergang nicht zum Absturz bringen.
+     */
+    fun finaleIdOf(lessonId: String): String? =
+        lessons.firstOrNull { it.id == lessonId }?.finaleId
+
     fun tasksOf(lesson: Lesson): List<TaskSpec> = lesson.taskIds.map { task(it) }
 
     /** Rendered words of a sentence, aligned with [Sentence.atomIds]. */

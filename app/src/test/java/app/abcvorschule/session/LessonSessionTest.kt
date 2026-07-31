@@ -117,4 +117,26 @@ class LessonSessionTest {
         assertEquals(ScaffoldLevel.Beginner, mathScaffolds.getValue(firstKey))
         assertEquals(ScaffoldLevel.Advanced, mathScaffolds.getValue(secondKey))
     }
+
+    @Test
+    fun everyAuthoredLessonYieldsItsFinaleId() {
+        pack.authoredLessons.forEach { lesson ->
+            assertEquals(
+                "lesson ${lesson.id}",
+                lesson.finaleId,
+                pack.finaleIdOf(lesson.id),
+            )
+        }
+    }
+
+    @Test
+    fun finaleIdOfAnUnknownLessonIsNull() {
+        // A stale resume snapshot must not crash the finish transition.
+        assertNull(pack.finaleIdOf("l99"))
+    }
+
+    @Test
+    fun repeatLessonYieldsTheFinaleOfItsBaseLesson() {
+        assertEquals("f-l01", pack.finaleIdOf("l19"))
+    }
 }
