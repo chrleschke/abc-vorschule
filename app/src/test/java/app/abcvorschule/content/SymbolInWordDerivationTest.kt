@@ -206,4 +206,45 @@ class SymbolInWordDerivationTest {
         assertEquals(listOf("letter-ck", "letter-pf", "letter-pf"), rounds("l16").map { it.targetAtomId })
         assertEquals(listOf("A", "pf", "e", "l"), rounds("l16")[1].segments)
     }
+
+    @Test
+    fun lessonSeventeenFallsBackToLetterModeWhenTheSyllableBlockDisagreesWithItsAtom() {
+        // l17-t8 ("Spinne") groups "Spin" under the `spi` syllable atom, whose own
+        // display is "spi" — a mismatch beyond casing. A round cannot honestly
+        // label a "spi" target above a "Spin" segment, so the syllable round is
+        // not asked at all and the word falls back to letter mode, hunting "Sp".
+        assertEquals(
+            listOf(SymbolInWordMode.letter, SymbolInWordMode.letter),
+            rounds("l17").map { it.mode },
+        )
+        assertEquals(listOf("letter-st", "letter-sp"), rounds("l17").map { it.targetAtomId })
+        assertEquals(listOf("Sp", "i", "n", "n", "e"), rounds("l17")[1].segments)
+    }
+
+    // --- displayed target must be recognisable among the segments -------------
+
+    @Test
+    fun theDisplayedTargetAlwaysOccursLiterallyAmongTheSegments() {
+        // Stronger than "targetIndices is not empty": a hit the child cannot
+        // recognise as the thing it was asked to find is not a hit. This is what
+        // rules out L17's "spi" label sitting above a "Spin" segment.
+        pack.authoredLessons.forEach { lesson ->
+            rounds(lesson.id).forEach { round ->
+                val label = SymbolInWordDerivation.targetLabel(
+                    pack.atom(round.targetAtomId),
+                    round.mode,
+                ).primary
+                assertTrue(
+                    "lesson ${lesson.id}: label '$label' is not a segment of ${round.segments}",
+                    round.segments.any { it.equals(label, ignoreCase = true) },
+                )
+                round.targetIndices.forEach { index ->
+                    assertTrue(
+                        "lesson ${lesson.id}: hit '${round.segments[index]}' is not the label '$label'",
+                        round.segments[index].equals(label, ignoreCase = true),
+                    )
+                }
+            }
+        }
+    }
 }

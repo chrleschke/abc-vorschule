@@ -114,18 +114,27 @@ object SymbolInWordDerivation {
         if (word.blocks.size < MinSegments) return null
         // word_build blocks are not reliable syllables ("Hä·u·s·e·r", "Ha·l·l·o"),
         // so only blocks backed by an actual syllable atom may be hunted — asking
-        // for "die Silbe l im Wort Hallo" would be nonsense.
-        val syllableBlocks = word.blocks.filter { pack.atoms[it.atomId]?.kind == AtomKind.syllable }
+        // for "die Silbe l im Wort Hallo" would be nonsense. A block also only
+        // qualifies when its authored display agrees with the atom's own display
+        // (case-insensitively): the label shown to the child comes from the atom
+        // (§2), so a block whose text disagrees with its atom — l17 "Spinne"
+        // groups "Spin" under the `spi` atom — cannot be labelled honestly. Rather
+        // than show "spi" above a segment that reads "Spin", the round is not
+        // asked at all, exactly like a word with no syllable block falls back to
+        // letter mode.
+        val syllableBlocks = word.blocks.filter { block ->
+            val atom = pack.atoms[block.atomId]
+            atom?.kind == AtomKind.syllable && block.display.equals(atom.display, ignoreCase = true)
+        }
         if (syllableBlocks.isEmpty()) return null
 
         val targetBlock = syllableBlocks.firstOrNull { it.atomId in focusSyllableAtomIds }
             ?: syllableBlocks.first()
         val target = pack.atom(targetBlock.atomId)
         val segments = word.blocks.map { it.display }
-        // Match by atomId, not by display text: a block's display can span more
-        // than its atom's own glyph (l17 "Spinne" groups "Spin" under the `spi`
-        // atom for legibility), so string equality against target.display would
-        // miss it and leave the round with no hit.
+        // Match by atomId, not by display text: a repeated syllable can appear as
+        // two differently-cased blocks of the same atom ("Mi"/"mi" in "Mimi"), and
+        // atomId is the authoritative link from a block to its atom.
         val hits = word.blocks.indices.filter { word.blocks[it].atomId == targetBlock.atomId }
         val template = if (hits.size > 1) PromptSyllableMany else PromptSyllableOne
         return Built(
