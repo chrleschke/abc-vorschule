@@ -24,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -173,6 +176,13 @@ private fun TtsDebugRow(
     val currentText = overrideText ?: entry.originalText
     var editing by remember(entry.id) { mutableStateOf(false) }
     var draft by remember(entry.id, currentText) { mutableStateOf(currentText) }
+    val focusRequester = remember(entry.id) { FocusRequester() }
+    var wasFocused by remember(entry.id) { mutableStateOf(false) }
+
+    LaunchedEffect(editing) {
+        // Only steal focus when entering edit mode — never on first row composition.
+        if (editing) focusRequester.requestFocus()
+    }
 
     Surface(
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -195,11 +205,17 @@ private fun TtsDebugRow(
                         onValueChange = { draft = it },
                         modifier = Modifier
                             .fillMaxWidth()
+                            .focusRequester(focusRequester)
                             .onFocusChanged { focus ->
-                                if (!focus.isFocused) {
+                                // onFocusChanged fires immediately when this field first enters
+                                // composition, reporting isFocused = false even though nothing
+                                // real happened yet. Only commit on an actual true -> false
+                                // transition, tracked via wasFocused.
+                                if (wasFocused && !focus.isFocused) {
                                     editing = false
                                     if (draft != currentText) onEdit(draft)
                                 }
+                                wasFocused = focus.isFocused
                             },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = SoftSky,
