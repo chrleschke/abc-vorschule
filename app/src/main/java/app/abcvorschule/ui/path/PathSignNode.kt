@@ -45,6 +45,7 @@ import app.abcvorschule.ui.theme.SoftSand
 import app.abcvorschule.ui.theme.SoftSky
 import app.abcvorschule.ui.theme.WoodDark
 import app.abcvorschule.ui.theme.WoodMid
+import app.abcvorschule.ui.theme.WoodNail
 import app.abcvorschule.ui.theme.WoodPost
 import app.abcvorschule.ui.theme.WoodWarm
 
@@ -224,5 +225,5 @@ fun PathSignNode(
 
 @Composable
 private fun Nail(modifier: Modifier = Modifier) {
-    Box(modifier.size(6.dp).background(WoodPost, CircleShape))
+    Box(modifier.size(6.dp).background(WoodNail, CircleShape))
 }

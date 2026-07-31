@@ -25,4 +25,9 @@ val NightHorizon = Color(0xFF16283A)
 val WoodDark = Color(0xFF2A2018)
 val WoodMid = Color(0xFF4A3728)
 val WoodWarm = Color(0xFF6B4E34)
-val WoodPost = Color(0xFF33261B)
+val WoodPost = Color(0xFF3D2E21)
+
+/** Nail heads in the board corners. Deliberately the old, darker post tone: the
+ *  post may get lighter, but the nails have to keep reading as a dent in the
+ *  board — against the darkest board they would otherwise glow. */
+val WoodNail = Color(0xFF33261B)

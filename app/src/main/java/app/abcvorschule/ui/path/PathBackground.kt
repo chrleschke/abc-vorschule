@@ -32,8 +32,39 @@ import kotlin.random.Random
 private const val StarCount = 40
 private const val StarSeed = 42
 
+/**
+ * A second, finer tier of stars: the sky read as too empty on the device. They
+ * are appended after the 40 main stars rather than mixed in, so the existing
+ * ones draw the same values out of Random(42) as before and keep their exact
+ * positions — only the dust around them is new. Radius stays below 1dp and the
+ * twinkle alpha is the same 0.10..0.25 as the main tier, so no dot gets
+ * brighter than one that is on screen today.
+ */
+private const val SmallStarCount = 34
+
 /** Line segments a hill's wave is sampled with — 24 was the old loop's step count. */
 private const val HillSegments = 24
+
+/**
+ * Tree silhouettes on the front hill band. In dp, not raw px: the old 42f/4f/16f
+ * were unconverted DrawScope pixels, so the trees shrank with rising density —
+ * ~15dp tall on an xxhdpi phone, ~46dp on an mdpi tablet. The star field in the
+ * same file already converts (star.radius.dp.toPx()), so this was an oversight,
+ * not a style. Ratio kept at the old 1.44:1 height-to-width so the silhouette
+ * reads the same, only bigger.
+ */
+private val TreeApexHeight = 26.dp
+private val TreeBaseDepth = 3.dp
+private val TreeHalfWidth = 10.dp
+
+/**
+ * The trees stand ON the front band — NightElevated at alpha 0.9 over the
+ * gradient, effectively ~#213146 — so they must stay darker than that or they
+ * stop reading as silhouette. NightInk at 0.65 composites to ~#151F30: 1.23:1
+ * against the band, one visible step up from the old 0.85 (~#111A29, 1.31:1),
+ * and still strictly darker than the ground they stand on.
+ */
+private const val TreeAlpha = 0.65f
 
 /** Star position in 0..1 screen fractions plus its twinkle phase. */
 private data class Star(val fx: Float, val fy: Float, val radius: Float, val phase: Float)
@@ -59,6 +90,15 @@ fun PathBackground(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
                 fy = random.nextFloat() * 0.66f,
                 radius = 1f + random.nextFloat(),
                 phase = index * 0.37f,
+            )
+        } + List(SmallStarCount) { index ->
+            Star(
+                fx = random.nextFloat(),
+                fy = random.nextFloat() * 0.66f,
+                radius = 0.5f + random.nextFloat() * 0.4f,
+                // The phase series simply continues, so the small stars do not
+                // blink in lockstep with the big ones above them.
+                phase = (StarCount + index) * 0.37f,
             )
         }
     }
@@ -149,16 +189,24 @@ private fun HillBand(
                 }
                 drawPath(hill, color = color.copy(alpha = alpha))
                 if (trees) {
+                    // Converted once per draw pass, not per tree.
+                    val apex = TreeApexHeight.toPx()
+                    val skirt = TreeBaseDepth.toPx()
+                    val halfWidth = TreeHalfWidth.toPx()
                     listOf(0.14f, 0.31f, 0.68f, 0.86f).forEach { fx ->
                         val tx = size.width * fx
+                        // Same wave the band is sampled on, so the trunk sits on the
+                        // crest. The four fractions fall between the 24 polyline
+                        // samples, but the interpolation error is under 0.03px at
+                        // amplitude 28f — the skirt below ty absorbs it.
                         val ty = base - amplitude * sin(fx * 3.4f)
                         val tree = Path().apply {
-                            moveTo(tx, ty - 42f)
-                            lineTo(tx - 16f, ty + 4f)
-                            lineTo(tx + 16f, ty + 4f)
+                            moveTo(tx, ty - apex)
+                            lineTo(tx - halfWidth, ty + skirt)
+                            lineTo(tx + halfWidth, ty + skirt)
                             close()
                         }
-                        drawPath(tree, color = NightInk.copy(alpha = 0.85f))
+                        drawPath(tree, color = NightInk.copy(alpha = TreeAlpha))
                     }
                 }
             },
