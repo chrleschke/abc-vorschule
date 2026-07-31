@@ -48,6 +48,9 @@ class SessionViewModel(
     private lateinit var pack: ContentPack
     private var progress: LearnerProgress = LearnerProgress()
 
+    /** Backs [lessonEmojis] — computed once when [pack] loads, not on every call. */
+    private var lessonEmojisByLessonId: Map<String, List<String>> = emptyMap()
+
     init {
         viewModelScope.launch { bootstrap() }
     }
@@ -55,6 +58,7 @@ class SessionViewModel(
     private suspend fun bootstrap() {
         runCatching {
             pack = withContext(Dispatchers.IO) { contentRepository.load() }
+            lessonEmojisByLessonId = pack.lessons.associate { it.id to LessonEmojis.forLesson(pack, it) }
             progress = progressRepository.current()
             val snapshot = progress.unfinishedSession
             val resumable = snapshot != null &&
@@ -97,13 +101,14 @@ class SessionViewModel(
     fun highlightedLessonId(): String? =
         if (this::pack.isInitialized) LessonGating.nextPlayable(pack, progress)?.id else null
 
-    /** Signpost emojis per lesson id — derived once, the pack does not change. */
+    /**
+     * Signpost emojis per lesson id. Computed once in [bootstrap] when the pack
+     * loads and cached from then on — not rebuilt on every call — so callers
+     * (Compose included) always get back the same Map instance and can treat it
+     * as unchanged across recompositions.
+     */
     fun lessonEmojis(): Map<String, List<String>> =
-        if (this::pack.isInitialized) {
-            pack.lessons.associate { it.id to LessonEmojis.forLesson(pack, it) }
-        } else {
-            emptyMap()
-        }
+        if (this::pack.isInitialized) lessonEmojisByLessonId else emptyMap()
 
     /** Spoken cue for a locked/planned node — a tap must always produce feedback. */
     fun lockedLessonCue(): String = "Das üben wir später."

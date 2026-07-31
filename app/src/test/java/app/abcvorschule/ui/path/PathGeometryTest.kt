@@ -8,8 +8,9 @@ class PathGeometryTest {
     private val width = 1000f
     private val spacing = 168f
     private val margin = 132f
+    private val horizontalMargin = 84f
 
-    private fun points(count: Int) = PathGeometry.points(count, width, spacing, margin)
+    private fun points(count: Int) = PathGeometry.points(count, width, spacing, margin, horizontalMargin)
 
     @Test
     fun emptyPathHasNoPoints() {
@@ -49,17 +50,28 @@ class PathGeometryTest {
 
     @Test
     fun amplitudeStaysInsideTheMargins() {
+        // The swing's bound is the horizontal inset, not the (larger) vertical
+        // margin — they were split apart specifically so the swing can be wider
+        // than the vertical gap allows.
         points(26).forEach {
-            assertTrue("x=${it.x} left of margin", it.x >= margin - 0.01f)
-            assertTrue("x=${it.x} right of margin", it.x <= width - margin + 0.01f)
+            assertTrue("x=${it.x} left of horizontal margin", it.x >= horizontalMargin - 0.01f)
+            assertTrue("x=${it.x} right of horizontal margin", it.x <= width - horizontalMargin + 0.01f)
         }
     }
 
     @Test
     fun narrowScreenCollapsesToAStraightLine() {
         // Amplitude 0 must swallow the organic jitter too, otherwise nodes would
-        // wander off a screen that has no room to swing.
-        val p = PathGeometry.points(4, width = 120f, spacing = spacing, margin = margin)
+        // wander off a screen that has no room to swing. A screen has no room to
+        // swing once it is narrower than 2x the horizontal margin, regardless of
+        // the (separate, larger) vertical margin.
+        val p = PathGeometry.points(
+            4,
+            width = 120f,
+            spacing = spacing,
+            margin = margin,
+            horizontalMargin = horizontalMargin,
+        )
         assertEquals(1, p.map { it.x }.distinct().size)
     }
 
@@ -138,14 +150,14 @@ class PathGeometryTest {
         // be identical. The only thing that could still separate their x
         // values is the index-dependent x-jitter, and that is bounded: each
         // point's jitter is independently clamped to +-6% of amplitude, so
-        // two such points can differ by at most 2 * 0.06 * amplitude (~44px
-        // for this fixture's 1000px width / 132px margin). With a
+        // two such points can differ by at most 2 * 0.06 * amplitude (~50px
+        // for this fixture's 1000px width / 84px horizontal margin). With a
         // non-integer period like 3.7 the swing angle is not periodic over a
         // 4-node gap, so most pairs differ far beyond that jitter-only
         // ceiling. Checking many pairs (not just one) rules out a single
         // lucky/unlucky jitter cancellation from deciding the test either way.
         val p = points(16)
-        val amplitude = width / 2f - margin
+        val amplitude = width / 2f - horizontalMargin
         val jitterOnlyCeiling = 2 * 0.06f * amplitude
         val pairsBeyondJitter = (0 until 12).count { i ->
             kotlin.math.abs(p[i + 4].x - p[i].x) > jitterOnlyCeiling + 1f

@@ -29,7 +29,25 @@ internal object PathNoise {
  */
 object PathGeometry {
     const val DefaultSpacing = 168f
+
+    /**
+     * Vertical margin: the gap before the first node and after the last one.
+     * Also fed to [yOffsets]/[contentHeight], so it can't be shrunk to widen the
+     * swing — it has a floor of its own (a sign's height, ~116dp) or the first
+     * sign clips off the top of the scroll content. See [DefaultHorizontalMargin]
+     * for the horizontal inset, which has no such constraint.
+     */
     const val DefaultMargin = 132f
+
+    /**
+     * Horizontal inset: how far the swing's outer edge stays from each screen
+     * edge. Deliberately separate from [DefaultMargin] — on a 360dp phone,
+     * reusing the 132dp vertical margin left only a 96dp-wide swing (48dp
+     * amplitude), not enough to clear a 136dp-wide signpost, so the trail hid
+     * behind the boards for roughly half of every step. 84dp gives a 192dp-wide
+     * swing (96dp amplitude) at that width, clearing the sign on both sides.
+     */
+    const val DefaultHorizontalMargin = 84f
 
     /** Nodes per full left-right-left swing. Non-integer on purpose. */
     private const val Period = 3.7
@@ -55,10 +73,15 @@ object PathGeometry {
         width: Float,
         spacing: Float = DefaultSpacing,
         margin: Float = DefaultMargin,
+        horizontalMargin: Float = DefaultHorizontalMargin,
     ): List<PathPoint> {
         if (count <= 0) return emptyList()
         val center = width / 2f
-        val amplitude = (center - margin).coerceAtLeast(0f)
+        // Amplitude comes from horizontalMargin, not margin: margin also sets the
+        // vertical gap via yOffsets/contentHeight and has a floor it can't drop
+        // below, so it can't be shrunk just to widen the swing. horizontalMargin
+        // carries no such constraint.
+        val amplitude = (center - horizontalMargin).coerceAtLeast(0f)
         val ys = yOffsets(count, spacing, margin)
         return (0 until count).map { index ->
             val swing = sin(index * 2.0 * PI / Period).toFloat()

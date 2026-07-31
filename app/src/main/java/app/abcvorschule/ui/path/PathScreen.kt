@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -80,6 +81,9 @@ fun PathScreen(
             val density = LocalDensity.current
             val spacingPx = with(density) { PathGeometry.DefaultSpacing.dp.toPx() }
             val marginPx = with(density) { PathGeometry.DefaultMargin.dp.toPx() }
+            val horizontalMarginPx = with(density) { PathGeometry.DefaultHorizontalMargin.dp.toPx() }
+            val dotSpacingPx = with(density) { PathTrail.DefaultDotSpacing.dp.toPx() }
+            val dotRadiusPx = with(density) { PathTrail.DefaultDotRadius.dp.toPx() }
 
             Box(
                 modifier = Modifier
@@ -97,11 +101,15 @@ fun PathScreen(
                         ),
                 ) {
                     val widthPx = with(density) { maxWidth.toPx() }
-                    val nodePoints = PathGeometry.points(lessons.size, widthPx, spacingPx, marginPx)
-                    val walkedUpTo = lessons.indexOfLast {
-                        val state = states[it.id]
-                        state == LessonState.Mastered || state == LessonState.InProgress
+                    // PathGeometry.points and PathTrail.polyline are pure-math but not
+                    // cheap (a 26-node path yields a 601-point polyline), so both are
+                    // memoized on exactly the primitives they depend on — recomputing
+                    // them on every recomposition (e.g. one triggered by an unrelated
+                    // state change elsewhere on screen) would be pointless churn.
+                    val nodePoints = remember(lessons.size, widthPx, spacingPx, marginPx, horizontalMarginPx) {
+                        PathGeometry.points(lessons.size, widthPx, spacingPx, marginPx, horizontalMarginPx)
                     }
+                    val walkedUpTo = walkedUpToIndex(lessons, states)
                     // PathTrail.dots() infers where each node falls in the polyline as
                     // walkedUpTo * samplesPerSegment, which is only correct if polyline()
                     // and dots() were built with the SAME samplesPerSegment. Neither call
@@ -109,12 +117,21 @@ fun PathScreen(
                     // do not give one of them a custom value without giving the other the
                     // matching one, or the "walked" boundary silently drifts off the
                     // actual node.
-                    val dots = PathTrail.dots(
-                        polyline = PathTrail.polyline(nodePoints),
-                        walkedUpTo = walkedUpTo,
-                        spacing = with(density) { PathTrail.DefaultDotSpacing.dp.toPx() },
-                        radius = with(density) { PathTrail.DefaultDotRadius.dp.toPx() },
-                    )
+                    val dots = remember(
+                        lessons.size,
+                        widthPx,
+                        spacingPx,
+                        marginPx,
+                        horizontalMarginPx,
+                        walkedUpTo,
+                    ) {
+                        PathTrail.dots(
+                            polyline = PathTrail.polyline(nodePoints),
+                            walkedUpTo = walkedUpTo,
+                            spacing = dotSpacingPx,
+                            radius = dotRadiusPx,
+                        )
+                    }
 
                     Canvas(Modifier.fillMaxSize()) {
                         dots.forEach { dot ->
