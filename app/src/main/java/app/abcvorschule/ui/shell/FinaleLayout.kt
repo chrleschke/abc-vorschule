@@ -32,6 +32,13 @@ object FinaleLayout {
     private const val CrowdedFrom = 4
     private const val RevealStepMillis = 180L
 
+    /**
+     * Horizontaler Abstand zwischen den Bildern der Reihe. Öffentlich, damit sowohl
+     * [pictureRowWidthDp] als auch das Composable (`RewardSummaryScreen.FinaleBody`)
+     * dieselbe Zahl verwenden statt zweier unsynchronisierter 16dp-Werte.
+     */
+    const val PictureRowGapDp = 16
+
     /** Basisgröße des Satzes bei `fontScale = 1.0`: Material3s Default für headlineSmall. */
     private const val SentenceSizeSp = 24
 
@@ -67,6 +74,21 @@ object FinaleLayout {
     fun pictureSizeSp(count: Int, fontScale: Float): Int {
         val base = if (count >= CrowdedFrom) CrowdedSizeSp else BaseSizeSp
         return capEffectiveSize(base, fontScale)
+    }
+
+    /**
+     * Geschätzte Breite der ganzen Bildreihe: [pictureSizeSp] je Bild — Emoji-Glyphen
+     * sind überwiegend quadratisch, ein Vorschuss von rund 1 em Breite pro Bild ist eine
+     * gängige Näherung, keine Messung, denn das Repo hat keine androidTests, die reale
+     * Glyph-Metriken prüfen könnten — plus die (count-1) Lücken von [PictureRowGapDp]
+     * dazwischen. Macht die Breitenprüfung testbar, die vorher nur als Kommentar-Rechnung
+     * in der Residual-Notiz stand: der Validator erlaubt bis zu vier Bilder, aber nichts
+     * prüfte automatisiert, ob vier Bilder auf das schmalste unterstützte Gerät passen.
+     */
+    fun pictureRowWidthDp(count: Int, fontScale: Float): Int {
+        if (count <= 0) return 0
+        val pictureWidth = pictureSizeSp(count, fontScale)
+        return pictureWidth * count + (count - 1) * PictureRowGapDp
     }
 
     /**

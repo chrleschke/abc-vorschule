@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.R
@@ -68,9 +69,12 @@ private val SentenceExtraHorizontalPadding = 20.dp
  *   Erwachsenen — die einzige bewusste Ausnahme von „das Kind kann nicht lesen"
  *   (PRODUCT_PRINCIPLES.md Abschnitt 12), weil keine Handlung am Text hängt.
  * - [finale] null (Abbruch mit Punkten): nur Erfolgs-Header, derselbe Stern und
- *   Weiter. Ohne Bildreihe sitzt der Stern an derselben Stelle, an der die Bildreihe
- *   sonst stünde (oben im mittleren Block) — er bleibt also sichtbar und an
- *   vorhersagbarer Stelle, statt zu verschwinden oder irgendwo zu landen.
+ *   Weiter. Ohne Bildreihe ist der Stern der einzige Inhalt des mittleren Blocks und
+ *   sitzt darum exakt in dessen Zentrum — tiefer als beim Finale, wo der Stern hinter
+ *   der Bildreihe sitzt, die selbst über der Mitte der (durch Satz und Speaker
+ *   verlängerten) Spalte liegt. Er bleibt also in beiden Varianten sichtbar und an
+ *   vorhersagbarer, wenn auch unterschiedlicher Stelle, statt zu verschwinden oder
+ *   irgendwo beliebig zu landen.
  *
  * Header, mittlerer Block und Weiter-Button liegen in einer Spalte; der mittlere
  * Block trägt `weight(1f)` und zentriert seinen Inhalt vertikal darin. `weight(1f)`
@@ -139,7 +143,14 @@ fun RewardSummaryScreen(
             contentAlignment = Alignment.Center,
         ) {
             if (finale == null) {
-                BackgroundStar(scale = starScale)
+                // Ohne Bildreihe gibt es keine Größe, die der Stern aufblähen könnte, aber
+                // excludedFromMeasurement() bleibt trotzdem dran: sonst wäre die Aussage im
+                // Datei-Kommentar oben ("der Stern trägt nicht zur gemessenen Größe seiner
+                // Box bei") nur für die Finale-Variante wahr, nicht unbedingt.
+                BackgroundStar(
+                    scale = starScale,
+                    modifier = Modifier.excludedFromMeasurement(),
+                )
             } else {
                 FinaleBody(
                     finale = finale,
@@ -171,11 +182,12 @@ private fun BackgroundStar(scale: Float, modifier: Modifier = Modifier) {
 }
 
 /**
- * Misst den Inhalt normal (in voller Größe), meldet dem Eltern-Layout aber eine Größe
- * von 0×0 zurück — zentriert auf demselben Punkt, an dem der Inhalt sonst gestanden
- * hätte. Für rein dekorative Elemente, die größer sein dürfen als das, was sie
- * hinterlegen, ohne dessen Größe (und damit die Höhe der ganzen Spalte) zu
- * beeinflussen.
+ * Misst den Inhalt ungebunden (`maxWidth`/`maxHeight` = unendlich, damit die gemeldete
+ * Größe garantiert der tatsächlich gezeichneten entspricht — dazu gleich mehr) und
+ * meldet dem Eltern-Layout trotzdem eine Größe von 0×0 zurück, zentriert auf demselben
+ * Punkt, an dem der Inhalt sonst gestanden hätte. Für rein dekorative Elemente, die
+ * größer sein dürfen als das, was sie hinterlegen, ohne dessen Größe (und damit die
+ * Höhe der ganzen Spalte) zu beeinflussen.
  *
  * `Modifier.wrapContentSize(unbounded = true)` allein reicht dafür nicht: eine `Box`
  * misst alle Kinder mit denselben eingehenden Constraints, die hier recht locker sind
@@ -183,9 +195,20 @@ private fun BackgroundStar(scale: Float, modifier: Modifier = Modifier) {
  * volle gemessene Größe zurückmelden, solange sie unter diesen Constraints bleibt, egal
  * wie "unbounded" er gemessen wurde. Hier wird die gemeldete Größe stattdessen explizit
  * überschrieben, unabhängig von den eingehenden Constraints.
+ *
+ * Wichtig: mit den *eingehenden* Constraints zu messen wäre trotzdem falsch, selbst mit
+ * der 0×0-Überschreibung — auf einem 320dp breiten Gerät ist die Inhaltsbreite z. B. nur
+ * 272dp, `IconStar` zeichnet aber immer anhand seines deklarierten `size`-Parameters
+ * (`AbcIcons.kt`: `val w = size.toPx()`), nicht anhand der gemessenen Breite. Mit engen
+ * eingehenden Constraints würde `placeable.width` (und damit `-placeable.width / 2` bei
+ * der Zentrierung) auf 272dp geklemmt, während der Stern weiterhin bei seiner vollen,
+ * deklarierten Größe gezeichnet wird — die Zentrierung würde um die halbe Differenz
+ * danebenliegen. Ungebundenes Messen hält gemeldete und gezeichnete Größe deckungsgleich.
  */
 private fun Modifier.excludedFromMeasurement(): Modifier = this.layout { measurable, constraints ->
-    val placeable = measurable.measure(constraints)
+    val placeable = measurable.measure(
+        constraints.copy(maxWidth = Constraints.Infinity, maxHeight = Constraints.Infinity),
+    )
     layout(0, 0) {
         placeable.place(-placeable.width / 2, -placeable.height / 2)
     }
@@ -215,7 +238,7 @@ private fun FinaleBody(
             contentAlignment = Alignment.Center,
         ) {
             // Hinter der Bildreihe statt hinter der ganzen Spalte. excludedFromMeasurement()
-            // ist hier Pflicht: ohne sie wäre der Stern (180dp) höher als die Bildreihe
+            // ist hier Pflicht: ohne sie wäre der Stern (300dp) höher als die Bildreihe
             // (~85dp) und würde die Box — und damit die ganze Spalte — entsprechend
             // aufblähen, bis am Ende der Speaker-Button keinen Platz mehr hätte.
             BackgroundStar(
@@ -224,7 +247,10 @@ private fun FinaleBody(
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(
+                    FinaleLayout.PictureRowGapDp.dp,
+                    Alignment.CenterHorizontally,
+                ),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 pictures.forEachIndexed { index, picture ->

@@ -197,6 +197,29 @@ class FinaleLayoutTest {
     }
 
     @Test
+    fun pictureRowFitsTheNarrowestSupportedContentWidthForEveryValidatorPermittedCount() {
+        // 320dp device minus the column's 24dp horizontal padding on each side — the
+        // narrowest content width used throughout this task's budget arithmetic. The
+        // validator (ContentValidator.MinFinalePictures..MaxFinalePictures) permits
+        // 2..4 pictures per finale; a bug that only ever exercised 2-3 in tests would
+        // miss a 4-picture finale that doesn't fit.
+        val narrowestContentWidthDp = 272
+        (2..4).forEach { count ->
+            val width = FinaleLayout.pictureRowWidthDp(count, fontScale = 1f)
+            assertTrue(
+                "row of $count pictures is ${width}dp wide, narrowest supported content " +
+                    "is ${narrowestContentWidthDp}dp",
+                width <= narrowestContentWidthDp,
+            )
+        }
+    }
+
+    @Test
+    fun pictureRowWidthIsZeroForNoPictures() {
+        assertEquals(0, FinaleLayout.pictureRowWidthDp(0, fontScale = 1f))
+    }
+
+    @Test
     fun picturesRevealLeftToRight() {
         assertEquals(0L, FinaleLayout.revealDelayMillis(0))
         assertEquals(180L, FinaleLayout.revealDelayMillis(1))
