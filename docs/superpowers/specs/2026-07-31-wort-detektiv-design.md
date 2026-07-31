@@ -42,12 +42,35 @@ Die Beispiele sind echte abgeleitete Runden (Anhang), keine erfundenen Illustrat
 Insbesondere ergibt `Oma` unter der Alternierung aus §4 eine Buchstaben-Runde auf `O`,
 nicht die Silben-Runde auf `ma` — die Silben-Runde der Lektion trägt `Mimi`.
 
-**Woher die Anzeige des Ziels kommt:** im Silben-Modus aus `WordBlock.display` des
-Zielblocks (`Mi`, `Schu`), **nicht** aus `Atom.display` — die Silben-Atome sind
-durchgängig kleingeschrieben (`mi`, `schu`), die Blöcke tragen die Orthografie des Wortes.
-Im Buchstaben-Modus aus `Atom.display` des Fokus-Atoms (`O`, `Sch`, `ck`). Das gesuchte
-Wort selbst kommt aus `Atom.display` des `targetAtomId` (bei allen Atomen identisch mit
-`lemma`, also auch für TTS gültig).
+### Anzeige des Zielsymbols
+
+**Buchstaben-Modus zeigt beide Formen: `P / p`.** So lernt das Kind im selben Moment, wie
+Groß- und Kleinform aussehen, in dem es beide im Wort finden soll — und die Aufgabe ist
+nicht mehr schwerer als sie aussieht (vgl. §4).
+
+Regel: `Atom.display` und `Atom.display.lowercase()`, getrennt durch einen Schrägstrich,
+**wenn sie sich unterscheiden** — sonst nur die eine Form. Das trifft von allein das
+Richtige, weil der Content nur-klein geschriebene Grapheme auch so autoriert:
+
+| Fokus-Atom | Anzeige | |
+| --- | --- | --- |
+| `P`, `Sch`, `Ei`, `Au`, `Qu`, `Pf`, `St`, `Sp`, `Ch`, `Ä`, `X`, `Y` | `P / p`, `Sch / sch`, … | beide Formen kommen im Wortschatz vor |
+| `ck`, `ß` | `ck`, `ß` | `display` ist schon klein; eine Form `Ck` existiert im Deutschen nicht |
+
+Der Schrägstrich ist kein Lesezeichen, sondern ein Trenner: `MutedText` @ 45%, halbe
+Glyphgröße, damit die beiden Buchstaben dominieren.
+
+**Silben-Modus zeigt nur die Kleinform**, aus `Atom.display` des Silben-Atoms (`ma`, `mi`,
+`schu`) — **nicht** aus `WordBlock.display`. Bei Buchstaben ist das Formenpaar echter
+Fibel-Inhalt; bei Silben wäre eine Großform eine erfundene Variante, die nur existiert,
+weil die Silbe zufällig am Wortanfang steht. Der Silben-Verschmelzer erzeugt Silben
+ebenfalls klein — der Trainer bleibt damit konsistent zum restlichen Content-Graph.
+
+Das gesuchte **Wort** kommt aus `Atom.display` des `targetAtomId` (bei allen Atomen
+identisch mit `lemma`, also auch für TTS gültig).
+
+In beiden Modi bleibt der Treffervergleich case-insensitive: `Mi` im Wort `Mi·mi` ist ein
+Treffer für das Ziel `mi`, `p` in `P·a·p·a` einer für `P / p`.
 
 Der Silben-Modus nutzt bewusst die autorierten Blöcke statt einer Silbentrennung: sie sind
 genau die Klötze, die das Kind im Wort-Bauer eben in die Hand genommen hat.
@@ -117,13 +140,17 @@ erste Silben-Block. Ohne Silben-Block fällt die Runde in den Buchstaben-Modus.
 ### Groß- und Kleinschreibung ist Absicht
 
 `Papa` → „Finde alle Buchstaben **P**" verlangt Tipps auf `P` *und* `p`. Das ist
-didaktisch gewollt: dass Groß- und Kleinform derselbe Buchstabe sind, ist Fibel-Inhalt,
-und die Atome tragen das Paar bereits (`Atom.display` = Großform, Wörter zeigen die
-korrekte Orthografie). Das Zielsymbol wird in der Form des Atoms angezeigt.
+didaktisch gewollt: dass Groß- und Kleinform derselbe Buchstabe sind, ist Fibel-Inhalt.
 
-Betroffen sind real: `Mama`/M (2), `Papa`/P (2), `Keks`/K (2), `Mimi`/Mi (2).
+Damit die Aufgabe aber nicht schwerer ist als sie aussieht, **zeigt der Screen beide
+Formen als Paar** (`P / p`, §2). Das Kind muss die Gleichsetzung nicht mitbringen — es
+lernt sie in genau dem Moment, in dem es sie braucht.
+
+Betroffen sind real: `Mama`/M (2), `Papa`/P (2), `Keks`/K (2), `Mimi`/mi (2).
 
 ## 5. Screen
+
+Echte Runde aus L03: `Papa`, Ziel `P`, zwei Treffer.
 
 ```
         ⌂ ⋯    ★ 12               ← bestehendes TaskShell-Chrome
@@ -133,19 +160,20 @@ Betroffen sind real: `Mama`/M (2), `Papa`/P (2), `Keks`/K (2), `Mimi`/Mi (2).
                (())                ← Speaker, AbcSpeakerButton
                                       via TaskPromptChrome(title = null)
 
-               ma                  ← Zielsymbol, 54sp, SoftSand
+             P / p                 ← Zielsymbol als Formenpaar, 54sp
 
-           O    ma                 ← das Wort, Segment = eigene Farbe, klickbar
+          P   a   p   a            ← das Wort, Segment = eigene Farbe, klickbar
 
-              ____                 ← Platzhalter-Strich je Treffer
+             __   __               ← ein Platzhalter-Strich je Treffer
 ```
 
 **Speaker** über allem im Aufgabenbereich, per `TaskPromptChrome(title = null, …)` —
 identisch zur Buchstaben-Jagd, konform zu Prinzip 7 („Speaker mittig über dem
 Aufgabentitel"). Er wiederholt den Prompt-TTS.
 
-**Zielsymbol** darunter, `AbcDimens.letterSp` (54sp), `SoftSand`. Antippbar → wird
-vorgelesen (Prinzip 7).
+**Zielsymbol** darunter, `AbcDimens.letterSp` (54sp), `SoftSand`, als Formenpaar nach der
+Regel aus §2. Antippbar → wird vorgelesen (Prinzip 7), gesprochen wird dabei die
+Atom-Form einmal, nicht „P Schrägstrich p".
 
 **Das Wort** als farbige Glyphen **ohne Rahmen** — es soll wie ein Wort aussehen, nicht
 wie ein Tray. Farben zyklisch aus `SoftMint · SoftCoral · SoftSky · SoftGold · SoftSand`;
@@ -276,7 +304,9 @@ der Screen enthält keine Entscheidungen.
 - Dedup: L05 „Hut" erzeugt eine Runde
 - Wort ohne Fokus-Graphem erzeugt keine Runde; bleibt keine übrig, wird kein Trainer
   eingefügt (synthetische Lektion, da der echte Content den Fall nicht hat)
-- Mehrfachtreffer: `Papa`/P = 2, `Mimi`/Mi = 2
+- Mehrfachtreffer: `Papa`/P = 2, `Mimi`/mi = 2
+- Anzeige des Zielsymbols: `P` → `P / p`, `Sch` → `Sch / sch`, `ck` → `ck` (einzeln),
+  `ß` → `ß` (einzeln), Silbe `mi` → `mi` (nie `Mi`)
 
 **`SymbolInWordProgress`**
 
