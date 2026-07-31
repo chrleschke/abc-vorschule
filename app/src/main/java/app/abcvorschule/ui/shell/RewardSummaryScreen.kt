@@ -43,7 +43,10 @@ import kotlinx.coroutines.delay
 // sie nicht über die Höhe der Spalte (der Stern trägt nicht zur gemessenen Größe seiner
 // Box bei, siehe excludedFromMeasurement()) und bleiben deshalb bewusst hier, nicht in
 // FinaleLayout.
-private val BackgroundStarSize = 180.dp
+// Bewusst größer als die Bildreihe, die er hinterlegt: der Stern soll als Bühne lesbar
+// sein, nicht als Rahmen. Weil er aus der Messung fällt, kostet zusätzliche Größe keinen
+// Platz und kann den Weiter- oder Speaker-Button nicht verdrängen.
+private val BackgroundStarSize = 300.dp
 private const val BackgroundStarAlpha = 0.12f
 
 // Zusätzliches horizontales Polster für den Satz, oben auf das 24dp der Spalte drauf

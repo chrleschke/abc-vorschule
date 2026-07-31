@@ -1,7 +1,7 @@
 # ABC-Vorschul App
 
 Kostenlose, werbefreie Android-Vorschul-App (ca. 4–7 Jahre) für Lesen und Rechnen auf Deutsch.
-Dunkles UI, offline nach Installation. Ein Fibel-Pfad aus 16 Lektionen; jede Lektion läuft
+Dunkles UI, offline nach Installation. Ein Fibel-Pfad aus 26 Lektionen; jede Lektion läuft
 sechs Trainer-Typen in fester didaktischer Reihenfolge über einen gemeinsamen Content-Graphen.
 Optional: Buchstaben-/Silben-Jagd als Übungselement zwischen den Trainern.
 
@@ -43,11 +43,12 @@ Install:
 | `atoms.json` | Buchstaben (mit Strichdaten für den Spurensucher), Silben, Wörter, Bildwörter |
 | `sentences.json` | Sätze als Atom-Folgen |
 | `tasks.json` | Ein Eintrag pro Trainer, `trainer`-Feld als Typ-Diskriminator, 1..n Runden |
-| `lessons.json` | 16 Lektionen in Fibel-Reihenfolge; `authored` = spielbar, `planned` = Knoten gesperrt |
+| `lessons.json` | 26 Lektionen in Fibel-Reihenfolge; `authored` = spielbar, `planned` = Knoten gesperrt |
 | `finales.json` | Ein kurzer Satz plus Bildreihe (`pictureAtomIds`) je Lektions-Ende |
 
-Autoriert: Lektionen 1–6 (Phase 1+2). Lektionen 7–16 sind als gesperrte Pfad-Knoten angelegt und
-brauchen nur noch Content — keinen Code.
+Autoriert: alle 26 Lektionen (Phase 1–7), inklusive der Wiederholungs-Tracks. Derzeit steht keine
+Lektion auf `planned`; der Status bleibt im Schema erhalten, damit künftige Lektionen als gesperrte
+Pfad-Knoten angelegt werden können, ohne Code zu ändern.
 
 Der Validator lehnt ein Pack ab, wenn eine autorierte Lektion nicht genau die sechs Trainer in
 Reihenfolge enthält, Kachelfolgen das Zielwort nicht buchstabieren, eine Summe nicht stimmt,
@@ -56,7 +57,7 @@ Strichdaten fehlen oder Referenzen ins Leere zeigen.
 ## Offline-Smoke-Skript (manuell)
 
 1. `./gradlew :app:installDebug`, Gerät in den Flugmodus.
-2. App öffnen → **Pfad-Screen** erscheint, Lektion 1 pulsiert, Lektionen 2–16 sind gesperrt.
+2. App öffnen → **Pfad-Screen** erscheint, Lektion 1 pulsiert, Lektionen 2–26 sind gesperrt (entsperren sich nach Mastery).
 3. Gesperrten Knoten antippen → gesprochener Hinweis, kein stummes No-Op.
 4. Lektion 1 öffnen und die Trainer der Reihenfolge nach durchspielen:
    Auditiver Finder (Waggon-Zuordnung) · Visueller Spurensucher (Buchstaben nachspuren) ·
