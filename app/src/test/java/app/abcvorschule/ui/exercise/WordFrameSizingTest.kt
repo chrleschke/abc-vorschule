@@ -81,4 +81,51 @@ class WordFrameSizingTest {
         val huge = WordFrameSizing.glyphSp(400f, longestDisplayChars = 1)
         assertEquals(WordFrameSizing.MaxGlyphSp, huge, 0.01f)
     }
+
+    // --- row wrapping for long words ----------------------------------------
+    // Reuses the `stageWidth` (396dp usable stage width) declared above.
+
+    @Test
+    fun sixSegmentsStayOnOneRow() {
+        // "Häuser" -> H·ä·u·s·e·r, the longest word in the current content.
+        assertEquals(1, WordFrameSizing.rowCount(stageWidth, 6))
+        assertEquals(6, WordFrameSizing.segmentsPerRow(stageWidth, 6))
+    }
+
+    @Test
+    fun eightSegmentsWrapIntoTwoBalancedRows() {
+        // "Xylophon" -> X·y·l·o·p·h·o·n. Tappability beats staying on one line.
+        assertEquals(2, WordFrameSizing.rowCount(stageWidth, 8))
+        assertEquals(4, WordFrameSizing.segmentsPerRow(stageWidth, 8))
+    }
+
+    @Test
+    fun sevenSegmentsWrapAndTheFirstRowTakesTheExtra() {
+        assertEquals(2, WordFrameSizing.rowCount(stageWidth, 7))
+        assertEquals(4, WordFrameSizing.segmentsPerRow(stageWidth, 7))
+    }
+
+    @Test
+    fun frameWidthNeverDropsBelowTheTouchFloorAfterWrapping() {
+        val perRow = WordFrameSizing.segmentsPerRow(stageWidth, 8)
+        assertTrue(WordFrameSizing.frameWidthDp(stageWidth, perRow) >= WordFrameSizing.MinFrameDp)
+    }
+
+    @Test
+    fun aSingleSegmentNeedsOneRow() {
+        assertEquals(1, WordFrameSizing.rowCount(stageWidth, 1))
+        assertEquals(1, WordFrameSizing.segmentsPerRow(stageWidth, 1))
+    }
+
+    @Test
+    fun anEmptyWordDoesNotDivideByZero() {
+        assertEquals(1, WordFrameSizing.rowCount(stageWidth, 0))
+        assertEquals(1, WordFrameSizing.segmentsPerRow(stageWidth, 0))
+    }
+
+    @Test
+    fun aVeryNarrowStageStillFitsOneSegmentPerRow() {
+        assertEquals(1, WordFrameSizing.maxPerRow(20f))
+        assertEquals(4, WordFrameSizing.rowCount(20f, 4))
+    }
 }

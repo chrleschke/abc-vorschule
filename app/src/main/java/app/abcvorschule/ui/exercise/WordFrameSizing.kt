@@ -58,4 +58,36 @@ object WordFrameSizing {
         val usable = (frameWidthDp - 2 * FramePaddingDp).coerceAtLeast(1f)
         return (usable / (chars * GlyphAspect)).coerceIn(MinGlyphSp, MaxGlyphSp)
     }
+
+    /**
+     * How many segments fit in one row at the touch-target floor. At least one, so
+     * an absurdly narrow stage degrades to one segment per row instead of zero.
+     */
+    fun maxPerRow(available: Float): Int {
+        val perSegment = MinFrameDp + MinGapDp
+        return (((available + MinGapDp) / perSegment).toInt()).coerceAtLeast(1)
+    }
+
+    /**
+     * Rows needed for [segmentCount] segments. The Wort-Detektiv wraps long words
+     * ("Xylophon" -> X·y·l·o·p·h·o·n) instead of shrinking below [MinFrameDp]:
+     * a preschooler has to be able to hit the segment, and a word on two lines is
+     * still readable while a 40dp target is not hittable.
+     */
+    fun rowCount(available: Float, segmentCount: Int): Int {
+        if (segmentCount <= 0) return 1
+        val perRow = maxPerRow(available)
+        return ((segmentCount + perRow - 1) / perRow).coerceAtLeast(1)
+    }
+
+    /**
+     * Segments per row, balanced across [rowCount] rows so two rows read as one
+     * word broken in half rather than a full row plus an orphan. An uneven count
+     * puts the extra segment in the earlier row.
+     */
+    fun segmentsPerRow(available: Float, segmentCount: Int): Int {
+        if (segmentCount <= 0) return 1
+        val rows = rowCount(available, segmentCount)
+        return ((segmentCount + rows - 1) / rows).coerceAtLeast(1)
+    }
 }
