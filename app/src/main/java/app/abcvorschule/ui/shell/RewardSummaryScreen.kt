@@ -23,8 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -40,8 +40,9 @@ import app.abcvorschule.ui.components.IconStar
 import kotlinx.coroutines.delay
 
 // Kosmetische Werte für den Hintergrundstern: anders als die Schriftgrößen entscheiden
-// sie nicht über die Höhe der Spalte (der Stern liegt hinter der Bildreihe, nicht in
-// ihrem Layout-Fluss) und bleiben deshalb bewusst hier, nicht in FinaleLayout.
+// sie nicht über die Höhe der Spalte (der Stern trägt nicht zur gemessenen Größe seiner
+// Box bei, siehe excludedFromMeasurement()) und bleiben deshalb bewusst hier, nicht in
+// FinaleLayout.
 private val BackgroundStarSize = 180.dp
 private const val BackgroundStarAlpha = 0.12f
 
@@ -51,9 +52,11 @@ private const val BackgroundStarAlpha = 0.12f
  * - [finale] gesetzt (echter Abschluss): Bildreihe, Satz und Speaker über einem
  *   gedämpften Hintergrundstern, der hinter der Bildreihe sitzt (nicht hinter dem
  *   ganzen Bildschirm) — er rahmt die Bilder, statt über den Satz zu laufen. Der
- *   Satztext richtet sich an den mitlesenden Erwachsenen — die einzige bewusste
- *   Ausnahme von „das Kind kann nicht lesen" (PRODUCT_PRINCIPLES.md Abschnitt 12),
- *   weil keine Handlung am Text hängt.
+ *   Stern ist rein dekorativ und darf größer sein als die Bildreihe, ohne deren
+ *   Höhe (und damit die Höhe der ganzen Spalte) zu beeinflussen — siehe
+ *   [excludedFromMeasurement]. Der Satztext richtet sich an den mitlesenden
+ *   Erwachsenen — die einzige bewusste Ausnahme von „das Kind kann nicht lesen"
+ *   (PRODUCT_PRINCIPLES.md Abschnitt 12), weil keine Handlung am Text hängt.
  * - [finale] null (Abbruch mit Punkten): nur Erfolgs-Header, derselbe Stern und
  *   Weiter. Ohne Bildreihe sitzt der Stern an derselben Stelle, an der die Bildreihe
  *   sonst stünde (oben im mittleren Block) — er bleibt also sichtbar und an
@@ -62,10 +65,13 @@ private const val BackgroundStarAlpha = 0.12f
  * Header, mittlerer Block und Weiter-Button liegen in einer Spalte; der mittlere
  * Block trägt `weight(1f)` und richtet seinen Inhalt oben aus, sodass Header und
  * Inhalt als eine zusammenhängende Einheit wirken und der Weiter-Button unten
- * andockt. Ein Nebeneffekt: Inhalt, der den verfügbaren Platz übersteigt, wird an der
- * Blockgrenze abgeschnitten (`clipToBounds`), statt den Button vom Bildschirm zu
- * schieben — robuster als das vorherige `SpaceBetween`, das das nicht verhindern
- * konnte.
+ * andockt. `weight(1f)` (mit dem Standard `fill = true`) gibt diesem Block eine
+ * feste Höhe, unabhängig vom Inhalt — der Weiter-Button rutscht dadurch nie vom
+ * Bildschirm. Der Block schneidet überlaufenden Inhalt nicht ab (kein
+ * `clipToBounds`): eine dekorative Fläche darf über ihre Kindgrenzen hinausragen,
+ * aber ein Bedienelement (der Speaker-Button) darf nie unsichtbar abgeschnitten
+ * werden — deshalb bleibt der Stern von der Höhenmessung ausgenommen, statt echten
+ * Inhalt wegzuschneiden, falls er zu groß würde.
  *
  * Zeigt bewusst **keine** Punktezahl: die steht im Übungs-Chrome und auf dem Pfad.
  */
@@ -116,12 +122,7 @@ fun RewardSummaryScreen(
         Box(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth()
-                // Garantiert das oben beschriebene "abschneiden statt verdrängen":
-                // weight(1f) allein gibt diesem Block eine feste Höhe, aber ohne
-                // clipToBounds würde zu hoher Inhalt trotzdem sichtbar über die
-                // Blockgrenze hinaus gezeichnet und den Weiter-Button überlappen.
-                .clipToBounds(),
+                .fillMaxWidth(),
             contentAlignment = Alignment.TopCenter,
         ) {
             if (finale == null) {
@@ -156,6 +157,27 @@ private fun BackgroundStar(scale: Float, modifier: Modifier = Modifier) {
     )
 }
 
+/**
+ * Misst den Inhalt normal (in voller Größe), meldet dem Eltern-Layout aber eine Größe
+ * von 0×0 zurück — zentriert auf demselben Punkt, an dem der Inhalt sonst gestanden
+ * hätte. Für rein dekorative Elemente, die größer sein dürfen als das, was sie
+ * hinterlegen, ohne dessen Größe (und damit die Höhe der ganzen Spalte) zu
+ * beeinflussen.
+ *
+ * `Modifier.wrapContentSize(unbounded = true)` allein reicht dafür nicht: eine `Box`
+ * misst alle Kinder mit denselben eingehenden Constraints, die hier recht locker sind
+ * (die Bildreihe braucht viel weniger als verfügbar ist) — der Stern würde also seine
+ * volle gemessene Größe zurückmelden, solange sie unter diesen Constraints bleibt, egal
+ * wie "unbounded" er gemessen wurde. Hier wird die gemeldete Größe stattdessen explizit
+ * überschrieben, unabhängig von den eingehenden Constraints.
+ */
+private fun Modifier.excludedFromMeasurement(): Modifier = this.layout { measurable, constraints ->
+    val placeable = measurable.measure(constraints)
+    layout(0, 0) {
+        placeable.place(-placeable.width / 2, -placeable.height / 2)
+    }
+}
+
 @Composable
 private fun FinaleBody(
     finale: LessonFinale,
@@ -179,9 +201,14 @@ private fun FinaleBody(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center,
         ) {
-            // Hinter der Bildreihe statt hinter der ganzen Spalte: so rahmt der Stern
-            // die Bilder, statt über den Satz darunter zu laufen.
-            BackgroundStar(scale = starScale)
+            // Hinter der Bildreihe statt hinter der ganzen Spalte. excludedFromMeasurement()
+            // ist hier Pflicht: ohne sie wäre der Stern (180dp) höher als die Bildreihe
+            // (~85dp) und würde die Box — und damit die ganze Spalte — entsprechend
+            // aufblähen, bis am Ende der Speaker-Button keinen Platz mehr hätte.
+            BackgroundStar(
+                scale = starScale,
+                modifier = Modifier.excludedFromMeasurement(),
+            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
