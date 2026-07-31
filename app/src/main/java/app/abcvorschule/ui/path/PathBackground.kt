@@ -42,6 +42,18 @@ private const val StarSeed = 42
  */
 private const val SmallStarCount = 34
 
+/**
+ * Floor for a star's drawn radius, in device pixels, applied after the dp
+ * conversion. The small tier is 0.5..0.9dp, which on an mdpi screen is 0.5..0.9
+ * physical pixels: an antialiased circle below a 1px radius spreads its already
+ * low twinkle alpha over partial pixels and vanishes, so those 34 drawCircle
+ * calls a frame would buy nothing there. Because it is a floor and not a scale
+ * it can only ever bind where a star would otherwise be sub-pixel — the
+ * smallest small star reaches 1px at xhdpi, and from there up every star keeps
+ * its exact dp size.
+ */
+private const val MinStarRadiusPx = 1f
+
 /** Line segments a hill's wave is sampled with — 24 was the old loop's step count. */
 private const val HillSegments = 24
 
@@ -136,13 +148,24 @@ fun PathBackground(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
                     0.10f + 0.15f * abs(sin((twinkle + star.phase) * PI.toFloat()))
                 drawCircle(
                     color = SoftSand.copy(alpha = twinkleAlpha),
-                    radius = star.radius.dp.toPx(),
+                    radius = star.radius.dp.toPx().coerceAtLeast(MinStarRadiusPx),
                     center = Offset(star.fx * size.width, star.fy * size.height),
                 )
             }
         }
 
         // Hills sit in their own layers so each can drift at its own parallax factor.
+        //
+        // The amplitudes are raw DrawScope pixels while the trees standing on them
+        // and the stars above them are dp — a known inconsistency, left in place on
+        // purpose: converting them reshapes the silhouette of the whole landscape at
+        // every density, and this one was signed off on a device. What it costs is
+        // that the tree-height-to-wave-amplitude ratio is density dependent and
+        // swings by 4x between mdpi and xxxhdpi. Whoever closes the gap has to
+        // convert all three together with TreeApexHeight, using the density the
+        // sign-off happened on as the divisor (on an xxhdpi phone that is 34/46/28px
+        // -> ~11/15/9dp), and then look at the screen again: the numbers alone do
+        // not say whether the hills still read as hills.
         HillBand(color = NightPanel, alpha = 0.5f, baseFraction = 0.72f, amplitude = 34f, parallax = 0.05f, scrollOffset = scrollOffset)
         HillBand(color = NightPanel, alpha = 0.7f, baseFraction = 0.82f, amplitude = 46f, parallax = 0.10f, scrollOffset = scrollOffset)
         HillBand(color = NightElevated, alpha = 0.9f, baseFraction = 0.92f, amplitude = 28f, parallax = 0.15f, scrollOffset = scrollOffset, trees = true)
@@ -197,8 +220,9 @@ private fun HillBand(
                         val tx = size.width * fx
                         // Same wave the band is sampled on, so the trunk sits on the
                         // crest. The four fractions fall between the 24 polyline
-                        // samples, but the interpolation error is under 0.03px at
-                        // amplitude 28f — the skirt below ty absorbs it.
+                        // samples, so the exact ty and the drawn edge differ by
+                        // 0.030/0.060/0.044/0.015px at amplitude 28f — at most 0.06px,
+                        // and the 3dp skirt below ty absorbs it.
                         val ty = base - amplitude * sin(fx * 3.4f)
                         val tree = Path().apply {
                             moveTo(tx, ty - apex)

@@ -44,10 +44,11 @@ import app.abcvorschule.ui.theme.SoftMint
 import app.abcvorschule.ui.theme.SoftSand
 import app.abcvorschule.ui.theme.SoftSky
 import app.abcvorschule.ui.theme.WoodDark
+import app.abcvorschule.ui.theme.WoodDarkShade
 import app.abcvorschule.ui.theme.WoodMid
-import app.abcvorschule.ui.theme.WoodNail
-import app.abcvorschule.ui.theme.WoodPost
+import app.abcvorschule.ui.theme.WoodMidShade
 import app.abcvorschule.ui.theme.WoodWarm
+import app.abcvorschule.ui.theme.WoodWarmShade
 
 /** Deliberately not named PathSignNode — a sibling object and composable with the
  *  same name compiles, but reads like a typo at every call site. */
@@ -84,6 +85,14 @@ fun PathSignNode(
         LessonState.Mastered -> WoodWarm
         LessonState.Available, LessonState.InProgress -> WoodMid
         LessonState.Locked, LessonState.Planned -> WoodDark
+    }
+    // The post stands behind the board and the nail heads are pressed into it, so
+    // both take this board's own shade instead of one global post tone. A single
+    // tone would sit above WoodDark and flip the depth on every locked sign.
+    val shade = when (state) {
+        LessonState.Mastered -> WoodWarmShade
+        LessonState.Available, LessonState.InProgress -> WoodMidShade
+        LessonState.Locked, LessonState.Planned -> WoodDarkShade
     }
     val ring: Color = when (state) {
         LessonState.Mastered, LessonState.Available -> SoftMint
@@ -150,7 +159,7 @@ fun PathSignNode(
                         .border(RingWidth, ring, BoardShape),
                 )
             }
-            Nail(Modifier.align(Alignment.TopStart).padding(10.dp))
+            Nail(shade, Modifier.align(Alignment.TopStart).padding(10.dp))
             when {
                 state == LessonState.Mastered -> IconStar(
                     tint = SoftGold,
@@ -170,7 +179,7 @@ fun PathSignNode(
                         .padding(8.dp)
                         .clearAndSetSemantics {},
                 )
-                else -> Nail(Modifier.align(Alignment.TopEnd).padding(10.dp))
+                else -> Nail(shade, Modifier.align(Alignment.TopEnd).padding(10.dp))
             }
 
             Column(
@@ -218,12 +227,14 @@ fun PathSignNode(
             Modifier
                 .width(10.dp)
                 .height(PathSignDimens.PostHeight)
-                .background(WoodPost, RoundedCornerShape(bottomStart = 3.dp, bottomEnd = 3.dp)),
+                .background(shade, RoundedCornerShape(bottomStart = 3.dp, bottomEnd = 3.dp)),
         )
     }
 }
 
+/** [shade] is the sign's own board pushed down ~4 L*, so the head reads as a
+ *  dent on every board rather than as a bead on the darkest one. */
 @Composable
-private fun Nail(modifier: Modifier = Modifier) {
-    Box(modifier.size(6.dp).background(WoodNail, CircleShape))
+private fun Nail(shade: Color, modifier: Modifier = Modifier) {
+    Box(modifier.size(6.dp).background(shade, CircleShape))
 }
