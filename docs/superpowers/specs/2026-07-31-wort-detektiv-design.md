@@ -203,7 +203,10 @@ Einzeiligkeit.** Im aktuellen Content erreicht kein Wort 7 Segmente (Maximum: `H
 `H·ä·u·s·e·r`, 6), der Umbruch ist der Pfad für künftige lange Wörter.
 
 **Die Platzhalter-Striche** im Antwortblock: ein 3dp-Strich in `MutedText`, so viele wie
-es Treffer gibt, Breite = gemessene Breite des Zielglyphs, mindestens 40dp. Keine Rahmen,
+es Treffer gibt, Breite aus der Zeichenzahl des Zielsymbols geschätzt (`GlyphAspect`, die
+Konvention von `WordFrameSizing`), mindestens 40dp. Eine echte Textmessung wäre genauer,
+aber der Strich muss nur *relativ* stimmen — `Sch` sichtbar breiter als `e` —, und die
+Schätzung nutzt dieselbe Konstante, gegen die der Wort-Bauer seine Rahmen schon rechnet. Keine Rahmen,
 keine Füllung, nichts von dort wegziehbar.
 
 Warum Striche statt der Batterie aus der Jagd:
@@ -275,10 +278,14 @@ das Kind kann ihn nicht lesen.
 **„Zeig mir"**
 
 Nach 6 aufeinanderfolgenden Fehltipps (`ResolveThreshold`, geteilt mit der Jagd) taucht
-`AbcResolveButton` auf. Tippen darauf lässt alle Ziele **gedimmt** in ihre Striche wandern
-— `MutedText`, nicht `SoftGold` — und meldet `onResult(correct = false, resolved = true)`:
-keine Punkte, und die aufgelöste Antwort trägt nicht die Belohnungsfarbe (Prinzip 8,
-„Auflösen ist nicht grün").
+`AbcResolveButton` auf. Tippen darauf setzt alle Ziele **gedimmt und ohne Flug** in ihre
+Striche — `MutedText`, nicht `SoftGold` — und meldet
+`onResult(correct = false, resolved = true)`: keine Punkte, und die aufgelöste Antwort
+trägt nicht die Belohnungsfarbe (Prinzip 8, „Auflösen ist nicht grün").
+
+**Ohne Flug ist Absicht.** Der Flug ist die Choreografie des Verdienens (§5, Punkt 3);
+ihn beim Auflösen abzuspielen würde genau das Gefühl erzeugen, das Prinzip 8 der
+Auflösung verweigert. Die Antwort erscheint einfach, sie wird nicht errungen.
 
 **Scoring:** `scoredAtomIds()` liefert die Ziel-Atom-ID, wie bei `SymbolHuntRound`.
 Nur der erste Fehltipp einer Runde wird für Adaptivität gemeldet — sonst würde ein Kind,
