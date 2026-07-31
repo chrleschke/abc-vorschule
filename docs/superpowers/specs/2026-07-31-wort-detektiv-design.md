@@ -135,6 +135,21 @@ ohne `letter_trace` in `SymbolHuntInsertion`.
 Ziel bevorzugt die Fokus-Silbe der Lektion (`syllable_merge.resultAtomId`), sonst der
 erste Silben-Block. Ohne Silben-Block fällt die Runde in den Buchstaben-Modus.
 
+**Zusätzliche Bedingung: der Block muss so heißen wie sein Atom.** Stimmt
+`WordBlock.display` nicht (case-insensitiv) mit `Atom.display` überein, fällt die Runde in
+den Buchstaben-Modus. Der Content hat genau einen solchen Fall: `l17-t8` autoriert
+`{atomId: "spi", display: "Spin"}` — vier Buchstaben unter einem dreibuchstabigen
+Silben-Atom. Ohne diese Bedingung stünde `spi` als Ziel über einem Segment `Spin`, und ein
+Kind, das nicht liest, müsste etwas antippen, das anders aussieht als das Gesuchte. Da das
+Label laut §2 aus dem Atom kommt und nicht aus dem Block, ist die Runde in diesem Fall
+nicht ehrlich beschriftbar — also wird sie nicht gestellt. L17 spielt stattdessen eine
+Buchstaben-Runde auf `Sp` in `Sp·i·n·n·e`.
+
+Daraus folgt die Invariante, die die Aufgabe überhaupt visuell lösbar macht und die ein
+Test festhalten muss: **das angezeigte Zielsymbol kommt in jeder Runde wörtlich (bis auf
+Groß-/Kleinschreibung) als Segment vor.** Sie ist stärker als „`targetIndices` ist nicht
+leer" — ein Treffer, den das Kind nicht als das Gesuchte erkennt, ist keiner.
+
 **Treffer sind immer *alle* Vorkommen des Ziels**, case-insensitive verglichen.
 
 ### Groß- und Kleinschreibung ist Absicht
@@ -364,7 +379,7 @@ die Derivation-Tests. `B` = Buchstaben-Modus, `S` = Silben-Modus.
 | L14 J, Z & Eu | B `Z` `Z·e·b·r·a` 1 · B `Eu` `Eu·l·e` 1 |
 | L15 ß & V | B `ß` `F·u·ß` 1 · S `vo` `Vo·gel` 1 · B `V` `V·a·s·e` 1 |
 | L16 ck & Pf | B `ck` `S·a·ck` 1 · B `Pf` `A·pf·e·l` 1 · B `Pf` `Pf·e·r·d` 1 |
-| L17 St & Sp | B `St` `St·e·r·n` 1 · S `spin` `Spin·ne` 1 |
+| L17 St & Sp | B `St` `St·e·r·n` 1 · B `Sp` `Sp·i·n·n·e` 1 |
 | L18 C, Y, X & Qu | B `Qu` `Qu·a·l·l·e` 1 · B `X` `T·a·x·i` 1 · B `Y` `P·o·n·y` 1 |
 | L19 M & A Wdh. | B `M` `M·a·m·a` 2 · B `A` `a·m` 1 |
 | L20 I & O Wdh. | B `O` `O·m·a` 1 · S `mi` `Mi·mi` 2 |
@@ -378,3 +393,7 @@ die Derivation-Tests. `B` = Buchstaben-Modus, `S` = Silben-Modus.
 L13 ergibt dreimal `Sch` in Folge, weil die Lektion nur ein Fokus-Graphem führt und die
 Rotation nichts hat, worauf sie wechseln könnte. Das ist kein Fehler, sondern die
 Lektion: L13 heißt „Sch (Der Dreifachlaut)".
+
+L17 bekommt zwei Buchstaben-Runden statt einer Silben-Runde, weil `l17-t8` seinen
+`spi`-Block als „Spin" schreibt — siehe die Block-Bedingung in §4. L24 („St & Sp
+Wiederholung") autoriert denselben Block als „Spi" und spielt darum die Silben-Runde.
