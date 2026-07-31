@@ -117,7 +117,13 @@ fun PathScreen(
                     // do not give one of them a custom value without giving the other the
                     // matching one, or the "walked" boundary silently drifts off the
                     // actual node.
+                    // nodePoints is a key of its own, not just the primitives it was
+                    // built from: this remember consumes the list, and the day either
+                    // key set gains or loses an entry the two stop lining up and this
+                    // one silently serves a stale polyline. 26 equals() beats
+                    // rebuilding a 601-point spline.
                     val dots = remember(
+                        nodePoints,
                         lessons.size,
                         widthPx,
                         spacingPx,

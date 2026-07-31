@@ -73,9 +73,9 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
   Lektion, Label = Graphem, darunter drei Emojis aus dem Bildwortschatz der Lektion.
   Der bereits zurückgelegte Teil des Weges ist wärmer gezeichnet als der Rest.
   Gesperrte Schilder zeigen ihre Emojis nur als Silhouette.
-Gesperrte und noch nicht autorierte Knoten reagieren auf Tippen mit einem gesprochenen Hinweis —
+Gesperrte und noch nicht autorierte Schilder reagieren auf Tippen mit einem gesprochenen Hinweis —
 niemals mit einem stummen No-Op.
-- Tippen auf einen freigeschalteten Knoten startet die Sechs-Trainer-Typen-Session dieser Lektion.
+- Tippen auf ein freigeschaltetes Schild startet die Sechs-Trainer-Typen-Session dieser Lektion.
 - Kein Domänen-Mix, keine Zufallsrotation: die Trainer-Reihenfolge ist didaktisch fix.
 - Vor/Zurück zwischen Runden ist **immer** möglich, unabhängig von Punkten/Fortschritt.
 - Fortschritt speichern nach jeder Antwort; unfertige Lektion wird beim Öffnen fortgesetzt.

@@ -103,9 +103,10 @@ class SessionViewModel(
 
     /**
      * Signpost emojis per lesson id. Computed once in [bootstrap] when the pack
-     * loads and cached from then on — not rebuilt on every call — so callers
-     * (Compose included) always get back the same Map instance and can treat it
-     * as unchanged across recompositions.
+     * loads and cached from then on — not rebuilt on every call — so every call
+     * after the pack has loaded returns the same Map instance. That is all this
+     * accessor guarantees: whether a Compose caller actually skips also depends on
+     * the other arguments it passes alongside this one.
      */
     fun lessonEmojis(): Map<String, List<String>> =
         if (this::pack.isInitialized) lessonEmojisByLessonId else emptyMap()

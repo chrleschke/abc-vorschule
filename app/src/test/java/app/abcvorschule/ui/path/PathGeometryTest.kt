@@ -60,6 +60,32 @@ class PathGeometryTest {
     }
 
     @Test
+    fun defaultHorizontalMarginClearsTheSignOnTheNarrowestPhone() {
+        // Unlike the other geometry constants, DefaultHorizontalMargin encodes a
+        // requirement rather than a taste judgement: on a 360dp screen the swing
+        // has to be wider than a signpost, or the trail runs behind the boards for
+        // roughly half of every step (which is exactly what reusing the 132dp
+        // vertical margin did). 360 - 2 * 84 = 192dp of swing against a 136dp
+        // board. Asserted on the shipped defaults, not on this class's fixture.
+        val screenWidth = 360f
+        val boardWidth = PathSignDimens.BoardWidth.value
+        val nominalSwing = screenWidth - 2 * PathGeometry.DefaultHorizontalMargin
+        assertTrue(
+            "swing $nominalSwing dp at 360dp width must exceed the ${boardWidth}dp sign",
+            nominalSwing > boardWidth,
+        )
+
+        // And the points must actually use that room, not just be allowed to.
+        val xs = PathGeometry.points(26, screenWidth).map { it.x }
+        val actualSwing = xs.maxOrNull()!! - xs.minOrNull()!!
+        assertTrue(
+            "nodes only spread $actualSwing dp at 360dp width, less than the " +
+                "${boardWidth}dp sign they have to clear",
+            actualSwing > boardWidth,
+        )
+    }
+
+    @Test
     fun narrowScreenCollapsesToAStraightLine() {
         // Amplitude 0 must swallow the organic jitter too, otherwise nodes would
         // wander off a screen that has no room to swing. A screen has no room to

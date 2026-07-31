@@ -10,6 +10,17 @@ data class PathPoint(val x: Float, val y: Float)
  * Deterministic pseudo-noise. The path must look hand-drawn but never move
  * between two recompositions, so nothing here uses Random or any state — the
  * same (index, salt) always yields the same value in (-1f, 1f).
+ *
+ * The salt is what keeps two effects from moving in lockstep, so it is allocated
+ * centrally here. Taken, across three files:
+ *
+ * - 3 — horizontal node jitter ([PathGeometry.points])
+ * - 5 — signpost tilt (`PathSignNode`)
+ * - 7 — vertical node jitter ([PathGeometry.yOffsets])
+ * - 11 — trail dot radius (`PathTrail.dots`)
+ *
+ * Pick an unused one for anything new: reusing a salt correlates two effects that
+ * are supposed to look independent, and nothing crashes to tell you.
  */
 internal object PathNoise {
     fun signed(index: Int, salt: Int): Float {

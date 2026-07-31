@@ -32,6 +32,9 @@ import kotlin.random.Random
 private const val StarCount = 40
 private const val StarSeed = 42
 
+/** Line segments a hill's wave is sampled with — 24 was the old loop's step count. */
+private const val HillSegments = 24
+
 /** Star position in 0..1 screen fractions plus its twinkle phase. */
 private data class Star(val fx: Float, val fy: Float, val radius: Float, val phase: Float)
 
@@ -73,6 +76,10 @@ fun PathBackground(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
     // Everything is wrapped in a Box of its own: the layers must stack on top of
     // each other, not depend on the caller happening to be a Box.
     Box(modifier.fillMaxSize()) {
+        // The gradient gets a Canvas of its own, drawn first and therefore behind
+        // the stars. Sharing one with the star field would rebuild its shader on
+        // every twinkle frame, because that lambda reads the animation and is
+        // invalidated ~60x a second for the life of the screen.
         Canvas(Modifier.fillMaxSize()) {
             drawRect(
                 brush = Brush.verticalGradient(
@@ -81,6 +88,9 @@ fun PathBackground(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
                     1f to NightHorizon,
                 ),
             )
+        }
+
+        Canvas(Modifier.fillMaxSize()) {
             stars.forEach { star ->
                 val twinkleAlpha =
                     0.10f + 0.15f * abs(sin((twinkle + star.phase) * PI.toFloat()))
@@ -121,13 +131,18 @@ private fun HillBand(
                 // the (shifted) wave down to size.height, so the bottom of the
                 // viewport is covered at any scroll offset, positive or negative.
                 val base = size.height * baseFraction - scrollOffset() * parallax
+                // Indexed, and the wave is sampled on the 0..1 fraction rather than
+                // on x/size.width: an accumulating `while (x <= size.width)` loop
+                // never terminates at width 0 (the increment is 0 too) and grows the
+                // Path until the app dies, and both divisions by size.width are gone
+                // with it. A draw pass at zero width is reachable through a
+                // freeform/split-screen resize.
                 val hill = Path().apply {
                     moveTo(0f, size.height)
                     lineTo(0f, base)
-                    var x = 0f
-                    while (x <= size.width) {
-                        lineTo(x, base - amplitude * sin(x / size.width * 3.4f))
-                        x += size.width / 24f
+                    for (i in 0..HillSegments) {
+                        val fx = i.toFloat() / HillSegments
+                        lineTo(size.width * fx, base - amplitude * sin(fx * 3.4f))
                     }
                     lineTo(size.width, size.height)
                     close()
@@ -136,7 +151,7 @@ private fun HillBand(
                 if (trees) {
                     listOf(0.14f, 0.31f, 0.68f, 0.86f).forEach { fx ->
                         val tx = size.width * fx
-                        val ty = base - amplitude * sin(tx / size.width * 3.4f)
+                        val ty = base - amplitude * sin(fx * 3.4f)
                         val tree = Path().apply {
                             moveTo(tx, ty - 42f)
                             lineTo(tx - 16f, ty + 4f)

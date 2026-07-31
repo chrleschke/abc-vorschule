@@ -54,7 +54,8 @@ class LessonEmojisTest {
     @Test
     fun plannedLessonWithoutTasksYieldsNothing() {
         // No lesson in the shipped pack is `planned`, so this case only exists
-        // synthetically — the sign then shows the lock and no emoji row.
+        // synthetically — the sign then shows the lock glyph and an empty (but
+        // still space-reserving) emoji row.
         val planned = Lesson(
             id = "l99",
             index = 99,

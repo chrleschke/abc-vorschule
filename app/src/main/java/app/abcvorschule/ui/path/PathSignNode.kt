@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,10 +22,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -58,11 +59,14 @@ object PathSignDimens {
     val TotalHeight = BoardHeight + PostHeight
 }
 
+private val BoardShape = RoundedCornerShape(14.dp)
+private val RingWidth = 4.dp
+
 /**
  * A lesson as a wooden signpost standing on the trail: the grapheme large, three
- * of the lesson's own picture words below it. Locked signs keep the emojis as
- * near-invisible silhouettes — enough to make a child curious, not enough to
- * give anything away.
+ * of the lesson's own picture words below it. Locked signs carry a lock glyph in
+ * the corner and keep the emojis as near-invisible silhouettes — enough to make a
+ * child curious, not enough to give anything away.
  */
 @Composable
 fun PathSignNode(
@@ -89,18 +93,6 @@ fun PathSignNode(
         LessonState.Mastered, LessonState.Available, LessonState.InProgress -> SoftSand
         LessonState.Locked, LessonState.Planned -> MutedText.copy(alpha = 0.45f)
     }
-    val ringAlpha = if (highlighted) {
-        val transition = rememberInfiniteTransition(label = "node_pulse")
-        val pulse by transition.animateFloat(
-            initialValue = 0.45f,
-            targetValue = 1f,
-            animationSpec = infiniteRepeatable(tween(900), RepeatMode.Reverse),
-            label = "node_pulse_alpha",
-        )
-        pulse
-    } else {
-        1f
-    }
     val stateDesc = stringResource(
         when (state) {
             LessonState.Mastered -> R.string.lesson_mastered
@@ -124,22 +116,60 @@ fun PathSignNode(
             modifier = Modifier
                 .width(PathSignDimens.BoardWidth)
                 .height(PathSignDimens.BoardHeight)
-                .background(board, RoundedCornerShape(14.dp))
-                .border(
-                    width = 4.dp,
-                    color = ring.copy(alpha = ring.alpha * ringAlpha),
-                    shape = RoundedCornerShape(14.dp),
-                ),
+                .background(board, BoardShape)
+                // A steady ring is a plain border here; the pulsing one is drawn by
+                // the overlay below instead, so a pulse frame cannot recompose the
+                // sign's whole content. Both draw the same 4dp border on the same
+                // shape.
+                .then(if (highlighted) Modifier else Modifier.border(RingWidth, ring, BoardShape)),
         ) {
+            if (highlighted) {
+                val transition = rememberInfiniteTransition(label = "node_pulse")
+                // Deliberately not `by`: the State is read inside the graphicsLayer
+                // block, which runs in the draw phase. Reading `pulse.value` up here
+                // would recompose this Column, its Box, the emoji Row and every glyph
+                // in it on every one of the pulse's frames.
+                val pulse = transition.animateFloat(
+                    initialValue = 0.45f,
+                    targetValue = 1f,
+                    animationSpec = infiniteRepeatable(tween(900), RepeatMode.Reverse),
+                    label = "node_pulse_alpha",
+                )
+                Box(
+                    Modifier
+                        .matchParentSize()
+                        .graphicsLayer {
+                            // Layer alpha multiplies the border's own alpha exactly
+                            // the way ring.copy(alpha = ring.alpha * pulse) did, and
+                            // the ring is a single non-overlapping stroke, so
+                            // ModulateAlpha is enough — no offscreen buffer.
+                            alpha = pulse.value
+                            compositingStrategy = CompositingStrategy.ModulateAlpha
+                        }
+                        .border(RingWidth, ring, BoardShape),
+                )
+            }
             Nail(Modifier.align(Alignment.TopStart).padding(10.dp))
-            if (state == LessonState.Mastered) {
-                IconStar(
+            when {
+                state == LessonState.Mastered -> IconStar(
                     tint = SoftGold,
                     size = 16.dp,
                     modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
                 )
-            } else {
-                Nail(Modifier.align(Alignment.TopEnd).padding(10.dp))
+                // The child cannot read, and WoodMid against WoodDark is only a
+                // 1.41:1 board difference, so "not yet" must not rest on the ring
+                // colour alone. Decorative for TalkBack — the sign's
+                // contentDescription already announces the locked state.
+                !playable -> Text(
+                    text = "🔒",
+                    fontSize = 16.sp,
+                    color = Color.Unspecified,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .clearAndSetSemantics {},
+                )
+                else -> Nail(Modifier.align(Alignment.TopEnd).padding(10.dp))
             }
 
             Column(
@@ -150,12 +180,20 @@ fun PathSignNode(
                     text = label,
                     style = MaterialTheme.typography.titleLarge,
                     color = labelColor,
+                    // Labels run up to 8 characters ("C y x qu", "Sch ch+"). At a
+                    // large font scale a wrapped second line spills past the board's
+                    // rounded corner, which is not clipped.
+                    maxLines = 1,
                 )
-                // Fixed height even when empty, so authored and planned signs stay
-                // the same size and the path does not jump.
+                // Reserved height even when empty, so authored and planned signs stay
+                // the same size and the path does not jump. A min, not a fixed
+                // height: height() caps as well as floors, and 16sp emojis need
+                // ~21.5dp at font scale 1.15 and ~24.3dp at 1.3 — they would silently
+                // crop, and the three pictures are the whole sign for a child who
+                // cannot read the letter above them. The 86dp board absorbs it.
                 Row(
                     modifier = Modifier
-                        .height(22.dp)
+                        .heightIn(min = 22.dp)
                         // Without this TalkBack reads "mouse tree ant" into the
                         // middle of the state announcement.
                         .clearAndSetSemantics {},
