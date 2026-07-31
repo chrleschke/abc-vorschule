@@ -77,11 +77,14 @@ niemals mit einem stummen No-Op.
 - Kein Domänen-Mix, keine Zufallsrotation: die Trainer-Reihenfolge ist didaktisch fix.
 - Vor/Zurück zwischen Runden ist **immer** möglich, unabhängig von Punkten/Fortschritt.
 - Fortschritt speichern nach jeder Antwort; unfertige Lektion wird beim Öffnen fortgesetzt.
-- Back in der Übung → Belohnungszusammenfassung (oder direkt zum Pfad, wenn noch keine Punkte);
-- **End-Screen in zwei Varianten.** Nur der *echte* Lektionsabschluss zeigt das Finale
-  (Bildreihe + Satz + Speaker, Abschnitt 12). Ein Abbruch mit Punkten zeigt den schlanken
-  Screen: Erfolgs-Header, Hintergrundstern, Weiter. Der Satz belohnt Durchhalten und nutzt
-  sich sonst ab.
+- Back in der Übung und der Schließen-Button verlassen die Lektion **direkt** zum Pfad, ohne
+  End-Screen — unabhängig von den Punkten.
+- **Der End-Screen erscheint nur beim echten Lektionsabschluss**, mit Finale (Bildreihe + Satz
+  + Speaker, Abschnitt 12). Der Satz belohnt damit Durchhalten und nutzt sich nicht ab.
+- Der End-Screen kennt zusätzlich eine **schlanke Variante** ohne Bildreihe und Satz. Sie ist
+  ein Defensivpfad für den Fall, dass sich kein Finale auflösen lässt — der Validator verbietet
+  das für autorierte Lektionen, also praktisch unerreichbar, aber ein reduzierter Screen ist
+  besser als ein leerer oder ein Absturz.
 - Der End-Screen zeigt **keine Punktezahl**. Punkte stehen im Übungs-Chrome und auf dem Pfad.
 
 ## 6. Hilfestufen
@@ -183,8 +186,15 @@ Random, kein Shuffle — nach demselben Compose-freien, testbaren Muster wie
   „roter Hut").
 - **Reim und Alliteration sind erlaubt, nie Pflicht.** Klang darf helfen, aber nie den
   Satz erzwingen.
-- **Vokabular aus der eigenen Lektion.** Die bildtragenden Nomen sind Atome derselben
-  Lektion. Verben und Adjektive dürfen frei sein — sie werden nie gelesen.
+- **Die bildtragenden Nomen tragen die Fokus-Grapheme der Lektion.** Das ist die eigentliche
+  Anforderung, nicht Herkunft aus dem Trainer-Vokabular: L10 („G & Ch") nimmt *Giraffe* und
+  *Dach*, L14 („J, Z & Eu") *Zebra* und *Jojo*, L17 („St & Sp") *Spinne* und *Spiegel*. Ein
+  Nomen darf dafür **neu** sein und ausschließlich im Finale vorkommen — `kuchen` 🍰 ist genau
+  so ein Atom (`kind: other`, nie gelesen, nie gebaut). Verben und Adjektive sind ohnehin frei,
+  weil sie nie gelesen werden.
+  Grund für die Freiheit: der Satz ist eine Belohnung, keine Übung. Er muss den Laut der
+  Lektion hörbar machen und ein Bild erzeugen — nicht die Kacheln des Wort-Bauers wiederholen.
+  Die strengen Reihenfolge-Regeln aus Abschnitt 3 gelten für Trainer-Content, nicht hier.
 - **Mindestens zwei bildtragende Nomen, maximal vier.** *Vom `ContentValidator` erzwungen.*
 - **Kein Nomen doppelt bebildern**, wenn zwei Atome denselben Emoji-Glyph teilen
   (`katze` und `mimi` sind beide 🐱 → nur eines).

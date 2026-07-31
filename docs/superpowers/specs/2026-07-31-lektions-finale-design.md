@@ -45,7 +45,7 @@ Nicht-Ziele in dieser Ausbaustufe:
 | Stern | Großer Stern im Hintergrund, gedämpft | Erhält das etablierte Erfolgssymbol, ohne einen zweiten Fokuspunkt neben der Bildreihe zu setzen. Passt zur Dark-Only-Nachtästhetik. |
 | Punktezeile | Entfällt | Doppelt redundant (Übungs-Chrome, Pfad-Screen). |
 | Erfolgsmeldung | Header oben statt zentriert | Macht Platz für Bildreihe und Satz als Bühnenmitte. |
-| Wann? | Nur bei echtem Abschluss | Bei Abbruch bleibt der schlanke Screen. Der Satz nutzt sich nicht ab und belohnt Durchhalten. |
+| Wann? | Nur bei echtem Abschluss | Der Satz nutzt sich nicht ab und belohnt Durchhalten. (Ursprünglich war für den Abbruch ein schlanker Screen vorgesehen — siehe Nachtrag am Ende: main hat den Abbruch-Pfad zum End-Screen inzwischen ganz entfernt.) |
 | Content-Typ | Eigener Typ `LessonFinale`, nicht `Sentence` | `Sentence.atomIds` sind Bausteine des Satz-Architekten und unterliegen der Fibel-Reihenfolge-Prüfung. Finale-Sätze enthalten Wörter wie *mampft* und *dicken*, die keine Atome sind und nie eingeführt werden. |
 | Bildauswahl | Redaktionell autoriert, nicht aus dem Text abgeleitet | Automatisches Wort→Atom-Matching scheitert an Flexion (*roten Hut*), an geteilten Glyphen (`dach` und `haus` sind beide 🏠) und an der Frage, welches Nomen ein Bild verdient. |
 
@@ -270,11 +270,11 @@ Header, Bildreihe, Satz und Buttons auf mehr als die nutzbare Höhe — und der 
 zusätzlich sprengte. Emojis sind Bilder, nicht Text; dass sie mit der Schrifteinstellung
 mitwachsen, ist eine Höflichkeit und darum das Erste, was nachgibt.
 
-Restrisiko, dokumentiert in `docs/residual-review-findings/feat-lektions-finale.md`:
-im pessimistischsten Fall (320×568 dp, `fontScale` 2.0, ein Satz der alle vier Zeilen
-braucht) reicht der Platz um ~16 dp nicht. Der Weiter-Button bleibt davon unberührt, weil
-`weight(1f)` inhaltsunabhängig ist; betroffen wäre allenfalls ein Randstreifen der
-Speaker-Fläche. Reale Sätze belegen zwei bis drei Zeilen.
+Restrisiko: im pessimistischsten Fall (320×568 dp, `fontScale` 2.0, ein Satz der alle vier
+Zeilen braucht) reicht der Platz um ~16 dp nicht. Der Weiter-Button bleibt davon unberührt,
+weil `weight(1f)` inhaltsunabhängig ist; betroffen wäre allenfalls ein Randstreifen der
+Speaker-Fläche. Reale Sätze belegen zwei bis drei Zeilen. Als Residual geführt in
+`docs/residual-review-findings/feat-lektions-finale.md`.
 
 ### 8.3 Abbruch-Variante (`finale == null`)
 
@@ -360,3 +360,31 @@ verankert:
   Lektion; Verben und Adjektive dürfen frei sein, weil sie nie gelesen werden müssen.
 - **Mindestens zwei bildtragende Nomen**, maximal vier. Vom Validator erzwungen.
 - **Kein Nomen doppelt bebildern**, wenn zwei Atome denselben Emoji-Glyph teilen.
+
+---
+
+## Nachtrag 2026-07-31: main hat den Abbruch-Pfad entfernt
+
+Während der Umsetzung landete auf `main` der Commit `664e440`
+(*feat(lesson): add close button and unify back behavior to skip end screen*). Er führt einen
+Schließen-Button ein und vereinheitlicht das Zurück-Verhalten: `onBackPressed()` ruft jetzt
+immer `exitLesson()` und verlässt eine laufende Lektion **direkt** zum Pfad.
+
+Damit ist die Ausgangslage aus Abschnitt 1 überholt. Der End-Screen wird nicht mehr an zwei
+Stellen erreicht, sondern nur noch an einer: `advance()`, wenn keine Runde mehr folgt. Was das
+für dieses Design bedeutet:
+
+- **Die Entscheidung „nur bei echtem Abschluss" ist stärker geworden**, nicht schwächer — sie
+  wird jetzt vom Session-Modell erzwungen statt von einem Feld, das an einer von zwei Stellen
+  gesetzt wird. `completedFinaleId` bleibt trotzdem sinnvoll: es trägt *welches* Finale gilt.
+- **Die schlanke Variante (Abschnitt 8.3) ist von einem regulären Zweig zum Defensivpfad
+  geworden.** Erreichbar nur noch, wenn sich eine `finaleId` nicht auflösen lässt — was der
+  Validator für autorierte Lektionen verbietet. Sie bleibt bewusst erhalten: ein reduzierter
+  Screen ist besser als ein leerer oder ein Absturz, und `TaskShell` nutzt deshalb
+  `pack.finales[id]` (nullable) statt `pack.finale(id)` (wirft).
+- **Smoke-Test-Punkt 10 der Residual-Notiz** („Abbruch mit Punkten zeigt kein Finale") ist damit
+  gegenstandslos: der Abbruch erreicht den End-Screen gar nicht mehr.
+
+Der Merge war konfliktfrei (`git merge-tree`), Build und die 256 Unit-Tests blieben grün.
+Abschnitt 1 und die Problembeschreibung bleiben unverändert stehen — sie beschreiben den Stand,
+gegen den dieses Design entworfen wurde.
