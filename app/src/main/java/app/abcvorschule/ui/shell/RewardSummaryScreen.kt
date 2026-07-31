@@ -43,12 +43,6 @@ import kotlinx.coroutines.delay
 private val BackgroundStarSize = 280.dp
 private const val BackgroundStarAlpha = 0.12f
 
-// Material3s eigenes Verhältnis für headlineSmall (32sp Zeilenhöhe / 24sp Schriftgröße),
-// hier reproduziert: sobald wir fontSize überschreiben, hängt lineHeight sonst weiter an
-// headlineSmalls festen 32sp und wächst mit der System-Schriftskalierung ungebremst
-// weiter — die gedeckelte Schriftgröße allein würde die Zeile dann nicht klein halten.
-private const val SentenceLineHeightRatio = 32f / 24f
-
 /**
  * Der End-Screen einer Lektion, in zwei Varianten:
  *
@@ -77,6 +71,7 @@ fun RewardSummaryScreen(
         animationSpec = tween(500),
         label = "reward-scale",
     )
+    val fontScale = LocalDensity.current.fontScale
 
     // Den Satz einmal beim Erscheinen sprechen, wie die Prompt-Ansage in der Übung.
     LaunchedEffect(finale?.id, ttsAvailable) {
@@ -104,6 +99,12 @@ fun RewardSummaryScreen(
                 text = stringResource(R.string.reward_title),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground,
+                // Ungedeckelt würde der Header bei großer Schriftskalierung nicht nur
+                // wachsen, sondern (ohne maxLines) auf zwei Zeilen umbrechen und den
+                // Puffer auffressen, den die gedeckelten Bilder und der gedeckelte Satz
+                // freihalten. Siehe FinaleLayout.headerSizeSp/-headerLineHeightSp.
+                fontSize = FinaleLayout.headerSizeSp(fontScale).sp,
+                lineHeight = FinaleLayout.headerLineHeightSp(fontScale).sp,
             )
 
             if (finale == null) {
@@ -115,6 +116,7 @@ fun RewardSummaryScreen(
                     ttsAvailable = ttsAvailable,
                     speaking = speaking,
                     onSpeak = onSpeak,
+                    fontScale = fontScale,
                 )
             }
 
@@ -133,11 +135,12 @@ private fun FinaleBody(
     ttsAvailable: Boolean,
     speaking: Boolean,
     onSpeak: (String) -> Unit,
+    fontScale: Float,
 ) {
-    val fontScale = LocalDensity.current.fontScale
     val pictures = FinaleLayout.picturesOf(pack, finale)
     val pictureSp = FinaleLayout.pictureSizeSp(pictures.size, fontScale).sp
     val sentenceSp = FinaleLayout.sentenceSizeSp(fontScale)
+    val sentenceLineHeightSp = FinaleLayout.sentenceLineHeightSp(fontScale)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -178,7 +181,7 @@ private fun FinaleBody(
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             fontSize = sentenceSp.sp,
-            lineHeight = (sentenceSp * SentenceLineHeightRatio).sp,
+            lineHeight = sentenceLineHeightSp.sp,
         )
 
         AbcSpeakerButton(

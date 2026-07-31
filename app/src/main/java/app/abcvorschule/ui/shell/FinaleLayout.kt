@@ -17,11 +17,14 @@ data class FinalePicture(
  * Deterministisch wie [app.abcvorschule.ui.exercise.WordFrameSizing]: kein Random, keine
  * Sortierung. Die Reihenfolge ist die des Satzes, weil sie den Satz erzählt.
  *
- * Seit der Font-Scale-Anpassung geben [pictureSizeSp] und [sentenceSizeSp] bei
- * `fontScale = 1.0` exakt die bisherigen Werte zurück und schrumpfen darüber, damit die
- * *effektiv gerenderte* Größe nie größer wird als bei `fontScale = 1.0` — siehe
+ * Seit der Font-Scale-Anpassung geben [pictureSizeSp], [sentenceSizeSp],
+ * [sentenceLineHeightSp], [headerSizeSp] und [headerLineHeightSp] bei `fontScale = 1.0`
+ * exakt die bisherigen Werte zurück und schrumpfen darüber, damit die *effektiv
+ * gerenderte* Größe nie größer wird als bei `fontScale = 1.0` — siehe
  * [capEffectiveSize]. Das hält den End-Screen bei jeder System-Schriftskalierung
  * innerhalb des am Bildschirm gemessenen Budgets, ohne dass die Spalte scrollen muss.
+ * Jede an dieser Rechnung beteiligte Zahl lebt hier, nicht im Composable — nur so bleibt
+ * sie testbar.
  */
 object FinaleLayout {
     private const val BaseSizeSp = 64
@@ -31,6 +34,15 @@ object FinaleLayout {
 
     /** Basisgröße des Satzes bei `fontScale = 1.0`: Material3s Default für headlineSmall. */
     private const val SentenceSizeSp = 24
+
+    /** Basis-Zeilenhöhe des Satzes bei `fontScale = 1.0`: Material3s Default für headlineSmall. */
+    private const val SentenceLineHeightSp = 32
+
+    /** Basisgröße des Headers bei `fontScale = 1.0`: `headlineMedium` (`ui/theme/Theme.kt`). */
+    private const val HeaderSizeSp = 28
+
+    /** Basis-Zeilenhöhe des Headers bei `fontScale = 1.0`: `headlineMedium` (`ui/theme/Theme.kt`). */
+    private const val HeaderLineHeightSp = 34
 
     /**
      * Bilder in Satzreihenfolge. Atome ohne Emoji oder ohne Eintrag im Pack werden
@@ -66,6 +78,29 @@ object FinaleLayout {
      * hätte sonst keinen Weg zurück.
      */
     fun sentenceSizeSp(fontScale: Float): Int = capEffectiveSize(SentenceSizeSp, fontScale)
+
+    /**
+     * Zeilenhöhe des Satzes, im Gleichschritt mit [sentenceSizeSp] gedeckelt: 32sp bei
+     * `fontScale = 1.0`, darüber genauso gebremst. Eine eigene, ebenfalls gedeckelte
+     * Zeilenhöhe ist nötig, weil Material3s `headlineSmall`-Stil sonst weiterhin fest
+     * 32sp vorgibt, die ungebremst mit `fontScale` wachsen würden — die gedeckelte
+     * Schriftgröße allein hielte die Zeile dann nicht klein.
+     */
+    fun sentenceLineHeightSp(fontScale: Float): Int = capEffectiveSize(SentenceLineHeightSp, fontScale)
+
+    /**
+     * Zielgröße des Headers ("Super gemacht!"): 28sp bei `fontScale = 1.0`, wie
+     * `headlineMedium`. Ungedeckelt würde der Header bei großer Schriftskalierung nicht
+     * nur wachsen, sondern auf zwei Zeilen umbrechen (der `Text` hat kein `maxLines`) —
+     * das verdoppelt seine Höhe und frisst genau den Puffer auf, den [sentenceSizeSp]
+     * und [pictureSizeSp] freihalten. Deckeln verhindert beides zugleich: Der Header
+     * bleibt bei jeder Skalierung so breit wie bei `fontScale = 1.0` und bricht darum nie
+     * um.
+     */
+    fun headerSizeSp(fontScale: Float): Int = capEffectiveSize(HeaderSizeSp, fontScale)
+
+    /** Zeilenhöhe des Headers, im Gleichschritt mit [headerSizeSp] gedeckelt: 34sp bei `fontScale = 1.0`. */
+    fun headerLineHeightSp(fontScale: Float): Int = capEffectiveSize(HeaderLineHeightSp, fontScale)
 
     /**
      * Deckelt die *effektiv gerenderte* Größe (= zurückgegebenes sp × `fontScale`) auf
