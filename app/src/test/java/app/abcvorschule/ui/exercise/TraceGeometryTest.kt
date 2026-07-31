@@ -74,6 +74,22 @@ class TraceGeometryTest {
     }
 
     @Test
+    fun activeStrokeIsDrawnLastSoItsStarsStayVisible() {
+        assertEquals(listOf(1, 2, 0), TraceGeometry.strokeDrawOrder(3, activeIndex = 0))
+        assertEquals(listOf(0, 2, 1), TraceGeometry.strokeDrawOrder(3, activeIndex = 1))
+        assertEquals(listOf(0, 1, 2), TraceGeometry.strokeDrawOrder(3, activeIndex = 2))
+        assertEquals(listOf(0), TraceGeometry.strokeDrawOrder(1, activeIndex = 0))
+    }
+
+    @Test
+    fun drawOrderFallsBackToPlainOrderWithoutAnActiveStroke() {
+        // A finished glyph: strokeIndex has walked past the last stroke.
+        assertEquals(listOf(0, 1, 2), TraceGeometry.strokeDrawOrder(3, activeIndex = 3))
+        assertEquals(listOf(0, 1, 2), TraceGeometry.strokeDrawOrder(3, activeIndex = -1))
+        assertTrue(TraceGeometry.strokeDrawOrder(0, activeIndex = 0).isEmpty())
+    }
+
+    @Test
     fun distanceToSegmentClampsToTheEndpoints() {
         val a = TracePoint(0f, 0f)
         val b = TracePoint(100f, 0f)

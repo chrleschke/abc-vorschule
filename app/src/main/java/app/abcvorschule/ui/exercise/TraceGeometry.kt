@@ -75,6 +75,21 @@ object TraceGeometry {
         }
     }
 
+    /**
+     * Painter's order for a glyph's strokes: everything else first, the stroke the child
+     * is currently on last. The road bands are wide enough to overlap where strokes meet,
+     * so a later stroke drawn on top would cover the active one's lane and stars — which
+     * is exactly the crossing point the child has to aim at. When the active stroke is
+     * finished, the next one takes the top slot.
+     */
+    fun strokeDrawOrder(strokeCount: Int, activeIndex: Int): List<Int> {
+        if (strokeCount <= 0) return emptyList()
+        val indices = (0 until strokeCount).toList()
+        // A finished glyph has no active stroke left; plain order is fine then.
+        if (activeIndex !in indices) return indices
+        return indices.filterNot { it == activeIndex } + activeIndex
+    }
+
     fun distanceToSegment(p: TracePoint, a: TracePoint, b: TracePoint): Float {
         val dx = b.x - a.x
         val dy = b.y - a.y

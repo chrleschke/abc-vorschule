@@ -34,7 +34,9 @@ Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede 
 1. **Auditiver Finder** — Laut im gesprochenen Wort verorten (Lok mit Anfang/Mitte/Ende-Waggon). Der gesuchte Laut steht groß über dem Zug; darunter zeigt das Bildwort seine Graphemgruppen in den drei Waggonfarben.
 2. **Visueller Spurensucher** — Graphem nachzeichnen („Zeichne das große T nach …"), gelbe Sterne in
   Strichreihenfolge sammeln. Nur der aktive Balken zeigt leuchtende Sterne, kommende Balken blass;
-  eingesammelte Sterne verschwinden. Fertige Balken füllen sich ease-in ein, das Fahrzeug springt an
+  eingesammelte Sterne verschwinden. Der aktive Balken liegt zuoberst und alle Sterne liegen über
+  allen Balken — kein späterer Balken darf den aktuellen Pfad oder seine Sterne verdecken; ist ein
+  Balken fertig, rückt der nächste nach oben. Fertige Balken füllen sich ease-in ein, das Fahrzeug springt an
   den Startpunkt des nächsten Balkens. Nach dem letzten Stern hält der fertige Buchstabe eine halbe
   Sekunde, dann folgt die Belohnungsseite: Bild groß, darunter die Wortzeile („**T** wie Tomate")
   mit fettem Graphem. Kein zusätzlicher Buchstaben-Text unter dem Pfad.
