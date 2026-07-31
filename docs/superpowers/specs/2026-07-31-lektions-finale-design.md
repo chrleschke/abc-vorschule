@@ -223,27 +223,58 @@ fun RewardSummaryScreen(
 ### 8.2 Aufbau
 
 ```
-Box(fillMaxSize)
-├── IconStar(size ≈ 280.dp, tint = primary bei alpha 0.12, Pop-Animation)  ← Hintergrund
-└── Column(SpaceBetween)
-    ├── Text(reward_title, headlineMedium)          ← Header oben
-    ├── Column(zentriert, weight 1f)
-    │   ├── Row(pictureAtomIds → Emoji, ≈ 64.sp)    ← Rebus, gestaffelt eingeblendet
-    │   ├── Text(finale.text, headlineSmall, center, max 2 Zeilen)
-    │   └── AbcSpeakerButton                        ← Satz erneut vorlesen
-    └── AbcContinueButton(centered)
+Column(padding 24 horizontal, 24 top, 40 bottom)
+├── Text(reward_title, headerSizeSp/headerLineHeightSp)   ← Header oben
+├── Box(weight 1f, contentAlignment = Center)             ← Mittelblock
+│   └── Column(zentriert)
+│       ├── Box                                           ← Bildreihe + Stern
+│       │   ├── IconStar(300.dp, alpha 0.12, Pop)         ← aus der Messung ausgeschlossen
+│       │   └── Row(pictureAtomIds → Emoji, pictureSizeSp) ← Rebus, gestaffelt
+│       ├── Text(finale.text, sentenceSizeSp, center, +20dp Seitenpolster, max 4 Zeilen)
+│       └── AbcSpeakerButton                              ← Satz erneut vorlesen
+└── AbcContinueButton(centered)
 ```
 
-Der Hintergrundstern ist die unterste Ebene der `Box`, der Inhalt liegt darüber. Die
-bestehende Pop-Animation wandert vom kleinen auf den großen Stern.
+**Der Stern beansprucht keinen Layout-Platz.** Er sitzt im `Box` hinter der Bildreihe, wird
+aber über einen `Modifier.layout {}`-Wrapper aus der Messung genommen, damit die Spalte
+genau so hoch bleibt wie ohne ihn. Ein dekoratives Element darf nie mitbestimmen, wie viel
+Raum der Speaker- oder Weiter-Button bekommt — ein früherer Zwischenstand tat das und
+schnitt auf schmalen Geräten den Speaker-Button ab. Kein `clipToBounds`: der Stern darf über
+die Ränder der Bildreihe hinausragen, ein Bedienelement abzuschneiden wäre schlimmer.
+
+**`weight(1f)` auf dem Mittelblock ist der Überlaufschutz.** Wächst der Inhalt über den
+verfügbaren Platz, wird er beschränkt statt den Weiter-Button aus dem Bild zu schieben.
+Der Inhalt darin ist vertikal **zentriert** — ein oben ausgerichteter Zwischenstand ließ
+alles im oberen Bildschirmviertel kleben und wurde am Gerät verworfen.
 
 Die Bildreihe blendet gestaffelt ein (≈ 180 ms Versatz pro Bild), was den Blick von
 links nach rechts führt. Die Staffelung läuft **nicht** synchron zum Audio: System-TTS
 liefert Wortgrenzen nur über `UtteranceProgressListener.onRangeStart` (API 26+) mit
 unzuverlässigem Timing, und der Aufwand steht nicht zum Gewinn.
 
-Bei mehr als drei Bildern schrumpft die Emoji-Größe auf ≈ 52 sp, damit die Reihe auf
-schmalen Geräten nicht umbricht. Der Satztext darf zwei Zeilen belegen.
+Bei mehr als drei Bildern schrumpft die Emoji-Größe von 64 auf 52 sp. Der Satztext darf bis
+zu vier Zeilen umbrechen und trägt zusätzlich 20 dp Seitenpolster (44 dp inklusive Spalten-
+Padding), damit er nicht bis an die Ränder läuft.
+
+### 8.2.1 Größen passen sich der Systemschrift an
+
+Alle Schriftgrößen laufen über `FinaleLayout`, das `LocalDensity.current.fontScale`
+entgegennimmt und die **effektive** Größe deckelt: `zurückgegeben × fontScale ≤ Basis`.
+Bei `fontScale = 1.0` sind das die Ausgangswerte (Bilder 64/52 sp, Satz 24 sp,
+Header 28 sp bei 34 sp Zeilenhöhe); darüber gibt der Screen die Vergrößerung zurück,
+statt den Weiter-Button aus dem Bild zu drängen.
+
+Warum das nötig war: bei `fontScale = 2.0` auf einem 360×640-dp-Gerät summierten sich
+Header, Bildreihe, Satz und Buttons auf mehr als die nutzbare Höhe — und der Header
+„Super gemacht!" in 28 sp Serif brach dabei auf zwei Zeilen um, was die Rechnung
+zusätzlich sprengte. Emojis sind Bilder, nicht Text; dass sie mit der Schrifteinstellung
+mitwachsen, ist eine Höflichkeit und darum das Erste, was nachgibt.
+
+Restrisiko, dokumentiert in `docs/residual-review-findings/feat-lektions-finale.md`:
+im pessimistischsten Fall (320×568 dp, `fontScale` 2.0, ein Satz der alle vier Zeilen
+braucht) reicht der Platz um ~16 dp nicht. Der Weiter-Button bleibt davon unberührt, weil
+`weight(1f)` inhaltsunabhängig ist; betroffen wäre allenfalls ein Randstreifen der
+Speaker-Fläche. Reale Sätze belegen zwei bis drei Zeilen.
 
 ### 8.3 Abbruch-Variante (`finale == null`)
 
