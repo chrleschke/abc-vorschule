@@ -29,6 +29,12 @@ object ContentValidator {
     private const val MaxWordTrayTiles = 5
     private const val MaxSentenceTrayTiles = 6
 
+    /** Redaktionsregeln für Finale-Sätze, siehe PRODUCT_PRINCIPLES.md Abschnitt 12. */
+    private const val MinFinalePictures = 2
+    private const val MaxFinalePictures = 4
+    private const val MinFinaleWords = 4
+    private const val MaxFinaleWords = 7
+
     fun validate(pack: ContentPack): List<ValidationIssue> {
         val issues = mutableListOf<ValidationIssue>()
         val atomIds = pack.atoms.keys
@@ -67,6 +73,39 @@ object ContentValidator {
                         "sentence ${sentence.id} displayOverride size must match atomIds",
                     )
                 }
+            }
+        }
+
+        pack.finales.values.forEach { finale ->
+            val count = finale.pictureAtomIds.size
+            if (count !in MinFinalePictures..MaxFinalePictures) {
+                issues += ValidationIssue(
+                    "finale ${finale.id} holds $count pictures; expected " +
+                        "$MinFinalePictures..$MaxFinalePictures",
+                )
+            }
+            val words = finale.text.trim().split(Regex("\\s+")).count { it.isNotEmpty() }
+            if (words !in MinFinaleWords..MaxFinaleWords) {
+                issues += ValidationIssue(
+                    "finale ${finale.id} holds $words words; expected " +
+                        "$MinFinaleWords..$MaxFinaleWords",
+                )
+            }
+            if (finale.tts.isBlank()) {
+                issues += ValidationIssue("finale ${finale.id} has no tts")
+            }
+            finale.pictureAtomIds.forEach { id ->
+                requireAtom("finale ${finale.id}", id)
+                if (pack.atoms[id]?.emoji.isNullOrBlank()) {
+                    issues += ValidationIssue("finale ${finale.id} picture $id carries no emoji")
+                }
+            }
+            // Dedupe on the glyph, not the atom id: `katze` and `mimi` share one cat
+            // emoji, and two identical pictures read as a bug — same rule as LessonEmojis.
+            val glyphs = finale.pictureAtomIds.mapNotNull { pack.atoms[it]?.emoji }
+                .filter { it.isNotBlank() }
+            if (glyphs.size != glyphs.distinct().size) {
+                issues += ValidationIssue("finale ${finale.id} shows the same glyph twice")
             }
         }
 
@@ -223,6 +262,14 @@ object ContentValidator {
                     if (lesson.focusAtomIds.isEmpty()) {
                         issues += ValidationIssue("authored lesson ${lesson.id} needs focusAtomIds")
                     }
+                    val finaleId = lesson.finaleId
+                    if (finaleId.isNullOrBlank()) {
+                        issues += ValidationIssue("authored lesson ${lesson.id} needs a finaleId")
+                    } else if (finaleId !in pack.finales) {
+                        issues += ValidationIssue(
+                            "lesson ${lesson.id} references missing finale $finaleId",
+                        )
+                    }
                 }
                 LessonStatus.planned -> {
                     if (lesson.taskIds.isNotEmpty()) {
@@ -241,6 +288,10 @@ object ContentValidator {
         val referenced = pack.lessons.flatMap { it.taskIds }.toSet()
         (pack.tasks.keys - referenced).forEach {
             issues += ValidationIssue("task $it is not referenced by any lesson")
+        }
+        val referencedFinales = pack.lessons.mapNotNull { it.finaleId }.toSet()
+        (pack.finales.keys - referencedFinales).forEach {
+            issues += ValidationIssue("finale $it is not referenced by any lesson")
         }
         return issues
     }

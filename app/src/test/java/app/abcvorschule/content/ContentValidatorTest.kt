@@ -229,4 +229,99 @@ class ContentValidatorTest {
             }
         }
     }
+
+    @Test
+    fun authoredLessonWithoutFinaleIsAnIssue() {
+        val issues = issuesOf { p ->
+            p.copy(lessons = p.lessons.map { if (it.id == "l01") it.copy(finaleId = null) else it })
+        }
+        assertTrue(issues.toString(), issues.any { it.contains("l01") && it.contains("finaleId") })
+    }
+
+    @Test
+    fun unknownFinaleReferenceIsAnIssue() {
+        val issues = issuesOf { p ->
+            p.copy(lessons = p.lessons.map { if (it.id == "l01") it.copy(finaleId = "f-nope") else it })
+        }
+        assertTrue(issues.toString(), issues.any { it.contains("f-nope") })
+    }
+
+    @Test
+    fun finalePictureMustExistAsAnAtom() {
+        val issues = issuesOf { p ->
+            p.copy(finales = p.finales + ("f-l01" to p.finale("f-l01").copy(pictureAtomIds = listOf("mama", "ghost"))))
+        }
+        assertTrue(issues.toString(), issues.any { it.contains("ghost") })
+    }
+
+    @Test
+    fun finalePictureMustCarryAnEmoji() {
+        // `tisch` exists but carries emoji "" on purpose — there is no usable table emoji.
+        val issues = issuesOf { p ->
+            p.copy(finales = p.finales + ("f-l01" to p.finale("f-l01").copy(pictureAtomIds = listOf("mama", "tisch"))))
+        }
+        assertTrue(issues.toString(), issues.any { it.contains("tisch") && it.contains("emoji") })
+    }
+
+    @Test
+    fun finaleMustNotRepeatTheSameGlyph() {
+        // `katze` and `mimi` are both 🐱 — two identical pictures read as a bug.
+        val issues = issuesOf { p ->
+            p.copy(finales = p.finales + ("f-l01" to p.finale("f-l01").copy(pictureAtomIds = listOf("katze", "mimi"))))
+        }
+        assertTrue(issues.toString(), issues.any { it.contains("f-l01") && it.contains("glyph") })
+    }
+
+    @Test
+    fun finaleNeedsTwoToFourPictures() {
+        val tooFew = issuesOf { p ->
+            p.copy(finales = p.finales + ("f-l01" to p.finale("f-l01").copy(pictureAtomIds = listOf("mama"))))
+        }
+        assertTrue(tooFew.toString(), tooFew.any { it.contains("f-l01") && it.contains("pictures") })
+
+        val tooMany = issuesOf { p ->
+            p.copy(
+                finales = p.finales + (
+                    "f-l01" to p.finale("f-l01")
+                        .copy(pictureAtomIds = listOf("mama", "maus", "apfel", "oma", "hut"))
+                    ),
+            )
+        }
+        assertTrue(tooMany.toString(), tooMany.any { it.contains("f-l01") && it.contains("pictures") })
+    }
+
+    @Test
+    fun finaleTextNeedsFourToSevenWords() {
+        val tooLong = issuesOf { p ->
+            p.copy(
+                finales = p.finales + (
+                    "f-l01" to p.finale("f-l01")
+                        .copy(text = "Mama Maus mampft einen ganz besonders dicken roten Apfel!")
+                    ),
+            )
+        }
+        assertTrue(tooLong.toString(), tooLong.any { it.contains("f-l01") && it.contains("words") })
+
+        val tooShort = issuesOf { p ->
+            p.copy(finales = p.finales + ("f-l01" to p.finale("f-l01").copy(text = "Mama mampft!")))
+        }
+        assertTrue(tooShort.toString(), tooShort.any { it.contains("f-l01") && it.contains("words") })
+    }
+
+    @Test
+    fun unreferencedFinaleIsAnIssue() {
+        val issues = issuesOf { p ->
+            p.copy(
+                finales = p.finales + (
+                    "f-orphan" to LessonFinale(
+                        id = "f-orphan",
+                        text = "Der Fuchs klaut den Keks!",
+                        tts = "Der Fuchs klaut den Keks!",
+                        pictureAtomIds = listOf("fuchs", "keks"),
+                    )
+                    ),
+            )
+        }
+        assertTrue(issues.toString(), issues.any { it.contains("f-orphan") && it.contains("not referenced") })
+    }
 }
