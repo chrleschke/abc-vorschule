@@ -90,4 +90,27 @@ object WordFrameSizing {
         val rows = rowCount(available, segmentCount)
         return ((segmentCount + rows - 1) / rows).coerceAtLeast(1)
     }
+
+    /** Matches AbcDimens.kidTouch — the comfortable row height for a single row. */
+    const val MaxRowHeightDp = 80f
+
+    /**
+     * Row height once a word wraps. Still above [MinFrameDp], so a segment stays
+     * hittable, but low enough that two rows fit the task block: the wrap threshold
+     * is width-derived, so "Häuser" (6 segments) already wraps on a Pixel 7 (329dp
+     * of usable stage), and two [MaxRowHeightDp] rows would push the prompt block
+     * past its space on a short 360x640dp device — [ExerciseStage] neither scrolls
+     * nor clips, so the overflow would overdraw the chrome above and the strokes
+     * below.
+     */
+    const val WrappedRowHeightDp = 64f
+
+    /**
+     * Height of one segment row. Full height while the word stays on one line, the
+     * reduced [WrappedRowHeightDp] as soon as it wraps — height is the only budget
+     * a second row spends, and the touch target survives either way because both
+     * values clear [MinFrameDp].
+     */
+    fun rowHeightDp(segmentCount: Int, segmentsPerRow: Int): Float =
+        if (segmentsPerRow in 1 until segmentCount) WrappedRowHeightDp else MaxRowHeightDp
 }

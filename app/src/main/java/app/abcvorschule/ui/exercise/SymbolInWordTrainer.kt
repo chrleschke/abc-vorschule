@@ -378,6 +378,11 @@ private fun WordSegments(
         val frameWidth = WordFrameSizing.frameWidthDp(available, perRow)
         val glyphSp = WordFrameSizing.glyphSp(frameWidth, round.segments.maxOfOrNull { it.length } ?: 1)
         val gap = WordFrameSizing.gapDp(available, perRow)
+        // A wrapped word buys its second row out of the height budget, not out of
+        // the touch target: the reduced height still clears the 56dp floor, and
+        // ExerciseStage's prompt block has no room for two 80dp rows on a short
+        // device (design doc §5).
+        val rowHeight = WordFrameSizing.rowHeightDp(round.segments.size, perRow)
         // In a SideEffect, not inline: this writes state the caller reads, and that
         // is only safe once the composition it comes from has succeeded. Writing the
         // same value again is a no-op for recomposition, so it settles immediately.
@@ -396,6 +401,7 @@ private fun WordSegments(
                             index = index,
                             state = state,
                             frameWidthDp = frameWidth,
+                            rowHeightDp = rowHeight,
                             glyphSp = glyphSp,
                             enabled = enabled,
                             onTap = onTap,
@@ -414,6 +420,7 @@ private fun SegmentGlyph(
     index: Int,
     state: SymbolInWordState,
     frameWidthDp: Float,
+    rowHeightDp: Float,
     glyphSp: Float,
     enabled: Boolean,
     onTap: (Int) -> Unit,
@@ -440,7 +447,7 @@ private fun SegmentGlyph(
     Box(
         modifier = Modifier
             .width(frameWidthDp.dp)
-            .height(AbcDimens.kidTouch)
+            .height(rowHeightDp.dp)
             .onGloballyPositioned { coordinates ->
                 val bounds = coordinates.size
                 onPlaced(
