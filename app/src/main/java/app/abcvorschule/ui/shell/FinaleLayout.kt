@@ -14,7 +14,7 @@ data class FinalePicture(
  * Ableitung und Maße der Finale-Bildreihe. Compose-frei, damit die Entscheidungen
  * testbar bleiben — das Repo hat keine androidTests.
  *
- * Deterministisch wie [app.abcvorschule.content.LessonEmojis]: kein Random, keine
+ * Deterministisch wie [app.abcvorschule.ui.exercise.WordFrameSizing]: kein Random, keine
  * Sortierung. Die Reihenfolge ist die des Satzes, weil sie den Satz erzählt.
  */
 object FinaleLayout {

@@ -32,6 +32,7 @@ class FinaleLayoutTest {
 
     @Test
     fun everyShippedFinaleRendersAllItsPictures() {
+        assertEquals(18, pack.finales.size)
         pack.finales.values.forEach { finale ->
             assertEquals(
                 "finale ${finale.id} loses a picture",
