@@ -33,7 +33,7 @@ data class SymbolHuntTapResult(val state: SymbolHuntState, val outcome: SymbolHu
  * number.
  */
 object SymbolHuntProgress {
-    const val ResolveThreshold = 6
+    const val ResolveThreshold = ResolveGate.Threshold
 
     // XOR salt so the distractor-selection shuffle is a distinct deterministic
     // stream from the scatter-layout shuffle, which reuses the same base `seed`

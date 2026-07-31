@@ -55,19 +55,11 @@ private val TileSize = AbcDimens.kidTouch
 private val TilePalette = listOf(SoftMint, SoftCoral, SoftSky, SoftGold, SoftSand)
 
 /**
- * How long the full battery celebrates before the round hands off. Covers the
- * 400 ms field fade plus roughly one pulse of the golden battery, so the child
- * sees the win land instead of the screen cutting away mid-animation. Mirrors
- * LetterTraceTrainer's RewardHoldMs, which solves the same problem.
- */
-private const val CelebrationHoldMs = 900L
-
-/**
  * Buchstaben-/Silben-Jagd: tiles scatter across the whole task area under a
  * fixed speaker strip (deliberate exception to Prinzip 9 — design doc §4), the
  * battery lives in the answer area (also an exception). A wrong tap reshuffles
  * without losing battery progress; when the battery fills, a short celebration
- * plays (400 ms field fade + golden pulse), then auto-proceeds after CelebrationHoldMs
+ * plays (400 ms field fade + golden pulse), then auto-proceeds after HuntCelebration.HoldMs
  * to the shared success pipeline — no "Weiter" tap needed (design doc §5).
  */
 @Composable
@@ -130,7 +122,7 @@ fun SymbolHuntTrainer(
     // success phase, which must not talk over the celebration.
     LaunchedEffect(batteryFull) {
         if (!batteryFull) return@LaunchedEffect
-        delay(CelebrationHoldMs)
+        delay(HuntCelebration.HoldMs)
         onResult(true, false, listOf(round.targetAtomId))
     }
 

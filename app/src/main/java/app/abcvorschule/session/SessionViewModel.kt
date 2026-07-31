@@ -13,6 +13,7 @@ import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.SymbolHuntRound
+import app.abcvorschule.content.SymbolInWordRound
 import app.abcvorschule.content.TaskSpec
 import app.abcvorschule.content.WordBuildRound
 import app.abcvorschule.content.rounds
@@ -156,12 +157,7 @@ class SessionViewModel(
                     )
                     return@runCatching
                 }
-                val trainers = SymbolHuntInsertion.insertSymbolHunts(
-                    pack.tasksOf(lesson).map { schedule(it) },
-                    pack,
-                    lesson.id,
-                    lesson.index,
-                )
+                val trainers = SessionTrainers.assemble(pack, lesson, ::schedule)
                 val step = SessionProgression.resumeSafe(expectedTrainerCount, trainers.size, trainerIndex, roundIndex)
                 val counts = trainers.map { it.spec.rounds.size }
                 val safeRound = step.roundIndex.coerceIn(0, (counts.getOrElse(step.trainerIndex) { 1 } - 1).coerceAtLeast(0))
@@ -304,6 +300,9 @@ class SessionViewModel(
         is LetterTraceRound -> round.rewardTts
         is SoundPositionRound -> pack.atoms[round.atomId]?.lemma ?: round.promptTts
         is SymbolHuntRound -> pack.atoms[round.targetAtomId]?.lemma ?: round.promptTts
+        // Speak the *word*, not the symbol: the child already heard the symbol on
+        // every tap, so the word is the new information and the didactic payoff.
+        is SymbolInWordRound -> pack.atoms[round.wordAtomId]?.display ?: round.promptTts
         else -> ""
     }
 
@@ -463,18 +462,17 @@ class SessionViewModel(
             return
         }
         if (missHint) {
-            // SymbolHuntTrainer already speaks the tapped tile's lemma synchronously,
-            // in the Composable, before onResult ever reaches here. Setting speakCue
-            // would queue the generic miss phrase right behind it, and SpeechController
-            // flushes its queue on every speak() call — so the tile name would get cut
-            // off and replaced before the child ever heard it. Every other round type
-            // has no such synchronous speech, so this only special-cases SymbolHuntRound
-            // by leaving speakCue untouched; everything else keeps setting it exactly
-            // as before.
-            val isSymbolHuntMiss = _ui.value.currentRound is SymbolHuntRound
+            // Both hunt trainers speak the tapped item synchronously in the
+            // Composable before onResult arrives here. Setting speakCue would queue
+            // the generic miss phrase right behind it, and SpeechController flushes
+            // on every speak() — so the item name would get cut off before the child
+            // heard it. Every other round type has no such synchronous speech.
+            val speaksMissItself = _ui.value.currentRound.let {
+                it is SymbolHuntRound || it is SymbolInWordRound
+            }
             _ui.update {
                 it.copy(
-                    speakCue = if (isSymbolHuntMiss) it.speakCue else speakOverride ?: missCueForCurrent(),
+                    speakCue = if (speaksMissItself) it.speakCue else speakOverride ?: missCueForCurrent(),
                     points = progress.points,
                 )
             }

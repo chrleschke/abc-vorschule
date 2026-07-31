@@ -237,6 +237,7 @@ object ContentValidator {
                     }
                 }
                 is SymbolHuntSpec -> Unit // synthetic-only; never appears in authored content
+                is SymbolInWordSpec -> Unit // synthetic-only; never appears in authored content
             }
         }
 

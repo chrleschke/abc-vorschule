@@ -48,6 +48,17 @@ Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede 
 
 Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Treffer füllen eine Batterie, Fehltipp mischt neu ohne Batterieverlust.
 
+Ebenfalls abgeleitet und nicht autoriert: der **Wort-Detektiv** direkt nach dem letzten
+Wort-Bauer — „Finde den Buchstaben / die Silbe im Wort". Eine Runde pro eingeführtem Wort,
+der Modus wechselt zwischen Buchstabe und Silbe, mit Rückfall auf Buchstabe, wenn die
+Silbe nicht sauber benannt werden kann (z. B. wenn der autorierte Wort-Bauer-Block anders
+geschrieben ist als sein Silben-Atom). Das Wort steht in farbige Segmente zerlegt da, jedes
+antippbar; Treffer wandern auf Platzhalter-Striche im Antwortbereich, ein Fehltipp dreht das
+Segment einmal um seinen Mittelpunkt und kostet nichts. Der Buchstaben-Modus zeigt das Ziel
+als Formenpaar (`P / p`), damit „finde alle P" in „Papa" nicht schwerer ist als es aussieht;
+Silben stehen nur klein. Details und Beispiele:
+[Wort-Detektiv-Design](superpowers/specs/2026-07-31-wort-detektiv-design.md).
+
 Reihenfolge-Regeln, die Content und Validator erzwingen:
 
 - Der Wort-Bauer zeigt nie ein Graphem oder eine Silbe, die noch nicht eingeführt wurde.
@@ -87,7 +98,9 @@ niemals mit einem stummen No-Op.
 - Mit der Eltern-Freigabe der Reihenfolge bleiben gesperrte Schilder abgedunkelt und behalten ihre
   Silhouetten, verlieren aber Schloss und „später“-Hinweis und sind antippbar. Noch nicht autorierte
   Lektionen bleiben in jedem Fall gesperrt — sie haben keinen Inhalt.
-- Tippen auf ein freigeschaltetes Schild startet die Sechs-Trainer-Typen-Session dieser Lektion.
+- Tippen auf ein freigeschaltetes Schild startet die Trainer-Session dieser Lektion — die
+  sechs autorierten Typen (Abschnitt 3), ergänzt um etwaige abgeleitete Zusatz-Trainer
+  (Jagd, Wort-Detektiv).
 - Kein Domänen-Mix, keine Zufallsrotation: die Trainer-Reihenfolge ist didaktisch fix.
 - Vor/Zurück zwischen Runden ist **immer** möglich, unabhängig von Punkten/Fortschritt.
 - Fortschritt speichern nach jeder Antwort; unfertige Lektion wird beim Öffnen fortgesetzt.
@@ -143,6 +156,9 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - **Antworten:** unterer Block, zentriert (Kacheln, Mengenwahl, Ziffernblock).
 - Keine doppelte Aufgabe+Vorschau desselben Tokens.
 - Ausnahme Buchstaben-/Silben-Jagd: Kacheln verstreuen sich über den gesamten Aufgabenbereich statt in einer geordneten Antwortliste; die Batterie bleibt im Antwortbereich unten.
+- Ausnahme Wort-Detektiv: der Antwortbereich trägt **Quittungs-Striche statt Wahloptionen**.
+  Sie sind bloße Grundstriche ohne Rahmen und ohne Tray — die einzige Symbolquelle ist das
+  Wort im Aufgabenblock. Damit sind sie von den Schablonen des Wort-Bauers unterscheidbar.
 
 
 
@@ -248,6 +264,8 @@ Wenn eine Änderung vorgeschlagen wird, prüfen:
 | Ist ein neuer Finale-Satz länger als 7 Wörter oder eine Mini-Geschichte?     | Nein → Abschnitt 12, Validator prüft |
 | Wäre das Bild des Finale-Satzes in einem Kinderbuch denkbar?                 | Ja — sonst AI-Slop                   |
 | Zeigt der End-Screen eine Punktezahl?                                        | Nein → Punkte leben im Chrome/Pfad   |
+| Zeigt ein abgeleiteter Trainer ein Graphem, das die Lektion noch nicht kennt?  | Nein → Graphem-Tabelle ist lektionsbeschränkt |
+| Verlangt der Wort-Detektiv einen Tipp auf eine Form, die er nicht zeigt?       | Buchstaben nein → Paar `P / p`; Silben zeigen nur die Kleinform, der Treffer darf die Großform sein |
 
 
 Siehe auch `[AGENTS.md](../AGENTS.md)` für den Arbeitsprozess und Dokumentationspflichten.

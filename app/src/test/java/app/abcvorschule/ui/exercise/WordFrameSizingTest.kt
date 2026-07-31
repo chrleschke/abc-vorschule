@@ -81,4 +81,141 @@ class WordFrameSizingTest {
         val huge = WordFrameSizing.glyphSp(400f, longestDisplayChars = 1)
         assertEquals(WordFrameSizing.MaxGlyphSp, huge, 0.01f)
     }
+
+    // --- row wrapping for long words ----------------------------------------
+    // Reuses the `stageWidth` (396dp usable stage width) declared above.
+
+    @Test
+    fun sixSegmentsStayOnOneRow() {
+        // "Häuser" -> H·ä·u·s·e·r, the longest word in the current content.
+        assertEquals(1, WordFrameSizing.rowCount(stageWidth, 6))
+        assertEquals(6, WordFrameSizing.segmentsPerRow(stageWidth, 6))
+    }
+
+    @Test
+    fun eightSegmentsWrapIntoTwoBalancedRows() {
+        // "Xylophon" -> X·y·l·o·p·h·o·n. Tappability beats staying on one line.
+        assertEquals(2, WordFrameSizing.rowCount(stageWidth, 8))
+        assertEquals(4, WordFrameSizing.segmentsPerRow(stageWidth, 8))
+    }
+
+    @Test
+    fun sevenSegmentsWrapAndTheFirstRowTakesTheExtra() {
+        assertEquals(2, WordFrameSizing.rowCount(stageWidth, 7))
+        assertEquals(4, WordFrameSizing.segmentsPerRow(stageWidth, 7))
+    }
+
+    @Test
+    fun frameWidthNeverDropsBelowTheTouchFloorAfterWrapping() {
+        val perRow = WordFrameSizing.segmentsPerRow(stageWidth, 8)
+        assertTrue(WordFrameSizing.frameWidthDp(stageWidth, perRow) >= WordFrameSizing.MinFrameDp)
+    }
+
+    @Test
+    fun aSingleSegmentNeedsOneRow() {
+        assertEquals(1, WordFrameSizing.rowCount(stageWidth, 1))
+        assertEquals(1, WordFrameSizing.segmentsPerRow(stageWidth, 1))
+    }
+
+    @Test
+    fun anEmptyWordDoesNotDivideByZero() {
+        assertEquals(1, WordFrameSizing.rowCount(stageWidth, 0))
+        assertEquals(1, WordFrameSizing.segmentsPerRow(stageWidth, 0))
+    }
+
+    @Test
+    fun aVeryNarrowStageStillFitsOneSegmentPerRow() {
+        assertEquals(1, WordFrameSizing.maxPerRow(20f))
+        assertEquals(4, WordFrameSizing.rowCount(20f, 4))
+    }
+
+    // --- real device widths, real segment counts ------------------------------
+    // The wrap threshold is width-derived, not count-derived, so testing only the
+    // 420dp-and-wider stage hid that "Häuser" already wraps on a Pixel 7. Measured
+    // through TaskShell (20dp/side) into ExerciseStage (widthIn 420 + 12dp/side).
+
+    /** 360dp -> 296, Pixel 7/8 393dp -> 329, 412dp -> 348, >=420dp -> 396. */
+    private val deviceStageWidths = listOf(296f, 329f, 348f, 396f)
+
+    /** Six segments need 6 x 56 + 5 x 4 = 356dp, so they only fit the widest stage. */
+    private fun expectedMaxPerRow(available: Float): Int = if (available >= 356f) 6 else 5
+
+    @Test
+    fun everyRealDeviceWidthKeepsTheTouchFloorForEveryRealSegmentCount() {
+        deviceStageWidths.forEach { available ->
+            // 2..6 is what the authored content produces: "m·a" up to "H·ä·u·s·e·r".
+            (2..6).forEach { segments ->
+                val perRow = WordFrameSizing.segmentsPerRow(available, segments)
+                val width = WordFrameSizing.frameWidthDp(available, perRow)
+                assertTrue(
+                    "$segments segments on ${available}dp give ${width}dp frames",
+                    width >= WordFrameSizing.MinFrameDp,
+                )
+                val expectedRows = if (segments <= expectedMaxPerRow(available)) 1 else 2
+                assertEquals(
+                    "$segments segments on ${available}dp",
+                    expectedRows,
+                    WordFrameSizing.rowCount(available, segments),
+                )
+            }
+        }
+    }
+
+    @Test
+    fun sixSegmentsWrapOnEveryPhoneNarrowerThanTheFullStage() {
+        // "Häuser" -> H·ä·u·s·e·r on a Pixel 7: 356dp of frames do not fit 329dp,
+        // and clickability beats staying on one line.
+        assertEquals(5, WordFrameSizing.maxPerRow(329f))
+        assertEquals(2, WordFrameSizing.rowCount(329f, 6))
+        assertEquals(3, WordFrameSizing.segmentsPerRow(329f, 6))
+        // ... and only stays on one row once the stage reaches the 420dp cap.
+        assertEquals(6, WordFrameSizing.maxPerRow(396f))
+        assertEquals(1, WordFrameSizing.rowCount(396f, 6))
+    }
+
+    // --- row height ----------------------------------------------------------
+
+    @Test
+    fun oneRowKeepsTheFullTouchHeight() {
+        assertEquals(
+            WordFrameSizing.MaxRowHeightDp,
+            WordFrameSizing.rowHeightDp(segmentCount = 6, segmentsPerRow = 6),
+            0.01f,
+        )
+    }
+
+    @Test
+    fun aWrappedWordUsesTheReducedRowHeight() {
+        // Two 80dp rows overflow the prompt block on a short 360x640dp device, and
+        // ExerciseStage neither scrolls nor clips.
+        assertEquals(
+            WordFrameSizing.WrappedRowHeightDp,
+            WordFrameSizing.rowHeightDp(segmentCount = 6, segmentsPerRow = 3),
+            0.01f,
+        )
+        assertTrue(WordFrameSizing.WrappedRowHeightDp < WordFrameSizing.MaxRowHeightDp)
+    }
+
+    @Test
+    fun everyRowHeightStillClearsTheTouchFloor() {
+        deviceStageWidths.forEach { available ->
+            (2..6).forEach { segments ->
+                val perRow = WordFrameSizing.segmentsPerRow(available, segments)
+                val height = WordFrameSizing.rowHeightDp(segments, perRow)
+                assertTrue(
+                    "$segments segments on ${available}dp give ${height}dp rows",
+                    height >= WordFrameSizing.MinFrameDp,
+                )
+            }
+        }
+    }
+
+    @Test
+    fun aDegenerateSegmentCountKeepsTheFullRowHeight() {
+        assertEquals(
+            WordFrameSizing.MaxRowHeightDp,
+            WordFrameSizing.rowHeightDp(segmentCount = 0, segmentsPerRow = 1),
+            0.01f,
+        )
+    }
 }
