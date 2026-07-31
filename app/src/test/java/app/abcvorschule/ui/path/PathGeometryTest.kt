@@ -129,4 +129,33 @@ class PathGeometryTest {
             values.distinct().size > 1,
         )
     }
+
+    @Test
+    fun periodIsNotAWholeNumberOfNodes() {
+        // If Period were a whole number of nodes (e.g. the old value of 4),
+        // sin(index * 2*PI / Period) repeats exactly every `Period` nodes, so
+        // for ANY index the raw swing angle at `index` and `index + 4` would
+        // be identical. The only thing that could still separate their x
+        // values is the index-dependent x-jitter, and that is bounded: each
+        // point's jitter is independently clamped to +-6% of amplitude, so
+        // two such points can differ by at most 2 * 0.06 * amplitude (~44px
+        // for this fixture's 1000px width / 132px margin). With a
+        // non-integer period like 3.7 the swing angle is not periodic over a
+        // 4-node gap, so most pairs differ far beyond that jitter-only
+        // ceiling. Checking many pairs (not just one) rules out a single
+        // lucky/unlucky jitter cancellation from deciding the test either way.
+        val p = points(16)
+        val amplitude = width / 2f - margin
+        val jitterOnlyCeiling = 2 * 0.06f * amplitude
+        val pairsBeyondJitter = (0 until 12).count { i ->
+            kotlin.math.abs(p[i + 4].x - p[i].x) > jitterOnlyCeiling + 1f
+        }
+        assertTrue(
+            "expected most index/index+4 pairs to differ beyond what jitter " +
+                "alone explains ($jitterOnlyCeiling px); only $pairsBeyondJitter " +
+                "of 12 did — looks like the swing period rasters onto whole-node " +
+                "cycles again",
+            pairsBeyondJitter >= 6,
+        )
+    }
 }
