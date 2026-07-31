@@ -1,6 +1,7 @@
 package app.abcvorschule.session
 
 import app.abcvorschule.content.ContentRepository
+import app.abcvorschule.content.LetterTraceSpec
 import app.abcvorschule.content.SentenceOrderSpec
 import app.abcvorschule.content.SymbolInWordSpec
 import app.abcvorschule.content.WordBuildSpec
@@ -30,13 +31,24 @@ class SymbolInWordInsertionTest {
     }
 
     @Test
-    fun theDetectiveComesBeforeTheSentenceArchitect() {
-        val result = insert("l03")
-        val detectiveIndex = result.indexOfFirst { it.spec is SymbolInWordSpec }
-        val firstSentence = result.indexOfFirst { it.spec is SentenceOrderSpec }
-        if (firstSentence >= 0) {
-            assertTrue("detective must precede sentence_order", detectiveIndex < firstSentence)
+    fun theDetectiveComesBeforeTheSentenceArchitectInEveryLessonThatHasOne() {
+        // l03 is the one authored lesson without sentence_order, so a single-lesson
+        // version of this test would assert nothing at all. Sweep every lesson and
+        // require that the invariant was actually exercised.
+        var checked = 0
+        pack.authoredLessons.forEach { lesson ->
+            val result = insert(lesson.id)
+            val detectiveIndex = result.indexOfFirst { it.spec is SymbolInWordSpec }
+            val firstSentence = result.indexOfFirst { it.spec is SentenceOrderSpec }
+            if (detectiveIndex >= 0 && firstSentence >= 0) {
+                assertTrue(
+                    "lesson ${lesson.id}: detective at $detectiveIndex must precede sentence_order at $firstSentence",
+                    detectiveIndex < firstSentence,
+                )
+                checked++
+            }
         }
+        assertTrue("no lesson exercised the invariant — the test would be vacuous", checked > 0)
     }
 
     @Test
@@ -65,6 +77,21 @@ class SymbolInWordInsertionTest {
         val trainers = lesson.taskIds.map { ScheduledTrainer(spec = pack.task(it)) }
         val result = SymbolInWordInsertion.insertSymbolInWord(trainers, pack, lesson)
         assertTrue(result.none { it.spec is SymbolInWordSpec })
+    }
+
+    @Test
+    fun aLessonWhoseWordsYieldNoRoundsGetsNoDetectiveEvenThoughItHasAWordBuilder() {
+        // Covers the second guard: an anchor exists, but derivation comes back empty.
+        // Stripping letter_trace removes every focus grapheme, so no letter round can
+        // name a scoreable target (design doc §4).
+        val lesson = pack.lesson("l05").let { base ->
+            base.copy(taskIds = base.taskIds.filter { pack.tasks[it] !is LetterTraceSpec })
+        }
+        val trainers = lesson.taskIds.map { ScheduledTrainer(spec = pack.task(it)) }
+        assertTrue(trainers.any { it.spec is WordBuildSpec })
+        val result = SymbolInWordInsertion.insertSymbolInWord(trainers, pack, lesson)
+        assertTrue(result.none { it.spec is SymbolInWordSpec })
+        assertEquals(trainers.map { it.spec.id }, result.map { it.spec.id })
     }
 
     @Test
