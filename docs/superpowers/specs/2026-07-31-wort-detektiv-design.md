@@ -36,7 +36,7 @@ der Sealed-Kommentar in `content/TaskSpecs.kt` verspricht.
 | **Buchstabe** | alle Grapheme (§3) | `O·m·a` → „Finde den Buchstaben – O – im Wort – Oma." |
 | | | `P·a·p·a` → „Finde **alle** Buchstaben – P – im Wort – Papa." |
 | **Silbe** | die autorierten `word_build`-Blöcke | `Ro·se` → „Finde die Silbe – se – im Wort – Rose." |
-| | | `Mi·mi` → „Finde **alle** Silben – Mi – im Wort – Mimi." |
+| | | `Mi·mi` → „Finde **alle** Silben – mi – im Wort – Mimi." |
 
 Die Beispiele sind echte abgeleitete Runden (Anhang), keine erfundenen Illustrationen.
 Insbesondere ergibt `Oma` unter der Alternierung aus §4 eine Buchstaben-Runde auf `O`,
@@ -349,7 +349,7 @@ die Derivation-Tests. `B` = Buchstaben-Modus, `S` = Silben-Modus.
 | Lektion | Runden (Modus · Ziel · Zerlegung · Treffer) |
 | --- | --- |
 | L01 M & A | B `M` `M·a·m·a` 2 · B `A` `m·a` 1 |
-| L02 I & O | B `O` `O·m·a` 1 · S `Mi` `Mi·mi` 2 |
+| L02 I & O | B `O` `O·m·a` 1 · S `mi` `Mi·mi` 2 |
 | L03 P & T | B `P` `P·a·p·a` 2 · S `pa` `O·pa` 1 · B `T` `T·o·m` 1 |
 | L04 L & H | B `L` `L·a·m·a` 1 · B `H` `H·a·l·l·o` 1 |
 | L05 F & U | B `U` `H·u·t` 1 · B `F` `U·f·o` 1 |
@@ -360,20 +360,20 @@ die Derivation-Tests. `B` = Buchstaben-Modus, `S` = Silben-Modus.
 | L10 G & Ch | B `G` `W·e·g` 1 · B `Ch` `D·a·ch` 1 · B `Ch` `i·ch` 1 |
 | L11 Au & B | B `Au` `H·au·s` 1 · B `B` `B·au·m` 1 |
 | L12 Umlaute | B `Ä` `H·ä·u·s·e·r` 1 · B `Ä` `B·ä·u·m·e` 1 · B `Ü` `R·ü·b·e` 1 |
-| L13 Sch | B `Sch` `Sch·u·h` 1 · B `Sch` `F·i·sch` 1 · B `Sch` `Sch·a·f` 1 · S `Schu` `Schu·le` 1 |
+| L13 Sch | B `Sch` `Sch·u·h` 1 · B `Sch` `F·i·sch` 1 · B `Sch` `Sch·a·f` 1 · S `schu` `Schu·le` 1 |
 | L14 J, Z & Eu | B `Z` `Z·e·b·r·a` 1 · B `Eu` `Eu·l·e` 1 |
-| L15 ß & V | B `ß` `F·u·ß` 1 · S `Vo` `Vo·gel` 1 · B `V` `V·a·s·e` 1 |
+| L15 ß & V | B `ß` `F·u·ß` 1 · S `vo` `Vo·gel` 1 · B `V` `V·a·s·e` 1 |
 | L16 ck & Pf | B `ck` `S·a·ck` 1 · B `Pf` `A·pf·e·l` 1 · B `Pf` `Pf·e·r·d` 1 |
-| L17 St & Sp | B `St` `St·e·r·n` 1 · S `Spin` `Spin·ne` 1 |
+| L17 St & Sp | B `St` `St·e·r·n` 1 · S `spin` `Spin·ne` 1 |
 | L18 C, Y, X & Qu | B `Qu` `Qu·a·l·l·e` 1 · B `X` `T·a·x·i` 1 · B `Y` `P·o·n·y` 1 |
 | L19 M & A Wdh. | B `M` `M·a·m·a` 2 · B `A` `a·m` 1 |
-| L20 I & O Wdh. | B `O` `O·m·a` 1 · S `Mi` `Mi·mi` 2 |
-| L21 P & T Wdh. | B `P` `P·a·p·a` 2 · S `To` `To·m` 1 |
+| L20 I & O Wdh. | B `O` `O·m·a` 1 · S `mi` `Mi·mi` 2 |
+| L21 P & T Wdh. | B `P` `P·a·p·a` 2 · S `to` `To·m` 1 |
 | L22 Ei & Au Wdh. | „Ei" fällt per Guard weg · B `Au` `B·au·m` 1 |
-| L23 Sch & Ch Wdh. | B `Sch` `Sch·u·h` 1 · S `Fi` `Fi·sch` 1 |
-| L24 St & Sp Wdh. | B `St` `St·e·r·n` 1 · S `Spi` `Spi·n·n·e` 1 |
-| L25 Ö & Ü Wdh. | B `Ö` `L·ö·w·e` 1 · S `Rü` `Rü·b·e` 1 |
-| L26 Qu & X Wdh. | B `Qu` `Qu·a·l·l·e` 1 · S `Ta` `Ta·x·i` 1 |
+| L23 Sch & Ch Wdh. | B `Sch` `Sch·u·h` 1 · S `fi` `Fi·sch` 1 |
+| L24 St & Sp Wdh. | B `St` `St·e·r·n` 1 · S `spi` `Spi·n·n·e` 1 |
+| L25 Ö & Ü Wdh. | B `Ö` `L·ö·w·e` 1 · S `rü` `Rü·b·e` 1 |
+| L26 Qu & X Wdh. | B `Qu` `Qu·a·l·l·e` 1 · S `ta` `Ta·x·i` 1 |
 
 L13 ergibt dreimal `Sch` in Folge, weil die Lektion nur ein Fokus-Graphem führt und die
 Rotation nichts hat, worauf sie wechseln könnte. Das ist kein Fehler, sondern die
