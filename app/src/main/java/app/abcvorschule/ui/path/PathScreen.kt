@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import app.abcvorschule.BuildConfig
 import app.abcvorschule.R
 import app.abcvorschule.content.Lesson
 import app.abcvorschule.progress.LessonGating
@@ -71,6 +72,7 @@ fun PathScreen(
     onOpenLesson: (String) -> Unit,
     onLockedTap: () -> Unit,
     onParentGateUnlocked: () -> Unit,
+    onOpenTtsDebug: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -136,6 +138,19 @@ fun PathScreen(
                     onLockedTap = onLockedTap,
                 )
             }
+        }
+
+        if (BuildConfig.DEBUG) {
+            Text(
+                text = "TTS Debug",
+                style = MaterialTheme.typography.labelLarge,
+                color = MutedText,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = 8.dp)
+                    .clickable(onClick = onOpenTtsDebug)
+                    .testTag("tts_debug_entry"),
+            )
         }
     }
 }

@@ -57,6 +57,7 @@ fun TaskShell(
     onSpeak: (String) -> Unit,
     onSpeakAndAwait: suspend (String) -> Unit,
     onStopSpeak: () -> Unit,
+    onOpenTtsDebug: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalHapticFeedback.current
@@ -111,6 +112,7 @@ fun TaskShell(
                         if (ttsAvailable) onSpeak(viewModel.lockedLessonCue())
                     },
                     onParentGateUnlocked = viewModel::openDifficultySheet,
+                    onOpenTtsDebug = onOpenTtsDebug,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
