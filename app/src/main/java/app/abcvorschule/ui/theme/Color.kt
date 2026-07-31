@@ -13,3 +13,16 @@ val SoftSky = Color(0xFF8FB8D9)
 /** Collectible-star yellow. Warm enough to read as "star" on the dark road. */
 val SoftGold = Color(0xFFF2C14E)
 val MutedText = Color(0xFFB7C2D0)
+
+/** Night sky gradient: deepest at the top, warmer towards the horizon. */
+val NightDeep = Color(0xFF080E18)
+val NightHorizon = Color(0xFF16283A)
+
+/**
+ * Signpost woods. Kept dark enough that SoftSand lettering stays above 4.5:1 on
+ * every one of them — the path is looked at in a dark room.
+ */
+val WoodDark = Color(0xFF2A2018)
+val WoodMid = Color(0xFF4A3728)
+val WoodWarm = Color(0xFF6B4E34)
+val WoodPost = Color(0xFF33261B)
