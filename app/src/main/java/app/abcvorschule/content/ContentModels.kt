@@ -67,11 +67,32 @@ data class Sentence(
 @Serializable
 data class SentencesFile(val sentences: List<Sentence>)
 
+/**
+ * Der Belohnungssatz einer Lektion: wird beim Abschluss vorgelesen und als Bildreihe
+ * visualisiert. Anders als [Sentence] ist er nicht baubar — er enthält bewusst Wörter
+ * außerhalb des Atom-Graphen (Verben, Adjektive), weil sie nie gelesen oder gebaut
+ * werden müssen. Nur die bildtragenden Nomen sind Atome.
+ */
+@Serializable
+data class LessonFinale(
+    val id: String,
+    /** Schriftbild für den mitlesenden Erwachsenen. */
+    val text: String,
+    /** Was TTS spricht; kann von [text] abweichen (Betonung, Satzzeichen). */
+    val tts: String,
+    /** Nomen-Atome in Satzreihenfolge; jedes muss ein Emoji tragen. */
+    val pictureAtomIds: List<String>,
+)
+
+@Serializable
+data class FinalesFile(val finales: List<LessonFinale>)
+
 data class ContentPack(
     val manifest: PackManifest,
     val atoms: Map<String, Atom>,
     val sentences: Map<String, Sentence>,
     val tasks: Map<String, TaskSpec>,
+    val finales: Map<String, LessonFinale>,
     val lessons: List<Lesson>,
 ) {
     val authoredLessons: List<Lesson> = lessons.filter { it.status == LessonStatus.authored }
@@ -79,6 +100,8 @@ data class ContentPack(
     fun atom(id: String): Atom = atoms.getValue(id)
 
     fun sentence(id: String): Sentence = sentences.getValue(id)
+
+    fun finale(id: String): LessonFinale = finales.getValue(id)
 
     fun task(id: String): TaskSpec = tasks.getValue(id)
 

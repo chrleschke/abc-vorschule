@@ -28,6 +28,12 @@ data class Lesson(
      * authored — a kind may repeat or be skipped, but the sequence never goes
      * backward, always starts with sound_position, and always ends with count_add. */
     val taskIds: List<String> = emptyList(),
+    /**
+     * Belohnungssatz beim Abschluss (`finales.json`). Ein Verweis statt eines
+     * Inline-Objekts, damit Wiederholungslektionen den Satz ihrer Basis-Lektion
+     * teilen, statt ihn zu duplizieren.
+     */
+    val finaleId: String? = null,
 )
 
 @Serializable

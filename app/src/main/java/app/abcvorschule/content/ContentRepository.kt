@@ -38,9 +38,11 @@ class ContentRepository(
             .associateBy { it.id }
         val tasks = json.decodeFromString<TasksFile>(read("content/tasks.json")).tasks
             .associateBy { it.id }
+        val finales = json.decodeFromString<FinalesFile>(read("content/finales.json")).finales
+            .associateBy { it.id }
         val lessons = json.decodeFromString<LessonsFile>(read("content/lessons.json")).lessons
             .sortedBy { it.index }
-        return ContentPack(manifest, atoms, sentences, tasks, lessons)
+        return ContentPack(manifest, atoms, sentences, tasks, finales, lessons)
     }
 
     private fun read(path: String): String =

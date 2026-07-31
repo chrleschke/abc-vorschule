@@ -1,0 +1,10 @@
+{
+  "finales": [
+    {
+      "id": "f-l01",
+      "text": "Mama Maus mampft einen dicken Apfel!",
+      "tts": "Mama Maus mampft einen dicken Apfel!",
+      "pictureAtomIds": ["mama", "maus", "apfel"]
+    }
+  ]
+}
