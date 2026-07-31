@@ -141,6 +141,25 @@ fun AbcNavChevron(
 }
 
 @Composable
+fun AbcCloseButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentDescription: String = stringResource(R.string.close_lesson),
+) {
+    FilledTonalIconButton(
+        onClick = onClick,
+        modifier = modifier
+            .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
+            .semantics { this.contentDescription = contentDescription },
+        colors = IconButtonDefaults.filledTonalIconButtonColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
+    ) {
+        IconClose(tint = MaterialTheme.colorScheme.onSurface, size = 22.dp)
+    }
+}
+
+@Composable
 fun AbcProgressBar(
     index: Int,
     total: Int,

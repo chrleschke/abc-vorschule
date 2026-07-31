@@ -30,13 +30,15 @@ class SpeechController(context: Context) : TextToSpeech.OnInitListener {
             _available.value = false
             return
         }
-        val german = Locale.GERMAN
+        val german = Locale.GERMANY
         val result = engine.setLanguage(german)
         val languageOk = result != TextToSpeech.LANG_MISSING_DATA &&
             result != TextToSpeech.LANG_NOT_SUPPORTED
         if (languageOk) {
             engine.voices?.firstOrNull { voice ->
-                voice.locale.language == german.language && !voice.isNetworkConnectionRequired
+                voice.locale.language == german.language &&
+                voice.locale.country == german.country &&
+                !voice.isNetworkConnectionRequired
             }?.let { engine.voice = it }
         }
         _available.value = languageOk
