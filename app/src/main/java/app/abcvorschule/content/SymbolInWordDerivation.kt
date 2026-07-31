@@ -58,8 +58,13 @@ object SymbolInWordDerivation {
             // The index that drives alternation counts *produced* rounds, not words
             // looked at — a skipped word must not flip the next word's mode.
             val wantsSyllable = rounds.size % 2 == 1
-            val built = (if (wantsSyllable) syllableRound(pack, wordAtom, word, focusSyllableAtomIds) else null)
-                ?: letterRound(pack, wordAtom, graphemes, focusLetterAtomIds, focusCursor)
+            val syllable = if (wantsSyllable) {
+                syllableRound(pack, wordAtom, word, focusSyllableAtomIds)?.failable()
+            } else {
+                null
+            }
+            val built = syllable
+                ?: letterRound(pack, wordAtom, graphemes, focusLetterAtomIds, focusCursor)?.failable()
                 ?: return@forEach
 
             rounds += built.round
@@ -71,6 +76,20 @@ object SymbolInWordDerivation {
     }
 
     private data class Built(val round: SymbolInWordRound, val usedFocusIndex: Int?)
+
+    /**
+     * Derselbe Defekt in anderer Verkleidung (design doc §4): sind *alle* Segmente
+     * Treffer, kann das Kind nicht danebentippen — kein Fehltipp für die
+     * Adaptivität, "Zeig mir" unerreichbar, und die Produktprinzipien-Prüfzeile
+     * "Kann die Aufgabe überhaupt fehlschlagen?" ist verletzt. `Mimi` -> `Mi·mi`
+     * mit dem Ziel `mi` ist genau dieser Fall.
+     *
+     * Eine so verworfene Silben-Runde fällt in den Buchstaben-Modus, wie die
+     * Block-Display-Bedingung auch — und `M·i·m·i` mit dem Ziel `I` ist zwei
+     * Treffer in vier Segmenten, am Fokus-Graphem der Lektion, und fehlschlagbar.
+     */
+    private fun Built.failable(): Built? =
+        takeIf { round.targetIndices.size < round.segments.size }
 
     private fun letterRound(
         pack: ContentPack,

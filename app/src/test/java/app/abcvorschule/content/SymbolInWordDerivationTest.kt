@@ -94,12 +94,16 @@ class SymbolInWordDerivationTest {
     }
 
     @Test
-    fun aRepeatedSyllableYieldsTwoHits() {
+    fun aRepeatedGraphemeYieldsTwoHits() {
+        // "Mimi" would give `Mi·mi` with the target `mi` in syllable mode — every
+        // segment a hit, so unfailable and rejected (see the all-hits guard tests
+        // below). The letter round it falls back to has two hits in four segments.
         val mimi = rounds("l02").last()
-        assertEquals(SymbolInWordMode.syllable, mimi.mode)
-        assertEquals(listOf("Mi", "mi"), mimi.segments)
-        assertEquals(listOf(0, 1), mimi.targetIndices)
-        assertEquals("Finde alle Silben - mi - im Wort - Mimi.", mimi.promptTts)
+        assertEquals(SymbolInWordMode.letter, mimi.mode)
+        assertEquals("letter-i", mimi.targetAtomId)
+        assertEquals(listOf("M", "i", "m", "i"), mimi.segments)
+        assertEquals(listOf(1, 3), mimi.targetIndices)
+        assertEquals("Finde alle Buchstaben - I - im Wort - Mimi.", mimi.promptTts)
     }
 
     @Test
@@ -129,6 +133,64 @@ class SymbolInWordDerivationTest {
         val l22 = rounds("l22")
         assertTrue("Ei must not become a round", l22.none { it.wordAtomId == "ei" })
         assertEquals(listOf("letter-au"), l22.map { it.targetAtomId })
+    }
+
+    @Test
+    fun noDerivedRoundOfAnyAuthoredLessonCanBeSolvedWithoutRisk() {
+        // Design doc §4 / PRODUCT_PRINCIPLES "Kann die Aufgabe überhaupt
+        // fehlschlagen?": if every segment is a hit there is nothing to tap wrong,
+        // so no Miss can be reported for adaptivity and "Zeig mir" is unreachable.
+        pack.authoredLessons.forEach { lesson ->
+            rounds(lesson.id).forEach { round ->
+                assertTrue(
+                    "lesson ${lesson.id}: ${round.promptTts} has a hit on every one of ${round.segments}",
+                    round.targetIndices.size < round.segments.size,
+                )
+            }
+        }
+    }
+
+    @Test
+    fun anAllHitsSyllableRoundFallsBackToLetterMode() {
+        // l02's second word is "Mimi": the syllable candidate `Mi·mi` / `mi` is two
+        // hits in two segments and is dropped, exactly like the block-display
+        // mismatch in l17. The letter round that replaces it hunts the lesson's own
+        // focus grapheme I and can be failed.
+        val l02 = rounds("l02")
+        assertEquals(listOf(SymbolInWordMode.letter, SymbolInWordMode.letter), l02.map { it.mode })
+        assertEquals(listOf("letter-o", "letter-i"), l02.map { it.targetAtomId })
+        // The repeat lesson derives from the same words and must agree.
+        assertEquals(l02.map { it.targetAtomId }, rounds("l20").map { it.targetAtomId })
+    }
+
+    @Test
+    fun aWordWhoseEveryGraphemeIsTheFocusLetterProducesNoRound() {
+        // Synthetic, because the authored content has no such word: "Mm" splits into
+        // M·m and both segments are hits for the focus grapheme M. With the letter
+        // round unfailable too, the word yields nothing at all (design doc §4).
+        val word = Atom(id = "synthetic-mm", lemma = "Mm", display = "Mm", emoji = "🤫")
+        val wordBuild = WordBuildSpec(
+            id = "synthetic-word-build",
+            rounds = listOf(
+                WordBuildRound(
+                    promptTts = "Baue Mm.",
+                    targetAtomId = word.id,
+                    blocks = listOf(
+                        WordBlock(atomId = "letter-m", display = "M"),
+                        WordBlock(atomId = "letter-m", display = "m"),
+                    ),
+                ),
+            ),
+        )
+        val synthetic = pack.copy(
+            atoms = pack.atoms + (word.id to word),
+            tasks = pack.tasks + (wordBuild.id to wordBuild),
+        )
+        val base = pack.lesson("l01")
+        val lesson = base.copy(
+            taskIds = base.taskIds.filter { pack.tasks[it] is LetterTraceSpec } + wordBuild.id,
+        )
+        assertTrue(SymbolInWordDerivation.buildRounds(synthetic, lesson).isEmpty())
     }
 
     @Test
