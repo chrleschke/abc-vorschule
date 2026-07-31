@@ -17,7 +17,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.theme.NightDeep
 import app.abcvorschule.ui.theme.NightElevated
@@ -40,8 +39,9 @@ private data class Star(val fx: Float, val fy: Float, val radius: Float, val pha
  * The night landscape behind the path: a vertical gradient, a fixed star field
  * and three layers of hills that drift slowly as the child scrolls.
  *
- * [scrollOffset] is passed as a lambda, not a value: it is read inside
- * graphicsLayer, so scrolling moves the hills without recomposing anything.
+ * [scrollOffset] is passed as a lambda, not a value: it is read inside each
+ * hill band's drawBehind block, so scrolling moves the hills without
+ * recomposing anything — only redrawing.
  */
 @Composable
 fun PathBackground(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
@@ -112,9 +112,15 @@ private fun HillBand(
     Box(
         Modifier
             .fillMaxSize()
-            .graphicsLayer { translationY = -scrollOffset() * parallax }
             .drawBehind {
-                val base = size.height * baseFraction
+                // Parallax is folded into the wave's own vertical position rather
+                // than a graphicsLayer translation on the whole box: a translated
+                // box is viewport-sized and does not grow, so shifting it opens an
+                // undrawn gap at the trailing edge once it has moved far enough.
+                // Recomputing base here instead means the fill always runs from
+                // the (shifted) wave down to size.height, so the bottom of the
+                // viewport is covered at any scroll offset, positive or negative.
+                val base = size.height * baseFraction - scrollOffset() * parallax
                 val hill = Path().apply {
                     moveTo(0f, size.height)
                     lineTo(0f, base)
