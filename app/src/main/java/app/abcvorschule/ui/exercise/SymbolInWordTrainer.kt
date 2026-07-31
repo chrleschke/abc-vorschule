@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -26,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -138,16 +140,29 @@ fun SymbolInWordTrainer(
     // Positions are captured in window space and differenced against the wrapping
     // Box, because a flight crosses ExerciseStage's two separate Columns and there
     // is no shared layout node to animate inside (design doc §6).
+    // Observable maps, not plain ones: they are written from onGloballyPositioned and
+    // read during composition to gate the flight overlay. A plain map's write
+    // schedules no recomposition, so an endpoint that arrives late — a new round is
+    // handed empty maps, and onGloballyPositioned need not re-fire for a layout that
+    // is geometrically identical, e.g. L06's r·o·t -> T·o·r — would drop the flight
+    // silently. With state maps a late write invalidates and the flight self-heals.
     var rootOffset by remember(roundKey) { mutableStateOf(Offset.Zero) }
-    val segmentCenters = remember(roundKey) { mutableMapOf<Int, Offset>() }
-    val slotCenters = remember(roundKey) { mutableMapOf<Int, Offset>() }
+    val segmentCenters = remember(roundKey) { mutableStateMapOf<Int, Offset>() }
+    val slotCenters = remember(roundKey) { mutableStateMapOf<Int, Offset>() }
 
     // An Animatable driven from a LaunchedEffect rather than animateFloatAsState:
     // the flight's target value never changes (it is always "go to the slot"), and
     // animateFloatAsState initialises its internal Animatable *at* the target, so a
     // constant target would land the glyph instantly and never replay per hit.
     var flight by remember(roundKey) { mutableStateOf<SymbolFlight?>(null) }
-    val flightProgress = remember(roundKey) { Animatable(0f) }
+
+    // Keyed on the flight, not the round: one Animatable per round would still hold
+    // 1f from the previous flight when the next hit's composition reads it, drawing
+    // the second glyph at rest on its stroke for one frame before the LaunchedEffect
+    // gets to reset it. A fresh Animatable starts at 0f by construction, so the
+    // frame ordering stops mattering. Reachable on every two-hit round (Papa, Mama,
+    // Keks, Mimi).
+    val flightProgress = remember(flight) { Animatable(0f) }
 
     // Reported up from WordSegments, which is where the row sizing is computed, so
     // the flight can start at the size the segment is actually drawn at instead of
@@ -188,7 +203,8 @@ fun SymbolInWordTrainer(
 
     LaunchedEffect(flight) {
         if (flight == null) return@LaunchedEffect
-        flightProgress.snapTo(0f)
+        // No snapTo first: flightProgress is remembered on the same key, so it is a
+        // brand-new Animatable sitting at 0f whenever this effect starts.
         flightProgress.animateTo(1f, tween(durationMillis = FlightMs, easing = FastOutSlowInEasing))
         // Clearing the flight is what fills the stroke, so the hand-off from the
         // flying copy to the resting glyph happens in one frame.
@@ -313,8 +329,20 @@ private fun TargetLabelRow(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.clickable { onClick() }.testTag("detective_target"),
+        // Centred inside the enforced minimum, so a single narrow glyph does not sit
+        // off to the left of its own touch target.
+        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+        modifier = Modifier
+            // A single-form single-glyph target ("ß" in L15's F·u·ß, where targetLabel
+            // returns no alternate because the atom is already lowercase) is barely
+            // one glyph wide, which is under the hit-box floor every touch target in
+            // this app has to clear.
+            .sizeIn(
+                minWidth = WordFrameSizing.MinFrameDp.dp,
+                minHeight = WordFrameSizing.MinFrameDp.dp,
+            )
+            .clickable { onClick() }
+            .testTag("detective_target"),
     ) {
         Text(text = label.primary, fontSize = AbcDimens.letterSp, color = SoftSand)
         if (label.alternate != null) {
@@ -478,7 +506,13 @@ private fun SlotRow(
     ) {
         repeat(round.targetIndices.size) { ordinal ->
             val filled = ordinal < landedCount
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                // The pulse sits on the whole slot, so the 3dp stroke pulses with its
+                // glyph: design doc §6 says "die *Striche* pulsieren golden", and a
+                // glyph brightening over a static stroke is not that.
+                modifier = Modifier.alpha(if (celebrate) glow else 1f),
+            ) {
                 Box(
                     modifier = Modifier
                         .width(slotWidth)
@@ -502,7 +536,6 @@ private fun SlotRow(
                             text = label.primary,
                             fontSize = AbcDimens.syllableSp,
                             color = landedColor,
-                            modifier = Modifier.alpha(if (celebrate) glow else 1f),
                         )
                     } else if (showSilhouette && label != null) {
                         // Scaffold "Beginner": the target sits in the stroke as a
