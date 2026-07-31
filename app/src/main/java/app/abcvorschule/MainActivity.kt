@@ -8,12 +8,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.speech.SpeechController
+import app.abcvorschule.ui.debug.TtsDebugScreen
 import app.abcvorschule.ui.shell.TaskShell
 import app.abcvorschule.ui.theme.AbcTheme
 
@@ -44,21 +47,38 @@ fun AbcApp(onFinish: () -> Unit = {}) {
     val state by viewModel.ui.collectAsStateWithLifecycle()
     val ttsAvailable by speech.available.collectAsStateWithLifecycle()
     val speaking by speech.speaking.collectAsStateWithLifecycle()
+    var showTtsDebug by remember { mutableStateOf(false) }
 
     BackHandler {
         if (viewModel.onBackPressed()) {
             onFinish()
         }
     }
+    BackHandler(enabled = showTtsDebug) {
+        showTtsDebug = false
+    }
 
-    TaskShell(
-        state = state,
-        pack = viewModel.contentPack(),
-        viewModel = viewModel,
-        ttsAvailable = ttsAvailable,
-        speaking = speaking,
-        onSpeak = speech::speak,
-        onSpeakAndAwait = speech::speakAndAwait,
-        onStopSpeak = speech::stop,
-    )
+    val pack = viewModel.contentPack()
+    if (BuildConfig.DEBUG && showTtsDebug && pack != null) {
+        TtsDebugScreen(
+            pack = pack,
+            repository = app.ttsDebugRepository,
+            ttsAvailable = ttsAvailable,
+            speaking = speaking,
+            onSpeak = speech::speak,
+            onClose = { showTtsDebug = false },
+        )
+    } else {
+        TaskShell(
+            state = state,
+            pack = pack,
+            viewModel = viewModel,
+            ttsAvailable = ttsAvailable,
+            speaking = speaking,
+            onSpeak = speech::speak,
+            onSpeakAndAwait = speech::speakAndAwait,
+            onStopSpeak = speech::stop,
+            onOpenTtsDebug = { showTtsDebug = true },
+        )
+    }
 }

@@ -1,6 +1,7 @@
 package app.abcvorschule.ui.path
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -26,6 +27,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import app.abcvorschule.BuildConfig
 import app.abcvorschule.content.Lesson
 import app.abcvorschule.progress.LessonGating
 import app.abcvorschule.progress.LessonState
@@ -51,6 +53,7 @@ fun PathScreen(
     onOpenLesson: (String) -> Unit,
     onLockedTap: () -> Unit,
     onParentGateUnlocked: () -> Unit,
+    onOpenTtsDebug: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -88,7 +91,7 @@ fun PathScreen(
 
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
                     .verticalScroll(scrollState)
                     .testTag("path_scroll"),
             ) {
@@ -165,6 +168,19 @@ fun PathScreen(
                         onLockedTap = onLockedTap,
                     )
                 }
+            }
+
+            if (BuildConfig.DEBUG) {
+                Text(
+                    text = "TTS Debug",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MutedText,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .clickable(onClick = onOpenTtsDebug)
+                        .padding(vertical = 8.dp)
+                        .testTag("tts_debug_entry"),
+                )
             }
         }
     }
