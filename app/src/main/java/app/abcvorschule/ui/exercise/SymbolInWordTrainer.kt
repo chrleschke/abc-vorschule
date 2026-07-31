@@ -23,7 +23,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -147,6 +149,13 @@ fun SymbolInWordTrainer(
     var flight by remember(roundKey) { mutableStateOf<SymbolFlight?>(null) }
     val flightProgress = remember(roundKey) { Animatable(0f) }
 
+    // Reported up from WordSegments, which is where the row sizing is computed, so
+    // the flight can start at the size the segment is actually drawn at instead of
+    // popping to the stroke's size at take-off. Identical to the stroke size for
+    // every word in the current content; it only diverges once a word is long
+    // enough for WordFrameSizing to shrink the glyphs.
+    var segmentGlyphSp by remember(roundKey) { mutableFloatStateOf(WordFrameSizing.MaxGlyphSp) }
+
     // A stroke only fills once its glyph has actually landed on it — while a copy is
     // in the air the slot stays empty, so the child sees one glyph, not two.
     val landedCount = state.collected.size - if (flight != null) 1 else 0
@@ -219,12 +228,12 @@ fun SymbolInWordTrainer(
                     enabled = !complete && !resolved,
                     onTap = ::handleTap,
                     onSegmentPlaced = { index, center -> segmentCenters[index] = center },
+                    onGlyphSpMeasured = { segmentGlyphSp = it },
                 )
             },
             answers = {
                 SlotRow(
                     round = round,
-                    state = state,
                     label = label,
                     slotWidth = slotWidth,
                     landedCount = landedCount,
@@ -252,12 +261,16 @@ fun SymbolInWordTrainer(
         val active = flight
         val from = active?.let { segmentCenters[it.segmentIndex] }
         val to = active?.let { slotCenters[it.slotOrdinal] }
-        if (active != null && from != null && to != null && !resolved) {
+        if (active != null && from != null && to != null && label != null && !resolved) {
             val progress = flightProgress.value
             val current = Offset(
                 x = from.x + (to.x - from.x) * progress,
                 y = from.y + (to.y - from.y) * progress,
             ) - rootOffset
+            // Grows (or shrinks) from the size the word is drawn at into the size the
+            // stroke holds, so the copy leaves the word at the size the child just
+            // touched rather than jumping to the stroke's size in mid-air.
+            val fontSp = segmentGlyphSp + (AbcDimens.syllableSp.value - segmentGlyphSp) * progress
             val density = LocalDensity.current
             Box(
                 modifier = Modifier
@@ -271,8 +284,8 @@ fun SymbolInWordTrainer(
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = round.segments.getOrNull(active.segmentIndex).orEmpty(),
-                    fontSize = AbcDimens.syllableSp,
+                    text = label.primary,
+                    fontSize = fontSp.sp,
                     color = SoftGold,
                     modifier = Modifier.alpha(1f - progress * 0.15f),
                 )
@@ -326,6 +339,7 @@ private fun WordSegments(
     enabled: Boolean,
     onTap: (Int) -> Unit,
     onSegmentPlaced: (Int, Offset) -> Unit,
+    onGlyphSpMeasured: (Float) -> Unit,
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
         // Measured rather than assumed: on a phone narrower than ExerciseStage's
@@ -336,6 +350,10 @@ private fun WordSegments(
         val frameWidth = WordFrameSizing.frameWidthDp(available, perRow)
         val glyphSp = WordFrameSizing.glyphSp(frameWidth, round.segments.maxOfOrNull { it.length } ?: 1)
         val gap = WordFrameSizing.gapDp(available, perRow)
+        // In a SideEffect, not inline: this writes state the caller reads, and that
+        // is only safe once the composition it comes from has succeeded. Writing the
+        // same value again is a no-op for recomposition, so it settles immediately.
+        SideEffect { onGlyphSpMeasured(glyphSp) }
 
         Column(
             modifier = Modifier.align(Alignment.Center),
@@ -428,7 +446,6 @@ private fun SegmentGlyph(
 @Composable
 private fun SlotRow(
     round: SymbolInWordRound,
-    state: SymbolInWordState,
     label: SymbolInWordDerivation.TargetLabel?,
     slotWidth: Dp,
     landedCount: Int,
@@ -461,12 +478,6 @@ private fun SlotRow(
     ) {
         repeat(round.targetIndices.size) { ordinal ->
             val filled = ordinal < landedCount
-            // The glyph that landed, not the target's canonical form: the child tapped
-            // the lowercase "p" in "Papa" and must see that same "p" come to rest, or
-            // the flight stops being the evidence it is there to be (design doc §6).
-            val landedGlyph = state.collected.getOrNull(ordinal)
-                ?.let { round.segments.getOrNull(it) }
-                ?: label?.primary.orEmpty()
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
                     modifier = Modifier
@@ -481,9 +492,14 @@ private fun SlotRow(
                         },
                     contentAlignment = Alignment.Center,
                 ) {
-                    if (filled) {
+                    if (filled && label != null) {
+                        // Always the target's own form, never the tapped segment's: the
+                        // strokes are the receipt for one question ("finde alle P"), so
+                        // two hits on "Papa" must both read "P", and under the label
+                        // "mi" no "Mi" may land (design doc §6). The §4 invariant keeps
+                        // the two forms a pure case difference.
                         Text(
-                            text = landedGlyph,
+                            text = label.primary,
                             fontSize = AbcDimens.syllableSp,
                             color = landedColor,
                             modifier = Modifier.alpha(if (celebrate) glow else 1f),
