@@ -7,13 +7,48 @@ import kotlin.math.sin
 data class PathPoint(val x: Float, val y: Float)
 
 /**
- * Calm winding S-curve: nodes stack top-down at constant spacing while x swings
- * center → right → center → left with a period of four nodes. Pure math so the
- * layout is unit-testable without Compose.
+ * Deterministic pseudo-noise. The path must look hand-drawn but never move
+ * between two recompositions, so nothing here uses Random or any state — the
+ * same (index, salt) always yields the same value in (-1f, 1f).
+ */
+internal object PathNoise {
+    fun signed(index: Int, salt: Int): Float {
+        var h = index * 374761393 + salt * 668265263
+        h = (h xor (h shr 13)) * 1274126177
+        h = h xor (h shr 16)
+        return (h % 1000) / 1000f
+    }
+}
+
+/**
+ * Winding trail: nodes stack top-down while x swings across the screen. The
+ * period is deliberately not a whole number of nodes and both axes carry a small
+ * index-derived offset, so the curve never rasters onto a handful of exact
+ * positions the way a plain sine does. Pure math so the layout is unit-testable
+ * without Compose.
  */
 object PathGeometry {
-    const val DefaultSpacing = 140f
-    const val DefaultMargin = 96f
+    const val DefaultSpacing = 168f
+    const val DefaultMargin = 132f
+
+    /** Nodes per full left-right-left swing. Non-integer on purpose. */
+    private const val Period = 3.7
+
+    private const val XJitterFraction = 0.06f
+    private const val YJitterFraction = 0.08f
+
+    /**
+     * y of every node. Shared by [points] and [contentHeight] — with variable
+     * spacing the two would otherwise drift apart and the scroll area would cut
+     * the last nodes off.
+     */
+    private fun yOffsets(count: Int, spacing: Float, margin: Float): List<Float> {
+        var y = margin
+        return (0 until count).map { index ->
+            if (index > 0) y += spacing * (1f + YJitterFraction * PathNoise.signed(index, salt = 7))
+            y
+        }
+    }
 
     fun points(
         count: Int,
@@ -24,10 +59,15 @@ object PathGeometry {
         if (count <= 0) return emptyList()
         val center = width / 2f
         val amplitude = (center - margin).coerceAtLeast(0f)
+        val ys = yOffsets(count, spacing, margin)
         return (0 until count).map { index ->
+            val swing = sin(index * 2.0 * PI / Period).toFloat()
+            val jitter = XJitterFraction * PathNoise.signed(index, salt = 3)
+            // Jitter is scaled by amplitude, not added in pixels: on a screen too
+            // narrow to swing (amplitude 0) every node must sit dead center.
             PathPoint(
-                x = center + amplitude * sin(index * PI / 2.0).toFloat(),
-                y = margin + index * spacing,
+                x = center + amplitude * (swing + jitter).coerceIn(-1f, 1f),
+                y = ys[index],
             )
         }
     }
@@ -36,5 +76,5 @@ object PathGeometry {
         count: Int,
         spacing: Float = DefaultSpacing,
         margin: Float = DefaultMargin,
-    ): Float = if (count <= 0) 0f else 2 * margin + (count - 1) * spacing
+    ): Float = if (count <= 0) 0f else yOffsets(count, spacing, margin).last() + margin
 }
