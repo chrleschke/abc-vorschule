@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,6 +42,12 @@ import kotlinx.coroutines.delay
 
 private val BackgroundStarSize = 280.dp
 private const val BackgroundStarAlpha = 0.12f
+
+// Material3s eigenes Verhältnis für headlineSmall (32sp Zeilenhöhe / 24sp Schriftgröße),
+// hier reproduziert: sobald wir fontSize überschreiben, hängt lineHeight sonst weiter an
+// headlineSmalls festen 32sp und wächst mit der System-Schriftskalierung ungebremst
+// weiter — die gedeckelte Schriftgröße allein würde die Zeile dann nicht klein halten.
+private const val SentenceLineHeightRatio = 32f / 24f
 
 /**
  * Der End-Screen einer Lektion, in zwei Varianten:
@@ -127,8 +134,10 @@ private fun FinaleBody(
     speaking: Boolean,
     onSpeak: (String) -> Unit,
 ) {
+    val fontScale = LocalDensity.current.fontScale
     val pictures = FinaleLayout.picturesOf(pack, finale)
-    val sizeSp = FinaleLayout.pictureSizeSp(pictures.size).sp
+    val pictureSp = FinaleLayout.pictureSizeSp(pictures.size, fontScale).sp
+    val sentenceSp = FinaleLayout.sentenceSizeSp(fontScale)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -151,7 +160,7 @@ private fun FinaleBody(
                 ) {
                     Text(
                         text = picture.emoji,
-                        fontSize = sizeSp,
+                        fontSize = pictureSp,
                         // Tippen liest das Wort vor (Prinzip 7).
                         modifier = Modifier.clickable(enabled = ttsAvailable) {
                             onSpeak(picture.lemma)
@@ -168,6 +177,8 @@ private fun FinaleBody(
             textAlign = TextAlign.Center,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
+            fontSize = sentenceSp.sp,
+            lineHeight = (sentenceSp * SentenceLineHeightRatio).sp,
         )
 
         AbcSpeakerButton(
