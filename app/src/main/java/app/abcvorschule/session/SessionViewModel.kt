@@ -157,11 +157,15 @@ class SessionViewModel(
                     )
                     return@runCatching
                 }
-                val trainers = SymbolHuntInsertion.insertSymbolHunts(
-                    pack.tasksOf(lesson).map { schedule(it) },
+                val trainers = SymbolInWordInsertion.insertSymbolInWord(
+                    SymbolHuntInsertion.insertSymbolHunts(
+                        pack.tasksOf(lesson).map { schedule(it) },
+                        pack,
+                        lesson.id,
+                        lesson.index,
+                    ),
                     pack,
-                    lesson.id,
-                    lesson.index,
+                    lesson,
                 )
                 val step = SessionProgression.resumeSafe(expectedTrainerCount, trainers.size, trainerIndex, roundIndex)
                 val counts = trainers.map { it.spec.rounds.size }
