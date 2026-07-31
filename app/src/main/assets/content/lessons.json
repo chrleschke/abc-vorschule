@@ -7,6 +7,7 @@
       "title": "M & A (Die Ur-Silbe)",
       "nodeLabel": "M a",
       "status": "authored",
+      "finaleId": "f-l01",
       "focusAtomIds": [
         "letter-m",
         "letter-a"
@@ -31,6 +32,7 @@
       "title": "I & O (Der Familien-Kreis)",
       "nodeLabel": "I o",
       "status": "authored",
+      "finaleId": "f-l02",
       "focusAtomIds": [
         "letter-i",
         "letter-o"
@@ -55,6 +57,7 @@
       "title": "P & T (Die Plosivlaute)",
       "nodeLabel": "P t",
       "status": "authored",
+      "finaleId": "f-l03",
       "focusAtomIds": [
         "letter-p",
         "letter-t"
@@ -79,6 +82,7 @@
       "title": "L & H (Das weiche Fließen)",
       "nodeLabel": "L h",
       "status": "authored",
+      "finaleId": "f-l04",
       "focusAtomIds": [
         "letter-l",
         "letter-h"
@@ -103,6 +107,7 @@
       "title": "F & U (Erste Abenteuer)",
       "nodeLabel": "F u",
       "status": "authored",
+      "finaleId": "f-l05",
       "focusAtomIds": [
         "letter-f",
         "letter-u"
@@ -127,6 +132,7 @@
       "title": "R & N (Die Rollenden Laute)",
       "nodeLabel": "R n",
       "status": "authored",
+      "finaleId": "f-l06",
       "focusAtomIds": [
         "letter-r",
         "letter-n"
@@ -151,6 +157,7 @@
       "title": "S & E (Das leise Zischen)",
       "nodeLabel": "S e",
       "status": "authored",
+      "finaleId": "f-l07",
       "focusAtomIds": [
         "letter-s",
         "letter-e"
@@ -175,6 +182,7 @@
       "title": "D & K (Die Satz-Bauer)",
       "nodeLabel": "D k",
       "status": "authored",
+      "finaleId": "f-l08",
       "focusAtomIds": [
         "letter-d",
         "letter-k"
@@ -199,6 +207,7 @@
       "title": "Ei & W (Der erste Doppellaut)",
       "nodeLabel": "Ei w",
       "status": "authored",
+      "finaleId": "f-l09",
       "focusAtomIds": [
         "letter-ei",
         "letter-w"
@@ -223,6 +232,7 @@
       "title": "G & Ch (Weiche Übergänge)",
       "nodeLabel": "G ch",
       "status": "authored",
+      "finaleId": "f-l10",
       "focusAtomIds": [
         "letter-g",
         "letter-ch"
@@ -247,6 +257,7 @@
       "title": "Au & B (Das Haus-Szenario)",
       "nodeLabel": "Au b",
       "status": "authored",
+      "finaleId": "f-l11",
       "focusAtomIds": [
         "letter-au",
         "letter-b"
@@ -271,6 +282,7 @@
       "title": "Umlaut-Rätsel (Mathematisch)",
       "nodeLabel": "ä ö ü",
       "status": "authored",
+      "finaleId": "f-l12",
       "focusAtomIds": [
         "letter-ae",
         "letter-oe",
@@ -296,6 +308,7 @@
       "title": "Sch (Der Dreifachlaut)",
       "nodeLabel": "Sch",
       "status": "authored",
+      "finaleId": "f-l13",
       "focusAtomIds": [
         "letter-sch"
       ],
@@ -319,6 +332,7 @@
       "title": "J, Z & Eu (Die Wilden)",
       "nodeLabel": "J z eu",
       "status": "authored",
+      "finaleId": "f-l14",
       "focusAtomIds": [
         "letter-j",
         "letter-z",
@@ -344,6 +358,7 @@
       "title": "ß & V (Spezielle Zeichen)",
       "nodeLabel": "ß v",
       "status": "authored",
+      "finaleId": "f-l15",
       "focusAtomIds": [
         "letter-sz",
         "letter-v"
@@ -368,6 +383,7 @@
       "title": "ck & Pf (Scharfe Laute)",
       "nodeLabel": "ck pf",
       "status": "authored",
+      "finaleId": "f-l16",
       "focusAtomIds": [
         "letter-ck",
         "letter-pf"
@@ -392,6 +408,7 @@
       "title": "St & Sp (Die Sch-Stolperer)",
       "nodeLabel": "St sp",
       "status": "authored",
+      "finaleId": "f-l17",
       "focusAtomIds": [
         "letter-st",
         "letter-sp"
@@ -416,6 +433,7 @@
       "title": "C, Y, X & Qu (Die Seltenen)",
       "nodeLabel": "C y x qu",
       "status": "authored",
+      "finaleId": "f-l18",
       "focusAtomIds": [
         "letter-c",
         "letter-y",
@@ -444,6 +462,7 @@
       "title": "M & A Wiederholung",
       "nodeLabel": "M a+",
       "status": "authored",
+      "finaleId": "f-l01",
       "focusAtomIds": [
         "letter-m",
         "letter-a"
@@ -468,6 +487,7 @@
       "title": "I & O Wiederholung",
       "nodeLabel": "I o+",
       "status": "authored",
+      "finaleId": "f-l02",
       "focusAtomIds": [
         "letter-i",
         "letter-o"
@@ -492,6 +512,7 @@
       "title": "P & T Wiederholung",
       "nodeLabel": "P t+",
       "status": "authored",
+      "finaleId": "f-l03",
       "focusAtomIds": [
         "letter-p",
         "letter-t"
@@ -516,6 +537,7 @@
       "title": "Ei & Au Wiederholung",
       "nodeLabel": "Ei au+",
       "status": "authored",
+      "finaleId": "f-l11",
       "focusAtomIds": [
         "letter-ei",
         "letter-au"
@@ -540,6 +562,7 @@
       "title": "Sch & Ch Wiederholung",
       "nodeLabel": "Sch ch+",
       "status": "authored",
+      "finaleId": "f-l13",
       "focusAtomIds": [
         "letter-sch",
         "letter-ch"
@@ -564,6 +587,7 @@
       "title": "St & Sp Wiederholung",
       "nodeLabel": "St sp+",
       "status": "authored",
+      "finaleId": "f-l17",
       "focusAtomIds": [
         "letter-st",
         "letter-sp"
@@ -588,6 +612,7 @@
       "title": "Ö & Ü Wiederholung",
       "nodeLabel": "Ö ü+",
       "status": "authored",
+      "finaleId": "f-l12",
       "focusAtomIds": [
         "letter-oe",
         "letter-ue"
@@ -612,6 +637,7 @@
       "title": "Qu & X Wiederholung",
       "nodeLabel": "Qu x+",
       "status": "authored",
+      "finaleId": "f-l18",
       "focusAtomIds": [
         "letter-qu",
         "letter-x"
