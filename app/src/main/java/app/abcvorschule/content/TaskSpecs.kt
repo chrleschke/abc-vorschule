@@ -229,7 +229,12 @@ data class SymbolInWordRound(
     val segments: List<String>,
     /** Indices into [segments] that are hits. Never empty. */
     val targetIndices: List<Int>,
-) : TrainerRound
+) : TrainerRound {
+    init {
+        require(targetIndices.isNotEmpty()) { "SymbolInWordRound $wordAtomId/$targetAtomId has no hit" }
+        require(targetIndices.all { it in segments.indices }) { "SymbolInWordRound $wordAtomId/$targetAtomId hit out of bounds" }
+    }
+}
 
 @Serializable
 data class TasksFile(val tasks: List<TaskSpec>)
