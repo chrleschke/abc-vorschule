@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.R
@@ -165,7 +166,8 @@ private fun FinaleBody(
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
-            maxLines = 2,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis,
         )
 
         AbcSpeakerButton(
