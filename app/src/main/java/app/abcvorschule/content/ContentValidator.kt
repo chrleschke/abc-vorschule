@@ -106,7 +106,7 @@ object ContentValidator {
                 }
             }
             // Dedupe on the glyph, not the atom id: `katze` and `mimi` share one cat
-            // emoji, and two identical pictures read as a bug.
+            // emoji, and two identical pictures read as a bug — same rule as LessonEmojis.
             val glyphs = finale.pictureAtomIds.mapNotNull { pack.atoms[it]?.emoji }
                 .filter { it.isNotBlank() }
             if (glyphs.size != glyphs.distinct().size) {

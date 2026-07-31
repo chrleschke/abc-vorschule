@@ -183,8 +183,9 @@ Welche Nomen ein Bild bekommen, ist **redaktionell autoriert** (`pictureAtomIds`
 aus dem Text abgeleitet. Automatisches Wort→Atom-Matching scheitert an Flexion („roten
 Hut"), an geteilten Glyphen (`dach` und `haus` sind beide 🏠) und an der Frage, welches
 Nomen ein Bild verdient. `pictureAtomIds` ist eine fest autorierte Reihenfolge — kein
-Random, kein Shuffle — nach demselben Compose-freien, testbaren Muster wie
-`ui/exercise/WordFrameSizing.kt` und `ui/exercise/SyllableFrameSizing.kt`.
+Random, kein Shuffle — nach demselben Muster wie `content/LessonEmojis.kt`, das die
+Emojis der Pfad-Schilder genauso deterministisch aus dem Lektions-Vokabular ableitet und
+ebenfalls auf dem Glyph statt der Atom-ID dedupliziert.
 
 ### Redaktionsregeln für neue Sätze
 

@@ -313,7 +313,10 @@ docs/PRODUCT_PRINCIPLES.md                      (geändert) Abschnitte 4, 5, 11,
 
 `FinaleLayout.kt` ist Compose-frei. Alles, was eine Entscheidung trifft — welche Atome ein
 Bild bekommen, wie groß die Emojis werden, wann sie erscheinen — liegt dort, damit es
-testbar bleibt. Vorbild: `ui/exercise/WordFrameSizing.kt`, `ui/exercise/SyllableFrameSizing.kt`.
+testbar bleibt. Nächster Verwandter im Content-Graph: `content/LessonEmojis.kt` leitet die
+Emojis der Pfad-Schilder nach demselben Prinzip ab (deterministisch, Dedupe auf dem Glyph).
+Für das reine Compose-frei-Muster ohne Emoji-Bezug: `ui/exercise/WordFrameSizing.kt`,
+`ui/exercise/SyllableFrameSizing.kt`.
 
 ## 11. Tests
 
