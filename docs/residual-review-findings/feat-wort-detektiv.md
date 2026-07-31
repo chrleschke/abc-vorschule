@@ -13,6 +13,29 @@ Source: whole-branch review + scoped fix re-review (2026-08-01)
 | P3 | Trainer | Zwei richtige Tipps innerhalb von 350ms lassen den ersten Glyphen in der Luft verschwinden; Endzustand bleibt korrekt |
 | P3 | Trainer | Animationswerte werden in der Composition gelesen (~21 Recompositions pro Treffer) statt in Layout/Draw. Gleiches Muster wie im Geschwister-Trainer |
 | P3 | Trainer | Während des letzten 350ms-Flugs pulsiert auf `Beginner`-Stufe die Silhouette des noch leeren Strichs mit |
+| P3 | Testing | Test-Hygiene-Reste, alle im Whole-Branch-Review als akzeptabel eingestuft — Details unten |
+
+## P3 im Detail — Test-Hygiene-Reste
+
+Vom Review benannt, jeweils mit der Begründung, warum sie nicht blockieren:
+
+- `WordGraphemes.split` hat keinen Test für den Leerstring und für einen Wortrest, der
+  kürzer ist als ein Tabellen-Eintrag. Beides von Hand geprüft; der kurze Rest wird
+  ohnehin von `Schaf` (Rest `f` gegen Kandidat `Sch`) mitgetestet.
+- `tableHoldsEveryIntroducedMultiLetterGrapheme` nutzt `containsAll`, ein zusätzlicher
+  Eintrag käme also durch. Ein Leak bedeutet vorzeitiges Verschmelzen, was die
+  Lösbarkeits- und Label-Invarianten über alle 26 Lektionen fangen.
+- `everyDerivedRoundIsSolvable` ist tautologisch geworden, seit `SymbolInWordRound.init`
+  dasselbe erzwingt. Bleibt als Rauch-Test über alle Lektionen; der Kommentar muss
+  verhindern, dass jemand das `require()` löscht, weil „der Test das deckt".
+- Ungenutzter Import `assertNull` in `SymbolInWordDerivationTest`. Kein Lint-Gate im Build.
+- `WordGraphemes.table()` wird pro Wort neu gebaut statt pro Lektion einmal. Drei Wörter
+  mal ~260 Map-Lookups beim Lektionsstart, außerhalb jedes Animationspfads.
+- `anOutOfBoundsIndexIsIgnored` testet 9 und -1, nicht die exakte Grenze
+  `index == segmentCount`. Die Bereichsprüfung deckt sie konstruktiv.
+- `frameWidthNeverDropsBelowTheTouchFloor` ist tautologisch, weil `frameWidthDp` ohnehin
+  klemmt. Die echten Wächter sind die Umbruch-Tests mit konkreten Werten.
+- Kein Test für negatives `segmentCount`; die `<= 0`-Wächter decken es.
 
 ## P1 im Detail — Höhenbudget bei umgebrochenem Wort
 
