@@ -33,6 +33,7 @@ enum class TrainerKind {
     sentence_order,
     count_add,
     symbol_hunt,
+    symbol_in_word,
 }
 
 // --- Trainer 1: Auditiver Finder --------------------------------------------
@@ -195,6 +196,41 @@ data class SymbolHuntRound(
     val distractorPool: List<String>,
 ) : TrainerRound
 
+// --- Wort-Detektiv — derived at runtime, never authored -----------------------
+
+enum class SymbolInWordMode { letter, syllable }
+
+/**
+ * Never appears in authored JSON — SymbolInWordInsertion derives instances at
+ * runtime from a lesson's own word_build rounds (design doc §1). `@Serializable`
+ * for the same reason as [SymbolHuntSpec]: every member of a kotlinx.serialization
+ * sealed hierarchy needs it for the polymorphic parent to compile.
+ */
+@Serializable
+@SerialName("symbol_in_word")
+data class SymbolInWordSpec(
+    override val id: String,
+    val rounds: List<SymbolInWordRound>,
+) : TaskSpec
+
+@Serializable
+data class SymbolInWordRound(
+    override val promptTts: String,
+    /** Word the child searches; its [Atom.display] is what gets segmented. */
+    val wordAtomId: String,
+    /** The hunted letter or syllable. Scoring key, and source of the displayed label. */
+    val targetAtomId: String,
+    val mode: SymbolInWordMode,
+    /**
+     * The word split into tappable segments in reading order, carrying the word's
+     * own casing ("P", "a", "p", "a"). Resolved at derivation time so the screen
+     * makes no decisions — same contract as [SymbolHuntRound.distractorPool].
+     */
+    val segments: List<String>,
+    /** Indices into [segments] that are hits. Never empty. */
+    val targetIndices: List<Int>,
+) : TrainerRound
+
 @Serializable
 data class TasksFile(val tasks: List<TaskSpec>)
 
@@ -207,6 +243,7 @@ val TaskSpec.kind: TrainerKind
         is SentenceOrderSpec -> TrainerKind.sentence_order
         is CountAddSpec -> TrainerKind.count_add
         is SymbolHuntSpec -> TrainerKind.symbol_hunt
+        is SymbolInWordSpec -> TrainerKind.symbol_in_word
     }
 
 val TaskSpec.rounds: List<TrainerRound>
@@ -218,6 +255,7 @@ val TaskSpec.rounds: List<TrainerRound>
         is SentenceOrderSpec -> rounds
         is CountAddSpec -> rounds
         is SymbolHuntSpec -> rounds
+        is SymbolInWordSpec -> rounds
     }
 
 val TaskSpec.roundCount: Int get() = rounds.size
@@ -248,4 +286,5 @@ fun TrainerRound.scoredAtomIds(): List<String> = when (this) {
     is SentenceOrderRound -> emptyList()
     is CountAddRound -> emptyList()
     is SymbolHuntRound -> listOf(targetAtomId)
+    is SymbolInWordRound -> listOf(targetAtomId)
 }

@@ -10,6 +10,7 @@ import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SoundPositionSpec
 import app.abcvorschule.content.SymbolHuntRound
+import app.abcvorschule.content.SymbolInWordRound
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.TrainerRound
 import app.abcvorschule.content.WordBuildRound
@@ -120,6 +121,18 @@ fun TrainerHost(
             round = round,
             roundIndex = roundIndex,
             pack = pack,
+            ttsAvailable = ttsAvailable,
+            speaking = speaking,
+            onSpeakPrompt = callbacks.onSpeakPrompt,
+            onSpeak = callbacks.onSpeak,
+            onResult = callbacks.onResult,
+            modifier = modifier.fillMaxSize(),
+        )
+        is SymbolInWordRound -> SymbolInWordTrainer(
+            round = round,
+            roundIndex = roundIndex,
+            pack = pack,
+            scaffoldFor = scaffoldFor,
             ttsAvailable = ttsAvailable,
             speaking = speaking,
             onSpeakPrompt = callbacks.onSpeakPrompt,
