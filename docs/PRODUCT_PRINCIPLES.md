@@ -56,6 +56,10 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
 ## 4. Content-Graph
 
 - Atome (Buchstabe / Silbe / Wort + Emoji) sind wiederverwendbar über alle sechs Trainer-Typen einer Lektion.
+- Atom-Emojis werden auch außerhalb der Trainer verwendet: die Pfad-Schilder zeigen drei
+  Emojis je Lektion, abgeleitet aus sound_position → word_build → count_add → sentence_order
+  (deterministisch, über den Emoji-Glyph dedupliziert). `letter_trace.rewardEmoji` bleibt
+  bewusst außen vor — er ist die Belohnung des Trainers und wird nicht vorweggenommen.
 - Tasks referenzieren Atom-IDs; Validierung verhindert tote Referenzen.
 - Orthografie: Silben eher klein; zusammengesetzte Wörter/Sätze korrekt großgeschrieben.
 - Rechnen nutzt die Bild-Ikonen derselben Lektion; Details zu Singular/Plural siehe Abschnitt 8.
@@ -64,7 +68,11 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
 
 ## 5. Session-Modell
 
-- **Pfad-Screen ist der Einstieg** (winkende S-Kurve, ein Knoten pro Lektion, Label = Graphem).
+- **Pfad-Screen ist der Einstieg**: ein gepunkteter Trittspuren-Weg durch eine Nachtlandschaft
+  (Verlauf, Sterne, Hügel mit Parallaxe — dark-only bleibt Prinzip). Ein Wegweiser-Schild pro
+  Lektion, Label = Graphem, darunter drei Emojis aus dem Bildwortschatz der Lektion.
+  Der bereits zurückgelegte Teil des Weges ist wärmer gezeichnet als der Rest.
+  Gesperrte Schilder zeigen ihre Emojis nur als Silhouette.
 Gesperrte und noch nicht autorierte Knoten reagieren auf Tippen mit einem gesprochenen Hinweis —
 niemals mit einem stummen No-Op.
 - Tippen auf einen freigeschalteten Knoten startet die Sechs-Trainer-Typen-Session dieser Lektion.
