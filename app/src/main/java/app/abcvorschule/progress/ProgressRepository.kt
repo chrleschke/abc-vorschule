@@ -42,6 +42,9 @@ class ProgressRepository(
     suspend fun setParentMode(mode: ParentMode): LearnerProgress =
         update { it.copy(parentMode = mode) }
 
+    suspend fun setUnlockAllLessons(enabled: Boolean): LearnerProgress =
+        update { it.copy(unlockAllLessons = enabled) }
+
     suspend fun saveSession(snapshot: SessionSnapshot?): LearnerProgress =
         update { it.copy(unfinishedSession = snapshot) }
 

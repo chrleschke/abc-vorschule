@@ -3,7 +3,9 @@
     <string name="app_name">ABC-Vorschul App</string>
     <string name="continue_label">Weiter</string>
     <string name="reward_title">Super gemacht!</string>
-    <string name="difficulty_title">Hilfestufe</string>
+    <string name="parent_title">Eltern</string>
+    <string name="parent_section_difficulty">Hilfestufe</string>
+    <string name="parent_unlock_all">Reihenfolge frei wählbar</string>
     <string name="mode_auto">Auto</string>
     <string name="mode_beginner">Mit Hilfe</string>
     <string name="mode_advanced">Ohne Hilfe</string>

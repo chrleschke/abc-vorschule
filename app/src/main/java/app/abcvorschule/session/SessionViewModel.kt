@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.ContentRepository
 import app.abcvorschule.content.CountAddRound
+import app.abcvorschule.content.LessonEmojis
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.Lesson
 import app.abcvorschule.content.SentenceOrderRound
@@ -41,11 +42,21 @@ class SessionViewModel(
     private val progressRepository: ProgressRepository,
 ) : ViewModel() {
 
-    private val _ui = MutableStateFlow(SessionUiState())
+    private lateinit var pack: ContentPack
+
+    // Declared before _ui because the initial state mirrors it.
+    private var progress: LearnerProgress = LearnerProgress()
+
+    private val _ui = MutableStateFlow(
+        SessionUiState(
+            parentMode = progress.parentMode,
+            unlockAllLessons = progress.unlockAllLessons,
+        ),
+    )
     val ui: StateFlow<SessionUiState> = _ui.asStateFlow()
 
-    private lateinit var pack: ContentPack
-    private var progress: LearnerProgress = LearnerProgress()
+    /** Backs [lessonEmojis] — computed once when [pack] loads, not on every call. */
+    private var lessonEmojisByLessonId: Map<String, List<String>> = emptyMap()
 
     init {
         viewModelScope.launch { bootstrap() }
@@ -54,12 +65,16 @@ class SessionViewModel(
     private suspend fun bootstrap() {
         runCatching {
             pack = withContext(Dispatchers.IO) { contentRepository.load() }
+            lessonEmojisByLessonId = pack.lessons.associate { it.id to LessonEmojis.forLesson(pack, it) }
             progress = progressRepository.current()
             val snapshot = progress.unfinishedSession
             val resumable = snapshot != null &&
                 snapshot.packId == pack.manifest.packId &&
                 pack.lessons.any { it.id == snapshot.lessonId } &&
-                LessonGating.isPlayable(LessonGating.stateOf(pack, progress, snapshot.lessonId))
+                LessonGating.isPlayable(
+                    LessonGating.stateOf(pack, progress, snapshot.lessonId),
+                    progress.unlockAllLessons,
+                )
             if (resumable) {
                 openLesson(
                     snapshot!!.lessonId,
@@ -76,6 +91,8 @@ class SessionViewModel(
                 _ui.value = SessionUiState(
                     screen = AppScreen.Path,
                     points = progress.points,
+                    parentMode = progress.parentMode,
+                    unlockAllLessons = progress.unlockAllLessons,
                     ready = true,
                 )
             }
@@ -96,6 +113,16 @@ class SessionViewModel(
     fun highlightedLessonId(): String? =
         if (this::pack.isInitialized) LessonGating.nextPlayable(pack, progress)?.id else null
 
+    /**
+     * Signpost emojis per lesson id. Computed once in [bootstrap] when the pack
+     * loads and cached from then on — not rebuilt on every call — so every call
+     * after the pack has loaded returns the same Map instance. That is all this
+     * accessor guarantees: whether a Compose caller actually skips also depends on
+     * the other arguments it passes alongside this one.
+     */
+    fun lessonEmojis(): Map<String, List<String>> =
+        if (this::pack.isInitialized) lessonEmojisByLessonId else emptyMap()
+
     /** Spoken cue for a locked/planned node — a tap must always produce feedback. */
     fun lockedLessonCue(): String = "Das üben wir später."
 
@@ -111,7 +138,10 @@ class SessionViewModel(
                 progress = progressRepository.current()
                 val lesson = pack.lessons.firstOrNull { it.id == lessonId }
                 val playable = lesson != null &&
-                    LessonGating.isPlayable(LessonGating.stateOf(pack, progress, lessonId))
+                    LessonGating.isPlayable(
+                        LessonGating.stateOf(pack, progress, lessonId),
+                        progress.unlockAllLessons,
+                    )
                 if (lesson == null || !playable) {
                     // Never leave the UI hanging on the loading screen: a lesson that
                     // turned out not to be playable (e.g. a stale resume snapshot)
@@ -120,6 +150,8 @@ class SessionViewModel(
                     _ui.value = SessionUiState(
                         screen = AppScreen.Path,
                         points = progress.points,
+                        parentMode = progress.parentMode,
+                        unlockAllLessons = progress.unlockAllLessons,
                         ready = true,
                     )
                     return@runCatching
@@ -141,6 +173,8 @@ class SessionViewModel(
                     roundIndex = safeRound,
                     points = progress.points,
                     sessionPoints = sessionPoints,
+                    parentMode = progress.parentMode,
+                    unlockAllLessons = progress.unlockAllLessons,
                     ready = true,
                 )
                 persistSnapshot()
@@ -306,6 +340,8 @@ class SessionViewModel(
         _ui.update { it.copy(showDifficultySheet = false) }
     }
 
+    // Both setters leave the sheet open: a parent usually comes for one setting and
+    // discovers the other, and closing on the first tap hides that there is a second.
     fun setParentMode(mode: ParentMode) {
         viewModelScope.launch {
             progress = progressRepository.setParentMode(mode)
@@ -314,8 +350,15 @@ class SessionViewModel(
                 val updated = state.trainers.mapIndexed { i, trainer ->
                     if (i <= state.trainerIndex) trainer else schedule(trainer.spec)
                 }
-                state.copy(showDifficultySheet = false, trainers = updated)
+                state.copy(parentMode = progress.parentMode, trainers = updated)
             }
+        }
+    }
+
+    fun setUnlockAllLessons(enabled: Boolean) {
+        viewModelScope.launch {
+            progress = progressRepository.setUnlockAllLessons(enabled)
+            _ui.update { it.copy(unlockAllLessons = progress.unlockAllLessons) }
         }
     }
 
@@ -499,8 +542,6 @@ class SessionViewModel(
 
     fun scaffoldFor(atomId: String): ScaffoldLevel =
         _ui.value.current?.scaffolds?.get(atomId) ?: ScaffoldLevel.Beginner
-
-    fun parentMode(): ParentMode = progress.parentMode
 
     companion object {
         const val POINTS_PER_CORRECT = 1

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -111,6 +112,33 @@ class ProgressRepositoryTest {
         repository.setParentMode(ParentMode.Beginner)
 
         assertEquals(ParentMode.Beginner, repository.current().parentMode)
+    }
+
+    @Test
+    fun setUnlockAllLessonsPersistsWithoutTouchingParentMode() = runTest {
+        val repository = ProgressRepository(FakePreferencesDataStore())
+        repository.setParentMode(ParentMode.Advanced)
+
+        repository.setUnlockAllLessons(true)
+
+        val loaded = repository.current()
+        assertTrue(loaded.unlockAllLessons)
+        assertEquals(ParentMode.Advanced, loaded.parentMode)
+    }
+
+    @Test
+    fun payloadWrittenBeforeTheFlagExistedDecodesToLockedOrder() = runTest {
+        // Progress stored by an older build carries no unlockAllLessons key; the
+        // parent switch must come up off, never silently opening the whole path.
+        val payload = """
+            {"parentMode":"Auto","points":3,"atomStats":{},"mathStats":{},
+             "taskStats":{},"unfinishedSession":null}
+        """.trimIndent()
+        val repository = ProgressRepository(FakePreferencesDataStore(preferencesOf(rawKey to payload)))
+
+        val loaded = repository.current()
+        assertFalse(loaded.unlockAllLessons)
+        assertEquals(3, loaded.points)
     }
 
     @Test

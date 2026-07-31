@@ -26,9 +26,14 @@ enum class LessonState {
  * An authored lesson opens once the previous authored lesson is mastered.
  */
 object LessonGating {
-    fun isPlayable(state: LessonState): Boolean =
+    /**
+     * [unlockAll] is the parent override: it lifts the progress lock, not the absence of
+     * content — a [LessonState.Planned] lesson has no taskIds and would open an empty
+     * trainer list, so it stays unplayable.
+     */
+    fun isPlayable(state: LessonState, unlockAll: Boolean = false): Boolean =
         state == LessonState.Available || state == LessonState.InProgress ||
-            state == LessonState.Mastered
+            state == LessonState.Mastered || (unlockAll && state == LessonState.Locked)
 
     fun isMastered(lesson: Lesson, progress: LearnerProgress): Boolean =
         lesson.taskIds.isNotEmpty() &&

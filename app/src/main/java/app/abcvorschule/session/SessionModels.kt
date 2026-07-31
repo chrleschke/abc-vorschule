@@ -4,6 +4,7 @@ import app.abcvorschule.content.TaskSpec
 import app.abcvorschule.content.TrainerRound
 import app.abcvorschule.content.round
 import app.abcvorschule.content.rounds
+import app.abcvorschule.progress.ParentMode
 import app.abcvorschule.progress.ScaffoldLevel
 
 sealed interface AppScreen {
@@ -99,6 +100,15 @@ data class SessionUiState(
     val completedFinaleId: String? = null,
     val ready: Boolean = false,
     val showDifficultySheet: Boolean = false,
+    /**
+     * Mirrored out of `LearnerProgress` the way [points] already is (spec 5.1): the
+     * parent sheet now stays open after a selection, so it has to observe the state.
+     * Reading the repository through a viewModel getter only ever recomposed because
+     * the setter touched `_ui` in passing — and on the Path, where [trainers] is
+     * empty, that `copy` yields an equal state that `MutableStateFlow` conflates away.
+     */
+    val parentMode: ParentMode = ParentMode.Auto,
+    val unlockAllLessons: Boolean = false,
     /** Spoken-only miss/hint text — never rendered as chrome. */
     val speakCue: String? = null,
     val successPhase: SuccessPhase = SuccessPhase.Idle,

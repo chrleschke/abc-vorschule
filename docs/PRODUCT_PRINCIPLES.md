@@ -7,7 +7,8 @@ Bei Konflikten mit Implementierungsdetails oder älteren Planabschnitten gelten 
 ## 1. Für wen die App da ist
 
 - Primäre Nutzer: Kinder im Vorschulalter (ca. 4–7 Jahre).
-- Eltern steuern nur selten (Hilfestufe hinter Kindersicherung), nicht den Lerninhalt im Alltag.
+- Eltern steuern nur selten und immer hinter derselben Kindersicherung: Hilfestufe und Freigabe der
+  Lektionsreihenfolge — nicht den Lerninhalt im Alltag.
 - Die App ist kostenlos, werbefrei und ohne Monetarisierung in der Produktidentität.
 - Offline nach Installation: Kernpraxis braucht kein Netz.
 
@@ -56,6 +57,10 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
 ## 4. Content-Graph
 
 - Atome (Buchstabe / Silbe / Wort + Emoji) sind wiederverwendbar über alle sechs Trainer-Typen einer Lektion.
+- Atom-Emojis werden auch außerhalb der Trainer verwendet: die Pfad-Schilder zeigen drei
+  Emojis je Lektion, abgeleitet aus sound_position → word_build → count_add → sentence_order
+  (deterministisch, über den Emoji-Glyph dedupliziert). `letter_trace.rewardEmoji` bleibt
+  bewusst außen vor — er ist die Belohnung des Trainers und wird nicht vorweggenommen.
 - Tasks referenzieren Atom-IDs; Validierung verhindert tote Referenzen.
 - Orthografie: Silben eher klein; zusammengesetzte Wörter/Sätze korrekt großgeschrieben.
 - Rechnen nutzt die Bild-Ikonen derselben Lektion; Details zu Singular/Plural siehe Abschnitt 8.
@@ -70,10 +75,17 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
 
 ## 5. Session-Modell
 
-- **Pfad-Screen ist der Einstieg** (winkende S-Kurve, ein Knoten pro Lektion, Label = Graphem).
-Gesperrte und noch nicht autorierte Knoten reagieren auf Tippen mit einem gesprochenen Hinweis —
+- **Pfad-Screen ist der Einstieg**: ein gepunkteter Trittspuren-Weg durch eine Nachtlandschaft
+  (Verlauf, Sterne, Hügel mit Parallaxe — dark-only bleibt Prinzip). Ein Wegweiser-Schild pro
+  Lektion, Label = Graphem, darunter drei Emojis aus dem Bildwortschatz der Lektion.
+  Der bereits zurückgelegte Teil des Weges ist wärmer gezeichnet als der Rest.
+  Gesperrte Schilder zeigen ihre Emojis nur als Silhouette.
+Gesperrte und noch nicht autorierte Schilder reagieren auf Tippen mit einem gesprochenen Hinweis —
 niemals mit einem stummen No-Op.
-- Tippen auf einen freigeschalteten Knoten startet die Sechs-Trainer-Typen-Session dieser Lektion.
+- Mit der Eltern-Freigabe der Reihenfolge bleiben gesperrte Schilder abgedunkelt und behalten ihre
+  Silhouetten, verlieren aber Schloss und „später“-Hinweis und sind antippbar. Noch nicht autorierte
+  Lektionen bleiben in jedem Fall gesperrt — sie haben keinen Inhalt.
+- Tippen auf ein freigeschaltetes Schild startet die Sechs-Trainer-Typen-Session dieser Lektion.
 - Kein Domänen-Mix, keine Zufallsrotation: die Trainer-Reihenfolge ist didaktisch fix.
 - Vor/Zurück zwischen Runden ist **immer** möglich, unabhängig von Punkten/Fortschritt.
 - Fortschritt speichern nach jeder Antwort; unfertige Lektion wird beim Öffnen fortgesetzt.
@@ -89,7 +101,9 @@ niemals mit einem stummen No-Op.
 
 ## 6. Hilfestufen
 
-- Parent-Gate (langer Druck auf ⋯): **Auto / Mit Hilfe / Ohne Hilfe**.
+- Parent-Gate (langer Druck auf ⋯) öffnet das Sheet „Eltern“ mit genau zwei Einstellungen:
+  Abschnitt „Hilfestufe“ (**Auto / Mit Hilfe / Ohne Hilfe**) und die Freigabe
+  „Reihenfolge frei wählbar“, die die Fortschrittssperre des Pfades aufhebt.
 - Auto passt Gerüste sanft an; erzwungene Stufen frieren Auto-Streaks ein.
 - Gerüste pro Atom/Slot (Silhouette vs. Lücke), nicht global starr über die ganze Aufgabe.
 
