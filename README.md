@@ -44,6 +44,7 @@ Install:
 | `sentences.json` | Sätze als Atom-Folgen |
 | `tasks.json` | Ein Eintrag pro Trainer, `trainer`-Feld als Typ-Diskriminator, 1..n Runden |
 | `lessons.json` | 16 Lektionen in Fibel-Reihenfolge; `authored` = spielbar, `planned` = Knoten gesperrt |
+| `finales.json` | Ein kurzer Satz plus Bildreihe (`pictureAtomIds`) je Lektions-Ende |
 
 Autoriert: Lektionen 1–6 (Phase 1+2). Lektionen 7–16 sind als gesperrte Pfad-Knoten angelegt und
 brauchen nur noch Content — keinen Code.

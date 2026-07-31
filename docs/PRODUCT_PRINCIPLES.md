@@ -165,7 +165,9 @@ Spurensuchers und wird nicht vorweggenommen (siehe Abschnitt 4).
 Welche Nomen ein Bild bekommen, ist **redaktionell autoriert** (`pictureAtomIds`), nicht
 aus dem Text abgeleitet. Automatisches Wort→Atom-Matching scheitert an Flexion („roten
 Hut"), an geteilten Glyphen (`dach` und `haus` sind beide 🏠) und an der Frage, welches
-Nomen ein Bild verdient. Deterministisch wie `LessonEmojis` — kein Random, kein Shuffle.
+Nomen ein Bild verdient. `pictureAtomIds` ist eine fest autorierte Reihenfolge — kein
+Random, kein Shuffle — nach demselben Compose-freien, testbaren Muster wie
+`ui/exercise/WordFrameSizing.kt` und `ui/exercise/SyllableFrameSizing.kt`.
 
 ### Redaktionsregeln für neue Sätze
 

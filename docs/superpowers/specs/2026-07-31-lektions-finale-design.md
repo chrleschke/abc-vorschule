@@ -175,7 +175,7 @@ Neue Prüfungen, fail-fast beim Laden über `requireValid`:
 2. Jedes `pictureAtomIds`-Element existiert (`requireAtom`) **und** trägt ein
    nicht-leeres `emoji`.
 3. Die Emoji-Glyphen innerhalb eines Finales sind eindeutig. Zwei identische Bilder
-   lesen sich als Bug — dieselbe Begründung wie in `LessonEmojis`.
+   lesen sich als Bug.
 4. `pictureAtomIds.size` liegt zwischen `MinFinalePictures = 2` und
    `MaxFinalePictures = 4`.
 5. Die Wortzahl von `text` liegt zwischen `MinFinaleWords = 4` und
@@ -282,7 +282,7 @@ docs/PRODUCT_PRINCIPLES.md                      (geändert) Abschnitte 4, 5, 11,
 
 `FinaleLayout.kt` ist Compose-frei. Alles, was eine Entscheidung trifft — welche Atome ein
 Bild bekommen, wie groß die Emojis werden, wann sie erscheinen — liegt dort, damit es
-testbar bleibt. Vorbild: `content/LessonEmojis.kt`, `ui/exercise/WordFrameSizing.kt`.
+testbar bleibt. Vorbild: `ui/exercise/WordFrameSizing.kt`, `ui/exercise/SyllableFrameSizing.kt`.
 
 ## 11. Tests
 
