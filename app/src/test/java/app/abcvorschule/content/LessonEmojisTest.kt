@@ -71,4 +71,58 @@ class LessonEmojisTest {
         val broken = pack.lesson("l01").copy(taskIds = listOf("does-not-exist"))
         assertEquals(emptyList<String>(), LessonEmojis.forLesson(pack, broken))
     }
+
+    @Test
+    fun duplicateGlyphFromADifferentAtomIsSkippedInFavorOfAThirdPicture() {
+        // No lesson in the shipped pack currently has two different atoms sharing
+        // one glyph, so the dedup-by-glyph rule has nothing to bite on there. This
+        // builds that collision by hand: atoms "twin-a" and "twin-b" both carry the
+        // duplicate glyph and are listed first; a correct implementation must skip
+        // the second twin (same glyph, different atom id) and keep reaching down
+        // the round order until a third, genuinely different picture turns up.
+        val duplicateGlyph = "🟢"
+        val atoms = listOf(
+            Atom(id = "twin-a", lemma = "twin-a", display = "A", emoji = duplicateGlyph),
+            Atom(id = "twin-b", lemma = "twin-b", display = "B", emoji = duplicateGlyph),
+            Atom(id = "other-c", lemma = "other-c", display = "C", emoji = "🔵"),
+            Atom(id = "other-d", lemma = "other-d", display = "D", emoji = "🟡"),
+        ).associateBy { it.id }
+
+        fun round(atomId: String) = SoundPositionRound(
+            promptTts = "prompt",
+            atomId = atomId,
+            slot = SoundSlot.start,
+            missTts = "miss",
+        )
+
+        val task = SoundPositionSpec(
+            id = "t-collision",
+            phonemeTts = "X",
+            // Duplicate pair first, on purpose — the dedup must fire on the second one.
+            rounds = listOf(round("twin-a"), round("twin-b"), round("other-c"), round("other-d")),
+        )
+
+        val lesson = Lesson(
+            id = "l-collision",
+            index = 1,
+            phase = 1,
+            title = "Fixture",
+            nodeLabel = "X",
+            status = LessonStatus.authored,
+            taskIds = listOf(task.id),
+        )
+
+        val pack = ContentPack(
+            manifest = PackManifest(schemaVersion = 1, packId = "test", title = "Test Pack"),
+            atoms = atoms,
+            sentences = emptyMap(),
+            tasks = mapOf(task.id to task),
+            lessons = listOf(lesson),
+        )
+
+        val emojis = LessonEmojis.forLesson(pack, lesson)
+
+        assertEquals(listOf(duplicateGlyph, "🔵", "🟡"), emojis)
+        assertEquals(3, emojis.distinct().size)
+    }
 }
