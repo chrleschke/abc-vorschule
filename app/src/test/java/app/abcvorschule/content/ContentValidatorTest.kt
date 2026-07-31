@@ -252,6 +252,9 @@ class ContentValidatorTest {
             p.copy(finales = p.finales + ("f-l01" to p.finale("f-l01").copy(pictureAtomIds = listOf("mama", "ghost"))))
         }
         assertTrue(issues.toString(), issues.any { it.contains("ghost") })
+        // One bad reference must yield one issue, not also a redundant "no emoji"
+        // complaint about the same missing atom.
+        assertTrue(issues.toString(), issues.none { it.contains("ghost") && it.contains("emoji") })
     }
 
     @Test
@@ -306,6 +309,14 @@ class ContentValidatorTest {
             p.copy(finales = p.finales + ("f-l01" to p.finale("f-l01").copy(text = "Mama mampft!")))
         }
         assertTrue(tooShort.toString(), tooShort.any { it.contains("f-l01") && it.contains("words") })
+    }
+
+    @Test
+    fun finaleTtsMustNotBeBlank() {
+        val issues = issuesOf { p ->
+            p.copy(finales = p.finales + ("f-l01" to p.finale("f-l01").copy(tts = "")))
+        }
+        assertTrue(issues.toString(), issues.any { it.contains("f-l01") && it.contains("tts") })
     }
 
     @Test

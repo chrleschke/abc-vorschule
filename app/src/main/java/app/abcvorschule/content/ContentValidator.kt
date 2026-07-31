@@ -96,7 +96,12 @@ object ContentValidator {
             }
             finale.pictureAtomIds.forEach { id ->
                 requireAtom("finale ${finale.id}", id)
-                if (pack.atoms[id]?.emoji.isNullOrBlank()) {
+                // Only judge the emoji when the atom actually resolves — a missing
+                // atom already produced its own issue via requireAtom above, and
+                // pack.atoms[id]?.emoji.isNullOrBlank() would otherwise be true for
+                // that same missing id too, doubling up on one bad reference.
+                val atom = pack.atoms[id]
+                if (atom != null && atom.emoji.isBlank()) {
                     issues += ValidationIssue("finale ${finale.id} picture $id carries no emoji")
                 }
             }
