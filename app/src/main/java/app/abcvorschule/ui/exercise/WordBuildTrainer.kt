@@ -69,6 +69,14 @@ object WordBuildTray {
 
     fun frameIndex(key: String): Int? = key.removePrefix("frame-").toIntOrNull()
         ?.takeIf { key.startsWith("frame-") }
+
+    /**
+     * Tray tiles are keyed by their position, not just atomId+display: a word like
+     * "Hallo" offers two blocks with the identical atomId ("letter-l") and display
+     * ("l"), and a key collision there makes drag state (bounds, dragOffset,
+     * selectedKey) shared between them — dragging one moves both.
+     */
+    fun tileKey(index: Int, block: WordBlock): String = "block-$index-${block.atomId}-${block.display}"
 }
 
 /**
@@ -159,7 +167,9 @@ fun WordBuildTrainer(
                             val atomId = round.blocks[index].atomId
                             Frame(expected, filled, scaffoldFor(atomId) == ScaffoldLevel.Beginner, field.selectedKey != null && filled == null, {
                                 val selected = field.selectedKey
-                                tiles.firstOrNull { blockKey(it) == selected }?.let { place(index, it) }
+                                tiles.withIndex()
+                                    .firstOrNull { (i, block) -> WordBuildTray.tileKey(i, block) == selected }
+                                    ?.let { (_, block) -> place(index, block) }
                                 if (filled != null) onSpeak(filled)
                             }, field, index, frameWidth, glyphSp)
                         }
@@ -174,8 +184,8 @@ fun WordBuildTrainer(
                 modifier = Modifier.testTag("word_tray"),
             ) {
                 if (!resolved && !completed) {
-                    tiles.forEach { block ->
-                        val key = blockKey(block)
+                    tiles.forEachIndexed { index, block ->
+                        val key = WordBuildTray.tileKey(index, block)
                         DragCard(
                             state = field,
                             key = key,
@@ -218,8 +228,6 @@ fun WordBuildTrainer(
         },
     )
 }
-
-private fun blockKey(block: WordBlock): String = "block-${block.atomId}-${block.display}"
 
 @Composable
 private fun Frame(

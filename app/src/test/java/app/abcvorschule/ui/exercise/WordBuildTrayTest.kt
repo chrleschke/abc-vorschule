@@ -103,4 +103,16 @@ class WordBuildTrayTest {
         assertEquals(3, WordBuildTray.frameIndex(WordBuildTray.frameKey(3)))
         assertNull(WordBuildTray.frameIndex("wagon-start"))
     }
+
+    @Test
+    fun tileKeysStayUniqueForIdenticalBlocks() {
+        // "Hallo" offers two blocks with the same atomId AND display ("letter-l"/"l").
+        // If their keys collided, dragging one tile would drag both (shared drag
+        // state), so the index must disambiguate them.
+        val hallo = WordBlock("letter-l", "l")
+        assertNotEquals(
+            WordBuildTray.tileKey(1, hallo),
+            WordBuildTray.tileKey(2, hallo),
+        )
+    }
 }
