@@ -7,9 +7,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import java.io.File
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -30,24 +34,37 @@ class TtsDebugRepository(
 ) {
     private val json = Json { encodeDefaults = true }
     private val key = stringPreferencesKey("tts_debug_overrides_v1")
+    private val mutex = Mutex()
 
     val overridesFlow: Flow<Map<String, String>> = dataStore.data.map { prefs -> currentFrom(prefs) }
 
     suspend fun current(): Map<String, String> = overridesFlow.first()
 
     suspend fun setOverride(id: String, text: String, entries: List<TtsDebugEntry>) {
-        val updated = updateOverrides { it + (id to text) }
-        writeExportFile(entries, updated)
+        withContext(Dispatchers.IO) {
+            mutex.withLock {
+                val updated = updateOverrides { it + (id to text) }
+                writeExportFile(entries, updated)
+            }
+        }
     }
 
     suspend fun clearOverride(id: String, entries: List<TtsDebugEntry>) {
-        val updated = updateOverrides { it - id }
-        writeExportFile(entries, updated)
+        withContext(Dispatchers.IO) {
+            mutex.withLock {
+                val updated = updateOverrides { it - id }
+                writeExportFile(entries, updated)
+            }
+        }
     }
 
     suspend fun clearAll() {
-        updateOverrides { emptyMap() }
-        exportFile.writeText("[]")
+        withContext(Dispatchers.IO) {
+            mutex.withLock {
+                updateOverrides { emptyMap() }
+                exportFile.writeText("[]")
+            }
+        }
     }
 
     private suspend fun updateOverrides(

@@ -102,7 +102,7 @@ fun PathScreen(
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .testTag("path_scroll"),
         ) {
@@ -147,8 +147,8 @@ fun PathScreen(
                 color = MutedText,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 8.dp)
                     .clickable(onClick = onOpenTtsDebug)
+                    .padding(vertical = 8.dp)
                     .testTag("tts_debug_entry"),
             )
         }

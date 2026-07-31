@@ -59,7 +59,7 @@ fun AbcApp(onFinish: () -> Unit = {}) {
     }
 
     val pack = viewModel.contentPack()
-    if (showTtsDebug && pack != null) {
+    if (BuildConfig.DEBUG && showTtsDebug && pack != null) {
         TtsDebugScreen(
             pack = pack,
             repository = app.ttsDebugRepository,
