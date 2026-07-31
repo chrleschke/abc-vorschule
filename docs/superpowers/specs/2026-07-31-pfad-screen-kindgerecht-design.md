@@ -188,11 +188,18 @@ nicht vorweggenommen werden.
 Innerhalb jeder Quelle gilt die autorierte Reihenfolge (`pack.tasksOf(lesson)`), also kein
 Zufall. Aufgelöst wird über `pack.atoms`, leere Emojis werden übersprungen.
 
-**Dedupliziert wird über den Emoji-String, nicht über die Atom-ID** — `dach` und `haus`
-tragen beide 🏠, zwei identische Häuser auf einem Schild sähen nach Fehler aus.
+**Dedupliziert wird über den Emoji-String, nicht über die Atom-ID.** `dach` und `haus`
+tragen beide 🏠; zwei identische Häuser auf einem Schild sähen nach Fehler aus. Im
+aktuellen Content-Pack (v7) greift diese Regel bei **keiner** der 26 Lektionen — sie ist
+eine Absicherung für künftigen Content, nicht die Korrektur eines bestehenden Fehlers.
+
+Gegen das echte Pack durchgerechnet ergibt die Regel u.a.:
+`l01 M a` → 🐜🐭🌳 · `l05 F u` → 🦊🐘🦉 · `l13 Sch` → 🏫🐟👟 · `l17 St sp` → ⭐🪟🕷️ ·
+`l26 Qu x+` → 🪼💧🚕. Alle 26 Lektionen liefern drei Emojis; keine läuft leer.
 
 Lektionen mit `status = planned` haben keine `taskIds` und liefern eine leere Liste; das
-Schild zeigt dann nur das Schloss. Das ist der Normalfall, kein Sonderfall.
+Schild zeigt dann nur das Schloss. Im aktuellen Pack ist keine Lektion `planned`, der
+Fall wird also nur durch einen synthetischen Unit-Test abgedeckt.
 
 Berechnet wird die Map einmal beim Laden des Packs im ViewModel. `PathScreen` bekommt
 sie als zusätzlichen Parameter `emojisByLessonId: Map<String, List<String>>` und bleibt
