@@ -231,6 +231,10 @@ Quelle für Symbole ist das Wort selbst. Die Striche sind Quittungen, keine Wahl
 
 ## 6. Interaktion
 
+Ein Tipp auf ein bereits eingesammeltes Segment ist vollständig wirkungslos — kein Treffer,
+kein Fehltipp, und auch keine Sprachausgabe. Es ist kein antippbares Item mehr (Prinzip 7
+gilt für handlungsfähige Items), sondern die Quittung, dass es schon gefunden wurde.
+
 **Richtiger Tipp**
 
 1. Segment wird vorgesprochen.
@@ -239,11 +243,25 @@ Quelle für Symbole ist das Wort selbst. Die Striche sind Quittungen, keine Wahl
 3. Eine Kopie fliegt in ~350ms auf den nächsten freien Strich und bleibt dort in
    `SoftGold` liegen — dieselbe Farbe wie Stern und Punkte: „verdient".
 
+**Was genau fliegt: die Form des Zielsymbols, nicht die des angetippten Segments.**
+Beide unterscheiden sich nur in der Groß-/Kleinschreibung (die Invariante aus §4 garantiert
+das), aber die Striche sind die Quittung auf *eine* Frage. „Finde alle **P**" soll unten als
+zwei P enden, nicht als `P` und `p`; und in `Mimi` darf unter dem Label `mi` kein `Mi`
+liegen, sonst widerspricht die Quittung der Aufgabe. Für Buchstaben ist das zusätzlich
+genau die Lektion, die das Formenpaar `P / p` sowieso vermittelt: beide Vorkommen sind
+dasselbe P.
+
+Die fliegende Kopie wird in der Glyphgröße des Segments gestartet und auf die Größe des
+Strichs interpoliert, damit sie beim Abflug nicht größer ist als das Zeichen, aus dem sie
+kommt — bei langen Wörtern sind die Segmente kleiner als die Striche.
+
 **Falscher Tipp**
 
 1. Segment wird vorgesprochen. Das *ist* das Fehlerfeedback — kein Lesesatz
    (Prinzip 7), und das Kind hört den Unterschied zum gesuchten Laut.
-2. Das Segment dreht sich einmal um 360° um seinen eigenen Mittelpunkt, ~450ms.
+2. Das Segment dreht sich einmal um 360° um seinen eigenen Mittelpunkt, ~450ms. Wird die
+   Drehung durch einen Tipp auf ein *anderes* falsches Segment unterbrochen, muss das erste
+   in seine Ausgangslage zurückgesetzt werden — sonst bleibt es schief stehen.
 3. `HapticFeedbackType.LongPress`, wie in der Jagd.
 4. Nichts geht verloren: kein Strich, keine Punkte, keine Strafe.
 
@@ -257,9 +275,10 @@ das Kind kann ihn nicht lesen.
 **„Zeig mir"**
 
 Nach 6 aufeinanderfolgenden Fehltipps (`ResolveThreshold`, geteilt mit der Jagd) taucht
-`AbcResolveButton` auf. Tippen darauf lässt alle Ziele gedimmt in ihre Striche wandern
-und meldet `onResult(correct = false, resolved = true)` — keine Punkte, kein Grün
-(Prinzip 8).
+`AbcResolveButton` auf. Tippen darauf lässt alle Ziele **gedimmt** in ihre Striche wandern
+— `MutedText`, nicht `SoftGold` — und meldet `onResult(correct = false, resolved = true)`:
+keine Punkte, und die aufgelöste Antwort trägt nicht die Belohnungsfarbe (Prinzip 8,
+„Auflösen ist nicht grün").
 
 **Scoring:** `scoredAtomIds()` liefert die Ziel-Atom-ID, wie bei `SymbolHuntRound`.
 Nur der erste Fehltipp einer Runde wird für Adaptivität gemeldet — sonst würde ein Kind,
