@@ -79,10 +79,6 @@ private const val SpinMs = 450
  * there." */
 private const val FlightMs = 350
 
-/** Celebration before handing off, matching SymbolHuntTrainer's battery hold so
- * both hunts feel the same. */
-private const val CelebrationHoldMs = 900L
-
 /** ExerciseStage caps its content at 420dp and pads 12dp per side; used only as an
  * upper bound, the real width is measured so a narrow phone shrinks correctly. */
 private const val StageContentDp = 396f
@@ -217,7 +213,7 @@ fun SymbolInWordTrainer(
     // talk over the celebration.
     LaunchedEffect(complete) {
         if (!complete) return@LaunchedEffect
-        delay(CelebrationHoldMs)
+        delay(HuntCelebration.HoldMs)
         onResult(true, false, listOf(round.targetAtomId))
     }
 
