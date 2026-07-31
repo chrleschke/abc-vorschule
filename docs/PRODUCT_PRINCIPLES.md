@@ -59,6 +59,12 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
 - Tasks referenzieren Atom-IDs; Validierung verhindert tote Referenzen.
 - Orthografie: Silben eher klein; zusammengesetzte Wörter/Sätze korrekt großgeschrieben.
 - Rechnen nutzt die Bild-Ikonen derselben Lektion; Details zu Singular/Plural siehe Abschnitt 8.
+- Jede autorierte Lektion verweist über `finaleId` auf einen **Finale-Satz** in
+  `finales.json` — den Belohnungssatz des End-Screens (Abschnitt 12). Wiederholungslektionen
+  teilen den Satz ihrer Basis-Lektion, statt ihn zu duplizieren.
+- Finale-Sätze sind ein **eigener Content-Typ**, nicht `Sentence`: sie enthalten bewusst
+  Verben und Adjektive außerhalb des Atom-Graphen, weil sie nie gebaut oder gelesen werden
+  müssen. Nur die bildtragenden Nomen sind Atome.
 
 
 
@@ -72,6 +78,11 @@ niemals mit einem stummen No-Op.
 - Vor/Zurück zwischen Runden ist **immer** möglich, unabhängig von Punkten/Fortschritt.
 - Fortschritt speichern nach jeder Antwort; unfertige Lektion wird beim Öffnen fortgesetzt.
 - Back in der Übung → Belohnungszusammenfassung (oder direkt zum Pfad, wenn noch keine Punkte);
+- **End-Screen in zwei Varianten.** Nur der *echte* Lektionsabschluss zeigt das Finale
+  (Bildreihe + Satz + Speaker, Abschnitt 12). Ein Abbruch mit Punkten zeigt den schlanken
+  Screen: Erfolgs-Header, Hintergrundstern, Weiter. Der Satz belohnt Durchhalten und nutzt
+  sich sonst ab.
+- Der End-Screen zeigt **keine Punktezahl**. Punkte stehen im Übungs-Chrome und auf dem Pfad.
 
 ## 6. Hilfestufen
 
@@ -131,6 +142,59 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - Englisch oder Mehrsprachigkeit als Produktkern.
 - Sprech-Trainer mit „Sprich mit!"-Cue.
 - Lese-Cloze/Wortfolge als eigenständige Trainer
+- Animierte Finale-Szene („Quatsch-Maschine": tippbarer Wal, der Wasser spritzt),
+  Sammelalbum für Finale-Sätze, wortsynchrone Bildeinblendung zum TTS-Audio.
+
+
+
+## 12. Finale-Sätze (Lesson-End)
+
+Nach dem Abschluss einer Lektion hört das Kind einen kurzen, lustigen Einzeiler aus dem
+Vokabular genau dieser Lektion. Die Nomen des Satzes stehen darüber als Bildreihe in
+Satzreihenfolge (Rebus). Der Satz steht zusätzlich als Text da — **nicht für das Kind,
+sondern für den Erwachsenen daneben.** Das ist die eine bewusste Ausnahme von Abschnitt 2:
+keine Handlung hängt an diesem Text, und die Wort-Bild-Kopplung entsteht ohnehin über
+Bild und Audio.
+
+### Warum Bilder statt Graphem-Icons
+
+Die Bildreihe zeigt die **Nomen des Satzes**, nicht die Fokus-Grapheme der Lektion.
+`letter-*`-Atome tragen kein Emoji, und `letter_trace.rewardEmoji` ist die Belohnung des
+Spurensuchers und wird nicht vorweggenommen (siehe Abschnitt 4).
+
+Welche Nomen ein Bild bekommen, ist **redaktionell autoriert** (`pictureAtomIds`), nicht
+aus dem Text abgeleitet. Automatisches Wort→Atom-Matching scheitert an Flexion („roten
+Hut"), an geteilten Glyphen (`dach` und `haus` sind beide 🏠) und an der Frage, welches
+Nomen ein Bild verdient. Deterministisch wie `LessonEmojis` — kein Random, kein Shuffle.
+
+### Redaktionsregeln für neue Sätze
+
+- **Kurz:** 4 bis 7 Wörter. *Vom `ContentValidator` erzwungen.*
+- **Ein Bild, eine Handlung.** Keine Mini-Geschichte, kein zweiter Nebensatz.
+- **Komisch durch Handlung**, nicht durch Wortwahl: klauen, mampfen, stecken, knacken,
+  bewundern, jonglieren.
+- **Cartoon-Logik statt Surrealismus.** Ein Tier mit Hut oder ein Tier, das etwas
+  Alltägliches tut, ist verständlich. Eine Nase, die wegläuft, ist es nicht.
+- **Kein AI-Slop:** keine Ansammlung seltener Wörter, keine Situation, deren einziger
+  Zweck maximale Absurdität ist. Prüffrage: Würde das Bild in einem Kinderbuch stehen?
+- **Adjektive sparsam** — nur wenn sie für Bild oder Laut etwas leisten („dicker Apfel",
+  „roter Hut").
+- **Reim und Alliteration sind erlaubt, nie Pflicht.** Klang darf helfen, aber nie den
+  Satz erzwingen.
+- **Vokabular aus der eigenen Lektion.** Die bildtragenden Nomen sind Atome derselben
+  Lektion. Verben und Adjektive dürfen frei sein — sie werden nie gelesen.
+- **Mindestens zwei bildtragende Nomen, maximal vier.** *Vom `ContentValidator` erzwungen.*
+- **Kein Nomen doppelt bebildern**, wenn zwei Atome denselben Emoji-Glyph teilen
+  (`katze` und `mimi` sind beide 🐱 → nur eines).
+- **Ein Nomen ohne brauchbares Emoji bekommt kein Bild.** Zwei Bilder sind erlaubt; ein
+  schlecht passendes Emoji ist schlimmer als eines weniger (für „Tisch" gibt es keins —
+  🪑 ist ein Stuhl).
+
+### Audio
+
+- Der Satz wird beim Erscheinen des Screens vorgelesen; ein Speaker-Button wiederholt ihn.
+- Tippen auf ein Bild spricht sein Wort (Abschnitt 7: antippbare Items werden vorgelesen).
+- Ohne deutsches TTS bleibt der Screen vollständig, der Speaker ist deaktiviert.
 
 
 
@@ -152,6 +216,9 @@ Wenn eine Änderung vorgeschlagen wird, prüfen:
 | Zeigt der Wort-Bauer ein noch nicht eingeführtes Graphem?           | Nein → Fibel-Reihenfolge             |
 | Enthält der Rechen-Trainer Lesewörter?                              | Nein → nur Icons und Ziffern         |
 | Hält jede autorierte Lektion die sechs Trainer-Typen in nicht-fallender Rangfolge (Start Auditiver Finder, Ende Rechnen)? | Ja → Validator prüft das             |
+| Ist ein neuer Finale-Satz länger als 7 Wörter oder eine Mini-Geschichte?     | Nein → Abschnitt 12, Validator prüft |
+| Wäre das Bild des Finale-Satzes in einem Kinderbuch denkbar?                 | Ja — sonst AI-Slop                   |
+| Zeigt der End-Screen eine Punktezahl?                                        | Nein → Punkte leben im Chrome/Pfad   |
 
 
 Siehe auch `[AGENTS.md](../AGENTS.md)` für den Arbeitsprozess und Dokumentationspflichten.
