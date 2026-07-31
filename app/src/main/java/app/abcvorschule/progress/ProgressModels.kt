@@ -51,6 +51,11 @@ data class SessionSnapshot(
 @Serializable
 data class LearnerProgress(
     val parentMode: ParentMode = ParentMode.Auto,
+    /**
+     * Parent override of the progress-based lock, so a later lesson can be practised
+     * on purpose. Planned lessons stay locked regardless — they have no content.
+     */
+    val unlockAllLessons: Boolean = false,
     val points: Int = 0,
     /** Per-atom stats drive per-slot scaffolds. */
     val atomStats: Map<String, SkillStats> = emptyMap(),

@@ -100,6 +100,7 @@ fun TaskShell(
                 PathScreen(
                     lessons = viewModel.pathLessons(),
                     states = viewModel.lessonStates(),
+                    unlockAllLessons = state.unlockAllLessons,
                     emojisByLessonId = viewModel.lessonEmojis(),
                     highlightedLessonId = viewModel.highlightedLessonId(),
                     points = state.points,
@@ -127,9 +128,11 @@ fun TaskShell(
         }
 
         if (state.showDifficultySheet) {
-            DifficultySheet(
-                current = viewModel.parentMode(),
-                onSelect = viewModel::setParentMode,
+            ParentSheet(
+                currentMode = state.parentMode,
+                unlockAllLessons = state.unlockAllLessons,
+                onSelectMode = viewModel::setParentMode,
+                onToggleUnlockAll = viewModel::setUnlockAllLessons,
                 onDismiss = viewModel::dismissDifficultySheet,
             )
         }

@@ -35,7 +35,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.R
-import app.abcvorschule.progress.LessonGating
 import app.abcvorschule.progress.LessonState
 import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.theme.MutedText
@@ -66,21 +65,28 @@ private val RingWidth = 4.dp
 
 /**
  * A lesson as a wooden signpost standing on the trail: the grapheme large, three
- * of the lesson's own picture words below it. Locked signs carry a lock glyph in
- * the corner and keep the emojis as near-invisible silhouettes — enough to make a
- * child curious, not enough to give anything away.
+ * of the lesson's own picture words below it. Signs the child cannot open carry a
+ * lock glyph in the corner and keep the emojis as near-invisible silhouettes —
+ * enough to make a child curious, not enough to give anything away.
+ *
+ * @param playable Whether a tap opens the lesson. The caller owns this because the
+ * parent's "free order" switch feeds into it — a sign can be [LessonState.Locked]
+ * and still playable.
  */
 @Composable
 fun PathSignNode(
     label: String,
     emojis: List<String>,
     state: LessonState,
+    playable: Boolean,
     highlighted: Boolean,
     index: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val playable = LessonGating.isPlayable(state)
+    // Deliberately not `!playable`: a parent-unlocked sign keeps the dimmed look of the
+    // lesson the child has not reached yet, so the path still shows where it stands.
+    val dimmed = state == LessonState.Locked || state == LessonState.Planned
     val board = when (state) {
         LessonState.Mastered -> WoodWarm
         LessonState.Available, LessonState.InProgress -> WoodMid
@@ -104,10 +110,12 @@ fun PathSignNode(
         LessonState.Locked, LessonState.Planned -> MutedText.copy(alpha = 0.45f)
     }
     val stateDesc = stringResource(
-        when (state) {
-            LessonState.Mastered -> R.string.lesson_mastered
-            LessonState.Available, LessonState.InProgress -> R.string.lesson_available
-            LessonState.Locked, LessonState.Planned -> R.string.lesson_locked
+        when {
+            // What TalkBack has to convey is whether the sign opens, so a
+            // parent-unlocked one announces itself as available despite its state.
+            state == LessonState.Mastered -> R.string.lesson_mastered
+            playable -> R.string.lesson_available
+            else -> R.string.lesson_locked
         },
     )
     val nodeDesc = stringResource(R.string.path_node)
@@ -216,7 +224,7 @@ fun PathSignNode(
                             fontSize = 16.sp,
                             color = Color.Unspecified,
                             modifier = Modifier.graphicsLayer {
-                                alpha = if (playable) 1f else 0.18f
+                                alpha = if (dimmed) 0.18f else 1f
                             },
                         )
                     }

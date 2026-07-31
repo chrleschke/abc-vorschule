@@ -7,7 +7,8 @@ Bei Konflikten mit Implementierungsdetails oder älteren Planabschnitten gelten 
 ## 1. Für wen die App da ist
 
 - Primäre Nutzer: Kinder im Vorschulalter (ca. 4–7 Jahre).
-- Eltern steuern nur selten (Hilfestufe hinter Kindersicherung), nicht den Lerninhalt im Alltag.
+- Eltern steuern nur selten und immer hinter derselben Kindersicherung: Hilfestufe und Freigabe der
+  Lektionsreihenfolge — nicht den Lerninhalt im Alltag.
 - Die App ist kostenlos, werbefrei und ohne Monetarisierung in der Produktidentität.
 - Offline nach Installation: Kernpraxis braucht kein Netz.
 
@@ -75,6 +76,9 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
   Gesperrte Schilder zeigen ihre Emojis nur als Silhouette.
 Gesperrte und noch nicht autorierte Schilder reagieren auf Tippen mit einem gesprochenen Hinweis —
 niemals mit einem stummen No-Op.
+- Mit der Eltern-Freigabe der Reihenfolge bleiben gesperrte Schilder abgedunkelt und behalten ihre
+  Silhouetten, verlieren aber Schloss und „später“-Hinweis und sind antippbar. Noch nicht autorierte
+  Lektionen bleiben in jedem Fall gesperrt — sie haben keinen Inhalt.
 - Tippen auf ein freigeschaltetes Schild startet die Sechs-Trainer-Typen-Session dieser Lektion.
 - Kein Domänen-Mix, keine Zufallsrotation: die Trainer-Reihenfolge ist didaktisch fix.
 - Vor/Zurück zwischen Runden ist **immer** möglich, unabhängig von Punkten/Fortschritt.
@@ -83,7 +87,9 @@ niemals mit einem stummen No-Op.
 
 ## 6. Hilfestufen
 
-- Parent-Gate (langer Druck auf ⋯): **Auto / Mit Hilfe / Ohne Hilfe**.
+- Parent-Gate (langer Druck auf ⋯) öffnet das Sheet „Eltern“ mit genau zwei Einstellungen:
+  Abschnitt „Hilfestufe“ (**Auto / Mit Hilfe / Ohne Hilfe**) und die Freigabe
+  „Reihenfolge frei wählbar“, die die Fortschrittssperre des Pfades aufhebt.
 - Auto passt Gerüste sanft an; erzwungene Stufen frieren Auto-Streaks ein.
 - Gerüste pro Atom/Slot (Silhouette vs. Lücke), nicht global starr über die ganze Aufgabe.
 

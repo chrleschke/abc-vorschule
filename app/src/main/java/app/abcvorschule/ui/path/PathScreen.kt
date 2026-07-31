@@ -44,6 +44,7 @@ import app.abcvorschule.ui.theme.SoftSand
 fun PathScreen(
     lessons: List<Lesson>,
     states: Map<String, LessonState>,
+    unlockAllLessons: Boolean,
     emojisByLessonId: Map<String, List<String>>,
     highlightedLessonId: String?,
     points: Int,
@@ -156,6 +157,7 @@ fun PathScreen(
                     PathSigns(
                         lessons = lessons,
                         states = states,
+                        unlockAllLessons = unlockAllLessons,
                         emojisByLessonId = emojisByLessonId,
                         highlightedLessonId = highlightedLessonId,
                         points = nodePoints,
@@ -172,6 +174,7 @@ fun PathScreen(
 private fun PathSigns(
     lessons: List<Lesson>,
     states: Map<String, LessonState>,
+    unlockAllLessons: Boolean,
     emojisByLessonId: Map<String, List<String>>,
     highlightedLessonId: String?,
     points: List<PathPoint>,
@@ -187,10 +190,12 @@ private fun PathSigns(
     lessons.forEachIndexed { index, lesson ->
         val point = points.getOrNull(index) ?: return@forEachIndexed
         val state = states[lesson.id] ?: LessonState.Locked
+        val playable = LessonGating.isPlayable(state, unlockAllLessons)
         PathSignNode(
             label = lesson.nodeLabel,
             emojis = emojisByLessonId[lesson.id].orEmpty(),
             state = state,
+            playable = playable,
             highlighted = lesson.id == highlightedLessonId,
             index = index,
             modifier = Modifier.offset(
@@ -198,7 +203,7 @@ private fun PathSigns(
                 y = with(density) { (point.y - fullHeight).toDp() },
             ),
             onClick = {
-                if (LessonGating.isPlayable(state)) onOpenLesson(lesson.id) else onLockedTap()
+                if (playable) onOpenLesson(lesson.id) else onLockedTap()
             },
         )
     }

@@ -90,6 +90,35 @@ class LessonGatingTest {
     }
 
     @Test
+    fun unlockAllOpensLockedLessonsButNeverPlannedOnes() {
+        assertTrue(LessonGating.isPlayable(LessonState.Locked, unlockAll = true))
+        // A planned lesson has no taskIds, so opening it would run into an empty
+        // trainer list — the parent switch lifts the progress gate, not missing content.
+        assertFalse(LessonGating.isPlayable(LessonState.Planned, unlockAll = true))
+        assertFalse(LessonGating.isPlayable(LessonState.Locked))
+    }
+
+    @Test
+    fun statesKeepReportingLockedWhileUnlockAllIsSet() {
+        // The dimmed sign look hangs off LessonState, so the override must not
+        // rewrite Locked into Available — only the padlock disappears.
+        val second = pack.authoredLessons.getOrNull(1) ?: return
+        val states = LessonGating.states(pack, LearnerProgress(unlockAllLessons = true))
+        assertEquals(LessonState.Locked, states[second.id])
+    }
+
+    @Test
+    fun nextPlayableIgnoresUnlockAll() {
+        // The pulsing sign stays the "you are here" anchor: it follows real progress,
+        // not the override.
+        val progress = mastering(first.id)
+        assertEquals(
+            LessonGating.nextPlayable(pack, progress)?.id,
+            LessonGating.nextPlayable(pack, progress.copy(unlockAllLessons = true))?.id,
+        )
+    }
+
+    @Test
     fun nextPlayableIsTheFirstUnmasteredAuthoredLesson() {
         assertEquals(first.id, LessonGating.nextPlayable(pack, LearnerProgress())?.id)
         val second = pack.authoredLessons.getOrNull(1)
