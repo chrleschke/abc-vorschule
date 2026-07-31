@@ -223,10 +223,20 @@ Zeile in zwei ausgeglichene Reihen, statt unter die 56dp-Trefferfläche zu schru
 Mindestbreite plus 4dp Lücke passen sechs Segmente erst ab etwa 356dp nutzbarer
 Bühnenbreite — die erreicht nur ein Gerät ab ~420dp. Auf einem Pixel 7 (393dp) bleiben
 329dp, also fünf Segmente pro Reihe, und `Häuser` (`H·ä·u·s·e·r`, 6 Segmente) bricht dort
-um. Der zweizeilige Fall ist damit **kein Zukunftspfad, sondern Alltag** und muss sein
-Höhenbudget einhalten: zwei Reihen dürfen den Aufgabenblock auf einem kurzen Gerät
-(360×640dp) nicht über seinen Platz hinaus drücken, weil `ExerciseStage` weder scrollt
-noch clippt.
+um. Der zweizeilige Fall ist damit **kein Zukunftspfad, sondern Alltag**. Eine umgebrochene
+Reihe ist deshalb 64dp hoch statt 80dp (`WordFrameSizing.rowHeightDp`) — immer noch über
+dem 56dp-Boden, aber 32dp sparsamer pro Wort.
+
+**Bekannte Restlücke, bewusst offen:** auf der 640dp-Höhenklasse reicht das noch nicht.
+`ExerciseStage` clippt seinen Aufgabenblock nicht und scrollt nicht, sondern Compose
+klemmt die Höhe der *letzten* Kind-Komponente — also des Wortes. In L12 („Häuser",
+6 Segmente) rendert die zweite Reihe dort ~30dp hoch, mit abgeschnittenen Glyphen und
+Trefferflächen unter dem 56dp-Boden; erscheint zusätzlich „Zeig mir", verschwindet sie
+ganz. Der Trainer braucht ~674dp Gerätehöhe (mit „Zeig mir" ~744dp), vorher waren es
+~706dp/~776dp. Betroffen ist eine Lektion auf einer kurzen Gerätequelle; die saubere
+Lösung (Aufgabenblock gegen die gemessene Resthöhe dimensionieren oder `ExerciseStage`
+scrollen lassen) betrifft **alle** Trainer und gehört in eine eigene Änderung —
+siehe `docs/residual-review-findings/feat-wort-detektiv.md`.
 
 **Die Platzhalter-Striche** im Antwortblock: ein 3dp-Strich in `MutedText`, so viele wie
 es Treffer gibt, Breite aus der Zeichenzahl des Zielsymbols geschätzt (`GlyphAspect`, die
