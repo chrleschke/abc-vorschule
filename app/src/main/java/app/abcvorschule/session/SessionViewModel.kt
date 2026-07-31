@@ -157,16 +157,7 @@ class SessionViewModel(
                     )
                     return@runCatching
                 }
-                val trainers = SymbolInWordInsertion.insertSymbolInWord(
-                    SymbolHuntInsertion.insertSymbolHunts(
-                        pack.tasksOf(lesson).map { schedule(it) },
-                        pack,
-                        lesson.id,
-                        lesson.index,
-                    ),
-                    pack,
-                    lesson,
-                )
+                val trainers = SessionTrainers.assemble(pack, lesson, ::schedule)
                 val step = SessionProgression.resumeSafe(expectedTrainerCount, trainers.size, trainerIndex, roundIndex)
                 val counts = trainers.map { it.spec.rounds.size }
                 val safeRound = step.roundIndex.coerceIn(0, (counts.getOrElse(step.trainerIndex) { 1 } - 1).coerceAtLeast(0))
