@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.ContentRepository
 import app.abcvorschule.content.CountAddRound
+import app.abcvorschule.content.LessonEmojis
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.Lesson
 import app.abcvorschule.content.SentenceOrderRound
@@ -95,6 +96,14 @@ class SessionViewModel(
 
     fun highlightedLessonId(): String? =
         if (this::pack.isInitialized) LessonGating.nextPlayable(pack, progress)?.id else null
+
+    /** Signpost emojis per lesson id — derived once, the pack does not change. */
+    fun lessonEmojis(): Map<String, List<String>> =
+        if (this::pack.isInitialized) {
+            pack.lessons.associate { it.id to LessonEmojis.forLesson(pack, it) }
+        } else {
+            emptyMap()
+        }
 
     /** Spoken cue for a locked/planned node — a tap must always produce feedback. */
     fun lockedLessonCue(): String = "Das üben wir später."

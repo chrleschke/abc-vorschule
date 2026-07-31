@@ -100,6 +100,7 @@ fun TaskShell(
                 PathScreen(
                     lessons = viewModel.pathLessons(),
                     states = viewModel.lessonStates(),
+                    emojisByLessonId = viewModel.lessonEmojis(),
                     highlightedLessonId = viewModel.highlightedLessonId(),
                     points = state.points,
                     onOpenLesson = { viewModel.openLesson(it) },
