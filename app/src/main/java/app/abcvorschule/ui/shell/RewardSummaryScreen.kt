@@ -46,6 +46,13 @@ import kotlinx.coroutines.delay
 private val BackgroundStarSize = 180.dp
 private const val BackgroundStarAlpha = 0.12f
 
+// Zusätzliches horizontales Polster für den Satz, oben auf das 24dp der Spalte drauf
+// (macht 44dp insgesamt pro Seite): 20dp liegt in der von der Produktseite gewünschten
+// Spanne von 16–24dp — die Mitte der Spanne, weil der Satz spürbar mehr Luft braucht,
+// ohne zu einem schmalen Textband zu werden. Reine Optik, keine Font-Scale-Entscheidung,
+// bleibt darum hier statt in FinaleLayout.
+private val SentenceExtraHorizontalPadding = 20.dp
+
 /**
  * Der End-Screen einer Lektion, in zwei Varianten:
  *
@@ -63,15 +70,18 @@ private const val BackgroundStarAlpha = 0.12f
  *   vorhersagbarer Stelle, statt zu verschwinden oder irgendwo zu landen.
  *
  * Header, mittlerer Block und Weiter-Button liegen in einer Spalte; der mittlere
- * Block trägt `weight(1f)` und richtet seinen Inhalt oben aus, sodass Header und
- * Inhalt als eine zusammenhängende Einheit wirken und der Weiter-Button unten
- * andockt. `weight(1f)` (mit dem Standard `fill = true`) gibt diesem Block eine
- * feste Höhe, unabhängig vom Inhalt — der Weiter-Button rutscht dadurch nie vom
- * Bildschirm. Der Block schneidet überlaufenden Inhalt nicht ab (kein
- * `clipToBounds`): eine dekorative Fläche darf über ihre Kindgrenzen hinausragen,
- * aber ein Bedienelement (der Speaker-Button) darf nie unsichtbar abgeschnitten
- * werden — deshalb bleibt der Stern von der Höhenmessung ausgenommen, statt echten
- * Inhalt wegzuschneiden, falls er zu groß würde.
+ * Block trägt `weight(1f)` und zentriert seinen Inhalt vertikal darin. `weight(1f)`
+ * (mit dem Standard `fill = true`) gibt diesem Block eine feste Höhe, unabhängig vom
+ * Inhalt — der Weiter-Button rutscht dadurch nie vom Bildschirm, ganz gleich wie der
+ * Inhalt innerhalb des Blocks ausgerichtet ist. Eine frühere Fassung richtete den
+ * Inhalt oben statt zentriert aus; das ließ ihn am oberen Bildschirmviertel kleben,
+ * statt wie eine zusammenhängende Komposition zu wirken — die Erfolgsmeldung selbst
+ * bleibt trotzdem oben, das Zentrieren betrifft nur den mittleren Block. Der Block
+ * schneidet überlaufenden Inhalt nicht ab (kein `clipToBounds`): eine dekorative
+ * Fläche darf über ihre Kindgrenzen hinausragen, aber ein Bedienelement (der
+ * Speaker-Button) darf nie unsichtbar abgeschnitten werden — deshalb bleibt der Stern
+ * von der Höhenmessung ausgenommen, statt echten Inhalt wegzuschneiden, falls er zu
+ * groß würde.
  *
  * Zeigt bewusst **keine** Punktezahl: die steht im Übungs-Chrome und auf dem Pfad.
  */
@@ -123,7 +133,7 @@ fun RewardSummaryScreen(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth(),
-            contentAlignment = Alignment.TopCenter,
+            contentAlignment = Alignment.Center,
         ) {
             if (finale == null) {
                 BackgroundStar(scale = starScale)
@@ -242,10 +252,17 @@ private fun FinaleBody(
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
-            maxLines = 3,
+            // Wrapping ist jetzt das erwartete Verhalten, kein Fehlerfall: die
+            // Schriftgröße bleibt unverändert (siehe FinaleLayout.sentenceSizeSp), der
+            // Satz darf dafür über mehr Zeilen laufen. 4 Zeilen sind eine sichere
+            // Obergrenze für 4–7 Wörter in der jetzt schmaleren Textspalte;
+            // TextOverflow.Ellipsis bleibt als letzte Absicherung, falls doch mehr
+            // Zeilen nötig wären.
+            maxLines = 4,
             overflow = TextOverflow.Ellipsis,
             fontSize = sentenceSp.sp,
             lineHeight = sentenceLineHeightSp.sp,
+            modifier = Modifier.padding(horizontal = SentenceExtraHorizontalPadding),
         )
 
         AbcSpeakerButton(
