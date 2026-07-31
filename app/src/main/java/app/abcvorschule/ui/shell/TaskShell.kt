@@ -91,8 +91,11 @@ fun TaskShell(
             }
             state.screen == AppScreen.RewardSummary -> {
                 RewardSummaryScreen(
-                    sessionPoints = state.sessionPoints,
-                    totalPoints = state.points,
+                    finale = state.completedFinaleId?.let { pack.finales[it] },
+                    pack = pack,
+                    ttsAvailable = ttsAvailable,
+                    speaking = speaking,
+                    onSpeak = onSpeak,
                     onContinue = viewModel::continueAfterSummary,
                 )
             }
