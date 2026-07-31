@@ -48,6 +48,27 @@ fun IconChevronRight(
 }
 
 @Composable
+fun IconClose(
+    tint: Color,
+    modifier: Modifier = Modifier,
+    size: Dp = 28.dp,
+) {
+    Canvas(modifier.size(size)) {
+        val stroke = Stroke(width = size.toPx() * 0.12f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        val a = Path().apply {
+            moveTo(size.toPx() * 0.25f, size.toPx() * 0.25f)
+            lineTo(size.toPx() * 0.75f, size.toPx() * 0.75f)
+        }
+        val b = Path().apply {
+            moveTo(size.toPx() * 0.75f, size.toPx() * 0.25f)
+            lineTo(size.toPx() * 0.25f, size.toPx() * 0.75f)
+        }
+        drawPath(a, color = tint, style = stroke)
+        drawPath(b, color = tint, style = stroke)
+    }
+}
+
+@Composable
 fun IconSpeaker(
     tint: Color,
     speaking: Boolean,

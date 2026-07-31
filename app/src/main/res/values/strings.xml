@@ -11,6 +11,7 @@
     <string name="resolve">Auflösen</string>
     <string name="nav_back">Zurück</string>
     <string name="nav_forward">Weiter</string>
+    <string name="close_lesson">Lektion schließen</string>
     <string name="wagon_start">Anfang</string>
     <string name="wagon_middle">Mitte</string>
     <string name="wagon_end">Ende</string>

@@ -318,16 +318,17 @@ class SessionViewModel(
         }
     }
 
+    /**
+     * Exits a lesson in progress directly, without showing the end screen — used by
+     * both the close button and the back handler so the two behave identically.
+     */
+    fun exitLesson() = backToPath(clearSnapshot = false)
+
     /** @return true when the Activity should finish. */
     fun onBackPressed(): Boolean = when (_ui.value.screen) {
         AppScreen.Path -> true
         AppScreen.Practice -> {
-            if (_ui.value.sessionPoints > 0) {
-                _ui.update { it.copy(screen = AppScreen.RewardSummary) }
-            } else {
-                // Backing out mid-lesson: keep the resume snapshot.
-                backToPath(clearSnapshot = false)
-            }
+            exitLesson()
             false
         }
         AppScreen.RewardSummary -> {

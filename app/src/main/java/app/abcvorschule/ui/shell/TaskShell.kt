@@ -32,6 +32,7 @@ import app.abcvorschule.session.AppScreen
 import app.abcvorschule.session.SessionUiState
 import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.session.SuccessPhase
+import app.abcvorschule.ui.components.AbcCloseButton
 import app.abcvorschule.ui.components.AbcNavChevron
 import app.abcvorschule.ui.components.AbcProgressBar
 import app.abcvorschule.ui.components.IconStar
@@ -219,7 +220,7 @@ private fun PracticeBody(
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
-            Spacer(Modifier.size(48.dp))
+            AbcCloseButton(onClick = viewModel::exitLesson)
         }
 
         Spacer(Modifier.height(8.dp))
