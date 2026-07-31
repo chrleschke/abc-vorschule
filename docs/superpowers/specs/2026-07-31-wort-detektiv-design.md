@@ -36,7 +36,7 @@ der Sealed-Kommentar in `content/TaskSpecs.kt` verspricht.
 | **Buchstabe** | alle Grapheme (§3) | `O·m·a` → „Finde den Buchstaben – O – im Wort – Oma." |
 | | | `P·a·p·a` → „Finde **alle** Buchstaben – P – im Wort – Papa." |
 | **Silbe** | die autorierten `word_build`-Blöcke | `Ro·se` → „Finde die Silbe – se – im Wort – Rose." |
-| | | `Mi·mi` → „Finde **alle** Silben – mi – im Wort – Mimi." |
+| | | (Mehrzahl-Vorlage; mit aktuellem Content ungenutzt, siehe §4) |
 
 Die Beispiele sind echte abgeleitete Runden (Anhang), keine erfundenen Illustrationen.
 Insbesondere ergibt `Oma` unter der Alternierung aus §4 eine Buchstaben-Runde auf `O`,
@@ -116,7 +116,25 @@ Eingabe: die `word_build`-Rounds der Lektion in Autorierungsreihenfolge, dedupli
 ergibt, fallen weg. Sonst entsteht in L22 die Runde „Finde Ei im Wort Ei" — das Wort ist
 die Antwort, das Kind kann nicht danebentippen, die Runde trägt nichts bei.
 
-Dann, über die verbleibenden Wörter mit Index `i` (0-basiert):
+**Derselbe Guard gilt für die fertige Runde: sind *alle* Segmente Treffer, wird sie nicht
+gestellt.** Das ist derselbe Defekt in anderer Verkleidung. `Mimi` → `Mi·mi` mit dem Ziel
+`mi` hat zwei Treffer bei zwei Segmenten: das Kind kann nicht danebentippen, kein Fehltipp
+kann für die Adaptivität gemeldet werden, und „Zeig mir" ist unerreichbar. Die Prüfzeile
+„Kann die Aufgabe überhaupt fehlschlagen?" in den Produktprinzipien verlangt das Gegenteil.
+
+Eine so verworfene Silben-Runde fällt in den Buchstaben-Modus, und das Ergebnis ist
+didaktisch besser: L02 stellt statt `mi` in `Mi·mi` dann **alle I in `M·i·m·i`** — zwei
+Treffer bei vier Segmenten, am Fokus-Graphem der Lektion, und fehlschlagbar. Bleibt auch
+im Buchstaben-Modus jedes Segment ein Treffer, fällt die Runde ganz weg.
+
+Folge fürs Vokabular: mit dem aktuellen Content bleibt die Mehrzahl-Vorlage
+„Finde alle Silben …" ungenutzt — kein Wort hat zwei gleiche Silben *und* eine dritte, die
+keine ist. Die Vorlage bleibt trotzdem stehen; sie ist für künftigen Content korrekt.
+
+Dann, über die verbleibenden Wörter mit Index `i` (0-basiert). **`i` zählt produzierte
+Runden, nicht betrachtete Wörter** — ein per Guard verworfenes Wort darf den Modus des
+nächsten nicht umkippen. Mit dem aktuellen Content fallen beide Zählweisen nur bei L22
+auseinander, aber die Regel ist die Absicht, nicht der Zufall.
 
 **Gerades `i` → Buchstaben-Modus.**
 Ziel ist das nächste Fokus-Graphem der Lektion, rotierend über die Buchstaben-Runden:
@@ -161,7 +179,7 @@ Damit die Aufgabe aber nicht schwerer ist als sie aussieht, **zeigt der Screen b
 Formen als Paar** (`P / p`, §2). Das Kind muss die Gleichsetzung nicht mitbringen — es
 lernt sie in genau dem Moment, in dem es sie braucht.
 
-Betroffen sind real: `Mama`/M (2), `Papa`/P (2), `Keks`/K (2), `Mimi`/mi (2).
+Betroffen sind real: `Mama`/M (2), `Papa`/P (2), `Keks`/K (2), `Mimi`/I (2).
 
 ## 5. Screen
 
@@ -197,10 +215,18 @@ sich die Palette also — kein Problem, weil die Farbe nur Segmentgrenzen markie
 Bedeutung trägt.
 
 Jedes Segment hat eine unsichtbare Trefferfläche. Breite und Glyphgröße kommen aus
-`WordFrameSizing` (84 → 56dp Rahmen, 46 → 20sp Glyph). Bei 7+ Segmenten bricht die Zeile
-in zwei Reihen, statt unter die 56dp-Trefferfläche zu schrumpfen: **Klickbarkeit vor
-Einzeiligkeit.** Im aktuellen Content erreicht kein Wort 7 Segmente (Maximum: `Häuser` →
-`H·ä·u·s·e·r`, 6), der Umbruch ist der Pfad für künftige lange Wörter.
+`WordFrameSizing` (84 → 56dp Rahmen, 46 → 20sp Glyph). Reicht die Breite nicht, bricht die
+Zeile in zwei ausgeglichene Reihen, statt unter die 56dp-Trefferfläche zu schrumpfen:
+**Klickbarkeit vor Einzeiligkeit.**
+
+**Die Umbruchschwelle hängt an der Gerätebreite, nicht an einer Segmentzahl.** Bei 56dp
+Mindestbreite plus 4dp Lücke passen sechs Segmente erst ab etwa 356dp nutzbarer
+Bühnenbreite — die erreicht nur ein Gerät ab ~420dp. Auf einem Pixel 7 (393dp) bleiben
+329dp, also fünf Segmente pro Reihe, und `Häuser` (`H·ä·u·s·e·r`, 6 Segmente) bricht dort
+um. Der zweizeilige Fall ist damit **kein Zukunftspfad, sondern Alltag** und muss sein
+Höhenbudget einhalten: zwei Reihen dürfen den Aufgabenblock auf einem kurzen Gerät
+(360×640dp) nicht über seinen Platz hinaus drücken, weil `ExerciseStage` weder scrollt
+noch clippt.
 
 **Die Platzhalter-Striche** im Antwortblock: ein 3dp-Strich in `MutedText`, so viele wie
 es Treffer gibt, Breite aus der Zeichenzahl des Zielsymbols geschätzt (`GlyphAspect`, die
@@ -390,7 +416,7 @@ die Derivation-Tests. `B` = Buchstaben-Modus, `S` = Silben-Modus.
 | Lektion | Runden (Modus · Ziel · Zerlegung · Treffer) |
 | --- | --- |
 | L01 M & A | B `M` `M·a·m·a` 2 · B `A` `m·a` 1 |
-| L02 I & O | B `O` `O·m·a` 1 · S `mi` `Mi·mi` 2 |
+| L02 I & O | B `O` `O·m·a` 1 · B `I` `M·i·m·i` 2 |
 | L03 P & T | B `P` `P·a·p·a` 2 · S `pa` `O·pa` 1 · B `T` `T·o·m` 1 |
 | L04 L & H | B `L` `L·a·m·a` 1 · B `H` `H·a·l·l·o` 1 |
 | L05 F & U | B `U` `H·u·t` 1 · B `F` `U·f·o` 1 |
@@ -408,7 +434,7 @@ die Derivation-Tests. `B` = Buchstaben-Modus, `S` = Silben-Modus.
 | L17 St & Sp | B `St` `St·e·r·n` 1 · B `Sp` `Sp·i·n·n·e` 1 |
 | L18 C, Y, X & Qu | B `Qu` `Qu·a·l·l·e` 1 · B `X` `T·a·x·i` 1 · B `Y` `P·o·n·y` 1 |
 | L19 M & A Wdh. | B `M` `M·a·m·a` 2 · B `A` `a·m` 1 |
-| L20 I & O Wdh. | B `O` `O·m·a` 1 · S `mi` `Mi·mi` 2 |
+| L20 I & O Wdh. | B `O` `O·m·a` 1 · B `I` `M·i·m·i` 2 |
 | L21 P & T Wdh. | B `P` `P·a·p·a` 2 · S `to` `To·m` 1 |
 | L22 Ei & Au Wdh. | „Ei" fällt per Guard weg · B `Au` `B·au·m` 1 |
 | L23 Sch & Ch Wdh. | B `Sch` `Sch·u·h` 1 · S `fi` `Fi·sch` 1 |
