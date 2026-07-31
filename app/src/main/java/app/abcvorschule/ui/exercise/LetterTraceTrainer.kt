@@ -297,7 +297,13 @@ private fun TraceCanvas(
     ) {
         val corridor = layout.boxSize * TraceProgress.CorridorFraction
 
-        layout.strokes.forEachIndexed { index, stroke ->
+        val order = TraceGeometry.strokeDrawOrder(layout.strokes.size, state.strokeIndex)
+
+        // Roads first, all of them, with the active stroke last. Drawing a stroke's stars
+        // right after its own road would let the *next* stroke's band cover them where the
+        // two overlap, which is precisely where the child has to aim.
+        order.forEach { index ->
+            val stroke = layout.strokes[index]
             val path = Path().apply {
                 moveTo(stroke.first().x, stroke.first().y)
                 stroke.drop(1).forEach { lineTo(it.x, it.y) }
@@ -326,6 +332,11 @@ private fun TraceCanvas(
                     join = StrokeJoin.Round,
                 ),
             )
+        }
+        // Stars on top of every road, active stroke last again so the star to aim at
+        // stays the topmost thing on the glyph.
+        order.forEach { index ->
+            val active = index == state.strokeIndex
             layout.stars.getOrNull(index)?.forEachIndexed { starIndex, star ->
                 val collected = index < state.strokeIndex ||
                     (index == state.strokeIndex && starIndex < state.starIndex)
