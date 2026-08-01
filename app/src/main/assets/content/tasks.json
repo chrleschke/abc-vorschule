@@ -675,7 +675,7 @@
       "id": "l04-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Hallo Lama!“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Hallo Lama! - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-hallo-lama",
           "illustrationAtomId": "lama",
           "blocks": []
@@ -867,7 +867,7 @@
       "id": "l05-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Oma hat einen Hut.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Oma hat einen Hut. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-oma-hat-hut",
           "illustrationAtomId": "hut",
           "blocks": []
@@ -1052,7 +1052,7 @@
       "id": "l06-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Tom ruft Opa.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Tom ruft Opa. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-tom-ruft-opa",
           "illustrationAtomId": "tom",
           "blocks": []
@@ -1249,7 +1249,7 @@
       "id": "l07-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Lama ist da.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Lama ist da. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-lama-ist-da",
           "illustrationAtomId": "lama",
           "blocks": []
@@ -1445,7 +1445,7 @@
       "id": "l08-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Oma ist da.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Oma ist da. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-oma-ist-da",
           "illustrationAtomId": "oma",
           "blocks": []
@@ -1645,7 +1645,7 @@
       "id": "l09-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Das ist mein Papa.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Das ist mein Papa. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-das-ist-mein-papa",
           "illustrationAtomId": "papa",
           "blocks": []
@@ -1829,7 +1829,7 @@
       "id": "l10-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Wir gehen den Weg.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Wir gehen den Weg. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-wir-gehen",
           "illustrationAtomId": "weg",
           "blocks": []
@@ -2022,7 +2022,7 @@
       "id": "l11-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Mama ist im Haus.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Mama ist im Haus. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-mama-im-haus",
           "illustrationAtomId": "haus",
           "blocks": []
@@ -2223,7 +2223,7 @@
       "id": "l12-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Hier sind Häuser.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Hier sind Häuser. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-viele-haeuser",
           "illustrationAtomId": "haus",
           "blocks": []
@@ -2413,7 +2413,7 @@
       "id": "l13-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Der Fisch schwimmt.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Der Fisch schwimmt. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-fisch-schwimmt",
           "illustrationAtomId": "fisch",
           "blocks": []
@@ -2591,7 +2591,7 @@
       "id": "l14-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Die Eule fliegt.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Die Eule fliegt. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-eule-fliegt",
           "illustrationAtomId": "eule",
           "blocks": []
@@ -2772,7 +2772,7 @@
       "id": "l15-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Der Fuß ist groß.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Der Fuß ist groß. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-fuss-ist-gross",
           "illustrationAtomId": "fuss",
           "blocks": []
@@ -2961,7 +2961,7 @@
       "id": "l16-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Das Pferd läuft.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Das Pferd läuft. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-pferd-laeuft",
           "illustrationAtomId": "pferd",
           "blocks": []
@@ -3139,7 +3139,7 @@
       "id": "l17-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Die Spinne spielt.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Die Spinne spielt. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-spinne-spielt",
           "illustrationAtomId": "spinne",
           "blocks": []
@@ -3355,7 +3355,7 @@
       "id": "l18-t11",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Das Taxi ist gelb.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Das Taxi ist gelb. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-taxi-ist-gelb",
           "illustrationAtomId": "taxi",
           "blocks": []
@@ -3858,7 +3858,7 @@
       "id": "l21-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Tom ruft Opa.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Tom ruft Opa. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-tom-ruft-opa",
           "illustrationAtomId": "tom"
         }
@@ -4022,7 +4022,7 @@
       "id": "l22-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Das ist mein Ei.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Das ist mein Ei. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-das-ist-mein-ei",
           "illustrationAtomId": "ei"
         }
@@ -4191,7 +4191,7 @@
       "id": "l23-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Der Fisch schwimmt.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Der Fisch schwimmt. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-fisch-schwimmt",
           "illustrationAtomId": "fisch"
         }
@@ -4375,7 +4375,7 @@
       "id": "l24-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Die Spinne spielt.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Die Spinne spielt. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-spinne-spielt",
           "illustrationAtomId": "spinne"
         }
@@ -4552,7 +4552,7 @@
       "id": "l25-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Der Löwe ist da.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Der Löwe ist da. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-der-loewe-ist-da",
           "illustrationAtomId": "loewe"
         }
@@ -4732,7 +4732,7 @@
       "id": "l26-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Das Taxi ist gelb.“ Ordne danach die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Das Taxi ist gelb. - Ordne die Wörter in die richtige Reihenfolge.",
           "sentenceId": "s-taxi-ist-gelb",
           "illustrationAtomId": "taxi"
         }
