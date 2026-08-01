@@ -37,11 +37,11 @@ import androidx.compose.ui.unit.sp
 import app.abcvorschule.R
 import app.abcvorschule.progress.LessonState
 import app.abcvorschule.ui.components.IconStar
-import app.abcvorschule.ui.theme.MutedText
-import app.abcvorschule.ui.theme.SoftGold
-import app.abcvorschule.ui.theme.SoftMint
+import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.SoftSand
-import app.abcvorschule.ui.theme.SoftSky
+import app.abcvorschule.ui.theme.StarGold
+import app.abcvorschule.ui.theme.WarmMuted
 import app.abcvorschule.ui.theme.WoodDark
 import app.abcvorschule.ui.theme.WoodDarkShade
 import app.abcvorschule.ui.theme.WoodMid
@@ -66,8 +66,8 @@ private val RingWidth = 4.dp
 /**
  * A lesson as a wooden signpost standing on the trail: the grapheme large, three
  * of the lesson's own picture words below it. Signs the child cannot open carry a
- * lock glyph in the corner and keep the emojis as near-invisible silhouettes —
- * enough to make a child curious, not enough to give anything away.
+ * lock glyph in the corner and keep the emojis as faint silhouettes — enough to
+ * make a child curious, not enough to give anything away.
  *
  * @param playable Whether a tap opens the lesson. The caller owns this because the
  * parent's "free order" switch feeds into it — a sign can be [LessonState.Locked]
@@ -100,14 +100,38 @@ fun PathSignNode(
         LessonState.Available, LessonState.InProgress -> WoodMidShade
         LessonState.Locked, LessonState.Planned -> WoodDarkShade
     }
+    // The ring is drawn inside the board's bounds, so its inner edge is always
+    // the board and its outer edge is whatever the sign happens to scroll over.
+    // Inner edge: LeafGreen 2.86:1 on WoodMid, 1.93:1 on WoodWarm; SkyBlue
+    // 2.63:1 on WoodMid. Outer edge against sky: 2.78:1 and 3.02:1 on DaySkyMid.
+    // Worst case is a green ring over a green hill — LeafGreen on HillNear is
+    // 1.39:1 and that edge all but vanishes on signs in the bottom quarter of
+    // the screen.
+    //
+    // All of that is accepted rather than tuned away, because the ring is not
+    // what tells a child whether a sign opens: the board tone and the lock glyph
+    // do, and the board itself is 3.4:1 against even the front hill, so the sign
+    // never loses its shape. Recolouring the ring to survive both a dark board
+    // and a mid-green hill would mean giving up green-for-open, which is the one
+    // association the whole app is built on.
     val ring: Color = when (state) {
-        LessonState.Mastered, LessonState.Available -> SoftMint
-        LessonState.InProgress -> SoftSky
-        LessonState.Locked, LessonState.Planned -> MutedText.copy(alpha = 0.28f)
+        LessonState.Mastered, LessonState.Available -> LeafGreen
+        LessonState.InProgress -> SkyBlue
+        // WarmMuted is the palette's dim tone, but it is a dark tone on a dark
+        // board: 0.28 (the old MutedText alpha) composites to 1.35:1 on WoodDark
+        // and disappears. 0.55 gives 1.88:1, which is where the night ring
+        // actually sat (~1.8:1) — inert, still an edge.
+        LessonState.Locked, LessonState.Planned -> WarmMuted.copy(alpha = 0.55f)
     }
+    // Deliberately still SoftSand, dimmed, and not WarmMuted: the label sits on
+    // the board, and WarmMuted tops out at 3.23:1 on WoodDark even at full
+    // opacity — a dim *warm-on-warm* grapheme no adult could check. SoftSand at
+    // 0.55 composites to 4.94:1 there, clearing the small-text bar and still
+    // reading as clearly quieter than the 13.06:1 of an open sign. (The old
+    // MutedText at 0.45 was 2.92:1.)
     val labelColor = when (state) {
         LessonState.Mastered, LessonState.Available, LessonState.InProgress -> SoftSand
-        LessonState.Locked, LessonState.Planned -> MutedText.copy(alpha = 0.45f)
+        LessonState.Locked, LessonState.Planned -> SoftSand.copy(alpha = 0.55f)
     }
     val stateDesc = stringResource(
         when {
@@ -170,7 +194,14 @@ fun PathSignNode(
             Nail(shade, Modifier.align(Alignment.TopStart).padding(10.dp))
             when {
                 state == LessonState.Mastered -> IconStar(
-                    tint = SoftGold,
+                    tint = StarGold,
+                    // IconStar's StarGoldDeep outline exists to lift the glyph over
+                    // *light* surfaces; here it sits on WoodWarm, where the fill
+                    // alone is already 3.72:1. On a 16dp star the stroke is 1.33dp,
+                    // so keeping it would only eat a tenth of the glyph for a
+                    // boundary it does not need — the flat silhouette the outline
+                    // parameter was added for.
+                    outline = StarGold,
                     size = 16.dp,
                     modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
                 )
@@ -224,7 +255,15 @@ fun PathSignNode(
                             fontSize = 16.sp,
                             color = Color.Unspecified,
                             modifier = Modifier.graphicsLayer {
-                                alpha = if (dimmed) 0.18f else 1f
+                                // 0.18 was set when the whole screen was a night
+                                // sky and the eye was adapted to it. The board is
+                                // still WoodDark, but it now sits in a bright
+                                // landscape, and against that surround a silhouette
+                                // at 0.18 on a near-black board reads as an empty
+                                // sign rather than a hidden one. 0.35 puts the
+                                // pictures back at "there is something there" —
+                                // still far from recognisable, which is the point.
+                                alpha = if (dimmed) 0.35f else 1f
                             },
                         )
                     }

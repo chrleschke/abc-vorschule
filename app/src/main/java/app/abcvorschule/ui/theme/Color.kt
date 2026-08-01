@@ -42,6 +42,43 @@ val SunCoral = Color(0xFFD25B2D)
 /** ClayRed on Cream ≈ 5.2:1 — small-text-safe, since it also serves as error text for adults. */
 val ClayRed = Color(0xFFB0402C)
 
+/**
+ * Die Taglandschaft des Pfad-Screens. Keine UI-Rollen, sondern Landschafts-
+ * flächen — deshalb ein eigener Block und keine Aufnahme ins ColorScheme.
+ *
+ * Tiefe kommt hier aus Tonwerten statt aus Transparenz: die drei Hügelbänder
+ * werden mit Alpha 1f gezeichnet und trennen sich über ihre relative Luminanz
+ * (HillFar 0.566, HillMid 0.445, HillNear 0.322 — Nachbarkontraste 1.24:1 und
+ * 1.33:1, eine sichtbare Stufe ohne harte Kante). Über dem dunklen Nachthimmel
+ * war Alpha nötig, um Bänder auseinanderzuhalten; auf hellem Grund würde es sie
+ * nur ausbleichen.
+ *
+ * Die Landschaft trägt weder Text noch UI-Komponente, ist also dekorativ im
+ * Sinne von WCAG 1.4.11. Der eine Kontrast, der die Silhouette trägt, ist die
+ * Baumkrone gegen den Himmel, in den sie ragt: TreeCrown auf DayHorizon =
+ * 3.49:1. Der Stammstumpf auf HillNear liegt bei 2.69:1 — als reine Deko
+ * ausreichend und deutlich über der 1.23:1-Silhouette der Nachtfassung.
+ */
+val DaySkyTop = Color(0xFF9CCAEE)
+val DaySkyMid = Color(0xFFBFDDF2)
+
+/** Warmes Licht am Horizont — dort, wo die Hügel den Himmel treffen. */
+val DayHorizon = Color(0xFFF7E7C3)
+
+val HillFar = Color(0xFFB5CF9F)
+val HillMid = Color(0xFF93BE7E)
+val HillNear = Color(0xFF6FA85E)
+
+val TreeCrown = Color(0xFF4E8747)
+
+/** Bewusst der WoodWarm-Ton: Stamm und warmes Schildbrett sind dasselbe Holz. */
+val TreeTrunk = Color(0xFF6B4E34)
+
+/** Wolken — fast-weißes Creme und bewusst die hellste Fläche der App. */
+val CloudWhite = Color(0xFFFDF9EF)
+
+val SunGlow = Color(0xFFF7CE73)
+
 val NightInk = Color(0xFF0E1624)
 val NightPanel = Color(0xFF172334)
 val NightElevated = Color(0xFF223247)
@@ -63,6 +100,12 @@ val NightHorizon = Color(0xFF16283A)
  * every one of them — the lettering sits on the board, not on the sky behind it,
  * so this contrast pairing holds regardless of the surrounding theme. Measured
  * against SoftSand: WoodDark 13.06:1, WoodMid 9.22:1, WoodWarm 6.23:1.
+ *
+ * The boards now stand against a bright day sky rather than a night one. That
+ * changes nothing about the numbers above — but it does mean the board is the
+ * dark shape on a light field instead of the other way round, so a sign's
+ * outline is separated from its surroundings more strongly than before, not
+ * less.
  */
 val WoodDark = Color(0xFF2A2018)
 val WoodMid = Color(0xFF4A3728)

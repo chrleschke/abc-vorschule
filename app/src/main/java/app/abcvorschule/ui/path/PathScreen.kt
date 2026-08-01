@@ -34,11 +34,11 @@ import app.abcvorschule.progress.LessonState
 import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.shell.ParentGateButton
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.MutedText
-import app.abcvorschule.ui.theme.SoftSand
+import app.abcvorschule.ui.theme.StarGold
+import app.abcvorschule.ui.theme.WarmInk
 
 /**
- * Fibel path: the app's start screen. A dotted trail winds through a night
+ * Fibel path: the app's start screen. A dotted trail winds through a sunny
  * landscape from signpost to signpost. Node labels stay minimal (a letter, a
  * syllable, a grapheme) — never an instruction the child would have to read.
  */
@@ -71,12 +71,23 @@ fun PathScreen(
             ) {
                 ParentGateButton(onUnlocked = onParentGateUnlocked)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconStar(tint = MaterialTheme.colorScheme.primary, size = 22.dp)
+                    // Not colorScheme.primary: primary is LeafGreen, the "correct"
+                    // colour, and a green star reads as a checkmark. The score is
+                    // gold.
+                    //
+                    // The outline is overridden because this is the one place in the
+                    // app where a star is not on Cream. IconStar's StarGoldDeep is
+                    // tuned to Cream (3.26:1) and drops to 2.07:1 on DaySkyTop, the
+                    // sky directly behind this row — and the StarGold fill itself is
+                    // 1.17:1 there, so without a working outline the glyph would be
+                    // a gold smudge on blue. WarmInk gives it 6.97:1, the same ink
+                    // the number beside it is drawn in.
+                    IconStar(tint = StarGold, outline = WarmInk, size = 22.dp)
                     Spacer(Modifier.width(6.dp))
                     Text(
                         text = "$points",
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = WarmInk,
                     )
                 }
                 Spacer(Modifier.size(48.dp))
@@ -143,13 +154,18 @@ fun PathScreen(
                         )
                     }
 
+                    // Walked footprints are warm gold and nearly opaque, the ones
+                    // still ahead are a faint warm grey — on a light landscape the
+                    // "already done" half has to be the *stronger* mark, where over
+                    // the night sky it was the brighter one. Both are decoration:
+                    // what the trail says is said again by the signs it connects.
                     Canvas(Modifier.fillMaxSize()) {
                         dots.forEach { dot ->
                             drawCircle(
                                 color = if (dot.walked) {
-                                    SoftSand.copy(alpha = 0.45f)
+                                    StarGold.copy(alpha = 0.8f)
                                 } else {
-                                    MutedText.copy(alpha = 0.16f)
+                                    WarmInk.copy(alpha = 0.18f)
                                 },
                                 radius = dot.radius,
                                 center = Offset(dot.x, dot.y),
@@ -174,7 +190,13 @@ fun PathScreen(
                 Text(
                     text = "TTS Debug",
                     style = MaterialTheme.typography.labelLarge,
-                    color = MutedText,
+                    // Sits at the very bottom of the screen, i.e. over the front
+                    // hill: WarmInk on HillNear is 4.33:1, a hair under the 4.5:1
+                    // small-text bar and the darkest the warm palette goes. This is
+                    // a debug-build-only affordance for an adult developer, so the
+                    // shortfall is accepted rather than papered over with a
+                    // background plate.
+                    color = WarmInk,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .clickable(onClick = onOpenTtsDebug)
