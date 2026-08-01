@@ -204,6 +204,24 @@ private fun colouredWord(word: String): AnnotatedString = buildAnnotatedString {
     }
 }
 
+/**
+ * Border/indicator-dot variants of the wagon colours. These sit directly on
+ * CreamElevated — the wagon's own idle fill — rather than on Cream, where
+ * [wagonColor] is read instead as word-segment text. At full strength there, SunCoral
+ * only reaches ~2.91:1 and StarGoldDeep ~2.65:1 against CreamElevated — both short of
+ * the 3:1 floor for UI components — so both are darkened further here to ~3.35:1
+ * (checked via WCAG relative luminance, no alpha involved). SkyBlue already clears
+ * 3:1 at full opacity (~3.12:1) and is used unchanged. Because none of the three has
+ * headroom to spare below full opacity, this colour is always drawn solid (alpha 1f);
+ * see the `armed` handling in [Wagon] for how the idle/armed distinction is carried
+ * instead.
+ */
+private fun wagonBorderColor(index: Int): Color = when (index % 3) {
+    0 -> Color(0xFFC15429) // darkened SunCoral
+    1 -> Color(0xFF9A6D09) // darkened StarGoldDeep
+    else -> SkyBlue
+}
+
 @Composable
 private fun Wagon(
     slot: SoundSlot,
@@ -213,7 +231,8 @@ private fun Wagon(
     onTap: () -> Unit,
     registerWith: DragFieldState,
 ) {
-    val accent = wagonColor(SoundPositionLogic.SlotOrder.indexOf(slot))
+    val index = SoundPositionLogic.SlotOrder.indexOf(slot)
+    val borderAccent = wagonBorderColor(index)
     val desc = stringResource(
         when (slot) {
             SoundSlot.start -> R.string.wagon_start
@@ -221,11 +240,11 @@ private fun Wagon(
             SoundSlot.end -> R.string.wagon_end
         },
     )
-    val border = when {
-        filledEmoji != null || revealed -> LeafGreen
-        armed -> accent
-        else -> accent.copy(alpha = 0.55f)
-    }
+    // The border itself no longer dims for the idle state — at reduced alpha none of
+    // the three wagon colours clears 3:1 against CreamElevated (~1.67–2.18:1 measured
+    // at the old 0.55/0.7 alphas). The idle/armed distinction now lives in the fill
+    // below instead.
+    val border = if (filledEmoji != null || revealed) LeafGreen else borderAccent
     DropZone(
         state = registerWith,
         key = SoundPositionLogic.slotKey(slot),
@@ -235,7 +254,11 @@ private fun Wagon(
             .background(
                 // Alpha raised from the old dark-theme 0.18f: a light wash needs more
                 // coverage to read as "filled" against Cream than it did on night ink.
-                color = if (filledEmoji != null) LeafGreen.copy(alpha = 0.25f) else CreamElevated,
+                color = when {
+                    filledEmoji != null -> LeafGreen.copy(alpha = 0.25f)
+                    armed -> borderAccent.copy(alpha = 0.18f)
+                    else -> CreamElevated
+                },
                 shape = RoundedCornerShape(18.dp),
             )
             .border(4.dp, border, RoundedCornerShape(18.dp))
@@ -246,12 +269,14 @@ private fun Wagon(
             Text(text = filledEmoji, fontSize = 44.sp)
         } else {
             // Position cue without text: one, two or three dots along the wagon.
+            // Solid fill, not the old 0.7f alpha wash: at that alpha none of the three
+            // wagon colours clears 3:1 against CreamElevated either (~1.94–2.17:1).
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                repeat(SoundPositionLogic.SlotOrder.indexOf(slot) + 1) {
+                repeat(index + 1) {
                     Box(
                         Modifier
                             .size(10.dp)
-                            .background(accent.copy(alpha = 0.7f), RoundedCornerShape(5.dp)),
+                            .background(borderAccent, RoundedCornerShape(5.dp)),
                     )
                 }
             }
