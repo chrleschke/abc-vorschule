@@ -40,7 +40,12 @@ Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede 
   den Startpunkt des nächsten Balkens. Nach dem letzten Stern hält der fertige Buchstabe eine halbe
   Sekunde, dann folgt die Belohnungsseite: Bild groß, darunter die Wortzeile („**T** wie Tomate")
   mit fettem Graphem. Kein zusätzlicher Buchstaben-Text unter dem Pfad.
-3. **Silben-Verschmelzer** — Konsonant auf Vokal ziehen, Silbe entsteht.
+3. **Silben-Verschmelzer** — beide Laut-Kacheln sind schiebbar und wandern symmetrisch
+  aufeinander zu (Magnet-Metapher); eine gepunktete Schiebespur mit einwärts laufender
+  Lichtwelle und ein Idle-„Atmen" laden ohne Text zum Schieben ein. Ab 60 % Nähe schnappen
+  die Kacheln zusammen, darunter gleiten sie straflos zurück. Ein Tipp auf eine Kachel
+  liest ihren Laut vor **und** stupst sie einen Schritt (30 %) näher — zwei Tipps
+  verschmelzen, es gibt keinen separaten Bestätigungs-Button.
 4. **Wort-Bauer** — Silben-/Buchstabenklötze in Schablonen unter dem Bild.
 5. **Satz-Architekt** — Wortschilder an die Wäscheleine; Einwort-Runden sind Wort-Bild-Zuordnung.
 6. **Rechnen** — reine Mengen-Arithmetik in *jeder* Lektion, Icons aus dem Wortschatz
