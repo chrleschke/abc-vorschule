@@ -7,29 +7,54 @@ import org.junit.Test
 
 class MergeProgressTest {
     @Test
-    fun fractionIsZeroAtTheStartAndOneAtTheTarget() {
-        assertEquals(0f, MergeProgress.fraction(100f, 100f, 400f), 0.001f)
-        assertEquals(1f, MergeProgress.fraction(400f, 100f, 400f), 0.001f)
-        assertEquals(0.5f, MergeProgress.fraction(250f, 100f, 400f), 0.001f)
+    fun draggingTheConsonantRightwardsClosesTheGap() {
+        assertEquals(0.5f, MergeProgress.applyDrag(0f, 50f, 100f, fromRightTile = false), 0.001f)
+        assertEquals(0.75f, MergeProgress.applyDrag(0.5f, 25f, 100f, fromRightTile = false), 0.001f)
     }
 
     @Test
-    fun draggingBackwardsOrPastTheTargetClamps() {
-        assertEquals(0f, MergeProgress.fraction(0f, 100f, 400f), 0.001f)
-        assertEquals(1f, MergeProgress.fraction(900f, 100f, 400f), 0.001f)
+    fun draggingTheVowelLeftwardsClosesTheGapToo() {
+        assertEquals(0.5f, MergeProgress.applyDrag(0f, -50f, 100f, fromRightTile = true), 0.001f)
     }
 
     @Test
-    fun zeroLengthTravelDoesNotDivideByZero() {
-        assertEquals(0f, MergeProgress.fraction(100f, 100f, 100f), 0.001f)
+    fun draggingAwayFromTheMiddleOpensTheGapAndClamps() {
+        assertEquals(0.25f, MergeProgress.applyDrag(0.5f, -25f, 100f, fromRightTile = false), 0.001f)
+        assertEquals(0f, MergeProgress.applyDrag(0.2f, -80f, 100f, fromRightTile = false), 0.001f)
+        assertEquals(1f, MergeProgress.applyDrag(0.9f, 80f, 100f, fromRightTile = false), 0.001f)
     }
 
     @Test
-    fun mergeCommitsOnlyCloseToTheVowel() {
-        assertFalse(MergeProgress.isMerged(0f))
-        assertFalse(MergeProgress.isMerged(0.7f))
-        assertTrue(MergeProgress.isMerged(MergeProgress.CommitFraction))
-        assertTrue(MergeProgress.isMerged(1f))
+    fun zeroTravelDoesNotDivideByZero() {
+        assertEquals(0.4f, MergeProgress.applyDrag(0.4f, 30f, 0f, fromRightTile = false), 0.001f)
+    }
+
+    @Test
+    fun twoTapsReachTheMagnetZone() {
+        val afterFirst = MergeProgress.stepped(0f)
+        assertFalse(MergeProgress.shouldAttract(afterFirst))
+        val afterSecond = MergeProgress.stepped(afterFirst)
+        assertTrue(MergeProgress.shouldAttract(afterSecond))
+    }
+
+    @Test
+    fun steppingNeverOvershoots() {
+        assertEquals(1f, MergeProgress.stepped(0.9f), 0.001f)
+    }
+
+    @Test
+    fun releaseAttractsOnlyInsideTheMagnetZone() {
+        assertFalse(MergeProgress.shouldAttract(0f))
+        assertFalse(MergeProgress.shouldAttract(0.59f))
+        assertTrue(MergeProgress.shouldAttract(MergeProgress.AttractFraction))
+        assertTrue(MergeProgress.shouldAttract(1f))
+    }
+
+    @Test
+    fun contactRequiresTheTilesToActuallyTouch() {
+        assertFalse(MergeProgress.isContact(0.9f))
+        assertTrue(MergeProgress.isContact(MergeProgress.CommitFraction))
+        assertTrue(MergeProgress.isContact(1f))
     }
 
     @Test
