@@ -36,6 +36,18 @@ enum class TrainerKind {
     symbol_in_word,
 }
 
+/**
+ * Trainer kinds paused from play. Content and code stay in the repo untouched —
+ * a paused kind is simply skipped when a lesson is scheduled ([ContentPack.playableTasksOf])
+ * and does not count toward lesson mastery ([app.abcvorschule.progress.LessonGating]).
+ *
+ * sound_position (Trainer 1, the locomotive/wagon "Zug") is paused: the
+ * Anfang/Mitte/Ende position concept was confusing for young testers, and its
+ * scoring is ambiguous for words with a repeated phoneme (e.g. both "e"s in
+ * "Erdbeere" sit in different slots but only one is marked correct).
+ */
+val PausedTrainerKinds: Set<TrainerKind> = setOf(TrainerKind.sound_position)
+
 // --- Trainer 1: Auditiver Finder --------------------------------------------
 
 @Serializable

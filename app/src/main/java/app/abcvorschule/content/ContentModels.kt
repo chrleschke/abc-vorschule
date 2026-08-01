@@ -116,6 +116,14 @@ data class ContentPack(
 
     fun tasksOf(lesson: Lesson): List<TaskSpec> = lesson.taskIds.map { task(it) }
 
+    /**
+     * [tasksOf], minus any [PausedTrainerKinds] — what a session actually schedules
+     * and what counts toward mastery. Authored content and [tasksOf] itself stay
+     * exhaustive; this is the one seam where a paused trainer disappears from play.
+     */
+    fun playableTasksOf(lesson: Lesson): List<TaskSpec> =
+        tasksOf(lesson).filter { it.kind !in PausedTrainerKinds }
+
     /** Rendered words of a sentence, aligned with [Sentence.atomIds]. */
     fun sentenceWords(sentence: Sentence): List<String> =
         sentence.displayOverride ?: sentence.atomIds.map { atom(it).display }

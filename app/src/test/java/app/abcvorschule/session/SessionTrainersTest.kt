@@ -81,9 +81,12 @@ class SessionTrainersTest {
     @Test
     fun theAssembledListKeepsTheAuthoredTasksInOrderAroundTheInsertions() {
         val lesson = pack.lesson("l02")
+        // playableTasksOf, not lesson.taskIds: a paused trainer kind (e.g. sound_position)
+        // never reaches the assembled list, so it can't be part of this ordering check.
+        val playableIds = pack.playableTasksOf(lesson).map { it.id }
         val assembled = assemble(lesson.id).map { it.spec.id }
-        assertEquals(lesson.taskIds, assembled.filter { it in lesson.taskIds })
-        assertTrue("insertions must actually add trainers", assembled.size > lesson.taskIds.size)
+        assertEquals(playableIds, assembled.filter { it in playableIds })
+        assertTrue("insertions must actually add trainers", assembled.size > playableIds.size)
     }
 
     @Test
