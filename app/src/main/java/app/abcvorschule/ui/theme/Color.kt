@@ -8,6 +8,13 @@ import androidx.compose.ui.graphics.Color
  * progress, SunCoral for CTAs) rather than reaching for `primary` directly.
  *
  * Contrast against Cream (background): WarmInk ~9.9:1, WarmMuted ~4.6:1.
+ *
+ * Contrast rule for the accent surfaces below (WCAG-differentiated, not a flat
+ * 4.5:1 everywhere): Cream text/glyphs drawn *on* an accent fill only need to
+ * clear 3:1 (large text / icons / UI components), since these fills carry short
+ * labels, icons, or the progress track — never small body copy. ClayRed is the
+ * exception: it also renders as error *text* on the Cream background for
+ * adults, so it is tuned to clear the small-text bar of 4.5:1 there instead.
  */
 val Cream = Color(0xFFFBF3E4)
 val CreamPanel = Color(0xFFF4E8D0)
@@ -15,10 +22,18 @@ val CreamElevated = Color(0xFFE9DBBD)
 val WarmInk = Color(0xFF3D3427)
 val WarmMuted = Color(0xFF7C6F5A)
 val StarGold = Color(0xFFF0A818)
-val LeafGreen = Color(0xFF4E9B5E)
-val SkyBlue = Color(0xFF4E8FC7)
-val SunCoral = Color(0xFFE8794A)
-val ClayRed = Color(0xFFC4553F)
+
+/** Cream on LeafGreen ≈ 3.5:1 (large text / icons / UI components). */
+val LeafGreen = Color(0xFF43904F)
+
+/** Cream on SkyBlue ≈ 3.8:1 (large text / icons / UI components). */
+val SkyBlue = Color(0xFF3F7FB5)
+
+/** Cream on SunCoral ≈ 3.6:1 (large text / icons / UI components). */
+val SunCoral = Color(0xFFD25B2D)
+
+/** ClayRed on Cream ≈ 5.2:1 — small-text-safe, since it also serves as error text for adults. */
+val ClayRed = Color(0xFFB0402C)
 
 val NightInk = Color(0xFF0E1624)
 val NightPanel = Color(0xFF172334)
