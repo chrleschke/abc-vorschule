@@ -23,4 +23,12 @@ object QuantityRepresentation {
     const val SymbolicFrom = 11
 
     fun isSymbolic(count: Int): Boolean = count >= SymbolicFrom
+
+    /**
+     * Once either side of a round reaches the symbolic range, the *other* side
+     * must switch too — otherwise "16 − 9" renders as one icon versus nine
+     * icons, which reads as an inconsistent, confusing mix. This decides the
+     * round-wide mode; it is not a per-number check.
+     */
+    fun forceSymbolicFor(left: Int, right: Int): Boolean = isSymbolic(left) || isSymbolic(right)
 }

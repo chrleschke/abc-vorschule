@@ -15,4 +15,11 @@ class MathOperationTest {
         assertFalse(QuantityRepresentation.isSymbolic(10))
         assertTrue(QuantityRepresentation.isSymbolic(11))
     }
+
+    @Test fun oneSideAboveTenForcesTheOtherSideSymbolicToo() {
+        // "16 - 9" must never render as one icon versus nine icons.
+        assertTrue(QuantityRepresentation.forceSymbolicFor(16, 9))
+        assertTrue(QuantityRepresentation.forceSymbolicFor(9, 16))
+        assertFalse(QuantityRepresentation.forceSymbolicFor(9, 10))
+    }
 }

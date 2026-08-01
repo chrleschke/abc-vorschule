@@ -61,6 +61,10 @@ fun VisualQuantityBoard(
             }
         },
         answers = {
+            // Solutions must match the prompt's representation: once either operand is
+            // symbolic, every answer tile shows a single icon too, never a mix of
+            // "one icon" and "nine icons" for the same round.
+            val forceSymbolic = QuantityRepresentation.forceSymbolicFor(left, right)
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -88,6 +92,7 @@ fun VisualQuantityBoard(
                             emojiSizeSp = 28,
                             showNumber = true,
                             numberColor = if (correct) NightInk else SoftSand,
+                            forceSymbolic = forceSymbolic,
                         )
                     }
                 }
@@ -107,8 +112,11 @@ fun QuantityCluster(
     modifier: Modifier = Modifier,
     showNumber: Boolean = true,
     numberColor: Color = SoftSand,
+    /** Set when the other number in this round is already symbolic, so both
+     * sides of the equation stay visually consistent. */
+    forceSymbolic: Boolean = false,
 ) {
-    if (QuantityRepresentation.isSymbolic(count)) {
+    if (forceSymbolic || QuantityRepresentation.isSymbolic(count)) {
         Column(
             modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -159,13 +167,14 @@ fun MathQuantityPrompt(
         MultiplicationMatrixGrid(emoji = emoji, rows = left, columns = right)
         return
     }
+    val forceSymbolic = QuantityRepresentation.forceSymbolicFor(left, right)
     Row(
         horizontalArrangement = Arrangement.spacedBy(20.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        QuantityCluster(emoji = emoji, count = left, emojiSizeSp = emojiSizeSp)
+        QuantityCluster(emoji = emoji, count = left, emojiSizeSp = emojiSizeSp, forceSymbolic = forceSymbolic)
         Text(operation.symbol, style = MaterialTheme.typography.displayMedium, color = SoftSand)
-        QuantityCluster(emoji = emoji, count = right, emojiSizeSp = emojiSizeSp)
+        QuantityCluster(emoji = emoji, count = right, emojiSizeSp = emojiSizeSp, forceSymbolic = forceSymbolic)
     }
 }
 
