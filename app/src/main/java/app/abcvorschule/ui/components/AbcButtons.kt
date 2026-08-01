@@ -26,7 +26,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -184,12 +186,19 @@ fun AbcProgressBar(
         animationSpec = tween(450),
         label = "progress-fraction",
     )
-    // Kurzer Gold-Puls an der Füllkante bei jeder Index-Erhöhung — rein
-    // dekorativ, bleibt unter colorScheme.primary (StarGold, gedämpfte Alpha).
+    // Kurzer Gold-Puls an der Füllkante — Puls markiert das Ereignis „Trainer
+    // geschafft", nicht den Zustand. Der Merker startet nur auf dem zuletzt
+    // gesehenen Index (kein Puls bei Erstkomposition) und pulst nur, wenn der
+    // neue Index tatsächlich größer ist — ein Rücksprung per Zurück-Chevron
+    // (index sinkt) pulst also ebenfalls nicht.
     val pulse = remember { Animatable(0f) }
+    var previousIndex by remember { mutableIntStateOf(index) }
     LaunchedEffect(index) {
-        pulse.snapTo(1f)
-        pulse.animateTo(0f, animationSpec = tween(500))
+        if (index > previousIndex) {
+            pulse.snapTo(1f)
+            pulse.animateTo(0f, animationSpec = tween(500))
+        }
+        previousIndex = index
     }
     Box(
         modifier = modifier
