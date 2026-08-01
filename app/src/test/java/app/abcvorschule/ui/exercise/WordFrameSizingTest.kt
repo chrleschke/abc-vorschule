@@ -218,4 +218,143 @@ class WordFrameSizingTest {
             0.01f,
         )
     }
+
+    // --- Wort-Detektiv sizing: the word must read as a word --------------------
+
+    /** What one Wort-Detektiv row costs for the given segments. */
+    private fun wordRowWidth(glyphSp: Float, segments: List<String>): Float =
+        segments.map { WordFrameSizing.wordSegmentWidthDp(glyphSp, it.length) }.sum() +
+            WordFrameSizing.WordSegmentGapDp * (segments.size - 1)
+
+    private fun wordGlyphSp(available: Float, segments: List<String>): Float {
+        val perRow = WordFrameSizing.segmentsPerRow(available, segments.size)
+        return WordFrameSizing.wordGlyphSp(
+            available = available,
+            segmentsPerRow = perRow,
+            longestDisplayChars = segments.maxOf { it.length },
+            rowHeightDp = WordFrameSizing.rowHeightDp(segments.size, perRow),
+        )
+    }
+
+    @Test
+    fun theWordSitsTighterThanTheWortBauersSlots() {
+        // The bug: "Mama" was drawn as 84dp frames 12dp apart, so 33dp glyphs stood
+        // 96dp from each other and read as loose letters. The hit boxes now hug.
+        val mama = listOf("M", "a", "m", "a")
+        val perRow = WordFrameSizing.segmentsPerRow(stageWidth, mama.size)
+        val tight = WordFrameSizing.wordSegmentWidthDp(wordGlyphSp(stageWidth, mama), 1) +
+            WordFrameSizing.WordSegmentGapDp
+        val loose = WordFrameSizing.frameWidthDp(stageWidth, perRow) +
+            WordFrameSizing.gapDp(stageWidth, perRow)
+        assertTrue("pitch ${tight}dp must beat the Wort-Bauer's ${loose}dp", tight < loose * 0.7f)
+    }
+
+    @Test
+    fun theWordGetsABiggerGlyphThanTheWortBauersTiles() {
+        val mama = listOf("M", "a", "m", "a")
+        assertTrue(
+            "the word must outgrow the ${WordFrameSizing.MaxGlyphSp}sp tile glyph",
+            wordGlyphSp(stageWidth, mama) > WordFrameSizing.MaxGlyphSp,
+        )
+    }
+
+    @Test
+    fun aMultiCharacterSegmentIsWiderThanASingleOneInTheSameWord() {
+        // "Sch·u·h": a uniform width would give `u` and `h` the box `Sch` needs and
+        // scatter the word all over again.
+        val schuh = listOf("Sch", "u", "h")
+        val glyph = wordGlyphSp(stageWidth, schuh)
+        assertTrue(
+            WordFrameSizing.wordSegmentWidthDp(glyph, 3) >
+                WordFrameSizing.wordSegmentWidthDp(glyph, 1),
+        )
+    }
+
+    @Test
+    fun everyRealWordFitsEveryRealDeviceWidth() {
+        // Every segment shape the authored content produces, longest segment first.
+        val words = listOf(
+            listOf("M", "a", "m", "a"),
+            listOf("a", "m"),
+            listOf("Sch", "u", "h"),
+            listOf("A", "pf", "e", "l"),
+            listOf("K", "l", "ei", "d"),
+            listOf("H", "ä", "u", "s", "e", "r"),
+            listOf("X", "y", "l", "o", "p", "h", "o", "n"),
+        )
+        deviceStageWidths.forEach { available ->
+            words.forEach { word ->
+                val perRow = WordFrameSizing.segmentsPerRow(available, word.size)
+                val glyph = wordGlyphSp(available, word)
+                word.chunked(perRow).forEach { row ->
+                    val used = wordRowWidth(glyph, row)
+                    assertTrue(
+                        "$row at ${glyph}sp needs ${used}dp of ${available}dp",
+                        used <= available,
+                    )
+                }
+                word.forEach { segment ->
+                    assertTrue(
+                        "segment '$segment' must stay hittable",
+                        WordFrameSizing.wordSegmentWidthDp(glyph, segment.length) >=
+                            WordFrameSizing.MinFrameDp,
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun aWrappedRowShrinksItsGlyphInsteadOfClippingIt() {
+        val full = WordFrameSizing.wordGlyphSp(
+            available = stageWidth,
+            segmentsPerRow = 3,
+            longestDisplayChars = 1,
+            rowHeightDp = WordFrameSizing.MaxRowHeightDp,
+        )
+        val wrapped = WordFrameSizing.wordGlyphSp(
+            available = stageWidth,
+            segmentsPerRow = 3,
+            longestDisplayChars = 1,
+            rowHeightDp = WordFrameSizing.WrappedRowHeightDp,
+        )
+        assertTrue("$wrapped must fit the shorter row", wrapped < full)
+        assertTrue(wrapped <= WordFrameSizing.WrappedRowHeightDp)
+    }
+
+    @Test
+    fun aLargeSystemFontScaleStillRendersInsideTheRow() {
+        // sp grows with the system font scale, dp does not — an uncapped 54sp glyph
+        // at scale 1.3 renders ~71dp tall and breaks out of the 80dp row.
+        listOf(1f, 1.3f, 2f).forEach { scale ->
+            val glyph = WordFrameSizing.wordGlyphSp(
+                available = stageWidth,
+                segmentsPerRow = 4,
+                longestDisplayChars = 1,
+                rowHeightDp = WordFrameSizing.MaxRowHeightDp,
+                fontScale = scale,
+            )
+            val rendered = glyph * scale
+            assertTrue(
+                "at scale $scale the glyph renders ${rendered}dp",
+                rendered <= WordFrameSizing.MaxRowHeightDp * WordFrameSizing.WordGlyphHeightFraction + 0.01f,
+            )
+            val width = WordFrameSizing.wordSegmentWidthDp(glyph, 1, scale)
+            assertTrue("hit box must stay hittable at scale $scale", width >= WordFrameSizing.MinFrameDp)
+        }
+    }
+
+    @Test
+    fun anAbsurdlyNarrowStageStopsAtTheLegibleMinimum() {
+        assertEquals(
+            WordFrameSizing.MinGlyphSp,
+            WordFrameSizing.wordGlyphSp(
+                available = 40f,
+                segmentsPerRow = 3,
+                longestDisplayChars = 3,
+                rowHeightDp = WordFrameSizing.WrappedRowHeightDp,
+            ),
+            0.01f,
+        )
+    }
 }

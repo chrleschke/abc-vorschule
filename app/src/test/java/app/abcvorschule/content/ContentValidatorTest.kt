@@ -133,6 +133,20 @@ class ContentValidatorTest {
     }
 
     @Test
+    fun wordBuildMustNotCallASyllableAWord() {
+        // The authored defect this rule closes: l01-t7 built the syllable `ma` and
+        // said "Baue das Wort ma", and the Wort-Detektiv inherited the lie as
+        // "Finde den Buchstaben A im Wort ma".
+        val spec = pack.tasks.values.filterIsInstance<WordBuildSpec>()
+            .first { round -> round.rounds.any { it.targetAtomId == "mama" } }
+        val broken = spec.copy(
+            rounds = spec.rounds.map { it.copy(targetAtomId = "ma", blocks = listOf(WordBlock("ma", "ma"))) },
+        )
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.any { it.contains("but the atom is a syllable") })
+    }
+
+    @Test
     fun countAddSumMustMatchAnswer() {
         val spec = pack.tasks.values.filterIsInstance<CountAddSpec>().first()
         val broken = spec.copy(rounds = spec.rounds.map { it.copy(answer = it.answer + 1) })

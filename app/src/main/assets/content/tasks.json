@@ -119,16 +119,16 @@
       "id": "l01-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort ma. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
-          "targetAtomId": "ma",
+          "promptTts": "Baue das Wort am. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "targetAtomId": "am",
           "blocks": [
-            {
-              "atomId": "letter-m",
-              "display": "m"
-            },
             {
               "atomId": "letter-a",
               "display": "a"
+            },
+            {
+              "atomId": "letter-m",
+              "display": "m"
             }
           ]
         }

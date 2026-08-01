@@ -246,8 +246,9 @@ fun SymbolInWordTrainer(
             answers = {
                 SlotRow(
                     round = round,
-                    label = label,
+                    hasLabel = label != null,
                     slotWidth = slotWidth,
+                    collected = state.collected,
                     landedCount = landedCount,
                     resolved = resolved,
                     showSilhouette = scaffold == ScaffoldLevel.Beginner,
@@ -284,19 +285,34 @@ fun SymbolInWordTrainer(
             // touched rather than jumping to the stroke's size in mid-air.
             val fontSp = segmentGlyphSp + (AbcDimens.syllableSp.value - segmentGlyphSp) * progress
             val density = LocalDensity.current
+            // The glyph in the word is now bigger than the one the stroke holds, so
+            // the box has to be measured against the *take-off*, not the landing:
+            // a "Sch" leaving the word at ~54sp is 117dp wide and 80dp tall, and the
+            // stroke's 99x56dp would clip it in the first frames. A constant box that
+            // covers both ends keeps the glyph centred on `current` the whole way,
+            // which an interpolated one would only do by accident.
+            val glyph = round.segments[active.segmentIndex]
+            val takeOffWidth = WordFrameSizing
+                .wordSegmentWidthDp(segmentGlyphSp, glyph.length, density.fontScale).dp
+            val takeOffHeight =
+                (segmentGlyphSp * density.fontScale / WordFrameSizing.WordGlyphHeightFraction).dp
+            val flightWidth = maxOf(slotWidth, takeOffWidth)
+            val flightHeight = maxOf(SlotGlyphHeight, takeOffHeight)
             Box(
                 modifier = Modifier
                     .offset(
-                        x = with(density) { current.x.toDp() } - slotWidth / 2,
-                        y = with(density) { current.y.toDp() } - SlotGlyphHeight / 2,
+                        x = with(density) { current.x.toDp() } - flightWidth / 2,
+                        y = with(density) { current.y.toDp() } - flightHeight / 2,
                     )
-                    .width(slotWidth)
-                    .height(SlotGlyphHeight)
+                    .width(flightWidth)
+                    .height(flightHeight)
                     .testTag("detective_flight"),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = label.primary,
+                    // The tapped segment's own form, not the label's: the child
+                    // touched a lowercase "m" in "Mama" and must see that "m" fly.
+                    text = glyph,
                     fontSize = fontSp.sp,
                     color = SoftGold,
                     modifier = Modifier.alpha(1f - progress * 0.15f),
@@ -315,6 +331,14 @@ fun SymbolInWordTrainer(
 private fun slotWidthDp(label: SymbolInWordDerivation.TargetLabel?): Dp =
     (AbcDimens.syllableSp.value * WordFrameSizing.GlyphAspect * (label?.primary?.length ?: 1))
         .coerceAtLeast(MinSlotWidthDp).dp
+
+/**
+ * Size of the hunted symbol above the word. Smaller than the word itself
+ * ([WordFrameSizing.wordGlyphSp] reaches ~54sp): the label is the question, the
+ * word is what the child works on, and at the old 54sp the two read as equals and
+ * the eye had no reason to go down to the word first.
+ */
+private val TargetGlyphSp = AbcDimens.answerTileSp
 
 /** The hunted symbol, as a case pair ("P / p") for letters and a single lowercase
  * form for syllables (design doc §2). */
@@ -340,16 +364,16 @@ private fun TargetLabelRow(
             .clickable { onClick() }
             .testTag("detective_target"),
     ) {
-        Text(text = label.primary, fontSize = AbcDimens.letterSp, color = SoftSand)
+        Text(text = label.primary, fontSize = TargetGlyphSp, color = SoftSand)
         if (label.alternate != null) {
             // A separator, not something to read: half size and dimmed so the two
             // letters dominate (design doc §2).
             Text(
                 text = "/",
-                fontSize = AbcDimens.letterSp / 2,
+                fontSize = TargetGlyphSp / 2,
                 color = MutedText.copy(alpha = 0.45f),
             )
-            Text(text = label.alternate, fontSize = AbcDimens.letterSp, color = SoftSand)
+            Text(text = label.alternate, fontSize = TargetGlyphSp, color = SoftSand)
         }
     }
 }
@@ -371,14 +395,23 @@ private fun WordSegments(
         // the frames past the edge instead of wrapping them.
         val available = maxWidth.value.coerceAtMost(StageContentDp)
         val perRow = WordFrameSizing.segmentsPerRow(available, round.segments.size)
-        val frameWidth = WordFrameSizing.frameWidthDp(available, perRow)
-        val glyphSp = WordFrameSizing.glyphSp(frameWidth, round.segments.maxOfOrNull { it.length } ?: 1)
-        val gap = WordFrameSizing.gapDp(available, perRow)
         // A wrapped word buys its second row out of the height budget, not out of
         // the touch target: the reduced height still clears the 56dp floor, and
         // ExerciseStage's prompt block has no room for two 80dp rows on a short
         // device (design doc §5).
         val rowHeight = WordFrameSizing.rowHeightDp(round.segments.size, perRow)
+        // The Wort-Bauer's stage-sharing sizing is deliberately not used here: it
+        // spaces slots, and this is a word. The glyph takes the row's height and the
+        // hit boxes hug it, so the segments sit as close as 56dp targets allow.
+        val fontScale = LocalDensity.current.fontScale
+        val glyphSp = WordFrameSizing.wordGlyphSp(
+            available = available,
+            segmentsPerRow = perRow,
+            longestDisplayChars = round.segments.maxOfOrNull { it.length } ?: 1,
+            rowHeightDp = rowHeight,
+            fontScale = fontScale,
+        )
+        val gap = WordFrameSizing.WordSegmentGapDp
         // In a SideEffect, not inline: this writes state the caller reads, and that
         // is only safe once the composition it comes from has succeeded. Writing the
         // same value again is a no-op for recomposition, so it settles immediately.
@@ -396,7 +429,11 @@ private fun WordSegments(
                             segment = segment,
                             index = index,
                             state = state,
-                            frameWidthDp = frameWidth,
+                            frameWidthDp = WordFrameSizing.wordSegmentWidthDp(
+                                glyphSp = glyphSp,
+                                displayChars = segment.length,
+                                fontScale = fontScale,
+                            ),
                             rowHeightDp = rowHeight,
                             glyphSp = glyphSp,
                             enabled = enabled,
@@ -477,8 +514,13 @@ private fun SegmentGlyph(
 @Composable
 private fun SlotRow(
     round: SymbolInWordRound,
-    label: SymbolInWordDerivation.TargetLabel?,
+    /** False only for a round whose target atom is missing — then the strokes stay
+     * bare, the same way the prompt block drops the target label. */
+    hasLabel: Boolean,
     slotWidth: Dp,
+    /** Hit segment indices in tap order; index `ordinal` is what landed on stroke
+     * `ordinal`. */
+    collected: List<Int>,
     landedCount: Int,
     resolved: Boolean,
     showSilhouette: Boolean,
@@ -529,23 +571,25 @@ private fun SlotRow(
                         },
                     contentAlignment = Alignment.Center,
                 ) {
-                    if (filled && label != null) {
-                        // Always the target's own form, never the tapped segment's: the
-                        // strokes are the receipt for one question ("finde alle P"), so
-                        // two hits on "Papa" must both read "P", and under the label
-                        // "mi" no "Mi" may land (design doc §6). The §4 invariant keeps
-                        // the two forms a pure case difference.
+                    if (filled && hasLabel) {
+                        // The form the child actually tapped, not the target atom's:
+                        // "Papa" ends as `P` `p` and "Mama" as `M` `m`. Both hits are
+                        // the same letter — that is the lesson the `P / p` label above
+                        // teaches — but the receipt has to show what was picked up, or
+                        // a child who tapped the small one sees a capital appear and
+                        // has no way to tell that its tap was the one that counted.
                         Text(
-                            text = label.primary,
+                            text = round.segments[collected[ordinal]],
                             fontSize = AbcDimens.syllableSp,
                             color = landedColor,
                         )
-                    } else if (showSilhouette && label != null) {
+                    } else if (showSilhouette && hasLabel) {
                         // Scaffold "Beginner": the target sits in the stroke as a
                         // silhouette (Prinzip 6 — Silhouette vs. Lücke, per stroke
-                        // rather than globally).
+                        // rather than globally). In reading order, so the two
+                        // silhouettes of "Mama" already spell out `M` and `m`.
                         Text(
-                            text = label.primary,
+                            text = round.segments[round.targetIndices[ordinal]],
                             fontSize = AbcDimens.syllableSp,
                             color = SoftSand.copy(alpha = SilhouetteAlpha),
                         )
