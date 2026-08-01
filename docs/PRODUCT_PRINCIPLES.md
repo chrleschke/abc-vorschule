@@ -19,7 +19,7 @@ Bei Konflikten mit Implementierungsdetails oder älteren Planabschnitten gelten 
 - **Das Kind kann (noch) nicht esen.** UI-Steuerung muss über Bild, Icon, Layout und Audio verständlich sein.
 - Lesbare Labels sind erlaubt, wo sie Erwachsenen helfen oder wo Buchstaben/Wörter *die Lernaufgabe selbst* sind — nicht als Anweisungschrome (Pack-Titel, lange Erklärtexte).
 - Handlungs-Buttons (z. B. **Weiter**): Text optional, immer klares **Vektor-/ASCII-Icon** (keine Emojis in Buttons). 
-- Dunkles, ruhiges UI; weiches Feedback statt Strafe oder Drucksprache.
+- Helles, warmes, ruhiges UI (Creme statt Weiß — augenfreundlich); weiches Feedback statt Strafe oder Drucksprache.
 - Distraktoren nur aus **echten, bereits geübten Atomen** (max. 2 pro Aufgabe, Tray ≤ 5 Kacheln) — nie erfundene „Fake-Antworten“. Falsche Kachel oder falsche Platzierung ist einfach falsch (gesprochenes Feedback). Die erste Begegnung mit neuem Stoff bleibt distraktorfrei.
 - Ausnahme Buchstaben-/Silben-Jagd: Streufeld statt Distraktor-Budget (bis zu 6 Distraktor-Kacheln, teils wiederholt) — die Übung braucht mehr Ablenker als eine autorierte Tray-Aufgabe.
 - Drag & Drop committet nur bei echtem Slot-Treffer (Hit-Testing); daneben losgelassene Kacheln schnappen ohne Strafe zurück.
@@ -93,8 +93,8 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
 
 ## 5. Session-Modell
 
-- **Pfad-Screen ist der Einstieg**: ein gepunkteter Trittspuren-Weg durch eine Nachtlandschaft
-  (Verlauf, Sterne, Hügel mit Parallaxe — dark-only bleibt Prinzip). Ein Wegweiser-Schild pro
+- **Pfad-Screen ist der Einstieg**: ein gepunkteter Trittspuren-Weg durch eine Taglandschaft
+  (Himmelsverlauf, Sonne und Wolken, grüne Hügel mit Parallaxe — helles Warmer-Tag-Theme). Ein Wegweiser-Schild pro
   Lektion, Label = Graphem, darunter drei Emojis aus dem Bildwortschatz der Lektion.
   Der bereits zurückgelegte Teil des Weges ist wärmer gezeichnet als der Rest.
   Gesperrte Schilder zeigen ihre Emojis nur als Silhouette.
@@ -212,6 +212,17 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - Gemeinsame Komponenten unter `ui/components/` (`AbcContinueButton`, `AbcSpeakerButton`, `AbcNavChevron`, `AbcProgressBar`, Vektor-Icons inkl. `IconStar`).
 - Buttons: keine Emojis — nur ASCII oder Canvas/SVG-Vektoren. Punkte-/Erfolgs-Symbol ist der Vektor-Stern `IconStar`, kein Text-Asterisk.
 - Übungen nutzen `ExerciseStage` für klare Trennung Aufgabenblock / Antwortblock.
+- Farbrollen (verbindlich): `StarGold` = Sterne/Punkte/Belohnung (`StarGoldDeep` als Kontur-/
+  Tiefton für den Stern-Glyph auf hellem Grund), `LeafGreen` = richtig/erledigt, `SkyBlue` =
+  Fortschritt/aktiv, `SunCoral` = Handlungs-CTA, `ClayRed` = Fehlertext (Erwachsene).
+  `LeafGreenLight`/`SkyBlueLight` sind helle Ring-Varianten ausschließlich für Akzente AUF
+  dunklen Flächen (Holzschilder auf dem Pfad) — nie als Fläche oder Akzent auf Cream.
+  Eine Bedeutung pro Farbe — Sterne und Progress greifen nie auf `primary` zu.
+- Haptik-Vokabular `AbcHaptics` (tick/success/celebrate/nudge): tick = kleiner Sammel-Erfolg
+  (Trace-Stern, Jagd-Treffer, Einrasten), success = Aufgabe richtig, celebrate = Lektions-/
+  Batterie-Feier, nudge = sanfte Korrektur. Haptik ergänzt Ton, ersetzt ihn nie.
+- Erfolgsmomente: SuccessBurst (Gold-Stern + Funken), Gold-Puls der Progress-Bar je Trainer,
+  Konfetti auf dem End-Screen.
 
 
 
@@ -301,6 +312,7 @@ Wenn eine Änderung vorgeschlagen wird, prüfen:
 | Kann die Aufgabe überhaupt fehlschlagen (Signal für Adaptivität)?   | Ja — sonst Distraktoren/Slots prüfen |
 | Bleibt Offline-Kern erhalten?                                       | Ja                                   |
 | Ist das UI ruhig und kindgerecht?                                   | Ja                                   |
+| Nutzt ein Stern/Progress `primary` statt der Farbrolle?             | Nein                                  |
 | Fehlerfeedback für Vorschulkinder?                                  | Audio, kein Lesesatz                 |
 | Buttons mit Emoji?                                                  | Nein → Vektor/ASCII                  |
 | Zeigt der Wort-Bauer ein noch nicht eingeführtes Graphem?           | Nein → Fibel-Reihenfolge             |

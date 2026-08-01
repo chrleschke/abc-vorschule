@@ -74,7 +74,7 @@ Kernpunkte (Kurzfassung):
 
 ## Technik-Kurzüberblick
 
-- Kotlin + Jetpack Compose, dark-only
+- Kotlin + Jetpack Compose, helles Warmer-Tag-Theme (Farbrollen + Haptik-Vokabular siehe PRODUCT_PRINCIPLES §10)
 - Content: versioniertes JSON unter `app/src/main/assets/content/`
 - Progress: DataStore
 - Content-Schema v2: ein polymorpher `TaskSpec` pro Trainer (`trainer`-Diskriminator), Lektionen in `lessons.json`

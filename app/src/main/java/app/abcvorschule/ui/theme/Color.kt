@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Color
  * pick by meaning (StarGold for stars, LeafGreen for correct, SkyBlue for
  * progress, SunCoral for CTAs) rather than reaching for `primary` directly.
  *
- * Contrast against Cream (background): WarmInk ~9.9:1, WarmMuted ~4.6:1.
+ * Contrast against Cream (background): WarmInk ~11.1:1, WarmMuted ~4.45:1.
  *
  * Contrast rule for the accent surfaces below (WCAG-differentiated, not a flat
  * 4.5:1 everywhere): Cream text/glyphs drawn *on* an accent fill only need to
@@ -103,21 +103,15 @@ val CloudWhite = Color(0xFFFDF9EF)
 
 val SunGlow = Color(0xFFF7CE73)
 
-val NightInk = Color(0xFF0E1624)
-val NightPanel = Color(0xFF172334)
-val NightElevated = Color(0xFF223247)
-val SoftMint = Color(0xFF7EC8A3)
-val SoftCoral = Color(0xFFE08E79)
+/**
+ * Last hold-over from the retired night palette — kept solely because it still
+ * has a live caller: the label lettering on PathSignNode's wood boards (see the
+ * Signpost boards contrast notes below, measured against WoodDark/WoodMid/
+ * WoodWarm). Every sibling constant from that palette (NightInk, NightPanel,
+ * NightElevated, NightDeep, NightHorizon, SoftMint, SoftCoral, SoftSky,
+ * SoftGold, MutedText) has been removed as unreferenced.
+ */
 val SoftSand = Color(0xFFF2E8CF)
-val SoftSky = Color(0xFF8FB8D9)
-
-/** Collectible-star yellow. Warm enough to read as "star" on the dark road. */
-val SoftGold = Color(0xFFF2C14E)
-val MutedText = Color(0xFFB7C2D0)
-
-/** Night sky gradient: deepest at the top, warmer towards the horizon. */
-val NightDeep = Color(0xFF080E18)
-val NightHorizon = Color(0xFF16283A)
 
 /**
  * Signpost boards. Kept dark enough that SoftSand lettering stays above 4.5:1 on
