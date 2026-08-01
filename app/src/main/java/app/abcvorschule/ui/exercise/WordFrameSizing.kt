@@ -113,4 +113,72 @@ object WordFrameSizing {
      */
     fun rowHeightDp(segmentCount: Int, segmentsPerRow: Int): Float =
         if (segmentsPerRow in 1 until segmentCount) WrappedRowHeightDp else MaxRowHeightDp
+
+    // --- Wort-Detektiv: a word, not a tray ------------------------------------
+    //
+    // The Wort-Bauer spreads its frames over the whole stage because they are slots
+    // to drop tiles into — the whitespace is the target. The Wort-Detektiv has no
+    // slots up there; the segments are invisible hit boxes around a word the child
+    // has to *read*. Sharing the stage equally put 96dp between the centres of two
+    // 33dp glyphs in "Mama", which reads as loose letters rather than as a word.
+    // These three functions instead hug each glyph and spend the freed width on
+    // making the glyph itself bigger.
+
+    /** Just enough air that two adjacent hit boxes are still separate targets. */
+    const val WordSegmentGapDp = 2f
+
+    /** Air per side between a glyph and the edge of its hit box. */
+    const val WordSegmentPaddingDp = 3f
+
+    /**
+     * How much of a row's height one glyph may claim. The rest is the ascender and
+     * descender space [Text] needs; deriving the cap instead of fixing it is what
+     * lets the wrapped 64dp row shrink its glyphs by itself rather than clip them.
+     */
+    const val WordGlyphHeightFraction = 0.68f
+
+    /**
+     * Glyph size for the Wort-Detektiv's segments: as large as the row height
+     * allows, stepped down only when the widest segment would not fit its share of
+     * [available]. Larger than [MaxGlyphSp] on purpose — the word is the thing the
+     * child is looking at, so it gets the app's biggest glyph, not the Wort-Bauer's
+     * tile size.
+     *
+     * Both budgets are dp, so [fontScale] divides the result the same way
+     * `FinaleLayout.capEffectiveSize` does: the *rendered* glyph stays inside the
+     * row a system font scale above 1.0 too, instead of growing out of the 80dp
+     * row the way a raw sp value would. [MinGlyphSp] still wins in the end — an
+     * illegible glyph is worse than an overflowing one, same trade as [glyphSp].
+     */
+    fun wordGlyphSp(
+        available: Float,
+        segmentsPerRow: Int,
+        longestDisplayChars: Int,
+        rowHeightDp: Float,
+        fontScale: Float = 1f,
+    ): Float {
+        val perRow = segmentsPerRow.coerceAtLeast(1)
+        val chars = longestDisplayChars.coerceAtLeast(1)
+        val share = (available - WordSegmentGapDp * (perRow - 1)) / perRow
+        val widthCap = (share - 2 * WordSegmentPaddingDp) / (chars * GlyphAspect)
+        val heightCap = rowHeightDp * WordGlyphHeightFraction
+        val budget = minOf(widthCap, heightCap)
+        val scaled = if (fontScale > 1f) budget / fontScale else budget
+        return scaled.coerceAtLeast(MinGlyphSp)
+    }
+
+    /**
+     * Hit box around one segment: its own glyph's width plus padding, never below
+     * the touch-target floor. Per segment rather than uniform, so "Sch·u·h" gives
+     * `Sch` the width it needs without granting `u` and `h` the same — a uniform
+     * width is the other half of what made the word look scattered.
+     *
+     * Fits by construction when [glyphSp] came from [wordGlyphSp] for the same row
+     * and [fontScale]: every segment is at most as wide as the equal share that size
+     * was solved against, and the [MinFrameDp] floor stays under that share because
+     * [segmentsPerRow] is derived from a wider per-segment budget ([MinGapDp]).
+     */
+    fun wordSegmentWidthDp(glyphSp: Float, displayChars: Int, fontScale: Float = 1f): Float =
+        (glyphSp * fontScale * GlyphAspect * displayChars.coerceAtLeast(1) + 2 * WordSegmentPaddingDp)
+            .coerceAtLeast(MinFrameDp)
 }

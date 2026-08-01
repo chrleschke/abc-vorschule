@@ -1,6 +1,7 @@
 package app.abcvorschule.content
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -73,8 +74,25 @@ class SymbolInWordDerivationTest {
 
     @Test
     fun focusRotationAdvancesInsteadOfRepeatingTheSameGrapheme() {
-        // l01 traces M then A: "Mama" takes M, "ma" must take A, not M again.
+        // l01 traces M then A: "Mama" takes M, "am" must take A, not M again.
         assertEquals(listOf("letter-m", "letter-a"), rounds("l01").map { it.targetAtomId })
+    }
+
+    @Test
+    fun noRoundHuntsInsideSomethingThatIsNotAWord() {
+        // "Finde den Buchstaben A im Wort ma" was the authored defect: l01-t7 built
+        // the syllable `ma` with the Wort-Bauer, and the derivation faithfully called
+        // it a word. The lesson now builds `am`, which is one. ContentValidator holds
+        // the authoring side of this; this test holds the derived prompts.
+        pack.authoredLessons.forEach { lesson ->
+            rounds(lesson.id).forEach { round ->
+                assertNotEquals(
+                    "lesson ${lesson.id}: ${round.promptTts} calls a syllable a word",
+                    AtomKind.syllable,
+                    pack.atom(round.wordAtomId).kind,
+                )
+            }
+        }
     }
 
     @Test

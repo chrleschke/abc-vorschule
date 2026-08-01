@@ -193,9 +193,9 @@ Echte Runde aus L03: `Papa`, Ziel `P`, zwei Treffer.
                (())                ← Speaker, AbcSpeakerButton
                                       via TaskPromptChrome(title = null)
 
-             P / p                 ← Zielsymbol als Formenpaar, 54sp
+             P / p                 ← Zielsymbol als Formenpaar, 38sp
 
-          P   a   p   a            ← das Wort, Segment = eigene Farbe, klickbar
+           P a p a                 ← das Wort, Segment = eigene Farbe, klickbar
 
              __   __               ← ein Platzhalter-Strich je Treffer
 ```
@@ -204,9 +204,14 @@ Echte Runde aus L03: `Papa`, Ziel `P`, zwei Treffer.
 identisch zur Buchstaben-Jagd, konform zu Prinzip 7 („Speaker mittig über dem
 Aufgabentitel"). Er wiederholt den Prompt-TTS.
 
-**Zielsymbol** darunter, `AbcDimens.letterSp` (54sp), `SoftSand`, als Formenpaar nach der
-Regel aus §2. Antippbar → wird vorgelesen (Prinzip 7), gesprochen wird dabei die
+**Zielsymbol** darunter, `AbcDimens.answerTileSp` (38sp), `SoftSand`, als Formenpaar nach
+der Regel aus §2. Antippbar → wird vorgelesen (Prinzip 7), gesprochen wird dabei die
 Atom-Form einmal, nicht „P Schrägstrich p".
+
+**Kleiner als das Wort, und zwar deutlich.** Ursprünglich stand es auf `letterSp` (54sp),
+also genau so groß wie das Wort darunter — die beiden lasen sich als gleichrangig, und der
+Blick hatte keinen Grund, vom Label zum Wort zu wandern. Das Label ist die Frage, das Wort
+ist die Arbeit; die Größen sagen das jetzt auch.
 
 **Das Wort** als farbige Glyphen **ohne Rahmen** — es soll wie ein Wort aussehen, nicht
 wie ein Tray. Farben zyklisch aus `SoftMint · SoftCoral · SoftSky · SoftGold · SoftSand`;
@@ -214,10 +219,30 @@ periodische Wiederholung ist ausdrücklich erlaubt. Bei 8 Segmenten (`Xylophon`)
 sich die Palette also — kein Problem, weil die Farbe nur Segmentgrenzen markiert und keine
 Bedeutung trägt.
 
-Jedes Segment hat eine unsichtbare Trefferfläche. Breite und Glyphgröße kommen aus
-`WordFrameSizing` (84 → 56dp Rahmen, 46 → 20sp Glyph). Reicht die Breite nicht, bricht die
+Jedes Segment hat eine unsichtbare Trefferfläche. Reicht die Breite nicht, bricht die
 Zeile in zwei ausgeglichene Reihen, statt unter die 56dp-Trefferfläche zu schrumpfen:
 **Klickbarkeit vor Einzeiligkeit.**
+
+**Die Trefferfläche umschließt den Buchstaben, sie teilt nicht die Bühne auf.** Die erste
+Fassung nahm dafür `WordFrameSizing.frameWidthDp`/`gapDp` — die Maße des Wort-Bauers. Dort
+ist der Rahmen ein Slot und der Weißraum das Ziel; hier ist er eine unsichtbare Hitbox um
+ein Wort, das gelesen werden soll. Vier gleich verteilte 84dp-Rahmen mit 12dp Lücke stellten
+die 33dp-Glyphen von `Mama` 96dp auseinander: Buchstabensalat statt Wort. Stattdessen
+(`WordFrameSizing.wordGlyphSp`/`wordSegmentWidthDp`):
+
+- **Glyph so groß, wie die Zeilenhöhe erlaubt** — 68% davon, also ~54sp in der 80dp-Zeile
+  und ~44sp in der umgebrochenen 64dp-Zeile. Der Deckel ist abgeleitet, nicht gesetzt, damit
+  die zweite Reihe von allein schrumpft, statt beschnitten zu werden. Über `fontScale = 1.0`
+  wird durch die Skala geteilt (wie `FinaleLayout.capEffectiveSize`), damit die *gerenderte*
+  Höhe in der Zeile bleibt.
+- **Hitbox = Glyphbreite + 3dp je Seite, Boden 56dp.** Pro Segment, nicht einheitlich:
+  `Sch·u·h` gibt `Sch` seine Breite, ohne sie `u` und `h` mitzugeben — eine einheitliche
+  Breite wäre die zweite Hälfte des Salats.
+- **2dp Lücke** statt 12dp. Bei einbuchstabigen Segmenten liegt die Hitbox ohnehin auf dem
+  56dp-Boden, der Abstand von Mitte zu Mitte fällt damit von 96dp auf 58dp.
+
+Das ist die engste Stellung, die 56dp-Trefferflächen zulassen; enger ginge nur auf Kosten
+der Tippbarkeit, und die steht laut Prinzip 7 nicht zur Disposition.
 
 **Die Umbruchschwelle hängt an der Gerätebreite, nicht an einer Segmentzahl.** Bei 56dp
 Mindestbreite plus 4dp Lücke passen sechs Segmente erst ab etwa 356dp nutzbarer
@@ -282,13 +307,22 @@ gilt für handlungsfähige Items), sondern die Quittung, dass es schon gefunden 
 3. Eine Kopie fliegt in ~350ms auf den nächsten freien Strich und bleibt dort in
    `SoftGold` liegen — dieselbe Farbe wie Stern und Punkte: „verdient".
 
-**Was genau fliegt: die Form des Zielsymbols, nicht die des angetippten Segments.**
-Beide unterscheiden sich nur in der Groß-/Kleinschreibung (die Invariante aus §4 garantiert
-das), aber die Striche sind die Quittung auf *eine* Frage. „Finde alle **P**" soll unten als
-zwei P enden, nicht als `P` und `p`; und in `Mimi` darf unter dem Label `mi` kein `Mi`
-liegen, sonst widerspricht die Quittung der Aufgabe. Für Buchstaben ist das zusätzlich
-genau die Lektion, die das Formenpaar `P / p` sowieso vermittelt: beide Vorkommen sind
-dasselbe P.
+**Was genau fliegt: die Form des angetippten Segments.** `Papa` endet unten als `P` `p`,
+`Mama` als `M` `m` — dieselbe Groß-/Kleinschreibung, die im Wort steht. Die Invariante aus
+§4 garantiert, dass sich Segment und Ziel nur darin unterscheiden.
+
+*Korrigiert.* Ursprünglich flog die Form des **Zielsymbols**, mit dem Argument, die Striche
+seien die Quittung auf *eine* Frage („finde alle P" → unten zwei P). In der Hand liest sich
+das aber nicht als Quittung, sondern als Widerspruch: das Kind tippt das kleine `p` an und
+sieht ein großes `P` landen. Damit verliert der Flug genau das, wofür es ihn gibt — „ich
+habe *das* getippt, und *das* ist dorthin gewandert" (§5, Punkt 3) —, und ein Kind, das
+nicht liest, hat kein Signal mehr, dass sein Tipp der zählende war. Die Gleichsetzung der
+beiden Formen trägt weiterhin das Label `P / p` über dem Wort; sie braucht die Striche
+nicht als zweiten Beweis, und die Striche brauchen sie nicht als Preis.
+
+Beim Auflösen („Zeig mir") landen dieselben Formen in Lesereihenfolge, und die
+Beginner-Silhouette zeigt sie ebenso — die leeren Striche von `Mama` buchstabieren also
+schon `M` und `m` vor.
 
 Die fliegende Kopie wird in der Glyphgröße des Segments gestartet und auf die Größe des
 Strichs interpoliert, damit sie beim Abflug nicht größer ist als das Zeichen, aus dem sie
@@ -425,7 +459,7 @@ die Derivation-Tests. `B` = Buchstaben-Modus, `S` = Silben-Modus.
 
 | Lektion | Runden (Modus · Ziel · Zerlegung · Treffer) |
 | --- | --- |
-| L01 M & A | B `M` `M·a·m·a` 2 · B `A` `m·a` 1 |
+| L01 M & A | B `M` `M·a·m·a` 2 · B `A` `a·m` 1 |
 | L02 I & O | B `O` `O·m·a` 1 · B `I` `M·i·m·i` 2 |
 | L03 P & T | B `P` `P·a·p·a` 2 · S `pa` `O·pa` 1 · B `T` `T·o·m` 1 |
 | L04 L & H | B `L` `L·a·m·a` 1 · B `H` `H·a·l·l·o` 1 |
@@ -451,6 +485,16 @@ die Derivation-Tests. `B` = Buchstaben-Modus, `S` = Silben-Modus.
 | L24 St & Sp Wdh. | B `St` `St·e·r·n` 1 · S `spi` `Spi·n·n·e` 1 |
 | L25 Ö & Ü Wdh. | B `Ö` `L·ö·w·e` 1 · S `rü` `Rü·b·e` 1 |
 | L26 Qu & X Wdh. | B `Qu` `Qu·a·l·l·e` 1 · S `ta` `Ta·x·i` 1 |
+
+L01 spielte ursprünglich `B A m·a 1` — „Finde den Buchstaben A im Wort **ma**". `ma` ist
+keins: das Atom ist `kind: syllable`, und `l01-t7` baute es trotzdem mit dem Wort-Bauer
+(„Baue das Wort ma"). Der Trainer hat die Lüge nur weitergereicht. `l01-t7` baut jetzt `am`
+— ein echtes Wort, aus denselben zwei Buchstaben, und genau das, was die
+Wiederholungslektion L19 an derselben Stelle schon tat. `ContentValidator` lehnt einen
+`word_build`-Task, dessen Ziel ein Silben-Atom ist, seither ab; dabei fiel auf, dass das
+Atom `ich` fälschlich als Silbe geführt war (es ist ein Wort und wird nirgends als Silbe
+verwendet) — korrigiert. `Kleid` bleibt `other`: das ist eine Einordnung als Bildvokabel,
+keine Falschaussage über die Wortart.
 
 L13 ergibt dreimal `Sch` in Folge, weil die Lektion nur ein Fokus-Graphem führt und die
 Rotation nichts hat, worauf sie wechseln könnte. Das ist kein Fehler, sondern die
