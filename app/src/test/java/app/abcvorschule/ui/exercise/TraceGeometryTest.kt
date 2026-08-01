@@ -110,4 +110,19 @@ class TraceGeometryTest {
         assertEquals(2f, TraceGeometry.distanceToPolyline(TracePoint(98f, 98f), elbow), 0.01f)
         assertEquals(3f, TraceGeometry.distanceToPolyline(TracePoint(3f, 40f), elbow), 0.01f)
     }
+
+    @Test
+    fun arcLengthMeasuresHowFarAlongTheStrokeTheFingerIs() {
+        assertEquals(0f, TraceGeometry.arcLengthAt(elbow, TracePoint(-5f, -5f)), 0.01f)
+        assertEquals(40f, TraceGeometry.arcLengthAt(elbow, TracePoint(3f, 40f)), 0.01f)
+        // Past the elbow the second segment adds to the first one's full length.
+        assertEquals(130f, TraceGeometry.arcLengthAt(elbow, TracePoint(30f, 98f)), 0.01f)
+        assertEquals(200f, TraceGeometry.arcLengthAt(elbow, TracePoint(140f, 100f)), 0.01f)
+    }
+
+    @Test
+    fun arcLengthOfADegeneratePolylineIsZero() {
+        assertEquals(0f, TraceGeometry.arcLengthAt(emptyList(), TracePoint(1f, 1f)), 0.01f)
+        assertEquals(0f, TraceGeometry.arcLengthAt(listOf(TracePoint(9f, 9f)), TracePoint(1f, 1f)), 0.01f)
+    }
 }

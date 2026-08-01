@@ -104,6 +104,40 @@ object TraceGeometry {
         points.size == 1 -> hypot(p.x - points[0].x, p.y - points[0].y)
         else -> points.zipWithNext().minOf { (a, b) -> distanceToSegment(p, a, b) }
     }
+
+    /**
+     * How far along [points] the nearest road position to [p] lies, measured from the
+     * stroke start. This is "where on the letter is the finger", the counterpart to
+     * [distanceToPolyline]'s "how far off the letter is it".
+     *
+     * Ties go to the earlier segment, so a closed loop (letter-o) reports the finger at
+     * the start rather than at the end when it sits on the seam — the permissive answer,
+     * which keeps the gate in [TraceProgress] from blocking a loop that just began.
+     */
+    fun arcLengthAt(points: List<TracePoint>, p: TracePoint): Float {
+        if (points.size < 2) return 0f
+        var walked = 0f
+        var best = Float.MAX_VALUE
+        var bestArc = 0f
+        points.zipWithNext().forEach { (a, b) ->
+            val dx = b.x - a.x
+            val dy = b.y - a.y
+            val segment = hypot(dx, dy)
+            val lengthSquared = dx * dx + dy * dy
+            val t = if (lengthSquared <= 0f) {
+                0f
+            } else {
+                (((p.x - a.x) * dx + (p.y - a.y) * dy) / lengthSquared).coerceIn(0f, 1f)
+            }
+            val distance = hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy))
+            if (distance < best) {
+                best = distance
+                bestArc = walked + t * segment
+            }
+            walked += segment
+        }
+        return bestArc
+    }
 }
 
 /** Which stroke and which star of that stroke the child is on. */
@@ -114,12 +148,19 @@ data class TraceUpdate(
     val collectedStar: Boolean,
     val offCorridor: Boolean,
     val glyphDone: Boolean,
+    /**
+     * The finger is on the road but further along the stroke than the star it is meant
+     * to collect next — so it marks no progress and the vehicle must stay put. Not the
+     * same as [offCorridor]: the child has not left the letter, so there is no nudge.
+     */
+    val ahead: Boolean = false,
 )
 
 /**
  * Stroke-order enforcement: the finger must stay inside a corridor around the
- * current stroke, and only the *next* star counts — so the glyph cannot be
- * shortcut and the writing direction is actually practiced.
+ * current stroke, may not run ahead of the next star along it, and only the *next*
+ * star counts — so the glyph cannot be shortcut and the writing direction is
+ * actually practiced.
  */
 object TraceProgress {
     /** Even the shortest tick (an umlaut dot) is worth exactly one star. */
@@ -167,7 +208,28 @@ object TraceProgress {
         }
         val target = stars.getOrNull(state.strokeIndex)?.getOrNull(state.starIndex)
             ?: return TraceUpdate(state, collectedStar = false, offCorridor = false, glyphDone = false)
-        val hit = TraceGeometry.distanceToPolyline(finger, listOf(target)) <= boxSize * StarHitFraction
+        val starHit = boxSize * StarHitFraction
+        // A corridor runs the whole length of its stroke, so being inside it says nothing
+        // about *where* along the letter the finger is. Star i sits at fraction (i+1)/count
+        // of the stroke by construction in TraceGeometry.starPositions, which gives the
+        // target's arc length without projecting a point that a closed stroke may share
+        // with its own start.
+        val targetArc = TraceGeometry.polylineLength(stroke) *
+            (state.starIndex + 1).toFloat() / stars[state.strokeIndex].size
+        // Ahead of that star the finger marks no progress — the pick-up radius is the only
+        // allowance, so a small overshoot still collects. Without this the drag that leaves
+        // the E of "Ei" at the bottom right slides on into the i's road at its foot and
+        // takes the vehicle with it, parking the start dot at the foot of the i.
+        if (TraceGeometry.arcLengthAt(stroke, finger) > targetArc + starHit) {
+            return TraceUpdate(
+                state = state,
+                collectedStar = false,
+                offCorridor = false,
+                glyphDone = false,
+                ahead = true,
+            )
+        }
+        val hit = TraceGeometry.distanceToPolyline(finger, listOf(target)) <= starHit
         if (!hit) {
             return TraceUpdate(state, collectedStar = false, offCorridor = false, glyphDone = false)
         }
