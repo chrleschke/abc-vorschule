@@ -18,6 +18,7 @@ import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.session.ScheduledTrainer
 import app.abcvorschule.ui.components.AbcResolveButton
+import app.abcvorschule.ui.theme.WarmInk
 
 /**
  * Trainer 6 — Rechnen. Pure quantity arithmetic: emoji groups and numerals only,
@@ -81,7 +82,7 @@ fun MathExercise(
                     Text(
                         text = "${round.left} ${operation.symbol} ${round.right} = ?",
                         style = MaterialTheme.typography.displayLarge,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = WarmInk,
                     )
                 }
                 Row(

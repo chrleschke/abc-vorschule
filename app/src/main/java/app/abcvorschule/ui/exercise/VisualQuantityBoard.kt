@@ -20,10 +20,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.ui.components.AbcResolveButton
-import app.abcvorschule.ui.theme.NightElevated
-import app.abcvorschule.ui.theme.NightInk
-import app.abcvorschule.ui.theme.SoftMint
-import app.abcvorschule.ui.theme.SoftSand
+import app.abcvorschule.ui.theme.Cream
+import app.abcvorschule.ui.theme.CreamElevated
+import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.WarmInk
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -77,7 +77,7 @@ fun VisualQuantityBoard(
                     Column(
                         modifier = Modifier
                             .background(
-                                color = if (correct) SoftMint else NightElevated,
+                                color = if (correct) LeafGreen else CreamElevated,
                                 shape = RoundedCornerShape(18.dp),
                             )
                             .clickable { onChoose(value) }
@@ -91,7 +91,7 @@ fun VisualQuantityBoard(
                             count = value,
                             emojiSizeSp = 28,
                             showNumber = true,
-                            numberColor = if (correct) NightInk else SoftSand,
+                            numberColor = if (correct) Cream else WarmInk,
                             forceSymbolic = forceSymbolic,
                         )
                     }
@@ -111,7 +111,7 @@ fun QuantityCluster(
     emojiSizeSp: Int,
     modifier: Modifier = Modifier,
     showNumber: Boolean = true,
-    numberColor: Color = SoftSand,
+    numberColor: Color = WarmInk,
     /** Set when the other number in this round is already symbolic, so both
      * sides of the equation stay visually consistent. */
     forceSymbolic: Boolean = false,
@@ -173,7 +173,7 @@ fun MathQuantityPrompt(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         QuantityCluster(emoji = emoji, count = left, emojiSizeSp = emojiSizeSp, forceSymbolic = forceSymbolic)
-        Text(operation.symbol, style = MaterialTheme.typography.displayMedium, color = SoftSand)
+        Text(operation.symbol, style = MaterialTheme.typography.displayMedium, color = WarmInk)
         QuantityCluster(emoji = emoji, count = right, emojiSizeSp = emojiSizeSp, forceSymbolic = forceSymbolic)
     }
 }

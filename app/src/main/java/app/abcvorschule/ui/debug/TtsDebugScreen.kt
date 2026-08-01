@@ -50,12 +50,10 @@ import app.abcvorschule.debug.ttsDebugEntries
 import app.abcvorschule.ui.components.AbcCloseButton
 import app.abcvorschule.ui.components.AbcSpeakerButton
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.MutedText
-import app.abcvorschule.ui.theme.NightInk
-import app.abcvorschule.ui.theme.NightPanel
-import app.abcvorschule.ui.theme.SoftGold
-import app.abcvorschule.ui.theme.SoftSand
-import app.abcvorschule.ui.theme.SoftSky
+import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.StarGold
+import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.theme.WarmMuted
 import kotlinx.coroutines.launch
 
 @Composable
@@ -89,7 +87,7 @@ fun TtsDebugScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(NightInk)
+            .background(MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.safeDrawing)
             .imePadding()
             .padding(horizontal = AbcDimens.screenHorizontal, vertical = 8.dp),
@@ -99,7 +97,7 @@ fun TtsDebugScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(text = "TTS Debug", style = MaterialTheme.typography.titleLarge, color = SoftSand)
+            Text(text = "TTS Debug", style = MaterialTheme.typography.titleLarge, color = WarmInk)
             AbcCloseButton(onClick = onClose)
         }
 
@@ -114,17 +112,17 @@ fun TtsDebugScreen(
             singleLine = true,
             placeholder = { Text("Suche…") },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = SoftSky,
-                unfocusedBorderColor = SoftSky.copy(alpha = 0.5f),
-                focusedTextColor = SoftSand,
-                unfocusedTextColor = SoftSand,
+                focusedBorderColor = SkyBlue,
+                unfocusedBorderColor = SkyBlue.copy(alpha = 0.5f),
+                focusedTextColor = WarmInk,
+                unfocusedTextColor = WarmInk,
             ),
         )
 
         Spacer(Modifier.height(AbcDimens.chromeGap))
 
         TextButton(onClick = { scope.launch { repository.clearAll() } }) {
-            Text("Alles zurücksetzen", color = MutedText)
+            Text("Alles zurücksetzen", color = WarmMuted)
         }
 
         LazyColumn(
@@ -138,7 +136,7 @@ fun TtsDebugScreen(
                     Text(
                         text = groupTitle(group),
                         style = MaterialTheme.typography.labelLarge,
-                        color = MutedText,
+                        color = WarmMuted,
                         modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
                     )
                 }
@@ -192,16 +190,16 @@ private fun TtsDebugRow(
 
     Surface(
         modifier = modifier.fillMaxWidth().padding(vertical = 4.dp),
-        color = NightPanel,
+        color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(12.dp),
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = entry.label, style = MaterialTheme.typography.labelMedium, color = MutedText)
+                    Text(text = entry.label, style = MaterialTheme.typography.labelMedium, color = WarmMuted)
                     if (overrideText != null) {
                         Spacer(Modifier.width(6.dp))
-                        Text(text = "bearbeitet", style = MaterialTheme.typography.labelSmall, color = SoftGold)
+                        Text(text = "bearbeitet", style = MaterialTheme.typography.labelSmall, color = StarGold)
                     }
                 }
                 Spacer(Modifier.height(2.dp))
@@ -224,17 +222,17 @@ private fun TtsDebugRow(
                                 wasFocused = focus.isFocused
                             },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = SoftSky,
-                            unfocusedBorderColor = SoftSky.copy(alpha = 0.5f),
-                            focusedTextColor = SoftSand,
-                            unfocusedTextColor = SoftSand,
+                            focusedBorderColor = SkyBlue,
+                            unfocusedBorderColor = SkyBlue.copy(alpha = 0.5f),
+                            focusedTextColor = WarmInk,
+                            unfocusedTextColor = WarmInk,
                         ),
                     )
                 } else {
                     Text(
                         text = currentText,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = SoftSand,
+                        color = WarmInk,
                         modifier = Modifier.clickable {
                             draft = currentText
                             editing = true
@@ -252,7 +250,7 @@ private fun TtsDebugRow(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     ),
                 ) {
-                    Text("↺", color = SoftSand)
+                    Text("↺", color = WarmInk)
                 }
                 Spacer(Modifier.width(4.dp))
             }

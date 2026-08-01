@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.ui.components.AbcSpeakerButton
-import app.abcvorschule.ui.theme.MutedText
-import app.abcvorschule.ui.theme.SoftSand
+import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.theme.WarmMuted
 
 /**
  * Speaker centered above the task title inside the exercise prompt area.
@@ -39,7 +39,7 @@ fun TaskPromptChrome(
             Text(
                 text = title,
                 fontSize = if (mutedTitle) 28.sp else 34.sp,
-                color = if (mutedTitle) MutedText.copy(alpha = 0.35f) else SoftSand,
+                color = if (mutedTitle) WarmMuted.copy(alpha = 0.5f) else WarmInk,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.clickable {
                     if (onTitleSpeak != null) onTitleSpeak(title) else onSpeakPrompt()

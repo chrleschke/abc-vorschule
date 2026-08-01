@@ -38,6 +38,7 @@ import app.abcvorschule.content.LessonFinale
 import app.abcvorschule.ui.components.AbcContinueButton
 import app.abcvorschule.ui.components.AbcSpeakerButton
 import app.abcvorschule.ui.components.IconStar
+import app.abcvorschule.ui.theme.StarGold
 import kotlinx.coroutines.delay
 
 // Kosmetische Werte für den Hintergrundstern: anders als die Schriftgrößen entscheiden
@@ -48,7 +49,7 @@ import kotlinx.coroutines.delay
 // sein, nicht als Rahmen. Weil er aus der Messung fällt, kostet zusätzliche Größe keinen
 // Platz und kann den Weiter- oder Speaker-Button nicht verdrängen.
 private val BackgroundStarSize = 300.dp
-private const val BackgroundStarAlpha = 0.12f
+private const val BackgroundStarAlpha = 0.15f
 
 // Zusätzliches horizontales Polster für den Satz, oben auf das 24dp der Spalte drauf
 // (macht 44dp insgesamt pro Seite): 20dp liegt in der von der Produktseite gewünschten
@@ -175,7 +176,7 @@ fun RewardSummaryScreen(
 @Composable
 private fun BackgroundStar(scale: Float, modifier: Modifier = Modifier) {
     IconStar(
-        tint = MaterialTheme.colorScheme.primary.copy(alpha = BackgroundStarAlpha),
+        tint = StarGold.copy(alpha = BackgroundStarAlpha),
         size = BackgroundStarSize,
         modifier = modifier.scale(scale),
     )

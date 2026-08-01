@@ -33,9 +33,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.components.IconChevronRight
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.SoftMint
-import app.abcvorschule.ui.theme.SoftSand
-import app.abcvorschule.ui.theme.SoftSky
+import app.abcvorschule.ui.theme.Cream
+import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.SunCoral
+import app.abcvorschule.ui.theme.WarmInk
 
 /**
  * Numeric answer field backed by the device's own keyboard (number mode) —
@@ -88,23 +90,23 @@ fun NumberPad(
             keyboardActions = KeyboardActions(onDone = { submit() }),
             // Neutral while typing so that green means one thing only: correct.
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (solved) SoftMint else SoftSky,
-                unfocusedBorderColor = if (solved) SoftMint else SoftSky.copy(alpha = 0.5f),
-                focusedTextColor = if (solved) SoftMint else SoftSand,
-                unfocusedTextColor = if (solved) SoftMint else SoftSand,
+                focusedBorderColor = if (solved) LeafGreen else SkyBlue,
+                unfocusedBorderColor = if (solved) LeafGreen else SkyBlue.copy(alpha = 0.5f),
+                focusedTextColor = WarmInk,
+                unfocusedTextColor = WarmInk,
             ),
         )
         Spacer(Modifier.width(16.dp))
         Surface(
             onClick = { submit() },
             shape = RoundedCornerShape(20.dp),
-            color = MaterialTheme.colorScheme.primary,
+            color = SunCoral,
             modifier = Modifier
                 .size(AbcDimens.kidTouch - 8.dp)
                 .testTag("number_submit"),
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                IconChevronRight(tint = MaterialTheme.colorScheme.onPrimary, size = 28.dp)
+                IconChevronRight(tint = Cream, size = 28.dp)
             }
         }
     }

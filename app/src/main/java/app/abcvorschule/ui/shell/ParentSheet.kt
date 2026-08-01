@@ -25,7 +25,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
 import app.abcvorschule.progress.ParentMode
-import app.abcvorschule.ui.theme.MutedText
+import app.abcvorschule.ui.theme.WarmMuted
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,7 +55,7 @@ fun ParentSheet(
             Text(
                 text = stringResource(R.string.parent_section_difficulty),
                 style = MaterialTheme.typography.titleMedium,
-                color = MutedText,
+                color = WarmMuted,
             )
             Column(modifier = Modifier.selectableGroup()) {
                 ModeOption(

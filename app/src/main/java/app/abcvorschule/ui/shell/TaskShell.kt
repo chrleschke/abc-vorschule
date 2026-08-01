@@ -42,9 +42,10 @@ import app.abcvorschule.ui.path.PathScreen
 import app.abcvorschule.ui.rewards.SuccessBurst
 import app.abcvorschule.ui.rewards.playBlockedBlip
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.MutedText
-import app.abcvorschule.ui.theme.NightInk
-import app.abcvorschule.ui.theme.SoftMint
+import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.StarGold
+import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.theme.WarmMuted
 import kotlinx.coroutines.delay
 
 @Composable
@@ -64,7 +65,7 @@ fun TaskShell(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(NightInk)
+            .background(MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.safeDrawing)
             .padding(bottom = AbcDimens.screenBottomExtra),
     ) {
@@ -77,7 +78,7 @@ fun TaskShell(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text(state.error, color = MaterialTheme.colorScheme.tertiary)
+                    Text(state.error, color = MaterialTheme.colorScheme.error)
                 }
             }
             !state.ready || pack == null -> {
@@ -221,12 +222,12 @@ private fun PracticeBody(
         ) {
             ParentGateButton(onUnlocked = viewModel::openDifficultySheet)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconStar(tint = MaterialTheme.colorScheme.primary, size = 22.dp)
+                IconStar(tint = StarGold, size = 22.dp)
                 Spacer(Modifier.width(6.dp))
                 Text(
                     text = "${state.points}",
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = WarmInk,
                 )
             }
             AbcCloseButton(onClick = viewModel::exitLesson)
@@ -320,7 +321,7 @@ private fun RoundProgressDots(
                 modifier = Modifier
                     .size(RoundDotSize)
                     .background(
-                        color = if (filled) SoftMint else MutedText.copy(alpha = 0.3f),
+                        color = if (filled) LeafGreen else WarmMuted.copy(alpha = 0.35f),
                         shape = CircleShape,
                     ),
             )
