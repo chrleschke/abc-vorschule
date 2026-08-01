@@ -14,7 +14,7 @@
 
 - Kein reines Weiß (`#FFFFFF`) und kein reines Schwarz als Fläche — Creme/warme Tinte.
 - Sterne/Punkte/Belohnung sind **immer** `StarGold`; „richtig/erledigt" ist **immer** `LeafGreen`; Progress-Füllung ist **immer** `SkyBlue`; CTA ist `SunCoral`. Nie `primary` für Sterne oder Progress verwenden.
-- Text-Kontrast ≥ 4.5:1 gegen seine Fläche (WarmInk/WarmMuted auf Creme-Tönen erfüllen das).
+- Text-Kontrast (WCAG-differenziert): Fließtext ≥ 4.5:1; großer Text (≥ ~24sp bzw. ≥ 18sp bold), Icons und UI-Komponenten ≥ 3:1 gegen ihre Fläche. WarmInk/WarmMuted auf Creme-Tönen erfüllen 4.5:1; Cream auf den (nachgedunkelten) Akzentflächen ist für große Glyphen/Icons/Buttons ausgelegt (≥ 3.5:1). Akzent-Zielwerte: LeafGreen `0xFF43904F`, SkyBlue `0xFF3F7FB5`, SunCoral `0xFFD25B2D`, ClayRed `0xFFB0402C`.
 - Buttons: keine Emojis, nur Vektor/ASCII (bestehende Regel).
 - Kind-Feedback bleibt Audio-first; Haptik ergänzt Ton, ersetzt ihn nie.
 - Layouts/Größen nicht ändern (Testgerät läuft font_scale 1.3) — nur Farben, Effekte, Haptik.

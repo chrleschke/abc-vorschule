@@ -61,8 +61,10 @@ M3-Mapping: `lightColorScheme` mit primary=`LeafGreen`, secondary=`SkyBlue`,
 tertiary=`SunCoral`, error=`ClayRed`, plus explizite outline/scrim-Werte. Sterne
 und Progress-Bar greifen **nie** auf `primary` zu, sondern auf die benannten
 Konstanten — damit kann keine Rollen-Überladung zurückkehren. Exakte Hex-Werte
-dürfen bei der Umsetzung feinjustiert werden, die Kontrast-Anforderungen
-(Text ≥ 4.5:1, Großflächen-Erkennbarkeit) sind bindend.
+dürfen bei der Umsetzung feinjustiert werden, die Kontrast-Anforderungen sind
+bindend: Fließtext ≥ 4.5:1; großer Text, Icons und UI-Komponenten ≥ 3:1
+(WCAG 1.4.3/1.4.11). Die Akzentflächen werden dafür so weit nachgedunkelt,
+dass Cream-Glyphen darauf ≥ 3.5:1 erreichen.
 
 Die Trainer-Paletten (Hunt/Detektiv-Segmente, Waggonfarben) werden auf die neuen
 Akzente umgestellt und dürfen dabei fröhlicher/gesättigter werden als bisher —
