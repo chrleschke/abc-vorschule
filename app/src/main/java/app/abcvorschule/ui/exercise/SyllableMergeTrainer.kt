@@ -41,10 +41,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.NightElevated
-import app.abcvorschule.ui.theme.SoftMint
-import app.abcvorschule.ui.theme.SoftSand
-import app.abcvorschule.ui.theme.SoftSky
+import app.abcvorschule.ui.theme.CreamElevated
+import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.WarmInk
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
@@ -301,7 +301,7 @@ private fun MergeTrack(progress: Float, modifier: Modifier = Modifier) {
             val toMiddle = 1f - abs(x - size.width / 2f) / (size.width / 2f)
             val highlight = (1f - abs(toMiddle - phase) * 3f).coerceIn(0f, 1f)
             drawCircle(
-                color = SoftSky.copy(alpha = fade * (0.18f + 0.55f * highlight)),
+                color = SkyBlue.copy(alpha = fade * (0.30f + 0.55f * highlight)),
                 radius = dotRadius * (0.8f + 0.4f * highlight),
                 center = Offset(x, centerY),
             )
@@ -322,12 +322,12 @@ private fun Floe(
             .width(SyllableFrameSizing.widthDp(label).dp)
             .height(AbcDimens.letterFrame)
             .background(
-                color = if (frozen) SoftMint.copy(alpha = 0.22f) else NightElevated,
+                color = if (frozen) LeafGreen.copy(alpha = 0.25f) else CreamElevated,
                 shape = RoundedCornerShape(26.dp),
             )
             .border(
                 width = 4.dp,
-                color = (if (frozen) SoftMint else SoftSky).copy(alpha = glow),
+                color = (if (frozen) LeafGreen else SkyBlue).copy(alpha = glow),
                 shape = RoundedCornerShape(26.dp),
             )
             .clickable(onClick = onTap),
@@ -336,7 +336,11 @@ private fun Floe(
         Text(
             text = label,
             fontSize = AbcDimens.letterSp,
-            color = if (frozen) SoftMint else SoftSand,
+            // Always WarmInk, even when frozen: LeafGreen text on the LeafGreen-tinted
+            // wash below only reaches ~2.25:1 (and ~2.87:1 even against plain
+            // CreamElevated) — short of the required 3:1 for large glyphs on Cream. The
+            // wash, border and scale-in animation already carry the "merged" cue.
+            color = WarmInk,
         )
     }
 }

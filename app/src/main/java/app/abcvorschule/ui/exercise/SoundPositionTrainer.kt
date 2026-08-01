@@ -42,11 +42,13 @@ import app.abcvorschule.ui.exercise.drag.DragFieldState
 import app.abcvorschule.ui.exercise.drag.DropZone
 import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.NightElevated
-import app.abcvorschule.ui.theme.SoftCoral
-import app.abcvorschule.ui.theme.SoftMint
-import app.abcvorschule.ui.theme.SoftSand
-import app.abcvorschule.ui.theme.SoftSky
+import app.abcvorschule.ui.theme.CreamElevated
+import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.StarGoldDeep
+import app.abcvorschule.ui.theme.SunCoral
+import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.theme.WarmMuted
 
 object SoundPositionLogic {
     /** Front to back: locomotive head, middle wagon, last wagon. */
@@ -116,7 +118,7 @@ fun SoundPositionTrainer(
             Text(
                 text = targetPhoneme,
                 fontSize = 42.sp,
-                color = SoftSand,
+                color = WarmInk,
                 modifier = Modifier.testTag("sound_target"),
             )
             Row(
@@ -165,7 +167,7 @@ fun SoundPositionTrainer(
                     modifier = Modifier
                         .size(AbcDimens.kidTouch + 20.dp)
                         .background(
-                            color = if (field.selectedKey == cardKey) SoftMint.copy(alpha = 0.3f) else NightElevated,
+                            color = if (field.selectedKey == cardKey) LeafGreen.copy(alpha = 0.25f) else CreamElevated,
                             shape = RoundedCornerShape(24.dp),
                         )
                         .testTag("sound_card"),
@@ -185,10 +187,13 @@ fun SoundPositionTrainer(
     )
 }
 
+// index 1 uses StarGoldDeep rather than StarGold: this value is also drawn as word-segment
+// text and as a UI-component border/fill on Cream, where plain StarGold only reaches
+// ~1.85:1 (see Color.kt) — well short of the required 3:1 for large glyphs/UI components.
 private fun wagonColor(index: Int): Color = when (index % 3) {
-    0 -> SoftCoral
-    1 -> SoftSand
-    else -> SoftSky
+    0 -> SunCoral
+    1 -> StarGoldDeep
+    else -> SkyBlue
 }
 
 private fun colouredWord(word: String): AnnotatedString = buildAnnotatedString {
@@ -217,7 +222,7 @@ private fun Wagon(
         },
     )
     val border = when {
-        filledEmoji != null || revealed -> SoftMint
+        filledEmoji != null || revealed -> LeafGreen
         armed -> accent
         else -> accent.copy(alpha = 0.55f)
     }
@@ -228,7 +233,9 @@ private fun Wagon(
         modifier = Modifier
             .size(WagonSize)
             .background(
-                color = if (filledEmoji != null) SoftMint.copy(alpha = 0.18f) else NightElevated,
+                // Alpha raised from the old dark-theme 0.18f: a light wash needs more
+                // coverage to read as "filled" against Cream than it did on night ink.
+                color = if (filledEmoji != null) LeafGreen.copy(alpha = 0.25f) else CreamElevated,
                 shape = RoundedCornerShape(18.dp),
             )
             .border(4.dp, border, RoundedCornerShape(18.dp))
@@ -263,33 +270,34 @@ private fun LocomotiveHead(steam: Float) {
         val h = size.height
         // Body
         drawRoundRect(
-            color = SoftCoral,
+            color = SunCoral,
             topLeft = Offset(w * 0.05f, h * 0.35f),
             size = Size(w * 0.9f, h * 0.5f),
             cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.12f),
         )
         // Cab
         drawRoundRect(
-            color = SoftCoral.copy(alpha = 0.85f),
+            color = SunCoral.copy(alpha = 0.85f),
             topLeft = Offset(w * 0.45f, h * 0.15f),
             size = Size(w * 0.45f, h * 0.28f),
             cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.08f),
         )
         // Chimney
         drawRoundRect(
-            color = SoftCoral,
+            color = SunCoral,
             topLeft = Offset(w * 0.14f, h * 0.18f),
             size = Size(w * 0.16f, h * 0.2f),
             cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.04f),
         )
         // Wheels
-        drawCircle(color = SoftSand, radius = w * 0.14f, center = Offset(w * 0.28f, h * 0.88f))
-        drawCircle(color = SoftSand, radius = w * 0.14f, center = Offset(w * 0.7f, h * 0.88f))
-        // Steam puffs grow when the child got it right.
+        drawCircle(color = WarmInk, radius = w * 0.14f, center = Offset(w * 0.28f, h * 0.88f))
+        drawCircle(color = WarmInk, radius = w * 0.14f, center = Offset(w * 0.7f, h * 0.88f))
+        // Steam puffs grow when the child got it right. Warm-grey rather than white so
+        // the puffs stay visible against the cream sky instead of vanishing into it.
         if (steam > 0f) {
             listOf(0.34f, 0.22f, 0.1f).forEachIndexed { i, y ->
                 drawCircle(
-                    color = Color.White.copy(alpha = 0.35f * steam),
+                    color = WarmMuted.copy(alpha = 0.4f * steam),
                     radius = w * (0.09f + i * 0.03f) * steam,
                     center = Offset(w * (0.22f - i * 0.03f), h * y),
                 )

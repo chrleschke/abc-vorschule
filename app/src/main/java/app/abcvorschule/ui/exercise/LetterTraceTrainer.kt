@@ -45,11 +45,13 @@ import app.abcvorschule.content.Atom
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.playStarBlip
-import app.abcvorschule.ui.theme.NightInk
-import app.abcvorschule.ui.theme.SoftCoral
-import app.abcvorschule.ui.theme.SoftGold
-import app.abcvorschule.ui.theme.SoftMint
-import app.abcvorschule.ui.theme.SoftSand
+import app.abcvorschule.ui.theme.CreamElevated
+import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.StarGold
+import app.abcvorschule.ui.theme.SunCoral
+import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.theme.WarmMuted
 import kotlinx.coroutines.delay
 
 private val GlyphBox = 260.dp
@@ -215,7 +217,7 @@ private fun TraceRewardCard(
                 }
             },
             style = MaterialTheme.typography.headlineMedium,
-            color = SoftSand,
+            color = WarmInk,
         )
     }
 }
@@ -310,22 +312,24 @@ private fun TraceCanvas(
             }
             val active = index == state.strokeIndex
             val fill = (filled - index).coerceIn(0f, 1f)
-            val outer = if (fill > 0f) SoftMint else SoftSand
-            // Hollow road: a wide light band with a dark inner lane.
+            val outer = if (fill > 0f) SkyBlue else WarmMuted
+            // Hollow road: a wide band with a dark inner lane. On the cream background
+            // the band needs more opacity than the old dark-theme calibration to stay
+            // legible, hence the higher alphas below.
             drawPath(
                 path = path,
-                color = outer.copy(alpha = if (active) 0.30f else 0.16f),
+                color = outer.copy(alpha = if (active) 0.45f else 0.22f),
                 style = Stroke(
                     width = corridor * 2f,
                     cap = StrokeCap.Round,
                     join = StrokeJoin.Round,
                 ),
             )
-            // A finished bar's lane eases from dark to the fill colour, so completion
-            // reads as "this one is done" without any text.
+            // A finished bar's lane eases from the elevated cream to the fill colour, so
+            // completion reads as "this one is done" without any text.
             drawPath(
                 path = path,
-                color = lerp(NightInk, SoftMint, fill),
+                color = lerp(CreamElevated, LeafGreen, fill),
                 style = Stroke(
                     width = corridor * 1.25f,
                     cap = StrokeCap.Round,
@@ -348,7 +352,7 @@ private fun TraceCanvas(
                     center = star,
                     // Only the active bar's stars are lit; the ones still to come stay
                     // faint so the next stroke announces itself without competing.
-                    color = if (active) SoftGold else SoftGold.copy(alpha = 0.28f),
+                    color = if (active) StarGold else StarGold.copy(alpha = 0.35f),
                     outerRadius = layout.boxSize * if (next) 0.055f else 0.042f,
                 )
             }
@@ -356,7 +360,7 @@ private fun TraceCanvas(
         val car = vehicle ?: layout.strokes.firstOrNull()?.firstOrNull()
         if (car != null) {
             drawCircle(
-                color = SoftCoral,
+                color = SunCoral,
                 radius = layout.boxSize * 0.055f,
                 center = Offset(car.x, car.y),
             )
