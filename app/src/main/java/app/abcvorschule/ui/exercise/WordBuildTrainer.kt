@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -232,6 +233,16 @@ fun WordBuildTrainer(
     )
 }
 
+/**
+ * Filled-slot border colour, dedicated and darker than [LeafGreen]: the border sits
+ * flush against the frame's own [CreamElevated] fill (no page background in between),
+ * and [LeafGreen] at full opacity only reaches 2.87:1 there — under the 3:1
+ * UI-component floor. This shade clears it at 3.79:1 against CreamElevated (4.71:1
+ * against the page's Cream), same fix pattern as SoundPositionTrainer's
+ * `wagonBorderColor` in Task 4.
+ */
+private val SlotBorderGreen = Color(0xFF3A7A44)
+
 @Composable
 private fun Frame(
     expected: String,
@@ -259,10 +270,11 @@ private fun Frame(
                 width = 3.dp,
                 // Deviates from the literal mapping (LeafGreen.copy(0.7f) / WarmMuted.copy(0.5f)):
                 // both fail the 3:1 UI-component floor once composited over CreamElevated
-                // (2.06:1 / 1.77:1). Full-opacity LeafGreen clears 3:1 against the page's
-                // Cream (3.57:1); WarmMuted needs alpha raised to ~0.9f to clear 3:1 against
-                // CreamElevated itself (3.11:1) — see task-5-report.md for the full calc.
-                color = if (filled != null) LeafGreen else WarmMuted.copy(alpha = 0.9f),
+                // (2.06:1 / 1.77:1). WarmMuted at alpha 0.9f clears 3:1 against CreamElevated
+                // itself (3.11:1). LeafGreen at full opacity still only reaches 2.87:1 against
+                // CreamElevated (it's calibrated against Cream, see Color.kt) — SlotBorderGreen
+                // is the dedicated darker fix for that case (3.79:1).
+                color = if (filled != null) SlotBorderGreen else WarmMuted.copy(alpha = 0.9f),
                 shape = RoundedCornerShape(22.dp),
             )
             .padding(

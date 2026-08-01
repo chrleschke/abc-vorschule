@@ -46,6 +46,7 @@ import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGoldDeep
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.theme.WarmMuted
 import kotlinx.coroutines.delay
 
 // Matches AbcDimens.kidTouch (the app-wide minimum touch target for 4-6-year-olds)
@@ -249,6 +250,7 @@ private fun SymbolHuntBattery(
     ) {
         repeat(total) { i ->
             val filled = i < collected
+            val empty = !celebrate && !filled
             Box(
                 modifier = Modifier
                     .size(width = 28.dp, height = 44.dp)
@@ -264,7 +266,24 @@ private fun SymbolHuntBattery(
                             else -> CreamElevated
                         },
                         shape = RoundedCornerShape(6.dp),
-                    ),
+                    )
+                    .let {
+                        // CreamElevated on Cream is only ~1.24:1 — an empty cell would be
+                        // nearly invisible against the page without an outline. WarmMuted
+                        // at alpha 0.9f clears 3:1 against both CreamElevated (3.11:1, the
+                        // fill it borders) and Cream (3.86:1, the page around it), same
+                        // value as the empty slot/peg borders above. Filled/celebrating
+                        // cells carry enough of their own contrast and stay bare.
+                        if (empty) {
+                            it.border(
+                                width = 3.dp,
+                                color = WarmMuted.copy(alpha = 0.9f),
+                                shape = RoundedCornerShape(6.dp),
+                            )
+                        } else {
+                            it
+                        }
+                    },
             )
         }
     }

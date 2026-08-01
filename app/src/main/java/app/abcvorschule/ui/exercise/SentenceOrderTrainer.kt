@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -261,6 +262,14 @@ fun SentenceOrderTrainer(
 
 private fun cardKey(card: WordBlock): String = "card-${card.atomId}-${card.display}"
 
+/**
+ * Filled-peg border colour, dedicated and darker than [LeafGreen] — same fix as
+ * WordBuildTrainer's `SlotBorderGreen` (identical situation: the border sits flush
+ * against the peg's own [CreamElevated] fill, where full-opacity [LeafGreen] only
+ * reaches 2.87:1). 3.79:1 against CreamElevated, 4.71:1 against the page's Cream.
+ */
+private val PegBorderGreen = Color(0xFF3A7A44)
+
 @Composable
 private fun Peg(
     index: Int,
@@ -289,10 +298,11 @@ private fun Peg(
                 // Same deviation as WordBuildTrainer's Frame() border (identical pattern,
                 // "wie WordBuild-Slots" per the brief): the literal LeafGreen.copy(0.7f) /
                 // WarmMuted.copy(0.32f) fail the 3:1 UI-component floor once composited
-                // over CreamElevated. Full-opacity LeafGreen clears 3:1 against the page's
-                // Cream (3.57:1); WarmMuted needs alpha ~0.9f to clear 3:1 against
-                // CreamElevated itself (3.11:1) — see task-5-report.md for the full calc.
-                color = if (filled != null) LeafGreen else WarmMuted.copy(alpha = 0.9f),
+                // over CreamElevated. WarmMuted at alpha 0.9f clears 3:1 against
+                // CreamElevated itself (3.11:1). LeafGreen at full opacity still only
+                // reaches 2.87:1 against CreamElevated — PegBorderGreen is the dedicated
+                // darker fix for that case (3.79:1).
+                color = if (filled != null) PegBorderGreen else WarmMuted.copy(alpha = 0.9f),
                 shape = RoundedCornerShape(16.dp),
             )
             .padding(
