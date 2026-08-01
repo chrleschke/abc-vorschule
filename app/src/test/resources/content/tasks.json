@@ -139,7 +139,7 @@
       "id": "l01-t8",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Mama.“ Ordne danach das Wort dem Bild zu.",
+          "promptTts": "Ordne das Wort - Mama - dem Bild zu.",
           "sentenceId": "s-mama",
           "illustrationAtomId": "mama",
           "blocks": []
@@ -321,7 +321,7 @@
       "id": "l02-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Oma.“ Ordne danach das Wort dem Bild zu.",
+          "promptTts": "Ordne das Wort - Oma - dem Bild zu.",
           "sentenceId": "s-oma",
           "illustrationAtomId": "oma",
           "blocks": []
@@ -3550,7 +3550,7 @@
       "id": "l19-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Mama.“ Ordne danach das Wort dem Bild zu.",
+          "promptTts": "Ordne das Wort - Mama - dem Bild zu.",
           "sentenceId": "s-mama",
           "illustrationAtomId": "mama"
         }
@@ -3717,7 +3717,7 @@
       "id": "l20-t9",
       "rounds": [
         {
-          "promptTts": "Höre gut zu: „Oma.“ Ordne danach das Wort dem Bild zu.",
+          "promptTts": "Ordne das Wort - Oma - dem Bild zu.",
           "sentenceId": "s-oma",
           "illustrationAtomId": "oma"
         }
