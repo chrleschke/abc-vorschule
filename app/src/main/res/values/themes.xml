@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.AbcVorschule" parent="android:Theme.Material.NoActionBar">
-        <item name="android:statusBarColor">#FF0E1624</item>
-        <item name="android:navigationBarColor">#FF0E1624</item>
-        <item name="android:windowBackground">#FF0E1624</item>
-        <item name="android:forceDarkAllowed">true</item>
+    <style name="Theme.AbcVorschule" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#FFFBF3E4</item>
+        <item name="android:navigationBarColor">#FFFBF3E4</item>
+        <item name="android:windowBackground">#FFFBF3E4</item>
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>

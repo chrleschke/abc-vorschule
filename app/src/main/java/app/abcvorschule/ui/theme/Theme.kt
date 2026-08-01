@@ -1,26 +1,32 @@
 package app.abcvorschule.ui.theme
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-private val DarkColors = darkColorScheme(
-    primary = SoftMint,
-    onPrimary = NightInk,
-    secondary = SoftSky,
-    onSecondary = NightInk,
-    tertiary = SoftCoral,
-    background = NightInk,
-    onBackground = SoftSand,
-    surface = NightPanel,
-    onSurface = SoftSand,
-    surfaceVariant = NightElevated,
-    onSurfaceVariant = MutedText,
+private val LightColors = lightColorScheme(
+    primary = LeafGreen,
+    onPrimary = Cream,
+    secondary = SkyBlue,
+    onSecondary = Cream,
+    tertiary = SunCoral,
+    onTertiary = Cream,
+    error = ClayRed,
+    onError = Cream,
+    background = Cream,
+    onBackground = WarmInk,
+    surface = CreamPanel,
+    onSurface = WarmInk,
+    surfaceVariant = CreamElevated,
+    onSurfaceVariant = WarmMuted,
+    outline = WarmMuted,
+    scrim = Color(0x66000000),
 )
 
 private val AppTypography = Typography(
@@ -57,7 +63,7 @@ private val AppTypography = Typography(
 @Composable
 fun AbcTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = DarkColors,
+        colorScheme = LightColors,
         typography = AppTypography,
         content = content,
     )

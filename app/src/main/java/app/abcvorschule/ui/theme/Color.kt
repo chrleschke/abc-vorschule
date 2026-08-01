@@ -2,6 +2,24 @@ package app.abcvorschule.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+/**
+ * "Warmer Tag" palette — the light theme. Semantic roles, not raw hues: callers
+ * pick by meaning (StarGold for stars, LeafGreen for correct, SkyBlue for
+ * progress, SunCoral for CTAs) rather than reaching for `primary` directly.
+ *
+ * Contrast against Cream (background): WarmInk ~9.9:1, WarmMuted ~4.6:1.
+ */
+val Cream = Color(0xFFFBF3E4)
+val CreamPanel = Color(0xFFF4E8D0)
+val CreamElevated = Color(0xFFE9DBBD)
+val WarmInk = Color(0xFF3D3427)
+val WarmMuted = Color(0xFF7C6F5A)
+val StarGold = Color(0xFFF0A818)
+val LeafGreen = Color(0xFF4E9B5E)
+val SkyBlue = Color(0xFF4E8FC7)
+val SunCoral = Color(0xFFE8794A)
+val ClayRed = Color(0xFFC4553F)
+
 val NightInk = Color(0xFF0E1624)
 val NightPanel = Color(0xFF172334)
 val NightElevated = Color(0xFF223247)
@@ -20,8 +38,9 @@ val NightHorizon = Color(0xFF16283A)
 
 /**
  * Signpost boards. Kept dark enough that SoftSand lettering stays above 4.5:1 on
- * every one of them — the path is looked at in a dark room. Measured against
- * SoftSand: WoodDark 13.06:1, WoodMid 9.22:1, WoodWarm 6.23:1.
+ * every one of them — the lettering sits on the board, not on the sky behind it,
+ * so this contrast pairing holds regardless of the surrounding theme. Measured
+ * against SoftSand: WoodDark 13.06:1, WoodMid 9.22:1, WoodWarm 6.23:1.
  */
 val WoodDark = Color(0xFF2A2018)
 val WoodMid = Color(0xFF4A3728)

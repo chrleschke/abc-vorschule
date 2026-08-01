@@ -18,7 +18,6 @@ import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.session.ScheduledTrainer
 import app.abcvorschule.ui.components.AbcResolveButton
-import app.abcvorschule.ui.theme.SoftSand
 
 /**
  * Trainer 6 — Rechnen. Pure quantity arithmetic: emoji groups and numerals only,

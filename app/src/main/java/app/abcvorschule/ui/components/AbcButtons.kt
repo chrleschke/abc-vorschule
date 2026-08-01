@@ -25,13 +25,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.CreamElevated
+import app.abcvorschule.ui.theme.SkyBlue
 
 /**
  * Primary action aligned to the trailing edge.
@@ -102,7 +103,11 @@ fun AbcSpeakerButton(
         ),
     ) {
         IconSpeaker(
-            tint = if (enabled) MaterialTheme.colorScheme.onSurface else Color.Gray,
+            tint = if (enabled) {
+                MaterialTheme.colorScheme.onSurface
+            } else {
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f)
+            },
             speaking = speaking,
             size = 26.dp,
         )
@@ -174,11 +179,11 @@ fun AbcProgressBar(
     ) {
         Canvas(Modifier.fillMaxSize()) {
             drawRoundRect(
-                color = Color(0xFF2A3A4F),
+                color = CreamElevated,
                 cornerRadius = CornerRadius(size.height),
             )
             drawRoundRect(
-                color = Color(0xFF7EC8A3),
+                color = SkyBlue,
                 size = Size(size.width * fraction, size.height),
                 cornerRadius = CornerRadius(size.height),
             )
