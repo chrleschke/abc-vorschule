@@ -131,7 +131,15 @@ fun IconStar(
         val w = size.toPx()
         val cx = w / 2f
         val cy = w / 2f
-        val outerR = w * 0.5f
+        val strokeWidth = w / 12f
+        // The stroke is centered on the path, so it grows outward by half its
+        // width at every point — most visibly at the star's outer tips, which
+        // otherwise sit exactly on the canvas edge (outerR = w * 0.5f) and get
+        // clipped by whatever sits outside this Composable's bounds (Compose
+        // does not clip Canvas drawing to its own size). Insetting both radii
+        // keeps fill + stroke entirely within the declared size.
+        val inset = strokeWidth / 2f
+        val outerR = w * 0.5f - inset
         val innerR = outerR * 0.42f
         val points = 5
         val path = Path().apply {
@@ -148,7 +156,7 @@ fun IconStar(
         drawPath(
             path,
             color = outline,
-            style = Stroke(width = w / 12f, join = StrokeJoin.Round),
+            style = Stroke(width = strokeWidth, join = StrokeJoin.Round),
         )
     }
 }
