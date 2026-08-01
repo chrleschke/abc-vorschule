@@ -89,6 +89,15 @@ class ProgressionEngineTest {
     }
 
     @Test
+    fun bandsCoverTheExpandedRangeUpToThirty() {
+        assertEquals("easy", ProgressionEngine.bandFor(5))
+        assertEquals("medium", ProgressionEngine.bandFor(10))
+        assertEquals("hard", ProgressionEngine.bandFor(20))
+        assertEquals("expert", ProgressionEngine.bandFor(21))
+        assertEquals("expert", ProgressionEngine.bandFor(30))
+    }
+
+    @Test
     fun pointsNeverGoNegative() {
         assertEquals(0, ProgressionEngine.awardPoints(LearnerProgress(), -5).points)
     }

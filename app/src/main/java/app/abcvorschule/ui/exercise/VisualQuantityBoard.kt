@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -141,7 +142,11 @@ fun QuantityCluster(
     }
 }
 
-/** One visual equation. Multiplication deliberately shows equal groups, not a giant total. */
+/**
+ * One visual equation. Multiplication shows the two-dimensional matrix — "left
+ * Reihen mit je right Stück" — instead of a symbol row, so both factors stay
+ * visible as rows × columns.
+ */
 @Composable
 fun MathQuantityPrompt(
     emoji: String,
@@ -150,20 +155,52 @@ fun MathQuantityPrompt(
     operation: MathOperation,
     emojiSizeSp: Int,
 ) {
+    if (operation == MathOperation.Multiply) {
+        MultiplicationMatrixGrid(emoji = emoji, rows = left, columns = right)
+        return
+    }
     Row(
         horizontalArrangement = Arrangement.spacedBy(20.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (operation == MathOperation.Multiply) {
-            QuantityCluster(emoji = emoji, count = right, emojiSizeSp = emojiSizeSp)
-        } else {
-            QuantityCluster(emoji = emoji, count = left, emojiSizeSp = emojiSizeSp)
-        }
+        QuantityCluster(emoji = emoji, count = left, emojiSizeSp = emojiSizeSp)
         Text(operation.symbol, style = MaterialTheme.typography.displayMedium, color = SoftSand)
-        if (operation == MathOperation.Multiply) {
-            Text(left.toString(), style = MaterialTheme.typography.headlineMedium, color = SoftSand)
-        } else {
-            QuantityCluster(emoji = emoji, count = right, emojiSizeSp = emojiSizeSp)
+        QuantityCluster(emoji = emoji, count = right, emojiSizeSp = emojiSizeSp)
+    }
+}
+
+/**
+ * "rows mal columns" als Matrix: the first row shows real objects, every further
+ * row only ghost placeholders — the child completes the picture mentally and
+ * learns multiplication as area, not as a chain of additions.
+ */
+@Composable
+fun MultiplicationMatrixGrid(
+    emoji: String,
+    rows: Int,
+    columns: Int,
+    modifier: Modifier = Modifier,
+) {
+    val sizeSp = MultiplicationMatrix.emojiSizeSp(columns)
+    Column(
+        modifier = modifier.testTag("multiplication_matrix"),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        repeat(rows) { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                repeat(columns) {
+                    Text(
+                        text = emoji,
+                        fontSize = sizeSp.sp,
+                        modifier = if (MultiplicationMatrix.isConcreteRow(row)) {
+                            Modifier
+                        } else {
+                            Modifier.alpha(MultiplicationMatrix.GhostAlpha)
+                        },
+                    )
+                }
+            }
         }
     }
 }

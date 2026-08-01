@@ -158,6 +158,28 @@ class ContentValidatorTest {
     }
 
     @Test
+    fun countAddQuantitiesAboveThirtyAreRejected() {
+        val spec = pack.tasks.values.filterIsInstance<CountAddSpec>().first()
+        val broken = spec.copy(
+            rounds = listOf(spec.rounds.first().copy(left = 25, right = 8, answer = 33, operation = "add")),
+        )
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.any { it.contains("quantity cap") })
+    }
+
+    @Test
+    fun multiplicationOutsideTheMatrixGridIsRejected() {
+        val spec = pack.tasks.values.filterIsInstance<CountAddSpec>().first()
+        // 3x9=27 stays under the quantity cap but no longer fits 5x6 — the matrix
+        // visual is the reason for the limit, not the size of the product.
+        val broken = spec.copy(
+            rounds = listOf(spec.rounds.first().copy(left = 3, right = 9, answer = 27, operation = "multiply")),
+        )
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.any { it.contains("matrix") })
+    }
+
+    @Test
     fun wordBuildRoundWithTooManyDistractorsIsRejected() {
         val spec = pack.tasks.values.filterIsInstance<WordBuildSpec>().first()
         val broken = spec.copy(

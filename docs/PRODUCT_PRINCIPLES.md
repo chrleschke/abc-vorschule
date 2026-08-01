@@ -183,7 +183,9 @@ niemals mit einem stummen No-Op.
 - Mengen bis 10 als Bilder/Emojis, sinnvoll gruppiert (Subitizing: Paare + Rest, z. B. 5 = 2+2+1). Ab 11 steht ein einzelnes Bildsymbol mit der Zahl für die Menge.
 - Zahl unter der Bildgruppe anzeigen.
 - Aufgabe oben, Antwortwahl unten; Bilder in der Aufgabe ausreichend groß.
-- Visuelle Mengenaufgaben: genau **3** Antwortoptionen; gleiche Dimensionen der buttons. Die Progression führt von Plus über Wegnehmen zu einfachen gleichen Gruppen (Malnehmen); Situationen bleiben gesprochen, konkret und kindernah.
+- Visuelle Mengenaufgaben: genau **3** Antwortoptionen; gleiche Dimensionen der buttons. Situationen bleiben gesprochen, konkret und kindernah.
+- **Progression (bewusst steil):** Zahlenraum 10 schon in Lektion 1, Wegnehmen ab Lektion 2, Zahlenraum 20 ab Lektion 3, Malnehmen ab Lektion 6, Zahlenraum **30** ab Lektion 9. Der Validator deckelt Operanden und Ergebnis bei 30 (`MaxMathQuantity`). Schwierigkeitsbänder: easy ≤5, medium ≤10, hard ≤20, expert ≤30.
+- **Multiplikations-Matrix:** „4 mal 5" wird als Matrix gezeichnet — `left` Reihen × `right` Spalten. Nur die **erste Reihe** zeigt die echten Objekte („je 5"), alle weiteren Reihen zeigen geisterhafte Platzhalter (gleiches Emoji, stark transparent). So lernen Kinder Multiplikation als zweidimensionale Fläche, nicht als Additionskette. Prompts sprechen die Struktur mit („Vier Reihen mit je fünf …"). Grid-Deckel für Lesbarkeit: max. 5 Reihen × 6 Spalten (validator-geprüft, `MultiplicationMatrix`).
 - Korrekte Antwort bestätigt sich **grün** (Kachel bzw. Zahlenfeld), solange sie vorgesprochen wird.
   Falsche Antwort wird **nicht** rot markiert — Miss bleibt gesprochenes Feedback. Auflösen ist nicht grün.
 - Rechnen „Ohne Hilfe“ (Zahlen-Eingabe): Antwortfeld nutzt die **System-Tastatur im Zahlenmodus** (kein Custom-Nummernblock) plus ein CTA-Absenden-Button mit Pfeil-Icon.

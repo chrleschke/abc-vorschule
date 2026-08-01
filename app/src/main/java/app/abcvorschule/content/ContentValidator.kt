@@ -24,6 +24,9 @@ object ContentValidator {
 
     private const val MinSoundPositionRounds = 2
 
+    /** Rechnen-Zahlenraum: operands and answers stay countable up to 30. */
+    private const val MaxMathQuantity = 30
+
     /** Authored-distractor budget: preschoolers must be able to scan the tray. */
     private const val MaxDistractorsPerRound = 2
     private const val MaxWordTrayTiles = 5
@@ -221,6 +224,13 @@ object ContentValidator {
                     if (round.left < 0 || round.right < 0) {
                         issues += ValidationIssue("task $id has a negative operand")
                     }
+                    if (round.left > MaxMathQuantity || round.right > MaxMathQuantity ||
+                        round.answer > MaxMathQuantity
+                    ) {
+                        issues += ValidationIssue(
+                            "task $id exceeds the curriculum quantity cap of $MaxMathQuantity",
+                        )
+                    }
                     val operation = app.abcvorschule.ui.exercise.MathOperation.fromWireName(round.operation)
                     if (operation == null) {
                         issues += ValidationIssue(
@@ -233,6 +243,17 @@ object ContentValidator {
                     } else if (operation.answer(round.left, round.right) != round.answer) {
                         issues += ValidationIssue(
                             "task $id answer ${round.answer} does not match ${round.operation} operands",
+                        )
+                    } else if (operation == app.abcvorschule.ui.exercise.MathOperation.Multiply &&
+                        (
+                            round.left > app.abcvorschule.ui.exercise.MultiplicationMatrix.MaxRows ||
+                                round.right > app.abcvorschule.ui.exercise.MultiplicationMatrix.MaxColumns
+                            )
+                    ) {
+                        issues += ValidationIssue(
+                            "task $id multiplication grid ${round.left}x${round.right} exceeds the " +
+                                "${app.abcvorschule.ui.exercise.MultiplicationMatrix.MaxRows}x" +
+                                "${app.abcvorschule.ui.exercise.MultiplicationMatrix.MaxColumns} matrix",
                         )
                     }
                 }

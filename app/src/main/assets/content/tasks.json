@@ -144,11 +144,11 @@
       "id": "l01-t10",
       "rounds": [
         {
-          "promptTts": "Vier Ameisen und drei Ameisen. Wie viele Ameisen sind das.",
+          "promptTts": "Sechs Ameisen und drei Ameisen. Wie viele Ameisen sind das.",
           "iconAtomId": "ameise",
-          "left": 4,
+          "left": 6,
           "right": 3,
-          "answer": 7
+          "answer": 9
         }
       ]
     },
@@ -313,18 +313,19 @@
       "id": "l02-t10",
       "rounds": [
         {
-          "promptTts": "Drei Omas und zwei Omas. Wie viele Omas sind das.",
+          "promptTts": "Fünf Omas und vier Omas. Wie viele Omas sind das.",
           "iconAtomId": "oma",
-          "left": 3,
-          "right": 2,
-          "answer": 5
+          "left": 5,
+          "right": 4,
+          "answer": 9
         },
         {
-          "promptTts": "Vier Omas und drei Omas. Wie viele Omas sind das.",
+          "promptTts": "Acht Omas winken. Drei Omas gehen nach Hause. Wie viele Omas bleiben.",
           "iconAtomId": "oma",
-          "left": 4,
+          "left": 8,
           "right": 3,
-          "answer": 7
+          "answer": 5,
+          "operation": "subtract"
         }
       ]
     },
@@ -501,18 +502,19 @@
       "id": "l03-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Tomaten und vier Tomaten. Wie viele Tomaten sind das.",
+          "promptTts": "Sieben Tomaten und fünf Tomaten. Wie viele Tomaten sind das.",
           "iconAtomId": "tomate",
-          "left": 2,
-          "right": 4,
-          "answer": 6
+          "left": 7,
+          "right": 5,
+          "answer": 12
         },
         {
-          "promptTts": "Drei Tomaten und vier Tomaten. Wie viele Tomaten sind das.",
+          "promptTts": "Neun Tomaten liegen im Korb. Vier werden gegessen. Wie viele Tomaten bleiben.",
           "iconAtomId": "tomate",
-          "left": 3,
+          "left": 9,
           "right": 4,
-          "answer": 7
+          "answer": 5,
+          "operation": "subtract"
         }
       ]
     },
@@ -685,18 +687,19 @@
       "id": "l04-t10",
       "rounds": [
         {
-          "promptTts": "Drei Lamas und zwei Lamas. Wie viele Lamas sind das.",
+          "promptTts": "Acht Lamas und sechs Lamas. Wie viele Lamas sind das.",
           "iconAtomId": "lama",
-          "left": 3,
-          "right": 2,
-          "answer": 5
+          "left": 8,
+          "right": 6,
+          "answer": 14
         },
         {
-          "promptTts": "Vier Lamas und drei Lamas. Wie viele Lamas sind das.",
+          "promptTts": "Zwölf Lamas stehen auf der Wiese. Fünf laufen weg. Wie viele Lamas bleiben.",
           "iconAtomId": "lama",
-          "left": 4,
-          "right": 3,
-          "answer": 7
+          "left": 12,
+          "right": 5,
+          "answer": 7,
+          "operation": "subtract"
         }
       ]
     },
@@ -876,18 +879,19 @@
       "id": "l05-t10",
       "rounds": [
         {
-          "promptTts": "Drei Hüte und zwei Hüte. Wie viele Hüte sind das.",
+          "promptTts": "Neun Hüte und sieben Hüte. Wie viele Hüte sind das.",
           "iconAtomId": "hut",
-          "left": 3,
-          "right": 2,
-          "answer": 5
+          "left": 9,
+          "right": 7,
+          "answer": 16
         },
         {
-          "promptTts": "Vier Hüte und drei Hüte. Wie viele Hüte sind das.",
+          "promptTts": "Vierzehn Hüte hängen am Haken. Sechs werden aufgesetzt. Wie viele Hüte bleiben.",
           "iconAtomId": "hut",
-          "left": 4,
-          "right": 3,
-          "answer": 7
+          "left": 14,
+          "right": 6,
+          "answer": 8,
+          "operation": "subtract"
         }
       ]
     },
@@ -1060,18 +1064,20 @@
       "id": "l06-t10",
       "rounds": [
         {
-          "promptTts": "Drei Tore und zwei Tore. Wie viele Tore sind das.",
+          "promptTts": "Zwei Reihen mit je vier Toren. Wie viele Tore sind das.",
           "iconAtomId": "tor",
-          "left": 3,
-          "right": 2,
-          "answer": 5
+          "left": 2,
+          "right": 4,
+          "answer": 8,
+          "operation": "multiply"
         },
         {
-          "promptTts": "Vier Tore und drei Tore. Wie viele Tore sind das.",
+          "promptTts": "Drei Reihen mit je drei Toren. Wie viele Tore sind das.",
           "iconAtomId": "tor",
-          "left": 4,
+          "left": 3,
           "right": 3,
-          "answer": 7
+          "answer": 9,
+          "operation": "multiply"
         }
       ]
     },
@@ -1255,18 +1261,19 @@
       "id": "l07-t10",
       "rounds": [
         {
-          "promptTts": "Drei Rosen und vier Rosen. Wie viele Rosen sind das.",
+          "promptTts": "Elf Rosen und sieben Rosen. Wie viele Rosen sind das.",
           "iconAtomId": "rose",
-          "left": 3,
-          "right": 4,
-          "answer": 7
+          "left": 11,
+          "right": 7,
+          "answer": 18
         },
         {
-          "promptTts": "Vier Rosen und vier Rosen. Wie viele Rosen sind das.",
+          "promptTts": "Fünfzehn Rosen blühen im Garten. Sieben werden gepflückt. Wie viele Rosen bleiben.",
           "iconAtomId": "rose",
-          "left": 4,
-          "right": 4,
-          "answer": 8
+          "left": 15,
+          "right": 7,
+          "answer": 8,
+          "operation": "subtract"
         }
       ]
     },
@@ -1450,18 +1457,19 @@
       "id": "l08-t10",
       "rounds": [
         {
-          "promptTts": "Drei Dosen und zwei Dosen. Wie viele Dosen sind das.",
+          "promptTts": "Drei Reihen mit je vier Dosen. Wie viele Dosen sind das.",
           "iconAtomId": "dose",
           "left": 3,
-          "right": 2,
-          "answer": 5
+          "right": 4,
+          "answer": 12,
+          "operation": "multiply"
         },
         {
-          "promptTts": "Vier Dosen und drei Dosen. Wie viele Dosen sind das.",
+          "promptTts": "Dreizehn Dosen und sieben Dosen. Wie viele Dosen sind das.",
           "iconAtomId": "dose",
-          "left": 4,
-          "right": 3,
-          "answer": 7
+          "left": 13,
+          "right": 7,
+          "answer": 20
         }
       ]
     },
@@ -1649,20 +1657,19 @@
       "id": "l09-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Eis und drei Eis. Wie viele Eis sind das zusammen.",
+          "promptTts": "Sechzehn Eis sind im Gefrierfach. Neun werden gegessen. Wie viele Eis bleiben.",
           "iconAtomId": "eis",
-          "left": 2,
-          "right": 3,
-          "answer": 5,
-          "blocks": []
+          "left": 16,
+          "right": 9,
+          "answer": 7,
+          "operation": "subtract"
         },
         {
-          "promptTts": "Drei Eis und drei Eis. Wie viele Eis sind das zusammen.",
+          "promptTts": "Zwölf Eis und neun Eis. Wie viele Eis sind das zusammen.",
           "iconAtomId": "eis",
-          "left": 3,
-          "right": 3,
-          "answer": 6,
-          "blocks": []
+          "left": 12,
+          "right": 9,
+          "answer": 21
         }
       ]
     },
@@ -1834,20 +1841,20 @@
       "id": "l10-t10",
       "rounds": [
         {
-          "promptTts": "Drei Wege treffen auf vier Wege. Wie viele Wege sind das.",
-          "iconAtomId": "weg",
-          "left": 3,
-          "right": 4,
-          "answer": 7,
-          "blocks": []
-        },
-        {
-          "promptTts": "Vier Wege treffen auf vier Wege. Wie viele Wege sind das.",
+          "promptTts": "Vier Reihen mit je vier Wegen. Wie viele Wege sind das.",
           "iconAtomId": "weg",
           "left": 4,
           "right": 4,
-          "answer": 8,
-          "blocks": []
+          "answer": 16,
+          "operation": "multiply"
+        },
+        {
+          "promptTts": "Achtzehn Wege sind auf der Karte. Neun sind gesperrt. Wie viele Wege bleiben.",
+          "iconAtomId": "weg",
+          "left": 18,
+          "right": 9,
+          "answer": 9,
+          "operation": "subtract"
         }
       ]
     },
@@ -2027,20 +2034,19 @@
       "id": "l11-t10",
       "rounds": [
         {
-          "promptTts": "In einer Straße stehen vier Häuser, daneben fünf Häuser. Wie viele Häuser sind das.",
+          "promptTts": "Vierzehn Häuser und neun Häuser. Wie viele Häuser sind das.",
+          "iconAtomId": "haus",
+          "left": 14,
+          "right": 9,
+          "answer": 23
+        },
+        {
+          "promptTts": "Vier Reihen mit je fünf Häusern. Wie viele Häuser sind das.",
           "iconAtomId": "haus",
           "left": 4,
           "right": 5,
-          "answer": 9,
-          "blocks": []
-        },
-        {
-          "promptTts": "Fünf Häuser stehen hier und fünf Häuser dort. Wie viele Häuser sind das.",
-          "iconAtomId": "haus",
-          "left": 5,
-          "right": 5,
-          "answer": 10,
-          "blocks": []
+          "answer": 20,
+          "operation": "multiply"
         }
       ]
     },
@@ -2229,22 +2235,19 @@
       "id": "l12-t10",
       "rounds": [
         {
-          "promptTts": "Am Teich sitzen acht Frösche. Drei hüpfen weg. Wie viele Frösche bleiben am Teich.",
+          "promptTts": "Einundzwanzig Frösche sitzen am Teich. Acht hüpfen weg. Wie viele Frösche bleiben.",
           "iconAtomId": "frosch",
-          "left": 8,
-          "right": 3,
-          "answer": 5,
-          "operation": "subtract",
-          "blocks": []
+          "left": 21,
+          "right": 8,
+          "answer": 13,
+          "operation": "subtract"
         },
         {
-          "promptTts": "Am Teich sitzen neun Frösche. Vier hüpfen weg. Wie viele Frösche bleiben am Teich.",
+          "promptTts": "Siebzehn Frösche und acht Frösche. Wie viele Frösche sind das.",
           "iconAtomId": "frosch",
-          "left": 9,
-          "right": 4,
-          "answer": 5,
-          "operation": "subtract",
-          "blocks": []
+          "left": 17,
+          "right": 8,
+          "answer": 25
         }
       ]
     },
@@ -2422,21 +2425,19 @@
       "id": "l13-t10",
       "rounds": [
         {
-          "promptTts": "In einem großen Aquarium schwimmen sechs Fische. Fünf Fische schwimmen dazu. Wie viele Fische sind das.",
+          "promptTts": "Fünf Reihen mit je vier Fischen. Wie viele Fische sind das.",
           "iconAtomId": "fisch",
-          "left": 6,
-          "right": 5,
-          "answer": 11,
-          "blocks": []
+          "left": 5,
+          "right": 4,
+          "answer": 20,
+          "operation": "multiply"
         },
         {
-          "promptTts": "Zwölf Fische schwimmen im Aquarium. Vier Fische schwimmen weg. Wie viele bleiben.",
+          "promptTts": "Neunzehn Fische und neun Fische. Wie viele Fische sind das.",
           "iconAtomId": "fisch",
-          "left": 12,
-          "right": 4,
-          "answer": 8,
-          "operation": "subtract",
-          "blocks": []
+          "left": 19,
+          "right": 9,
+          "answer": 28
         }
       ]
     },
@@ -2602,21 +2603,20 @@
       "id": "l14-t10",
       "rounds": [
         {
-          "promptTts": "Sieben Eulen sitzen im Baum. Sechs Eulen fliegen dazu. Wie viele Eulen sind das.",
+          "promptTts": "Vierundzwanzig Eulen sitzen im Wald. Neun fliegen weg. Wie viele Eulen bleiben.",
           "iconAtomId": "eule",
-          "left": 7,
-          "right": 6,
-          "answer": 13,
-          "blocks": []
+          "left": 24,
+          "right": 9,
+          "answer": 15,
+          "operation": "subtract"
         },
         {
-          "promptTts": "Vierzehn Eulen sitzen im Baum. Fünf Eulen fliegen weg. Wie viele bleiben.",
+          "promptTts": "Fünf Reihen mit je fünf Eulen. Wie viele Eulen sind das.",
           "iconAtomId": "eule",
-          "left": 14,
+          "left": 5,
           "right": 5,
-          "answer": 9,
-          "operation": "subtract",
-          "blocks": []
+          "answer": 25,
+          "operation": "multiply"
         }
       ]
     },
@@ -2784,22 +2784,20 @@
       "id": "l15-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Gruppen mit je drei Füßen. Wie viele Füße sind es.",
-          "iconAtomId": "fuss",
-          "left": 2,
-          "right": 3,
-          "answer": 6,
-          "operation": "multiply",
-          "blocks": []
-        },
-        {
-          "promptTts": "Drei Gruppen mit je drei Füßen. Wie viele Füße sind es.",
+          "promptTts": "Drei Reihen mit je sechs Füßen. Wie viele Füße sind das.",
           "iconAtomId": "fuss",
           "left": 3,
-          "right": 3,
-          "answer": 9,
-          "operation": "multiply",
-          "blocks": []
+          "right": 6,
+          "answer": 18,
+          "operation": "multiply"
+        },
+        {
+          "promptTts": "Dreiundzwanzig Füße stampfen. Neun hören auf. Wie viele Füße stampfen noch.",
+          "iconAtomId": "fuss",
+          "left": 23,
+          "right": 9,
+          "answer": 14,
+          "operation": "subtract"
         }
       ]
     },
@@ -2975,22 +2973,20 @@
       "id": "l16-t10",
       "rounds": [
         {
-          "promptTts": "Drei Reihen mit je vier Säcken. Wie viele Säcke sind es.",
-          "iconAtomId": "sack",
-          "left": 3,
-          "right": 4,
-          "answer": 12,
-          "operation": "multiply",
-          "blocks": []
-        },
-        {
-          "promptTts": "Vier Reihen mit je drei Säcken. Wie viele Säcke sind es.",
+          "promptTts": "Vier Reihen mit je sechs Säcken. Wie viele Säcke sind das.",
           "iconAtomId": "sack",
           "left": 4,
-          "right": 3,
-          "answer": 12,
-          "operation": "multiply",
-          "blocks": []
+          "right": 6,
+          "answer": 24,
+          "operation": "multiply"
+        },
+        {
+          "promptTts": "Sechsundzwanzig Säcke stehen im Lager. Dreizehn werden abgeholt. Wie viele Säcke bleiben.",
+          "iconAtomId": "sack",
+          "left": 26,
+          "right": 13,
+          "answer": 13,
+          "operation": "subtract"
         }
       ]
     },
@@ -3155,22 +3151,19 @@
       "id": "l17-t10",
       "rounds": [
         {
-          "promptTts": "Fünfzehn Spinnen sitzen im Garten. Sechs krabbeln weg. Wie viele bleiben.",
+          "promptTts": "Siebenundzwanzig Spinnen sitzen im Netz. Neun krabbeln weg. Wie viele Spinnen bleiben.",
           "iconAtomId": "spinne",
-          "left": 15,
-          "right": 6,
-          "answer": 9,
-          "operation": "subtract",
-          "blocks": []
+          "left": 27,
+          "right": 9,
+          "answer": 18,
+          "operation": "subtract"
         },
         {
-          "promptTts": "Vierzehn Spinnen sitzen im Garten. Fünf krabbeln weg. Wie viele bleiben.",
+          "promptTts": "Sechzehn Spinnen und vierzehn Spinnen. Wie viele Spinnen sind das.",
           "iconAtomId": "spinne",
-          "left": 14,
-          "right": 5,
-          "answer": 9,
-          "operation": "subtract",
-          "blocks": []
+          "left": 16,
+          "right": 14,
+          "answer": 30
         }
       ]
     },
@@ -3374,22 +3367,20 @@
       "id": "l18-t12",
       "rounds": [
         {
-          "promptTts": "Drei Reihen mit je vier Taxis. Wie viele Taxis warten.",
+          "promptTts": "Fünf Reihen mit je fünf Taxis. Wie viele Taxis warten.",
           "iconAtomId": "taxi",
-          "left": 3,
-          "right": 4,
-          "answer": 12,
-          "operation": "multiply",
-          "blocks": []
+          "left": 5,
+          "right": 5,
+          "answer": 25,
+          "operation": "multiply"
         },
         {
-          "promptTts": "Vier Reihen mit je vier Taxis. Wie viele Taxis warten.",
+          "promptTts": "Fünf Reihen mit je sechs Taxis. Wie viele Taxis warten.",
           "iconAtomId": "taxi",
-          "left": 4,
-          "right": 4,
-          "answer": 16,
-          "operation": "multiply",
-          "blocks": []
+          "left": 5,
+          "right": 6,
+          "answer": 30,
+          "operation": "multiply"
         }
       ]
     },
@@ -3541,18 +3532,19 @@
       "id": "l19-t10",
       "rounds": [
         {
-          "promptTts": "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das.",
+          "promptTts": "Siebzehn Ameisen und neun Ameisen. Wie viele Ameisen sind das.",
           "iconAtomId": "ameise",
-          "left": 3,
-          "right": 2,
-          "answer": 5
+          "left": 17,
+          "right": 9,
+          "answer": 26
         },
         {
-          "promptTts": "Vier Ameisen und drei Ameisen. Wie viele Ameisen sind das.",
+          "promptTts": "Dreiundzwanzig Ameisen krabbeln im Bau. Acht krabbeln hinaus. Wie viele Ameisen bleiben.",
           "iconAtomId": "ameise",
-          "left": 4,
-          "right": 3,
-          "answer": 7
+          "left": 23,
+          "right": 8,
+          "answer": 15,
+          "operation": "subtract"
         }
       ]
     },
@@ -3708,18 +3700,20 @@
       "id": "l20-t10",
       "rounds": [
         {
-          "promptTts": "Drei Omas und zwei Omas. Wie viele Omas sind das.",
-          "iconAtomId": "oma",
-          "left": 3,
-          "right": 2,
-          "answer": 5
-        },
-        {
-          "promptTts": "Vier Omas und drei Omas. Wie viele Omas sind das.",
+          "promptTts": "Vier Reihen mit je sechs Omas singen im Chor. Wie viele Omas singen.",
           "iconAtomId": "oma",
           "left": 4,
-          "right": 3,
-          "answer": 7
+          "right": 6,
+          "answer": 24,
+          "operation": "multiply"
+        },
+        {
+          "promptTts": "Achtundzwanzig Omas sitzen im Bus. Dreizehn steigen aus. Wie viele Omas bleiben.",
+          "iconAtomId": "oma",
+          "left": 28,
+          "right": 13,
+          "answer": 15,
+          "operation": "subtract"
         }
       ]
     },
@@ -3875,18 +3869,19 @@
       "id": "l21-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Tomaten und vier Tomaten. Wie viele Tomaten sind das.",
+          "promptTts": "Neunzehn Tomaten und elf Tomaten. Wie viele Tomaten sind das.",
           "iconAtomId": "tomate",
-          "left": 2,
-          "right": 4,
-          "answer": 6
+          "left": 19,
+          "right": 11,
+          "answer": 30
         },
         {
-          "promptTts": "Drei Tomaten und vier Tomaten. Wie viele Tomaten sind das.",
+          "promptTts": "Fünfundzwanzig Tomaten hängen am Strauch. Sechzehn werden geerntet. Wie viele Tomaten bleiben.",
           "iconAtomId": "tomate",
-          "left": 3,
-          "right": 4,
-          "answer": 7
+          "left": 25,
+          "right": 16,
+          "answer": 9,
+          "operation": "subtract"
         }
       ]
     },
@@ -4038,18 +4033,20 @@
       "id": "l22-t10",
       "rounds": [
         {
-          "promptTts": "Drei Eier im Nest und vier Eier kommen dazu. Wie viele Eier sind das.",
+          "promptTts": "Fünf Reihen mit je vier Eiern. Wie viele Eier sind das.",
           "iconAtomId": "ei",
-          "left": 3,
+          "left": 5,
           "right": 4,
-          "answer": 7
+          "answer": 20,
+          "operation": "multiply"
         },
         {
-          "promptTts": "Vier Eier im Nest und drei Eier kommen dazu. Wie viele Eier sind das.",
+          "promptTts": "Sechsundzwanzig Eier liegen im Korb. Siebzehn werden gekocht. Wie viele Eier bleiben.",
           "iconAtomId": "ei",
-          "left": 4,
-          "right": 3,
-          "answer": 7
+          "left": 26,
+          "right": 17,
+          "answer": 9,
+          "operation": "subtract"
         }
       ]
     },
@@ -4205,18 +4202,19 @@
       "id": "l23-t10",
       "rounds": [
         {
-          "promptTts": "Vier Fische schwimmen im Wasser. Drei Fische kommen dazu. Wie viele Fische sind das.",
+          "promptTts": "Fünfzehn Fische und fünfzehn Fische. Wie viele Fische sind das.",
           "iconAtomId": "fisch",
-          "left": 4,
-          "right": 3,
-          "answer": 7
+          "left": 15,
+          "right": 15,
+          "answer": 30
         },
         {
-          "promptTts": "Fünf Fische schwimmen im Wasser. Vier Fische kommen dazu. Wie viele Fische sind das.",
+          "promptTts": "Neunundzwanzig Fische schwimmen im See. Vierzehn schwimmen weg. Wie viele Fische bleiben.",
           "iconAtomId": "fisch",
-          "left": 5,
-          "right": 4,
-          "answer": 9
+          "left": 29,
+          "right": 14,
+          "answer": 15,
+          "operation": "subtract"
         }
       ]
     },
@@ -4388,19 +4386,19 @@
       "id": "l24-t10",
       "rounds": [
         {
-          "promptTts": "Fünf Spinnen sitzen im Garten. Zwei krabbeln weg. Wie viele bleiben.",
+          "promptTts": "Fünf Reihen mit je sechs Spinnen. Wie viele Spinnen sind das.",
           "iconAtomId": "spinne",
           "left": 5,
-          "right": 2,
-          "answer": 3,
-          "operation": "subtract"
+          "right": 6,
+          "answer": 30,
+          "operation": "multiply"
         },
         {
-          "promptTts": "Sechs Spinnen sitzen im Garten. Drei krabbeln weg. Wie viele bleiben.",
+          "promptTts": "Siebenundzwanzig Spinnen sitzen im Garten. Achtzehn krabbeln weg. Wie viele Spinnen bleiben.",
           "iconAtomId": "spinne",
-          "left": 6,
-          "right": 3,
-          "answer": 3,
+          "left": 27,
+          "right": 18,
+          "answer": 9,
           "operation": "subtract"
         }
       ]
@@ -4565,18 +4563,19 @@
       "id": "l25-t10",
       "rounds": [
         {
-          "promptTts": "Sechs Füße und drei Füße. Wie viele Füße sind das.",
+          "promptTts": "Vierundzwanzig Füße und sechs Füße. Wie viele Füße sind das.",
           "iconAtomId": "fuss",
-          "left": 6,
-          "right": 3,
-          "answer": 9
+          "left": 24,
+          "right": 6,
+          "answer": 30
         },
         {
-          "promptTts": "Acht Füße und vier Füße. Wie viele Füße sind das.",
+          "promptTts": "Dreißig Füße stampfen. Fünfzehn hören auf. Wie viele Füße stampfen noch.",
           "iconAtomId": "fuss",
-          "left": 8,
-          "right": 4,
-          "answer": 12
+          "left": 30,
+          "right": 15,
+          "answer": 15,
+          "operation": "subtract"
         }
       ]
     },
@@ -4744,20 +4743,20 @@
       "id": "l26-t10",
       "rounds": [
         {
-          "promptTts": "Drei Reihen mit je vier Taxis. Wie viele Taxis warten.",
+          "promptTts": "Fünf Reihen mit je sechs Taxis. Wie viele Taxis warten.",
           "iconAtomId": "taxi",
-          "left": 3,
-          "right": 4,
-          "answer": 12,
+          "left": 5,
+          "right": 6,
+          "answer": 30,
           "operation": "multiply"
         },
         {
-          "promptTts": "Vier Reihen mit je vier Taxis. Wie viele Taxis warten.",
+          "promptTts": "Dreißig Taxis warten am Bahnhof. Siebzehn fahren los. Wie viele Taxis bleiben.",
           "iconAtomId": "taxi",
-          "left": 4,
-          "right": 4,
-          "answer": 16,
-          "operation": "multiply"
+          "left": 30,
+          "right": 17,
+          "answer": 13,
+          "operation": "subtract"
         }
       ]
     }

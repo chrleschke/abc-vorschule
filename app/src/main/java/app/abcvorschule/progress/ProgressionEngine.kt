@@ -37,7 +37,8 @@ object ProgressionEngine {
     fun bandFor(sum: Int): String = when {
         sum <= 5 -> "easy"
         sum <= 10 -> "medium"
-        else -> "hard"
+        sum <= 20 -> "hard"
+        else -> "expert"
     }
 
     fun recordAtomAttempt(
