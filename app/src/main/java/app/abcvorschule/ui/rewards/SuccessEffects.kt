@@ -4,14 +4,16 @@ import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -19,8 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.components.IconStar
+import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.StarGold
+import app.abcvorschule.ui.theme.SunCoral
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -37,6 +43,7 @@ fun SuccessBurst(
     val haptics = LocalAbcHaptics.current
     val scale = remember(trigger) { Animatable(0.4f) }
     val alpha = remember(trigger) { Animatable(0f) }
+    val burst = remember(trigger) { Animatable(0f) }
 
     LaunchedEffect(trigger) {
         playSuccessChime()
@@ -52,6 +59,7 @@ fun SuccessBurst(
                 )
             }
             launch { alpha.animateTo(1f, tween(180)) }
+            launch { burst.animateTo(1f, tween(600, easing = FastOutSlowInEasing)) }
         }
         delay(550)
         // Wait for the exit animation to fully finish before the caller advances —
@@ -71,8 +79,25 @@ fun SuccessBurst(
                 .align(Alignment.TopCenter),
             contentAlignment = Alignment.Center,
         ) {
+            Canvas(modifier = Modifier.size(200.dp)) {
+                val sparkColors = listOf(StarGold, SunCoral, SkyBlue)
+                val offsets = BurstGeometry.sparkOffsets(
+                    count = 8,
+                    progress = burst.value,
+                    radiusPx = size.minDimension / 2f,
+                )
+                val center = Offset(this.size.width / 2f, this.size.height / 2f)
+                offsets.forEachIndexed { i, offset ->
+                    drawCircle(
+                        color = sparkColors[i % sparkColors.size],
+                        radius = 5.dp.toPx() * (1f - burst.value),
+                        center = center + offset,
+                        alpha = 1f - burst.value,
+                    )
+                }
+            }
             IconStar(
-                tint = MaterialTheme.colorScheme.primary,
+                tint = StarGold,
                 size = 84.dp,
                 modifier = Modifier
                     .scale(scale.value)

@@ -1,5 +1,6 @@
 package app.abcvorschule.ui.exercise
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -17,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.Atom
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.ui.components.AbcResolveButton
+import app.abcvorschule.ui.rewards.BurstGeometry
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.playStarBlip
 import app.abcvorschule.ui.theme.CreamElevated
@@ -88,6 +91,8 @@ fun LetterTraceTrainer(
     var done by remember(roundKey) { mutableStateOf(false) }
     var reward by remember(roundKey) { mutableStateOf(false) }
     var resolved by remember(roundKey) { mutableStateOf(false) }
+    var sparkSeq by remember(roundKey) { mutableLongStateOf(0L) }
+    var spark by remember(roundKey) { mutableStateOf<Pair<TracePoint, Long>?>(null) }
     val haptics = LocalAbcHaptics.current
 
     val morph by animateFloatAsState(
@@ -145,6 +150,11 @@ fun LetterTraceTrainer(
                                 if (update.collectedStar) {
                                     // Read before the state write below, which is visible immediately.
                                     val barFinished = update.state.strokeIndex != state.strokeIndex
+                                    stars.getOrNull(state.strokeIndex)?.getOrNull(state.starIndex)
+                                        ?.let { collectedAt ->
+                                            sparkSeq += 1
+                                            spark = collectedAt to sparkSeq
+                                        }
                                     playStarBlip(starsCollected)
                                     // A distinct short tick per star: the reward must not feel
                                     // like the long buzz that means "off the road".
@@ -168,6 +178,7 @@ fun LetterTraceTrainer(
                                 .testTag("trace_canvas_${atom.id}"),
                         )
                     }
+                    TraceStarSpark(spark = spark)
                 } else {
                     TraceRewardCard(round = round)
                 }
@@ -362,6 +373,41 @@ private fun TraceCanvas(
                 color = SunCoral,
                 radius = layout.boxSize * 0.055f,
                 center = Offset(car.x, car.y),
+            )
+        }
+    }
+}
+
+/**
+ * Small spark burst at the spot a trace star was just collected (Spec §5.2). Pure
+ * draw overlay — same box size as [TraceCanvas], no layout impact — so it neither
+ * measures nor shifts anything underneath it.
+ */
+@Composable
+private fun TraceStarSpark(
+    spark: Pair<TracePoint, Long>?,
+    modifier: Modifier = Modifier,
+) {
+    val progress = remember { Animatable(1f) }
+    LaunchedEffect(spark?.second) {
+        if (spark == null) return@LaunchedEffect
+        progress.snapTo(0f)
+        progress.animateTo(1f, tween(400))
+    }
+    val point = spark?.first ?: return
+    Canvas(modifier = modifier.size(GlyphBox)) {
+        val offsets = BurstGeometry.sparkOffsets(
+            count = 5,
+            progress = progress.value,
+            radiusPx = 18.dp.toPx(),
+        )
+        val center = Offset(point.x, point.y)
+        offsets.forEach { offset ->
+            drawCircle(
+                color = StarGold,
+                radius = 3.dp.toPx() * (1f - progress.value),
+                center = center + offset,
+                alpha = 1f - progress.value,
             )
         }
     }
