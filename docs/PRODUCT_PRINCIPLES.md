@@ -120,6 +120,44 @@ niemals mit einem stummen No-Op.
 - Wort-Bauer (Trainer 4): Prompt „Bilde das Wort …“; Silben-/Buchstabenklötze in Schablonen tragen die Aufgabe, keine zusätzliche Lese-Titelzeile.
 - Feedback bei Fehlern (besonders Rechnen): **vorsprechen**, nicht als Fehler-Satz anzeigen.
 
+### TTS-Grenzen und Autorierungs-Konventionen
+
+- **„Buchstabe" nur für echte Einzelbuchstaben.** Mehrzeichen-Grapheme (`Sch`, `Sp`, `St`, `Ch`,
+  `Au`, `Ei`, `Eu`, `Pf`, `Qu`, `ck`, `ks` …) sind kein „Buchstabe" — das Wort ist fachlich falsch
+  und für Vorschulkinder irreführend. Prompts, die einen solchen Mehrzeichen-Laut ansprechen,
+  heißen „…den Laut …" statt „…den Buchstaben …" (Auditiver Finder, Spurensucher,
+  Buchstaben-/Silben-Jagd). Umlaute (`Ä`, `Ö`, `Ü`) und `ß` bleiben „Buchstabe" — sie sind je ein
+  einzelnes Zeichen. Silben (`kind: syllable`, z. B. `ma`, `sp`, `st` als verschmolzenes Ergebnis
+  im Silben-Verschmelzer) heißen weiterhin „Silbe", nie „Laut" oder „Buchstabe".
+- **Einzelbuchstaben-Betonung:** Steht ein einzelner Buchstabe/Graphem als eigenständiges Wort in einem
+  TTS-String (z. B. „der Buchstabe M", „Hörst du das M …", „M wie Mond"), wird er mit Gedankenstrichen
+  isoliert: `- M` wenn danach nur noch Satzzeichen folgt, `M -` wenn er einen Satz eröffnet, `- M -`
+  wenn er mittendrin steht (z. B. „Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am
+  Ende.", „Zeichne den Buchstaben - M - nach …", „M - wie Mond."). Grund: ohne die kurze Pause
+  verschluckt die System-TTS den Buchstabennamen im Wortfluss oder betont ihn falsch. Gilt für alle
+  Trainer-`promptTts`/`rewardTts`, die einen einzelnen Buchstaben ansprechen (Auditiver Finder,
+  Spurensucher, Buchstaben-Jagd) — nicht für Silben-Verschmelzer (dort werden Laute bewusst
+  aneinandergezogen) oder für Ganzwörter.
+- **Letzte Frage ohne Fragezeichen:** Endet ein `promptTts`/`missTts` mit einer Frage, verliert nur die
+  **letzte** Frage in diesem String ihr Fragezeichen (z. B. „Wo hörst du den Buchstaben - M? Am Anfang,
+  in der Mitte oder am Ende." — die erste Frage behält ihr „?", die zweite/letzte nicht). Grund: ein
+  Fragezeichen am Stringende lässt die System-TTS die Stimme am letzten Wort hochziehen, was bei
+  Vorschulkindern falsch/unruhig klingt; ohne „?" klingt der Satz natürlich aus.
+- **Auditiver Finder liest ganze Wörter, nicht buchstabiert.** Das `missTts` einer verpassten Runde
+  nennt das Wort am Stück („Ameise.", nicht „A - M - eise."). Eine buchstabierte/segmentierte
+  Wiederholung wird von der System-TTS Buchstabe für Buchstabe vorgelesen und ist für Vorschulkinder
+  unverständlich.
+- **`Sch`, `sp`, `st` sind bekannte, aber akzeptierte TTS-Lücken.** Die System-TTS spricht diese
+  Zischlaut-Cluster nicht korrekt (kein sauberes „Sch"-/„Schp"-/„Scht"-Phonem, eher buchstabiert oder
+  verschluckt) und lässt sich dafür auch nicht zuverlässig durch Schreibweisen-Tricks korrigieren.
+  Didaktisch sind sie trotzdem nicht aus dem Lehrplan streichbar (feste Laut-Buchstaben-Gruppen der
+  Fibel-Reihenfolge, Abschnitt 3). Das ist eine bekannte, akzeptierte Einschränkung der Sprachausgabe —
+  kein offener Bug.
+- **Kein verwaistes `br`-Silben-Atom.** Ein `br`-Atom in `atoms.json` wurde entfernt: die System-TTS
+  sprach es als getrennte Buchstaben „b" + „r" statt als verschmolzenen Laut, ohne dass sich das per
+  Text korrigieren ließ, und es war ohnehin von keiner Aufgabe referenziert (kein `syllable_merge`,
+  `word_build` o. ä. nutzte die ID). Ersatzlos entfernt statt „repariert".
+
 ## 8. Mathematik-Visuals
 
 - Mengen bis 10 als Bilder/Emojis, sinnvoll gruppiert (Subitizing: Paare + Rest, z. B. 5 = 2+2+1). Ab 11 steht ein einzelnes Bildsymbol mit der Zahl für die Menge.

@@ -61,7 +61,7 @@ class SymbolHuntDerivationTest {
         val round = SymbolHuntDerivation.buildRound(
             pack, currentLessonIndex = 1, mode = SymbolHuntMode.letter, targetAtomId = "letter-a",
         )
-        assertEquals("Finde alle Buchstaben A!", round?.promptTts)
+        assertEquals("Finde alle Buchstaben - A!", round?.promptTts)
         assertEquals(listOf("letter-m"), round?.distractorPool)
     }
 

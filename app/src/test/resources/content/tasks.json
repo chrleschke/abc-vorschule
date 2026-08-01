@@ -6,24 +6,24 @@
       "phonemeTts": "M",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben M? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "ameise",
           "slot": "middle",
-          "missTts": "A - M - eise. Hörst du das M in der Mitte?",
+          "missTts": "Ameise. Hörst du das - M - in der Mitte.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben M? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "maus",
           "slot": "start",
-          "missTts": "M - aus. Hörst du das M am Anfang?",
+          "missTts": "Maus. Hörst du das - M - am Anfang.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben M? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "baum",
           "slot": "end",
-          "missTts": "Bau - M. Hörst du das M am Ende?",
+          "missTts": "Baum. Hörst du das - M - am Ende.",
           "blocks": []
         }
       ]
@@ -34,17 +34,17 @@
       "phonemeTts": "A",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben A? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - A? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "ampel",
           "slot": "start",
-          "missTts": "A - mpel.",
+          "missTts": "Ampel.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben A? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - A? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "salat",
           "slot": "middle",
-          "missTts": "Sa - l - A - t.",
+          "missTts": "Salat.",
           "blocks": []
         }
       ]
@@ -54,10 +54,10 @@
       "id": "l01-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben M nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - M - nach und sammle dabei alle Sterne.",
           "atomId": "letter-m",
           "glyph": "M",
-          "rewardTts": "M wie Mond.",
+          "rewardTts": "M - wie Mond.",
           "rewardEmoji": "🌙",
           "blocks": []
         }
@@ -68,10 +68,10 @@
       "id": "l01-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben A nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - A - nach und sammle dabei alle Sterne.",
           "atomId": "letter-a",
           "glyph": "A",
-          "rewardTts": "A wie Ampel.",
+          "rewardTts": "A - wie Ampel.",
           "rewardEmoji": "🚦",
           "blocks": []
         }
@@ -82,7 +82,7 @@
       "id": "l01-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe m und a zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe m und a zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-m",
           "leftDisplay": "m",
           "rightAtomId": "letter-a",
@@ -151,7 +151,7 @@
       "id": "l01-t9",
       "rounds": [
         {
-          "promptTts": "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das?",
+          "promptTts": "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das.",
           "iconAtomId": "ameise",
           "left": 3,
           "right": 2,
@@ -164,7 +164,7 @@
       "id": "l01-t10",
       "rounds": [
         {
-          "promptTts": "Vier Ameisen und drei Ameisen. Wie viele Ameisen sind das?",
+          "promptTts": "Vier Ameisen und drei Ameisen. Wie viele Ameisen sind das.",
           "iconAtomId": "ameise",
           "left": 4,
           "right": 3,
@@ -178,17 +178,17 @@
       "phonemeTts": "I",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben I? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "igel",
           "slot": "start",
-          "missTts": "I - gel.",
+          "missTts": "Igel.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben I? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "insel",
           "slot": "start",
-          "missTts": "I - nsel.",
+          "missTts": "Insel.",
           "blocks": []
         }
       ]
@@ -199,17 +199,17 @@
       "phonemeTts": "O",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben O? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - O? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "ohr",
           "slot": "start",
-          "missTts": "O - hr.",
+          "missTts": "Ohr.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben O? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - O? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "radio",
           "slot": "end",
-          "missTts": "Radi - O.",
+          "missTts": "Radio.",
           "blocks": []
         }
       ]
@@ -219,10 +219,10 @@
       "id": "l02-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben I nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - I - nach und sammle dabei alle Sterne.",
           "atomId": "letter-i",
           "glyph": "I",
-          "rewardTts": "I wie Igel.",
+          "rewardTts": "I - wie Igel.",
           "rewardEmoji": "🦔",
           "blocks": []
         }
@@ -233,10 +233,10 @@
       "id": "l02-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben O nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - O - nach und sammle dabei alle Sterne.",
           "atomId": "letter-o",
           "glyph": "O",
-          "rewardTts": "O wie Ohr.",
+          "rewardTts": "O - wie Ohr.",
           "rewardEmoji": "👂",
           "blocks": []
         }
@@ -247,7 +247,7 @@
       "id": "l02-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe m und i zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe m und i zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-m",
           "leftDisplay": "m",
           "rightAtomId": "letter-i",
@@ -264,7 +264,7 @@
       "id": "l02-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe m und o zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe m und o zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-m",
           "leftDisplay": "m",
           "rightAtomId": "letter-o",
@@ -333,14 +333,14 @@
       "id": "l02-t10",
       "rounds": [
         {
-          "promptTts": "Drei Omas und zwei Omas. Wie viele Omas sind das?",
+          "promptTts": "Drei Omas und zwei Omas. Wie viele Omas sind das.",
           "iconAtomId": "oma",
           "left": 3,
           "right": 2,
           "answer": 5
         },
         {
-          "promptTts": "Vier Omas und drei Omas. Wie viele Omas sind das?",
+          "promptTts": "Vier Omas und drei Omas. Wie viele Omas sind das.",
           "iconAtomId": "oma",
           "left": 4,
           "right": 3,
@@ -354,17 +354,17 @@
       "phonemeTts": "P",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben P? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - P? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "paket",
           "slot": "start",
-          "missTts": "P - aket.",
+          "missTts": "Paket.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben P? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - P? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "suppe",
           "slot": "middle",
-          "missTts": "Su - p - pe.",
+          "missTts": "Suppe.",
           "blocks": []
         }
       ]
@@ -375,17 +375,17 @@
       "phonemeTts": "T",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben T? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "tomate",
           "slot": "start",
-          "missTts": "T - omate.",
+          "missTts": "Tomate.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben T? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "tiger",
           "slot": "start",
-          "missTts": "T - iger.",
+          "missTts": "Tiger.",
           "blocks": []
         }
       ]
@@ -395,10 +395,10 @@
       "id": "l03-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben P nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - P - nach und sammle dabei alle Sterne.",
           "atomId": "letter-p",
           "glyph": "P",
-          "rewardTts": "P wie Paket.",
+          "rewardTts": "P - wie Paket.",
           "rewardEmoji": "📦",
           "blocks": []
         }
@@ -409,10 +409,10 @@
       "id": "l03-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben T nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - T - nach und sammle dabei alle Sterne.",
           "atomId": "letter-t",
           "glyph": "T",
-          "rewardTts": "T wie Tomate.",
+          "rewardTts": "T - wie Tomate.",
           "rewardEmoji": "🍅",
           "blocks": []
         }
@@ -423,7 +423,7 @@
       "id": "l03-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe p und a zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe p und a zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-p",
           "leftDisplay": "p",
           "rightAtomId": "letter-a",
@@ -440,7 +440,7 @@
       "id": "l03-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe t und o zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe t und o zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-t",
           "leftDisplay": "t",
           "rightAtomId": "letter-o",
@@ -521,14 +521,14 @@
       "id": "l03-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Tomaten und vier Tomaten. Wie viele Tomaten sind das?",
+          "promptTts": "Zwei Tomaten und vier Tomaten. Wie viele Tomaten sind das.",
           "iconAtomId": "tomate",
           "left": 2,
           "right": 4,
           "answer": 6
         },
         {
-          "promptTts": "Drei Tomaten und vier Tomaten. Wie viele Tomaten sind das?",
+          "promptTts": "Drei Tomaten und vier Tomaten. Wie viele Tomaten sind das.",
           "iconAtomId": "tomate",
           "left": 3,
           "right": 4,
@@ -542,17 +542,17 @@
       "phonemeTts": "L",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben L? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - L? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "lama",
           "slot": "start",
-          "missTts": "L - ama.",
+          "missTts": "Lama.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben L? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - L? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "himmel",
           "slot": "end",
-          "missTts": "Himme - l.",
+          "missTts": "Himmel.",
           "blocks": []
         }
       ]
@@ -563,17 +563,17 @@
       "phonemeTts": "H",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben H? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - H? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "hut",
           "slot": "start",
-          "missTts": "H - ut.",
+          "missTts": "Hut.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben H? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - H? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "hase",
           "slot": "start",
-          "missTts": "H - ase.",
+          "missTts": "Hase.",
           "blocks": []
         }
       ]
@@ -583,10 +583,10 @@
       "id": "l04-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben L nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - L - nach und sammle dabei alle Sterne.",
           "atomId": "letter-l",
           "glyph": "L",
-          "rewardTts": "L wie Lama.",
+          "rewardTts": "L - wie Lama.",
           "rewardEmoji": "🦙",
           "blocks": []
         }
@@ -597,10 +597,10 @@
       "id": "l04-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben H nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - H - nach und sammle dabei alle Sterne.",
           "atomId": "letter-h",
           "glyph": "H",
-          "rewardTts": "H wie Hut.",
+          "rewardTts": "H - wie Hut.",
           "rewardEmoji": "🎩",
           "blocks": []
         }
@@ -611,7 +611,7 @@
       "id": "l04-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe l und a zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe l und a zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-l",
           "leftDisplay": "l",
           "rightAtomId": "letter-a",
@@ -628,7 +628,7 @@
       "id": "l04-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe h und o zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe h und o zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-h",
           "leftDisplay": "h",
           "rightAtomId": "letter-o",
@@ -705,14 +705,14 @@
       "id": "l04-t10",
       "rounds": [
         {
-          "promptTts": "Drei Lamas und zwei Lamas. Wie viele Lamas sind das?",
+          "promptTts": "Drei Lamas und zwei Lamas. Wie viele Lamas sind das.",
           "iconAtomId": "lama",
           "left": 3,
           "right": 2,
           "answer": 5
         },
         {
-          "promptTts": "Vier Lamas und drei Lamas. Wie viele Lamas sind das?",
+          "promptTts": "Vier Lamas und drei Lamas. Wie viele Lamas sind das.",
           "iconAtomId": "lama",
           "left": 4,
           "right": 3,
@@ -726,17 +726,17 @@
       "phonemeTts": "F",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben F? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - F? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "fuchs",
           "slot": "start",
-          "missTts": "F - uchs.",
+          "missTts": "Fuchs.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben F? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - F? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "elefant",
           "slot": "middle",
-          "missTts": "Ele - f - ant.",
+          "missTts": "Elefant.",
           "blocks": []
         }
       ]
@@ -747,17 +747,17 @@
       "phonemeTts": "U",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben U? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - U? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "uhu",
           "slot": "start",
-          "missTts": "U - hu.",
+          "missTts": "Uhu.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben U? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - U? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "ufo",
           "slot": "start",
-          "missTts": "U - fo.",
+          "missTts": "Ufo.",
           "blocks": []
         }
       ]
@@ -767,10 +767,10 @@
       "id": "l05-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben F nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - F - nach und sammle dabei alle Sterne.",
           "atomId": "letter-f",
           "glyph": "F",
-          "rewardTts": "F wie Fuchs.",
+          "rewardTts": "F - wie Fuchs.",
           "rewardEmoji": "🦊",
           "blocks": []
         }
@@ -781,10 +781,10 @@
       "id": "l05-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben U nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - U - nach und sammle dabei alle Sterne.",
           "atomId": "letter-u",
           "glyph": "U",
-          "rewardTts": "U wie Uhu.",
+          "rewardTts": "U - wie Uhu.",
           "rewardEmoji": "🦉",
           "blocks": []
         }
@@ -795,7 +795,7 @@
       "id": "l05-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe f und u zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe f und u zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-f",
           "leftDisplay": "f",
           "rightAtomId": "letter-u",
@@ -896,14 +896,14 @@
       "id": "l05-t10",
       "rounds": [
         {
-          "promptTts": "Drei Hüte und zwei Hüte. Wie viele Hüte sind das?",
+          "promptTts": "Drei Hüte und zwei Hüte. Wie viele Hüte sind das.",
           "iconAtomId": "hut",
           "left": 3,
           "right": 2,
           "answer": 5
         },
         {
-          "promptTts": "Vier Hüte und drei Hüte. Wie viele Hüte sind das?",
+          "promptTts": "Vier Hüte und drei Hüte. Wie viele Hüte sind das.",
           "iconAtomId": "hut",
           "left": 4,
           "right": 3,
@@ -917,17 +917,17 @@
       "phonemeTts": "R",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben R? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - R? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "rose",
           "slot": "start",
-          "missTts": "R - ose.",
+          "missTts": "Rose.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben R? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - R? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "ohr",
           "slot": "end",
-          "missTts": "Oh - r.",
+          "missTts": "Ohr.",
           "blocks": []
         }
       ]
@@ -938,17 +938,17 @@
       "phonemeTts": "N",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben N? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - N? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "nase",
           "slot": "start",
-          "missTts": "N - ase.",
+          "missTts": "Nase.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben N? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - N? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "nuss",
           "slot": "start",
-          "missTts": "N - uss.",
+          "missTts": "Nuss.",
           "blocks": []
         }
       ]
@@ -958,10 +958,10 @@
       "id": "l06-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben R nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - R - nach und sammle dabei alle Sterne.",
           "atomId": "letter-r",
           "glyph": "R",
-          "rewardTts": "R wie Rose.",
+          "rewardTts": "R - wie Rose.",
           "rewardEmoji": "🌹",
           "blocks": []
         }
@@ -972,10 +972,10 @@
       "id": "l06-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben N nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - N - nach und sammle dabei alle Sterne.",
           "atomId": "letter-n",
           "glyph": "N",
-          "rewardTts": "N wie Nase.",
+          "rewardTts": "N - wie Nase.",
           "rewardEmoji": "👃",
           "blocks": []
         }
@@ -986,7 +986,7 @@
       "id": "l06-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe r und o zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe r und o zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-r",
           "leftDisplay": "r",
           "rightAtomId": "letter-o",
@@ -1003,7 +1003,7 @@
       "id": "l06-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe n und a zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe n und a zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-n",
           "leftDisplay": "n",
           "rightAtomId": "letter-a",
@@ -1080,14 +1080,14 @@
       "id": "l06-t10",
       "rounds": [
         {
-          "promptTts": "Drei Tore und zwei Tore. Wie viele Tore sind das?",
+          "promptTts": "Drei Tore und zwei Tore. Wie viele Tore sind das.",
           "iconAtomId": "tor",
           "left": 3,
           "right": 2,
           "answer": 5
         },
         {
-          "promptTts": "Vier Tore und drei Tore. Wie viele Tore sind das?",
+          "promptTts": "Vier Tore und drei Tore. Wie viele Tore sind das.",
           "iconAtomId": "tor",
           "left": 4,
           "right": 3,
@@ -1101,17 +1101,17 @@
       "phonemeTts": "S",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben S? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - S? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "sonne",
           "slot": "start",
-          "missTts": "S - onne.",
+          "missTts": "Sonne.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben S? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - S? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "gras",
           "slot": "end",
-          "missTts": "Gra - s.",
+          "missTts": "Gras.",
           "blocks": []
         }
       ]
@@ -1122,17 +1122,17 @@
       "phonemeTts": "E",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben E? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - E? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "ente",
           "slot": "start",
-          "missTts": "E - nte.",
+          "missTts": "Ente.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben E? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - E? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "erdbeere",
           "slot": "start",
-          "missTts": "E - rdbeere.",
+          "missTts": "Erdbeere.",
           "blocks": []
         }
       ]
@@ -1142,10 +1142,10 @@
       "id": "l07-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben S nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - S - nach und sammle dabei alle Sterne.",
           "atomId": "letter-s",
           "glyph": "S",
-          "rewardTts": "S wie Sonne.",
+          "rewardTts": "S - wie Sonne.",
           "rewardEmoji": "☀️",
           "blocks": []
         }
@@ -1156,10 +1156,10 @@
       "id": "l07-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben E nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - E - nach und sammle dabei alle Sterne.",
           "atomId": "letter-e",
           "glyph": "E",
-          "rewardTts": "E wie Ente.",
+          "rewardTts": "E - wie Ente.",
           "rewardEmoji": "🦆",
           "blocks": []
         }
@@ -1170,7 +1170,7 @@
       "id": "l07-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe s und e zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe s und e zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-s",
           "leftDisplay": "s",
           "rightAtomId": "letter-e",
@@ -1275,14 +1275,14 @@
       "id": "l07-t10",
       "rounds": [
         {
-          "promptTts": "Drei Rosen und vier Rosen. Wie viele Rosen sind das?",
+          "promptTts": "Drei Rosen und vier Rosen. Wie viele Rosen sind das.",
           "iconAtomId": "rose",
           "left": 3,
           "right": 4,
           "answer": 7
         },
         {
-          "promptTts": "Vier Rosen und vier Rosen. Wie viele Rosen sind das?",
+          "promptTts": "Vier Rosen und vier Rosen. Wie viele Rosen sind das.",
           "iconAtomId": "rose",
           "left": 4,
           "right": 4,
@@ -1296,17 +1296,17 @@
       "phonemeTts": "D",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben D? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - D? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "dose",
           "slot": "start",
-          "missTts": "D - ose.",
+          "missTts": "Dose.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben D? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - D? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "rad",
           "slot": "end",
-          "missTts": "Ra - d.",
+          "missTts": "Rad.",
           "blocks": []
         }
       ]
@@ -1317,17 +1317,17 @@
       "phonemeTts": "K",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben K? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - K? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "keks",
           "slot": "start",
-          "missTts": "K - eks.",
+          "missTts": "Keks.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben K? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - K? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "katze",
           "slot": "start",
-          "missTts": "K - atze.",
+          "missTts": "Katze.",
           "blocks": []
         }
       ]
@@ -1337,10 +1337,10 @@
       "id": "l08-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben D nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - D - nach und sammle dabei alle Sterne.",
           "atomId": "letter-d",
           "glyph": "D",
-          "rewardTts": "D wie Dose.",
+          "rewardTts": "D - wie Dose.",
           "rewardEmoji": "🥫",
           "blocks": []
         }
@@ -1351,10 +1351,10 @@
       "id": "l08-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben K nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - K - nach und sammle dabei alle Sterne.",
           "atomId": "letter-k",
           "glyph": "K",
-          "rewardTts": "K wie Keks.",
+          "rewardTts": "K - wie Keks.",
           "rewardEmoji": "🍪",
           "blocks": []
         }
@@ -1365,7 +1365,7 @@
       "id": "l08-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe d und o zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe d und o zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-d",
           "leftDisplay": "d",
           "rightAtomId": "letter-o",
@@ -1470,14 +1470,14 @@
       "id": "l08-t10",
       "rounds": [
         {
-          "promptTts": "Drei Dosen und zwei Dosen. Wie viele Dosen sind das?",
+          "promptTts": "Drei Dosen und zwei Dosen. Wie viele Dosen sind das.",
           "iconAtomId": "dose",
           "left": 3,
           "right": 2,
           "answer": 5
         },
         {
-          "promptTts": "Vier Dosen und drei Dosen. Wie viele Dosen sind das?",
+          "promptTts": "Vier Dosen und drei Dosen. Wie viele Dosen sind das.",
           "iconAtomId": "dose",
           "left": 4,
           "right": 3,
@@ -1491,17 +1491,17 @@
       "phonemeTts": "Ei",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Ei? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Ei? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "eis",
           "slot": "start",
-          "missTts": "Ei - s.",
+          "missTts": "Eis.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Ei? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Ei? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "kleid",
           "slot": "middle",
-          "missTts": "Kl - Ei - d.",
+          "missTts": "Kleid.",
           "blocks": []
         }
       ]
@@ -1512,17 +1512,17 @@
       "phonemeTts": "W",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben W? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - W? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "wolke",
           "slot": "start",
-          "missTts": "W - olke.",
+          "missTts": "Wolke.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben W? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - W? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "wal",
           "slot": "start",
-          "missTts": "W - al.",
+          "missTts": "Wal.",
           "blocks": []
         }
       ]
@@ -1532,10 +1532,10 @@
       "id": "l09-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Ei nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Ei - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ei",
           "glyph": "Ei",
-          "rewardTts": "Ei wie Eis.",
+          "rewardTts": "Ei - wie Eis.",
           "rewardEmoji": "🍦",
           "blocks": []
         }
@@ -1546,10 +1546,10 @@
       "id": "l09-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben W nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - W - nach und sammle dabei alle Sterne.",
           "atomId": "letter-w",
           "glyph": "W",
-          "rewardTts": "W wie Weg.",
+          "rewardTts": "W - wie Weg.",
           "rewardEmoji": "🛣️",
           "blocks": []
         }
@@ -1560,7 +1560,7 @@
       "id": "l09-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe m und ei zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe m und ei zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-m",
           "leftDisplay": "m",
           "rightAtomId": "letter-ei",
@@ -1669,7 +1669,7 @@
       "id": "l09-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Eis und drei Eis. Wie viele Eis sind das zusammen?",
+          "promptTts": "Zwei Eis und drei Eis. Wie viele Eis sind das zusammen.",
           "iconAtomId": "eis",
           "left": 2,
           "right": 3,
@@ -1677,7 +1677,7 @@
           "blocks": []
         },
         {
-          "promptTts": "Drei Eis und drei Eis. Wie viele Eis sind das zusammen?",
+          "promptTts": "Drei Eis und drei Eis. Wie viele Eis sind das zusammen.",
           "iconAtomId": "eis",
           "left": 3,
           "right": 3,
@@ -1692,17 +1692,17 @@
       "phonemeTts": "G",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben G? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - G? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "gabel",
           "slot": "start",
-          "missTts": "G - abel.",
+          "missTts": "Gabel.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben G? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - G? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "tag",
           "slot": "end",
-          "missTts": "Ta - g.",
+          "missTts": "Tag.",
           "blocks": []
         }
       ]
@@ -1713,17 +1713,17 @@
       "phonemeTts": "Ch",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Ch? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "dach",
           "slot": "end",
-          "missTts": "Da - ch.",
+          "missTts": "Dach.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Ch? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "buch",
           "slot": "end",
-          "missTts": "Bu - ch.",
+          "missTts": "Buch.",
           "blocks": []
         }
       ]
@@ -1733,10 +1733,10 @@
       "id": "l10-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben G nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - G - nach und sammle dabei alle Sterne.",
           "atomId": "letter-g",
           "glyph": "G",
-          "rewardTts": "G wie Gabel.",
+          "rewardTts": "G - wie Gabel.",
           "rewardEmoji": "🍴",
           "blocks": []
         }
@@ -1747,10 +1747,10 @@
       "id": "l10-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Ch nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Ch - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ch",
           "glyph": "Ch",
-          "rewardTts": "Ch wie Dach.",
+          "rewardTts": "Ch - wie Dach.",
           "rewardEmoji": "🏠",
           "blocks": []
         }
@@ -1761,7 +1761,7 @@
       "id": "l10-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe g und e zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe g und e zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-g",
           "leftDisplay": "g",
           "rightAtomId": "letter-e",
@@ -1854,7 +1854,7 @@
       "id": "l10-t10",
       "rounds": [
         {
-          "promptTts": "Drei Wege treffen auf vier Wege. Wie viele Wege sind das?",
+          "promptTts": "Drei Wege treffen auf vier Wege. Wie viele Wege sind das.",
           "iconAtomId": "weg",
           "left": 3,
           "right": 4,
@@ -1862,7 +1862,7 @@
           "blocks": []
         },
         {
-          "promptTts": "Vier Wege treffen auf vier Wege. Wie viele Wege sind das?",
+          "promptTts": "Vier Wege treffen auf vier Wege. Wie viele Wege sind das.",
           "iconAtomId": "weg",
           "left": 4,
           "right": 4,
@@ -1877,17 +1877,17 @@
       "phonemeTts": "Au",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Au? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Au? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "haus",
           "slot": "middle",
-          "missTts": "H - Au - s.",
+          "missTts": "Haus.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Au? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Au? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "baum",
           "slot": "middle",
-          "missTts": "B - Au - m.",
+          "missTts": "Baum.",
           "blocks": []
         }
       ]
@@ -1898,17 +1898,17 @@
       "phonemeTts": "B",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben B? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - B? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "ball",
           "slot": "start",
-          "missTts": "B - all.",
+          "missTts": "Ball.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben B? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - B? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "taube",
           "slot": "middle",
-          "missTts": "Tau - b - e.",
+          "missTts": "Taube.",
           "blocks": []
         }
       ]
@@ -1918,10 +1918,10 @@
       "id": "l11-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben B nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - B - nach und sammle dabei alle Sterne.",
           "atomId": "letter-b",
           "glyph": "B",
-          "rewardTts": "B wie Ball.",
+          "rewardTts": "B - wie Ball.",
           "rewardEmoji": "⚽",
           "blocks": []
         }
@@ -1932,10 +1932,10 @@
       "id": "l11-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Au nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Au - nach und sammle dabei alle Sterne.",
           "atomId": "letter-au",
           "glyph": "Au",
-          "rewardTts": "Au wie Auto.",
+          "rewardTts": "Au - wie Auto.",
           "rewardEmoji": "🚗",
           "blocks": []
         }
@@ -1946,7 +1946,7 @@
       "id": "l11-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe b und au zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe b und au zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-b",
           "leftDisplay": "b",
           "rightAtomId": "letter-au",
@@ -2047,7 +2047,7 @@
       "id": "l11-t10",
       "rounds": [
         {
-          "promptTts": "In einer Straße stehen vier Häuser, daneben fünf Häuser. Wie viele Häuser sind das?",
+          "promptTts": "In einer Straße stehen vier Häuser, daneben fünf Häuser. Wie viele Häuser sind das.",
           "iconAtomId": "haus",
           "left": 4,
           "right": 5,
@@ -2055,7 +2055,7 @@
           "blocks": []
         },
         {
-          "promptTts": "Fünf Häuser stehen hier und fünf Häuser dort. Wie viele Häuser sind das?",
+          "promptTts": "Fünf Häuser stehen hier und fünf Häuser dort. Wie viele Häuser sind das.",
           "iconAtomId": "haus",
           "left": 5,
           "right": 5,
@@ -2070,17 +2070,17 @@
       "phonemeTts": "Ä",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Ä? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - Ä? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "kaese",
           "slot": "middle",
-          "missTts": "K - Ä - se.",
+          "missTts": "Käse.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Ä? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - Ä? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "baer",
           "slot": "middle",
-          "missTts": "B - Ä - r.",
+          "missTts": "Bär.",
           "blocks": []
         }
       ]
@@ -2091,17 +2091,17 @@
       "phonemeTts": "Ö",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Ö? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - Ö? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "loewe",
           "slot": "middle",
-          "missTts": "Lö - we. Hörst du das Ö in der Mitte?",
+          "missTts": "Löwe. Hörst du das - Ö - in der Mitte.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Ö? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - Ö? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "loeffel",
           "slot": "middle",
-          "missTts": "L - Ö - ffel.",
+          "missTts": "Löffel.",
           "blocks": []
         }
       ]
@@ -2111,10 +2111,10 @@
       "id": "l12-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Ä nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - Ä - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ae",
           "glyph": "Ä",
-          "rewardTts": "Ä wie Ähre.",
+          "rewardTts": "Ä - wie Ähre.",
           "rewardEmoji": "🌾",
           "blocks": []
         }
@@ -2125,10 +2125,10 @@
       "id": "l12-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Ö nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - Ö - nach und sammle dabei alle Sterne.",
           "atomId": "letter-oe",
           "glyph": "Ö",
-          "rewardTts": "Ö wie Löwe.",
+          "rewardTts": "Ö - wie Löwe.",
           "rewardEmoji": "🦁",
           "blocks": []
         }
@@ -2139,10 +2139,10 @@
       "id": "l12-t5",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Ü nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - Ü - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ue",
           "glyph": "Ü",
-          "rewardTts": "Ü wie Überraschung.",
+          "rewardTts": "Ü - wie Überraschung.",
           "rewardEmoji": "🎁",
           "blocks": []
         }
@@ -2249,7 +2249,7 @@
       "id": "l12-t10",
       "rounds": [
         {
-          "promptTts": "Am Teich sitzen acht Frösche. Drei hüpfen weg. Wie viele Frösche bleiben am Teich?",
+          "promptTts": "Am Teich sitzen acht Frösche. Drei hüpfen weg. Wie viele Frösche bleiben am Teich.",
           "iconAtomId": "frosch",
           "left": 8,
           "right": 3,
@@ -2258,7 +2258,7 @@
           "blocks": []
         },
         {
-          "promptTts": "Am Teich sitzen neun Frösche. Vier hüpfen weg. Wie viele Frösche bleiben am Teich?",
+          "promptTts": "Am Teich sitzen neun Frösche. Vier hüpfen weg. Wie viele Frösche bleiben am Teich.",
           "iconAtomId": "frosch",
           "left": 9,
           "right": 4,
@@ -2274,17 +2274,17 @@
       "phonemeTts": "Sch",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Sch? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Sch? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "schule",
           "slot": "start",
-          "missTts": "Sch - ule.",
+          "missTts": "Schule.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Sch? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Sch? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "fisch",
           "slot": "end",
-          "missTts": "Fi - sch.",
+          "missTts": "Fisch.",
           "blocks": []
         }
       ]
@@ -2294,10 +2294,10 @@
       "id": "l13-t2",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Sch nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Sch - nach und sammle dabei alle Sterne.",
           "atomId": "letter-sch",
           "glyph": "Sch",
-          "rewardTts": "Sch wie Schule.",
+          "rewardTts": "Sch - wie Schule.",
           "rewardEmoji": "🏫",
           "blocks": []
         }
@@ -2308,7 +2308,7 @@
       "id": "l13-t3",
       "rounds": [
         {
-          "promptTts": "Schiebe sch und u zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe sch und u zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-sch",
           "leftDisplay": "sch",
           "rightAtomId": "letter-u",
@@ -2325,7 +2325,7 @@
       "id": "l13-t4",
       "rounds": [
         {
-          "promptTts": "Schiebe sch und a zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe sch und a zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-sch",
           "leftDisplay": "sch",
           "rightAtomId": "letter-a",
@@ -2442,7 +2442,7 @@
       "id": "l13-t10",
       "rounds": [
         {
-          "promptTts": "In einem großen Aquarium schwimmen sechs Fische. Fünf Fische schwimmen dazu. Wie viele Fische sind das?",
+          "promptTts": "In einem großen Aquarium schwimmen sechs Fische. Fünf Fische schwimmen dazu. Wie viele Fische sind das.",
           "iconAtomId": "fisch",
           "left": 6,
           "right": 5,
@@ -2450,7 +2450,7 @@
           "blocks": []
         },
         {
-          "promptTts": "Zwölf Fische schwimmen im Aquarium. Vier Fische schwimmen weg. Wie viele bleiben?",
+          "promptTts": "Zwölf Fische schwimmen im Aquarium. Vier Fische schwimmen weg. Wie viele bleiben.",
           "iconAtomId": "fisch",
           "left": 12,
           "right": 4,
@@ -2466,17 +2466,17 @@
       "phonemeTts": "Z",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Z? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - Z? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "zebra",
           "slot": "start",
-          "missTts": "Z - ebra.",
+          "missTts": "Zebra.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Z? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - Z? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "blitz",
           "slot": "end",
-          "missTts": "Bli - tz.",
+          "missTts": "Blitz.",
           "blocks": []
         }
       ]
@@ -2487,17 +2487,17 @@
       "phonemeTts": "Eu",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Eu? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Eu? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "eule",
           "slot": "start",
-          "missTts": "Eu - le.",
+          "missTts": "Eule.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Eu? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Eu? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "feuer",
           "slot": "middle",
-          "missTts": "F - Eu - er.",
+          "missTts": "Feuer.",
           "blocks": []
         }
       ]
@@ -2507,10 +2507,10 @@
       "id": "l14-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben J nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - J - nach und sammle dabei alle Sterne.",
           "atomId": "letter-j",
           "glyph": "J",
-          "rewardTts": "J wie Jacke.",
+          "rewardTts": "J - wie Jacke.",
           "rewardEmoji": "🧥",
           "blocks": []
         }
@@ -2521,10 +2521,10 @@
       "id": "l14-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Z nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - Z - nach und sammle dabei alle Sterne.",
           "atomId": "letter-z",
           "glyph": "Z",
-          "rewardTts": "Z wie Zebra.",
+          "rewardTts": "Z - wie Zebra.",
           "rewardEmoji": "🦓",
           "blocks": []
         }
@@ -2535,10 +2535,10 @@
       "id": "l14-t5",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Eu nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Eu - nach und sammle dabei alle Sterne.",
           "atomId": "letter-eu",
           "glyph": "Eu",
-          "rewardTts": "Eu wie Eule.",
+          "rewardTts": "Eu - wie Eule.",
           "rewardEmoji": "🦉",
           "blocks": []
         }
@@ -2549,7 +2549,7 @@
       "id": "l14-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe z und e zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe z und e zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-z",
           "leftDisplay": "z",
           "rightAtomId": "letter-e",
@@ -2622,7 +2622,7 @@
       "id": "l14-t10",
       "rounds": [
         {
-          "promptTts": "Sieben Eulen sitzen im Baum. Sechs Eulen fliegen dazu. Wie viele Eulen sind das?",
+          "promptTts": "Sieben Eulen sitzen im Baum. Sechs Eulen fliegen dazu. Wie viele Eulen sind das.",
           "iconAtomId": "eule",
           "left": 7,
           "right": 6,
@@ -2630,7 +2630,7 @@
           "blocks": []
         },
         {
-          "promptTts": "Vierzehn Eulen sitzen im Baum. Fünf Eulen fliegen weg. Wie viele bleiben?",
+          "promptTts": "Vierzehn Eulen sitzen im Baum. Fünf Eulen fliegen weg. Wie viele bleiben.",
           "iconAtomId": "eule",
           "left": 14,
           "right": 5,
@@ -2646,17 +2646,17 @@
       "phonemeTts": "ß",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben ß? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - ß? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "fuss",
           "slot": "end",
-          "missTts": "Fu - ß.",
+          "missTts": "Fuß.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben ß? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - ß? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "strasse",
           "slot": "middle",
-          "missTts": "Stra - ß - e.",
+          "missTts": "Straße.",
           "blocks": []
         }
       ]
@@ -2667,17 +2667,17 @@
       "phonemeTts": "V",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben V? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - V? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "vogel",
           "slot": "start",
-          "missTts": "V - ogel.",
+          "missTts": "Vogel.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben V? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - V? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "klavier",
           "slot": "middle",
-          "missTts": "Kla - v - ier.",
+          "missTts": "Klavier.",
           "blocks": []
         }
       ]
@@ -2687,10 +2687,10 @@
       "id": "l15-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben ß nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - ß - nach und sammle dabei alle Sterne.",
           "atomId": "letter-sz",
           "glyph": "ß",
-          "rewardTts": "ß wie Fuß.",
+          "rewardTts": "ß - wie Fuß.",
           "rewardEmoji": "🦶",
           "blocks": []
         }
@@ -2701,10 +2701,10 @@
       "id": "l15-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben V nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - V - nach und sammle dabei alle Sterne.",
           "atomId": "letter-v",
           "glyph": "V",
-          "rewardTts": "V wie Vogel.",
+          "rewardTts": "V - wie Vogel.",
           "rewardEmoji": "🐦",
           "blocks": []
         }
@@ -2715,7 +2715,7 @@
       "id": "l15-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe v und o zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe v und o zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-v",
           "leftDisplay": "v",
           "rightAtomId": "letter-o",
@@ -2804,7 +2804,7 @@
       "id": "l15-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Gruppen mit je drei Füßen. Wie viele Füße sind es?",
+          "promptTts": "Zwei Gruppen mit je drei Füßen. Wie viele Füße sind es.",
           "iconAtomId": "fuss",
           "left": 2,
           "right": 3,
@@ -2813,7 +2813,7 @@
           "blocks": []
         },
         {
-          "promptTts": "Drei Gruppen mit je drei Füßen. Wie viele Füße sind es?",
+          "promptTts": "Drei Gruppen mit je drei Füßen. Wie viele Füße sind es.",
           "iconAtomId": "fuss",
           "left": 3,
           "right": 3,
@@ -2829,17 +2829,17 @@
       "phonemeTts": "ck",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben ck? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - ck? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "sack",
           "slot": "end",
-          "missTts": "Sa - ck.",
+          "missTts": "Sack.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben ck? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - ck? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "zucker",
           "slot": "middle",
-          "missTts": "Zu - ck - er.",
+          "missTts": "Zucker.",
           "blocks": []
         }
       ]
@@ -2850,17 +2850,17 @@
       "phonemeTts": "Pf",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Pf? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Pf? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "pferd",
           "slot": "start",
-          "missTts": "Pf - erd.",
+          "missTts": "Pferd.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Pf? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Pf? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "apfel",
           "slot": "middle",
-          "missTts": "A - Pf - el.",
+          "missTts": "Apfel.",
           "blocks": []
         }
       ]
@@ -2870,10 +2870,10 @@
       "id": "l16-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben ck nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - ck - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ck",
           "glyph": "ck",
-          "rewardTts": "ck wie Sack.",
+          "rewardTts": "ck - wie Sack.",
           "rewardEmoji": "🛍️",
           "blocks": []
         }
@@ -2884,10 +2884,10 @@
       "id": "l16-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Pf nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Pf - nach und sammle dabei alle Sterne.",
           "atomId": "letter-pf",
           "glyph": "Pf",
-          "rewardTts": "Pf wie Pferd.",
+          "rewardTts": "Pf - wie Pferd.",
           "rewardEmoji": "🐎",
           "blocks": []
         }
@@ -2898,7 +2898,7 @@
       "id": "l16-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe pf und a zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe pf und a zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-pf",
           "leftDisplay": "pf",
           "rightAtomId": "letter-a",
@@ -2995,7 +2995,7 @@
       "id": "l16-t10",
       "rounds": [
         {
-          "promptTts": "Drei Reihen mit je vier Säcken. Wie viele Säcke sind es?",
+          "promptTts": "Drei Reihen mit je vier Säcken. Wie viele Säcke sind es.",
           "iconAtomId": "sack",
           "left": 3,
           "right": 4,
@@ -3004,7 +3004,7 @@
           "blocks": []
         },
         {
-          "promptTts": "Vier Reihen mit je drei Säcken. Wie viele Säcke sind es?",
+          "promptTts": "Vier Reihen mit je drei Säcken. Wie viele Säcke sind es.",
           "iconAtomId": "sack",
           "left": 4,
           "right": 3,
@@ -3020,17 +3020,17 @@
       "phonemeTts": "St",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben St? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - St? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "stern",
           "slot": "start",
-          "missTts": "St - ern.",
+          "missTts": "Stern.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben St? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - St? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "fenster",
           "slot": "middle",
-          "missTts": "Fen - st - er.",
+          "missTts": "Fenster.",
           "blocks": []
         }
       ]
@@ -3041,17 +3041,17 @@
       "phonemeTts": "Sp",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Sp? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Sp? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "spinne",
           "slot": "start",
-          "missTts": "Sp - inne.",
+          "missTts": "Spinne.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Sp? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Sp? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "wespe",
           "slot": "middle",
-          "missTts": "We - sp - e.",
+          "missTts": "Wespe.",
           "blocks": []
         }
       ]
@@ -3061,10 +3061,10 @@
       "id": "l17-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben St nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - St - nach und sammle dabei alle Sterne.",
           "atomId": "letter-st",
           "glyph": "St",
-          "rewardTts": "St wie Stern.",
+          "rewardTts": "St - wie Stern.",
           "rewardEmoji": "⭐",
           "blocks": []
         }
@@ -3075,10 +3075,10 @@
       "id": "l17-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Sp nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Sp - nach und sammle dabei alle Sterne.",
           "atomId": "letter-sp",
           "glyph": "Sp",
-          "rewardTts": "Sp wie Spinne.",
+          "rewardTts": "Sp - wie Spinne.",
           "rewardEmoji": "🕷️",
           "blocks": []
         }
@@ -3089,7 +3089,7 @@
       "id": "l17-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe st und e zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe st und e zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-st",
           "leftDisplay": "st",
           "rightAtomId": "letter-e",
@@ -3106,7 +3106,7 @@
       "id": "l17-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe sp und i zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe sp und i zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-sp",
           "leftDisplay": "sp",
           "rightAtomId": "letter-i",
@@ -3175,7 +3175,7 @@
       "id": "l17-t10",
       "rounds": [
         {
-          "promptTts": "Fünfzehn Spinnen sitzen im Garten. Sechs krabbeln weg. Wie viele bleiben?",
+          "promptTts": "Fünfzehn Spinnen sitzen im Garten. Sechs krabbeln weg. Wie viele bleiben.",
           "iconAtomId": "spinne",
           "left": 15,
           "right": 6,
@@ -3184,7 +3184,7 @@
           "blocks": []
         },
         {
-          "promptTts": "Vierzehn Spinnen sitzen im Garten. Fünf krabbeln weg. Wie viele bleiben?",
+          "promptTts": "Vierzehn Spinnen sitzen im Garten. Fünf krabbeln weg. Wie viele bleiben.",
           "iconAtomId": "spinne",
           "left": 14,
           "right": 5,
@@ -3200,17 +3200,17 @@
       "phonemeTts": "ks",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben ks? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - ks? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "taxi",
           "slot": "middle",
-          "missTts": "Ta - ks - i.",
+          "missTts": "Taxi.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben ks? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - ks? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "fuchs",
           "slot": "end",
-          "missTts": "Fu - ks.",
+          "missTts": "Fuchs.",
           "blocks": []
         }
       ]
@@ -3221,17 +3221,17 @@
       "phonemeTts": "Qu",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Qu? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Qu? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "qualle",
           "slot": "start",
-          "missTts": "Qu - alle.",
+          "missTts": "Qualle.",
           "blocks": []
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Qu? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Qu? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "quelle",
           "slot": "start",
-          "missTts": "Qu - elle.",
+          "missTts": "Quelle.",
           "blocks": []
         }
       ]
@@ -3241,10 +3241,10 @@
       "id": "l18-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben C nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - C - nach und sammle dabei alle Sterne.",
           "atomId": "letter-c",
           "glyph": "C",
-          "rewardTts": "C wie Clown.",
+          "rewardTts": "C - wie Clown.",
           "rewardEmoji": "🤡",
           "blocks": []
         }
@@ -3255,10 +3255,10 @@
       "id": "l18-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Y nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - Y - nach und sammle dabei alle Sterne.",
           "atomId": "letter-y",
           "glyph": "Y",
-          "rewardTts": "Y wie Yacht.",
+          "rewardTts": "Y - wie Yacht.",
           "rewardEmoji": "⛵",
           "blocks": []
         }
@@ -3269,10 +3269,10 @@
       "id": "l18-t5",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben X nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - X - nach und sammle dabei alle Sterne.",
           "atomId": "letter-x",
           "glyph": "X",
-          "rewardTts": "X wie Xylophon.",
+          "rewardTts": "X - wie Xylophon.",
           "rewardEmoji": "🎵",
           "blocks": []
         }
@@ -3283,10 +3283,10 @@
       "id": "l18-t6",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Qu nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Qu - nach und sammle dabei alle Sterne.",
           "atomId": "letter-qu",
           "glyph": "Qu",
-          "rewardTts": "Qu wie Qualle.",
+          "rewardTts": "Qu - wie Qualle.",
           "rewardEmoji": "🪼",
           "blocks": []
         }
@@ -3297,7 +3297,7 @@
       "id": "l18-t7",
       "rounds": [
         {
-          "promptTts": "Schiebe qu und a zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe qu und a zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-qu",
           "leftDisplay": "qu",
           "rightAtomId": "letter-a",
@@ -3394,7 +3394,7 @@
       "id": "l18-t12",
       "rounds": [
         {
-          "promptTts": "Drei Reihen mit je vier Taxis. Wie viele Taxis warten?",
+          "promptTts": "Drei Reihen mit je vier Taxis. Wie viele Taxis warten.",
           "iconAtomId": "taxi",
           "left": 3,
           "right": 4,
@@ -3403,7 +3403,7 @@
           "blocks": []
         },
         {
-          "promptTts": "Vier Reihen mit je vier Taxis. Wie viele Taxis warten?",
+          "promptTts": "Vier Reihen mit je vier Taxis. Wie viele Taxis warten.",
           "iconAtomId": "taxi",
           "left": 4,
           "right": 4,
@@ -3419,16 +3419,16 @@
       "phonemeTts": "M",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben M? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "maus",
           "slot": "start",
-          "missTts": "M - aus."
+          "missTts": "Maus."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben M? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "ameise",
           "slot": "middle",
-          "missTts": "A - M - eise."
+          "missTts": "Ameise."
         }
       ]
     },
@@ -3438,16 +3438,16 @@
       "phonemeTts": "A",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben A? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - A? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "ampel",
           "slot": "start",
-          "missTts": "A - mpel."
+          "missTts": "Ampel."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben A? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - A? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "lama",
           "slot": "middle",
-          "missTts": "L - a - ma."
+          "missTts": "Lama."
         }
       ]
     },
@@ -3456,10 +3456,10 @@
       "id": "l19-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben M nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - M - nach und sammle dabei alle Sterne.",
           "atomId": "letter-m",
           "glyph": "M",
-          "rewardTts": "M wie Maus.",
+          "rewardTts": "M - wie Maus.",
           "rewardEmoji": "🐭"
         }
       ]
@@ -3469,10 +3469,10 @@
       "id": "l19-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben A nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - A - nach und sammle dabei alle Sterne.",
           "atomId": "letter-a",
           "glyph": "A",
-          "rewardTts": "A wie Ampel.",
+          "rewardTts": "A - wie Ampel.",
           "rewardEmoji": "🚦"
         }
       ]
@@ -3482,7 +3482,7 @@
       "id": "l19-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe m und a zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe m und a zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-m",
           "leftDisplay": "m",
           "rightAtomId": "letter-a",
@@ -3498,7 +3498,7 @@
       "id": "l19-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe a und m zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe a und m zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-a",
           "leftDisplay": "a",
           "rightAtomId": "letter-m",
@@ -3561,14 +3561,14 @@
       "id": "l19-t10",
       "rounds": [
         {
-          "promptTts": "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das?",
+          "promptTts": "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das.",
           "iconAtomId": "ameise",
           "left": 3,
           "right": 2,
           "answer": 5
         },
         {
-          "promptTts": "Vier Ameisen und drei Ameisen. Wie viele Ameisen sind das?",
+          "promptTts": "Vier Ameisen und drei Ameisen. Wie viele Ameisen sind das.",
           "iconAtomId": "ameise",
           "left": 4,
           "right": 3,
@@ -3582,16 +3582,16 @@
       "phonemeTts": "I",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben I? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "igel",
           "slot": "start",
-          "missTts": "I - gel."
+          "missTts": "Igel."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben I? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "mimi",
           "slot": "middle",
-          "missTts": "M - i - m - i."
+          "missTts": "Mimi."
         }
       ]
     },
@@ -3601,16 +3601,16 @@
       "phonemeTts": "O",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben O? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - O? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "oma",
           "slot": "start",
-          "missTts": "O - ma."
+          "missTts": "Oma."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben O? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - O? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "tomate",
           "slot": "middle",
-          "missTts": "T - o - mate."
+          "missTts": "Tomate."
         }
       ]
     },
@@ -3619,10 +3619,10 @@
       "id": "l20-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben I nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - I - nach und sammle dabei alle Sterne.",
           "atomId": "letter-i",
           "glyph": "I",
-          "rewardTts": "I wie Igel.",
+          "rewardTts": "I - wie Igel.",
           "rewardEmoji": "🦔"
         }
       ]
@@ -3632,10 +3632,10 @@
       "id": "l20-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben O nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - O - nach und sammle dabei alle Sterne.",
           "atomId": "letter-o",
           "glyph": "O",
-          "rewardTts": "O wie Oma.",
+          "rewardTts": "O - wie Oma.",
           "rewardEmoji": "👵"
         }
       ]
@@ -3645,7 +3645,7 @@
       "id": "l20-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe m und i zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe m und i zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-m",
           "leftDisplay": "m",
           "rightAtomId": "letter-i",
@@ -3661,7 +3661,7 @@
       "id": "l20-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe m und o zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe m und o zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-m",
           "leftDisplay": "m",
           "rightAtomId": "letter-o",
@@ -3728,14 +3728,14 @@
       "id": "l20-t10",
       "rounds": [
         {
-          "promptTts": "Drei Omas und zwei Omas. Wie viele Omas sind das?",
+          "promptTts": "Drei Omas und zwei Omas. Wie viele Omas sind das.",
           "iconAtomId": "oma",
           "left": 3,
           "right": 2,
           "answer": 5
         },
         {
-          "promptTts": "Vier Omas und drei Omas. Wie viele Omas sind das?",
+          "promptTts": "Vier Omas und drei Omas. Wie viele Omas sind das.",
           "iconAtomId": "oma",
           "left": 4,
           "right": 3,
@@ -3749,16 +3749,16 @@
       "phonemeTts": "P",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben P? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - P? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "papa",
           "slot": "start",
-          "missTts": "P - apa."
+          "missTts": "Papa."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben P? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - P? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "suppe",
           "slot": "middle",
-          "missTts": "Su - p - pe."
+          "missTts": "Suppe."
         }
       ]
     },
@@ -3768,16 +3768,16 @@
       "phonemeTts": "T",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben T? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "tom",
           "slot": "start",
-          "missTts": "T - om."
+          "missTts": "Tom."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben T? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "hut",
           "slot": "end",
-          "missTts": "Hu - t."
+          "missTts": "Hut."
         }
       ]
     },
@@ -3786,10 +3786,10 @@
       "id": "l21-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben P nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - P - nach und sammle dabei alle Sterne.",
           "atomId": "letter-p",
           "glyph": "P",
-          "rewardTts": "P wie Papa.",
+          "rewardTts": "P - wie Papa.",
           "rewardEmoji": "👨"
         }
       ]
@@ -3799,10 +3799,10 @@
       "id": "l21-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben T nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - T - nach und sammle dabei alle Sterne.",
           "atomId": "letter-t",
           "glyph": "T",
-          "rewardTts": "T wie Tom.",
+          "rewardTts": "T - wie Tom.",
           "rewardEmoji": "👦"
         }
       ]
@@ -3812,7 +3812,7 @@
       "id": "l21-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe p und a zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe p und a zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-p",
           "leftDisplay": "p",
           "rightAtomId": "letter-a",
@@ -3828,7 +3828,7 @@
       "id": "l21-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe t und o zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe t und o zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-t",
           "leftDisplay": "t",
           "rightAtomId": "letter-o",
@@ -3895,14 +3895,14 @@
       "id": "l21-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Tomaten und vier Tomaten. Wie viele Tomaten sind das?",
+          "promptTts": "Zwei Tomaten und vier Tomaten. Wie viele Tomaten sind das.",
           "iconAtomId": "tomate",
           "left": 2,
           "right": 4,
           "answer": 6
         },
         {
-          "promptTts": "Drei Tomaten und vier Tomaten. Wie viele Tomaten sind das?",
+          "promptTts": "Drei Tomaten und vier Tomaten. Wie viele Tomaten sind das.",
           "iconAtomId": "tomate",
           "left": 3,
           "right": 4,
@@ -3916,16 +3916,16 @@
       "phonemeTts": "Ei",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Ei? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Ei? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "ei",
           "slot": "start",
           "missTts": "Ei."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Ei? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Ei? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "kleid",
           "slot": "middle",
-          "missTts": "Kl - ei - d."
+          "missTts": "Kleid."
         }
       ]
     },
@@ -3935,16 +3935,16 @@
       "phonemeTts": "Au",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Au? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Au? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "auto",
           "slot": "start",
-          "missTts": "Au - to."
+          "missTts": "Auto."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Au? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Au? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "baum",
           "slot": "middle",
-          "missTts": "B - au - m."
+          "missTts": "Baum."
         }
       ]
     },
@@ -3953,10 +3953,10 @@
       "id": "l22-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Ei nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Ei - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ei",
           "glyph": "Ei",
-          "rewardTts": "Ei wie Ei.",
+          "rewardTts": "Ei - wie Ei.",
           "rewardEmoji": "🥚"
         }
       ]
@@ -3966,10 +3966,10 @@
       "id": "l22-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Au nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Au - nach und sammle dabei alle Sterne.",
           "atomId": "letter-au",
           "glyph": "Au",
-          "rewardTts": "Au wie Auto.",
+          "rewardTts": "Au - wie Auto.",
           "rewardEmoji": "🚗"
         }
       ]
@@ -3979,7 +3979,7 @@
       "id": "l22-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe m und ei zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe m und ei zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-m",
           "leftDisplay": "m",
           "rightAtomId": "letter-ei",
@@ -3995,7 +3995,7 @@
       "id": "l22-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe b und au zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe b und au zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-b",
           "leftDisplay": "b",
           "rightAtomId": "letter-au",
@@ -4058,14 +4058,14 @@
       "id": "l22-t10",
       "rounds": [
         {
-          "promptTts": "Drei Eier im Nest und vier Eier kommen dazu. Wie viele Eier sind das?",
+          "promptTts": "Drei Eier im Nest und vier Eier kommen dazu. Wie viele Eier sind das.",
           "iconAtomId": "ei",
           "left": 3,
           "right": 4,
           "answer": 7
         },
         {
-          "promptTts": "Vier Eier im Nest und drei Eier kommen dazu. Wie viele Eier sind das?",
+          "promptTts": "Vier Eier im Nest und drei Eier kommen dazu. Wie viele Eier sind das.",
           "iconAtomId": "ei",
           "left": 4,
           "right": 3,
@@ -4079,16 +4079,16 @@
       "phonemeTts": "Sch",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Sch? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Sch? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "schaf",
           "slot": "start",
-          "missTts": "Sch - af."
+          "missTts": "Schaf."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Sch? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Sch? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "fisch",
           "slot": "end",
-          "missTts": "Fi - sch."
+          "missTts": "Fisch."
         }
       ]
     },
@@ -4098,16 +4098,16 @@
       "phonemeTts": "Ch",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Ch? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "dach",
           "slot": "end",
-          "missTts": "Da - ch."
+          "missTts": "Dach."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Ch? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "buch",
           "slot": "end",
-          "missTts": "Bu - ch."
+          "missTts": "Buch."
         }
       ]
     },
@@ -4116,10 +4116,10 @@
       "id": "l23-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Sch nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Sch - nach und sammle dabei alle Sterne.",
           "atomId": "letter-sch",
           "glyph": "Sch",
-          "rewardTts": "Sch wie Schaf.",
+          "rewardTts": "Sch - wie Schaf.",
           "rewardEmoji": "🐑"
         }
       ]
@@ -4129,10 +4129,10 @@
       "id": "l23-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Ch nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Ch - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ch",
           "glyph": "Ch",
-          "rewardTts": "Ch wie Dach.",
+          "rewardTts": "Ch - wie Dach.",
           "rewardEmoji": "🏠"
         }
       ]
@@ -4142,7 +4142,7 @@
       "id": "l23-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe sch und u zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe sch und u zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-sch",
           "leftDisplay": "sch",
           "rightAtomId": "letter-u",
@@ -4158,7 +4158,7 @@
       "id": "l23-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe f und i zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe f und i zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-f",
           "leftDisplay": "f",
           "rightAtomId": "letter-i",
@@ -4225,14 +4225,14 @@
       "id": "l23-t10",
       "rounds": [
         {
-          "promptTts": "Vier Fische schwimmen im Wasser. Drei Fische kommen dazu. Wie viele Fische sind das?",
+          "promptTts": "Vier Fische schwimmen im Wasser. Drei Fische kommen dazu. Wie viele Fische sind das.",
           "iconAtomId": "fisch",
           "left": 4,
           "right": 3,
           "answer": 7
         },
         {
-          "promptTts": "Fünf Fische schwimmen im Wasser. Vier Fische kommen dazu. Wie viele Fische sind das?",
+          "promptTts": "Fünf Fische schwimmen im Wasser. Vier Fische kommen dazu. Wie viele Fische sind das.",
           "iconAtomId": "fisch",
           "left": 5,
           "right": 4,
@@ -4246,16 +4246,16 @@
       "phonemeTts": "St",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben St? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - St? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "stern",
           "slot": "start",
-          "missTts": "St - ern."
+          "missTts": "Stern."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben St? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - St? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "fenster",
           "slot": "middle",
-          "missTts": "Fen - st - er."
+          "missTts": "Fenster."
         }
       ]
     },
@@ -4265,16 +4265,16 @@
       "phonemeTts": "Sp",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Sp? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Sp? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "spinne",
           "slot": "start",
-          "missTts": "Sp - inne."
+          "missTts": "Spinne."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Sp? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Sp? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "wespe",
           "slot": "middle",
-          "missTts": "We - sp - e."
+          "missTts": "Wespe."
         }
       ]
     },
@@ -4283,10 +4283,10 @@
       "id": "l24-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben St nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - St - nach und sammle dabei alle Sterne.",
           "atomId": "letter-st",
           "glyph": "St",
-          "rewardTts": "St wie Stern.",
+          "rewardTts": "St - wie Stern.",
           "rewardEmoji": "⭐"
         }
       ]
@@ -4296,10 +4296,10 @@
       "id": "l24-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Sp nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Sp - nach und sammle dabei alle Sterne.",
           "atomId": "letter-sp",
           "glyph": "Sp",
-          "rewardTts": "Sp wie Spinne.",
+          "rewardTts": "Sp - wie Spinne.",
           "rewardEmoji": "🕷️"
         }
       ]
@@ -4309,7 +4309,7 @@
       "id": "l24-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe s und t zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe s und t zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-s",
           "leftDisplay": "s",
           "rightAtomId": "letter-t",
@@ -4325,7 +4325,7 @@
       "id": "l24-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe s und p zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe s und p zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-s",
           "leftDisplay": "s",
           "rightAtomId": "letter-p",
@@ -4408,7 +4408,7 @@
       "id": "l24-t10",
       "rounds": [
         {
-          "promptTts": "Fünf Spinnen sitzen im Garten. Zwei krabbeln weg. Wie viele bleiben?",
+          "promptTts": "Fünf Spinnen sitzen im Garten. Zwei krabbeln weg. Wie viele bleiben.",
           "iconAtomId": "spinne",
           "left": 5,
           "right": 2,
@@ -4416,7 +4416,7 @@
           "operation": "subtract"
         },
         {
-          "promptTts": "Sechs Spinnen sitzen im Garten. Drei krabbeln weg. Wie viele bleiben?",
+          "promptTts": "Sechs Spinnen sitzen im Garten. Drei krabbeln weg. Wie viele bleiben.",
           "iconAtomId": "spinne",
           "left": 6,
           "right": 3,
@@ -4431,16 +4431,16 @@
       "phonemeTts": "Ö",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Ö? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - Ö? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "loewe",
           "slot": "middle",
-          "missTts": "L - ö - we."
+          "missTts": "Löwe."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Ö? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - Ö? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "loeffel",
           "slot": "middle",
-          "missTts": "L - ö - ffel."
+          "missTts": "Löffel."
         }
       ]
     },
@@ -4450,16 +4450,16 @@
       "phonemeTts": "Ü",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Ü? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - Ü? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "ruebe",
           "slot": "start",
-          "missTts": "Rü - be."
+          "missTts": "Rübe."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Ü? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - Ü? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "tuer",
           "slot": "middle",
-          "missTts": "T - ü - r."
+          "missTts": "Tür."
         }
       ]
     },
@@ -4468,10 +4468,10 @@
       "id": "l25-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Ö nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - Ö - nach und sammle dabei alle Sterne.",
           "atomId": "letter-oe",
           "glyph": "Ö",
-          "rewardTts": "Ö wie Löwe.",
+          "rewardTts": "Ö - wie Löwe.",
           "rewardEmoji": "🦁"
         }
       ]
@@ -4481,10 +4481,10 @@
       "id": "l25-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Ü nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - Ü - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ue",
           "glyph": "Ü",
-          "rewardTts": "Ü wie Rübe.",
+          "rewardTts": "Ü - wie Rübe.",
           "rewardEmoji": "🫜"
         }
       ]
@@ -4494,7 +4494,7 @@
       "id": "l25-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe l und ö zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe l und ö zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-l",
           "leftDisplay": "l",
           "rightAtomId": "letter-oe",
@@ -4510,7 +4510,7 @@
       "id": "l25-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe r und ü zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe r und ü zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-r",
           "leftDisplay": "r",
           "rightAtomId": "letter-ue",
@@ -4585,14 +4585,14 @@
       "id": "l25-t10",
       "rounds": [
         {
-          "promptTts": "Sechs Füße und drei Füße. Wie viele Füße sind das?",
+          "promptTts": "Sechs Füße und drei Füße. Wie viele Füße sind das.",
           "iconAtomId": "fuss",
           "left": 6,
           "right": 3,
           "answer": 9
         },
         {
-          "promptTts": "Acht Füße und vier Füße. Wie viele Füße sind das?",
+          "promptTts": "Acht Füße und vier Füße. Wie viele Füße sind das.",
           "iconAtomId": "fuss",
           "left": 8,
           "right": 4,
@@ -4606,16 +4606,16 @@
       "phonemeTts": "Qu",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben Qu? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Qu? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "qualle",
           "slot": "start",
-          "missTts": "Qu - alle."
+          "missTts": "Qualle."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben Qu? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Laut - Qu? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "quelle",
           "slot": "start",
-          "missTts": "Qu - elle."
+          "missTts": "Quelle."
         }
       ]
     },
@@ -4625,16 +4625,16 @@
       "phonemeTts": "X",
       "rounds": [
         {
-          "promptTts": "Wo hörst du den Buchstaben X? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - X? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "taxi",
           "slot": "middle",
-          "missTts": "Ta - x - i."
+          "missTts": "Taxi."
         },
         {
-          "promptTts": "Wo hörst du den Buchstaben X? Am Anfang, in der Mitte oder am Ende?",
+          "promptTts": "Wo hörst du den Buchstaben - X? Am Anfang, in der Mitte oder am Ende.",
           "atomId": "fuchs",
           "slot": "end",
-          "missTts": "Fu - x."
+          "missTts": "Fuchs."
         }
       ]
     },
@@ -4643,10 +4643,10 @@
       "id": "l26-t3",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben Qu nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Laut - Qu - nach und sammle dabei alle Sterne.",
           "atomId": "letter-qu",
           "glyph": "Qu",
-          "rewardTts": "Qu wie Qualle.",
+          "rewardTts": "Qu - wie Qualle.",
           "rewardEmoji": "🪼"
         }
       ]
@@ -4656,10 +4656,10 @@
       "id": "l26-t4",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben X nach und sammle dabei alle Sterne.",
+          "promptTts": "Zeichne den Buchstaben - X - nach und sammle dabei alle Sterne.",
           "atomId": "letter-x",
           "glyph": "X",
-          "rewardTts": "X wie Taxi.",
+          "rewardTts": "X - wie Taxi.",
           "rewardEmoji": "🚕"
         }
       ]
@@ -4669,7 +4669,7 @@
       "id": "l26-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe qu und a zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe qu und a zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-qu",
           "leftDisplay": "qu",
           "rightAtomId": "letter-a",
@@ -4685,7 +4685,7 @@
       "id": "l26-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe t und a zusammen. Welche Silbe entsteht?",
+          "promptTts": "Schiebe t und a zusammen. Welche Silbe entsteht.",
           "leftAtomId": "letter-t",
           "leftDisplay": "t",
           "rightAtomId": "letter-a",
@@ -4764,7 +4764,7 @@
       "id": "l26-t10",
       "rounds": [
         {
-          "promptTts": "Drei Reihen mit je vier Taxis. Wie viele Taxis warten?",
+          "promptTts": "Drei Reihen mit je vier Taxis. Wie viele Taxis warten.",
           "iconAtomId": "taxi",
           "left": 3,
           "right": 4,
@@ -4772,7 +4772,7 @@
           "operation": "multiply"
         },
         {
-          "promptTts": "Vier Reihen mit je vier Taxis. Wie viele Taxis warten?",
+          "promptTts": "Vier Reihen mit je vier Taxis. Wie viele Taxis warten.",
           "iconAtomId": "taxi",
           "left": 4,
           "right": 4,

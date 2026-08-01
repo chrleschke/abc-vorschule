@@ -7,7 +7,8 @@ package app.abcvorschule.content
  * parsed — see design doc §3 for the rules this implements.
  */
 object SymbolHuntDerivation {
-    private const val PromptLetterTemplate = "Finde alle Buchstaben %s!"
+    private const val PromptLetterTemplate = "Finde alle Buchstaben - %s!"
+    private const val PromptDigraphTemplate = "Finde alle Laute - %s!"
     private const val PromptSyllableTemplate = "Finde alle Silben %s!"
 
     /**
@@ -68,7 +69,11 @@ object SymbolHuntDerivation {
         if (mode == SymbolHuntMode.syllable && target.kind != AtomKind.syllable) return null
         val pool = distractorPool(pack, currentLessonIndex, mode, targetAtomId)
         if (pool.isEmpty()) return null
-        val template = if (mode == SymbolHuntMode.letter) PromptLetterTemplate else PromptSyllableTemplate
+        val template = when {
+            mode == SymbolHuntMode.syllable -> PromptSyllableTemplate
+            target.display.length > 1 -> PromptDigraphTemplate
+            else -> PromptLetterTemplate
+        }
         return SymbolHuntRound(
             promptTts = template.format(target.display),
             targetAtomId = targetAtomId,
