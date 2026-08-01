@@ -181,4 +181,23 @@ object WordFrameSizing {
     fun wordSegmentWidthDp(glyphSp: Float, displayChars: Int, fontScale: Float = 1f): Float =
         (glyphSp * fontScale * GlyphAspect * displayChars.coerceAtLeast(1) + 2 * WordSegmentPaddingDp)
             .coerceAtLeast(MinFrameDp)
+
+    /** Wie viel vom Wort-Glyphen das gesuchte Symbol darüber haben darf. */
+    const val TargetLabelFraction = 0.6f
+
+    /**
+     * Größe des gesuchten Symbols über dem Wort — ein fester Anteil dessen, was der
+     * Wort-Glyph maximal bekommt ([MaxRowHeightDp] × [WordGlyphHeightFraction]).
+     *
+     * **Derselbe `fontScale`-Deckel wie [wordGlyphSp], und das ist der Punkt.** Ohne
+     * ihn wuchs das Label mit der System-Schriftgröße weiter, während das Wort
+     * gedeckelt blieb: auf einem Gerät mit `font_scale = 1.3` rendern 38sp Label und
+     * 42sp Wort beide rund 50dp hoch, und die Hierarchie, die den Blick aufs Wort
+     * ziehen soll, ist weg. Als Anteil formuliert bleibt das Verhältnis bei *jeder*
+     * Skala 0,6 — die Frage bleibt kleiner als die Arbeit.
+     */
+    fun targetLabelSp(fontScale: Float = 1f): Float {
+        val budget = MaxRowHeightDp * WordGlyphHeightFraction * TargetLabelFraction
+        return if (fontScale > 1f) budget / fontScale else budget
+    }
 }

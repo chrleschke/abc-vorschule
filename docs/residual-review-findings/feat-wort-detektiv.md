@@ -54,7 +54,10 @@ Wort. Gemessen für 360×640dp mit 3-Knopf-Navigation:
   unter 56dp); mit „Zeig mir" verschwindet sie ganz
 
 Die 64dp-Reihe (statt 80dp) hat den Bedarf von ~706dp auf ~674dp Gerätehöhe gesenkt, die
-Lücke aber nicht geschlossen. Betroffen: L12 („Häuser") auf der 640dp-Höhenklasse und auf
+Lücke aber nicht geschlossen. Die 36dp Luft zwischen Zielsymbol und Wort
+(`TargetToWordExtraGap` plus die zwei `blockGap`s, die `ExerciseStage` darum legt) haben
+ihn wieder auf ~710dp gehoben, mit „Zeig mir" ~780dp — bewusst in Kauf genommen, weil die
+Lücke auf dieser Höhenklasse ohnehin offen ist und die saubere Lösung sie zumacht. Betroffen: L12 („Häuser") auf der 640dp-Höhenklasse und auf
 Geräten mit vergrößerter Display-Größe. Bei unter ~320dp Breite fangen auch die
 5-Segment-Wörter (Wolke, Zebra, Spinne, Qualle, Bäume, Apfel) an umzubrechen.
 

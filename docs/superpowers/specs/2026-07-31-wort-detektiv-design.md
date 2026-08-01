@@ -206,7 +206,8 @@ Echte Runde aus L03: `Papa`, Ziel `P`, zwei Treffer.
                (())                ← Speaker, AbcSpeakerButton
                                       via TaskPromptChrome(title = null)
 
-             P / p                 ← Zielsymbol als Formenpaar, 38sp
+             P / p                 ← Zielsymbol als Formenpaar, 60% des Wort-Glyphen
+
 
            P a p a                 ← das Wort, Segment = eigene Farbe, klickbar
 
@@ -217,14 +218,28 @@ Echte Runde aus L03: `Papa`, Ziel `P`, zwei Treffer.
 identisch zur Buchstaben-Jagd, konform zu Prinzip 7 („Speaker mittig über dem
 Aufgabentitel"). Er wiederholt den Prompt-TTS.
 
-**Zielsymbol** darunter, `AbcDimens.answerTileSp` (38sp), `SoftSand`, als Formenpaar nach
-der Regel aus §2. Antippbar → wird vorgelesen (Prinzip 7), gesprochen wird dabei die
-Atom-Form einmal, nicht „P Schrägstrich p".
+**Zielsymbol** darunter, `SoftSand`, als Formenpaar nach der Regel aus §2. Antippbar →
+wird vorgelesen (Prinzip 7), gesprochen wird dabei die Atom-Form einmal, nicht „P
+Schrägstrich p".
 
-**Kleiner als das Wort, und zwar deutlich.** Ursprünglich stand es auf `letterSp` (54sp),
-also genau so groß wie das Wort darunter — die beiden lasen sich als gleichrangig, und der
-Blick hatte keinen Grund, vom Label zum Wort zu wandern. Das Label ist die Frage, das Wort
-ist die Arbeit; die Größen sagen das jetzt auch.
+**Kleiner als das Wort, und zwar als Anteil, nicht als feste Zahl.**
+`WordFrameSizing.targetLabelSp` liefert 60% dessen, was der Wort-Glyph maximal bekommt —
+rund 33dp gegen 54dp. Zwei Anläufe waren nötig:
+
+1. Ursprünglich stand es auf `letterSp` (54sp), also genau so groß wie das Wort darunter.
+   Gleichrangig gelesen, kein Grund für den Blick, nach unten zu wandern.
+2. Dann auf feste 38sp. Auf dem Testgerät (`font_scale = 1.3`) sah es weiterhin gleich
+   groß aus — und war es auch: das Wort ist gegen `fontScale` gedeckelt und rendert
+   konstant 54dp, das Label wuchs mit der Skala auf 49dp mit. Eine feste sp-Zahl kann
+   neben einer gedeckelten keine Hierarchie halten.
+
+Als Anteil mit demselben Deckel bleibt das Verhältnis bei jeder Systemskala 0,6. Das Label
+ist die Frage, das Wort ist die Arbeit.
+
+**Luft dazwischen:** ein 14dp-Spacer, den `ExerciseStage` beidseitig mit `blockGap`
+umrahmt — Abstand Zielsymbol→Wort also 58dp statt 22dp. Weil der Aufgabenblock als Ganzes
+zentriert liegt, hebt das den Speaker und das Zielsymbol um ~18dp an. Kostet dieselben
+36dp aus dem Höhenbudget der kurzen Gerätequelle, siehe unten.
 
 **Das Wort** als farbige Glyphen **ohne Rahmen** — es soll wie ein Wort aussehen, nicht
 wie ein Tray. Farben zyklisch aus `SoftMint · SoftCoral · SoftSky · SoftGold · SoftSand`;
