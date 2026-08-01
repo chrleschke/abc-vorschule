@@ -112,6 +112,19 @@ eine Änderung würde seine Tests ohne Gegenwert mit anfassen.
 Eingabe: die `word_build`-Rounds der Lektion in Autorierungsreihenfolge, dedupliziert
 über `targetAtomId`.
 
+**Guard null: in Silben wird nicht gejagt.** Ist das Ziel-Atom eines `word_build`
+`kind: syllable`, fällt das Wort weg, bevor irgendetwas anderes geprüft wird. Zwei Gründe,
+und der zweite wiegt schwerer:
+
+1. Jeder Prompt sagt „im **Wort** – %s". Für `ma` ist das falsch.
+2. Die Silbe wird eingeführt, damit das Kind sie als *eine* Einheit liest (`Ma·ma`) — sie
+   danach wieder in Buchstaben zu zerlegen, arbeitet gegen genau das. „Finde den
+   Buchstaben A in der Silbe ma" ist deshalb auch mit korrigiertem Wortlaut keine Aufgabe,
+   die wir stellen wollen.
+
+Der Wort-Bauer darf eine Silbe weiterhin bauen; nur gejagt wird darin nicht. Der Guard
+sitzt daher in der Ableitung, nicht im `ContentValidator`.
+
 **Guard vor allem anderen:** Wörter, deren Buchstaben-Split weniger als 2 Segmente
 ergibt, fallen weg. Sonst entsteht in L22 die Runde „Finde Ei im Wort Ei" — das Wort ist
 die Antwort, das Kind kann nicht danebentippen, die Runde trägt nichts bei.
@@ -409,8 +422,10 @@ der Screen enthält keine Entscheidungen.
   falls jemand später die Lektionsbeschränkung entfernt.
 - Modus-Alternierung: gerade Indizes Buchstabe, ungerade Silbe wenn möglich
 - Fallback in den Buchstaben-Modus ohne Silben-Block (`Tom`, `Hut`)
-- Fokus-Rotation: L01 ergibt `M` dann `A`, nicht zweimal `M`
+- Fokus-Rotation: L08 ergibt `D` dann `K`, nicht zweimal `D`
 - Rotation überspringt im Wort fehlende Grapheme: L06 „Tor" ergibt `R`, nicht `N`
+- Guard null: ein `word_build`, dessen Ziel ein Silben-Atom ist, erzeugt keine Runde
+  (synthetisch, seit `l01-t7` weg ist) — und keine autorierte Lektion jagt in einer Silbe
 - Guard: L22 „Ei" erzeugt keine Runde
 - Dedup: L05 „Hut" erzeugt eine Runde
 - Wort ohne Fokus-Graphem erzeugt keine Runde; bleibt keine übrig, wird kein Trainer
@@ -459,7 +474,7 @@ die Derivation-Tests. `B` = Buchstaben-Modus, `S` = Silben-Modus.
 
 | Lektion | Runden (Modus · Ziel · Zerlegung · Treffer) |
 | --- | --- |
-| L01 M & A | B `M` `M·a·m·a` 2 · B `A` `a·m` 1 |
+| L01 M & A | B `M` `M·a·m·a` 2 |
 | L02 I & O | B `O` `O·m·a` 1 · B `I` `M·i·m·i` 2 |
 | L03 P & T | B `P` `P·a·p·a` 2 · S `pa` `O·pa` 1 · B `T` `T·o·m` 1 |
 | L04 L & H | B `L` `L·a·m·a` 1 · B `H` `H·a·l·l·o` 1 |
@@ -486,15 +501,18 @@ die Derivation-Tests. `B` = Buchstaben-Modus, `S` = Silben-Modus.
 | L25 Ö & Ü Wdh. | B `Ö` `L·ö·w·e` 1 · S `rü` `Rü·b·e` 1 |
 | L26 Qu & X Wdh. | B `Qu` `Qu·a·l·l·e` 1 · S `ta` `Ta·x·i` 1 |
 
-L01 spielte ursprünglich `B A m·a 1` — „Finde den Buchstaben A im Wort **ma**". `ma` ist
-keins: das Atom ist `kind: syllable`, und `l01-t7` baute es trotzdem mit dem Wort-Bauer
-(„Baue das Wort ma"). Der Trainer hat die Lüge nur weitergereicht. `l01-t7` baut jetzt `am`
-— ein echtes Wort, aus denselben zwei Buchstaben, und genau das, was die
-Wiederholungslektion L19 an derselben Stelle schon tat. `ContentValidator` lehnt einen
-`word_build`-Task, dessen Ziel ein Silben-Atom ist, seither ab; dabei fiel auf, dass das
-Atom `ich` fälschlich als Silbe geführt war (es ist ein Wort und wird nirgends als Silbe
-verwendet) — korrigiert. `Kleid` bleibt `other`: das ist eine Einordnung als Bildvokabel,
-keine Falschaussage über die Wortart.
+L01 hat als einzige Lektion nur eine Runde. Ursprünglich stand hier `B A m·a 1` — „Finde
+den Buchstaben A im Wort **ma**". `ma` ist kein Wort, sondern die Silbe, die L01 einführt,
+weil `Mama` sie braucht; `l01-t7` baute sie trotzdem mit dem Wort-Bauer („Baue das Wort
+ma"), und der Detektiv reichte das weiter. `l01-t7` ist ersatzlos gestrichen: die Silbe
+wird in `l01-t5` verschmolzen, das war ihre Einführung, ein zweiter Bau-Task war Dopplung.
+Ein Ersatzwort gibt es nicht — `am` wäre in L01 weder eingeführt noch in einem Satz
+gebraucht. Bleibt „Mama", und damit kommt die Fokus-Rotation in L01 nie bis zum `A`.
+
+Beim Aufräumen fiel auf, dass das Atom `ich` als `syllable` geführt war. Es ist ein Wort,
+wird nirgends als Silbe verwendet, und L10 baut es (`l10-t8`) — als Silbe geführt wäre
+seine Runde `B Ch i·ch 1` unter Guard null weggefallen. Korrigiert auf `word`. `Kleid`
+bleibt `other`: das ist eine Einordnung als Bildvokabel, keine Aussage über die Wortart.
 
 L13 ergibt dreimal `Sch` in Folge, weil die Lektion nur ein Fokus-Graphem führt und die
 Rotation nichts hat, worauf sie wechseln könnte. Das ist kein Fehler, sondern die

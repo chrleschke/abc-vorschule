@@ -52,6 +52,14 @@ object SymbolInWordDerivation {
         var focusCursor = 0
         words.forEach { word ->
             val wordAtom = pack.atoms[word.targetAtomId] ?: return@forEach
+            // Kein Buchstabenfinden in Silben. Eine Silbe ist kein Wort, und der
+            // Trainer sagt in jedem Prompt "im Wort - %s" — für `ma` wäre das
+            // schlicht falsch, und "Finde den Buchstaben A in der Silbe ma" wäre es
+            // didaktisch: die Silbe wird eingeführt, damit das Kind sie als *eine*
+            // Einheit liest (`Ma·ma`), nicht damit es sie wieder in Buchstaben
+            // zerlegt. Der Wort-Bauer darf eine Silbe weiterhin bauen; nur gejagt
+            // wird darin nicht.
+            if (wordAtom.kind == AtomKind.syllable) return@forEach
             val graphemes = WordGraphemes.split(pack, lesson.index, wordAtom.display)
             if (graphemes.size < MinSegments) return@forEach
 
