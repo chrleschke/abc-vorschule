@@ -345,6 +345,31 @@ class WordFrameSizingTest {
     }
 
     @Test
+    fun theTargetLabelStaysSmallerThanTheWordAtEverySystemFontScale() {
+        // The regression this pins: the word was capped against fontScale and the
+        // label was not, so on a device at font_scale 1.3 a 38sp label and a 42sp
+        // word both rendered ~50dp and the hierarchy collapsed.
+        val mama = listOf("M", "a", "m", "a")
+        val perRow = WordFrameSizing.segmentsPerRow(stageWidth, mama.size)
+        listOf(0.85f, 1f, 1.15f, 1.3f, 1.5f, 2f).forEach { scale ->
+            val word = WordFrameSizing.wordGlyphSp(
+                available = stageWidth,
+                segmentsPerRow = perRow,
+                longestDisplayChars = 1,
+                rowHeightDp = WordFrameSizing.MaxRowHeightDp,
+                fontScale = scale,
+            ) * scale
+            val label = WordFrameSizing.targetLabelSp(scale) * scale
+            assertEquals(
+                "at scale $scale the label must stay at ${WordFrameSizing.TargetLabelFraction} of the word",
+                WordFrameSizing.TargetLabelFraction,
+                label / word,
+                0.01f,
+            )
+        }
+    }
+
+    @Test
     fun anAbsurdlyNarrowStageStopsAtTheLegibleMinimum() {
         assertEquals(
             WordFrameSizing.MinGlyphSp,

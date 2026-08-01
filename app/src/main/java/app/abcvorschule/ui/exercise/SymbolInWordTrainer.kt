@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -92,6 +93,10 @@ private val SlotGlyphHeight = 56.dp
 
 /** Design doc §5: a bare 3dp stroke, no frame, no fill. */
 private val SlotStrokeHeight = 3.dp
+
+/** Extra air between the target label and the word, on top of the two
+ * [AbcDimens.blockGap]s ExerciseStage already puts around it. */
+private val TargetToWordExtraGap = 14.dp
 
 /** One collected glyph in transit: which segment was tapped, and which stroke it is
  * heading for. Held outside the state machine because it is pure presentation. */
@@ -234,6 +239,12 @@ fun SymbolInWordTrainer(
                         onClick = { onSpeak(target.display) },
                     )
                 }
+                // Luft zwischen Frage und Arbeit. ExerciseStage setzt AbcDimens.blockGap
+                // (22dp) zwischen *je zwei* Kinder, also auch links und rechts von diesem
+                // Spacer: aus 22dp Abstand Label→Wort werden damit 58dp. Weil der
+                // Aufgabenblock als Ganzes zentriert liegt, hebt das den Speaker und das
+                // gesuchte Symbol an, statt nur das Wort nach unten zu schieben.
+                Spacer(modifier = Modifier.height(TargetToWordExtraGap))
                 WordSegments(
                     round = round,
                     state = state,
@@ -332,21 +343,16 @@ private fun slotWidthDp(label: SymbolInWordDerivation.TargetLabel?): Dp =
     (AbcDimens.syllableSp.value * WordFrameSizing.GlyphAspect * (label?.primary?.length ?: 1))
         .coerceAtLeast(MinSlotWidthDp).dp
 
-/**
- * Size of the hunted symbol above the word. Smaller than the word itself
- * ([WordFrameSizing.wordGlyphSp] reaches ~54sp): the label is the question, the
- * word is what the child works on, and at the old 54sp the two read as equals and
- * the eye had no reason to go down to the word first.
- */
-private val TargetGlyphSp = AbcDimens.answerTileSp
-
 /** The hunted symbol, as a case pair ("P / p") for letters and a single lowercase
- * form for syllables (design doc §2). */
+ * form for syllables (design doc §2). Its size comes from
+ * [WordFrameSizing.targetLabelSp] so it stays a fixed fraction of the word below it
+ * at every system font scale. */
 @Composable
 private fun TargetLabelRow(
     label: SymbolInWordDerivation.TargetLabel,
     onClick: () -> Unit,
 ) {
+    val targetGlyphSp = WordFrameSizing.targetLabelSp(LocalDensity.current.fontScale).sp
     Row(
         verticalAlignment = Alignment.CenterVertically,
         // Centred inside the enforced minimum, so a single narrow glyph does not sit
@@ -364,16 +370,16 @@ private fun TargetLabelRow(
             .clickable { onClick() }
             .testTag("detective_target"),
     ) {
-        Text(text = label.primary, fontSize = TargetGlyphSp, color = SoftSand)
+        Text(text = label.primary, fontSize = targetGlyphSp, color = SoftSand)
         if (label.alternate != null) {
             // A separator, not something to read: half size and dimmed so the two
             // letters dominate (design doc §2).
             Text(
                 text = "/",
-                fontSize = TargetGlyphSp / 2,
+                fontSize = targetGlyphSp / 2,
                 color = MutedText.copy(alpha = 0.45f),
             )
-            Text(text = label.alternate, fontSize = TargetGlyphSp, color = SoftSand)
+            Text(text = label.alternate, fontSize = targetGlyphSp, color = SoftSand)
         }
     }
 }
