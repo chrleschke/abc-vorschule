@@ -45,11 +45,11 @@ import app.abcvorschule.ui.exercise.drag.DragCard
 import app.abcvorschule.ui.exercise.drag.DropZone
 import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.MutedText
-import app.abcvorschule.ui.theme.NightElevated
-import app.abcvorschule.ui.theme.NightInk
-import app.abcvorschule.ui.theme.SoftMint
-import app.abcvorschule.ui.theme.SoftSand
+import app.abcvorschule.ui.theme.Cream
+import app.abcvorschule.ui.theme.CreamElevated
+import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.theme.WarmMuted
 
 object SentenceOrderTray {
     /** A sentence can need more cards than a word, but the tray stays scannable. */
@@ -156,7 +156,7 @@ fun SentenceOrderTrainer(
                 transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(140)) },
                 label = "sentence_complete",
             ) { isComplete -> if (isComplete) {
-                Text(words.joinToString(" "), style = MaterialTheme.typography.headlineSmall, color = SoftSand, modifier = Modifier.testTag("completed_sentence"))
+                Text(words.joinToString(" "), style = MaterialTheme.typography.headlineSmall, color = WarmInk, modifier = Modifier.testTag("completed_sentence"))
             } else Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Canvas(
                     Modifier
@@ -165,7 +165,7 @@ fun SentenceOrderTrainer(
                 ) {
                     // A gently sagging line, drawn rather than iconified.
                     drawLine(
-                        color = MutedText.copy(alpha = 0.5f),
+                        color = WarmMuted.copy(alpha = 0.6f),
                         start = Offset(0f, size.height * 0.2f),
                         end = Offset(size.width, size.height * 0.2f),
                         strokeWidth = 5f,
@@ -230,7 +230,7 @@ fun SentenceOrderTrainer(
                             modifier = Modifier
                                 .defaultMinSize(minHeight = AbcDimens.kidTouch - 8.dp)
                                 .background(
-                                    color = if (field.selectedKey == key) SoftMint else NightElevated,
+                                    color = if (field.selectedKey == key) LeafGreen else CreamElevated,
                                     shape = RoundedCornerShape(18.dp),
                                 )
                                 .padding(horizontal = 16.dp, vertical = 12.dp)
@@ -239,7 +239,9 @@ fun SentenceOrderTrainer(
                             Text(
                                 text = card.display,
                                 style = MaterialTheme.typography.headlineSmall,
-                                color = if (field.selectedKey == key) NightInk else SoftSand,
+                                // Cream on LeafGreen ~3.57:1 (large glyph, see Color.kt);
+                                // WarmInk on CreamElevated ~8.9:1.
+                                color = if (field.selectedKey == key) Cream else WarmInk,
                             )
                         }
                     }
@@ -279,12 +281,18 @@ private fun Peg(
             .width(pegWidthDp.dp)
             .defaultMinSize(minHeight = 64.dp)
             .background(
-                color = if (armed) SoftMint.copy(alpha = 0.22f) else NightElevated,
+                color = if (armed) LeafGreen.copy(alpha = 0.22f) else CreamElevated,
                 shape = RoundedCornerShape(16.dp),
             )
             .border(
                 width = 3.dp,
-                color = if (filled != null) SoftMint.copy(alpha = 0.7f) else SoftSand.copy(alpha = 0.32f),
+                // Same deviation as WordBuildTrainer's Frame() border (identical pattern,
+                // "wie WordBuild-Slots" per the brief): the literal LeafGreen.copy(0.7f) /
+                // WarmMuted.copy(0.32f) fail the 3:1 UI-component floor once composited
+                // over CreamElevated. Full-opacity LeafGreen clears 3:1 against the page's
+                // Cream (3.57:1); WarmMuted needs alpha ~0.9f to clear 3:1 against
+                // CreamElevated itself (3.11:1) — see task-5-report.md for the full calc.
+                color = if (filled != null) LeafGreen else WarmMuted.copy(alpha = 0.9f),
                 shape = RoundedCornerShape(16.dp),
             )
             .padding(
@@ -297,20 +305,22 @@ private fun Peg(
             filled != null -> Text(
                 text = filled,
                 style = MaterialTheme.typography.headlineSmall.copy(fontSize = glyphSp.sp),
-                color = SoftSand,
+                color = WarmInk,
                 maxLines = 1,
             )
             showGhost -> Text(
                 text = expected,
                 style = MaterialTheme.typography.headlineSmall.copy(fontSize = glyphSp.sp),
-                color = SoftSand,
+                color = WarmInk,
                 maxLines = 1,
                 modifier = Modifier.alpha(0.22f),
             )
             else -> Text(
                 text = "_",
                 style = MaterialTheme.typography.headlineSmall.copy(fontSize = glyphSp.sp),
-                color = SoftSand.copy(alpha = 0.45f),
+                // Decorative empty-peg marker, not reading content — alpha bumped +0.1
+                // (0.45f -> 0.55f), same pattern as WordBuildTrainer's Frame().
+                color = WarmMuted.copy(alpha = 0.55f),
                 maxLines = 1,
             )
         }

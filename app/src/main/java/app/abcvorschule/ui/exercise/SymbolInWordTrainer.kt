@@ -53,24 +53,32 @@ import app.abcvorschule.content.SymbolInWordRound
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.MutedText
-import app.abcvorschule.ui.theme.SoftCoral
-import app.abcvorschule.ui.theme.SoftGold
-import app.abcvorschule.ui.theme.SoftMint
-import app.abcvorschule.ui.theme.SoftSand
-import app.abcvorschule.ui.theme.SoftSky
+import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.StarGoldDeep
+import app.abcvorschule.ui.theme.SunCoral
+import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.theme.WarmMuted
 import kotlinx.coroutines.delay
 
 /** Segment colours cycle; the palette only marks boundaries, it carries no meaning,
- * so repeating it on an eight-segment word is harmless (design doc §5). */
-private val SegmentPalette = listOf(SoftMint, SoftCoral, SoftSky, SoftGold, SoftSand)
+ * so repeating it on an eight-segment word is harmless (design doc §5).
+ *
+ * Four, not five (dropping the dark theme's near-white SoftSand entry, which would
+ * vanish on the light field), and StarGold swapped for StarGoldDeep: StarGold alone is
+ * only ~1.85:1 against Cream (see Color.kt), under the 3:1 floor these large single-glyph
+ * segments need as UI-component-scale text; StarGoldDeep clears it at ~3.29:1. The other
+ * three, solid against Cream: SunCoral ~3.61:1, SkyBlue ~3.88:1, LeafGreen ~3.57:1.
+ */
+private val SegmentPalette = listOf(SunCoral, SkyBlue, LeafGreen, StarGoldDeep)
 
 /** A collected segment stays visible but spent — this is the "completed colour"
- * and the "no longer tappable" affordance in one treatment. */
-private const val CollectedSegmentAlpha = 0.35f
+ * and the "no longer tappable" affordance in one treatment. Alpha bumped +0.1 (0.35f
+ * dark-theme value) for the light theme, same pattern as the other muted alphas here. */
+private const val CollectedSegmentAlpha = 0.45f
 
 /** Scaffold "Beginner": the target lies in the stroke as a silhouette (Prinzip 6). */
-private const val SilhouetteAlpha = 0.18f
+private const val SilhouetteAlpha = 0.15f
 
 /** How long a wrong segment spins around its own centre. */
 private const val SpinMs = 450
@@ -325,7 +333,11 @@ fun SymbolInWordTrainer(
                     // touched a lowercase "m" in "Mama" and must see that "m" fly.
                     text = glyph,
                     fontSize = fontSp.sp,
-                    color = SoftGold,
+                    // StarGoldDeep, not StarGold: StarGold alone is only ~1.85:1 against
+                    // the Cream page this flight is drawn over — under the 3:1 floor for a
+                    // glyph the child must track and read mid-flight. StarGoldDeep clears
+                    // it at ~3.29:1 (same substitution as landedColor below).
+                    color = StarGoldDeep,
                     modifier = Modifier.alpha(1f - progress * 0.15f),
                 )
             }
@@ -370,16 +382,17 @@ private fun TargetLabelRow(
             .clickable { onClick() }
             .testTag("detective_target"),
     ) {
-        Text(text = label.primary, fontSize = targetGlyphSp, color = SoftSand)
+        Text(text = label.primary, fontSize = targetGlyphSp, color = WarmInk)
         if (label.alternate != null) {
             // A separator, not something to read: half size and dimmed so the two
-            // letters dominate (design doc §2).
+            // letters dominate (design doc §2). Decorative, so not held to 3:1/4.5:1;
+            // alpha bumped +0.1 (0.45f -> 0.55f), same pattern as the other muted alphas.
             Text(
                 text = "/",
                 fontSize = targetGlyphSp / 2,
-                color = MutedText.copy(alpha = 0.45f),
+                color = WarmMuted.copy(alpha = 0.55f),
             )
-            Text(text = label.alternate, fontSize = targetGlyphSp, color = SoftSand)
+            Text(text = label.alternate, fontSize = targetGlyphSp, color = WarmInk)
         }
     }
 }
@@ -503,7 +516,7 @@ private fun SegmentGlyph(
             fontSize = glyphSp.sp,
             fontWeight = FontWeight.SemiBold,
             color = if (collected) {
-                MutedText.copy(alpha = CollectedSegmentAlpha)
+                WarmMuted.copy(alpha = CollectedSegmentAlpha)
             } else {
                 SegmentPalette[index % SegmentPalette.size]
             },
@@ -513,9 +526,11 @@ private fun SegmentGlyph(
 }
 
 /**
- * One bare stroke per hit. A landed glyph rests in SoftGold — the same colour as
- * stars and points, so a filled stroke reads as "earned". After "Zeig mir" the same
- * glyphs arrive dimmed instead: resolving is not a reward (Prinzip 8, design doc §6).
+ * One bare stroke per hit. A landed glyph rests in StarGoldDeep — the same colour
+ * family as stars and points (StarGold itself is only ~1.85:1 against Cream, under the
+ * 3:1 floor for this large glyph/stroke fill; StarGoldDeep clears it at ~3.29:1), so a
+ * filled stroke reads as "earned". After "Zeig mir" the same glyphs arrive dimmed
+ * instead: resolving is not a reward (Prinzip 8, design doc §6).
  */
 @Composable
 private fun SlotRow(
@@ -550,7 +565,7 @@ private fun SlotRow(
     } else {
         1f
     }
-    val landedColor = if (resolved) MutedText else SoftGold
+    val landedColor = if (resolved) WarmMuted else StarGoldDeep
     Row(
         modifier = Modifier.fillMaxWidth().testTag("detective_slots"),
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
@@ -597,7 +612,7 @@ private fun SlotRow(
                         Text(
                             text = round.segments[round.targetIndices[ordinal]],
                             fontSize = AbcDimens.syllableSp,
-                            color = SoftSand.copy(alpha = SilhouetteAlpha),
+                            color = WarmInk.copy(alpha = SilhouetteAlpha),
                         )
                     }
                 }
@@ -606,7 +621,7 @@ private fun SlotRow(
                         .width(slotWidth)
                         .height(SlotStrokeHeight)
                         .background(
-                            color = if (filled) landedColor else MutedText,
+                            color = if (filled) landedColor else WarmMuted,
                             shape = RoundedCornerShape(2.dp),
                         ),
                 )

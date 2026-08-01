@@ -40,19 +40,26 @@ import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.NightElevated
-import app.abcvorschule.ui.theme.SoftCoral
-import app.abcvorschule.ui.theme.SoftGold
-import app.abcvorschule.ui.theme.SoftMint
-import app.abcvorschule.ui.theme.SoftSand
-import app.abcvorschule.ui.theme.SoftSky
+import app.abcvorschule.ui.theme.CreamElevated
+import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.StarGoldDeep
+import app.abcvorschule.ui.theme.SunCoral
+import app.abcvorschule.ui.theme.WarmInk
 import kotlinx.coroutines.delay
 
 // Matches AbcDimens.kidTouch (the app-wide minimum touch target for 4-6-year-olds)
 // so that even the smallest scattered tile (scale 0.8, see SymbolHuntLayout) renders
 // at 64dp — comfortably above the design spec's 56dp hit-box floor.
 private val TileSize = AbcDimens.kidTouch
-private val TilePalette = listOf(SoftMint, SoftCoral, SoftSky, SoftGold, SoftSand)
+
+// Four, not five: the dark theme's fifth entry (SoftSand, near-white) worked against a
+// dark field but a near-Cream tile on the light field would vanish into the page. Also
+// swaps StarGold for StarGoldDeep — StarGold's own border-solid contrast against Cream
+// is only ~1.85:1 (see Color.kt), well under the 3:1 UI-component floor this tile's ring
+// needs; StarGoldDeep clears it at ~3.29:1. The other three, at full opacity against
+// Cream: SunCoral ~3.61:1, SkyBlue ~3.88:1, LeafGreen ~3.57:1 — all pass.
+private val TilePalette = listOf(SunCoral, SkyBlue, StarGoldDeep, LeafGreen)
 
 /**
  * Buchstaben-/Silben-Jagd: tiles scatter across the whole task area under a
@@ -203,7 +210,7 @@ private fun SymbolHuntField(
                 Text(
                     text = pack.atoms[tile.atomId]?.display ?: tile.atomId,
                     fontSize = 28.sp,
-                    color = SoftSand,
+                    color = WarmInk,
                 )
             }
         }
@@ -248,9 +255,13 @@ private fun SymbolHuntBattery(
                     .alpha(if (celebrate) glow else 1f)
                     .background(
                         color = when {
-                            celebrate -> SoftGold
-                            filled -> SoftMint
-                            else -> NightElevated
+                            // Deviates from the literal StarGold mapping for the same
+                            // reason as TilePalette above: StarGold alone is only ~1.85:1
+                            // against Cream, well under the 3:1 floor for this filled
+                            // rectangle. StarGoldDeep clears it (~3.29:1).
+                            celebrate -> StarGoldDeep
+                            filled -> LeafGreen
+                            else -> CreamElevated
                         },
                         shape = RoundedCornerShape(6.dp),
                     ),

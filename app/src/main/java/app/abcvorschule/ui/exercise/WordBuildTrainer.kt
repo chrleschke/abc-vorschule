@@ -41,10 +41,11 @@ import app.abcvorschule.ui.exercise.drag.DragFieldState
 import app.abcvorschule.ui.exercise.drag.DropZone
 import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.NightElevated
-import app.abcvorschule.ui.theme.NightInk
-import app.abcvorschule.ui.theme.SoftMint
-import app.abcvorschule.ui.theme.SoftSand
+import app.abcvorschule.ui.theme.Cream
+import app.abcvorschule.ui.theme.CreamElevated
+import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.theme.WarmMuted
 
 object WordBuildTray {
     /** Preschoolers must be able to scan the whole tray at a glance. */
@@ -155,7 +156,7 @@ fun WordBuildTrainer(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            Text(solution.joinToString(""), fontSize = glyphSp.sp, color = SoftSand, modifier = Modifier.testTag("completed_word"))
+                            Text(solution.joinToString(""), fontSize = glyphSp.sp, color = WarmInk, modifier = Modifier.testTag("completed_word"))
                         }
                     } else Row(
                         horizontalArrangement = Arrangement.spacedBy(gap.dp, Alignment.CenterHorizontally),
@@ -202,7 +203,7 @@ fun WordBuildTrainer(
                                     minHeight = AbcDimens.kidTouch,
                                 )
                                 .background(
-                                    color = if (field.selectedKey == key) SoftMint else NightElevated,
+                                    color = if (field.selectedKey == key) LeafGreen else CreamElevated,
                                     shape = RoundedCornerShape(22.dp),
                                 )
                                 .padding(horizontal = 18.dp, vertical = 12.dp)
@@ -211,7 +212,9 @@ fun WordBuildTrainer(
                             Text(
                                 text = block.display,
                                 fontSize = AbcDimens.syllableSp,
-                                color = if (field.selectedKey == key) NightInk else SoftSand,
+                                // Cream on LeafGreen ~3.57:1 (large glyph, see Color.kt);
+                                // WarmInk on CreamElevated ~8.9:1.
+                                color = if (field.selectedKey == key) Cream else WarmInk,
                             )
                         }
                     }
@@ -249,12 +252,17 @@ private fun Frame(
             .width(frameWidthDp.dp)
             .defaultMinSize(minHeight = frameWidthDp.dp)
             .background(
-                color = if (armed) SoftMint.copy(alpha = 0.22f) else NightElevated,
+                color = if (armed) LeafGreen.copy(alpha = 0.22f) else CreamElevated,
                 shape = RoundedCornerShape(22.dp),
             )
             .border(
                 width = 3.dp,
-                color = if (filled != null) SoftMint.copy(alpha = 0.7f) else SoftSand.copy(alpha = 0.35f),
+                // Deviates from the literal mapping (LeafGreen.copy(0.7f) / WarmMuted.copy(0.5f)):
+                // both fail the 3:1 UI-component floor once composited over CreamElevated
+                // (2.06:1 / 1.77:1). Full-opacity LeafGreen clears 3:1 against the page's
+                // Cream (3.57:1); WarmMuted needs alpha raised to ~0.9f to clear 3:1 against
+                // CreamElevated itself (3.11:1) — see task-5-report.md for the full calc.
+                color = if (filled != null) LeafGreen else WarmMuted.copy(alpha = 0.9f),
                 shape = RoundedCornerShape(22.dp),
             )
             .padding(
@@ -264,18 +272,21 @@ private fun Frame(
             .testTag("frame_$index"),
     ) {
         when {
-            filled != null -> Text(text = filled, fontSize = glyphSp.sp, color = SoftSand, maxLines = 1)
+            filled != null -> Text(text = filled, fontSize = glyphSp.sp, color = WarmInk, maxLines = 1)
             showSilhouette -> Text(
                 text = expected,
                 fontSize = glyphSp.sp,
-                color = SoftSand,
+                color = WarmInk,
                 maxLines = 1,
                 modifier = Modifier.alpha(0.22f),
             )
             else -> Text(
                 text = "_",
                 fontSize = glyphSp.sp,
-                color = SoftSand.copy(alpha = 0.45f),
+                // Decorative empty-slot marker, not reading content — alpha bumped +0.1
+                // (0.45f -> 0.55f) over the dark-theme value, same pattern as the other
+                // muted alphas in this task, not held to the 3:1/4.5:1 floors.
+                color = WarmMuted.copy(alpha = 0.55f),
                 maxLines = 1,
             )
         }
