@@ -39,6 +39,7 @@ import app.abcvorschule.ui.components.AbcContinueButton
 import app.abcvorschule.ui.components.AbcSpeakerButton
 import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.theme.StarGold
+import app.abcvorschule.ui.theme.StarGoldDeep
 import kotlinx.coroutines.delay
 
 // Kosmetische Werte für den Hintergrundstern: anders als die Schriftgrößen entscheiden
@@ -177,6 +178,12 @@ fun RewardSummaryScreen(
 private fun BackgroundStar(scale: Float, modifier: Modifier = Modifier) {
     IconStar(
         tint = StarGold.copy(alpha = BackgroundStarAlpha),
+        // Ohne Override würde die neue Standard-Kontur (StarGoldDeep, siehe AbcIcons.kt)
+        // mit voller Deckkraft gezeichnet — ein scharfer Ring um einen sonst absichtlich
+        // fast unsichtbaren Hintergrundstern. Die Kontur bleibt darum auf derselben
+        // gedämpften Alpha wie die Füllung; Kontrast ist hier ohnehin irrelevant, weil
+        // dieser Stern rein dekorativ ist, kein bedienbares Glyph.
+        outline = StarGoldDeep.copy(alpha = BackgroundStarAlpha),
         size = BackgroundStarSize,
         modifier = modifier.scale(scale),
     )

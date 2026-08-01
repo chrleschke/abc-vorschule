@@ -23,6 +23,13 @@ val WarmInk = Color(0xFF3D3427)
 val WarmMuted = Color(0xFF7C6F5A)
 val StarGold = Color(0xFFF0A818)
 
+/**
+ * Kontur-/Tiefton des Belohnungsgolds: ≈3.25:1 auf Cream, gibt dem Stern-Glyph
+ * auf hellen Flächen eine ≥3:1-Grenze (StarGold selbst liegt auf Cream nur bei
+ * ~1.85:1 und reicht als reine Füllung nicht für ein UI-Komponenten-Glyph).
+ */
+val StarGoldDeep = Color(0xFFB07D0A)
+
 /** Cream on LeafGreen ≈ 3.5:1 (large text / icons / UI components). */
 val LeafGreen = Color(0xFF43904F)
 

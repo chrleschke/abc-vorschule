@@ -39,7 +39,7 @@ fun TaskPromptChrome(
             Text(
                 text = title,
                 fontSize = if (mutedTitle) 28.sp else 34.sp,
-                color = if (mutedTitle) WarmMuted.copy(alpha = 0.5f) else WarmInk,
+                color = if (mutedTitle) WarmMuted else WarmInk,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.clickable {
                     if (onTitleSpeak != null) onTitleSpeak(title) else onSpeakPrompt()

@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import app.abcvorschule.ui.theme.StarGoldDeep
 
 @Composable
 fun IconChevronLeft(
@@ -116,6 +117,15 @@ fun IconStar(
     tint: Color,
     modifier: Modifier = Modifier,
     size: Dp = 28.dp,
+    /**
+     * Kontur des Sternpfads: StarGold allein liegt auf Cream nur bei ~1.85:1 und
+     * unterschreitet die 3:1-Grenze für UI-Glyphen. Der Tiefton-Stroke gibt dem
+     * Glyph diese Grenze, ohne die Füllfarbe (und damit den "Belohnung"-Ton) zu
+     * verändern. Aufrufer, die bewusst einen andersfarbigen Stern wollen, können
+     * outline überschreiben (z. B. auf tint, um eine unifarbene Silhouette zu
+     * behalten).
+     */
+    outline: Color = StarGoldDeep,
 ) {
     Canvas(modifier.size(size)) {
         val w = size.toPx()
@@ -135,6 +145,11 @@ fun IconStar(
             close()
         }
         drawPath(path, color = tint)
+        drawPath(
+            path,
+            color = outline,
+            style = Stroke(width = w / 12f, join = StrokeJoin.Round),
+        )
     }
 }
 
