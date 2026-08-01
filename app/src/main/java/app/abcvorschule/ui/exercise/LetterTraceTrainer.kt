@@ -147,6 +147,11 @@ fun LetterTraceTrainer(
                                     return@TraceCanvas
                                 }
                                 wasOffCorridor = false
+                                // On the road but past the next star: the vehicle stays
+                                // where it is, so the start dot of a fresh bar keeps
+                                // marking that bar's beginning instead of following the
+                                // finger to wherever it entered the road.
+                                if (update.ahead) return@TraceCanvas
                                 vehicle = finger
                                 if (update.collectedStar) {
                                     // Read before the state write below, which is visible immediately.

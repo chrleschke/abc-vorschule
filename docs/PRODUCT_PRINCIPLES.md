@@ -37,7 +37,12 @@ Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede 
   eingesammelte Sterne verschwinden. Der aktive Balken liegt zuoberst und alle Sterne liegen über
   allen Balken — kein späterer Balken darf den aktuellen Pfad oder seine Sterne verdecken; ist ein
   Balken fertig, rückt der nächste nach oben. Fertige Balken füllen sich ease-in ein, das Fahrzeug springt an
-  den Startpunkt des nächsten Balkens. Nach dem letzten Stern hält der fertige Buchstabe eine halbe
+  den Startpunkt des nächsten Balkens **und bleibt dort stehen, bis das Kind den Balken wirklich dort
+  beginnt**: ein Finger, der weiter auf dem Balken liegt als der nächste Stern (plus Sammelradius),
+  zählt nicht und zieht das Fahrzeug nicht mit — er ist aber nicht „neben der Straße", also gibt es
+  dafür keinen Rüttel-Impuls. Sonst rutscht die Ziehbewegung z. B. nach dem E von „Ei" direkt unten
+  in die i-Straße und der Startpunkt sitzt am Fuß des i statt an seinem Kopf. Nach dem letzten
+  Stern hält der fertige Buchstabe eine halbe
   Sekunde, dann folgt die Belohnungsseite: Bild groß, darunter die Wortzeile („**T** wie Tomate")
   mit fettem Graphem. Kein zusätzlicher Buchstaben-Text unter dem Pfad.
 3. **Silben-Verschmelzer** — beide Laut-Kacheln sind schiebbar und wandern symmetrisch
@@ -80,6 +85,10 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
   (deterministisch, über den Emoji-Glyph dedupliziert). `letter_trace.rewardEmoji` bleibt
   bewusst außen vor — er ist die Belohnung des Trainers und wird nicht vorweggenommen.
 - Tasks referenzieren Atom-IDs; Validierung verhindert tote Referenzen.
+- **Glyphen-Strichenden treffen sich exakt oder deutlich nicht.** Ein Querstrich, der den Stamm
+  kappt, teilt dessen y-Wert (E/F/Ei/Eu/Pf: obere Balken auf `0.08` wie der Stamm, untere auf
+  `0.92`); ein Beinahe-Treffer von 0.02 liest sich als Wackler in der Buchstabenform. Getestet in
+  `GlyphLetterformTest` gegen das Pack, nicht gegen abgeschriebene Zahlen.
 - Orthografie: Silben eher klein; zusammengesetzte Wörter/Sätze korrekt großgeschrieben.
 - Rechnen nutzt die Bild-Ikonen derselben Lektion; Details zu Singular/Plural siehe Abschnitt 8.
 - Jede autorierte Lektion verweist über `finaleId` auf einen **Finale-Satz** in

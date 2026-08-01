@@ -24,6 +24,8 @@ class TraceProgressTest {
         val result = update(TraceState(), TracePoint(10f, 4f))
         assertFalse(result.offCorridor)
         assertFalse(result.collectedStar)
+        // Behind the next star, so the vehicle is free to follow the finger.
+        assertFalse(result.ahead)
     }
 
     @Test
@@ -46,6 +48,40 @@ class TraceProgressTest {
         val result = update(TraceState(), stars[0][1])
         assertFalse(result.collectedStar)
         assertEquals(TraceState(0, 0), result.state)
+    }
+
+    @Test
+    fun runningAheadOfTheNextStarIsFlaggedWithoutAnOffRoadNudge() {
+        // The far end of the stem while star 0 (half way down) is still uncollected.
+        val result = update(TraceState(1, 0), TracePoint(50f, 100f))
+        assertTrue(result.ahead)
+        assertFalse(result.offCorridor)
+        assertFalse(result.collectedStar)
+        assertEquals(TraceState(1, 0), result.state)
+    }
+
+    @Test
+    fun aSmallOvershootOfTheNextStarStillCounts() {
+        // The pick-up radius is the allowance: a finger a hair past the star collects it
+        // instead of being frozen out one pixel before the hit.
+        val justPast = TracePoint(50f, 50f + boxSize * TraceProgress.StarHitFraction * 0.9f)
+        val result = update(TraceState(1, 0), justPast)
+        assertFalse(result.ahead)
+        assertTrue(result.collectedStar)
+    }
+
+    @Test
+    fun tappingTheNextStarIsNeverTreatedAsRunningAhead() {
+        // The tap shortcut (R15) feeds the star position itself as the finger, on every
+        // stroke and star index — the gate must let all of those through.
+        strokes.indices.forEach { strokeIndex ->
+            stars[strokeIndex].indices.forEach { starIndex ->
+                val state = TraceState(strokeIndex, starIndex)
+                val result = update(state, stars[strokeIndex][starIndex])
+                assertFalse("$state", result.ahead)
+                assertTrue("$state", result.collectedStar)
+            }
+        }
     }
 
     @Test
