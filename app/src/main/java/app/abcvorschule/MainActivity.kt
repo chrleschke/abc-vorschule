@@ -33,8 +33,8 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.light(AndroidColor.TRANSPARENT, AndroidColor.TRANSPARENT),
         )
         setContent {
-            CompositionLocalProvider(LocalAbcHaptics provides rememberAbcHaptics()) {
-                AbcTheme {
+            AbcTheme {
+                CompositionLocalProvider(LocalAbcHaptics provides rememberAbcHaptics()) {
                     AbcApp(onFinish = { finish() })
                 }
             }
