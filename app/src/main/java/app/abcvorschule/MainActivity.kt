@@ -8,6 +8,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +20,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.speech.SpeechController
 import app.abcvorschule.ui.debug.TtsDebugScreen
+import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.rememberAbcHaptics
 import app.abcvorschule.ui.shell.TaskShell
 import app.abcvorschule.ui.theme.AbcTheme
 
@@ -30,8 +33,10 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.light(AndroidColor.TRANSPARENT, AndroidColor.TRANSPARENT),
         )
         setContent {
-            AbcTheme {
-                AbcApp(onFinish = { finish() })
+            CompositionLocalProvider(LocalAbcHaptics provides rememberAbcHaptics()) {
+                AbcTheme {
+                    AbcApp(onFinish = { finish() })
+                }
             }
         }
     }
