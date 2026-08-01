@@ -36,6 +36,30 @@ val LeafGreen = Color(0xFF43904F)
 /** Cream on SkyBlue ≈ 3.8:1 (large text / icons / UI components). */
 val SkyBlue = Color(0xFF3F7FB5)
 
+/**
+ * Helle Varianten von LeafGreen und SkyBlue — ausschließlich für Akzente AUF
+ * dunklen Flächen, in der Praxis die Ringe der Holzschilder auf dem Pfad.
+ *
+ * LeafGreen und SkyBlue sind gegen Cream kalibriert: sie sind die dunkle Hälfte
+ * eines hellen Paars. Auf einem dunklen Brett kehrt sich das um und sie fallen
+ * auf 2.86:1 bzw. 2.63:1 gegen WoodMid — ein dunkler Akzent auf dunklem Holz.
+ * Diese beiden sind dasselbe Grün und Blau, nur auf die andere Seite gedreht:
+ *   LeafGreenLight auf WoodMid 5.65:1, auf WoodWarm 3.82:1
+ *   SkyBlueLight   auf WoodMid 5.37:1
+ *
+ * Umgekehrt gilt hier dieselbe Falle: NIE als Fläche unter Cream- oder
+ * SoftSand-Text und nie als Akzent auf Cream — gegen Cream liegen sie bei
+ * 1.79:1 bzw. 1.88:1. Wer eine helle Fläche einfärben will, nimmt LeafGreen
+ * bzw. SkyBlue.
+ *
+ * Hex-gleich mit SoftMint und SoftSky aus der Nachtpalette: die beiden lagen
+ * aus demselben Grund auf demselben Holz und sind hier unter warmem Namen
+ * geerbt statt neu erfunden. Wer den Soft*-Block aufräumt, löscht dort nur die
+ * alten Namen — diese hier sind der Ersatz.
+ */
+val LeafGreenLight = Color(0xFF7EC8A3)
+val SkyBlueLight = Color(0xFF8FB8D9)
+
 /** Cream on SunCoral ≈ 3.6:1 (large text / icons / UI components). */
 val SunCoral = Color(0xFFD25B2D)
 

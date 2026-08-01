@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.sp
 import app.abcvorschule.R
 import app.abcvorschule.progress.LessonState
 import app.abcvorschule.ui.components.IconStar
-import app.abcvorschule.ui.theme.LeafGreen
-import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.LeafGreenLight
+import app.abcvorschule.ui.theme.SkyBlueLight
 import app.abcvorschule.ui.theme.SoftSand
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.WarmMuted
@@ -100,23 +100,26 @@ fun PathSignNode(
         LessonState.Available, LessonState.InProgress -> WoodMidShade
         LessonState.Locked, LessonState.Planned -> WoodDarkShade
     }
-    // The ring is drawn inside the board's bounds, so its inner edge is always
-    // the board and its outer edge is whatever the sign happens to scroll over.
-    // Inner edge: LeafGreen 2.86:1 on WoodMid, 1.93:1 on WoodWarm; SkyBlue
-    // 2.63:1 on WoodMid. Outer edge against sky: 2.78:1 and 3.02:1 on DaySkyMid.
-    // Worst case is a green ring over a green hill — LeafGreen on HillNear is
-    // 1.39:1 and that edge all but vanishes on signs in the bottom quarter of
-    // the screen.
+    // The light variants, not LeafGreen/SkyBlue themselves. The ring is drawn
+    // inside the board's bounds, so the edge that has to work is the inner one,
+    // against dark wood — and LeafGreen/SkyBlue are calibrated against Cream,
+    // i.e. they are the dark half of a light pair (2.86:1 and 2.63:1 on WoodMid,
+    // a dark accent on dark wood). Turned around:
+    //   LeafGreenLight on WoodMid  5.65:1   (Available)
+    //   LeafGreenLight on WoodWarm 3.82:1   (Mastered — the lighter board, so
+    //                                        the weakest of the three, still
+    //                                        clear of the 3:1 bar)
+    //   SkyBlueLight   on WoodMid  5.37:1   (InProgress)
     //
-    // All of that is accepted rather than tuned away, because the ring is not
-    // what tells a child whether a sign opens: the board tone and the lock glyph
-    // do, and the board itself is 3.4:1 against even the front hill, so the sign
-    // never loses its shape. Recolouring the ring to survive both a dark board
-    // and a mid-green hill would mean giving up green-for-open, which is the one
-    // association the whole app is built on.
+    // The outer edge is now the weak one (LeafGreenLight is 1.41:1 against
+    // DaySkyMid and 1.42:1 against HillNear), and that is the right way round:
+    // the ring's outer edge coincides with the board's own, and the board is
+    // 7.9:1 against the sky and 3.4:1 against even the front hill. The sign's
+    // silhouette is carried by the board; the ring only has to read as a
+    // coloured band on it.
     val ring: Color = when (state) {
-        LessonState.Mastered, LessonState.Available -> LeafGreen
-        LessonState.InProgress -> SkyBlue
+        LessonState.Mastered, LessonState.Available -> LeafGreenLight
+        LessonState.InProgress -> SkyBlueLight
         // WarmMuted is the palette's dim tone, but it is a dark tone on a dark
         // board: 0.28 (the old MutedText alpha) composites to 1.35:1 on WoodDark
         // and disappears. 0.55 gives 1.88:1, which is where the night ring
