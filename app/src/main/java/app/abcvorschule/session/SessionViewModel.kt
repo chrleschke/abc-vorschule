@@ -157,7 +157,7 @@ class SessionViewModel(
                     return@runCatching
                 }
                 val trainers = SymbolHuntInsertion.insertSymbolHunts(
-                    pack.tasksOf(lesson).map { schedule(it) },
+                    pack.playableTasksOf(lesson).map { schedule(it) },
                     pack,
                     lesson.id,
                     lesson.index,

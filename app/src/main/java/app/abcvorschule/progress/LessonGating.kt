@@ -35,12 +35,19 @@ object LessonGating {
         state == LessonState.Available || state == LessonState.InProgress ||
             state == LessonState.Mastered || (unlockAll && state == LessonState.Locked)
 
-    fun isMastered(lesson: Lesson, progress: LearnerProgress): Boolean =
-        lesson.taskIds.isNotEmpty() &&
-            lesson.taskIds.all { (progress.taskStats[it]?.correct ?: 0) > 0 }
+    /**
+     * Gates on [ContentPack.playableTasksOf], not the lesson's raw taskIds — a
+     * paused trainer (see [app.abcvorschule.content.PausedTrainerKinds]) must never
+     * block mastery, since the child can no longer play it to earn a correct.
+     */
+    fun isMastered(pack: ContentPack, lesson: Lesson, progress: LearnerProgress): Boolean {
+        val playableIds = pack.playableTasksOf(lesson).map { it.id }
+        return playableIds.isNotEmpty() &&
+            playableIds.all { (progress.taskStats[it]?.correct ?: 0) > 0 }
+    }
 
-    fun isTouched(lesson: Lesson, progress: LearnerProgress): Boolean =
-        lesson.taskIds.any { (progress.taskStats[it]?.attempts ?: 0) > 0 }
+    fun isTouched(pack: ContentPack, lesson: Lesson, progress: LearnerProgress): Boolean =
+        pack.playableTasksOf(lesson).map { it.id }.any { (progress.taskStats[it]?.attempts ?: 0) > 0 }
 
     fun stateOf(pack: ContentPack, progress: LearnerProgress, lessonId: String): LessonState =
         states(pack, progress).getValue(lessonId)
@@ -51,8 +58,8 @@ object LessonGating {
             val state = when {
                 lesson.status == LessonStatus.planned -> LessonState.Planned
                 !previousMastered -> LessonState.Locked
-                isMastered(lesson, progress) -> LessonState.Mastered
-                isTouched(lesson, progress) -> LessonState.InProgress
+                isMastered(pack, lesson, progress) -> LessonState.Mastered
+                isTouched(pack, lesson, progress) -> LessonState.InProgress
                 else -> LessonState.Available
             }
             if (lesson.status == LessonStatus.authored) {

@@ -53,9 +53,22 @@ class LessonGatingTest {
     @Test
     fun touchedButUnfinishedLessonIsInProgress() {
         val progress = LearnerProgress(
-            taskStats = mapOf(first.taskIds.first() to SkillStats(attempts = 2, correct = 0)),
+            taskStats = mapOf(
+                pack.playableTasksOf(first).first().id to SkillStats(attempts = 2, correct = 0),
+            ),
         )
         assertEquals(LessonState.InProgress, LessonGating.stateOf(pack, progress, first.id))
+    }
+
+    @Test
+    fun touchingOnlyAPausedTrainerDoesNotUnlockProgress() {
+        // sound_position (Trainer 1) is paused — attempts on it must not count
+        // toward touched/mastered, since the child can no longer play it.
+        val pausedTaskId = pack.tasksOf(first).first { it !in pack.playableTasksOf(first) }.id
+        val progress = LearnerProgress(
+            taskStats = mapOf(pausedTaskId to SkillStats(attempts = 3, correct = 1)),
+        )
+        assertEquals(LessonState.Available, LessonGating.stateOf(pack, progress, first.id))
     }
 
     @Test
