@@ -1145,7 +1145,7 @@
     {
       "id": "letter-ae",
       "lemma": "Ä",
-      "display": "Ä",
+      "display": "Äh",
       "emoji": "",
       "kind": "letter",
       "strokes": [
@@ -1599,7 +1599,7 @@
     {
       "id": "letter-eu",
       "lemma": "Eu",
-      "display": "Eu",
+      "display": "Oy",
       "emoji": "",
       "kind": "letter",
       "strokes": [
@@ -1955,7 +1955,7 @@
     },
     {
       "id": "letter-st",
-      "lemma": "St",
+      "lemma": "S t",
       "display": "St",
       "emoji": "",
       "kind": "letter",
@@ -2597,7 +2597,7 @@
     },
     {
       "id": "spi",
-      "lemma": "spi",
+      "lemma": "spie",
       "display": "spi",
       "emoji": "",
       "kind": "syllable"
@@ -3947,7 +3947,7 @@
     },
     {
       "id": "ha",
-      "lemma": "ha",
+      "lemma": "h",
       "display": "ha",
       "emoji": "",
       "kind": "syllable"
@@ -4109,7 +4109,7 @@
     },
     {
       "id": "st",
-      "lemma": "st",
+      "lemma": "s t",
       "display": "st",
       "emoji": "",
       "kind": "syllable"
