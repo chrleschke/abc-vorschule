@@ -41,6 +41,7 @@ import app.abcvorschule.ui.exercise.drag.DragCard
 import app.abcvorschule.ui.exercise.drag.DragFieldState
 import app.abcvorschule.ui.exercise.drag.DropZone
 import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
+import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
@@ -110,12 +111,14 @@ fun WordBuildTrainer(
         (round.blocks.map { it.atomId } + round.targetAtomId).distinct()
     }
     val tiles = WordBuildTray.tiles(round, placed.values.toList(), seed = round.targetAtomId.hashCode())
+    val haptics = LocalAbcHaptics.current
 
     fun place(index: Int, block: WordBlock) {
         if (resolved || placed[index] != null) return
         field.select(null)
         if (OrderedPlacement.isCorrectPlacement(index, block.display, solution)) {
             placed[index] = block.display
+            haptics.tick()
             onSpeak(block.display)
             if (OrderedPlacement.isSolved(placed.toMap(), solution)) {
                 completed = true

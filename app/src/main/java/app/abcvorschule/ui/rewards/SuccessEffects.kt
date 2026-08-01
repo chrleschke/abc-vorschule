@@ -34,11 +34,13 @@ fun SuccessBurst(
     modifier: Modifier = Modifier,
 ) {
     if (!trigger) return
+    val haptics = LocalAbcHaptics.current
     val scale = remember(trigger) { Animatable(0.4f) }
     val alpha = remember(trigger) { Animatable(0f) }
 
     LaunchedEffect(trigger) {
         playSuccessChime()
+        haptics.success()
         coroutineScope {
             launch {
                 scale.animateTo(

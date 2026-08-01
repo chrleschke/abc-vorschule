@@ -30,15 +30,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.ui.components.AbcResolveButton
+import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
@@ -92,7 +91,7 @@ fun SymbolHuntTrainer(
     val initialTileCount = remember(roundKey) { state.tiles.size }
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var batteryFull by remember(roundKey) { mutableStateOf(false) }
-    val haptics = LocalHapticFeedback.current
+    val haptics = LocalAbcHaptics.current
 
     fun handleTap(instanceId: Int) {
         if (resolved || batteryFull) return
@@ -106,15 +105,17 @@ fun SymbolHuntTrainer(
                 // reshuffle-every-time behavior, not just the first-reported miss),
                 // following the same haptic pattern as LetterTraceTrainer's
                 // off-corridor excursion feedback.
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                haptics.nudge()
                 onResult(false, false, listOf(round.targetAtomId))
             }
             SymbolHuntTapOutcome.MissAlreadyReported ->
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-            SymbolHuntTapOutcome.RoundComplete -> batteryFull = true
-            SymbolHuntTapOutcome.Collected,
-            SymbolHuntTapOutcome.Ignored,
-            -> Unit
+                haptics.nudge()
+            SymbolHuntTapOutcome.Collected -> haptics.tick()
+            SymbolHuntTapOutcome.RoundComplete -> {
+                batteryFull = true
+                haptics.celebrate()
+            }
+            SymbolHuntTapOutcome.Ignored -> Unit
         }
     }
 

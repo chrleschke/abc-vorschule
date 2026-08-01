@@ -37,11 +37,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -52,6 +50,7 @@ import app.abcvorschule.content.SymbolInWordDerivation
 import app.abcvorschule.content.SymbolInWordRound
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.ui.components.AbcResolveButton
+import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.SkyBlue
@@ -139,7 +138,7 @@ fun SymbolInWordTrainer(
     var state by remember(roundKey) { mutableStateOf(SymbolInWordProgress.initialState(round)) }
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var complete by remember(roundKey) { mutableStateOf(false) }
-    val haptics = LocalHapticFeedback.current
+    val haptics = LocalAbcHaptics.current
 
     val target = pack.atoms[round.targetAtomId]
     val label = target?.let { SymbolInWordDerivation.targetLabel(it, round.mode) }
@@ -195,14 +194,17 @@ fun SymbolInWordTrainer(
         state = result.state
         when (result.outcome) {
             SymbolInWordTapOutcome.Miss -> {
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                haptics.nudge()
                 onResult(false, false, listOf(round.targetAtomId))
             }
             SymbolInWordTapOutcome.MissAlreadyReported ->
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-            SymbolInWordTapOutcome.Collected ->
+                haptics.nudge()
+            SymbolInWordTapOutcome.Collected -> {
+                haptics.tick()
                 flight = SymbolFlight(index, result.state.collected.size - 1)
+            }
             SymbolInWordTapOutcome.RoundComplete -> {
+                haptics.tick()
                 flight = SymbolFlight(index, result.state.collected.size - 1)
                 complete = true
             }

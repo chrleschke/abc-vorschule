@@ -30,10 +30,8 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -44,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.Atom
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.ui.components.AbcResolveButton
+import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.playStarBlip
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
@@ -89,7 +88,7 @@ fun LetterTraceTrainer(
     var done by remember(roundKey) { mutableStateOf(false) }
     var reward by remember(roundKey) { mutableStateOf(false) }
     var resolved by remember(roundKey) { mutableStateOf(false) }
-    val haptics = LocalHapticFeedback.current
+    val haptics = LocalAbcHaptics.current
 
     val morph by animateFloatAsState(
         targetValue = if (reward || resolved) 1f else 0f,
@@ -137,7 +136,7 @@ fun LetterTraceTrainer(
                                     if (!wasOffCorridor) {
                                         wasOffCorridor = true
                                         offRoadCount += 1
-                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        haptics.nudge()
                                     }
                                     return@TraceCanvas
                                 }
@@ -149,7 +148,7 @@ fun LetterTraceTrainer(
                                     playStarBlip(starsCollected)
                                     // A distinct short tick per star: the reward must not feel
                                     // like the long buzz that means "off the road".
-                                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    haptics.tick()
                                     starsCollected += 1
                                     state = update.state
                                     // A finished bar hands the vehicle over to the next one, so the

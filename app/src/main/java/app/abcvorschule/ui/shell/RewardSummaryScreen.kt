@@ -38,6 +38,7 @@ import app.abcvorschule.content.LessonFinale
 import app.abcvorschule.ui.components.AbcContinueButton
 import app.abcvorschule.ui.components.AbcSpeakerButton
 import app.abcvorschule.ui.components.IconStar
+import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
 import kotlinx.coroutines.delay
@@ -105,7 +106,11 @@ fun RewardSummaryScreen(
     modifier: Modifier = Modifier,
 ) {
     var popped by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { popped = true }
+    val haptics = LocalAbcHaptics.current
+    LaunchedEffect(Unit) {
+        popped = true
+        haptics.celebrate()
+    }
     val starScale by animateFloatAsState(
         targetValue = if (popped) 1f else 0.7f,
         animationSpec = tween(500),

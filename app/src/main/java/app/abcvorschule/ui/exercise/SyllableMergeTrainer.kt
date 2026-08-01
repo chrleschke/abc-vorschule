@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.content.SyllableMergeRound
+import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
@@ -121,10 +122,12 @@ fun SyllableMergeTrainer(
     val scoredIds = remember(roundKey) {
         listOf(round.leftAtomId, round.rightAtomId, round.resultAtomId).distinct()
     }
+    val haptics = LocalAbcHaptics.current
 
     fun commit() {
         if (merged) return
         merged = true
+        haptics.success()
         onResult(true, false, scoredIds)
     }
 

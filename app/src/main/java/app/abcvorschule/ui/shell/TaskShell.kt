@@ -22,8 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
@@ -39,6 +37,7 @@ import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.exercise.TrainerCallbacks
 import app.abcvorschule.ui.exercise.TrainerHost
 import app.abcvorschule.ui.path.PathScreen
+import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.SuccessBurst
 import app.abcvorschule.ui.rewards.playBlockedBlip
 import app.abcvorschule.ui.theme.AbcDimens
@@ -61,7 +60,7 @@ fun TaskShell(
     onOpenTtsDebug: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val haptics = LocalHapticFeedback.current
+    val haptics = LocalAbcHaptics.current
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -113,7 +112,7 @@ fun TaskShell(
                     onOpenLesson = { viewModel.openLesson(it) },
                     onLockedTap = {
                         // A tap must never be a silent no-op, with or without TTS.
-                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        haptics.nudge()
                         playBlockedBlip()
                         if (ttsAvailable) onSpeak(viewModel.lockedLessonCue())
                     },
@@ -164,7 +163,7 @@ private fun PracticeBody(
 ) {
     val task = state.current
     val round = state.currentRound
-    val haptics = LocalHapticFeedback.current
+    val haptics = LocalAbcHaptics.current
     val speakPrompt = {
         onSpeak(viewModel.currentPromptText(ttsAvailable))
     }
@@ -182,7 +181,7 @@ private fun PracticeBody(
             onSpeak(cue)
         } else {
             // No German voice: a miss must still be perceivable.
-            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            haptics.nudge()
             playBlockedBlip()
         }
         viewModel.clearSpeakCue()

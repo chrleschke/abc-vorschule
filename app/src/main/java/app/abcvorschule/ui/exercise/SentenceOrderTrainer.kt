@@ -45,6 +45,7 @@ import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.exercise.drag.DragCard
 import app.abcvorschule.ui.exercise.drag.DropZone
 import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
+import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
@@ -121,12 +122,14 @@ fun SentenceOrderTrainer(
         placed.values.toList(),
         seed = round.sentenceId.hashCode(),
     )
+    val haptics = LocalAbcHaptics.current
 
     fun place(index: Int, card: WordBlock) {
         if (resolved || placed[index] != null) return
         field.select(null)
         if (OrderedPlacement.isCorrectPlacement(index, card.display, words)) {
             placed[index] = card.display
+            haptics.tick()
             onSpeak(card.display)
             if (OrderedPlacement.isSolved(placed.toMap(), words)) {
                 completed = true
