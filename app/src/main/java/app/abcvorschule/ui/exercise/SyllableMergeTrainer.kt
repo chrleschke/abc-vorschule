@@ -127,7 +127,11 @@ fun SyllableMergeTrainer(
     fun commit() {
         if (merged) return
         merged = true
-        haptics.success()
+        // Small collect-moment for the snap itself; the round's SuccessBurst (fired
+        // from onResult below) already plays haptics.success() once, so this only
+        // needs the lighter tick — otherwise the single "correct" event would double
+        // up on two success buzzes.
+        haptics.tick()
         onResult(true, false, scoredIds)
     }
 

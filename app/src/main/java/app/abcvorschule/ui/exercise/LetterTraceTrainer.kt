@@ -51,6 +51,7 @@ import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
+import app.abcvorschule.ui.theme.StarGoldDeep
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
@@ -363,6 +364,12 @@ private fun TraceCanvas(
                     // Only the active bar's stars are lit; the ones still to come stay
                     // faint so the next stroke announces itself without competing.
                     color = if (active) StarGold else StarGold.copy(alpha = 0.35f),
+                    // StarGold alone sits on the CreamElevated lane at only ~1.6:1 — well
+                    // under the 3:1 floor for UI glyphs. A StarGoldDeep contour (same
+                    // treatment as IconStar) restores that margin without changing the
+                    // "reward" hue. The inactive stars keep the same faded alpha on both
+                    // fill and outline so they read as one dimmed shape, not two layers.
+                    outline = if (active) StarGoldDeep else StarGoldDeep.copy(alpha = 0.35f),
                     outerRadius = layout.boxSize * if (next) 0.055f else 0.042f,
                 )
             }
@@ -413,16 +420,22 @@ private fun TraceStarSpark(
     }
 }
 
-/** Five-pointed collectible star, filled. */
+/** Five-pointed collectible star, filled, with a deep-gold contour for contrast. */
 private fun DrawScope.drawStar(
     center: TracePoint,
     color: Color,
+    outline: Color,
     outerRadius: Float,
 ) {
+    // The stroke is centered on the path, so it grows outward by half its width at
+    // the star's tips. Insetting the path radius by that half-width keeps the
+    // contoured star within the same footprint the plain fill used before.
+    val strokeWidth = outerRadius / 6f
+    val insetOuterRadius = outerRadius - strokeWidth / 2f
     val points = TraceGeometry.starPoints(
         center = center,
-        outerRadius = outerRadius,
-        innerRadius = outerRadius * 0.45f,
+        outerRadius = insetOuterRadius,
+        innerRadius = insetOuterRadius * 0.45f,
     )
     if (points.isEmpty()) return
     val path = Path().apply {
@@ -431,4 +444,9 @@ private fun DrawScope.drawStar(
         close()
     }
     drawPath(path = path, color = color)
+    drawPath(
+        path = path,
+        color = outline,
+        style = Stroke(width = strokeWidth, join = StrokeJoin.Round),
+    )
 }

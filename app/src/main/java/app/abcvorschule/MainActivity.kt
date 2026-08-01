@@ -29,8 +29,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
+            // Status bar: API 26 has windowLightStatusBar, so a fully transparent
+            // darkScrim fallback never actually gets used — safe to leave transparent.
             statusBarStyle = SystemBarStyle.light(AndroidColor.TRANSPARENT, AndroidColor.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.light(AndroidColor.TRANSPARENT, AndroidColor.TRANSPARENT),
+            // Nav bar: the second argument is the darkScrim shown on API 26 devices,
+            // which lack windowLightNavigationBar and so can't tint the (white) nav
+            // icons dark themselves. A transparent scrim there left white icons
+            // invisible on the Cream background; a translucent dark scrim keeps them
+            // legible without visibly darkening the bar on the newer devices that
+            // don't need the fallback.
+            navigationBarStyle = SystemBarStyle.light(AndroidColor.TRANSPARENT, 0x66000000),
         )
         setContent {
             AbcTheme {

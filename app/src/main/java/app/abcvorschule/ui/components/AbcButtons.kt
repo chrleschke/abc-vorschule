@@ -40,9 +40,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
+import app.abcvorschule.ui.theme.SunCoral
 
 /**
  * Primary action aligned to the trailing edge.
@@ -67,13 +69,13 @@ fun AbcContinueButton(
             contentPadding = PaddingValues(horizontal = 22.dp, vertical = 14.dp),
             modifier = Modifier.defaultMinSize(minHeight = AbcDimens.kidTouch - 8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = SunCoral,
+                contentColor = Cream,
             ),
         ) {
             Text(text = label, style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.width(10.dp))
-            IconChevronRight(tint = MaterialTheme.colorScheme.onPrimary, size = 22.dp)
+            IconChevronRight(tint = Cream, size = 22.dp)
         }
     }
 }

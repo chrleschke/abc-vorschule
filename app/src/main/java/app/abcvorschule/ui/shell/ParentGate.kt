@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
 
@@ -22,6 +23,7 @@ fun ParentGateButton(
     onUnlocked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val haptics = LocalAbcHaptics.current
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = MaterialTheme.shapes.medium,
@@ -36,6 +38,9 @@ fun ParentGateButton(
                                 tryAwaitRelease()
                             }
                         } catch (_: TimeoutCancellationException) {
+                            // Long-press threshold reached: confirm the gesture landed
+                            // before the gate unlocks.
+                            haptics.nudge()
                             onUnlocked()
                             tryAwaitRelease()
                         }
