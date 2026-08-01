@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.theme.SkyBlue
@@ -48,6 +47,12 @@ fun SuccessBurst(
     LaunchedEffect(trigger) {
         playSuccessChime()
         haptics.success()
+        // Fire-and-forget, purely decorative: NOT inside the coroutineScope below —
+        // that scope suspends until every launched child completes, so awaiting a
+        // 600ms burst there would stretch the whole entry phase to 600ms and push
+        // back delay(550)/exit/onFinished. The burst is only ever read via
+        // `burst.value` in the Canvas below, so it never needs to be joined.
+        launch { burst.animateTo(1f, tween(600, easing = FastOutSlowInEasing)) }
         coroutineScope {
             launch {
                 scale.animateTo(
@@ -59,7 +64,6 @@ fun SuccessBurst(
                 )
             }
             launch { alpha.animateTo(1f, tween(180)) }
-            launch { burst.animateTo(1f, tween(600, easing = FastOutSlowInEasing)) }
         }
         delay(550)
         // Wait for the exit animation to fully finish before the caller advances —
@@ -86,7 +90,6 @@ fun SuccessBurst(
                     progress = burst.value,
                     radiusPx = size.minDimension / 2f,
                 )
-                val center = Offset(this.size.width / 2f, this.size.height / 2f)
                 offsets.forEachIndexed { i, offset ->
                     drawCircle(
                         color = sparkColors[i % sparkColors.size],
