@@ -1,5 +1,8 @@
 package app.abcvorschule.ui.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,9 +24,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -33,6 +40,7 @@ import app.abcvorschule.R
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.StarGold
 
 /**
  * Primary action aligned to the trailing edge.
@@ -171,6 +179,18 @@ fun AbcProgressBar(
     modifier: Modifier = Modifier,
 ) {
     val fraction = if (total <= 0) 0f else ((index + 1).toFloat() / total.toFloat()).coerceIn(0f, 1f)
+    val animatedFraction by animateFloatAsState(
+        targetValue = fraction,
+        animationSpec = tween(450),
+        label = "progress-fraction",
+    )
+    // Kurzer Gold-Puls an der Füllkante bei jeder Index-Erhöhung — rein
+    // dekorativ, bleibt unter colorScheme.primary (StarGold, gedämpfte Alpha).
+    val pulse = remember { Animatable(0f) }
+    LaunchedEffect(index) {
+        pulse.snapTo(1f)
+        pulse.animateTo(0f, animationSpec = tween(500))
+    }
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -182,11 +202,20 @@ fun AbcProgressBar(
                 color = CreamElevated,
                 cornerRadius = CornerRadius(size.height),
             )
+            val fillWidth = size.width * animatedFraction
             drawRoundRect(
                 color = SkyBlue,
-                size = Size(size.width * fraction, size.height),
+                size = Size(fillWidth, size.height),
                 cornerRadius = CornerRadius(size.height),
             )
+            val pulseValue = pulse.value
+            if (pulseValue > 0f) {
+                drawCircle(
+                    color = StarGold.copy(alpha = 0.6f * pulseValue),
+                    radius = size.height * (0.8f + 0.6f * (1f - pulseValue)),
+                    center = Offset(fillWidth, size.height / 2f),
+                )
+            }
         }
     }
 }

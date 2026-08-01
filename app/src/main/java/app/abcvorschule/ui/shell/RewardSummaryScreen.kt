@@ -1,10 +1,12 @@
 package app.abcvorschule.ui.shell
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +26,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -38,9 +44,13 @@ import app.abcvorschule.content.LessonFinale
 import app.abcvorschule.ui.components.AbcContinueButton
 import app.abcvorschule.ui.components.AbcSpeakerButton
 import app.abcvorschule.ui.components.IconStar
+import app.abcvorschule.ui.rewards.ConfettiGeometry
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
+import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.SunCoral
 import kotlinx.coroutines.delay
 
 // Kosmetische Werte für den Hintergrundstern: anders als die Schriftgrößen entscheiden
@@ -124,57 +134,117 @@ fun RewardSummaryScreen(
         if (ttsAvailable) onSpeak(text)
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp)
-            .padding(top = 24.dp, bottom = 40.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Box(
+        modifier = modifier.fillMaxSize(),
     ) {
-        Text(
-            text = stringResource(R.string.reward_title),
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-            // Ungedeckelt würde der Header bei großer Schriftskalierung nicht nur
-            // wachsen, sondern (ohne maxLines) auf zwei Zeilen umbrechen und den
-            // Puffer auffressen, den die gedeckelten Bilder und der gedeckelte Satz
-            // freihalten. Siehe FinaleLayout.headerSizeSp/-headerLineHeightSp.
-            fontSize = FinaleLayout.headerSizeSp(fontScale).sp,
-            lineHeight = FinaleLayout.headerLineHeightSp(fontScale).sp,
-        )
+        // Ganz unten in der z-Reihenfolge: rein dekorativ, überlagert weder
+        // Bildreihe/Satz/Buttons noch fängt es Toucheingaben (Canvas ist nicht
+        // klickbar) — siehe ConfettiOverlay-Kommentar.
+        ConfettiOverlay(modifier = Modifier.fillMaxSize())
 
-        Box(
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center,
+                .fillMaxSize()
+                .padding(horizontal = 24.dp)
+                .padding(top = 24.dp, bottom = 40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (finale == null) {
-                // Ohne Bildreihe gibt es keine Größe, die der Stern aufblähen könnte, aber
-                // excludedFromMeasurement() bleibt trotzdem dran: sonst wäre die Aussage im
-                // Datei-Kommentar oben ("der Stern trägt nicht zur gemessenen Größe seiner
-                // Box bei") nur für die Finale-Variante wahr, nicht unbedingt.
-                BackgroundStar(
-                    scale = starScale,
-                    modifier = Modifier.excludedFromMeasurement(),
-                )
-            } else {
-                FinaleBody(
-                    finale = finale,
-                    pack = pack,
-                    ttsAvailable = ttsAvailable,
-                    speaking = speaking,
-                    onSpeak = onSpeak,
-                    fontScale = fontScale,
-                    starScale = starScale,
-                )
+            Text(
+                text = stringResource(R.string.reward_title),
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                // Ungedeckelt würde der Header bei großer Schriftskalierung nicht nur
+                // wachsen, sondern (ohne maxLines) auf zwei Zeilen umbrechen und den
+                // Puffer auffressen, den die gedeckelten Bilder und der gedeckelte Satz
+                // freihalten. Siehe FinaleLayout.headerSizeSp/-headerLineHeightSp.
+                fontSize = FinaleLayout.headerSizeSp(fontScale).sp,
+                lineHeight = FinaleLayout.headerLineHeightSp(fontScale).sp,
+            )
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (finale == null) {
+                    // Ohne Bildreihe gibt es keine Größe, die der Stern aufblähen könnte, aber
+                    // excludedFromMeasurement() bleibt trotzdem dran: sonst wäre die Aussage im
+                    // Datei-Kommentar oben ("der Stern trägt nicht zur gemessenen Größe seiner
+                    // Box bei") nur für die Finale-Variante wahr, nicht unbedingt.
+                    BackgroundStar(
+                        scale = starScale,
+                        modifier = Modifier.excludedFromMeasurement(),
+                    )
+                } else {
+                    FinaleBody(
+                        finale = finale,
+                        pack = pack,
+                        ttsAvailable = ttsAvailable,
+                        speaking = speaking,
+                        onSpeak = onSpeak,
+                        fontScale = fontScale,
+                        starScale = starScale,
+                    )
+                }
+            }
+
+            AbcContinueButton(
+                onClick = onContinue,
+                centered = true,
+            )
+        }
+    }
+}
+
+/**
+ * Fallendes Konfetti hinter dem gesamten Inhalt des End-Screens: läuft einmalig
+ * über [ConfettiDurationMillis] und zeichnet danach nichts mehr (deterministische
+ * Geometrie aus [ConfettiGeometry], Seed fest, damit Recompositions stabil bleiben).
+ * Reine Deko-Ebene — kein Klick-/Touch-Handling, liegt unterhalb des restlichen
+ * Inhalts in der Box, verdeckt also weder Bildreihe noch Satz noch Buttons.
+ */
+private const val ConfettiCount = 40
+private const val ConfettiSeed = 42L
+private const val ConfettiDurationMillis = 2200
+
+@Composable
+private fun ConfettiOverlay(modifier: Modifier = Modifier) {
+    val pieces = remember { ConfettiGeometry.pieces(count = ConfettiCount, seed = ConfettiSeed) }
+    val colors = listOf(StarGold, SunCoral, SkyBlue, LeafGreen)
+    var progress by remember { mutableStateOf(0f) }
+    val animatedProgress by animateFloatAsState(
+        targetValue = progress,
+        animationSpec = tween(ConfettiDurationMillis, easing = LinearEasing),
+        label = "confetti-progress",
+    )
+    LaunchedEffect(Unit) {
+        progress = 1f
+    }
+
+    if (animatedProgress < 1f) {
+        Canvas(modifier = modifier) {
+            val width = size.width
+            val height = size.height
+            pieces.forEach { piece ->
+                val y = ConfettiGeometry.yFraction(piece, animatedProgress)
+                if (y in -0.1f..1.1f) {
+                    val x = (piece.xFraction + piece.drift * animatedProgress).coerceIn(0f, 1f) * width
+                    val pieceSize = (10f * piece.sizeFraction)
+                    withTransform({
+                        translate(left = x, top = y * height)
+                        rotate(degrees = piece.drift * 360f * animatedProgress, pivot = Offset.Zero)
+                    }) {
+                        drawRoundRect(
+                            color = colors[piece.colorIndex],
+                            topLeft = Offset(-pieceSize / 2f, -pieceSize / 2f),
+                            size = Size(pieceSize, pieceSize),
+                            cornerRadius = CornerRadius(pieceSize * 0.3f),
+                        )
+                    }
+                }
             }
         }
-
-        AbcContinueButton(
-            onClick = onContinue,
-            centered = true,
-        )
     }
 }
 
