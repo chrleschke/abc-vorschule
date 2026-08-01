@@ -74,25 +74,61 @@ class SymbolInWordDerivationTest {
 
     @Test
     fun focusRotationAdvancesInsteadOfRepeatingTheSameGrapheme() {
-        // l01 traces M then A: "Mama" takes M, "am" must take A, not M again.
-        assertEquals(listOf("letter-m", "letter-a"), rounds("l01").map { it.targetAtomId })
+        // l08 traces D then K: "Dose" takes D, "Keks" must take K, not D again.
+        assertEquals(listOf("letter-d", "letter-k"), rounds("l08").map { it.targetAtomId })
     }
 
+    // --- no hunting inside a syllable -----------------------------------------
+
     @Test
-    fun noRoundHuntsInsideSomethingThatIsNotAWord() {
-        // "Finde den Buchstaben A im Wort ma" was the authored defect: l01-t7 built
-        // the syllable `ma` with the Wort-Bauer, and the derivation faithfully called
-        // it a word. The lesson now builds `am`, which is one. ContentValidator holds
-        // the authoring side of this; this test holds the derived prompts.
+    fun noRoundHuntsInsideASyllable() {
+        // A syllable is not a word, and every prompt says "im Wort - %s". It is also
+        // not the point: `ma` is introduced so the child reads it as *one* unit in
+        // `Ma·ma`, not so it takes it apart again.
         pack.authoredLessons.forEach { lesson ->
             rounds(lesson.id).forEach { round ->
                 assertNotEquals(
-                    "lesson ${lesson.id}: ${round.promptTts} calls a syllable a word",
+                    "lesson ${lesson.id}: ${round.promptTts} hunts inside a syllable",
                     AtomKind.syllable,
                     pack.atom(round.wordAtomId).kind,
                 )
             }
         }
+    }
+
+    @Test
+    fun aWordBuilderThatBuildsASyllableYieldsNoRound() {
+        // Synthetic, because the authored content no longer holds such a task —
+        // l01-t7 used to build `ma` and is gone. The guard stays because the
+        // Wort-Bauer is still allowed to build a syllable; only the hunt is not.
+        val wordBuild = WordBuildSpec(
+            id = "synthetic-syllable-build",
+            rounds = listOf(
+                WordBuildRound(
+                    promptTts = "Baue die Silbe ma.",
+                    targetAtomId = "ma",
+                    blocks = listOf(
+                        WordBlock(atomId = "letter-m", display = "m"),
+                        WordBlock(atomId = "letter-a", display = "a"),
+                    ),
+                ),
+            ),
+        )
+        val synthetic = pack.copy(tasks = pack.tasks + (wordBuild.id to wordBuild))
+        val base = pack.lesson("l01")
+        val lesson = base.copy(
+            taskIds = base.taskIds.filter { pack.tasks[it] is LetterTraceSpec } + wordBuild.id,
+        )
+        assertEquals(AtomKind.syllable, pack.atom("ma").kind)
+        assertTrue(SymbolInWordDerivation.buildRounds(synthetic, lesson).isEmpty())
+    }
+
+    @Test
+    fun lessonOneHuntsOnlyInsideMama() {
+        // Its other word_build target used to be the syllable `ma`; the lesson now
+        // builds only "Mama", so the rotation never gets to A.
+        assertEquals(listOf("letter-m"), rounds("l01").map { it.targetAtomId })
+        assertEquals(listOf("M", "a", "m", "a"), rounds("l01").single().segments)
     }
 
     @Test

@@ -162,18 +162,6 @@ object ContentValidator {
                     if (round.blocks.isEmpty()) {
                         issues += ValidationIssue("task $id has a word_build round without blocks")
                     }
-                    // The Wort-Bauer says "Baue das Wort …" and the Wort-Detektiv
-                    // derives "Finde … im Wort …" from the same target, so a target
-                    // that is a syllable makes both trainers assert something false
-                    // ("Baue das Wort ma"). Only `syllable` is rejected: `Kleid` is
-                    // authored as `other` because it is also picture vocabulary, and
-                    // that is a classification, not a lie about what it is.
-                    val targetKind = pack.atoms[round.targetAtomId]?.kind
-                    if (targetKind == AtomKind.syllable) {
-                        issues += ValidationIssue(
-                            "task $id builds ${round.targetAtomId} as a word, but the atom is a syllable",
-                        )
-                    }
                     (round.blocks + round.distractors).forEach { requireAtom("task $id", it.atomId) }
                     val spelled = round.blocks.joinToString("") { it.display }
                     val expected = pack.atoms[round.targetAtomId]?.display

@@ -115,26 +115,6 @@
       ]
     },
     {
-      "trainer": "word_build",
-      "id": "l01-t7",
-      "rounds": [
-        {
-          "promptTts": "Baue das Wort am. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
-          "targetAtomId": "am",
-          "blocks": [
-            {
-              "atomId": "letter-a",
-              "display": "a"
-            },
-            {
-              "atomId": "letter-m",
-              "display": "m"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "trainer": "sentence_order",
       "id": "l01-t8",
       "rounds": [
