@@ -3,6 +3,7 @@ package app.abcvorschule.speech
 import java.io.FileNotFoundException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ClipIndexTest {
@@ -66,5 +67,35 @@ class ClipIndexTest {
         assertNull(missing.lookup("Mama mag Mais."))
         val broken = ClipIndex.load { "kein json".byteInputStream() }
         assertNull(broken.lookup("Mama mag Mais."))
+    }
+
+    @Test
+    fun `laedt den echten committeten Asset-Index`() {
+        // src/main/assets ist als JVM-Test-Resource eingebunden (build.gradle.kts) —
+        // dieser Test sieht also genau die Dateien, die auch im APK landen.
+        val index = ClipIndex.load { path ->
+            javaClass.classLoader!!.getResourceAsStream(path)
+                ?: throw FileNotFoundException(path)
+        }
+        assertTrue("committed index.json darf nicht leer sein", index.size > 0)
+
+        val fileNamePattern = Regex(
+            "^(word|phoneme|prompt|miss|reward|sentence|finale|ui)_[0-9a-f]{12}\\.ogg$",
+        )
+        index.entries().forEach { entry ->
+            assertTrue(
+                "Dateiname ${entry.file} entspricht nicht dem Exporter-Schema",
+                fileNamePattern.matches(entry.file),
+            )
+        }
+
+        // Pinnt die Exporter→App-Naht an einen echten, aktuell gelockten Clip.
+        // Falls dieser Text jemals entlockt wird, verschwindet der Eintrag aus
+        // dem committeten index.json — dann muss dieser Test aktualisiert werden.
+        assertEquals(
+            "prompt_206bc14a3673.ogg",
+            index.lookup("Baue das Wort Eis. Suche die passenden Buchstaben und " +
+                "setze sie in die richtige Reihenfolge.")?.file,
+        )
     }
 }

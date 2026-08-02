@@ -26,6 +26,9 @@ class ClipIndex private constructor(private val clips: Map<String, ClipEntry>) {
 
     fun lookup(text: String): ClipEntry? = clips[text.trim()]
 
+    /** Alle Einträge, für Konsistenz-Checks über den gesamten Index (Tests). */
+    fun entries(): Collection<ClipEntry> = clips.values
+
     companion object {
         private val json = Json { ignoreUnknownKeys = true }
 
