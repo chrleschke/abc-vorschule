@@ -128,6 +128,16 @@ function candidateCount() {
   return Math.min(max, Math.max(1, fallback));
 }
 
+// Eigener Zähler für den Batch-Lauf: klein gehalten, weil er über mehrere
+// ausgewählte Clips hinweg multipliziert — anders als „Kandidaten würfeln“,
+// das nur einen einzigen Clip trifft.
+function batchCount() {
+  const max = state.limits.maxCandidates || 16;
+  const stored = Number(readLocal("ttsBatchCount", 2));
+  const fallback = Number.isFinite(stored) && stored >= 1 ? Math.round(stored) : 2;
+  return Math.min(max, Math.max(1, fallback));
+}
+
 function persistViewState() {
   writeLocal("ttsView", {
     search: el("search").value,
@@ -421,9 +431,15 @@ function profileSummaryCard(clip, profile) {
 
 function candidateRow(clip, cand, index) {
   const encoded = encodeURIComponent(clip.key);
-  const isProduction = clip.locked && clip.seed === cand.seed;
-  const classes = [cand.good ? "good" : "", cand.fresh === false ? "outdated" : ""]
-    .join(" ").trim();
+  // Nicht `clip.locked && ...`: auch ein noch unbestätigter Batch-Entwurf ist
+  // bereits die Aufnahme, die die App gerade ausliefert — das Radio zeigt das,
+  // unabhängig davon, ob der Seed schon per Lock geschützt ist.
+  const isProduction = clip.seed === cand.seed;
+  const classes = [cand.good ? "good" : "", cand.fresh === false ? "outdated" : "",
+                    isProduction ? "production" : ""].join(" ").trim();
+  const src = cand.isProductionOnly
+    ? `/audio/${encoded}.wav`
+    : `/candidates/${encoded}/${cand.seed}.wav`;
   return `
     <tr class="${classes}">
       <td class="center">
@@ -431,18 +447,18 @@ function candidateRow(clip, cand, index) {
                ${isProduction ? "checked" : ""}
                title="Genau diese Aufnahme wird sofort die Produktions-Audio, der Seed wird festgelegt." />
       </td>
-      <td><audio controls preload="metadata"
-                 src="/candidates/${encoded}/${cand.seed}.wav"
-                 data-index="${index}"></audio></td>
+      <td><audio controls preload="metadata" src="${src}"
+                 data-index="${index}" ${isProduction ? "data-current-production" : ""}></audio></td>
       <td class="nowrap">
+        ${cand.isProductionOnly ? "" : `
         <button data-rate="${cand.seed}" class="icon ${cand.good ? "active" : ""}"
                 title="${cand.good
                   ? "Bewertung zurücknehmen — der Seed verlässt auch den Seed-Pool des Profils"
                   : "Klingt gut — Bewertung wird gespeichert und der Seed in den Seed-Pool des Profils aufgenommen"}">👍</button>
         <button data-discard="${cand.seed}" class="icon"
-                title="Klingt schlecht — Probeaufnahme löschen">👎</button>
+                title="Klingt schlecht — Probeaufnahme löschen">👎</button>`}
       </td>
-      <td class="mono nowrap">${cand.seed}${index < 9 ? ` <span class="muted">[${index + 1}]</span>` : ""}</td>
+      <td class="mono nowrap">${cand.seed}</td>
       <td class="nowrap muted" title="Zeitpunkt der Erzeugung">${formatWhen(cand.createdAt)}</td>
       <td class="nowrap">${cand.speaker ? escapeHtml(cand.speaker) : '<span class="muted">—</span>'}</td>
       <td class="text-cell" title="${escapeHtml(cand.text || "")}">
@@ -541,20 +557,11 @@ function renderDetail(key) {
       <p class="muted small">Seed <span class="mono">${clip.seed}</span>
         <span>(${seedOrigin(clip, profile)})</span>
         · Sprache ${escapeHtml(profile.language)} (aus dem Profil)</p>
-      ${clip.status !== "missing"
-        ? `<audio controls src="/audio/${encoded}.wav" id="main-audio"></audio>` +
-          (clip.status === "stale"
-            ? '<p class="muted small">Diese Aufnahme ist veraltet — Text, Stimme, Seed ' +
-              'oder Einstellungen haben sich seit dem Rendern geändert. Der nächste ' +
-              'Batch-Lauf ersetzt sie.</p>' : "")
-        : '<p class="muted">Noch nicht gerendert.</p>'}
-      ${clip.locked
-        ? '<p><button id="btn-unlock" title="Festgelegten Seed, eigene Aussprache und eigene Stimme wieder freigeben — der Clip fällt komplett auf sein Profil zurück">Festlegung (Lock) entfernen</button></p>' : ""}
     </div>
 
     <div class="card">
-      <h3 style="margin-top:0">Kandidaten
-        <span class="muted normal">— Probeaufnahmen mit zufälligen Seeds, neueste zuerst</span></h3>
+      <h3 style="margin-top:0">Aufnahmen
+        <span class="muted normal">— Probeaufnahmen und aktuelle Produktion, neueste zuerst</span></h3>
       <p>
         <button id="btn-candidates" class="primary">🎲 Kandidaten würfeln</button>
         <input id="cand-count" type="number" min="1" max="${max}"
@@ -567,18 +574,20 @@ function renderDetail(key) {
         <ul class="small">
           <li><b>Produktion</b> — es kann nur eine geben: die Auswahl übernimmt genau
             diese Aufnahme sofort als Produktions-Audio und legt ihren Seed fest.
-            Freigeben über „Festlegung (Lock) entfernen“ oben.</li>
+            Die Festlegung entfällt von selbst, sobald keine Aufnahme dieses Clips
+            mehr übrig ist — dafür gibt es keinen eigenen Knopf.</li>
           <li><b>👍</b> — klingt gut: Bewertung wird gespeichert und der Seed automatisch
             in den Seed-Pool des Profils „${clip.profile}“ aufgenommen (Clips ohne Lock
             bekommen ihre Seeds aus diesem Pool).</li>
           <li><b>👎</b> — klingt schlecht: Probeaufnahme löschen (nimmt einen
             👍-Seed auch wieder aus dem Pool).</li>
-          <li><b>Erzeugt / Stimme / Text</b> — womit die Probeaufnahme entstand.
-            So bleiben mehrere Würfel-Runden auseinanderhaltbar.</li>
+          <li><b>Erzeugt / Stimme / Text</b> — womit die Aufnahme entstand.
+            So bleiben mehrere Würfel- und Batch-Läufe auseinanderhaltbar.</li>
         </ul>
       </details>
       ${clip.candidates.length === 0
-        ? '<p class="muted">Noch keine. „🎲 Kandidaten würfeln“ erzeugt Probeaufnahmen.</p>'
+        ? '<p class="muted">Noch keine Aufnahme. „🎲 Kandidaten würfeln“ oder ' +
+          '„▶ Batch-Lauf“ erzeugt welche.</p>'
         : `<div class="cand-scroll"><table class="cand-table">
             <thead><tr>
               <th title="Genau eine Aufnahme kann Produktion sein">Produktion</th>
@@ -618,14 +627,6 @@ function renderDetail(key) {
   el("cand-count").onchange = () => {
     writeLocal("ttsCandCount", Number(el("cand-count").value));
   };
-  const unlock = el("btn-unlock");
-  if (unlock) {
-    unlock.onclick = guard(async () => {
-      await api(`/api/clips/${encoded}/lock`, { method: "DELETE" });
-      await refresh();
-      showBanner("Festlegung entfernt — der Clip bekommt seinen Seed wieder automatisch.", "ok");
-    });
-  }
   el("clip-profile").onchange = guard(async (event) => {
     await post(`/api/clips/${encoded}/lock`,
                { seed: clip.seed, profile: event.target.value });
@@ -841,7 +842,7 @@ document.addEventListener("keydown", (event) => {
     select(clips[current - 1].key);
   } else if (event.key === " ") {
     event.preventDefault();
-    const audio = el("main-audio");
+    const audio = el("detail").querySelector("audio[data-current-production]");
     if (audio) {
       audio.currentTime = 0;
       audio.play();
@@ -876,13 +877,21 @@ el("sel-visible").onclick = () => setSelection(visibleClips().map((c) => c.key))
 el("sel-all").onclick = () => setSelection(state.clips.map((c) => c.key));
 el("sel-none").onclick = () => setSelection([]);
 
+el("batch-count").value = batchCount();
+el("batch-count").onchange = () => {
+  writeLocal("ttsBatchCount", Number(el("batch-count").value));
+  el("batch-count").value = batchCount();
+};
+
 el("btn-render").onclick = guard(async () => {
   const keys = [...state.selectedKeys];
   if (keys.length === 0) return;
+  const n = batchCount();
   if (!confirm(`Batch-Lauf für ${keys.length} ausgewählte Clips starten? ` +
-               `Gerendert wird nur, was fehlt oder veraltet ist — fertige Clips ` +
-               `werden übersprungen.`)) return;
-  await post("/api/render", { keys });
+               `Erzeugt wird nur, was fehlt oder veraltet ist — fertige Clips ` +
+               `werden übersprungen. Pro Clip entstehen ${n} Kandidaten, die du ` +
+               `danach in der Liste als Produktion bestätigst.`)) return;
+  await post("/api/render", { keys, n });
 });
 
 el("btn-cancel").onclick = guard(() => post("/api/jobs/cancel", {}));

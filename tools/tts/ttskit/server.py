@@ -26,17 +26,23 @@ from .cli import load_context
 from .paths import Paths
 from .plan import fingerprint, orphan_locks, status_of
 from .render import (
-    candidate_fingerprint, candidate_infos, candidate_meta, candidate_seeds,
-    random_seeds, render_clips, sample_candidates, update_candidate_meta,
+    candidate_fingerprint, candidate_meta, candidate_seeds, clip_audio_list,
+    random_seeds, render_batch_candidates, sample_candidates, update_candidate_meta,
 )
 from .store import BASE_SAMPLING, Lock, Locks, Profiles, RenderState
 
 STATIC = Path(__file__).resolve().parent / "static"
 
-#: Upper bound for one candidate batch. Each seed is a full model generation
-#: and `cancel` does not drain the queue, so an unbounded `n` would be a
-#: self-inflicted denial of service on a single-worker tool.
+#: Upper bound for one candidate batch — used both for a single clip's
+#: "Kandidaten würfeln" and per clip in a Batch-Lauf. Each seed is a full
+#: model generation and `cancel` does not drain the queue, so an unbounded
+#: `n` would be a self-inflicted denial of service on a single-worker tool.
 MAX_CANDIDATES = 16
+
+#: Default für "wie viele Beispiele pro Clip" im Batch-Lauf. Klein gehalten,
+#: weil er über mehrere ausgewählte Clips hinweg multipliziert — anders als
+#: das Kandidaten-Würfeln, das nur einen einzigen Clip trifft.
+DEFAULT_BATCH_COUNT = 2
 
 
 def _checked_speaker(name: Any) -> str:
@@ -195,7 +201,7 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                 "fields": list(clip.fields),
                 "lessons": list(clip.lessons),
                 "status": status_of(clip, profile, ctx.state, paths.audio),
-                "candidates": candidate_infos(paths, clip, profile),
+                "candidates": clip_audio_list(paths, clip, profile, ctx.state),
             })
         return {
             "engine": {"loaded": bool(getattr(engine, "loaded", False)),
@@ -371,7 +377,13 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
             raise HTTPException(status_code=422, detail="'seed' fehlt im Request-Body")
         seed = int(body["seed"])
         source = paths.candidates / key / f"{seed}.wav"
-        if not source.exists():
+        production = paths.audio / f"{key}.wav"
+        # Kein Kandidat unter diesem Seed — es sei denn, es ist genau der Seed,
+        # der schon unbestätigt in Produktion liegt (der Nachbau-Eintrag aus
+        # clip_audio_list, z. B. von `tts render` auf der Kommandozeile). Dort
+        # gibt es nichts zu kopieren, nur festzulegen.
+        already_in_place = seed == clip.seed and production.exists()
+        if not source.exists() and not already_in_place:
             raise HTTPException(status_code=404,
                                 detail=f"kein Kandidat mit Seed {seed} für {key!r}")
 
@@ -390,14 +402,20 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
         ))
         locks.save(paths.locks)
 
-        _copy_atomic(source, paths.audio / f"{key}.wav")
+        if source.exists():
+            _copy_atomic(source, production)
 
         # Nur wenn der Kandidat nachweislich mit den aktuellen Einstellungen
         # erzeugt wurde, gilt der Clip als gerendert. Sonst bleibt er
         # "stale" und der nächste Lauf rendert ihn mit dem gelockten Seed neu.
         profile = ctx.profiles.profiles[clip.profile]
         target = fingerprint(replace(clip, seed=seed), profile)
-        verified = candidate_fingerprint(paths, key, seed) == target
+        if source.exists():
+            verified = candidate_fingerprint(paths, key, seed) == target
+        else:
+            # Der Nachbau-Eintrag hat keinen Sidecar — die Frische steht schon
+            # im render-state, aus genau dem Lauf, der die Datei geschrieben hat.
+            verified = ctx.state.entries.get(key) == target
         if verified:
             render_state = RenderState.load(paths.render_state)
             render_state.entries[key] = target
@@ -450,12 +468,32 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
             profiles.save(paths.profiles)
         wav.unlink()
         (paths.candidates / key / f"{seed}.json").unlink(missing_ok=True)
+
+        production = paths.audio / f"{key}.wav"
+        # Der gelöschte Kandidat war die aktuelle Produktion: die Datei, die
+        # die App ausliefern würde, darf keinen verworfenen Klang mehr enthalten.
+        if clip.seed == seed and production.exists():
+            production.unlink()
+            render_state = RenderState.load(paths.render_state)
+            if render_state.entries.pop(key, None) is not None:
+                render_state.save(paths.render_state)
+
+        # Keine Probeaufnahme und keine Produktions-Datei mehr übrig — die
+        # Festlegung hat nichts mehr, worauf sie zeigen könnte, und fällt
+        # automatisch weg. Ein eigener "Lock entfernen"-Knopf erübrigt sich so.
+        if not candidate_seeds(paths, key) and not (paths.audio / f"{key}.wav").exists():
+            locks = Locks.load(paths.locks)
+            if locks.get(key) is not None:
+                locks.remove(key)
+                locks.save(paths.locks)
+
         return {"ok": "deleted"}
 
     @app.post("/api/render", status_code=202)
     def api_render(body: dict = Body(default={})) -> dict[str, str]:
         profile = body.get("profile") or None
         force = bool(body.get("force"))
+        count = max(1, min(MAX_CANDIDATES, int(body.get("n", DEFAULT_BATCH_COUNT))))
         keys = body.get("keys")
         if keys is not None:
             # Batch-Lauf über eine explizite Auswahl. Unbekannte Keys sind ein
@@ -479,16 +517,16 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
             ctx = context()
             clips = (ctx.clips if selection is None
                      else [c for c in ctx.clips if c.key in selection])
-            report = render_clips(
-                clips, ctx.profiles, engine, ctx.state, paths,
+            report = render_batch_candidates(
+                clips, ctx.profiles, engine, ctx.state, paths, count=count,
                 profile=profile, force=force, cancel=is_cancelled,
                 progress=lambda p: jobs.publish({
                     "type": "render", "clipKey": p.clip_key,
                     "index": p.index, "total": p.total,
                     "status": p.status, "message": p.message}))
-            # render_clips swallows per-clip failures so the batch continues.
-            # Without this summary the job publishes `job-done` and the UI says
-            # "fertig" even when every single clip failed.
+            # render_batch_candidates swallows per-clip failures so the batch
+            # continues. Without this summary the job publishes `job-done` and
+            # the UI says "fertig" even when every single clip failed.
             jobs.publish({"type": "job-summary", "job": name,
                           "rendered": report.rendered, "skipped": report.skipped,
                           "failed": len(report.failed)})

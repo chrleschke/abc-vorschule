@@ -124,6 +124,80 @@ def render_clips(
     return report
 
 
+def render_batch_candidates(
+    clips: Iterable[Clip],
+    profiles: Profiles,
+    engine: SupportsGenerate | None,
+    state: RenderState,
+    paths: Paths,
+    *,
+    count: int,
+    force: bool = False,
+    only: str | None = None,
+    profile: str | None = None,
+    dry_run: bool = False,
+    progress: Callable[[Progress], None] | None = None,
+    cancel: Callable[[], bool] | None = None,
+) -> RenderReport:
+    """Batch-Lauf im Web-Interface: erzeugt pro Clip `count` Kandidaten statt
+    direkt eine Produktions-Datei zu schreiben.
+
+    Anders als `render_clips` (der finale, inkrementelle CLI-Lauf, der
+    weiterhin unverändert direkt in die Produktions-Datei schreibt) bleibt
+    Produktion hier immer ein bewusster Schritt in der Kandidaten-Liste: ein
+    unbestätigter Treffer würde sonst beim nächsten Profil- oder Pool-Wechsel
+    stillschweigend durch einen anderen Seed ersetzt, ohne dass ihn je jemand
+    gehört hat.
+    """
+    selected = _select(clips, only, profile)
+    report = RenderReport()
+
+    todo: list[Clip] = []
+    for clip in selected:
+        prof = profiles.profiles[clip.profile]
+        if status_of(clip, prof, state, paths.audio) == "rendered" and not force:
+            report.skipped += 1
+            continue
+        todo.append(clip)
+
+    if dry_run:
+        report.rendered = len(todo)
+        return report
+
+    # `engine` is legitimately None for a dry run, which returned above. Assert
+    # rather than trust the ordering: a future reordering must fail here and not
+    # as an AttributeError deep inside the loop.
+    assert engine is not None, "render_batch_candidates needs an engine unless dry_run=True"
+
+    total = len(todo)
+    units_done = 0
+    total_units = total * count
+    for index, clip in enumerate(todo, start=1):
+        if cancel is not None and cancel():
+            break
+        prof = profiles.profiles[clip.profile]
+        existing = set(candidate_seeds(paths, clip.key)) | set(prof.seed_pool)
+        seeds = random_seeds(count, exclude=existing)
+
+        base = units_done
+
+        def on_candidate(p: Progress, clip: Clip = clip, base: int = base) -> None:
+            if progress is not None:
+                progress(Progress(index=base + p.index, total=total_units,
+                                  clip_key=clip.key, status=p.status, message=p.message))
+
+        written = sample_candidates(clip, prof, engine, paths, seeds,
+                                    progress=on_candidate, cancel=cancel)
+        units_done += len(seeds)
+        if len(written) == len(seeds):
+            report.rendered += 1
+        else:
+            report.failed.append((
+                clip.key,
+                f"{len(seeds) - len(written)} von {len(seeds)} Kandidaten fehlgeschlagen"))
+    return report
+
+
 def random_seeds(n: int, exclude: set[int] | None = None) -> list[int]:
     blocked = set(exclude or ())
     out: list[int] = []
@@ -244,5 +318,39 @@ def candidate_infos(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
             "text": meta.get("text"),
             "good": meta.get("rating") == "good",
         })
+    infos.sort(key=lambda info: (info["createdAt"] or "", info["seed"]), reverse=True)
+    return infos
+
+
+def clip_audio_list(paths: Paths, clip: Clip, profile: Profile,
+                    state: RenderState) -> list[dict]:
+    """Kandidaten UND — falls keiner von ihnen der aktuellen Produktion
+    entspricht — ein Nachbau-Eintrag für die Produktions-Datei selbst.
+
+    Vor dem Umbau auf Batch-Kandidaten schrieb ein Batch-Lauf direkt in die
+    Produktions-Datei, ohne je einen Kandidaten anzulegen; dasselbe gilt für
+    den finalen `tts render` auf der Kommandozeile. Ohne diesen Nachbau
+    verschwände so eine Aufnahme aus der Web-UI, sobald die eigene
+    Anzeige über der Kandidaten-Tabelle wegfällt — dabei ist die Tabelle
+    jetzt die einzige Stelle, an der man sie noch anhören und bewusst
+    festlegen kann.
+    """
+    infos = candidate_infos(paths, clip, profile)
+    if any(info["seed"] == clip.seed for info in infos):
+        return infos
+    audio_path = Path(paths.audio) / f"{clip.key}.wav"
+    if not audio_path.exists():
+        return infos
+    created = datetime.fromtimestamp(
+        audio_path.stat().st_mtime, timezone.utc).isoformat(timespec="seconds")
+    infos.append({
+        "seed": clip.seed,
+        "fresh": state.entries.get(clip.key) == fingerprint(clip, profile),
+        "createdAt": created,
+        "speaker": clip.speaker,
+        "text": clip.text,
+        "good": False,
+        "isProductionOnly": True,
+    })
     infos.sort(key=lambda info: (info["createdAt"] or "", info["seed"]), reverse=True)
     return infos

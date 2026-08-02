@@ -119,6 +119,36 @@ def test_state_reports_candidate_freshness_and_limits(client):
     assert all(c["fresh"] is False for c in clip["candidates"])
 
 
+def test_state_surfaces_a_legacy_production_only_entry(client):
+    """Vor dem Umbau auf Batch-Kandidaten landete eine Aufnahme direkt in
+    Produktion, ohne Kandidat — genau wie der finale `tts render` auf der
+    Kommandozeile es weiterhin tut. Sie muss trotzdem in der Kandidaten-Liste
+    auftauchen, denn das ist die einzige Stelle, an der man sie noch anhören
+    und bewusst festlegen kann."""
+    from ttskit.cli import load_context
+    from ttskit.render import render_clips
+
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    ctx = load_context(client.paths)
+    clip = next(c for c in ctx.clips if c.key == key)
+    render_clips([clip], ctx.profiles, FakeEngine(), ctx.state, client.paths)
+
+    clip_state = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert clip_state["status"] == "rendered"
+    assert clip_state["locked"] is False
+    assert len(clip_state["candidates"]) == 1
+    entry = clip_state["candidates"][0]
+    assert entry["seed"] == clip_state["seed"]
+    assert entry["isProductionOnly"] is True
+    assert entry["fresh"] is True
+
+    assert client.post(f"/api/clips/{key}/promote",
+                       json={"seed": entry["seed"]}).status_code == 200
+    after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert after["locked"] is True
+    assert after["status"] == "rendered"
+
+
 def test_promote_copies_audio_locks_seed_and_marks_rendered(client):
     key = client.get("/api/state").json()["clips"][0]["key"]
     client.post(f"/api/clips/{key}/candidates", json={"n": 1})
@@ -254,6 +284,44 @@ def test_deleting_a_candidate_removes_wav_and_sidecar(client):
     assert client.delete(f"/api/clips/{key}/candidates/{seed}").status_code == 404
 
 
+def test_deleting_the_promoted_candidate_removes_production_and_unlocks(client):
+    """Ohne eigenen 'Lock entfernen'-Knopf muss die Festlegung von selbst
+    verschwinden, sobald keine Audios mehr übrig sind."""
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    seed = clip["candidates"][0]["seed"]
+    assert client.post(f"/api/clips/{key}/promote", json={"seed": seed}).status_code == 200
+
+    locked = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert locked["locked"] is True
+    assert (client.paths.audio / f"{key}.wav").exists()
+
+    assert client.delete(f"/api/clips/{key}/candidates/{seed}").status_code == 200
+
+    after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert after["locked"] is False, "keine Audios mehr → Festlegung fällt automatisch weg"
+    assert after["candidates"] == []
+    assert not (client.paths.audio / f"{key}.wav").exists()
+
+
+def test_deleting_the_promoted_candidate_keeps_the_lock_if_others_remain(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 2})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    promoted_seed, other_seed = (c["seed"] for c in clip["candidates"])
+    client.post(f"/api/clips/{key}/promote", json={"seed": promoted_seed})
+
+    assert client.delete(f"/api/clips/{key}/candidates/{promoted_seed}").status_code == 200
+
+    after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert after["locked"] is True, "es gibt noch eine Probeaufnahme — die Festlegung bleibt"
+    assert [c["seed"] for c in after["candidates"]] == [other_seed]
+    assert not (client.paths.audio / f"{key}.wav").exists()
+
+
 def test_locking_a_clip_changes_its_seed(client):
     clip = client.get("/api/state").json()["clips"][0]
     key, before = clip["key"], clip["seed"]
@@ -286,10 +354,38 @@ def test_render_job_produces_audio(client):
     assert client.post("/api/render", json={"profile": "finale"}).status_code == 202
     wait_for_idle(client)
     clips = [c for c in client.get("/api/state").json()["clips"] if c["profile"] == "finale"]
-    assert clips and all(c["status"] == "rendered" for c in clips)
-    audio = client.get(f"/audio/{clips[0]['key']}.wav")
+    assert clips
+    # Batch-Lauf erzeugt Kandidaten, keine sofortige Produktion — bestätigen
+    # muss man selbst über den Radio-Button/promote.
+    assert all(len(c["candidates"]) == 2 for c in clips), "Default: 2 Beispiele pro Clip"
+    assert all(c["status"] == "missing" for c in clips)
+
+    key = clips[0]["key"]
+    seed = clips[0]["candidates"][0]["seed"]
+    assert client.post(f"/api/clips/{key}/promote", json={"seed": seed}).status_code == 200
+    promoted = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert promoted["status"] == "rendered"
+    audio = client.get(f"/audio/{key}.wav")
     assert audio.status_code == 200
     assert audio.content[:4] == b"RIFF"
+
+
+def test_batch_render_count_defaults_to_two(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    assert client.post("/api/render", json={"keys": [key]}).status_code == 202
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert len(clip["candidates"]) == 2
+
+
+def test_batch_render_count_is_clamped(client):
+    clips = client.get("/api/state").json()["clips"]
+    key = clips[1]["key"]  # a different clip than the default-count test above
+    assert client.post("/api/render",
+                       json={"keys": [key], "n": 100000}).status_code == 202
+    wait_for_idle(client, timeout=30)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert len(clip["candidates"]) == 16
 
 
 def test_unknown_clip_audio_is_404(client):
@@ -707,10 +803,11 @@ def test_batch_render_renders_only_the_selected_clips(client):
     assert client.post("/api/render", json={"keys": chosen}).status_code == 202
     wait_for_idle(client)
 
-    after = {c["key"]: c["status"] for c in client.get("/api/state").json()["clips"]}
-    assert all(after[k] == "rendered" for k in chosen)
+    after = {c["key"]: c for c in client.get("/api/state").json()["clips"]}
+    assert all(len(after[k]["candidates"]) == 2 for k in chosen), \
+        "Batch-Lauf erzeugt Kandidaten für die ausgewählten Clips"
     untouched = [k for k in after if k not in chosen]
-    assert all(after[k] == "missing" for k in untouched), \
+    assert all(after[k]["candidates"] == [] for k in untouched), \
         "der Batch-Lauf darf nicht ausgewählte Clips nicht anfassen"
 
 
