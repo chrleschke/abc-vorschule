@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 from .models import Item
+from .store import read_json
 
 FIELD_TO_PROFILE: dict[str, str] = {
     "lemma": "word",
@@ -27,8 +27,23 @@ ROUND_FIELDS = ("promptTts", "missTts", "rewardTts", "stretchTts")
 
 
 def _load(content_dir: Path, name: str, key: str) -> list[dict]:
+    """Read one content file, naming it in every failure mode.
+
+    A raw FileNotFoundError or KeyError('atoms') here tells the operator
+    nothing about which of the five files is at fault.
+    """
     path = content_dir / name
-    return json.loads(path.read_text(encoding="utf-8"))[key]
+    raw = read_json(path)
+    if raw is None:
+        raise ValueError(f"{path} does not exist — is the content pack path right?")
+    if not isinstance(raw, dict):
+        raise ValueError(f"{path} must contain an object, got {type(raw).__name__}")
+    if key not in raw:
+        raise ValueError(f"{path} has no {key!r} key")
+    entries = raw[key]
+    if not isinstance(entries, list):
+        raise ValueError(f"{path}: {key!r} must be a list, got {type(entries).__name__}")
+    return entries
 
 
 def _lesson_index(lessons: list[dict]) -> tuple[dict[str, str], dict[str, str]]:
@@ -44,10 +59,13 @@ def _lesson_index(lessons: list[dict]) -> tuple[dict[str, str], dict[str, str]]:
     return by_task, by_finale
 
 
-def extract_items(content_dir: Path, extra_strings: dict | None = None) -> list[Item]:
+def extract_items(content_dir: Path, extra_strings: dict | None = None,
+                  blanks: list[str] | None = None) -> list[Item]:
     """Collect every authored TTS string from the content pack.
 
-    Blank strings are skipped — they would produce empty audio.
+    Blank strings are skipped — they would produce empty audio. Pass a list as
+    `blanks` to collect the ids that were skipped, so `status` can report them
+    instead of silently swallowing an authoring mistake.
     """
     content_dir = Path(content_dir)
     atoms = _load(content_dir, "atoms.json", "atoms")
@@ -62,6 +80,8 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None) -> list[
     def add(item_id: str, text: str, field: str, source: str,
             lesson: str | None, label: str) -> None:
         if not text or not text.strip():
+            if blanks is not None:
+                blanks.append(item_id)
             return
         items.append(Item(id=item_id, text=text, field=field, source=source,
                           lesson=lesson, label=label))

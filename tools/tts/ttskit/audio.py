@@ -7,7 +7,13 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-SAMPLE_RATE = 24000
+#: Version of the post-processing chain below. It is part of the render
+#: fingerprint (see plan.fingerprint), so **bump it whenever any constant in
+#: this module changes** — the trim threshold, the trim pad, the normalisation
+#: target. Without a bump, `render` considers every existing clip up to date
+#: and out/audio/ ends up holding a mix of two post-processing generations that
+#: can only be told apart by ear.
+POSTPROCESS_VERSION = 1
 
 
 def trim_silence(wav: np.ndarray, sr: int, threshold: float = 0.01,

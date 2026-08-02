@@ -83,13 +83,22 @@ DEFAULT_PROFILES: dict[str, Any] = {
 }
 
 
-def _read_json(path: Path) -> dict[str, Any] | None:
+def read_json(path: Path) -> dict[str, Any] | None:
+    """Parse `path`, or return None if it does not exist.
+
+    Every failure is re-raised as a ValueError naming the path: these files are
+    hand-edited, so an error that does not say which file is at fault is close
+    to useless.
+    """
+    path = Path(path)
     if not path.exists():
         return None
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         raise ValueError(f"{path} is not valid JSON: {exc}") from exc
+    except OSError as exc:
+        raise ValueError(f"{path} could not be read: {exc}") from exc
 
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -131,7 +140,15 @@ class Profile:
     normalize: bool = True
 
     @classmethod
-    def from_dict(cls, raw: dict[str, Any]) -> "Profile":
+    def from_dict(cls, raw: dict[str, Any], *, name: str = "?",
+                  path: Path | None = None) -> "Profile":
+        where = f"{path}: " if path is not None else ""
+        if not isinstance(raw, dict):
+            raise ValueError(f"{where}profile {name!r} must be an object, "
+                             f"got {type(raw).__name__}")
+        for required in ("label", "speaker", "language", "instruct"):
+            if required not in raw:
+                raise ValueError(f"{where}profile {name!r} is missing {required!r}")
         return cls(
             label=raw["label"],
             speaker=raw["speaker"],
@@ -163,10 +180,26 @@ class Profiles:
 
     @classmethod
     def load(cls, path: Path) -> "Profiles":
-        raw = _read_json(Path(path)) or DEFAULT_PROFILES
+        path = Path(path)
+        raw = read_json(path)
+        # Explicitly `is None`, never truthiness: a truncated file that parses
+        # to `{}` must not silently hand back the defaults — that would throw
+        # away every curated seed pool without a word.
+        if raw is None:
+            raw = DEFAULT_PROFILES
+        if not isinstance(raw, dict):
+            raise ValueError(f"{path} must contain an object, got {type(raw).__name__}")
+        if "profiles" not in raw:
+            raise ValueError(f"{path} has no 'profiles' key — "
+                             f"delete the file to fall back to the defaults")
+        entries = raw["profiles"]
+        if not isinstance(entries, dict):
+            raise ValueError(f"{path}: 'profiles' must be an object, "
+                             f"got {type(entries).__name__}")
         return cls(
             pool_salt=raw.get("poolSalt", "v1"),
-            profiles={n: Profile.from_dict(p) for n, p in raw["profiles"].items()},
+            profiles={n: Profile.from_dict(p, name=n, path=path)
+                      for n, p in entries.items()},
         )
 
     def save(self, path: Path) -> None:
@@ -185,9 +218,21 @@ class Lock:
     source_text: str | None = None
 
     @classmethod
-    def from_dict(cls, raw: dict[str, Any]) -> "Lock":
+    def from_dict(cls, raw: dict[str, Any], *, key: str = "?",
+                  path: Path | None = None) -> "Lock":
+        where = f"{path}: " if path is not None else ""
+        if not isinstance(raw, dict):
+            raise ValueError(f"{where}lock {key!r} must be an object, "
+                             f"got {type(raw).__name__}")
+        if "seed" not in raw:
+            raise ValueError(f"{where}lock {key!r} is missing 'seed'")
+        try:
+            seed = int(raw["seed"])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"{where}lock {key!r} has a non-numeric seed "
+                             f"{raw['seed']!r}") from exc
         return cls(
-            seed=int(raw["seed"]),
+            seed=seed,
             profile=raw.get("profile"),
             text_override=raw.get("textOverride"),
             note=raw.get("note"),
@@ -208,11 +253,23 @@ class Lock:
 @dataclass
 class Locks:
     locks: dict[str, Lock] = field(default_factory=dict)
+    #: Where these locks came from, so downstream errors can name the file.
+    source: Path | None = None
 
     @classmethod
     def load(cls, path: Path) -> "Locks":
-        raw = _read_json(Path(path)) or {"version": 1, "locks": {}}
-        return cls({k: Lock.from_dict(v) for k, v in raw.get("locks", {}).items()})
+        path = Path(path)
+        raw = read_json(path)
+        if raw is None:  # explicitly, not truthiness — see Profiles.load
+            raw = {"version": 1, "locks": {}}
+        if not isinstance(raw, dict):
+            raise ValueError(f"{path} must contain an object, got {type(raw).__name__}")
+        entries = raw.get("locks", {})
+        if not isinstance(entries, dict):
+            raise ValueError(f"{path}: 'locks' must be an object, "
+                             f"got {type(entries).__name__}")
+        return cls({k: Lock.from_dict(v, key=k, path=path) for k, v in entries.items()},
+                   source=path)
 
     def save(self, path: Path) -> None:
         _write_json(Path(path), {
@@ -232,14 +289,37 @@ class Locks:
 
 @dataclass
 class RenderState:
-    """Maps clipKey -> render fingerprint of the file currently on disk."""
+    """Maps clipKey -> render fingerprint of the file currently on disk.
+
+    `failures` remembers the error message of the last failed attempt per clip
+    so `tts status` can report it — without it, a failed clip is
+    indistinguishable from one that was never rendered.
+    """
 
     entries: dict[str, str] = field(default_factory=dict)
+    failures: dict[str, str] = field(default_factory=dict)
 
     @classmethod
     def load(cls, path: Path) -> "RenderState":
-        raw = _read_json(Path(path)) or {"version": 1, "entries": {}}
-        return cls(dict(raw.get("entries", {})))
+        path = Path(path)
+        raw = read_json(path)
+        if raw is None:  # explicitly, not truthiness — see Profiles.load
+            raw = {"version": 1, "entries": {}}
+        if not isinstance(raw, dict):
+            raise ValueError(f"{path} must contain an object, got {type(raw).__name__}")
+        entries = raw.get("entries", {})
+        failures = raw.get("failures", {})
+        if not isinstance(entries, dict):
+            raise ValueError(f"{path}: 'entries' must be an object, "
+                             f"got {type(entries).__name__}")
+        if not isinstance(failures, dict):
+            raise ValueError(f"{path}: 'failures' must be an object, "
+                             f"got {type(failures).__name__}")
+        return cls(dict(entries), dict(failures))
 
     def save(self, path: Path) -> None:
-        _write_json(Path(path), {"version": 1, "entries": dict(sorted(self.entries.items()))})
+        _write_json(Path(path), {
+            "version": 1,
+            "entries": dict(sorted(self.entries.items())),
+            "failures": dict(sorted(self.failures.items())),
+        })

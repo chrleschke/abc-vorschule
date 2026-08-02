@@ -114,3 +114,97 @@ def test_failed_write_leaves_the_original_file_intact_and_no_stray_temp_file(
 
     assert path.read_text(encoding="utf-8") == original, "original file untouched"
     assert list(tmp_path.iterdir()) == [path], "no stray temp file left behind"
+
+
+def test_a_truncated_profiles_file_is_an_error_not_a_silent_reset(tmp_path):
+    """The worst possible outcome for this file is losing every curated seed
+    pool without a word — so `{}` must raise, not fall back to the defaults."""
+    path = tmp_path / "profiles.json"
+    path.write_text("{}", encoding="utf-8")
+    with pytest.raises(ValueError) as excinfo:
+        Profiles.load(path)
+    assert "profiles.json" in str(excinfo.value)
+    assert "profiles" in str(excinfo.value)
+
+
+def test_a_profile_missing_a_required_key_names_the_file_and_the_profile(tmp_path):
+    path = tmp_path / "profiles.json"
+    path.write_text(json.dumps({"poolSalt": "v1", "profiles": {
+        "word": {"speaker": "sohee", "language": "german", "instruct": "x"},
+    }}), encoding="utf-8")
+    with pytest.raises(ValueError) as excinfo:
+        Profiles.load(path)
+    assert "profiles.json" in str(excinfo.value)
+    assert "'word'" in str(excinfo.value)
+    assert "label" in str(excinfo.value)
+
+
+def test_profiles_must_be_an_object(tmp_path):
+    path = tmp_path / "profiles.json"
+    path.write_text(json.dumps({"profiles": []}), encoding="utf-8")
+    with pytest.raises(ValueError, match="profiles.json"):
+        Profiles.load(path)
+
+
+def test_an_empty_locks_file_is_an_error_not_a_silent_reset(tmp_path):
+    path = tmp_path / "locks.json"
+    path.write_text("[]", encoding="utf-8")
+    with pytest.raises(ValueError, match="locks.json"):
+        Locks.load(path)
+
+
+def test_a_locks_file_that_parses_to_an_empty_object_is_simply_empty(tmp_path):
+    path = tmp_path / "locks.json"
+    path.write_text("{}", encoding="utf-8")
+    assert Locks.load(path).locks == {}
+
+
+def test_a_lock_without_a_seed_names_the_file_and_the_key(tmp_path):
+    path = tmp_path / "locks.json"
+    path.write_text(json.dumps({"version": 1, "locks": {
+        "prompt:aaaabbbbcccc": {"profile": "word"},
+    }}), encoding="utf-8")
+    with pytest.raises(ValueError) as excinfo:
+        Locks.load(path)
+    assert "locks.json" in str(excinfo.value)
+    assert "prompt:aaaabbbbcccc" in str(excinfo.value)
+    assert "seed" in str(excinfo.value)
+
+
+def test_a_lock_with_a_non_numeric_seed_names_the_file_and_the_key(tmp_path):
+    path = tmp_path / "locks.json"
+    path.write_text(json.dumps({"version": 1, "locks": {
+        "prompt:aaaabbbbcccc": {"seed": "gleich wie vorher"},
+    }}), encoding="utf-8")
+    with pytest.raises(ValueError, match="prompt:aaaabbbbcccc"):
+        Locks.load(path)
+
+
+def test_locks_remember_where_they_came_from(tmp_path):
+    path = tmp_path / "locks.json"
+    assert Locks.load(path).source == path
+
+
+def test_a_malformed_render_state_is_an_error_not_a_silent_reset(tmp_path):
+    path = tmp_path / "render-state.json"
+    path.write_text(json.dumps({"entries": []}), encoding="utf-8")
+    with pytest.raises(ValueError, match="render-state.json"):
+        RenderState.load(path)
+
+
+def test_render_state_roundtrips_failures(tmp_path):
+    path = tmp_path / "render-state.json"
+    state = RenderState.load(path)
+    state.entries["prompt:abc123abc123"] = "fp"
+    state.failures["prompt:def456def456"] = "RuntimeError: kaputt"
+    state.save(path)
+
+    reloaded = RenderState.load(path)
+    assert reloaded.entries == {"prompt:abc123abc123": "fp"}
+    assert reloaded.failures == {"prompt:def456def456": "RuntimeError: kaputt"}
+
+
+def test_an_old_render_state_without_failures_still_loads(tmp_path):
+    path = tmp_path / "render-state.json"
+    path.write_text(json.dumps({"version": 1, "entries": {"a:1": "fp"}}), encoding="utf-8")
+    assert RenderState.load(path).failures == {}

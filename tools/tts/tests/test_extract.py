@@ -84,3 +84,53 @@ def test_blank_text_is_skipped(tmp_path):
         key = name.removesuffix(".json")
         (d / name).write_text('{"%s": []}' % key, encoding="utf-8")
     assert extract_items(d) == []
+
+
+def test_blank_text_can_be_collected_for_reporting(tmp_path):
+    d = tmp_path / "content"
+    d.mkdir()
+    (d / "atoms.json").write_text(
+        '{"atoms": [{"id": "empty", "lemma": "   ", "display": "", "kind": "word"},'
+        ' {"id": "maus", "lemma": "Maus", "display": "Maus", "kind": "word"}]}',
+        encoding="utf-8")
+    for name in ("sentences.json", "finales.json", "tasks.json", "lessons.json"):
+        (d / name).write_text('{"%s": []}' % name.removesuffix(".json"), encoding="utf-8")
+
+    blanks = []
+    items = extract_items(d, blanks=blanks)
+    assert [i.id for i in items] == ["atom:maus:lemma"]
+    assert blanks == ["atom:empty:lemma"]
+
+
+def test_a_missing_content_file_names_the_file(tmp_path):
+    import pytest
+
+    d = tmp_path / "content"
+    d.mkdir()
+    with pytest.raises(ValueError) as excinfo:
+        extract_items(d)
+    assert "atoms.json" in str(excinfo.value)
+
+
+def test_a_content_file_without_its_key_names_the_file_and_the_key(tmp_path):
+    import pytest
+
+    d = tmp_path / "content"
+    d.mkdir()
+    (d / "atoms.json").write_text('{"nope": []}', encoding="utf-8")
+    for name in ("sentences.json", "finales.json", "tasks.json", "lessons.json"):
+        (d / name).write_text('{"%s": []}' % name.removesuffix(".json"), encoding="utf-8")
+    with pytest.raises(ValueError) as excinfo:
+        extract_items(d)
+    assert "atoms.json" in str(excinfo.value)
+    assert "atoms" in str(excinfo.value)
+
+
+def test_malformed_json_in_a_content_file_names_the_file(tmp_path):
+    import pytest
+
+    d = tmp_path / "content"
+    d.mkdir()
+    (d / "atoms.json").write_text("{ kaputt", encoding="utf-8")
+    with pytest.raises(ValueError, match="atoms.json"):
+        extract_items(d)

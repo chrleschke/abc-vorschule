@@ -216,3 +216,73 @@ def test_orphan_locks_are_reported_not_deleted():
     orphans = orphan_locks(locks, clips)
     assert orphans == ["prompt:deadbeef1234"]
     assert locks.get("prompt:deadbeef1234") is not None, "must not be removed"
+
+
+def test_fingerprint_tracks_the_postprocessing_version():
+    """Bumping POSTPROCESS_VERSION must invalidate every clip — otherwise a
+    changed trim pad leaves out/audio/ holding two generations of audio."""
+    import ttskit.plan as plan_module
+    from ttskit.audio import POSTPROCESS_VERSION
+
+    prof = profiles()
+    clip = build_clips([item("task:t1:round:0:promptTts", "Hallo", "promptTts")],
+                       prof, Locks())[0]
+    profile = prof.profiles["prompt"]
+    base = fingerprint(clip, profile)
+
+    original = plan_module.POSTPROCESS_VERSION
+    try:
+        plan_module.POSTPROCESS_VERSION = original + 1
+        assert fingerprint(clip, profile) != base
+    finally:
+        plan_module.POSTPROCESS_VERSION = original
+    assert fingerprint(clip, profile) == base
+    assert plan_module.POSTPROCESS_VERSION == POSTPROCESS_VERSION
+
+
+def test_bumping_the_postprocessing_version_makes_rendered_clips_stale(tmp_path):
+    import ttskit.plan as plan_module
+
+    prof = profiles()
+    clip = build_clips([item("task:t1:round:0:promptTts", "Hallo", "promptTts")],
+                       prof, Locks())[0]
+    profile = prof.profiles["prompt"]
+    audio_dir = tmp_path / "audio"
+    audio_dir.mkdir()
+    (audio_dir / f"{clip.key}.wav").write_bytes(b"RIFF")
+    state = RenderState({clip.key: fingerprint(clip, profile)})
+    assert status_of(clip, profile, state, audio_dir) == "rendered"
+
+    original = plan_module.POSTPROCESS_VERSION
+    try:
+        plan_module.POSTPROCESS_VERSION = original + 1
+        assert status_of(clip, profile, state, audio_dir) == "stale"
+    finally:
+        plan_module.POSTPROCESS_VERSION = original
+
+
+def test_a_lock_naming_an_unknown_profile_is_rejected_by_name(tmp_path):
+    """It used to escape build_clips and raise a bare KeyError in `status`,
+    `render` and /api/state alike, naming neither the file nor the key."""
+    import pytest
+
+    items = [item("task:t1:phonemeTts", "M", "phonemeTts")]
+    key = clip_key("phoneme", "M")
+    locks = Locks({key: Lock(seed=5, profile="tippfehler")},
+                  source=tmp_path / "locks.json")
+    with pytest.raises(ValueError) as excinfo:
+        build_clips(items, profiles(), locks)
+    message = str(excinfo.value)
+    assert "locks.json" in message
+    assert key in message
+    assert "tippfehler" in message
+    assert "phoneme" in message, "the valid options must be listed"
+
+
+def test_a_missing_default_profile_is_rejected_without_blaming_the_lock():
+    import pytest
+
+    prof = profiles()
+    del prof.profiles["phoneme"]
+    with pytest.raises(ValueError, match="defaults to the unknown profile 'phoneme'"):
+        build_clips([item("task:t1:phonemeTts", "M", "phonemeTts")], prof, Locks())

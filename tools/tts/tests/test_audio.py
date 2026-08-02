@@ -1,9 +1,11 @@
 import numpy as np
 import soundfile as sf
 
-from ttskit.audio import (
-    SAMPLE_RATE, normalize_peak, postprocess, trim_silence, write_wav,
-)
+from ttskit.audio import normalize_peak, postprocess, trim_silence, write_wav
+
+# The production code never names a rate — it always uses whatever the engine
+# returned alongside the samples. This is a fixture value for the tests only.
+SAMPLE_RATE = 24000
 
 
 def tone(n: int, amplitude: float = 0.5) -> np.ndarray:
