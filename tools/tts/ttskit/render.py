@@ -7,8 +7,9 @@ loading 4 GB of weights to check a loop would be absurd.
 from __future__ import annotations
 
 import fnmatch
+import json
 import secrets
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Callable, Iterable, Protocol
 
@@ -151,6 +152,10 @@ def sample_candidates(
             wav = postprocess(wav, sample_rate, trim=profile.trim,
                               normalize=profile.normalize)
             write_wav(paths.candidates / clip.key / f"{seed}.wav", wav, sample_rate)
+            meta_path = paths.candidates / clip.key / f"{seed}.json"
+            meta_path.write_text(json.dumps(
+                {"fingerprint": fingerprint(replace(clip, seed=seed), profile)},
+            ) + "\n", encoding="utf-8")
             written.append(seed)
             status, message = "ok", ""
         except Exception as exc:  # noqa: BLE001
@@ -166,3 +171,31 @@ def candidate_seeds(paths: Paths, clip_key: str) -> list[int]:
     if not directory.exists():
         return []
     return sorted(int(p.stem) for p in directory.glob("*.wav") if p.stem.isdigit())
+
+
+def candidate_fingerprint(paths: Paths, clip_key: str, seed: int) -> str | None:
+    """Fingerprint, unter dem ein Kandidat erzeugt wurde — None, wenn unbekannt.
+
+    Kandidaten aus der Zeit vor den Sidecars haben keine Metadatei; eine
+    kaputte Datei behandeln wir genauso, statt die ganze State-Antwort zu
+    reißen: 'unbekannt' ist hier eine legitime Antwort.
+    """
+    path = Path(paths.candidates) / clip_key / f"{seed}.json"
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    value = raw.get("fingerprint") if isinstance(raw, dict) else None
+    return value if isinstance(value, str) else None
+
+
+def candidate_infos(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
+    """Kandidaten-Seeds plus Frische: entspricht der Sidecar-Fingerprint noch
+    den aktuellen Einstellungen? None = Alt-Kandidat ohne Sidecar."""
+    infos = []
+    for seed in candidate_seeds(paths, clip.key):
+        recorded = candidate_fingerprint(paths, clip.key, seed)
+        current = fingerprint(replace(clip, seed=seed), profile)
+        infos.append({"seed": seed,
+                      "fresh": None if recorded is None else recorded == current})
+    return infos
