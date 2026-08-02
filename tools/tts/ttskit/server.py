@@ -211,7 +211,8 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                               progress=lambda p: jobs.publish({
                                   "type": "candidate", "clipKey": clip.key,
                                   "index": p.index, "total": p.total,
-                                  "status": p.status, "message": p.message}))
+                                  "status": p.status, "message": p.message}),
+                              cancel=is_cancelled)
 
         jobs.submit(f"candidates:{key}", run)
         return {"ok": "queued"}
@@ -286,16 +287,32 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
 
     @app.get("/events")
     def api_events() -> StreamingResponse:
-        def stream():
-            sub = jobs.subscribe()
-            try:
-                yield f"data: {json.dumps(jobs.status())}\n\n"
-                while True:
-                    event = sub.get()
-                    yield f"data: {json.dumps(event)}\n\n"
-            finally:
-                jobs.unsubscribe(sub)
-
-        return StreamingResponse(stream(), media_type="text/event-stream")
+        return StreamingResponse(_event_stream(jobs), media_type="text/event-stream")
 
     return app
+
+
+def _event_stream(jobs: JobQueue):
+    """SSE body for `/events` — a module-level generator so it is directly
+    testable without going through the HTTP transport (see the note below on
+    why a real client can't exercise this end to end).
+
+    A timeout on `sub.get()` is essential: this generator runs in one of
+    anyio's shared threadpool slots. Without it, a client that disconnects
+    while idle leaves `sub.get()` blocked forever — the thread never returns,
+    `finally` never runs, and the slot is gone for good. The timeout wakes the
+    loop periodically so a dead connection's failed `yield`/send is noticed
+    and the generator can exit and clean up.
+    """
+    sub = jobs.subscribe()
+    try:
+        yield f"data: {json.dumps(jobs.status())}\n\n"
+        while True:
+            try:
+                event = sub.get(timeout=15)
+            except queue.Empty:
+                yield ": keep-alive\n\n"
+                continue
+            yield f"data: {json.dumps(event)}\n\n"
+    finally:
+        jobs.unsubscribe(sub)

@@ -157,6 +157,20 @@ def test_sample_candidates_writes_one_file_per_seed(setup):
         assert (paths.candidates / clip.key / f"{seed}.wav").exists()
 
 
+def test_sample_candidates_cancel_stops_the_run(setup):
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    calls = {"n": 0}
+
+    def cancel():
+        calls["n"] += 1
+        return calls["n"] > 1
+
+    written = sample_candidates(clip, profiles.profiles[clip.profile], FakeEngine(),
+                                paths, seeds=[7, 8, 9], cancel=cancel)
+    assert len(written) < 3
+
+
 def test_candidate_seeds_lists_what_is_on_disk(setup):
     from ttskit.render import candidate_seeds
 

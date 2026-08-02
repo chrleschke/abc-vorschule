@@ -128,9 +128,12 @@ def sample_candidates(
     paths: Paths,
     seeds: list[int],
     progress: Callable[[Progress], None] | None = None,
+    cancel: Callable[[], bool] | None = None,
 ) -> list[int]:
     written: list[int] = []
     for index, seed in enumerate(seeds, start=1):
+        if cancel is not None and cancel():
+            break
         try:
             wav, sample_rate = engine.generate(clip.text, profile, seed)
             wav = postprocess(wav, sample_rate, trim=profile.trim,

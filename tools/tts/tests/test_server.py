@@ -159,3 +159,24 @@ def test_index_is_served(client):
     response = client.get("/")
     assert response.status_code == 200
     assert "<html" in response.text.lower()
+
+
+def test_events_streams_the_initial_status_frame(client):
+    # httpx's ASGITransport drives the whole ASGI app to completion before
+    # returning any response (see httpx.ASGITransport.handle_async_request),
+    # so a genuinely infinite SSE generator can never be exercised through a
+    # real request/response round trip — it would hang forever. Instead, call
+    # the generator that backs `/events` directly, which is exactly what a
+    # client of that endpoint would receive as the first framed chunk.
+    from ttskit.server import _event_stream
+
+    jobs = client.app.state.jobs
+    gen = _event_stream(jobs)
+    try:
+        frame = next(gen)
+        assert frame.startswith("data:")
+        payload = json.loads(frame[len("data:"):])
+        assert "running" in payload
+        assert "queued" in payload
+    finally:
+        gen.close()

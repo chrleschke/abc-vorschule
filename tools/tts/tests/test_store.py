@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from ttskit import store
 from ttskit.store import DEFAULT_PROFILES, Lock, Locks, Profiles, RenderState
 
 
@@ -93,3 +94,23 @@ def test_corrupt_json_raises_with_the_path(tmp_path):
     path.write_text("{ not json", encoding="utf-8")
     with pytest.raises(ValueError, match="locks.json"):
         Locks.load(path)
+
+
+def test_failed_write_leaves_the_original_file_intact_and_no_stray_temp_file(
+    tmp_path, monkeypatch,
+):
+    path = tmp_path / "profiles.json"
+    profiles = Profiles.load(path)
+    profiles.save(path)
+    original = path.read_text(encoding="utf-8")
+
+    def boom(*args, **kwargs):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(store.json, "dumps", boom)
+    profiles.profiles["prompt"].instruct = "würde nie geschrieben"
+    with pytest.raises(RuntimeError, match="boom"):
+        profiles.save(path)
+
+    assert path.read_text(encoding="utf-8") == original, "original file untouched"
+    assert list(tmp_path.iterdir()) == [path], "no stray temp file left behind"

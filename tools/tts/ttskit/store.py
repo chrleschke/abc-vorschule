@@ -7,6 +7,8 @@ and belong in git. render-state.json is derivable and lives under out/.
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -91,10 +93,30 @@ def _read_json(path: Path) -> dict[str, Any] | None:
 
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
+    """Write atomically: readers must never observe a truncated file.
+
+    `render_clips` saves render-state.json after every clip, and the server
+    re-reads profiles.json / locks.json / render-state.json on every HTTP
+    request, so a naive truncate-then-write has a real reader landing in the
+    gap. `os.replace` is atomic on the same filesystem, so a concurrent reader
+    always sees either the fully-old or the fully-new file, never a partial
+    one. The temp file lives in the same directory (via `dir=`) so it is on
+    the same filesystem as the target, and `mkstemp` guarantees a unique name
+    per call so concurrent writers never collide on the temp path itself.
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
+    fd, tmp_name = tempfile.mkstemp(
+        dir=path.parent, prefix=f".{path.name}.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
+        os.replace(tmp_name, path)
+    except BaseException:
+        try:
+            os.unlink(tmp_name)
+        except OSError:
+            pass
+        raise
 
 
 @dataclass
