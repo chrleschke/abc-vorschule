@@ -242,3 +242,37 @@ def test_candidate_seeds_lists_what_is_on_disk(setup):
     sample_candidates(clip, profiles.profiles[clip.profile], FakeEngine(),
                       paths, seeds=[9, 7, 8])
     assert candidate_seeds(paths, clip.key) == [7, 8, 9], "sorted"
+
+
+def test_sample_candidates_writes_fingerprint_sidecar(setup):
+    from dataclasses import replace
+    import json as jsonlib
+    from ttskit.plan import fingerprint
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    written = sample_candidates(clip, profile, FakeEngine(), paths, seeds=[11, 22])
+    assert written == [11, 22]
+    for seed in (11, 22):
+        meta = jsonlib.loads(
+            (paths.candidates / clip.key / f"{seed}.json").read_text(encoding="utf-8"))
+        assert meta["fingerprint"] == fingerprint(replace(clip, seed=seed), profile)
+
+
+def test_candidate_infos_reports_freshness(setup):
+    from ttskit.render import candidate_infos
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    sample_candidates(clip, profile, FakeEngine(), paths, seeds=[11])
+    # Alt-Kandidat ohne Sidecar (Bestand aus der Zeit vor den Sidecars):
+    (paths.candidates / clip.key / "99.wav").write_bytes(b"RIFF")
+
+    infos = candidate_infos(paths, clip, profile)
+    assert {i["seed"]: i["fresh"] for i in infos} == {11: True, 99: None}
+
+    profile.instruct = "Ganz anders."
+    infos = candidate_infos(paths, clip, profile)
+    assert {i["seed"]: i["fresh"] for i in infos} == {11: False, 99: None}

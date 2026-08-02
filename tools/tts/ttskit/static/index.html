@@ -14,18 +14,35 @@
       <select id="filter-status">
         <option value="">Alle Status</option>
         <option value="missing">fehlt</option>
-        <option value="stale">stale</option>
+        <option value="stale">veraltet</option>
         <option value="rendered">fertig</option>
-        <option value="locked">gelockt</option>
+        <option value="locked">festgelegt</option>
       </select>
-      <button id="btn-render" class="primary">Finalen Lauf starten</button>
-      <button id="btn-cancel">Abbrechen</button>
-      <span id="progress"></span>
+      <button id="btn-params"
+              title="Sampling, Trim/Normalisierung und Instruktionen aller Profile bearbeiten">
+        ⚙️ TTS-Parameter</button>
+      <button id="btn-render" class="primary"
+              title="Rendert alle fehlenden und veralteten Clips (inkrementell)">
+        Finalen Lauf starten</button>
+      <div id="job">
+        <span id="job-spinner" class="spinner hidden"></span>
+        <div id="job-bar-track" class="hidden"><div id="job-bar"></div></div>
+        <span id="job-text"></span>
+        <button id="btn-cancel" class="hidden">Abbrechen</button>
+      </div>
     </header>
+    <div id="banner" class="hidden">
+      <span id="banner-text"></span>
+      <button id="banner-close" title="Meldung schließen">×</button>
+    </div>
     <main>
       <div id="list"></div>
-      <div id="detail"><p class="muted">Links einen Clip wählen. Tasten: j/k blättern, Leertaste spielt, 1–4 spielen Kandidaten.</p></div>
+      <div id="detail">
+        <p class="muted">Links einen Clip wählen.
+          Tasten: j/k blättern, Leertaste spielt, 1–9 spielen Kandidaten.</p>
+      </div>
     </main>
+    <div id="params-panel" class="hidden"></div>
     <script src="/app.js"></script>
   </body>
 </html>
