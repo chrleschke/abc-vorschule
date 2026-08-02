@@ -8,9 +8,11 @@ progress arrives over SSE.
 from __future__ import annotations
 
 import json
+import os
 import queue
+import tempfile
 import threading
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Callable
 
@@ -21,9 +23,12 @@ from fastapi.responses import (
 
 from .cli import load_context
 from .paths import Paths
-from .plan import orphan_locks, status_of
-from .render import candidate_seeds, random_seeds, render_clips, sample_candidates
-from .store import BASE_SAMPLING, Lock, Locks, Profiles
+from .plan import fingerprint, orphan_locks, status_of
+from .render import (
+    candidate_fingerprint, candidate_infos, candidate_seeds, random_seeds,
+    render_clips, sample_candidates,
+)
+from .store import BASE_SAMPLING, Lock, Locks, Profiles, RenderState
 
 STATIC = Path(__file__).resolve().parent / "static"
 
@@ -31,6 +36,23 @@ STATIC = Path(__file__).resolve().parent / "static"
 #: and `cancel` does not drain the queue, so an unbounded `n` would be a
 #: self-inflicted denial of service on a single-worker tool.
 MAX_CANDIDATES = 16
+
+
+def _copy_atomic(src: Path, dst: Path) -> None:
+    """Wie store._write_json: die App-Seite darf nie eine halbe WAV sehen,
+    falls parallel ein Render-Lauf oder ein zweiter Promote schreibt."""
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_name = tempfile.mkstemp(dir=dst.parent, prefix=f".{dst.name}.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(src.read_bytes())
+        os.replace(tmp_name, dst)
+    except BaseException:
+        try:
+            os.unlink(tmp_name)
+        except OSError:
+            pass
+        raise
 
 
 @dataclass
@@ -155,7 +177,7 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                 "fields": list(clip.fields),
                 "lessons": list(clip.lessons),
                 "status": status_of(clip, profile, ctx.state, paths.audio),
-                "candidates": candidate_seeds(paths, clip.key),
+                "candidates": candidate_infos(paths, clip, profile),
             })
         return {
             "engine": {"loaded": bool(getattr(engine, "loaded", False)),
@@ -163,6 +185,7 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                        "device": getattr(engine, "device", None)},
             "profiles": {n: p.to_dict() for n, p in ctx.profiles.profiles.items()},
             "poolSalt": ctx.profiles.pool_salt,
+            "limits": {"maxCandidates": MAX_CANDIDATES},
             "clips": clips,
             "orphans": [
                 {"key": k, "seed": ctx.locks.get(k).seed,
@@ -293,6 +316,55 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
         locks.remove(key)
         locks.save(paths.locks)
         return {"ok": "unlocked"}
+
+    @app.post("/api/clips/{key}/promote")
+    def api_promote(key: str, body: dict = Body(...)) -> dict[str, Any]:
+        ctx, clip = clip_by_key(key)
+        seed = int(body["seed"])
+        source = paths.candidates / key / f"{seed}.wav"
+        if not source.exists():
+            raise HTTPException(status_code=404,
+                                detail=f"kein Kandidat mit Seed {seed} für {key!r}")
+
+        # Lock zuerst: anders als api_lock bleiben vorhandene kuratierte
+        # Felder (profile, textOverride, note) erhalten — Promote entscheidet
+        # nur über den Seed, nicht über den Rest der Hörarbeit.
+        locks = Locks.load(paths.locks)
+        existing = locks.get(key)
+        locks.set(key, Lock(
+            seed=seed,
+            profile=existing.profile if existing else None,
+            text_override=existing.text_override if existing else None,
+            note=existing.note if existing else None,
+            source_text=clip.source_text,
+        ))
+        locks.save(paths.locks)
+
+        _copy_atomic(source, paths.audio / f"{key}.wav")
+
+        # Nur wenn der Kandidat nachweislich mit den aktuellen Einstellungen
+        # erzeugt wurde, gilt der Clip als gerendert. Sonst bleibt er
+        # "stale" und der nächste Lauf rendert ihn mit dem gelockten Seed neu.
+        profile = ctx.profiles.profiles[clip.profile]
+        target = fingerprint(replace(clip, seed=seed), profile)
+        verified = candidate_fingerprint(paths, key, seed) == target
+        if verified:
+            render_state = RenderState.load(paths.render_state)
+            render_state.entries[key] = target
+            render_state.failures.pop(key, None)
+            render_state.save(paths.render_state)
+        return {"ok": "promoted", "verified": verified}
+
+    @app.delete("/api/clips/{key}/candidates/{seed}")
+    def api_delete_candidate(key: str, seed: int) -> dict[str, str]:
+        clip_by_key(key)
+        wav = paths.candidates / key / f"{seed}.wav"
+        if not wav.exists():
+            raise HTTPException(status_code=404,
+                                detail=f"kein Kandidat mit Seed {seed} für {key!r}")
+        wav.unlink()
+        (paths.candidates / key / f"{seed}.json").unlink(missing_ok=True)
+        return {"ok": "deleted"}
 
     @app.post("/api/render", status_code=202)
     def api_render(body: dict = Body(default={})) -> dict[str, str]:
