@@ -169,14 +169,19 @@ Default aus dem Quellfeld; die UI kann es pro Clip überschreiben.
 | Profil | Quellfeld | Instruktions-Richtung |
 | --- | --- | --- |
 | `word` | `atoms.lemma` | Einzelwort, klar, freundlich-neutral |
-| `phoneme` | `phonemeTts` | **Lautwert**, gedehnt — nicht der Buchstabenname |
+| `phoneme` | `phonemeTts`, `stretchTts` | **Lautwert**, gedehnt — nicht der Buchstabenname |
 | `prompt` | `promptTts` | Kindergärtnerin: warm, deutlich, ruhiges Tempo, fragende Betonung |
 | `miss` | `missTts` | sanft korrigierend, ohne Tadel |
 | `reward` | `rewardTts` | fröhlich, feiernd |
-| `stretch` | `stretchTts` | sehr langsam, Silben gedehnt ineinander |
 | `sentence` | `sentences.tts` | einfacher, klarer Satz |
 | `finale` | `finales.tts` | verspielt, pointiert |
 | `ui` | `extra-strings.json` | ruhig, neutral |
+
+`stretchTts` und `phonemeTts` teilen sich bewusst ein Profil: `stretchTts` enthält
+ausschließlich Grapheme (`A`, `M`, `Sch`, `Pf`, …) und ist mit 20 von 37 Werten eine echte
+Teilmenge von `phonemeTts`. Getrennte Profile würden dieselben Laute doppelt rendern und
+— gravierender — doppelt kuratieren lassen. Zusammengelegt sind es ~37 Clips, die einmal
+gutgehört werden.
 
 Struktur in `profiles.json`:
 
