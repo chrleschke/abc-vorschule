@@ -10,8 +10,9 @@ import fnmatch
 import json
 import secrets
 from dataclasses import dataclass, field, replace
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Iterable, Protocol
+from typing import Any, Callable, Iterable, Protocol
 
 import numpy as np
 
@@ -154,10 +155,16 @@ def sample_candidates(
             wav = postprocess(wav, sample_rate, trim=profile.trim,
                               normalize=profile.normalize)
             write_wav(paths.candidates / clip.key / f"{seed}.wav", wav, sample_rate)
+            # Das Sidecar hält fest, WOMIT die Probeaufnahme entstand. Ohne
+            # Zeitpunkt, Stimme und Text mischen sich in der UI die Batches
+            # verschiedener Sessions zu einer unentwirrbaren Liste.
             meta_path = paths.candidates / clip.key / f"{seed}.json"
-            meta_path.write_text(json.dumps(
-                {"fingerprint": fingerprint(replace(clip, seed=seed), profile)},
-            ) + "\n", encoding="utf-8")
+            meta_path.write_text(json.dumps({
+                "fingerprint": fingerprint(replace(clip, seed=seed), profile),
+                "createdAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "speaker": clip.speaker,
+                "text": clip.text,
+            }, ensure_ascii=False) + "\n", encoding="utf-8")
             written.append(seed)
             status, message = "ok", ""
         except Exception as exc:  # noqa: BLE001
@@ -175,8 +182,8 @@ def candidate_seeds(paths: Paths, clip_key: str) -> list[int]:
     return sorted(int(p.stem) for p in directory.glob("*.wav") if p.stem.isdigit())
 
 
-def candidate_fingerprint(paths: Paths, clip_key: str, seed: int) -> str | None:
-    """Fingerprint, unter dem ein Kandidat erzeugt wurde — None, wenn unbekannt.
+def candidate_meta(paths: Paths, clip_key: str, seed: int) -> dict[str, Any]:
+    """Sidecar-Metadaten eines Kandidaten — {} wenn unbekannt.
 
     Kandidaten aus der Zeit vor den Sidecars haben keine Metadatei; eine
     kaputte Datei behandeln wir genauso, statt die ganze State-Antwort zu
@@ -186,18 +193,56 @@ def candidate_fingerprint(paths: Paths, clip_key: str, seed: int) -> str | None:
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
-        return None
-    value = raw.get("fingerprint") if isinstance(raw, dict) else None
+        return {}
+    return raw if isinstance(raw, dict) else {}
+
+
+def candidate_fingerprint(paths: Paths, clip_key: str, seed: int) -> str | None:
+    value = candidate_meta(paths, clip_key, seed).get("fingerprint")
     return value if isinstance(value, str) else None
 
 
+def update_candidate_meta(paths: Paths, clip_key: str, seed: int,
+                          **changes: Any) -> dict[str, Any]:
+    """Einzelne Sidecar-Felder setzen (None löscht ein Feld ausdrücklich).
+
+    Der Rest der Metadaten — allen voran der Erzeugungs-Fingerprint — bleibt
+    unangetastet: eine Bewertung darf einen Kandidaten nicht "frisch" oder
+    "veraltet" machen.
+    """
+    meta = candidate_meta(paths, clip_key, seed)
+    for key, value in changes.items():
+        if value is None:
+            meta.pop(key, None)
+        else:
+            meta[key] = value
+    path = Path(paths.candidates) / clip_key / f"{seed}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(meta, ensure_ascii=False) + "\n", encoding="utf-8")
+    return meta
+
+
 def candidate_infos(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
-    """Kandidaten-Seeds plus Frische: entspricht der Sidecar-Fingerprint noch
-    den aktuellen Einstellungen? None = Alt-Kandidat ohne Sidecar."""
+    """Kandidaten mit allem, was die UI zum Auseinanderhalten braucht:
+    Frische (fresh: None = Alt-Kandidat ohne Sidecar), Erzeugungszeitpunkt,
+    Stimme und Text zur Erzeugungszeit sowie die gespeicherte Bewertung.
+
+    Neueste zuerst — genau deshalb steht der Zeitpunkt im Sidecar. Kandidaten
+    ohne Zeitstempel (vor den Metadaten erzeugt) landen am Ende.
+    """
     infos = []
     for seed in candidate_seeds(paths, clip.key):
-        recorded = candidate_fingerprint(paths, clip.key, seed)
+        meta = candidate_meta(paths, clip.key, seed)
+        recorded = meta.get("fingerprint")
+        recorded = recorded if isinstance(recorded, str) else None
         current = fingerprint(replace(clip, seed=seed), profile)
-        infos.append({"seed": seed,
-                      "fresh": None if recorded is None else recorded == current})
+        infos.append({
+            "seed": seed,
+            "fresh": None if recorded is None else recorded == current,
+            "createdAt": meta.get("createdAt"),
+            "speaker": meta.get("speaker"),
+            "text": meta.get("text"),
+            "good": meta.get("rating") == "good",
+        })
+    infos.sort(key=lambda info: (info["createdAt"] or "", info["seed"]), reverse=True)
     return infos

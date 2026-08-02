@@ -32,18 +32,30 @@ tts status                         # Überblick: fehlt / stale / fertig / Pools 
                                    # plus Fehlschläge des letzten Laufs und leere Texte
 tts sample --profile prompt -n 8   # 8 Seeds an 3 Beispielen des Profils ausprobieren
 tts web                            # Kuratieren unter http://127.0.0.1:8420
-tts render                         # finaler Lauf, inkrementell, ca. 25–40 Minuten
+tts render                         # Batch-Lauf über alles, inkrementell, ca. 25–40 Minuten
 ```
 
-Typisch: einmal `sample` pro Profil, im Web-Interface die guten Seeds mit
-„＋ In Seed-Pool" sammeln, dann `render`. Einzelne schlechte Clips im Web-Interface
-mit „🎲 Kandidaten würfeln" (Anzahl einstellbar, 1–16) neu erzeugen, mit 👍/👎
-vorsortieren und dann entweder per „📌 Seed festlegen" fürs nächste Rendern locken —
-oder per „🚀 In Produktion" die gehörte Aufnahme direkt als Produktions-Audio
-übernehmen (kopiert die WAV, lockt den Seed, kein Re-Render und kein erneutes
-Anhören nötig). Stimme, Sprache, Sampling-Parameter, Trim/Normalisierung und
-Instruktionen aller Profile sind über „⚙️ TTS-Parameter" in der Kopfzeile editierbar;
-Stimme und Aussprache zusätzlich pro Clip in der Detailsicht.
+Typisch: einmal `sample` pro Profil, im Web-Interface Kandidaten anhören und mit 👍
+bewerten — 👍 speichert die Bewertung **und** nimmt den Seed automatisch in den
+Seed-Pool des Profils auf (👎 löscht die Probeaufnahme und räumt den Pool wieder auf).
+Einzelne schlechte Clips mit „🎲 Kandidaten würfeln" (Anzahl einstellbar, 1–16) neu
+erzeugen: die Probeaufnahmen stehen als Tabelle, neueste zuerst, mit Erzeugungszeitpunkt,
+Stimme und Text — so bleiben mehrere Würfel-Runden auseinanderhaltbar. Der
+Radio-Button „Produktion" übernimmt genau eine Aufnahme sofort als Produktions-Audio
+und lockt ihren Seed (kein Re-Render, kein erneutes Anhören nötig).
+
+Gerendert wird über den **Batch-Lauf**: links in der Liste Clips ankreuzen (einzeln
+oder über „Sichtbare / Alle / Keine"), dann „▶ Batch-Lauf" in der Kopfzeile —
+gerendert wird nur, was fehlt oder veraltet ist. Da viel von Hand korrigiert wird,
+gibt es bewusst keinen „finalen Lauf" über alles mehr; die Auswahl bestimmt den Umfang.
+
+Die Detailsicht zeigt oben eine Zusammenfassung der Profil-Einstellungen (Stimme,
+Sprache, Instruktion, Sampling) — „Bearbeiten" klappt das Formular auf. Dieselben
+Einstellungen aller Profile auf einmal gibt es über „⚙️ TTS-Parameter" in der
+Kopfzeile; Stimme und Aussprache zusätzlich pro Clip in der Detailsicht. Bewertungen,
+Locks und Profile liegen in Dateien (Sidecar-JSONs, `locks.json`, `profiles.json`) und
+überleben damit Server- und Browser-Neustart; Filter und Batch-Auswahl merkt sich der
+Browser lokal.
 
 **Mit `phoneme` anfangen.** Das ist Absicht: mit 37 Clips ist es das kleinste Profil und
 zugleich das riskanteste — gefragt ist der *Lautwert*, nicht der Buchstabenname („mmmmm",
@@ -142,7 +154,14 @@ identisch. `poolSalt` in `profiles.json` hochzählen würfelt bewusst alles neu.
 
 `profiles.json` und `locks.json` nie automatisiert überschreiben: darin steckt Hörarbeit.
 
-Kandidaten unter `out/candidates/` tragen seit dem UI-Redesign eine Sidecar-Datei `{seed}.json` mit dem Erzeugungs-Fingerprint. „🚀 In Produktion" markiert einen Clip nur dann als fertig, wenn dieser Fingerprint noch den aktuellen Einstellungen entspricht — sonst wird die Aufnahme zwar übernommen und der Seed gelockt, der Clip bleibt aber „veraltet" (in der UI) bzw. `stale`.
+Kandidaten unter `out/candidates/` tragen seit dem UI-Redesign eine Sidecar-Datei
+`{seed}.json` mit dem Erzeugungs-Fingerprint — inzwischen zusätzlich mit
+Erzeugungszeitpunkt, Stimme, Text und der 👍-Bewertung (`rating: "good"`), damit die
+Kandidaten-Tabelle mehrere Würfel-Runden auseinanderhalten kann und Bewertungen einen
+Neustart überleben. Der Produktions-Radio-Button markiert einen Clip nur dann als
+fertig, wenn der Fingerprint noch den aktuellen Einstellungen entspricht — sonst wird
+die Aufnahme zwar übernommen und der Seed gelockt, der Clip bleibt aber „veraltet"
+(in der UI) bzw. `stale`.
 
 Beide Dateien werden beim Laden geprüft. Ein Tippfehler — ein Lock auf ein Profil, das es
 nicht gibt; ein Lock ohne `seed`; ein fehlendes `label` — bricht mit einer Meldung ab, die

@@ -19,11 +19,11 @@
         <option value="locked">festgelegt</option>
       </select>
       <button id="btn-params"
-              title="Sampling, Trim/Normalisierung und Instruktionen aller Profile bearbeiten">
+              title="Stimme, Sprache, Instruktion und Sampling aller Profile bearbeiten">
         ⚙️ TTS-Parameter</button>
       <button id="btn-render" class="primary"
-              title="Rendert alle fehlenden und veralteten Clips (inkrementell)">
-        Finalen Lauf starten</button>
+              title="Rendert die links ausgewählten Clips — nur was fehlt oder veraltet ist">
+        ▶ Batch-Lauf</button>
       <div id="job">
         <span id="job-spinner" class="spinner hidden"></span>
         <div id="job-bar-track" class="hidden"><div id="job-bar"></div></div>
@@ -36,7 +36,16 @@
       <button id="banner-close" title="Meldung schließen">×</button>
     </div>
     <main>
-      <div id="list"></div>
+      <div id="list-pane">
+        <div id="list-tools">
+          <span class="muted small">Auswahl für den Batch-Lauf:</span>
+          <button id="sel-visible" title="Alle aktuell sichtbaren (gefilterten) Clips auswählen">Sichtbare</button>
+          <button id="sel-all" title="Alle Clips auswählen">Alle</button>
+          <button id="sel-none" title="Auswahl leeren">Keine</button>
+          <span id="sel-count" class="muted small"></span>
+        </div>
+        <div id="list"></div>
+      </div>
       <div id="detail">
         <p class="muted">Links einen Clip wählen.
           Tasten: j/k blättern, Leertaste spielt, 1–9 spielen Kandidaten.</p>

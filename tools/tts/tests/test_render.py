@@ -278,6 +278,67 @@ def test_candidate_infos_reports_freshness(setup):
     assert {i["seed"]: i["fresh"] for i in infos} == {11: False, 99: None}
 
 
+def test_sidecar_records_when_voice_and_text(setup):
+    """Ohne diese Metadaten mischen sich in der UI die Würfel-Runden
+    verschiedener Sessions zu einer unentwirrbaren Liste."""
+    from ttskit.render import candidate_infos
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    sample_candidates(clip, profile, FakeEngine(), paths, seeds=[11])
+
+    info = candidate_infos(paths, clip, profile)[0]
+    assert info["speaker"] == clip.speaker
+    assert info["text"] == clip.text
+    assert info["createdAt"], "Erzeugungszeitpunkt fehlt im Sidecar"
+    assert info["good"] is False
+
+
+def test_candidate_infos_sorts_newest_first_legacy_last(setup):
+    import json as jsonlib
+    from ttskit.render import candidate_infos
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    sample_candidates(clip, profile, FakeEngine(), paths, seeds=[11, 22])
+    # Zeitstempel von Hand auseinanderziehen — sample_candidates schreibt beide
+    # in derselben Sekunde.
+    for seed, when in ((11, "2026-01-01T10:00:00+00:00"),
+                       (22, "2026-01-02T10:00:00+00:00")):
+        path = paths.candidates / clip.key / f"{seed}.json"
+        meta = jsonlib.loads(path.read_text(encoding="utf-8"))
+        meta["createdAt"] = when
+        path.write_text(jsonlib.dumps(meta), encoding="utf-8")
+    # Alt-Kandidat ohne Sidecar muss ganz ans Ende:
+    (paths.candidates / clip.key / "99.wav").write_bytes(b"RIFF")
+
+    infos = candidate_infos(paths, clip, profile)
+    assert [i["seed"] for i in infos] == [22, 11, 99]
+
+
+def test_update_candidate_meta_sets_and_clears_rating_only(setup):
+    import json as jsonlib
+    from ttskit.render import update_candidate_meta
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    sample_candidates(clip, profile, FakeEngine(), paths, seeds=[11])
+    path = paths.candidates / clip.key / "11.json"
+    before = jsonlib.loads(path.read_text(encoding="utf-8"))
+
+    update_candidate_meta(paths, clip.key, 11, rating="good")
+    after = jsonlib.loads(path.read_text(encoding="utf-8"))
+    assert after["rating"] == "good"
+    assert after["fingerprint"] == before["fingerprint"], \
+        "eine Bewertung darf die Frische nicht verändern"
+
+    update_candidate_meta(paths, clip.key, 11, rating=None)
+    assert "rating" not in jsonlib.loads(path.read_text(encoding="utf-8"))
+
+
 def test_the_clip_voice_reaches_the_engine_not_the_profile_default(tmp_path):
     """Ein Stimm-Override im Lock ist nur dann etwas wert, wenn er auch am
     Modell ankommt — der Fingerprint allein macht den Clip bloß stale."""

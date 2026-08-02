@@ -26,8 +26,8 @@ from .cli import load_context
 from .paths import Paths
 from .plan import fingerprint, orphan_locks, status_of
 from .render import (
-    candidate_fingerprint, candidate_infos, candidate_seeds, random_seeds,
-    render_clips, sample_candidates,
+    candidate_fingerprint, candidate_infos, candidate_meta, candidate_seeds,
+    random_seeds, render_clips, sample_candidates, update_candidate_meta,
 )
 from .store import BASE_SAMPLING, Lock, Locks, Profiles, RenderState
 
@@ -405,13 +405,49 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
             render_state.save(paths.render_state)
         return {"ok": "promoted", "verified": verified}
 
-    @app.delete("/api/clips/{key}/candidates/{seed}")
-    def api_delete_candidate(key: str, seed: int) -> dict[str, str]:
-        clip_by_key(key)
+    @app.put("/api/clips/{key}/candidates/{seed}/rating")
+    def api_rate_candidate(key: str, seed: int, body: dict = Body(...)) -> dict[str, Any]:
+        """👍 an einer Probeaufnahme.
+
+        Bewertung und Seed-Pool sind EIN Handgriff: „gut“ heißt, der Seed darf
+        künftig auch anderen Clips des Profils automatisch zugeteilt werden.
+        Die Bewertung selbst liegt im Sidecar — dateibasiert, damit sie einen
+        Server-Neustart überlebt (vorher: nur localStorage im Browser).
+        """
+        ctx, clip = clip_by_key(key)
         wav = paths.candidates / key / f"{seed}.wav"
         if not wav.exists():
             raise HTTPException(status_code=404,
                                 detail=f"kein Kandidat mit Seed {seed} für {key!r}")
+        good = bool(body.get("good"))
+        update_candidate_meta(paths, key, seed, rating="good" if good else None)
+
+        profiles = Profiles.load(paths.profiles)
+        pool = profiles.profiles[clip.profile].seed_pool
+        if good and seed not in pool:
+            pool.append(seed)
+            pool.sort()
+        elif not good:
+            profiles.profiles[clip.profile].seed_pool = [s for s in pool if s != seed]
+        profiles.save(paths.profiles)
+        return {"ok": "rated", "good": good}
+
+    @app.delete("/api/clips/{key}/candidates/{seed}")
+    def api_delete_candidate(key: str, seed: int) -> dict[str, str]:
+        ctx, clip = clip_by_key(key)
+        wav = paths.candidates / key / f"{seed}.wav"
+        if not wav.exists():
+            raise HTTPException(status_code=404,
+                                detail=f"kein Kandidat mit Seed {seed} für {key!r}")
+        # 👍 hat den Seed in den Pool gelegt — das Löschen der Aufnahme nimmt
+        # ihn wieder heraus, sonst verteilt der Pool einen Seed, dessen Klang
+        # niemand mehr anhören kann.
+        if candidate_meta(paths, key, seed).get("rating") == "good":
+            profiles = Profiles.load(paths.profiles)
+            profiles.profiles[clip.profile].seed_pool = [
+                s for s in profiles.profiles[clip.profile].seed_pool if s != seed
+            ]
+            profiles.save(paths.profiles)
         wav.unlink()
         (paths.candidates / key / f"{seed}.json").unlink(missing_ok=True)
         return {"ok": "deleted"}
@@ -420,11 +456,31 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
     def api_render(body: dict = Body(default={})) -> dict[str, str]:
         profile = body.get("profile") or None
         force = bool(body.get("force"))
+        keys = body.get("keys")
+        if keys is not None:
+            # Batch-Lauf über eine explizite Auswahl. Unbekannte Keys sind ein
+            # Fehler und kein stilles Überspringen: die UI hätte sie gar nicht
+            # anbieten dürfen, und ein Tippfehler im API-Aufruf soll auffallen.
+            if (not isinstance(keys, list)
+                    or not all(isinstance(k, str) for k in keys)):
+                raise HTTPException(status_code=422,
+                                    detail="'keys' muss eine Liste von Clip-Keys sein")
+            known = {clip.key for clip in context().clips}
+            unknown = sorted(set(keys) - known)
+            if unknown:
+                raise HTTPException(status_code=422,
+                                    detail=f"unbekannte Clips: {', '.join(unknown)}")
+
+        selection = set(keys) if keys is not None else None
+        name = (f"render:{len(selection)} ausgewählte" if selection is not None
+                else f"render:{profile or 'alle'}")
 
         def run(is_cancelled) -> None:
             ctx = context()
+            clips = (ctx.clips if selection is None
+                     else [c for c in ctx.clips if c.key in selection])
             report = render_clips(
-                ctx.clips, ctx.profiles, engine, ctx.state, paths,
+                clips, ctx.profiles, engine, ctx.state, paths,
                 profile=profile, force=force, cancel=is_cancelled,
                 progress=lambda p: jobs.publish({
                     "type": "render", "clipKey": p.clip_key,
@@ -433,11 +489,11 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
             # render_clips swallows per-clip failures so the batch continues.
             # Without this summary the job publishes `job-done` and the UI says
             # "fertig" even when every single clip failed.
-            jobs.publish({"type": "job-summary", "job": f"render:{profile or 'alle'}",
+            jobs.publish({"type": "job-summary", "job": name,
                           "rendered": report.rendered, "skipped": report.skipped,
                           "failed": len(report.failed)})
 
-        jobs.submit(f"render:{profile or 'alle'}", run)
+        jobs.submit(name, run)
         return {"ok": "queued"}
 
     @app.post("/api/jobs/cancel")
