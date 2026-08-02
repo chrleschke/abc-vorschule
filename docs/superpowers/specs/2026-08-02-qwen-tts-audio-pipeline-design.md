@@ -74,12 +74,18 @@ Diese Strings lassen sich nicht statisch enumerieren, ohne die Kotlin-Ableitungs
 (`WordGraphemes`, Lektionsbeschränkung) in Python nachzubauen — eine Duplizierung, die
 zwangsläufig auseinanderläuft.
 
-**Entscheidung:** außerhalb des Scopes dieser Spec. `extra-strings.json` sieht dafür einen
-Eintragstyp `template` mit expliziter Expansionsliste vor, damit die Datenstruktur später
-trägt; befüllt wird sie aber erst, wenn die App-Integrations-Spec entschieden hat, ob die
-App Clips zur Laufzeit zusammensetzt oder für abgeleitete Trainer bei Android-TTS bleibt.
-Der Extractor meldet die nicht abgedeckten Templates im `status`-Output, damit die Lücke
-sichtbar bleibt statt zu verschwinden.
+**Entscheidung:** außerhalb des Scopes dieser Spec, aber die Lösungsrichtung steht fest.
+`extra-strings.json` sieht einen Eintragstyp `template` mit expliziter Expansionsliste
+vor, damit die Datenstruktur trägt. Der Extractor meldet nicht abgedeckte Templates im
+`status`-Output, damit die Lücke sichtbar bleibt statt zu verschwinden.
+
+Angepeilt ist, die Expansionen später **vollständig zu rendern statt zur Laufzeit zu
+komponieren** — als OGG sind die Clips klein genug, dass auch einige hundert Kombinationen
+vertretbar sind, und zusammengesetzte Audio-Schnipsel klängen ohnehin abgehackt. Weil die
+App für fehlende Clips auf System-TTS zurückfällt, muss die Abdeckung dabei nicht
+vollständig sein, um nutzbar zu sein: jede gerenderte Kombination ist eine Verbesserung,
+der Rest bleibt funktionsfähig. Damit ist die Expansionsliste eine reine Fleißaufgabe
+ohne Risiko — nicht der blockierende Sonderfall, als der sie zunächst aussah.
 
 ## 3. Betrachtete Ansätze
 
@@ -359,7 +365,10 @@ Pytest, ausgeführt mit dem Qwen-venv-Interpreter.
 
 ## 13. Nicht enthalten
 
-- Jede Änderung an der App (`SpeechController`, Trainer, Assets)
+- Jede Änderung an der App (`SpeechController`, Trainer, Assets) — darunter der
+  Fallback auf System-TTS für Clips, die (noch) nicht gerendert sind. Dieser Fallback ist
+  die Voraussetzung dafür, dass ein unvollständiges Audio-Paket überhaupt ausgeliefert
+  werden kann, und gehört damit an den Anfang der App-Integrations-Spec.
 - OGG/Opus-Konvertierung und APK-Größenbetrachtung
 - Sprechtexte der abgeleiteten Trainer (Symbol-Jagd, Wort-Detektiv) — siehe §2
 - Voice-Cloning oder VoiceDesign-Modelle; diese Spec nutzt ausschließlich CustomVoice
