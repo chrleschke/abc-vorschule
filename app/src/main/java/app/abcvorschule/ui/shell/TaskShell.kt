@@ -108,6 +108,7 @@ fun TaskShell(
                     unlockAllLessons = state.unlockAllLessons,
                     emojisByLessonId = viewModel.lessonEmojis(),
                     highlightedLessonId = viewModel.highlightedLessonId(),
+                    advanceFromLessonId = state.pathAdvanceFromLessonId,
                     points = state.points,
                     onOpenLesson = { viewModel.openLesson(it) },
                     onLockedTap = {
@@ -116,6 +117,7 @@ fun TaskShell(
                         playBlockedBlip()
                         if (ttsAvailable) onSpeak(viewModel.lockedLessonCue())
                     },
+                    onAdvanceAnimated = viewModel::onPathAdvanceAnimated,
                     onParentGateUnlocked = viewModel::openDifficultySheet,
                     onOpenTtsDebug = onOpenTtsDebug,
                     modifier = Modifier.fillMaxSize(),

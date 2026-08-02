@@ -39,7 +39,7 @@ class PathTrailTest {
 
     @Test
     fun dotsAreEvenlySpacedAlongTheTrail() {
-        val dots = PathTrail.dots(PathTrail.polyline(nodes), walkedUpTo = -1, spacing = 18f)
+        val dots = PathTrail.dots(PathTrail.polyline(nodes), spacing = 18f)
         assertTrue("expected a good number of dots, got ${dots.size}", dots.size > 40)
         dots.zipWithNext { a, b ->
             val d = hypot(b.x - a.x, b.y - a.y)
@@ -49,7 +49,7 @@ class PathTrailTest {
 
     @Test
     fun dotRadiusVariesButStaysNearNominal() {
-        val dots = PathTrail.dots(PathTrail.polyline(nodes), walkedUpTo = -1, radius = 4f)
+        val dots = PathTrail.dots(PathTrail.polyline(nodes), radius = 4f)
         assertTrue("radius must vary", dots.map { it.radius }.distinct().size > 1)
         dots.forEach {
             assertTrue("radius ${it.radius} off nominal 4", it.radius in 3.4f..4.6f)
@@ -57,36 +57,42 @@ class PathTrailTest {
     }
 
     @Test
-    fun dotsBeforeTheReachedNodeAreMarkedWalked() {
-        val line = PathTrail.polyline(nodes)
-        val dots = PathTrail.dots(line, walkedUpTo = 3)
-        assertTrue("walked dots must exist", dots.any { it.walked })
-        assertTrue("unwalked dots must exist", dots.any { !it.walked })
-        // walked must be a prefix: once the flag flips it never flips back.
-        val firstUnwalked = dots.indexOfFirst { !it.walked }
-        assertTrue(dots.drop(firstUnwalked).none { it.walked })
+    fun nodeProgressGrowsAlongTheTrailAndSpansEveryNode() {
+        val dots = PathTrail.dots(PathTrail.polyline(nodes))
+        dots.zipWithNext { a, b ->
+            assertTrue(
+                "nodeProgress must grow: ${a.nodeProgress} -> ${b.nodeProgress}",
+                b.nodeProgress > a.nodeProgress,
+            )
+        }
+        assertTrue(dots.first().nodeProgress > 0f)
+        assertTrue(
+            "last dot ${dots.last().nodeProgress} must be near the last node ${nodes.lastIndex}",
+            dots.last().nodeProgress > nodes.lastIndex - 1f,
+        )
+        assertTrue(dots.last().nodeProgress <= nodes.lastIndex.toFloat())
     }
 
     @Test
-    fun nothingReachedMeansNothingWalked() {
-        val dots = PathTrail.dots(PathTrail.polyline(nodes), walkedUpTo = -1)
-        assertTrue(dots.none { it.walked })
-        val fromZero = PathTrail.dots(PathTrail.polyline(nodes), walkedUpTo = 0)
-        assertTrue(fromZero.none { it.walked })
+    fun nodeProgressLinesUpWithTheNodeItPassesBy() {
+        // The whole warm/cold boundary rests on this: a head of 3.0 must warm the dots
+        // up to node 3 and no further, so the dots bracketing node 3 must bracket 3.0.
+        val line = PathTrail.polyline(nodes)
+        val dots = PathTrail.dots(line)
+        val node = nodes[3]
+        val nearest = dots.minByOrNull { hypot(it.x - node.x, it.y - node.y) }!!
+        assertEquals(3f, nearest.nodeProgress, 0.15f)
     }
 
     @Test
     fun tooFewNodesProduceNoDots() {
-        assertEquals(emptyList<TrailDot>(), PathTrail.dots(emptyList(), walkedUpTo = 0))
-        assertEquals(
-            emptyList<TrailDot>(),
-            PathTrail.dots(listOf(PathPoint(1f, 1f)), walkedUpTo = 0),
-        )
+        assertEquals(emptyList<TrailDot>(), PathTrail.dots(emptyList()))
+        assertEquals(emptyList<TrailDot>(), PathTrail.dots(listOf(PathPoint(1f, 1f))))
     }
 
     @Test
     fun dotsAreDeterministic() {
         val line = PathTrail.polyline(nodes)
-        assertEquals(PathTrail.dots(line, walkedUpTo = 2), PathTrail.dots(line, walkedUpTo = 2))
+        assertEquals(PathTrail.dots(line), PathTrail.dots(line))
     }
 }

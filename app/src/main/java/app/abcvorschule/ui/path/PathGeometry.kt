@@ -44,11 +44,16 @@ object PathGeometry {
     /**
      * Vertical margin: the gap before the first node and after the last one.
      * Also fed to [yOffsets]/[contentHeight], so it can't be shrunk to widen the
-     * swing — it has a floor of its own (a sign's height, ~116dp) or the first
-     * sign clips off the top of the scroll content. See [DefaultHorizontalMargin]
-     * for the horizontal inset, which has no such constraint.
+     * swing — it has a floor of its own or the top of the scroll content clips the
+     * first sign. See [DefaultHorizontalMargin] for the horizontal inset, which has
+     * no such constraint.
+     *
+     * The floor is a sign's height (`PathSignDimens.TotalHeight`, 116dp) plus the
+     * headroom the "you are here" marker needs above it (`PathMarkerDimens.Headroom`,
+     * 50dp) = 166dp; hence 168 and not the 132 of the sign-only path. Asserted in
+     * PathGeometryTest.
      */
-    const val DefaultMargin = 132f
+    const val DefaultMargin = 168f
 
     /**
      * Horizontal inset: how far the swing's outer edge stays from each screen

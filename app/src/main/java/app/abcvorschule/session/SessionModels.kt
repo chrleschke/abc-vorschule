@@ -109,6 +109,16 @@ data class SessionUiState(
      */
     val parentMode: ParentMode = ParentMode.Auto,
     val unlockAllLessons: Boolean = false,
+    /**
+     * Die Lektion, aus der das Kind gerade zum Pfad zurückgekommen ist — Startpunkt
+     * der „Du bist hier“-Animation auf dem Pfad. Muss durch den State laufen und
+     * nicht im Pfad-Screen bleiben: der Screen wird beim Verlassen des Pfades
+     * verworfen, also ist das hier das Einzige, was „woher“ über die Lektion hinweg
+     * trägt. Der Pfad meldet mit `onPathAdvanceAnimated()` zurück, sobald der Marker
+     * seine Startposition hat — sonst würde der Hüpfer bei jeder Rückkehr erneut
+     * laufen.
+     */
+    val pathAdvanceFromLessonId: String? = null,
     /** Spoken-only miss/hint text — never rendered as chrome. */
     val speakCue: String? = null,
     val successPhase: SuccessPhase = SuccessPhase.Idle,

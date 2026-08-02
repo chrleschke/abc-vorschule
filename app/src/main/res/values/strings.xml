@@ -20,5 +20,7 @@
     <string name="lesson_locked">Noch gesperrt</string>
     <string name="lesson_available">Bereit</string>
     <string name="lesson_mastered">Geschafft</string>
+    <!-- Was der „Du bist hier“-Marker auf dem Pfad sichtbar sagt, für TalkBack. -->
+    <string name="lesson_current">jetzt dran</string>
     <string name="path_node">Lektion</string>
 </resources>

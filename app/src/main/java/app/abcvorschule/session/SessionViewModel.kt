@@ -127,6 +127,17 @@ class SessionViewModel(
     /** Spoken cue for a locked/planned node — a tap must always produce feedback. */
     fun lockedLessonCue(): String = "Das üben wir später."
 
+    /**
+     * The path has picked up [SessionUiState.pathAdvanceFromLessonId] and its marker
+     * stands on that sign; from here the hop runs on the path's own animation. Clears
+     * the flag so it plays once and not again on the next recomposition.
+     */
+    fun onPathAdvanceAnimated() {
+        _ui.update {
+            if (it.pathAdvanceFromLessonId == null) it else it.copy(pathAdvanceFromLessonId = null)
+        }
+    }
+
     fun openLesson(
         lessonId: String,
         trainerIndex: Int = 0,
@@ -194,6 +205,10 @@ class SessionViewModel(
             _ui.update {
                 it.copy(
                     screen = AppScreen.Path,
+                    // Set on every return, not only on a finished lesson: the path
+                    // itself decides whether that is a move at all — the marker only
+                    // hops if the highlight has actually left this lesson.
+                    pathAdvanceFromLessonId = it.lessonId,
                     lessonId = null,
                     trainers = emptyList(),
                     trainerIndex = 0,
