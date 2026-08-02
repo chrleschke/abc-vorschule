@@ -13,6 +13,7 @@ REPO_ROOT = TOOL_ROOT.parent.parent
 class Paths:
     root: Path = TOOL_ROOT
     content_dir: Path = REPO_ROOT / "app" / "src" / "main" / "assets" / "content"
+    app_audio_dir: Path = REPO_ROOT / "app" / "src" / "main" / "assets" / "audio"
 
     @property
     def profiles(self) -> Path:

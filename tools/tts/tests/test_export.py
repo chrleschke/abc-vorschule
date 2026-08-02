@@ -1,0 +1,149 @@
+import json
+import wave
+from pathlib import Path
+
+import numpy as np
+import pytest
+import soundfile as sf
+
+from ttskit.cli import load_context
+from ttskit.export import ExportReport, asset_name, export_to_app
+from ttskit.paths import Paths
+from ttskit.plan import fingerprint
+
+
+def make_paths(tmp_path: Path, content_dir: Path) -> Paths:
+    return Paths(root=tmp_path, content_dir=content_dir,
+                 app_audio_dir=tmp_path / "app-audio")
+
+
+def write_wav(path: Path, seconds: float = 0.2, sr: int = 24000) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    t = np.linspace(0, seconds, int(sr * seconds), endpoint=False)
+    sf.write(path, (0.3 * np.sin(2 * np.pi * 440 * t)).astype(np.float32),
+             sr, subtype="PCM_16")
+
+
+def lock_and_render(paths: Paths, key: str, fresh: bool = True) -> None:
+    """Lockt `key` und legt WAV + (optional aktuellen) Fingerprint an."""
+    locks_file = paths.locks
+    data = (json.loads(locks_file.read_text()) if locks_file.exists()
+            else {"version": 1, "locks": {}})
+    data["locks"][key] = {"seed": 1}
+    locks_file.write_text(json.dumps(data), encoding="utf-8")
+
+    write_wav(paths.audio / f"{key}.wav")
+
+    ctx = load_context(paths)
+    clip = next(c for c in ctx.clips if c.key == key)
+    fp = fingerprint(clip, ctx.profiles.profiles[clip.profile]) if fresh else "stale00"
+    state = (json.loads(paths.render_state.read_text())
+             if paths.render_state.exists() else {"version": 1, "entries": {}})
+    state["entries"][key] = fp
+    paths.render_state.parent.mkdir(parents=True, exist_ok=True)
+    paths.render_state.write_text(json.dumps(state), encoding="utf-8")
+
+
+def clip_key_for_text(paths: Paths, text: str) -> str:
+    ctx = load_context(paths)
+    return next(c.key for c in ctx.clips if c.source_text == text)
+
+
+def test_asset_name_replaces_colon():
+    assert asset_name("sentence:0620b64d3955") == "sentence_0620b64d3955.ogg"
+
+
+def test_exports_locked_rendered_clip_as_ogg(tmp_path, content_dir):
+    paths = make_paths(tmp_path, content_dir)
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)
+
+    report = export_to_app(paths)
+
+    assert report.exported == [key]
+    ogg = paths.app_audio_dir / asset_name(key)
+    assert ogg.exists()
+    data, sr = sf.read(ogg)
+    assert sr == 24000 and len(data) > 0
+    index = json.loads((paths.app_audio_dir / "index.json").read_text())
+    assert index["clips"]["Mama."] == {
+        "file": asset_name(key), "profile": "sentence"}
+
+
+def test_skips_unlocked_stale_and_missing(tmp_path, content_dir):
+    paths = make_paths(tmp_path, content_dir)
+    stale_key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, stale_key, fresh=False)
+
+    missing_key = clip_key_for_text(paths, "Maus")
+    lock_and_render(paths, missing_key)
+    (paths.audio / f"{missing_key}.wav").unlink()
+
+    report = export_to_app(paths)
+
+    assert report.exported == []
+    reasons = dict(report.skipped)
+    assert "stale" in reasons[stale_key]
+    assert "missing" in reasons[missing_key]
+    # Ungelockte Clips tauchen gar nicht erst im Bericht auf:
+    assert len(report.skipped) == 2
+    index = json.loads((paths.app_audio_dir / "index.json").read_text())
+    assert index["clips"] == {}
+
+
+def test_orphan_lock_is_reported_not_exported(tmp_path, content_dir):
+    paths = make_paths(tmp_path, content_dir)
+    paths.locks.write_text(json.dumps(
+        {"version": 1, "locks": {"sentence:deadbeef0000": {"seed": 1}}}),
+        encoding="utf-8")
+
+    report = export_to_app(paths)
+
+    assert report.exported == []
+    assert any(key == "sentence:deadbeef0000" and "verwaist" in reason
+               for key, reason in report.skipped)
+
+
+def test_sync_removes_stale_ogg_but_keeps_foreign_files(tmp_path, content_dir):
+    paths = make_paths(tmp_path, content_dir)
+    paths.app_audio_dir.mkdir(parents=True)
+    (paths.app_audio_dir / "word_000000000000.ogg").write_bytes(b"old")
+    (paths.app_audio_dir / "notes.txt").write_text("bleibt")
+
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)
+    report = export_to_app(paths)
+
+    assert not (paths.app_audio_dir / "word_000000000000.ogg").exists()
+    assert (paths.app_audio_dir / "notes.txt").exists()
+    assert report.removed == ["word_000000000000.ogg"]
+
+
+def test_collision_prefers_word_over_phoneme(tmp_path, content_dir):
+    # "M" existiert als lemma (word) und als phonemeTts/stretchTts (phoneme).
+    paths = make_paths(tmp_path, content_dir)
+    ctx = load_context(paths)
+    word_key = next(c.key for c in ctx.clips
+                    if c.source_text == "M" and c.profile == "word")
+    phoneme_key = next(c.key for c in ctx.clips
+                       if c.source_text == "M" and c.profile == "phoneme")
+    lock_and_render(paths, word_key)
+    lock_and_render(paths, phoneme_key)
+
+    report = export_to_app(paths)
+
+    index = json.loads((paths.app_audio_dir / "index.json").read_text())
+    assert index["clips"]["M"]["profile"] == "word"
+    assert any("M" in w for w in report.warnings)
+    # Beide OGGs liegen trotzdem da — nur der Index-Eintrag ist eindeutig.
+    assert (paths.app_audio_dir / asset_name(phoneme_key)).exists()
+
+
+def test_export_is_deterministic(tmp_path, content_dir):
+    paths = make_paths(tmp_path, content_dir)
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)
+    export_to_app(paths)
+    first = (paths.app_audio_dir / "index.json").read_bytes()
+    export_to_app(paths)
+    assert (paths.app_audio_dir / "index.json").read_bytes() == first

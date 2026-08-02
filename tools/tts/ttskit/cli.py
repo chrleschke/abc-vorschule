@@ -212,6 +212,21 @@ def cmd_sample(paths: Paths, args) -> int:
     return 0
 
 
+def cmd_export(paths: Paths) -> int:
+    from .export import export_to_app
+
+    report = export_to_app(paths)
+    print(f"{len(report.exported)} Clips exportiert → {paths.app_audio_dir}")
+    if report.removed:
+        print(f"{len(report.removed)} veraltete Dateien entfernt: "
+              f"{', '.join(report.removed)}")
+    for key, reason in report.skipped:
+        print(f"  übersprungen {key}: {reason}")
+    for warning in report.warnings:
+        print(f"  Achtung: {warning}")
+    return 0
+
+
 def cmd_web(paths: Paths, args) -> int:
     import uvicorn
 
@@ -229,6 +244,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("extract", help="Content-JSON → out/manifest.json")
     sub.add_parser("status", help="Überblick über Clips, Pools und Locks")
+    sub.add_parser("export", help="Approvete Clips als OGG in die App-Assets")
 
     render_parser = sub.add_parser("render", help="Finaler Lauf, inkrementell")
     render_parser.add_argument("--profile", help="nur dieses Profil")
@@ -255,6 +271,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_extract(paths)
     if args.command == "status":
         return cmd_status(paths)
+    if args.command == "export":
+        return cmd_export(paths)
     if args.command == "render":
         return cmd_render(paths, args)
     if args.command == "sample":
