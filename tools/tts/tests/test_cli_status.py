@@ -50,3 +50,52 @@ def test_load_context_does_not_import_torch(tmp_path, content_dir):
     paths = make_root(tmp_path, content_dir)
     load_context(paths)
     assert "torch" not in sys.modules, "status must stay instant"
+
+
+def test_status_reports_blank_items(tmp_path, content_dir, capsys):
+    paths = make_root(tmp_path, content_dir)
+    atoms = paths.content_dir / "atoms.json"
+    raw = json.loads(atoms.read_text(encoding="utf-8"))
+    raw["atoms"].append({"id": "leer", "lemma": "  ", "display": "", "kind": "word"})
+    atoms.write_text(json.dumps(raw), encoding="utf-8")
+
+    cmd_status(paths)
+    out = capsys.readouterr().out
+    assert "leerem Text übersprungen" in out
+    assert "atom:leer:lemma" in out
+
+
+def test_status_lists_the_failures_of_the_last_run(tmp_path, content_dir, capsys):
+    from ttskit.store import RenderState
+
+    paths = make_root(tmp_path, content_dir)
+    key = load_context(paths).clips[0].key
+    state = RenderState(failures={key: "RuntimeError: Modell explodiert"})
+    state.save(paths.render_state)
+
+    cmd_status(paths)
+    out = capsys.readouterr().out
+    assert "fehlgeschlagen" in out
+    assert key in out
+    assert "Modell explodiert" in out
+
+
+def test_status_ignores_failures_of_clips_that_no_longer_exist(tmp_path, content_dir,
+                                                               capsys):
+    from ttskit.store import RenderState
+
+    paths = make_root(tmp_path, content_dir)
+    RenderState(failures={"prompt:deadbeef1234": "alt"}).save(paths.render_state)
+    cmd_status(paths)
+    assert "fehlgeschlagen" not in capsys.readouterr().out
+
+
+def test_status_does_not_re_read_extra_strings(tmp_path, content_dir, capsys):
+    """load_context already read the file; cmd_status must use what it carries."""
+    paths = make_root(tmp_path, content_dir)
+    paths.extra_strings.write_text(
+        json.dumps({"version": 1, "strings": [], "templates": ["x"]}), encoding="utf-8")
+    ctx = load_context(paths)
+    assert ctx.extras["templates"] == ["x"]
+    cmd_status(paths)
+    assert "keine Template-Expansionen" not in capsys.readouterr().out

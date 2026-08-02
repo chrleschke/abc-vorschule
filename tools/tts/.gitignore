@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+# Atomic-write temp files: a hard kill mid-save leaves one behind, and this
+# repo lives on clean curated diffs.
+.*.tmp

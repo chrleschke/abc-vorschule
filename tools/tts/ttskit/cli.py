@@ -5,13 +5,14 @@ from __future__ import annotations
 import argparse
 import collections
 import json
-from dataclasses import dataclass
+import time
+from dataclasses import dataclass, field
 
 from .extract import extract_items
 from .models import Clip, Item
 from .paths import Paths
 from .plan import build_clips, orphan_locks, status_of
-from .store import Locks, Profiles, RenderState
+from .store import Locks, Profiles, RenderState, read_json
 
 
 @dataclass
@@ -21,13 +22,16 @@ class Context:
     locks: Locks
     clips: list[Clip]
     state: RenderState
+    #: Raw extra-strings.json, carried so callers need not re-read it.
+    extras: dict | None = None
+    #: Item ids whose text was blank and therefore skipped.
+    blanks: list[str] = field(default_factory=list)
 
 
 def load_context(paths: Paths) -> Context:
-    extra = None
-    if paths.extra_strings.exists():
-        extra = json.loads(paths.extra_strings.read_text(encoding="utf-8"))
-    items = extract_items(paths.content_dir, extra_strings=extra)
+    extra = read_json(paths.extra_strings)
+    blanks: list[str] = []
+    items = extract_items(paths.content_dir, extra_strings=extra, blanks=blanks)
     profiles = Profiles.load(paths.profiles)
     locks = Locks.load(paths.locks)
     return Context(
@@ -36,12 +40,13 @@ def load_context(paths: Paths) -> Context:
         locks=locks,
         clips=build_clips(items, profiles, locks),
         state=RenderState.load(paths.render_state),
+        extras=extra,
+        blanks=blanks,
     )
 
 
 def cmd_extract(paths: Paths) -> int:
     ctx = load_context(paths)
-    by_text_profile = {c.key: c for c in ctx.clips}
     item_clip = {}
     for clip in ctx.clips:
         for item_id in clip.item_ids:
@@ -50,7 +55,7 @@ def cmd_extract(paths: Paths) -> int:
     payload = {
         "version": 1,
         "itemCount": len(ctx.items),
-        "clipCount": len(by_text_profile),
+        "clipCount": len(ctx.clips),
         "items": [{
             "id": i.id, "text": i.text, "field": i.field, "source": i.source,
             "lesson": i.lesson, "label": i.label, "clipKey": item_clip[i.id],
@@ -59,7 +64,7 @@ def cmd_extract(paths: Paths) -> int:
     paths.manifest.parent.mkdir(parents=True, exist_ok=True)
     paths.manifest.write_text(
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"{len(ctx.items)} Items → {len(by_text_profile)} Clips → {paths.manifest}")
+    print(f"{len(ctx.items)} Items → {len(ctx.clips)} Clips → {paths.manifest}")
     return 0
 
 
@@ -86,6 +91,18 @@ def cmd_status(paths: Paths) -> int:
         print(f"Seed-Pool leer bei: {', '.join(sorted(empty))} "
               f"— Seeds werden aus dem Clip-Hash abgeleitet.")
 
+    live = {c.key for c in ctx.clips}
+    failures = {k: v for k, v in sorted(ctx.state.failures.items()) if k in live}
+    if failures:
+        print(f"\n{len(failures)} Clips sind beim letzten Lauf fehlgeschlagen:")
+        for key, message in failures.items():
+            print(f"  {key}  {message}")
+
+    if ctx.blanks:
+        print(f"\n{len(ctx.blanks)} Items mit leerem Text übersprungen:")
+        for item_id in ctx.blanks:
+            print(f"  {item_id}")
+
     orphans = orphan_locks(ctx.locks, ctx.clips)
     if orphans:
         print(f"\n{len(orphans)} verwaiste Locks (Text hat sich geändert?):")
@@ -94,14 +111,18 @@ def cmd_status(paths: Paths) -> int:
             shown = lock.source_text if lock and lock.source_text else "(kein Text notiert)"
             print(f"  {key}  seed={lock.seed}  {shown!r}")
 
-    templates = []
-    if paths.extra_strings.exists():
-        raw = json.loads(paths.extra_strings.read_text(encoding="utf-8"))
-        templates = raw.get("templates", [])
+    templates = (ctx.extras or {}).get("templates", [])
     if not templates:
         print("\nHinweis: keine Template-Expansionen erfasst — die Sprechtexte von "
               "Symbol-Jagd und Wort-Detektiv fehlen im Paket (Spec §2).")
     return 0
+
+
+def _human_duration(seconds: float) -> str:
+    seconds = max(0, int(round(seconds)))
+    if seconds < 60:
+        return f"{seconds} s"
+    return f"{seconds // 60} min {seconds % 60:02d} s"
 
 
 def _engine_or_exit(profiles: Profiles):
@@ -137,9 +158,19 @@ def cmd_render(paths: Paths, args) -> int:
     if engine is None:
         return 1
 
+    started = time.monotonic()
+
     def show(p) -> None:
         mark = "!" if p.status == "failed" else "."
-        print(f"[{p.index}/{p.total}] {mark} {p.clip_key} {p.message}".rstrip())
+        # Running average, not a per-clip estimate: clip time swings from ~2.4 s
+        # for a word to ~3.2 s for a finale sentence, so only the mean over the
+        # run so far says anything useful about the remaining minutes.
+        average = (time.monotonic() - started) / max(1, p.index)
+        parts = [f"[{p.index}/{p.total}]", mark, p.clip_key]
+        if p.message:
+            parts.append(p.message)
+        parts.append(f"(noch ~{_human_duration(average * (p.total - p.index))})")
+        print(" ".join(parts))
 
     report = render_clips(ctx.clips, ctx.profiles, engine, ctx.state, paths,
                           force=args.force, only=args.only,
@@ -186,7 +217,7 @@ def cmd_web(paths: Paths, args) -> int:
 
     from .server import create_app
 
-    print(f"Lade Modell — das dauert ein paar Sekunden ...")
+    print("Lade Modell — das dauert ein paar Sekunden ...")
     app = create_app(paths)
     print(f"Web-Interface auf http://{args.host}:{args.port}")
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
