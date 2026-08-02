@@ -1,13 +1,12 @@
 import json
-import wave
+import shutil
 from pathlib import Path
 
 import numpy as np
-import pytest
 import soundfile as sf
 
 from ttskit.cli import load_context
-from ttskit.export import ExportReport, asset_name, export_to_app
+from ttskit.export import asset_name, export_to_app
 from ttskit.paths import Paths
 from ttskit.plan import fingerprint
 
@@ -139,6 +138,60 @@ def test_collision_prefers_word_over_phoneme(tmp_path, content_dir):
     assert any("M" in w for w in report.warnings)
     # Beide OGGs liegen trotzdem da — nur der Index-Eintrag ist eindeutig.
     assert (paths.app_audio_dir / asset_name(phoneme_key)).exists()
+
+
+def test_fresh_checkout_keeps_existing_assets_when_local_state_missing(tmp_path, content_dir):
+    """out/ is gitignored. On a fresh clone locks + committed assets/index
+    exist but the WAV and render-state don't — every locked clip reads as
+    `missing`. Deletion must track unlocks, not local render state: the
+    committed OGG and its index entry have to survive untouched."""
+    paths = make_paths(tmp_path, content_dir)
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)
+    first = export_to_app(paths)
+    assert first.exported == [key]
+    ogg = paths.app_audio_dir / asset_name(key)
+    ogg_bytes = ogg.read_bytes()
+    index_before = json.loads((paths.app_audio_dir / "index.json").read_text())
+
+    # Simulate a fresh checkout: out/ (WAV + render-state) is gone, only the
+    # lock and the previously committed assets/index remain.
+    shutil.rmtree(paths.out)
+
+    report = export_to_app(paths)
+
+    assert report.exported == []
+    assert report.removed == []
+    assert ogg.exists()
+    assert ogg.read_bytes() == ogg_bytes
+    reasons = dict(report.skipped)
+    assert "missing" in reasons[key]
+    assert "vorhandene Datei bleibt erhalten" in reasons[key]
+    index_after = json.loads((paths.app_audio_dir / "index.json").read_text())
+    assert index_after == index_before
+
+
+def test_unlock_deletes_kept_file_and_index_entry(tmp_path, content_dir):
+    """Deletion tracks unlocks: once a clip is no longer locked at all, its
+    asset and index entry must disappear — even if it was previously kept
+    across a run where it was merely missing/stale."""
+    paths = make_paths(tmp_path, content_dir)
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)
+    export_to_app(paths)
+    ogg = paths.app_audio_dir / asset_name(key)
+    assert ogg.exists()
+
+    locks_data = json.loads(paths.locks.read_text())
+    del locks_data["locks"][key]
+    paths.locks.write_text(json.dumps(locks_data), encoding="utf-8")
+
+    report = export_to_app(paths)
+
+    assert not ogg.exists()
+    assert report.removed == [asset_name(key)]
+    index = json.loads((paths.app_audio_dir / "index.json").read_text())
+    assert index["clips"] == {}
 
 
 def test_export_is_deterministic(tmp_path, content_dir):

@@ -1,9 +1,15 @@
 """Approvete Clips als OGG/Opus in die App-Assets exportieren.
 
 Exportiert wird genau ein Clip, wenn er gelockt ist und sein Render-Stand
-aktuell ('rendered'). Der Export besitzt das Zielverzeichnis: nicht mehr
-exportierte .ogg-Dateien werden entfernt, index.json wird immer neu
-geschrieben — deterministisch, ohne Zeitstempel, für saubere Diffs.
+aktuell ('rendered'). Der Export besitzt das Zielverzeichnis, aber die
+Lösch-Semantik folgt Unlocks, nicht dem lokalen Render-Stand: `out/` ist
+gitignored, auf einem frischen Checkout fehlen WAV und render-state.json für
+jeden gelockten Clip, obwohl die Datei längst committet ist. Ein Clip, der
+gelockt, aber lokal nicht (mehr) rendered ist (Status `missing`/`stale`),
+behält seine bereits exportierte Datei und seinen Index-Eintrag — nur ein
+echter Unlock (oder ein Text, der zu keinem Lock mehr gehört) entfernt eine
+Datei. index.json wird immer neu geschrieben — deterministisch, ohne
+Zeitstempel, für saubere Diffs.
 
 Determinismus heißt hier: ein wiederholter Lauf ohne geänderte Eingaben fasst
 keine Datei an. Die OGG-Bytes selbst sind pro Encode NICHT reproduzierbar —
@@ -57,11 +63,12 @@ class ExportReport:
         }
 
 
-def _previous_fingerprints(index_path: Path) -> dict[str, str]:
-    """asset-Dateiname → zuletzt exportierter Fingerprint, aus dem alten Index.
+def _previous_index(index_path: Path) -> dict[str, tuple[str, dict]]:
+    """asset-Dateiname → (Text, Eintrag) aus dem zuletzt geschriebenen Index.
 
     Fehlt die Datei oder ist sie kaputt, ist das kein Fehler — dann wird
-    einfach alles neu encodiert, wie beim allerersten Export.
+    einfach alles neu encodiert, wie beim allerersten Export, und nichts kann
+    für einen gelockten, aber lokal nicht gerenderten Clip erhalten werden.
     """
     if not index_path.exists():
         return {}
@@ -72,14 +79,13 @@ def _previous_fingerprints(index_path: Path) -> dict[str, str]:
     clips = payload.get("clips") if isinstance(payload, dict) else None
     if not isinstance(clips, dict):
         return {}
-    result: dict[str, str] = {}
-    for entry in clips.values():
-        if not isinstance(entry, dict):
+    result: dict[str, tuple[str, dict]] = {}
+    for text, entry in clips.items():
+        if not isinstance(text, str) or not isinstance(entry, dict):
             continue
         file = entry.get("file")
-        fp = entry.get("fingerprint")
-        if isinstance(file, str) and isinstance(fp, str):
-            result[file] = fp
+        if isinstance(file, str):
+            result[file] = (text, entry)
     return result
 
 
@@ -92,21 +98,38 @@ def export_to_app(paths: Paths) -> ExportReport:
     for key in orphan_locks(ctx.locks, ctx.clips):
         report.skipped.append((key, "Lock ist verwaist — Quelltext existiert nicht mehr"))
 
+    target = Path(paths.app_audio_dir)
+    target.mkdir(parents=True, exist_ok=True)
+
+    previous = _previous_index(target / "index.json")
+
     exportable = []
+    #: Text → Index-Eintrag (verbatim, inkl. altem Fingerprint) für gelockte
+    #: Clips, die lokal nicht (mehr) rendered sind, deren Datei aber schon aus
+    #: einem früheren Export existiert. Sie bleiben liegen, bis der Lock fällt.
+    retained_entries: dict[str, dict] = {}
+    retained_files: set[str] = set()
     for clip in ctx.clips:
         if not clip.locked:
             continue
         profile = ctx.profiles.profiles[clip.profile]
         status = status_of(clip, profile, ctx.state, paths.audio)
         if status != "rendered":
-            report.skipped.append((clip.key, f"Status ist {status}, nicht rendered"))
+            name = asset_name(clip.key)
+            if (target / name).exists():
+                report.skipped.append(
+                    (clip.key,
+                     f"Status ist {status}, nicht rendered — "
+                     "vorhandene Datei bleibt erhalten"))
+                retained_files.add(name)
+                prev = previous.get(name)
+                if prev is not None:
+                    prev_text, prev_entry = prev
+                    retained_entries[prev_text] = prev_entry
+            else:
+                report.skipped.append((clip.key, f"Status ist {status}, nicht rendered"))
             continue
         exportable.append(clip)
-
-    target = Path(paths.app_audio_dir)
-    target.mkdir(parents=True, exist_ok=True)
-
-    previous = _previous_fingerprints(target / "index.json")
 
     index: dict[str, dict] = {}
     for clip in sorted(exportable, key=lambda c: c.key):
@@ -115,14 +138,15 @@ def export_to_app(paths: Paths) -> ExportReport:
         name = asset_name(clip.key)
         dest = target / name
 
-        if previous.get(name) == fp and dest.exists():
+        prev = previous.get(name)
+        if prev is not None and prev[1].get("fingerprint") == fp and dest.exists():
             report.unchanged.append(clip.key)
         else:
             data, sr = sf.read(paths.audio / f"{clip.key}.wav", dtype="float32")
             sf.write(dest, data, sr, format="OGG", subtype="OPUS")
             report.exported.append(clip.key)
 
-        text = clip.source_text
+        text = clip.source_text.strip()
         existing = index.get(text)
         if existing is None:
             index[text] = {"file": name, "profile": clip.profile, "fingerprint": fp}
@@ -136,7 +160,12 @@ def export_to_app(paths: Paths) -> ExportReport:
             f"Text {text!r} existiert in mehreren Profilen — "
             f"App spielt {winner!r}")
 
-    keep = {asset_name(c.key) for c in exportable} | {"index.json"}
+    # Zurückbehaltene Einträge dürfen frische (exportierte/unveränderte)
+    # Einträge nie überschreiben — bei gleichem Text gewinnt der frische.
+    for text, entry in retained_entries.items():
+        index.setdefault(text, entry)
+
+    keep = {asset_name(c.key) for c in exportable} | retained_files | {"index.json"}
     for path in sorted(target.glob("*.ogg")):
         if path.name not in keep:
             path.unlink()
