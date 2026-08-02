@@ -18,6 +18,7 @@ alias tts="~/qwen-tts-test/.venv/bin/python $(git rev-parse --show-toplevel)/too
 ```bash
 tts extract                        # Content-JSON → out/manifest.json
 tts status                         # Überblick: fehlt / stale / fertig / Pools / Locks
+                                   # plus Fehlschläge des letzten Laufs und leere Texte
 tts sample --profile prompt -n 8   # 8 Seeds an 3 Beispielen des Profils ausprobieren
 tts web                            # Kuratieren unter http://127.0.0.1:8420
 tts render                         # finaler Lauf, inkrementell, ca. 25–40 Minuten
@@ -26,6 +27,11 @@ tts render                         # finaler Lauf, inkrementell, ca. 25–40 Min
 Typisch: einmal `sample` pro Profil, im Web-Interface die guten Seeds mit „✓ Pool"
 sammeln, dann `render`. Einzelne schlechte Clips im Web-Interface mit „🎲 4 Kandidaten"
 neu würfeln und den besten per „📌 Lock" festnageln.
+
+**Mit `phoneme` anfangen.** Das ist Absicht: mit 37 Clips ist es das kleinste Profil und
+zugleich das riskanteste — gefragt ist der *Lautwert*, nicht der Buchstabenname („mmmmm",
+nicht „Em"). Klappt das per Instruktion nicht, greift `textOverride` im Lock als
+Notausgang. Das weiß man dann nach ein paar Minuten und nicht nach 25–40 Minuten Rendern.
 
 ## Umfang
 
@@ -79,9 +85,36 @@ identisch. `poolSalt` in `profiles.json` hochzählen würfelt bewusst alles neu.
 
 `profiles.json` und `locks.json` nie automatisiert überschreiben: darin steckt Hörarbeit.
 
+Beide Dateien werden beim Laden geprüft. Ein Tippfehler — ein Lock auf ein Profil, das es
+nicht gibt; ein Lock ohne `seed`; ein fehlendes `label` — bricht mit einer Meldung ab, die
+Datei und Schlüssel nennt, statt später als nackter `KeyError` aufzuschlagen. Insbesondere
+ersetzt eine leere oder abgeschnittene `profiles.json` **nicht** stillschweigend alle
+kuratierten Seed-Pools durch die Defaults, sondern ist ein Fehler. Wer wirklich zurück auf
+die Defaults will, löscht die Datei.
+
+`textOverride` und `note` in `locks.json` setzt man per Hand — das Web-Interface schickt
+beide (noch) nicht:
+
+```json
+{ "version": 1, "locks": {
+  "phoneme:9f2c1a7b4e08": { "seed": 991, "textOverride": "mmmmm",
+                            "note": "sprach sonst 'Em'", "sourceText": "M" }
+}}
+```
+
 Aktuell liegen unter `out/audio/` bereits 18 gerenderte `finale`-Clips sowie ein
 `candidates/`-Verzeichnis aus der Entwicklung (probeweise gewürfelte Kandidaten-Seeds).
 Beides ist jederzeit löschbar; `tts render` bzw. `tts sample` erzeugen es bei Bedarf neu.
+Die 18 Clips stehen momentan auf `stale`, weil die Nachbearbeitungs-Version in den
+Fingerprint aufgenommen wurde (siehe unten) — der nächste Lauf erzeugt sie neu.
+
+## Nachbearbeitung ändern
+
+Trim-Schwellwert, Trim-Polster und Normalisierungsziel sind Konstanten in
+`ttskit/audio.py`. Sie fließen über `POSTPROCESS_VERSION` in den Render-Fingerprint ein:
+**wer eine dieser Konstanten ändert, muss `POSTPROCESS_VERSION` hochzählen.** Sonst hält
+`render` alle Clips für aktuell, rendert nichts neu, und unter `out/audio/` liegen zwei
+Nachbearbeitungs-Generationen nebeneinander, die man nur noch am Klang unterscheidet.
 
 ## Tests
 

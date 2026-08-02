@@ -40,7 +40,9 @@ Generate-Aufruf lieferte für Seed 42 zweimal bit-identische Wellenformen
 dieser Spec steht und fällt mit dieser Eigenschaft; ein Smoke-Test sichert sie ab
 (§9). Voraussetzung ist Batchgröße 1 — Batching würde die Zuordnung Seed↔Clip zerstören.
 
-Hochrechnung: ein vollständiger Lauf über ~694 Clips dauert rund **28 Minuten**.
+Hochrechnung: ein vollständiger Lauf über ~694 Clips dauert **25–40 Minuten** — je
+nach Profilmix. Eine einzelne Zahl wäre irreführend: ein kurzer Satz braucht ~2,4 s,
+die langen `finale`-Sätze im Schnitt ~3,2 s, einzelne Wörter deutlich weniger.
 
 ## 2. Textbestand
 
@@ -296,7 +298,7 @@ dessen Hash sich geändert hat.
 
 Praktische Folge: eine geänderte Instruktion rendert nur ihr Profil neu, ein geänderter
 Satz in `tasks.json` nur den einen Clip. Der Regelfall ist damit ein Lauf von Sekunden,
-nicht von 28 Minuten.
+nicht von 25–40 Minuten.
 
 ## 8. Audio-Nachbearbeitung
 
@@ -358,9 +360,12 @@ Content-Pack der App.
   statt still danebenzugreifen.
 - **Modell nicht ladbar** — der Server startet trotzdem, die UI zeigt „Engine offline"
   mit der Fehlermeldung; Kuratieren bereits gerenderter Clips bleibt möglich.
-- **Generierung schlägt fehl** — der Clip wird als `failed` mit Meldung markiert, der
-  Batch läuft weiter. `status` listet die Fehlschläge.
-- **Leerer Text** — wird übersprungen und in `status` gemeldet.
+- **Generierung schlägt fehl** — der Clip wird mit seiner Fehlermeldung in
+  `out/render-state.json` unter `failures` festgehalten, der Batch läuft weiter.
+  `status` listet die Fehlschläge des letzten Laufs mit Meldung auf; ein erfolgreicher
+  Neuversuch räumt den Eintrag wieder ab. Der Status-Chip selbst bleibt bei
+  `missing`/`stale`/`rendered` — er beschreibt, was auf der Platte liegt.
+- **Leerer Text** — wird übersprungen und in `status` mit seiner Item-ID gemeldet.
 - **Verwaiste Locks** — ändert sich ein Text im App-JSON, ändert sich sein `clipKey`.
   Das alte Lock wird nicht stillschweigend verworfen, sondern als „verwaist" gemeldet;
   Aufräumen ist eine bewusste Entscheidung des Nutzers.

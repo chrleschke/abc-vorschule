@@ -1998,7 +1998,7 @@ Ein Fehlschlag bei einem Clip darf den Batch nicht stoppen: er landet in
 `report.failed` und die Schleife läuft weiter.
 
 Der Render-State wird **nach jedem Clip** geschrieben, nicht am Ende. Ein abgebrochener
-25-Minuten-Lauf soll nicht die ganze Arbeit verlieren.
+25–40-Minuten-Lauf soll nicht die ganze Arbeit verlieren.
 
 - [ ] **Step 1: Den failing test schreiben**
 
@@ -3620,10 +3620,13 @@ cd tools/tts
 ~/qwen-tts-test/.venv/bin/python ./tts extract
 ~/qwen-tts-test/.venv/bin/python ./tts sample --profile phoneme -n 8
 ~/qwen-tts-test/.venv/bin/python ./tts web       # kuratieren
-~/qwen-tts-test/.venv/bin/python ./tts render    # ~28 Minuten beim ersten Mal
+~/qwen-tts-test/.venv/bin/python ./tts render    # ~25-40 Minuten beim ersten Mal
 ```
 
 Das `phoneme`-Profil zuerst zu sampeln ist Absicht: es ist mit 37 Clips das kleinste und
 zugleich das riskanteste (Lautwert vs. Buchstabenname). Klappt es dort nicht per
 Instruktion, greift der `textOverride` im Lock — und das weiß man dann früh, nicht nach
-28 Minuten Rendern.
+25–40 Minuten Rendern.
+
+*(Dieser Hinweis steht jetzt in `tools/tts/README.md` neben dem `sample`-Kommando, wo
+er beim Betrieb auch gefunden wird.)*
