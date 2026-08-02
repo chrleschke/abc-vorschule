@@ -66,6 +66,7 @@ main { flex: 1; display: grid; grid-template-columns: minmax(320px, 1fr) 1.4fr; 
 }
 .cand-table tr.good td { background: #edf4e8; }
 .cand-table tr.outdated td { opacity: 0.55; }
+.cand-table tr.production td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
 .cand-table audio { width: 180px; height: 32px; display: block; }
 .cand-table .center { text-align: center; }
 .cand-table .nowrap { white-space: nowrap; }

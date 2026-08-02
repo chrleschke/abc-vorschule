@@ -22,8 +22,10 @@
               title="Stimme, Sprache, Instruktion und Sampling aller Profile bearbeiten">
         ⚙️ TTS-Parameter</button>
       <button id="btn-render" class="primary"
-              title="Rendert die links ausgewählten Clips — nur was fehlt oder veraltet ist">
+              title="Erzeugt Kandidaten für die links ausgewählten Clips — nur was fehlt oder veraltet ist. Produktion bestätigt man danach pro Clip in der Kandidaten-Liste.">
         ▶ Batch-Lauf</button>
+      <input id="batch-count" type="number" min="1" max="16" value="2"
+             title="Anzahl Beispiele pro Clip (1–16)" /> Stück
       <div id="job">
         <span id="job-spinner" class="spinner hidden"></span>
         <div id="job-bar-track" class="hidden"><div id="job-bar"></div></div>

@@ -44,10 +44,16 @@ Stimme und Text — so bleiben mehrere Würfel-Runden auseinanderhaltbar. Der
 Radio-Button „Produktion" übernimmt genau eine Aufnahme sofort als Produktions-Audio
 und lockt ihren Seed (kein Re-Render, kein erneutes Anhören nötig).
 
-Gerendert wird über den **Batch-Lauf**: links in der Liste Clips ankreuzen (einzeln
-oder über „Sichtbare / Alle / Keine"), dann „▶ Batch-Lauf" in der Kopfzeile —
-gerendert wird nur, was fehlt oder veraltet ist. Da viel von Hand korrigiert wird,
-gibt es bewusst keinen „finalen Lauf" über alles mehr; die Auswahl bestimmt den Umfang.
+Erzeugt wird über den **Batch-Lauf**: links in der Liste Clips ankreuzen (einzeln
+oder über „Sichtbare / Alle / Keine"), Anzahl Beispiele pro Clip einstellen (Default 2),
+dann „▶ Batch-Lauf" in der Kopfzeile — angefasst wird nur, was fehlt oder veraltet ist.
+Der Lauf erzeugt Kandidaten wie „🎲 Kandidaten würfeln", aber für alle ausgewählten Clips
+auf einmal; er schreibt nie direkt in die Produktion. Die Entwürfe stehen danach in
+derselben Kandidaten-Tabelle wie jede andere Probeaufnahme — dort per Radio-Button
+„Produktion" bestätigen. Ohne Bestätigung bleibt der Clip „fehlt"/„veraltet"; eine
+Festlegung fällt von selbst weg, sobald keine Aufnahme des Clips mehr übrig ist (keine
+eigene „Lock entfernen"-Aktion nötig). Da viel von Hand korrigiert wird, gibt es bewusst
+keinen „finalen Lauf" über alles mehr; die Auswahl bestimmt den Umfang.
 
 Die Detailsicht zeigt oben eine Zusammenfassung der Profil-Einstellungen (Stimme,
 Sprache, Instruktion, Sampling) — „Bearbeiten" klappt das Formular auf. Dieselben

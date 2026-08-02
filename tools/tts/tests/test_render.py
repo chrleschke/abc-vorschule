@@ -4,7 +4,9 @@ import pytest
 from ttskit.models import Item
 from ttskit.paths import Paths
 from ttskit.plan import build_clips
-from ttskit.render import random_seeds, render_clips, sample_candidates
+from ttskit.render import (
+    random_seeds, render_batch_candidates, render_clips, sample_candidates,
+)
 from ttskit.store import Locks, Profiles, RenderState
 
 
@@ -201,6 +203,140 @@ def test_progress_reports_index_and_total(setup):
     render_clips(clips, profiles, FakeEngine(), state, paths,
                  progress=lambda p: seen.append((p.index, p.total)))
     assert seen == [(1, 3), (2, 3), (3, 3)]
+
+
+def test_render_batch_candidates_writes_n_candidates_per_missing_clip(setup):
+    paths, profiles, clips, state = setup
+    engine = FakeEngine()
+    report = render_batch_candidates(clips, profiles, engine, state, paths, count=2)
+    assert report.rendered == 3
+    assert report.skipped == 0
+    assert report.failed == []
+    for clip in clips:
+        assert not (paths.audio / f"{clip.key}.wav").exists(), \
+            "Batch-Kandidaten dürfen nicht direkt in Produktion landen"
+        from ttskit.render import candidate_seeds
+        assert len(candidate_seeds(paths, clip.key)) == 2
+
+
+def test_render_batch_candidates_skips_already_rendered_clips(setup):
+    paths, profiles, clips, state = setup
+    engine = FakeEngine()
+    render_clips(clips, profiles, engine, state, paths)  # simulates a prior `tts render`
+    report = render_batch_candidates(clips, profiles, engine, state, paths, count=2)
+    assert report.rendered == 0
+    assert report.skipped == 3
+
+
+def test_render_batch_candidates_force_ignores_rendered_status(setup):
+    paths, profiles, clips, state = setup
+    engine = FakeEngine()
+    render_clips(clips, profiles, engine, state, paths)
+    report = render_batch_candidates(clips, profiles, engine, state, paths,
+                                     count=2, force=True)
+    assert report.rendered == 3
+    assert report.skipped == 0
+
+
+def test_render_batch_candidates_dry_run_writes_nothing(setup):
+    paths, profiles, clips, state = setup
+    report = render_batch_candidates(clips, profiles, None, state, paths,
+                                     count=2, dry_run=True)
+    assert report.rendered == 3
+    assert not paths.candidates.exists() or list(paths.candidates.iterdir()) == []
+
+
+def test_render_batch_candidates_needs_an_engine_unless_dry_run(setup):
+    paths, profiles, clips, state = setup
+    with pytest.raises(AssertionError, match="needs an engine"):
+        render_batch_candidates(clips, profiles, None, state, paths, count=2)
+
+
+def test_render_batch_candidates_cancel_stops_the_run(setup):
+    paths, profiles, clips, state = setup
+    calls = {"n": 0}
+
+    def cancel():
+        calls["n"] += 1
+        return calls["n"] > 1
+
+    report = render_batch_candidates(clips, profiles, FakeEngine(), state, paths,
+                                     count=2, cancel=cancel)
+    assert report.rendered < 3
+
+
+def test_render_batch_candidates_progress_spans_the_whole_batch(setup):
+    paths, profiles, clips, state = setup
+    seen = []
+    render_batch_candidates(clips, profiles, FakeEngine(), state, paths, count=2,
+                            progress=lambda p: seen.append((p.index, p.total)))
+    assert seen == [(1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6)]
+
+
+def test_render_batch_candidates_reports_a_failing_clip(setup):
+    paths, profiles, clips, state = setup
+    engine = FakeEngine(fail_on={"Frage eins?"})
+    report = render_batch_candidates(clips, profiles, engine, state, paths, count=2)
+    assert report.rendered == 2
+    assert len(report.failed) == 1
+    failed_key, message = report.failed[0]
+    assert failed_key == next(c.key for c in clips if c.text == "Frage eins?")
+    assert "fehlgeschlagen" in message
+
+
+def test_clip_audio_list_adds_a_synthetic_entry_for_unmirrored_production(setup):
+    from ttskit.render import clip_audio_list
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    render_clips([clip], profiles, FakeEngine(), state, paths)
+
+    infos = clip_audio_list(paths, clip, profile, state)
+    assert len(infos) == 1
+    entry = infos[0]
+    assert entry["seed"] == clip.seed
+    assert entry["isProductionOnly"] is True
+    assert entry["fresh"] is True
+    assert entry["createdAt"], "muss aus der Datei-mtime kommen"
+
+
+def test_clip_audio_list_is_stale_when_settings_changed_since(setup):
+    from ttskit.render import clip_audio_list
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    render_clips([clip], profiles, FakeEngine(), state, paths)
+
+    profile.instruct = "Ganz anders."
+    entry = clip_audio_list(paths, clip, profile, state)[0]
+    assert entry["fresh"] is False
+
+
+def test_clip_audio_list_skips_synthetic_entry_when_a_candidate_already_matches(setup):
+    from ttskit.render import clip_audio_list, sample_candidates
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    render_clips([clip], profiles, FakeEngine(), state, paths)
+    # Ein echter Kandidat mit demselben Seed wie die Produktion — z. B. weil
+    # er genau daraus per promote entstand.
+    sample_candidates(clip, profile, FakeEngine(), paths, seeds=[clip.seed])
+
+    infos = clip_audio_list(paths, clip, profile, state)
+    assert len(infos) == 1
+    assert "isProductionOnly" not in infos[0]
+
+
+def test_clip_audio_list_without_any_audio_is_empty(setup):
+    from ttskit.render import clip_audio_list
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    assert clip_audio_list(paths, clip, profile, state) == []
 
 
 def test_random_seeds_are_unique_and_avoid_exclusions():
