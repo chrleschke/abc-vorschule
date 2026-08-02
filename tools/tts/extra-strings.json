@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "strings": [
+    {
+      "id": "lockedLessonCue",
+      "text": "Das üben wir später.",
+      "note": "SessionViewModel.lockedLessonCue()"
+    },
+    {
+      "id": "genericMiss",
+      "text": "Probiere eine andere Antwort",
+      "note": "SessionViewModel — generisches Miss-Feedback"
+    }
+  ],
+  "templates": []
+}
