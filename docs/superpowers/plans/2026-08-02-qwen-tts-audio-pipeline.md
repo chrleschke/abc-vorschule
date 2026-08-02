@@ -1616,13 +1616,16 @@ def cmd_status(paths: Paths) -> int:
         profile = ctx.profiles.profiles[clip.profile]
         counts[clip.profile][status_of(clip, profile, ctx.state, paths.audio)] += 1
 
-    print(f"{'Profil':<10} {'gesamt':>7} {'fehlt':>7} {'stale':>7} {'fertig':>7} {'Pool':>6}")
+    # Column headers use the technical status vocabulary (missing/stale/rendered), not
+    # German labels: the cells hold counts, so these words are the only place the status
+    # names appear at all — and a test asserts "missing" shows up in the output.
+    print(f"{'Profil':<10} {'gesamt':>7} {'missing':>7} {'stale':>7} {'rendered':>8} {'Pool':>6}")
     for name in sorted(counts):
         c = counts[name]
         total = sum(c.values())
         pool = len(ctx.profiles.profiles[name].seed_pool)
         print(f"{name:<10} {total:>7} {c['missing']:>7} {c['stale']:>7} "
-              f"{c['rendered']:>7} {pool:>6}")
+              f"{c['rendered']:>8} {pool:>6}")
 
     locked = sum(1 for c in ctx.clips if c.locked)
     print(f"\n{len(ctx.clips)} Clips aus {len(ctx.items)} Items, davon {locked} gelockt.")
