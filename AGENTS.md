@@ -79,7 +79,11 @@ Kernpunkte (Kurzfassung):
 - Progress: DataStore
 - Content-Schema v2: ein polymorpher `TaskSpec` pro Trainer (`trainer`-Diskriminator), Lektionen in `lessons.json`
 - Lektions-Freischaltung wird aus `taskStats` abgeleitet (`progress/LessonGating.kt`) — keine Extra-Persistenz
-- Tests: `./gradlew :app:testDebugUnitTest`
+- Tests: `./gradlew :app:testDebugUnitTest`. Die Unit-Tests laden das **ausgelieferte**
+  Content-Pack: `src/main/assets` ist als Test-Resource-Root eingetragen, es gibt **keine**
+  zweite Kopie unter `src/test/resources/content/` mehr (die war unbemerkt veraltet, u. a.
+  ohne die gesamte Rechnen-Progression — `ContentValidatorTest` war grün auf altem Content).
+  Content-Fixtures also nie duplizieren, sondern den Pack im Test mutieren (`pack.copy(...)`).
 - Sprachaufnahmen: `tools/tts/` erzeugt mit lokalem Qwen3-TTS ein Audio-Paket aus dem
   Content-Pack (`tools/tts/README.md`). Läuft mit `~/qwen-tts-test/.venv/bin/python`,
   nicht mit dem System-Python. `tools/tts/profiles.json` und `tools/tts/locks.json`

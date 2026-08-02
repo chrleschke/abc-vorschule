@@ -18,6 +18,16 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Unit tests read the *shipped* content pack from src/main/assets instead of a
+    // second copy under src/test/resources. The copy had silently drifted — the whole
+    // math progression (Multiplikations-Matrix included) never reached it, so
+    // `ContentValidatorTest.shippedPackIsValid` was green on stale content.
+    sourceSets {
+        getByName("test") {
+            resources.srcDir("src/main/assets")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false

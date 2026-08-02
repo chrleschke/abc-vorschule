@@ -32,4 +32,39 @@ class MultiplicationMatrixTest {
     fun gridCapsAllowTheFullCurriculumRangeUpToThirty() {
         assertEquals(30, MultiplicationMatrix.MaxRows * MultiplicationMatrix.MaxColumns)
     }
+
+    @Test
+    fun rowsAreNumberedFromOne() {
+        assertEquals("1", MultiplicationMatrix.rowLabel(0))
+        assertEquals(
+            (1..MultiplicationMatrix.MaxRows).map { it.toString() },
+            (0 until MultiplicationMatrix.MaxRows).map { MultiplicationMatrix.rowLabel(it) },
+        )
+    }
+
+    @Test
+    fun rowLabelsStaySingleDigitWithinTheGrid() {
+        // The gutter is a fixed width, so the cap must keep the labels one digit wide.
+        assertTrue(MultiplicationMatrix.MaxRows < 10)
+        assertTrue(MultiplicationMatrix.RowLabelGutterDp > 0)
+    }
+
+    @Test
+    fun equationLabelSpellsOutBothFactors() {
+        assertEquals("3 × 4", MultiplicationMatrix.equationLabel(3, 4))
+        assertEquals(
+            "${MultiplicationMatrix.MaxRows} × ${MultiplicationMatrix.MaxColumns}",
+            MultiplicationMatrix.equationLabel(
+                MultiplicationMatrix.MaxRows,
+                MultiplicationMatrix.MaxColumns,
+            ),
+        )
+    }
+
+    @Test
+    fun equationLabelUsesTheSharedMultiplicationSymbol() {
+        assertTrue(
+            MultiplicationMatrix.equationLabel(2, 5).contains(MathOperation.Multiply.symbol),
+        )
+    }
 }

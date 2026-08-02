@@ -16,13 +16,33 @@ class WordGraphemesTest {
         assertTrue(WordGraphemes.table(pack, indexOf("l07")).isEmpty())
     }
 
+    /** Every grapheme traced up to and including [lessonId], in curriculum order. */
+    private fun tracedUpTo(lessonId: String): List<Atom> =
+        pack.lessons.filter { it.index <= indexOf(lessonId) }
+            .flatMap { pack.tasksOf(it) }
+            .filterIsInstance<LetterTraceSpec>()
+            .flatMap { spec -> spec.rounds.map { pack.atom(it.atomId) } }
+
     @Test
     fun tableHoldsEveryIntroducedMultiLetterGraphemeByTheLastLesson() {
+        val traced = tracedUpTo("l18")
         val table = WordGraphemes.table(pack, indexOf("l18"))
-        assertTrue(
-            "expected all taught digraphs, got $table",
-            table.containsAll(listOf("Ei", "Ch", "Au", "Sch", "Eu", "ck", "Pf", "St", "Sp", "Qu")),
+        assertEquals(
+            traced.filter { it.display.length > 1 }.map { it.display }.toSet(),
+            table.toSet(),
         )
+    }
+
+    @Test
+    fun theFirstEighteenLessonsTeachEveryDigraphOfTheFibel() {
+        // Checked by atom id, not by display form: a display may carry a spelling
+        // trick for the speech output (the Eu-grapheme ships as "Oy"), and this
+        // assertion is about the curriculum, not about that spelling.
+        val tracedIds = tracedUpTo("l18").map { it.id }.toSet()
+        listOf(
+            "letter-ei", "letter-ch", "letter-au", "letter-sch", "letter-eu",
+            "letter-ck", "letter-pf", "letter-st", "letter-sp", "letter-qu",
+        ).forEach { assertTrue("$it must be traced by l18, got $tracedIds", it in tracedIds) }
     }
 
     @Test
