@@ -44,6 +44,23 @@ class ClipIndexTest {
     }
 
     @Test
+    fun `unbekanntes Feld in einem Clip-Eintrag stoert nicht`() {
+        // Der Exporter schreibt seit dem Fingerprint-Vergleich pro Clip ein
+        // "fingerprint"-Feld in index.json — das muss ClipEntry ignorieren.
+        val withFingerprint = sample.replace(
+            "\"file\": \"sentence_0620b64d3955.ogg\", \"profile\": \"sentence\"",
+            "\"file\": \"sentence_0620b64d3955.ogg\", \"profile\": \"sentence\", " +
+                "\"fingerprint\": \"abc\"",
+        )
+        val index = ClipIndex.parse(withFingerprint)
+        assertEquals(2, index.size)
+        assertEquals(
+            ClipEntry(file = "sentence_0620b64d3955.ogg", profile = "sentence"),
+            index.lookup("Mama mag Mais."),
+        )
+    }
+
+    @Test
     fun `fehlender oder kaputter Index ergibt leeren Index`() {
         val missing = ClipIndex.load { throw FileNotFoundException(it) }
         assertNull(missing.lookup("Mama mag Mais."))

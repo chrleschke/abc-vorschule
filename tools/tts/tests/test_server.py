@@ -415,7 +415,7 @@ def test_export_endpoint_returns_report(client):
     response = client.post("/api/export")
     assert response.status_code == 200
     body = response.json()
-    assert set(body) == {"exported", "skipped", "removed", "warnings"}
+    assert set(body) == {"exported", "skipped", "removed", "warnings", "unchanged"}
 
 
 def test_events_route_is_wired_to_the_stream_generator(client, monkeypatch):

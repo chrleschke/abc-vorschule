@@ -217,6 +217,9 @@ def cmd_export(paths: Paths) -> int:
 
     report = export_to_app(paths)
     print(f"{len(report.exported)} Clips exportiert → {paths.app_audio_dir}")
+    if report.unchanged:
+        print(f"{len(report.unchanged)} Clips unverändert übersprungen "
+              f"(Fingerprint gleich)")
     if report.removed:
         print(f"{len(report.removed)} veraltete Dateien entfernt: "
               f"{', '.join(report.removed)}")

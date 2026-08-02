@@ -66,8 +66,10 @@ def test_exports_locked_rendered_clip_as_ogg(tmp_path, content_dir):
     data, sr = sf.read(ogg)
     assert sr == 24000 and len(data) > 0
     index = json.loads((paths.app_audio_dir / "index.json").read_text())
-    assert index["clips"]["Mama."] == {
-        "file": asset_name(key), "profile": "sentence"}
+    entry = index["clips"]["Mama."]
+    assert entry["file"] == asset_name(key)
+    assert entry["profile"] == "sentence"
+    assert isinstance(entry["fingerprint"], str) and len(entry["fingerprint"]) == 16
 
 
 def test_skips_unlocked_stale_and_missing(tmp_path, content_dir):
@@ -147,3 +149,56 @@ def test_export_is_deterministic(tmp_path, content_dir):
     first = (paths.app_audio_dir / "index.json").read_bytes()
     export_to_app(paths)
     assert (paths.app_audio_dir / "index.json").read_bytes() == first
+
+
+def test_second_export_leaves_ogg_bytes_untouched(tmp_path, content_dir):
+    """OGG/Opus embeds a random Ogg-Bitstream-Seriennummer pro Encode — ohne
+    den Fingerprint-Vergleich würde jeder Lauf alle Dateien neu schreiben,
+    obwohl sich nichts geändert hat."""
+    paths = make_paths(tmp_path, content_dir)
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)
+
+    first_report = export_to_app(paths)
+    assert first_report.exported == [key]
+    assert first_report.unchanged == []
+    ogg = paths.app_audio_dir / asset_name(key)
+    first_bytes = ogg.read_bytes()
+
+    second_report = export_to_app(paths)
+
+    assert second_report.exported == []
+    assert second_report.unchanged == [key]
+    assert ogg.read_bytes() == first_bytes
+
+
+def test_fingerprint_change_forces_reencode(tmp_path, content_dir):
+    paths = make_paths(tmp_path, content_dir)
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)
+    export_to_app(paths)
+    ogg = paths.app_audio_dir / asset_name(key)
+    first_bytes = ogg.read_bytes()
+
+    # Ein neuer Seed macht den Clip fachlich zu einer neuen Aufnahme. Die WAV
+    # bliebe im echten Ablauf durch `tts render` neu erzeugt; hier reicht es,
+    # den render-state-Fingerprint passend zum neuen Seed nachzuziehen, um den
+    # Re-Encode-Pfad zu prüfen.
+    locks_data = json.loads(paths.locks.read_text())
+    locks_data["locks"][key]["seed"] = 2
+    paths.locks.write_text(json.dumps(locks_data), encoding="utf-8")
+
+    ctx = load_context(paths)
+    clip = next(c for c in ctx.clips if c.key == key)
+    new_fp = fingerprint(clip, ctx.profiles.profiles[clip.profile])
+    state = json.loads(paths.render_state.read_text())
+    state["entries"][key] = new_fp
+    paths.render_state.write_text(json.dumps(state), encoding="utf-8")
+
+    report = export_to_app(paths)
+
+    assert report.exported == [key]
+    assert report.unchanged == []
+    assert ogg.read_bytes() != first_bytes
+    index = json.loads((paths.app_audio_dir / "index.json").read_text())
+    assert index["clips"]["Mama."]["fingerprint"] == new_fp
