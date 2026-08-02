@@ -35,9 +35,14 @@ tts web                            # Kuratieren unter http://127.0.0.1:8420
 tts render                         # finaler Lauf, inkrementell, ca. 25–40 Minuten
 ```
 
-Typisch: einmal `sample` pro Profil, im Web-Interface die guten Seeds mit „✓ Pool"
-sammeln, dann `render`. Einzelne schlechte Clips im Web-Interface mit „🎲 4 Kandidaten"
-neu würfeln und den besten per „📌 Lock" festnageln.
+Typisch: einmal `sample` pro Profil, im Web-Interface die guten Seeds mit
+„＋ In Seed-Pool" sammeln, dann `render`. Einzelne schlechte Clips im Web-Interface
+mit „🎲 Kandidaten würfeln" (Anzahl einstellbar, 1–16) neu erzeugen, mit 👍/👎
+vorsortieren und dann entweder per „📌 Seed festlegen" fürs nächste Rendern locken —
+oder per „🚀 In Produktion" die gehörte Aufnahme direkt als Produktions-Audio
+übernehmen (kopiert die WAV, lockt den Seed, kein Re-Render und kein erneutes
+Anhören nötig). Sampling-Parameter, Trim/Normalisierung und Instruktionen aller
+Profile sind über „⚙️ TTS-Parameter" in der Kopfzeile editierbar.
 
 **Mit `phoneme` anfangen.** Das ist Absicht: mit 37 Clips ist es das kleinste Profil und
 zugleich das riskanteste — gefragt ist der *Lautwert*, nicht der Buchstabenname („mmmmm",
@@ -95,6 +100,8 @@ identisch. `poolSalt` in `profiles.json` hochzählen würfelt bewusst alles neu.
 | `out/` | nein | Manifest, Render-State, Audio, Kandidaten — jederzeit neu erzeugbar |
 
 `profiles.json` und `locks.json` nie automatisiert überschreiben: darin steckt Hörarbeit.
+
+Kandidaten unter `out/candidates/` tragen seit dem UI-Redesign eine Sidecar-Datei `{seed}.json` mit dem Erzeugungs-Fingerprint. „🚀 In Produktion" markiert einen Clip nur dann als fertig, wenn dieser Fingerprint noch den aktuellen Einstellungen entspricht — sonst wird die Aufnahme zwar übernommen und der Seed gelockt, der Clip bleibt aber „veraltet" (in der UI) bzw. `stale`.
 
 Beide Dateien werden beim Laden geprüft. Ein Tippfehler — ein Lock auf ein Profil, das es
 nicht gibt; ein Lock ohne `seed`; ein fehlendes `label` — bricht mit einer Meldung ab, die
