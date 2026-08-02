@@ -1064,16 +1064,16 @@
       "id": "l06-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Reihen mit je vier Toren. Wie viele Tore sind das.",
-          "iconAtomId": "tor",
+          "promptTts": "Zwei Reihen mit je vier Rosen blühen im Beet. Wie viele Rosen sind das.",
+          "iconAtomId": "rose",
           "left": 2,
           "right": 4,
           "answer": 8,
           "operation": "multiply"
         },
         {
-          "promptTts": "Drei Reihen mit je drei Toren. Wie viele Tore sind das.",
-          "iconAtomId": "tor",
+          "promptTts": "Drei Reihen mit je drei Rosen blühen im Beet. Wie viele Rosen sind das.",
+          "iconAtomId": "rose",
           "left": 3,
           "right": 3,
           "answer": 9,
@@ -1457,7 +1457,7 @@
       "id": "l08-t10",
       "rounds": [
         {
-          "promptTts": "Drei Reihen mit je vier Dosen. Wie viele Dosen sind das.",
+          "promptTts": "Drei Reihen mit je vier Dosen stehen im Regal. Wie viele Dosen sind das.",
           "iconAtomId": "dose",
           "left": 3,
           "right": 4,
@@ -1841,16 +1841,16 @@
       "id": "l10-t10",
       "rounds": [
         {
-          "promptTts": "Vier Reihen mit je vier Wegen. Wie viele Wege sind das.",
-          "iconAtomId": "weg",
+          "promptTts": "Vier Reihen mit je vier Büchern stehen im Bücherregal. Wie viele Bücher sind das.",
+          "iconAtomId": "buch",
           "left": 4,
           "right": 4,
           "answer": 16,
           "operation": "multiply"
         },
         {
-          "promptTts": "Achtzehn Wege sind auf der Karte. Neun sind gesperrt. Wie viele Wege bleiben.",
-          "iconAtomId": "weg",
+          "promptTts": "Achtzehn Bücher stehen im Regal. Neun werden ausgeliehen. Wie viele Bücher bleiben.",
+          "iconAtomId": "buch",
           "left": 18,
           "right": 9,
           "answer": 9,
@@ -2041,7 +2041,7 @@
           "answer": 23
         },
         {
-          "promptTts": "Vier Reihen mit je fünf Häusern. Wie viele Häuser sind das.",
+          "promptTts": "Vier Reihen mit je fünf Häusern stehen in der Stadt. Wie viele Häuser sind das.",
           "iconAtomId": "haus",
           "left": 4,
           "right": 5,
@@ -2425,7 +2425,7 @@
       "id": "l13-t10",
       "rounds": [
         {
-          "promptTts": "Fünf Reihen mit je vier Fischen. Wie viele Fische sind das.",
+          "promptTts": "Fünf Reihen mit je vier Fischen schwimmen im Aquarium. Wie viele Fische sind das.",
           "iconAtomId": "fisch",
           "left": 5,
           "right": 4,
@@ -2611,7 +2611,7 @@
           "operation": "subtract"
         },
         {
-          "promptTts": "Fünf Reihen mit je fünf Eulen. Wie viele Eulen sind das.",
+          "promptTts": "Fünf Reihen mit je fünf Eulen sitzen auf den Ästen. Wie viele Eulen sind das.",
           "iconAtomId": "eule",
           "left": 5,
           "right": 5,
@@ -2784,16 +2784,16 @@
       "id": "l15-t10",
       "rounds": [
         {
-          "promptTts": "Drei Reihen mit je sechs Füßen. Wie viele Füße sind das.",
-          "iconAtomId": "fuss",
+          "promptTts": "Drei Reihen mit je sechs Vögeln sitzen auf den Leitungen. Wie viele Vögel sind das.",
+          "iconAtomId": "vogel",
           "left": 3,
           "right": 6,
           "answer": 18,
           "operation": "multiply"
         },
         {
-          "promptTts": "Dreiundzwanzig Füße stampfen. Neun hören auf. Wie viele Füße stampfen noch.",
-          "iconAtomId": "fuss",
+          "promptTts": "Dreiundzwanzig Vögel sitzen auf dem Dach. Neun fliegen weg. Wie viele Vögel bleiben.",
+          "iconAtomId": "vogel",
           "left": 23,
           "right": 9,
           "answer": 14,
@@ -2973,7 +2973,7 @@
       "id": "l16-t10",
       "rounds": [
         {
-          "promptTts": "Vier Reihen mit je sechs Säcken. Wie viele Säcke sind das.",
+          "promptTts": "Vier Reihen mit je sechs Säcken stehen im Lager. Wie viele Säcke sind das.",
           "iconAtomId": "sack",
           "left": 4,
           "right": 6,
@@ -3367,7 +3367,7 @@
       "id": "l18-t12",
       "rounds": [
         {
-          "promptTts": "Fünf Reihen mit je fünf Taxis. Wie viele Taxis warten.",
+          "promptTts": "Fünf Reihen mit je fünf Taxis warten am Flughafen. Wie viele Taxis sind das.",
           "iconAtomId": "taxi",
           "left": 5,
           "right": 5,
@@ -3375,11 +3375,11 @@
           "operation": "multiply"
         },
         {
-          "promptTts": "Fünf Reihen mit je sechs Taxis. Wie viele Taxis warten.",
+          "promptTts": "Vier Reihen mit je sechs Taxis warten am Flughafen. Wie viele Taxis sind das.",
           "iconAtomId": "taxi",
-          "left": 5,
+          "left": 4,
           "right": 6,
-          "answer": 30,
+          "answer": 24,
           "operation": "multiply"
         }
       ]
@@ -4033,7 +4033,7 @@
       "id": "l22-t10",
       "rounds": [
         {
-          "promptTts": "Fünf Reihen mit je vier Eiern. Wie viele Eier sind das.",
+          "promptTts": "Fünf Reihen mit je vier Eiern liegen im Karton. Wie viele Eier sind das.",
           "iconAtomId": "ei",
           "left": 5,
           "right": 4,
@@ -4386,16 +4386,16 @@
       "id": "l24-t10",
       "rounds": [
         {
-          "promptTts": "Fünf Reihen mit je sechs Spinnen. Wie viele Spinnen sind das.",
-          "iconAtomId": "spinne",
+          "promptTts": "Fünf Reihen mit je sechs Fenstern glänzen am Haus. Wie viele Fenster sind das.",
+          "iconAtomId": "fenster",
           "left": 5,
           "right": 6,
           "answer": 30,
           "operation": "multiply"
         },
         {
-          "promptTts": "Siebenundzwanzig Spinnen sitzen im Garten. Achtzehn krabbeln weg. Wie viele Spinnen bleiben.",
-          "iconAtomId": "spinne",
+          "promptTts": "Siebenundzwanzig Fenster hat das Haus. Achtzehn sind zu. Wie viele Fenster sind offen.",
+          "iconAtomId": "fenster",
           "left": 27,
           "right": 18,
           "answer": 9,
@@ -4743,7 +4743,7 @@
       "id": "l26-t10",
       "rounds": [
         {
-          "promptTts": "Fünf Reihen mit je sechs Taxis. Wie viele Taxis warten.",
+          "promptTts": "Fünf Reihen mit je sechs Taxis warten am Bahnhof. Wie viele Taxis sind das.",
           "iconAtomId": "taxi",
           "left": 5,
           "right": 6,

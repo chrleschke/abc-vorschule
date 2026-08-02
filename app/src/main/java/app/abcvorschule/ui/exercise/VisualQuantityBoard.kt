@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.ui.components.AbcResolveButton
@@ -24,6 +26,7 @@ import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.theme.WarmMuted
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -181,7 +184,9 @@ fun MathQuantityPrompt(
 /**
  * "rows mal columns" als Matrix: the first row shows real objects, every further
  * row only ghost placeholders — the child completes the picture mentally and
- * learns multiplication as area, not as a chain of additions.
+ * learns multiplication as area, not as a chain of additions. The task ("3 × 4")
+ * sits above the grid, and each row carries its number in a gutter on the left,
+ * so both factors stay readable while the child counts.
  */
 @Composable
 fun MultiplicationMatrixGrid(
@@ -196,8 +201,30 @@ fun MultiplicationMatrixGrid(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
+        Text(
+            text = MultiplicationMatrix.equationLabel(rows, columns),
+            style = MaterialTheme.typography.headlineMedium,
+            color = WarmInk,
+            modifier = Modifier
+                .padding(bottom = 6.dp)
+                .testTag("multiplication_equation"),
+        )
         repeat(rows) { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                // Full opacity even beside a ghost row: the numerals are the
+                // counting aid, so they must not fade along with the placeholders.
+                Text(
+                    text = MultiplicationMatrix.rowLabel(row),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = WarmMuted,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier
+                        .width(MultiplicationMatrix.RowLabelGutterDp.dp)
+                        .testTag("multiplication_row_label_${MultiplicationMatrix.rowLabel(row)}"),
+                )
                 repeat(columns) {
                     Text(
                         text = emoji,
