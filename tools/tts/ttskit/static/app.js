@@ -128,8 +128,10 @@ function candidateCount() {
   return Math.min(max, Math.max(1, fallback));
 }
 
+const useKnownSeeds = () => readLocal("ttsUseKnownSeeds", false) === true;
+
 // Eigener Zähler für den Batch-Lauf: klein gehalten, weil er über mehrere
-// ausgewählte Clips hinweg multipliziert — anders als „Kandidaten würfeln“,
+// ausgewählte Clips hinweg multipliziert — anders als „Generate“,
 // das nur einen einzigen Clip trifft.
 function batchCount() {
   const max = state.limits.maxCandidates || 16;
@@ -475,6 +477,7 @@ function renderDetail(key) {
   const profile = state.profiles[clip.profile];
   const encoded = encodeURIComponent(clip.key);
   const max = state.limits.maxCandidates || 16;
+  const poolSize = profile.seedPool.length;
 
   const spoken = clip.text !== clip.sourceText;
   const ownVoice = clip.speaker !== profile.speaker;
@@ -517,7 +520,7 @@ function renderDetail(key) {
           </p>
           <p class="muted small">Ändert nur den Klang: in der App steht weiter der Satz
             von oben. Speichern legt dabei den aktuellen Seed fest (Lock) — anhören und
-            neu würfeln lohnt sich über „🎲 Kandidaten würfeln“.</p>
+            neue Aufnahmen lohnen sich über „🎲 Generate“.</p>
           <details class="help">
             <summary>Wie schreibt man eine Aussprache auf?</summary>
             <ul class="small">
@@ -529,7 +532,7 @@ function renderDetail(key) {
               <li><b>Alles ausschreiben</b>, was keine Buchstabenfolge ist: „5“ → „fünf“,
                 „z. B.“ → „zum Beispiel“.</li>
               <li>Nichts davon ist garantiert — jede Änderung muss gehört werden.
-                Nach dem Speichern Kandidaten würfeln und vergleichen.</li>
+                Nach dem Speichern „Generate“ drücken und vergleichen.</li>
             </ul>
           </details>
         </div>
@@ -563,10 +566,21 @@ function renderDetail(key) {
       <h3 style="margin-top:0">Aufnahmen
         <span class="muted normal">— Probeaufnahmen und aktuelle Produktion, neueste zuerst</span></h3>
       <p>
-        <button id="btn-candidates" class="primary">🎲 Kandidaten würfeln</button>
+        <button id="btn-candidates" class="primary">🎲 Generate</button>
         <input id="cand-count" type="number" min="1" max="${max}"
                value="${candidateCount()}"
                title="Anzahl der Probeaufnahmen (1–${max})" /> Stück
+        <label id="cand-known" class="inline"
+               title="Zieht die Seeds zufällig aus dem Seed-Pool von „${escapeHtml(clip.profile)}“ ${
+                 poolSize
+                   ? `(${poolSize} gespeichert) statt neue zu erzeugen`
+                   : "— der ist gerade leer, es werden also Zufalls-Seeds erzeugt"}">
+          <input id="cand-known-seeds" type="checkbox" ${useKnownSeeds() ? "checked" : ""} />
+          Use known seeds
+          <span class="muted small">${poolSize
+            ? `(${poolSize} im Pool)`
+            : "(Pool leer — es kommen Zufalls-Seeds)"}</span>
+        </label>
         <span id="cand-progress" class="muted small"></span>
       </p>
       <details class="help">
@@ -582,11 +596,11 @@ function renderDetail(key) {
           <li><b>👎</b> — klingt schlecht: Probeaufnahme löschen (nimmt einen
             👍-Seed auch wieder aus dem Pool).</li>
           <li><b>Erzeugt / Stimme / Text</b> — womit die Aufnahme entstand.
-            So bleiben mehrere Würfel- und Batch-Läufe auseinanderhaltbar.</li>
+            So bleiben mehrere Generate- und Batch-Läufe auseinanderhaltbar.</li>
         </ul>
       </details>
       ${clip.candidates.length === 0
-        ? '<p class="muted">Noch keine Aufnahme. „🎲 Kandidaten würfeln“ oder ' +
+        ? '<p class="muted">Noch keine Aufnahme. „🎲 Generate“ oder ' +
           '„▶ Batch-Lauf“ erzeugt welche.</p>'
         : `<div class="cand-scroll"><table class="cand-table">
             <thead><tr>
@@ -620,12 +634,16 @@ function renderDetail(key) {
   el("btn-candidates").onclick = guard(async () => {
     const count = Math.min(max, Math.max(1, Number(el("cand-count").value) || 4));
     writeLocal("ttsCandCount", count);
-    await post(`/api/clips/${encoded}/candidates`, { n: count });
+    const known = el("cand-known-seeds").checked;
+    await post(`/api/clips/${encoded}/candidates`, { n: count, useKnownSeeds: known });
     el("cand-progress").textContent = state.jobs.running
       ? "eingereiht — wartet auf den laufenden Job …" : "eingereiht …";
   });
   el("cand-count").onchange = () => {
     writeLocal("ttsCandCount", Number(el("cand-count").value));
+  };
+  el("cand-known-seeds").onchange = (event) => {
+    writeLocal("ttsUseKnownSeeds", event.target.checked);
   };
   el("clip-profile").onchange = guard(async (event) => {
     await post(`/api/clips/${encoded}/lock`,
@@ -654,7 +672,7 @@ function renderDetail(key) {
     await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, textOverride: text });
     await refresh();
     showBanner(`Aussprache gespeichert: „${text}“. Zum Anhören und Bestätigen ` +
-      `Kandidaten würfeln.`, "ok");
+      `„Generate“ drücken.`, "ok");
   });
   el("btn-reset-text").onclick = guard(async () => {
     await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, textOverride: null });

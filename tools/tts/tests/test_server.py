@@ -105,6 +105,56 @@ def test_candidates_are_generated_and_listed(client):
     assert audio.content[:4] == b"RIFF"
 
 
+def _candidate_seeds_of(client, key):
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    return [c["seed"] for c in clip["candidates"]]
+
+
+def test_candidates_with_known_seeds_come_from_the_pool(client):
+    clip = client.get("/api/state").json()["clips"][0]
+    key, pool = clip["key"], [111, 222, 333]
+    for seed in pool:
+        client.post(f"/api/profiles/{clip['profile']}/pool", json={"seed": seed})
+
+    client.post(f"/api/clips/{key}/candidates", json={"n": 2, "useKnownSeeds": True})
+    wait_for_idle(client)
+    assert set(_candidate_seeds_of(client, key)) <= set(pool)
+
+
+def test_candidates_with_known_seeds_skip_what_is_already_recorded(client):
+    clip = client.get("/api/state").json()["clips"][0]
+    key, pool = clip["key"], [111, 222]
+    for seed in pool:
+        client.post(f"/api/profiles/{clip['profile']}/pool", json={"seed": seed})
+
+    client.post(f"/api/clips/{key}/candidates", json={"n": 2, "useKnownSeeds": True})
+    wait_for_idle(client)
+    # Beide Pool-Seeds liegen jetzt als Aufnahme vor; ein zweiter Lauf würde
+    # sonst dieselben Dateien nochmal erzeugen und die Tabelle bliebe stehen.
+    client.post(f"/api/clips/{key}/candidates", json={"n": 2, "useKnownSeeds": True})
+    wait_for_idle(client)
+    seeds = _candidate_seeds_of(client, key)
+    assert len(seeds) == len(set(seeds)) == 4
+
+
+def test_candidates_without_known_seeds_avoid_the_pool(client):
+    clip = client.get("/api/state").json()["clips"][0]
+    key, pool = clip["key"], [111, 222]
+    for seed in pool:
+        client.post(f"/api/profiles/{clip['profile']}/pool", json={"seed": seed})
+
+    client.post(f"/api/clips/{key}/candidates", json={"n": 3})
+    wait_for_idle(client)
+    assert not (set(_candidate_seeds_of(client, key)) & set(pool))
+
+
+def test_candidates_with_known_seeds_but_an_empty_pool_are_random(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 2, "useKnownSeeds": True})
+    wait_for_idle(client)
+    assert len(set(_candidate_seeds_of(client, key))) == 2
+
+
 def test_state_reports_candidate_freshness_and_limits(client):
     body = client.get("/api/state").json()
     assert body["limits"]["maxCandidates"] == 16

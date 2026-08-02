@@ -207,6 +207,24 @@ def random_seeds(n: int, exclude: set[int] | None = None) -> list[int]:
     return out
 
 
+def pooled_seeds(n: int, pool: list[int], exclude: set[int] | None = None) -> list[int]:
+    """`n` Seeds, zufällig aus `pool` gezogen, ohne die aus `exclude`.
+
+    Für „bekannte Seeds verwenden“: der Pool sammelt die 👍-Seeds eines Profils,
+    klingt also erprobt. Reicht er nicht für `n` (leer, oder alles schon als
+    Kandidat vorhanden), wird mit frischen Zufalls-Seeds aufgefüllt statt
+    weniger als bestellt zu liefern — sonst würde die Anzahl im UI stillschweigend
+    schrumpfen.
+    """
+    blocked = set(exclude or ())
+    available = [seed for seed in dict.fromkeys(pool) if seed not in blocked]
+    rng = secrets.SystemRandom()
+    chosen = rng.sample(available, min(n, len(available)))
+    if len(chosen) < n:
+        chosen += random_seeds(n - len(chosen), exclude=blocked | set(pool))
+    return chosen
+
+
 def sample_candidates(
     clip: Clip,
     profile: Profile,
