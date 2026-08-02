@@ -534,6 +534,12 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
         jobs.submit(name, run)
         return {"ok": "queued"}
 
+    @app.post("/api/export")
+    def api_export() -> dict[str, Any]:
+        from .export import export_to_app
+
+        return export_to_app(paths).as_dict()
+
     @app.post("/api/jobs/cancel")
     def api_cancel() -> dict[str, str]:
         jobs.cancel()

@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.abcvorschule.session.SessionViewModel
+import app.abcvorschule.speech.ClipIndex
 import app.abcvorschule.speech.SpeechController
 import app.abcvorschule.ui.debug.TtsDebugScreen
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
@@ -54,7 +55,9 @@ class MainActivity : ComponentActivity() {
 fun AbcApp(onFinish: () -> Unit = {}) {
     val context = LocalContext.current
     val app = context.applicationContext as AbcApplication
-    val speech = remember { SpeechController(context) }
+    val speech = remember {
+        SpeechController(context, ClipIndex.load { path -> context.assets.open(path) })
+    }
     DisposableEffect(speech) {
         onDispose { speech.shutdown() }
     }

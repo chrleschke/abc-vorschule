@@ -12,9 +12,13 @@ import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
-class SpeechController(context: Context) : TextToSpeech.OnInitListener {
+class SpeechController(
+    context: Context,
+    private val clips: ClipIndex = ClipIndex.empty(),
+) : TextToSpeech.OnInitListener {
     private val appContext = context.applicationContext
     private var tts: TextToSpeech? = TextToSpeech(appContext, this)
+    private val clipPlayer = ClipPlayer(appContext)
 
     private val _available = MutableStateFlow(false)
     val available: StateFlow<Boolean> = _available.asStateFlow()
@@ -61,21 +65,28 @@ class SpeechController(context: Context) : TextToSpeech.OnInitListener {
     }
 
     fun speak(text: String) {
-        val engine = tts ?: return
-        if (!_available.value || text.isBlank()) return
+        if (text.isBlank()) return
         clearWaiters()
-        engine.stop()
+        stopOutput()
+        if (playClip(text, onComplete = {})) return
+        val engine = tts ?: return
+        if (!_available.value) return
         engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, UUID.randomUUID().toString())
     }
 
     /** Speaks [text] and suspends until the utterance finishes (or times out). */
     suspend fun speakAndAwait(text: String, timeoutMs: Long = 10_000L) {
-        val engine = tts ?: return
-        if (!_available.value || text.isBlank()) return
+        if (text.isBlank()) return
         clearWaiters()
-        engine.stop()
-        val id = UUID.randomUUID().toString()
+        stopOutput()
         val deferred = CompletableDeferred<Unit>()
+        if (playClip(text, onComplete = { deferred.complete(Unit) })) {
+            withTimeoutOrNull(timeoutMs) { deferred.await() }
+            return
+        }
+        val engine = tts ?: return
+        if (!_available.value) return
+        val id = UUID.randomUUID().toString()
         utteranceWaiters[id] = deferred
         engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)
         withTimeoutOrNull(timeoutMs) { deferred.await() }
@@ -83,18 +94,34 @@ class SpeechController(context: Context) : TextToSpeech.OnInitListener {
     }
 
     fun stop() {
-        tts?.stop()
-        _speaking.value = false
+        stopOutput()
         clearWaiters()
     }
 
     fun shutdown() {
-        tts?.stop()
+        stopOutput()
         tts?.shutdown()
         tts = null
         _available.value = false
-        _speaking.value = false
         clearWaiters()
+    }
+
+    /** Clip gefunden und gestartet? Setzt `speaking` passend. */
+    private fun playClip(text: String, onComplete: () -> Unit): Boolean {
+        val entry = clips.lookup(text) ?: return false
+        val started = clipPlayer.play(entry.file) {
+            _speaking.value = false
+            onComplete()
+        }
+        if (started) _speaking.value = true
+        return started
+    }
+
+    /** Beendet beide Ausgabewege — die Flush-Semantik jedes speak-Aufrufs. */
+    private fun stopOutput() {
+        clipPlayer.stop()
+        tts?.stop()
+        _speaking.value = false
     }
 
     private fun completeWaiter(utteranceId: String?) {
