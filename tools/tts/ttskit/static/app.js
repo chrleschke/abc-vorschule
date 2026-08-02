@@ -897,6 +897,7 @@ el("btn-render").onclick = guard(async () => {
 el("btn-export").onclick = guard(async () => {
   const report = await api("/api/export", { method: "POST" });
   const parts = [`${report.exported.length} Clips in die App exportiert`];
+  if (report.unchanged.length) parts.push(`${report.unchanged.length} unverändert`);
   if (report.removed.length) parts.push(`${report.removed.length} veraltete entfernt`);
   if (report.skipped.length) {
     parts.push(`${report.skipped.length} übersprungen: ` +
