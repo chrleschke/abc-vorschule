@@ -25,6 +25,7 @@ class ClipPlayer(context: Context) {
         stop()
         return try {
             val mp = MediaPlayer()
+            player = mp
             appContext.assets.openFd("audio/$file").use { afd ->
                 mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
             }
@@ -44,7 +45,6 @@ class ClipPlayer(context: Context) {
                 true
             }
             mp.prepare()
-            player = mp
             mp.start()
             true
         } catch (_: Exception) {
