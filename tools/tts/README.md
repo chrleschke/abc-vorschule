@@ -13,6 +13,17 @@ Alles läuft mit dem Interpreter aus dem Qwen-venv:
 alias tts="~/qwen-tts-test/.venv/bin/python $(git rev-parse --show-toplevel)/tools/tts/tts"
 ```
 
+## Quickstart: Web-Interface
+
+```bash
+cd /Users/cleschke/projects/abc-vorschul-app
+./start-tts-ui.sh
+# Öffnet http://127.0.0.1:8420 in einem Browser
+```
+
+Das Skript `start-tts-ui.sh` im Project Root startet das Web-Interface direkt — keine
+weiteren Befehle nötig. `tts extract` und `tts status` laufen bereits beim Start.
+
 ## Ablauf
 
 ```bash
