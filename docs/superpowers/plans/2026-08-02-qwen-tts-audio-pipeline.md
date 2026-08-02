@@ -2481,7 +2481,7 @@ git commit -m "feat(tts): inkrementeller Renderer, Kandidaten-Sampling, render/s
 - Consumes: alles Bisherige
 - Produces:
   - `server.create_app(paths: Paths, engine=None) -> fastapi.FastAPI`
-  - `server.JobQueue` mit `submit(name, fn)`, `cancel()`, `events()`, `status()`
+  - `server.JobQueue` mit `start()`, `submit(name, fn)`, `cancel()`, `status()`, `publish(event)`, `subscribe()`, `unsubscribe(sub)`
   - Endpunkte:
     - `GET /api/state` → `{engine: {...}, profiles: {...}, clips: [...], orphans: [...]}`
     - `PUT /api/profiles/{name}` — Body `{instruct?, sampling?, trim?, normalize?}`
@@ -2495,6 +2495,7 @@ git commit -m "feat(tts): inkrementeller Renderer, Kandidaten-Sampling, render/s
     - `POST /api/jobs/cancel`
     - `GET /api/jobs` → aktueller Job + Fortschritt
     - `GET /audio/{key}.wav`, `GET /candidates/{key}/{seed}.wav`
+    - `GET /app.js`, `GET /style.css` — Task 9 legt die Dateien an; bis dahin 404
     - `GET /events` → SSE-Stream
     - `GET /` → `static/index.html`
   - `cli.cmd_web(paths, args) -> int`
