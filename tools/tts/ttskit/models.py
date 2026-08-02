@@ -21,3 +21,18 @@ class Item:
     source: str
     lesson: str | None
     label: str
+
+
+@dataclass(frozen=True)
+class Clip:
+    """One render unit. Several items can share it when text and profile match."""
+
+    key: str
+    profile: str
+    text: str
+    source_text: str
+    seed: int
+    locked: bool
+    item_ids: tuple[str, ...]
+    fields: tuple[str, ...]
+    lessons: tuple[str, ...]
