@@ -181,6 +181,18 @@ def cmd_sample(paths: Paths, args) -> int:
     return 0
 
 
+def cmd_web(paths: Paths, args) -> int:
+    import uvicorn
+
+    from .server import create_app
+
+    print(f"Lade Modell — das dauert ein paar Sekunden ...")
+    app = create_app(paths)
+    print(f"Web-Interface auf http://{args.host}:{args.port}")
+    uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="tts", description="Qwen-TTS Audio-Pipeline")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -198,6 +210,10 @@ def build_parser() -> argparse.ArgumentParser:
     sample_parser.add_argument("-n", type=int, default=8, help="Anzahl Seeds")
     sample_parser.add_argument("--examples", type=int, default=3,
                                help="wie viele Beispiel-Clips des Profils")
+
+    web_parser = sub.add_parser("web", help="Web-Interface starten")
+    web_parser.add_argument("--port", type=int, default=8420)
+    web_parser.add_argument("--host", default="127.0.0.1")
     return parser
 
 
@@ -212,4 +228,6 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_render(paths, args)
     if args.command == "sample":
         return cmd_sample(paths, args)
+    if args.command == "web":
+        return cmd_web(paths, args)
     return 1
