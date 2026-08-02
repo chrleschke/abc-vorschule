@@ -621,3 +621,105 @@ def test_promote_preserves_a_locked_voice(client):
     lock = json.loads(client.paths.locks.read_text(encoding="utf-8"))["locks"][key]
     assert lock["speaker"] == "vivian"
     assert lock["seed"] == seed
+
+
+def test_rating_good_persists_and_fills_the_seed_pool(client):
+    """👍 ist Bewertung UND Pool-Aufnahme in einem Handgriff — beides in
+    Dateien, damit es einen Server-Neustart übersteht."""
+    clip = client.get("/api/state").json()["clips"][0]
+    key, profile = clip["key"], clip["profile"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    seed = clip["candidates"][0]["seed"]
+
+    response = client.put(f"/api/clips/{key}/candidates/{seed}/rating",
+                          json={"good": True})
+    assert response.status_code == 200
+
+    meta = json.loads((client.paths.candidates / key / f"{seed}.json")
+                      .read_text(encoding="utf-8"))
+    assert meta["rating"] == "good"
+    raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+    assert seed in raw["profiles"][profile]["seedPool"]
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert clip["candidates"][0]["good"] is True
+
+
+def test_unrating_removes_the_seed_from_the_pool_again(client):
+    clip = client.get("/api/state").json()["clips"][0]
+    key, profile = clip["key"], clip["profile"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    seed = clip["candidates"][0]["seed"]
+
+    client.put(f"/api/clips/{key}/candidates/{seed}/rating", json={"good": True})
+    client.put(f"/api/clips/{key}/candidates/{seed}/rating", json={"good": False})
+
+    meta = json.loads((client.paths.candidates / key / f"{seed}.json")
+                      .read_text(encoding="utf-8"))
+    assert "rating" not in meta
+    raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+    assert seed not in raw["profiles"][profile]["seedPool"]
+
+
+def test_rating_an_unknown_candidate_is_404(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    response = client.put(f"/api/clips/{key}/candidates/12345/rating",
+                          json={"good": True})
+    assert response.status_code == 404
+
+
+def test_deleting_a_rated_candidate_cleans_the_pool(client):
+    """👎 auf einen 👍-Kandidaten: der Pool darf keinen Seed verteilen,
+    dessen Aufnahme niemand mehr anhören kann."""
+    clip = client.get("/api/state").json()["clips"][0]
+    key, profile = clip["key"], clip["profile"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    seed = clip["candidates"][0]["seed"]
+    client.put(f"/api/clips/{key}/candidates/{seed}/rating", json={"good": True})
+
+    assert client.delete(f"/api/clips/{key}/candidates/{seed}").status_code == 200
+    raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+    assert seed not in raw["profiles"][profile]["seedPool"]
+
+
+def test_state_ships_candidate_metadata(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    cand = clip["candidates"][0]
+    assert set(cand) >= {"seed", "fresh", "createdAt", "speaker", "text", "good"}
+    assert cand["speaker"] == clip["speaker"]
+    assert cand["text"] == clip["text"]
+    assert cand["createdAt"]
+
+
+def test_batch_render_renders_only_the_selected_clips(client):
+    clips = client.get("/api/state").json()["clips"]
+    assert len(clips) >= 2
+    chosen = [c["key"] for c in clips[:2]]
+
+    assert client.post("/api/render", json={"keys": chosen}).status_code == 202
+    wait_for_idle(client)
+
+    after = {c["key"]: c["status"] for c in client.get("/api/state").json()["clips"]}
+    assert all(after[k] == "rendered" for k in chosen)
+    untouched = [k for k in after if k not in chosen]
+    assert all(after[k] == "missing" for k in untouched), \
+        "der Batch-Lauf darf nicht ausgewählte Clips nicht anfassen"
+
+
+def test_batch_render_with_unknown_keys_is_422(client):
+    response = client.post("/api/render", json={"keys": ["nope:000000000000"]})
+    assert response.status_code == 422
+    assert "nope:000000000000" in response.json()["detail"]
+
+
+def test_batch_render_with_a_non_list_keys_is_422(client):
+    assert client.post("/api/render", json={"keys": "alles"}).status_code == 422
+    assert client.post("/api/render", json={"keys": [1, 2]}).status_code == 422
