@@ -176,6 +176,69 @@ def test_promote_unknown_candidate_is_404(client):
     assert client.post(f"/api/clips/{key}/promote", json={"seed": 424242}).status_code == 404
 
 
+def test_promote_with_stale_sidecar_is_unverified_and_stays_stale(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    seed = clip["candidates"][0]["seed"]
+
+    # Instruktion nach der Kandidaten-Erzeugung geändert: der Sidecar-
+    # Fingerprint des Kandidaten passt nicht mehr zu den aktuellen Einstellungen.
+    client.put(f"/api/profiles/{clip['profile']}", json={"instruct": "Anders."})
+
+    response = client.post(f"/api/clips/{key}/promote", json={"seed": seed})
+    assert response.status_code == 200
+    assert response.json() == {"ok": "promoted", "verified": False}
+
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert clip["locked"] is True and clip["seed"] == seed
+    assert clip["status"] == "stale"
+
+
+def test_unverified_promote_does_not_touch_existing_render_state_entry(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    seed = clip["candidates"][0]["seed"]
+
+    # Verifizierter Promote setzt den render-state-Eintrag.
+    response = client.post(f"/api/clips/{key}/promote", json={"seed": seed})
+    assert response.json()["verified"] is True
+    entry_before = json.loads(
+        client.paths.render_state.read_text(encoding="utf-8"))["entries"][key]
+
+    # Profil ändern macht den Clip veraltet.
+    client.put(f"/api/profiles/{clip['profile']}", json={"instruct": "Anders."})
+
+    # Sidecar-loser Kandidat (Alt-Kandidat aus der Zeit vor den Sidecars).
+    (client.paths.candidates / key).mkdir(parents=True, exist_ok=True)
+    (client.paths.candidates / key / "999.wav").write_bytes(b"RIFFfake")
+
+    response = client.post(f"/api/clips/{key}/promote", json={"seed": 999})
+    assert response.status_code == 200
+    assert response.json() == {"ok": "promoted", "verified": False}
+
+    entry_after = json.loads(
+        client.paths.render_state.read_text(encoding="utf-8"))["entries"][key]
+    assert entry_after == entry_before, \
+        "ein unverifizierter Promote darf den bestehenden render-state-Eintrag nicht anfassen"
+
+
+def test_promote_and_delete_candidate_on_unknown_clip_are_404(client):
+    key = "gibtsnicht:000000000000"
+    assert client.post(f"/api/clips/{key}/promote", json={"seed": 1}).status_code == 404
+    assert client.delete(f"/api/clips/{key}/candidates/1").status_code == 404
+
+
+def test_promote_with_empty_body_is_422(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    response = client.post(f"/api/clips/{key}/promote", json={})
+    assert response.status_code == 422
+    assert "seed" in response.json()["detail"]
+
+
 def test_deleting_a_candidate_removes_wav_and_sidecar(client):
     key = client.get("/api/state").json()["clips"][0]["key"]
     client.post(f"/api/clips/{key}/candidates", json={"n": 1})

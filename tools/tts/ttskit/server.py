@@ -320,6 +320,8 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
     @app.post("/api/clips/{key}/promote")
     def api_promote(key: str, body: dict = Body(...)) -> dict[str, Any]:
         ctx, clip = clip_by_key(key)
+        if "seed" not in body:
+            raise HTTPException(status_code=422, detail="'seed' fehlt im Request-Body")
         seed = int(body["seed"])
         source = paths.candidates / key / f"{seed}.wav"
         if not source.exists():

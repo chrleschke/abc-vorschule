@@ -398,7 +398,10 @@ function paramsCard(name) {
       </p>
       <textarea data-instruct>${escapeHtml(profile.instruct)}</textarea>
       <p class="muted small">Seed-Pool: ${profile.seedPool.length === 0 ? "leer"
-        : profile.seedPool.join(", ")}</p>
+        : profile.seedPool.map((seed) =>
+            `<span class="chip">${seed}
+              <a href="#" data-panel-unpool="${seed}" data-profile-name="${name}"
+                 title="aus dem Pool entfernen">×</a></span>`).join(" ")}</p>
       <p>
         <button data-save class="primary">Speichern</button>
         <button data-save-all
@@ -433,7 +436,13 @@ function renderParams() {
   const readSampling = (card) => {
     const sampling = {};
     card.querySelectorAll("[data-param]").forEach((input) => {
-      sampling[input.dataset.param] = Number(input.value);
+      const value = Number(input.value);
+      // Number("") ist 0 — ein geleertes Feld darf nicht stillschweigend als
+      // 0 gespeichert werden.
+      if (input.value.trim() === "" || Number.isNaN(value)) {
+        throw new Error(`Sampling-Parameter „${input.dataset.param}“ ist leer oder keine Zahl`);
+      }
+      sampling[input.dataset.param] = value;
     });
     return sampling;
   };
@@ -450,6 +459,17 @@ function renderParams() {
       });
       await refresh();
       showBanner(`Profil „${name}“ gespeichert — geänderte Clips sind jetzt veraltet.`, "ok");
+    });
+  });
+  panel.querySelectorAll("[data-panel-unpool]").forEach((link) => {
+    link.onclick = guard(async (event) => {
+      event.preventDefault();
+      const name = link.dataset.profileName;
+      const seed = link.dataset.panelUnpool;
+      await api(`/api/profiles/${name}/pool/${seed}`, { method: "DELETE" });
+      // refresh() ruft renderParams() selbst wieder auf, solange das Panel
+      // offen ist — kein zusätzlicher renderParams()-Aufruf nötig.
+      await refresh();
     });
   });
   panel.querySelectorAll("[data-save-all]").forEach((button) => {
@@ -486,6 +506,12 @@ function formatEta(ms) {
   return `~${Math.round(seconds / 60)} min`;
 }
 
+// state.jobs.queued kommt nur über refresh() rein (kein eigenes Polling) —
+// das ist beim Anhängen an den Job-Text ausreichend aktuell.
+function queueSuffix() {
+  return state.jobs.queued > 0 ? ` · ${state.jobs.queued} in Warteschlange` : "";
+}
+
 function setJobIdle(text) {
   job.name = null;
   el("job-spinner").classList.add("hidden");
@@ -501,7 +527,7 @@ function setJobRunning(name) {
   el("job-bar-track").classList.remove("hidden");
   el("job-bar").style.width = "0%";
   el("btn-cancel").classList.remove("hidden");
-  el("job-text").textContent = `läuft: ${jobLabel(name)}`;
+  el("job-text").textContent = `läuft: ${jobLabel(name)}${queueSuffix()}`;
 }
 
 function onProgress(event) {
@@ -513,7 +539,8 @@ function onProgress(event) {
     `${jobLabel(job.name)} · ${event.index}/${event.total}` +
     (remaining !== null && event.index < event.total
       ? ` · noch ${formatEta(remaining)}` : "") +
-    (event.status === "failed" ? " · ⚠️" : "");
+    (event.status === "failed" ? " · ⚠️" : "") +
+    queueSuffix();
   if (event.type === "candidate" && event.clipKey === state.selected) {
     const inline = el("cand-progress");
     if (inline) inline.textContent = `erzeuge Probeaufnahme ${event.index}/${event.total} …`;
@@ -601,9 +628,19 @@ events.onmessage = (message) => {
   } else if (event.type === "job-start") {
     lastSummary = null;
     setJobRunning(event.job);
-  } else if ("running" in event && event.running) {
-    // Initialframe des SSE-Streams: es läuft bereits ein Job.
-    setJobRunning(event.running);
+  } else if ("running" in event) {
+    if (event.running) {
+      // Initialframe des SSE-Streams: es läuft bereits ein Job.
+      setJobRunning(event.running);
+    } else if (job.name) {
+      // Reconnect nach Verbindungsabriss: der Job endete, während wir
+      // getrennt waren. Ohne diesen Zweig bliebe die Kopfzeile für immer auf
+      // "läuft" stehen (Spinner+Abbrechen nie zurückgesetzt). Der Guard auf
+      // job.name verhindert einen unnötigen Doppel-Refresh beim allerersten
+      // Initialframe direkt nach dem Seitenladen.
+      setJobIdle("");
+      refresh().catch(showError);
+    }
   }
 };
 
