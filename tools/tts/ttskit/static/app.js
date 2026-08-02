@@ -12,6 +12,19 @@ async function api(path, options) {
   return response.status === 204 ? null : response.json();
 }
 
+function showError(error) {
+  el("progress").innerHTML =
+    `<span class="warn">Fehler: ${escapeHtml(String(error && error.message || error))}</span>`;
+}
+
+// Every click handler below is a bare `async` function and `api()` throws on
+// a non-OK response. Without this wrapper a failed request produced an
+// unhandled rejection in the console and nothing at all in the UI — refresh()
+// never ran, so the seed simply did not appear and nobody knew why.
+const guard = (fn) => (...args) => Promise.resolve()
+  .then(() => fn(...args))
+  .catch(showError);
+
 const post = (path, body) =>
   api(path, {
     method: "POST",
@@ -66,7 +79,6 @@ function renderList() {
   clips.forEach((clip) => {
     const row = document.createElement("div");
     row.className = "row" + (clip.key === state.selected ? " active" : "");
-    row.dataset.key = clip.key;
     row.innerHTML = `
       <span class="chip">${clip.profile}</span>
       <span class="text">${escapeHtml(clip.text)}</span>
@@ -141,7 +153,7 @@ function renderDetail(key) {
     </div>
 
     <div class="card">
-      <h3 style="margin-top:0">Profil „${clip.profile}" — ${profile.label}</h3>
+      <h3 style="margin-top:0">Profil „${clip.profile}“ — ${profile.label}</h3>
       <textarea id="profile-instruct">${escapeHtml(profile.instruct)}</textarea>
       <p>
         <button id="btn-save-profile" class="primary">Instruktion speichern</button>
@@ -154,46 +166,46 @@ function renderDetail(key) {
       </p>
     </div>`;
 
-  el("btn-candidates").onclick = async () => {
+  el("btn-candidates").onclick = guard(async () => {
     await post(`/api/clips/${encoded}/candidates`, { n: 4 });
-  };
+  });
   const unlock = el("btn-unlock");
   if (unlock) {
-    unlock.onclick = async () => {
+    unlock.onclick = guard(async () => {
       await api(`/api/clips/${encoded}/lock`, { method: "DELETE" });
       await refresh();
-    };
+    });
   }
-  el("clip-profile").onchange = async (event) => {
+  el("clip-profile").onchange = guard(async (event) => {
     await post(`/api/clips/${encoded}/lock`,
                { seed: clip.seed, profile: event.target.value });
     await refresh();
-  };
-  el("btn-save-profile").onclick = async () => {
+  });
+  el("btn-save-profile").onclick = guard(async () => {
     await put(`/api/profiles/${clip.profile}`,
               { instruct: el("profile-instruct").value });
     await refresh();
-  };
+  });
   el("detail").querySelectorAll("[data-pool]").forEach((button) => {
-    button.onclick = async () => {
+    button.onclick = guard(async () => {
       await post(`/api/profiles/${clip.profile}/pool`,
                  { seed: Number(button.dataset.pool) });
       await refresh();
-    };
+    });
   });
   el("detail").querySelectorAll("[data-lock]").forEach((button) => {
-    button.onclick = async () => {
+    button.onclick = guard(async () => {
       await post(`/api/clips/${encoded}/lock`, { seed: Number(button.dataset.lock) });
       await refresh();
-    };
+    });
   });
   el("detail").querySelectorAll("[data-unpool]").forEach((link) => {
-    link.onclick = async (event) => {
+    link.onclick = guard(async (event) => {
       event.preventDefault();
       await api(`/api/profiles/${clip.profile}/pool/${link.dataset.unpool}`,
                 { method: "DELETE" });
       await refresh();
-    };
+    });
   });
 }
 
@@ -230,14 +242,18 @@ document.addEventListener("keydown", (event) => {
   el(id).addEventListener("input", renderList);
 });
 
-el("btn-render").onclick = async () => {
+el("btn-render").onclick = guard(async () => {
   const profile = el("filter-profile").value || null;
-  const label = profile ? `Profil „${profile}"` : "alle Profile";
+  const label = profile ? `Profil „${profile}“` : "alle Profile";
   if (!confirm(`Finalen Lauf für ${label} starten?`)) return;
   await post("/api/render", { profile });
-};
+});
 
-el("btn-cancel").onclick = () => post("/api/jobs/cancel", {});
+el("btn-cancel").onclick = guard(() => post("/api/jobs/cancel", {}));
+
+// The last `job-summary` of the running job. render_clips keeps going after a
+// failed clip, so "job-done" on its own says nothing about success.
+let lastSummary = null;
 
 const events = new EventSource("/events");
 events.onmessage = (message) => {
@@ -245,15 +261,31 @@ events.onmessage = (message) => {
   if (event.type === "render" || event.type === "candidate") {
     el("progress").textContent =
       `${event.index}/${event.total} · ${event.status} ${event.message || ""}`;
+  } else if (event.type === "job-summary") {
+    lastSummary = event;
   } else if (event.type === "job-done") {
-    el("progress").textContent = "fertig";
-    refresh();
+    const summary = lastSummary;
+    lastSummary = null;
+    if (summary && summary.failed > 0) {
+      el("progress").innerHTML =
+        `<span class="warn">${summary.failed} von ` +
+        `${summary.failed + summary.rendered} fehlgeschlagen!</span> ` +
+        `${summary.rendered} gerendert, ${summary.skipped} übersprungen.`;
+    } else if (summary) {
+      el("progress").textContent =
+        `fertig — ${summary.rendered} gerendert, ${summary.skipped} übersprungen.`;
+    } else {
+      el("progress").textContent = "fertig";
+    }
+    refresh().catch(showError);
   } else if (event.type === "job-error") {
+    lastSummary = null;
     el("progress").innerHTML = `<span class="warn">${escapeHtml(event.message)}</span>`;
-    refresh();
+    refresh().catch(showError);
   } else if (event.type === "job-start") {
+    lastSummary = null;
     el("progress").textContent = `läuft: ${event.job}`;
   }
 };
 
-refresh();
+refresh().catch(showError);

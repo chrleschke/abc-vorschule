@@ -15,15 +15,22 @@ from pathlib import Path
 from typing import Any, Callable
 
 from fastapi import Body, FastAPI, HTTPException
-from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
+from fastapi.responses import (
+    FileResponse, HTMLResponse, JSONResponse, StreamingResponse,
+)
 
 from .cli import load_context
 from .paths import Paths
 from .plan import orphan_locks, status_of
 from .render import candidate_seeds, random_seeds, render_clips, sample_candidates
-from .store import Lock, Locks, Profiles
+from .store import BASE_SAMPLING, Lock, Locks, Profiles
 
 STATIC = Path(__file__).resolve().parent / "static"
+
+#: Upper bound for one candidate batch. Each seed is a full model generation
+#: and `cancel` does not drain the queue, so an unbounded `n` would be a
+#: self-inflicted denial of service on a single-worker tool.
+MAX_CANDIDATES = 16
 
 
 @dataclass
@@ -101,6 +108,14 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
     app.state.engine = engine
     app.state.jobs = jobs
 
+    @app.exception_handler(ValueError)
+    def on_bad_curated_file(request, exc: ValueError):
+        # The curated JSON files are hand-edited. When one of them is
+        # inconsistent, the message names the file and the key — show exactly
+        # that instead of an opaque 500, so the UI can tell the operator what
+        # to fix.
+        return JSONResponse(status_code=500, content={"detail": str(exc)})
+
     def context():
         return load_context(paths)
 
@@ -164,9 +179,37 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
             raise HTTPException(status_code=404, detail=f"unbekanntes Profil {name!r}")
         profile = profiles.profiles[name]
         if "instruct" in body:
+            # profiles.json is curated and git-tracked; a dict landing in
+            # `instruct` would persist and then blow up at generate time.
+            if not isinstance(body["instruct"], str):
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"'instruct' muss ein Text sein, nicht "
+                           f"{type(body['instruct']).__name__}")
             profile.instruct = body["instruct"]
         if "sampling" in body:
-            profile.sampling.update(body["sampling"])
+            sampling = body["sampling"]
+            if not isinstance(sampling, dict):
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"'sampling' muss ein Objekt sein, nicht "
+                           f"{type(sampling).__name__}")
+            # Whitelist: an unknown key would change the fingerprint (every
+            # clip of the profile goes stale) and then reach
+            # generate_custom_voice(**sampling) as a TypeError on every clip.
+            unknown = sorted(set(sampling) - set(BASE_SAMPLING))
+            if unknown:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"unbekannte Sampling-Parameter: {', '.join(unknown)}. "
+                           f"Erlaubt: {', '.join(sorted(BASE_SAMPLING))}")
+            for param, value in sampling.items():
+                if isinstance(value, bool) or not isinstance(value, (int, float)):
+                    raise HTTPException(
+                        status_code=422,
+                        detail=f"Sampling-Parameter {param!r} muss eine Zahl sein, "
+                               f"nicht {type(value).__name__}")
+            profile.sampling.update(sampling)
         if "trim" in body:
             profile.trim = bool(body["trim"])
         if "normalize" in body:
@@ -201,33 +244,42 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
     @app.post("/api/clips/{key}/candidates", status_code=202)
     def api_candidates(key: str, body: dict = Body(default={})) -> dict[str, str]:
         ctx, clip = clip_by_key(key)
-        count = int(body.get("n", 4))
+        count = max(1, min(MAX_CANDIDATES, int(body.get("n", 4))))
         profile = ctx.profiles.profiles[clip.profile]
         existing = set(candidate_seeds(paths, clip.key)) | set(profile.seed_pool)
         seeds = random_seeds(count, exclude=existing)
 
         def run(is_cancelled) -> None:
-            sample_candidates(clip, profile, engine, paths, seeds,
-                              progress=lambda p: jobs.publish({
-                                  "type": "candidate", "clipKey": clip.key,
-                                  "index": p.index, "total": p.total,
-                                  "status": p.status, "message": p.message}),
-                              cancel=is_cancelled)
+            written = sample_candidates(
+                clip, profile, engine, paths, seeds,
+                progress=lambda p: jobs.publish({
+                    "type": "candidate", "clipKey": clip.key,
+                    "index": p.index, "total": p.total,
+                    "status": p.status, "message": p.message}),
+                cancel=is_cancelled)
+            jobs.publish({"type": "job-summary", "job": f"candidates:{key}",
+                          "rendered": len(written), "skipped": 0,
+                          "failed": len(seeds) - len(written)})
 
         jobs.submit(f"candidates:{key}", run)
         return {"ok": "queued"}
 
-    @app.get("/api/clips/{key}/candidates")
-    def api_list_candidates(key: str) -> dict[str, list[int]]:
-        return {"seeds": candidate_seeds(paths, key)}
-
     @app.post("/api/clips/{key}/lock")
     def api_lock(key: str, body: dict = Body(...)) -> dict[str, str]:
-        _, clip = clip_by_key(key)
+        ctx, clip = clip_by_key(key)
+        override = body.get("profile")
+        # An unvalidated profile name here used to persist into locks.json and
+        # then brick every entry point — `status`, `extract`, `render` and the
+        # /api/state the UI needs to fix it again.
+        if override is not None and override not in ctx.profiles.profiles:
+            raise HTTPException(
+                status_code=422,
+                detail=f"unbekanntes Profil {override!r}. Gültig: "
+                       f"{', '.join(sorted(ctx.profiles.profiles))}")
         locks = Locks.load(paths.locks)
         locks.set(key, Lock(
             seed=int(body["seed"]),
-            profile=body.get("profile"),
+            profile=override,
             text_override=body.get("textOverride"),
             note=body.get("note"),
             source_text=clip.source_text,
@@ -249,12 +301,19 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
 
         def run(is_cancelled) -> None:
             ctx = context()
-            render_clips(ctx.clips, ctx.profiles, engine, ctx.state, paths,
-                         profile=profile, force=force, cancel=is_cancelled,
-                         progress=lambda p: jobs.publish({
-                             "type": "render", "clipKey": p.clip_key,
-                             "index": p.index, "total": p.total,
-                             "status": p.status, "message": p.message}))
+            report = render_clips(
+                ctx.clips, ctx.profiles, engine, ctx.state, paths,
+                profile=profile, force=force, cancel=is_cancelled,
+                progress=lambda p: jobs.publish({
+                    "type": "render", "clipKey": p.clip_key,
+                    "index": p.index, "total": p.total,
+                    "status": p.status, "message": p.message}))
+            # render_clips swallows per-clip failures so the batch continues.
+            # Without this summary the job publishes `job-done` and the UI says
+            # "fertig" even when every single clip failed.
+            jobs.publish({"type": "job-summary", "job": f"render:{profile or 'alle'}",
+                          "rendered": report.rendered, "skipped": report.skipped,
+                          "failed": len(report.failed)})
 
         jobs.submit(f"render:{profile or 'alle'}", run)
         return {"ok": "queued"}

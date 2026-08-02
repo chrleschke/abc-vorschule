@@ -82,18 +82,81 @@ def test_profile_filter(setup):
     assert report.rendered == 1
 
 
-def test_only_glob_filter(setup):
+def test_only_exact_clip_key(setup):
     paths, profiles, clips, state = setup
     reward = next(c for c in clips if c.profile == "reward")
     report = render_clips(clips, profiles, FakeEngine(), state, paths, only=f"{reward.key}")
     assert report.rendered == 1
 
 
+def test_only_glob_matches_several_clip_keys(setup):
+    paths, profiles, clips, state = setup
+    report = render_clips(clips, profiles, FakeEngine(), state, paths, only="prompt:*")
+    assert report.rendered == 2, "both prompt clips"
+    assert report.skipped == 0, "the reward clip is filtered out, not skipped"
+
+
+def test_only_glob_matches_item_ids(setup):
+    """The spec's own example is `--only "task:l01-t1:*"` — an item-id glob."""
+    paths, profiles, clips, state = setup
+    engine = FakeEngine()
+    report = render_clips(clips, profiles, engine, state, paths, only="task:t1:*")
+    assert report.rendered == 1
+    assert engine.calls == [("Frage eins?", engine.calls[0][1])], \
+        "only the clip that task:t1's item points at"
+
+
+def test_only_item_id_glob_can_span_several_clips(setup):
+    paths, profiles, clips, state = setup
+    report = render_clips(clips, profiles, FakeEngine(), state, paths,
+                          only="task:*:round:0:promptTts")
+    assert report.rendered == 2
+
+
+def test_only_glob_is_case_sensitive(setup):
+    paths, profiles, clips, state = setup
+    report = render_clips(clips, profiles, FakeEngine(), state, paths,
+                          only="PROMPT:*")
+    assert report.rendered == 0, "clip keys are identifiers, not filenames"
+
+
+def test_only_matching_nothing_renders_nothing(setup):
+    paths, profiles, clips, state = setup
+    engine = FakeEngine()
+    report = render_clips(clips, profiles, engine, state, paths, only="gibt:es:nicht")
+    assert report.rendered == 0
+    assert engine.calls == []
+
+
+def test_a_failure_is_persisted_so_status_can_report_it(setup):
+    paths, profiles, clips, state = setup
+    engine = FakeEngine(fail_on={"Frage eins?"})
+    render_clips(clips, profiles, engine, state, paths)
+
+    reloaded = RenderState.load(paths.render_state)
+    failed_key = next(c.key for c in clips if c.text == "Frage eins?")
+    assert failed_key in reloaded.failures
+    assert "model exploded" in reloaded.failures[failed_key]
+
+
+def test_a_later_success_clears_the_persisted_failure(setup):
+    paths, profiles, clips, state = setup
+    render_clips(clips, profiles, FakeEngine(fail_on={"Frage eins?"}), state, paths)
+    render_clips(clips, profiles, FakeEngine(), state, paths)
+    assert RenderState.load(paths.render_state).failures == {}
+
+
+def test_a_dry_run_without_an_engine_is_fine_but_a_real_run_is_not(setup):
+    paths, profiles, clips, state = setup
+    assert render_clips(clips, profiles, None, state, paths, dry_run=True).rendered == 3
+    with pytest.raises(AssertionError, match="needs an engine"):
+        render_clips(clips, profiles, None, state, paths)
+
+
 def test_dry_run_writes_nothing(setup):
     paths, profiles, clips, state = setup
     engine = FakeEngine()
     report = render_clips(clips, profiles, engine, state, paths, dry_run=True)
-    assert report.dry_run is True
     assert report.rendered == 3
     assert engine.calls == []
     assert not paths.audio.exists() or list(paths.audio.iterdir()) == []
