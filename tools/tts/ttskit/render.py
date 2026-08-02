@@ -73,16 +73,15 @@ def render_clips(
     selected = _select(clips, only, profile)
     report = RenderReport()
 
-    todo: list[tuple[Clip, Profile, str]] = []
+    todo: list[tuple[Clip, Profile]] = []
     for clip in selected:
         prof = profiles.profiles[clip.profile]
-        stamp = fingerprint(clip, prof)
-        # `status_of` owns the staleness predicate — re-deriving it here once
-        # made `status` and `render` two expressions for one truth.
-        if status_of(clip, prof, state, paths.audio) == "rendered" and not force:
+        # `status_of` owns the "already rendered" predicate — re-deriving it
+        # here once made `status` and `render` two expressions for one truth.
+        if status_of(clip, paths.audio) == "rendered" and not force:
             report.skipped += 1
             continue
-        todo.append((clip, prof, stamp))
+        todo.append((clip, prof))
 
     if dry_run:
         report.rendered = len(todo)
@@ -94,7 +93,7 @@ def render_clips(
     assert engine is not None, "render_clips needs an engine unless dry_run=True"
 
     total = len(todo)
-    for index, (clip, prof, stamp) in enumerate(todo, start=1):
+    for index, (clip, prof) in enumerate(todo, start=1):
         if cancel is not None and cancel():
             break
         try:
@@ -102,7 +101,6 @@ def render_clips(
                 clip.text, effective_profile(clip, prof), clip.seed)
             wav = postprocess(wav, sample_rate, trim=prof.trim, normalize=prof.normalize)
             write_wav(paths.audio / f"{clip.key}.wav", wav, sample_rate)
-            state.entries[clip.key] = stamp
             state.failures.pop(clip.key, None)
             # Written per clip, not at the end: an aborted half-hour run
             # must not throw away the work it already did.
@@ -154,8 +152,7 @@ def render_batch_candidates(
 
     todo: list[Clip] = []
     for clip in selected:
-        prof = profiles.profiles[clip.profile]
-        if status_of(clip, prof, state, paths.audio) == "rendered" and not force:
+        if status_of(clip, paths.audio) == "rendered" and not force:
             report.skipped += 1
             continue
         todo.append(clip)
@@ -322,8 +319,7 @@ def candidate_infos(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
     return infos
 
 
-def clip_audio_list(paths: Paths, clip: Clip, profile: Profile,
-                    state: RenderState) -> list[dict]:
+def clip_audio_list(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
     """Kandidaten UND — falls keiner von ihnen der aktuellen Produktion
     entspricht — ein Nachbau-Eintrag für die Produktions-Datei selbst.
 
@@ -334,6 +330,10 @@ def clip_audio_list(paths: Paths, clip: Clip, profile: Profile,
     Anzeige über der Kandidaten-Tabelle wegfällt — dabei ist die Tabelle
     jetzt die einzige Stelle, an der man sie noch anhören und bewusst
     festlegen kann.
+
+    Kein `fresh`-Feld für diesen Eintrag: er IST die aktuelle Produktion,
+    ein späteres Profil-Update darf sie nicht nachträglich als veraltet
+    zeigen (siehe `plan.status_of`).
     """
     infos = candidate_infos(paths, clip, profile)
     if any(info["seed"] == clip.seed for info in infos):
@@ -345,7 +345,6 @@ def clip_audio_list(paths: Paths, clip: Clip, profile: Profile,
         audio_path.stat().st_mtime, timezone.utc).isoformat(timespec="seconds")
     infos.append({
         "seed": clip.seed,
-        "fresh": state.entries.get(clip.key) == fingerprint(clip, profile),
         "createdAt": created,
         "speaker": clip.speaker,
         "text": clip.text,

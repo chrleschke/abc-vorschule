@@ -141,7 +141,7 @@ def test_state_surfaces_a_legacy_production_only_entry(client):
     entry = clip_state["candidates"][0]
     assert entry["seed"] == clip_state["seed"]
     assert entry["isProductionOnly"] is True
-    assert entry["fresh"] is True
+    assert "fresh" not in entry
 
     assert client.post(f"/api/clips/{key}/promote",
                        json={"seed": entry["seed"]}).status_code == 200
@@ -170,7 +170,7 @@ def test_promote_copies_audio_locks_seed_and_marks_rendered(client):
     assert audio.read_bytes() == candidate.read_bytes()
 
 
-def test_promote_without_sidecar_still_locks_but_stays_stale(client):
+def test_promote_without_sidecar_still_locks_and_is_rendered(client):
     key = client.get("/api/state").json()["clips"][0]["key"]
     (client.paths.candidates / key).mkdir(parents=True)
     # Alt-Kandidat aus der Zeit vor den Sidecars: nur die WAV liegt da.
@@ -182,7 +182,7 @@ def test_promote_without_sidecar_still_locks_but_stays_stale(client):
 
     clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
     assert clip["locked"] is True and clip["seed"] == 777
-    assert clip["status"] == "stale"
+    assert clip["status"] == "rendered"
 
 
 def test_promote_preserves_existing_lock_fields(client):
@@ -207,7 +207,7 @@ def test_promote_unknown_candidate_is_404(client):
     assert client.post(f"/api/clips/{key}/promote", json={"seed": 424242}).status_code == 404
 
 
-def test_promote_with_stale_sidecar_is_unverified_and_stays_stale(client):
+def test_promote_with_outdated_sidecar_is_unverified_but_rendered(client):
     key = client.get("/api/state").json()["clips"][0]["key"]
     client.post(f"/api/clips/{key}/candidates", json={"n": 1})
     wait_for_idle(client)
@@ -215,7 +215,9 @@ def test_promote_with_stale_sidecar_is_unverified_and_stays_stale(client):
     seed = clip["candidates"][0]["seed"]
 
     # Instruktion nach der Kandidaten-Erzeugung geändert: der Sidecar-
-    # Fingerprint des Kandidaten passt nicht mehr zu den aktuellen Einstellungen.
+    # Fingerprint des Kandidaten passt nicht mehr zu den aktuellen
+    # Einstellungen. `verified` meldet das rein informativ — der Clip wird
+    # trotzdem "rendered", sobald die Datei liegt.
     client.put(f"/api/profiles/{clip['profile']}", json={"instruct": "Anders."})
 
     response = client.post(f"/api/clips/{key}/promote", json={"seed": seed})
@@ -224,37 +226,7 @@ def test_promote_with_stale_sidecar_is_unverified_and_stays_stale(client):
 
     clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
     assert clip["locked"] is True and clip["seed"] == seed
-    assert clip["status"] == "stale"
-
-
-def test_unverified_promote_does_not_touch_existing_render_state_entry(client):
-    key = client.get("/api/state").json()["clips"][0]["key"]
-    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
-    wait_for_idle(client)
-    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
-    seed = clip["candidates"][0]["seed"]
-
-    # Verifizierter Promote setzt den render-state-Eintrag.
-    response = client.post(f"/api/clips/{key}/promote", json={"seed": seed})
-    assert response.json()["verified"] is True
-    entry_before = json.loads(
-        client.paths.render_state.read_text(encoding="utf-8"))["entries"][key]
-
-    # Profil ändern macht den Clip veraltet.
-    client.put(f"/api/profiles/{clip['profile']}", json={"instruct": "Anders."})
-
-    # Sidecar-loser Kandidat (Alt-Kandidat aus der Zeit vor den Sidecars).
-    (client.paths.candidates / key).mkdir(parents=True, exist_ok=True)
-    (client.paths.candidates / key / "999.wav").write_bytes(b"RIFFfake")
-
-    response = client.post(f"/api/clips/{key}/promote", json={"seed": 999})
-    assert response.status_code == 200
-    assert response.json() == {"ok": "promoted", "verified": False}
-
-    entry_after = json.loads(
-        client.paths.render_state.read_text(encoding="utf-8"))["entries"][key]
-    assert entry_after == entry_before, \
-        "ein unverifizierter Promote darf den bestehenden render-state-Eintrag nicht anfassen"
+    assert clip["status"] == "rendered"
 
 
 def test_promote_and_delete_candidate_on_unknown_clip_are_404(client):

@@ -1,23 +1,25 @@
 """Approvete Clips als OGG/Opus in die App-Assets exportieren.
 
-Exportiert wird genau ein Clip, wenn er gelockt ist und sein Render-Stand
-aktuell ('rendered'). Der Export besitzt das Zielverzeichnis, aber die
+Exportiert wird genau ein Clip, wenn er gelockt ist und lokal eine Datei unter
+out/audio/ hat. Ein Profil-Update (Instruktion, Sampling, Seed-Pool,
+Nachbearbeitung) invalidiert nie bereits bestätigten (gelockten) Content —
+siehe `plan.status_of`. Der Export besitzt das Zielverzeichnis, aber die
 Lösch-Semantik folgt Unlocks, nicht dem lokalen Render-Stand: `out/` ist
-gitignored, auf einem frischen Checkout fehlen WAV und render-state.json für
-jeden gelockten Clip, obwohl die Datei längst committet ist. Ein Clip, der
-gelockt, aber lokal nicht (mehr) rendered ist (Status `missing`/`stale`),
-behält seine bereits exportierte Datei und seinen Index-Eintrag — nur ein
-echter Unlock (oder ein Text, der zu keinem Lock mehr gehört) entfernt eine
-Datei. index.json wird immer neu geschrieben — deterministisch, ohne
-Zeitstempel, für saubere Diffs.
+gitignored, auf einem frischen Checkout fehlt die WAV für jeden gelockten
+Clip, obwohl die Datei längst committet ist. Ein gelockter Clip ohne lokale
+WAV (Status `missing`) behält seine bereits exportierte Datei und seinen
+Index-Eintrag — nur ein echter Unlock (oder ein Text, der zu keinem Lock mehr
+gehört) entfernt eine Datei. index.json wird immer neu geschrieben —
+deterministisch, ohne Zeitstempel, für saubere Diffs.
 
 Determinismus heißt hier: ein wiederholter Lauf ohne geänderte Eingaben fasst
 keine Datei an. Die OGG-Bytes selbst sind pro Encode NICHT reproduzierbar —
 `soundfile`/libsndfile schreibt eine zufällige Ogg-Bitstream-Seriennummer, also
 erzeugt derselbe WAV-Input bei jedem Aufruf ein anderes .ogg. Deshalb merkt
-sich `index.json` pro Clip den Render-Fingerprint (denselben 16-stelligen Wert
-wie render-state.json) und ein Clip wird nur neu encodiert, wenn sich sein
-Fingerprint geändert hat oder die Zieldatei fehlt.
+sich `index.json` pro Clip einen eigenen Fingerprint (Text, Profil, Seed,
+Stimme, Instruktion, Sampling — siehe `plan.fingerprint`) und ein Clip wird
+nur neu encodiert, wenn sich dieser Fingerprint geändert hat oder die
+Zieldatei fehlt.
 """
 
 from __future__ import annotations
@@ -112,14 +114,13 @@ def export_to_app(paths: Paths) -> ExportReport:
     for clip in ctx.clips:
         if not clip.locked:
             continue
-        profile = ctx.profiles.profiles[clip.profile]
-        status = status_of(clip, profile, ctx.state, paths.audio)
+        status = status_of(clip, paths.audio)
         if status != "rendered":
             name = asset_name(clip.key)
             if (target / name).exists():
                 report.skipped.append(
                     (clip.key,
-                     f"Status ist {status}, nicht rendered — "
+                     f"Lokal nicht gerendert (status {status}) — "
                      "vorhandene Datei bleibt erhalten"))
                 retained_files.add(name)
                 prev = previous.get(name)
@@ -127,7 +128,7 @@ def export_to_app(paths: Paths) -> ExportReport:
                     prev_text, prev_entry = prev
                     retained_entries[prev_text] = prev_entry
             else:
-                report.skipped.append((clip.key, f"Status ist {status}, nicht rendered"))
+                report.skipped.append((clip.key, f"Lokal nicht gerendert (status {status})"))
             continue
         exportable.append(clip)
 

@@ -29,7 +29,7 @@ from .render import (
     candidate_fingerprint, candidate_meta, candidate_seeds, clip_audio_list,
     random_seeds, render_batch_candidates, sample_candidates, update_candidate_meta,
 )
-from .store import BASE_SAMPLING, Lock, Locks, Profiles, RenderState
+from .store import BASE_SAMPLING, Lock, Locks, Profiles
 
 STATIC = Path(__file__).resolve().parent / "static"
 
@@ -200,8 +200,8 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                 "itemIds": list(clip.item_ids),
                 "fields": list(clip.fields),
                 "lessons": list(clip.lessons),
-                "status": status_of(clip, profile, ctx.state, paths.audio),
-                "candidates": clip_audio_list(paths, clip, profile, ctx.state),
+                "status": status_of(clip, paths.audio),
+                "candidates": clip_audio_list(paths, clip, profile),
             })
         return {
             "engine": {"loaded": bool(getattr(engine, "loaded", False)),
@@ -254,9 +254,9 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                     status_code=422,
                     detail=f"'sampling' muss ein Objekt sein, nicht "
                            f"{type(sampling).__name__}")
-            # Whitelist: an unknown key would change the fingerprint (every
-            # clip of the profile goes stale) and then reach
-            # generate_custom_voice(**sampling) as a TypeError on every clip.
+            # Whitelist: an unknown key would reach
+            # generate_custom_voice(**sampling) as a TypeError on every future
+            # render of this profile.
             unknown = sorted(set(sampling) - set(BASE_SAMPLING))
             if unknown:
                 raise HTTPException(
@@ -405,22 +405,18 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
         if source.exists():
             _copy_atomic(source, production)
 
-        # Nur wenn der Kandidat nachweislich mit den aktuellen Einstellungen
-        # erzeugt wurde, gilt der Clip als gerendert. Sonst bleibt er
-        # "stale" und der nächste Lauf rendert ihn mit dem gelockten Seed neu.
-        profile = ctx.profiles.profiles[clip.profile]
-        target = fingerprint(replace(clip, seed=seed), profile)
+        # `verified` ist rein informativ: entstand die übernommene Aufnahme
+        # nachweislich mit den aktuellen Profil-Einstellungen? Der Clip gilt
+        # so oder so ab jetzt als "rendered" — bestätigter Content wird nie
+        # durch ein späteres Profil-Update invalidiert (siehe plan.status_of).
         if source.exists():
+            profile = ctx.profiles.profiles[clip.profile]
+            target = fingerprint(replace(clip, seed=seed), profile)
             verified = candidate_fingerprint(paths, key, seed) == target
         else:
-            # Der Nachbau-Eintrag hat keinen Sidecar — die Frische steht schon
-            # im render-state, aus genau dem Lauf, der die Datei geschrieben hat.
-            verified = ctx.state.entries.get(key) == target
-        if verified:
-            render_state = RenderState.load(paths.render_state)
-            render_state.entries[key] = target
-            render_state.failures.pop(key, None)
-            render_state.save(paths.render_state)
+            # Nachbau-Eintrag ohne Sidecar — es gibt nichts, wogegen sich das
+            # verifizieren ließe.
+            verified = False
         return {"ok": "promoted", "verified": verified}
 
     @app.put("/api/clips/{key}/candidates/{seed}/rating")
@@ -474,9 +470,6 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
         # die App ausliefern würde, darf keinen verworfenen Klang mehr enthalten.
         if clip.seed == seed and production.exists():
             production.unlink()
-            render_state = RenderState.load(paths.render_state)
-            if render_state.entries.pop(key, None) is not None:
-                render_state.save(paths.render_state)
 
         # Keine Probeaufnahme und keine Produktions-Datei mehr übrig — die
         # Festlegung hat nichts mehr, worauf sie zeigen könnte, und fällt

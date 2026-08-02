@@ -117,12 +117,13 @@ Konstruktion weiterhin einzig in `MainActivity` — kein neuer DI-Mechanismus.
 ## 7. Amendments während der Umsetzung
 
 - **Fingerprint im Index:** Jeder Index-Eintrag trägt zusätzlich zu `file` und
-  `profile` ein `fingerprint`-Feld (derselbe 16-stellige Wert wie in
-  `render-state.json`). Der Export ist dadurch inkrementell: die OGG/Opus-Bytes
-  sind pro Encode NICHT reproduzierbar (`soundfile`/libsndfile schreibt eine
-  zufällige Ogg-Bitstream-Seriennummer), ohne Fingerprint-Vergleich würde jeder
-  Lauf also alle Dateien neu schreiben, obwohl sich inhaltlich nichts geändert
-  hat.
+  `profile` ein `fingerprint`-Feld (`plan.fingerprint(clip, profile)`, vom
+  Export selbst berechnet und im eigenen `index.json` gemerkt — unabhängig von
+  `render-state.json`, siehe Amendment weiter unten). Der Export ist dadurch
+  inkrementell: die OGG/Opus-Bytes sind pro Encode NICHT reproduzierbar
+  (`soundfile`/libsndfile schreibt eine zufällige Ogg-Bitstream-Seriennummer),
+  ohne Fingerprint-Vergleich würde jeder Lauf also alle Dateien neu schreiben,
+  obwohl sich inhaltlich nichts geändert hat.
 - **41 statt 22 Clips exportiert:** Die Kuratierung lief nach diesem Design
   weiter — inzwischen liegen 53 Locks vor, davon 41 gelockt und rendered.
   §4 nennt noch den Stand zum Zeitpunkt des Designs.
@@ -132,7 +133,26 @@ Konstruktion weiterhin einzig in `MainActivity` — kein neuer DI-Mechanismus.
   `assets/audio/` committet ist. Der Export löscht deshalb nur noch Dateien,
   die zu keinem aktuell gelockten Clip mehr gehören (z. B. nach einem Unlock
   oder einer Textänderung) sowie Dateien ohne jeden zugehörigen Lock. Ein
-  gelockter, aber lokal nicht (mehr) gerenderter Clip (`missing`/`stale`)
-  behält seine bereits exportierte Datei und seinen Index-Eintrag unangetastet
-  bei — sonst würde ein einzelner Export-Lauf auf einem frischen Checkout ohne
-  `out/` sämtliche committeten Clips löschen.
+  gelockter, aber lokal nicht (mehr) gerenderter Clip (`missing`) behält seine
+  bereits exportierte Datei und seinen Index-Eintrag unangetastet bei — sonst
+  würde ein einzelner Export-Lauf auf einem frischen Checkout ohne `out/`
+  sämtliche committeten Clips löschen.
+- **Der Status-Wert `stale` wurde vollständig entfernt.** `plan.status_of`
+  kannte ursprünglich `missing` / `stale` / `rendered`, wobei `stale` einen
+  gelockten, bereits produzierten Clip anzeigte, dessen Render-Fingerprint
+  nicht mehr zu Profil-Instruktion, Sampling, Trim/Normalisierung oder der
+  Nachbearbeitungs-Version passte. Das invalidierte bereits bestätigten
+  (gelockten) Content jedes Mal, wenn jemand nur die Instruktion eines Profils
+  verbesserte oder einen Seed in den Pool aufnahm — genau das durfte laut
+  Anforderung nicht passieren. `status_of` kennt seither nur noch `missing`
+  (keine Datei) und `rendered` (Datei existiert), unabhängig von Profil- oder
+  Lock-Änderungen seit dem Render. `RenderState` verlor sein `entries`-Feld
+  (Fingerprint pro Clip) komplett — `render-state.json` merkt sich nur noch
+  `failures`. Ein Re-Render bereits vorhandener Dateien ist seither immer eine
+  bewusste Handlung (`tts render --force`, ggf. mit `--only`, oder Löschen der
+  Datei), nie ein stillschweigender Seiteneffekt eines geänderten Profils.
+  Betrifft `tools/tts/ttskit/{plan,render,server,cli,export}.py` und die
+  Web-UI (kein „veraltet"-Status/-Filter mehr); die App-Integration selbst
+  (Kapitel 1–4 dieses Dokuments) ist davon nicht betroffen — der Export-Gate
+  bleibt „gelockt und `rendered`", nur wie `rendered` bestimmt wird, hat sich
+  vereinfacht.

@@ -4,7 +4,7 @@ from ttskit.models import Item
 from ttskit.plan import (
     build_clips, clip_key, fingerprint, orphan_locks, resolve_seed, status_of,
 )
-from ttskit.store import Lock, Locks, Profiles, RenderState
+from ttskit.store import Lock, Locks, Profiles
 
 
 def profiles() -> Profiles:
@@ -175,34 +175,45 @@ def test_fingerprint_ignores_which_items_point_at_the_clip():
     assert fingerprint(one, prof.profiles["prompt"]) == fingerprint(two, prof.profiles["prompt"])
 
 
-def test_status_missing_stale_rendered(tmp_path):
+def test_status_is_missing_then_rendered(tmp_path):
     prof = profiles()
     clip = build_clips([item("task:t1:round:0:promptTts", "Hallo", "promptTts")],
                        prof, Locks())[0]
-    profile = prof.profiles["prompt"]
     audio_dir = tmp_path / "audio"
     audio_dir.mkdir()
-    state = RenderState()
 
-    assert status_of(clip, profile, state, audio_dir) == "missing"
+    assert status_of(clip, audio_dir) == "missing"
 
     (audio_dir / f"{clip.key}.wav").write_bytes(b"RIFF")
-    state.entries[clip.key] = fingerprint(clip, profile)
-    assert status_of(clip, profile, state, audio_dir) == "rendered"
+    assert status_of(clip, audio_dir) == "rendered"
 
-    profile.instruct = "Ganz anders."
-    assert status_of(clip, profile, state, audio_dir) == "stale"
+
+def test_status_is_not_affected_by_profile_changes_once_rendered(tmp_path):
+    """Kern der Anforderung: ein Profil-Update (Instruktion, Sampling, ...)
+    invalidiert nie bereits gerenderten, bestätigten Content."""
+    prof = profiles()
+    clip = build_clips([item("task:t1:round:0:promptTts", "Hallo", "promptTts")],
+                       prof, Locks())[0]
+    audio_dir = tmp_path / "audio"
+    audio_dir.mkdir()
+    (audio_dir / f"{clip.key}.wav").write_bytes(b"RIFF")
+    assert status_of(clip, audio_dir) == "rendered"
+
+    prof.profiles["prompt"].instruct = "Ganz anders."
+    assert status_of(clip, audio_dir) == "rendered"
 
 
 def test_status_is_missing_when_the_file_was_deleted(tmp_path):
     prof = profiles()
     clip = build_clips([item("task:t1:round:0:promptTts", "Hallo", "promptTts")],
                        prof, Locks())[0]
-    profile = prof.profiles["prompt"]
     audio_dir = tmp_path / "audio"
     audio_dir.mkdir()
-    state = RenderState({clip.key: fingerprint(clip, profile)})
-    assert status_of(clip, profile, state, audio_dir) == "missing"
+    wav = audio_dir / f"{clip.key}.wav"
+    wav.write_bytes(b"RIFF")
+    assert status_of(clip, audio_dir) == "rendered"
+    wav.unlink()
+    assert status_of(clip, audio_dir) == "missing"
 
 
 def test_orphan_locks_are_reported_not_deleted():
@@ -240,23 +251,21 @@ def test_fingerprint_tracks_the_postprocessing_version():
     assert plan_module.POSTPROCESS_VERSION == POSTPROCESS_VERSION
 
 
-def test_bumping_the_postprocessing_version_makes_rendered_clips_stale(tmp_path):
+def test_bumping_the_postprocessing_version_does_not_affect_status(tmp_path):
     import ttskit.plan as plan_module
 
     prof = profiles()
     clip = build_clips([item("task:t1:round:0:promptTts", "Hallo", "promptTts")],
                        prof, Locks())[0]
-    profile = prof.profiles["prompt"]
     audio_dir = tmp_path / "audio"
     audio_dir.mkdir()
     (audio_dir / f"{clip.key}.wav").write_bytes(b"RIFF")
-    state = RenderState({clip.key: fingerprint(clip, profile)})
-    assert status_of(clip, profile, state, audio_dir) == "rendered"
+    assert status_of(clip, audio_dir) == "rendered"
 
     original = plan_module.POSTPROCESS_VERSION
     try:
         plan_module.POSTPROCESS_VERSION = original + 1
-        assert status_of(clip, profile, state, audio_dir) == "stale"
+        assert status_of(clip, audio_dir) == "rendered"
     finally:
         plan_module.POSTPROCESS_VERSION = original
 
@@ -304,9 +313,9 @@ def test_lock_can_swap_the_voice_for_one_clip_without_moving_the_key():
     assert clip.speaker == "serena"
 
 
-def test_a_voice_override_makes_only_that_clip_stale():
+def test_a_voice_override_changes_the_fingerprint_of_only_that_clip():
     """The profile is shared; the override is not. Both clips of the profile
-    must not go stale because one of them got a different voice."""
+    must not change fingerprint because one of them got a different voice."""
     prof = profiles()
     items = [item("task:t1:phonemeTts", "M", "phonemeTts"),
              item("task:t2:phonemeTts", "A", "phonemeTts")]

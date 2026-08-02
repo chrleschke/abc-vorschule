@@ -23,8 +23,8 @@ def write_wav(path: Path, seconds: float = 0.2, sr: int = 24000) -> None:
              sr, subtype="PCM_16")
 
 
-def lock_and_render(paths: Paths, key: str, fresh: bool = True) -> None:
-    """Lockt `key` und legt WAV + (optional aktuellen) Fingerprint an."""
+def lock_and_render(paths: Paths, key: str) -> None:
+    """Lockt `key` und legt die passende WAV unter out/audio/ an."""
     locks_file = paths.locks
     data = (json.loads(locks_file.read_text()) if locks_file.exists()
             else {"version": 1, "locks": {}})
@@ -32,15 +32,6 @@ def lock_and_render(paths: Paths, key: str, fresh: bool = True) -> None:
     locks_file.write_text(json.dumps(data), encoding="utf-8")
 
     write_wav(paths.audio / f"{key}.wav")
-
-    ctx = load_context(paths)
-    clip = next(c for c in ctx.clips if c.key == key)
-    fp = fingerprint(clip, ctx.profiles.profiles[clip.profile]) if fresh else "stale00"
-    state = (json.loads(paths.render_state.read_text())
-             if paths.render_state.exists() else {"version": 1, "entries": {}})
-    state["entries"][key] = fp
-    paths.render_state.parent.mkdir(parents=True, exist_ok=True)
-    paths.render_state.write_text(json.dumps(state), encoding="utf-8")
 
 
 def clip_key_for_text(paths: Paths, text: str) -> str:
@@ -71,11 +62,8 @@ def test_exports_locked_rendered_clip_as_ogg(tmp_path, content_dir):
     assert isinstance(entry["fingerprint"], str) and len(entry["fingerprint"]) == 16
 
 
-def test_skips_unlocked_stale_and_missing(tmp_path, content_dir):
+def test_skips_unlocked_and_missing_locked_clips(tmp_path, content_dir):
     paths = make_paths(tmp_path, content_dir)
-    stale_key = clip_key_for_text(paths, "Mama.")
-    lock_and_render(paths, stale_key, fresh=False)
-
     missing_key = clip_key_for_text(paths, "Maus")
     lock_and_render(paths, missing_key)
     (paths.audio / f"{missing_key}.wav").unlink()
@@ -84,10 +72,9 @@ def test_skips_unlocked_stale_and_missing(tmp_path, content_dir):
 
     assert report.exported == []
     reasons = dict(report.skipped)
-    assert "stale" in reasons[stale_key]
     assert "missing" in reasons[missing_key]
     # Ungelockte Clips tauchen gar nicht erst im Bericht auf:
-    assert len(report.skipped) == 2
+    assert len(report.skipped) == 1
     index = json.loads((paths.app_audio_dir / "index.json").read_text())
     assert index["clips"] == {}
 
@@ -105,7 +92,7 @@ def test_orphan_lock_is_reported_not_exported(tmp_path, content_dir):
                for key, reason in report.skipped)
 
 
-def test_sync_removes_stale_ogg_but_keeps_foreign_files(tmp_path, content_dir):
+def test_sync_removes_orphaned_ogg_but_keeps_foreign_files(tmp_path, content_dir):
     paths = make_paths(tmp_path, content_dir)
     paths.app_audio_dir.mkdir(parents=True)
     (paths.app_audio_dir / "word_000000000000.ogg").write_bytes(b"old")
@@ -174,7 +161,7 @@ def test_fresh_checkout_keeps_existing_assets_when_local_state_missing(tmp_path,
 def test_unlock_deletes_kept_file_and_index_entry(tmp_path, content_dir):
     """Deletion tracks unlocks: once a clip is no longer locked at all, its
     asset and index entry must disappear — even if it was previously kept
-    across a run where it was merely missing/stale."""
+    across a run where it was merely locked without a local render."""
     paths = make_paths(tmp_path, content_dir)
     key = clip_key_for_text(paths, "Mama.")
     lock_and_render(paths, key)
@@ -233,10 +220,11 @@ def test_fingerprint_change_forces_reencode(tmp_path, content_dir):
     ogg = paths.app_audio_dir / asset_name(key)
     first_bytes = ogg.read_bytes()
 
-    # Ein neuer Seed macht den Clip fachlich zu einer neuen Aufnahme. Die WAV
-    # bliebe im echten Ablauf durch `tts render` neu erzeugt; hier reicht es,
-    # den render-state-Fingerprint passend zum neuen Seed nachzuziehen, um den
-    # Re-Encode-Pfad zu prüfen.
+    # Ein neuer Seed macht den Clip fachlich zu einer neuen Aufnahme — die WAV
+    # bliebe im echten Ablauf durch `tts render` neu erzeugt; hier reicht die
+    # bestehende Datei, um den Re-Encode-Pfad über den geänderten Fingerprint
+    # zu prüfen (Text/Profil/Stimme/Instruktion/Sampling bleiben gleich, nur
+    # der Seed ändert sich).
     locks_data = json.loads(paths.locks.read_text())
     locks_data["locks"][key]["seed"] = 2
     paths.locks.write_text(json.dumps(locks_data), encoding="utf-8")
@@ -244,9 +232,6 @@ def test_fingerprint_change_forces_reencode(tmp_path, content_dir):
     ctx = load_context(paths)
     clip = next(c for c in ctx.clips if c.key == key)
     new_fp = fingerprint(clip, ctx.profiles.profiles[clip.profile])
-    state = json.loads(paths.render_state.read_text())
-    state["entries"][key] = new_fp
-    paths.render_state.write_text(json.dumps(state), encoding="utf-8")
 
     report = export_to_app(paths)
 

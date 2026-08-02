@@ -293,14 +293,14 @@ class Locks:
 
 @dataclass
 class RenderState:
-    """Maps clipKey -> render fingerprint of the file currently on disk.
+    """Merkt sich pro Clip die letzte Fehlermeldung eines Render-Versuchs.
 
-    `failures` remembers the error message of the last failed attempt per clip
-    so `tts status` can report it — without it, a failed clip is
-    indistinguishable from one that was never rendered.
+    `failures` erlaubt `tts status`, einen fehlgeschlagenen Clip von einem nie
+    versuchten zu unterscheiden. Es gibt bewusst keine Fingerprint-Ablage mehr:
+    ob ein Clip "rendered" ist, entscheidet einzig, ob seine Datei existiert —
+    ein Profil-Update darf bereits bestätigten Content nie invalidieren.
     """
 
-    entries: dict[str, str] = field(default_factory=dict)
     failures: dict[str, str] = field(default_factory=dict)
 
     @classmethod
@@ -308,22 +308,17 @@ class RenderState:
         path = Path(path)
         raw = read_json(path)
         if raw is None:  # explicitly, not truthiness — see Profiles.load
-            raw = {"version": 1, "entries": {}}
+            raw = {"version": 1, "failures": {}}
         if not isinstance(raw, dict):
             raise ValueError(f"{path} must contain an object, got {type(raw).__name__}")
-        entries = raw.get("entries", {})
         failures = raw.get("failures", {})
-        if not isinstance(entries, dict):
-            raise ValueError(f"{path}: 'entries' must be an object, "
-                             f"got {type(entries).__name__}")
         if not isinstance(failures, dict):
             raise ValueError(f"{path}: 'failures' must be an object, "
                              f"got {type(failures).__name__}")
-        return cls(dict(entries), dict(failures))
+        return cls(dict(failures))
 
     def save(self, path: Path) -> None:
         _write_json(Path(path), {
             "version": 1,
-            "entries": dict(sorted(self.entries.items())),
             "failures": dict(sorted(self.failures.items())),
         })

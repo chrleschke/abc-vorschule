@@ -14,7 +14,6 @@
       <select id="filter-status">
         <option value="">Alle Status</option>
         <option value="missing">fehlt</option>
-        <option value="stale">veraltet</option>
         <option value="rendered">fertig</option>
         <option value="locked">festgelegt</option>
       </select>
@@ -22,7 +21,7 @@
               title="Stimme, Sprache, Instruktion und Sampling aller Profile bearbeiten">
         ⚙️ TTS-Parameter</button>
       <button id="btn-render" class="primary"
-              title="Erzeugt Kandidaten für die links ausgewählten Clips — nur was fehlt oder veraltet ist. Produktion bestätigt man danach pro Clip in der Kandidaten-Liste.">
+              title="Erzeugt Kandidaten für die links ausgewählten Clips — nur was noch fehlt. Produktion bestätigt man danach pro Clip in der Kandidaten-Liste.">
         ▶ Batch-Lauf</button>
       <input id="batch-count" type="number" min="1" max="16" value="2"
              title="Anzahl Beispiele pro Clip (1–16)" /> Stück
