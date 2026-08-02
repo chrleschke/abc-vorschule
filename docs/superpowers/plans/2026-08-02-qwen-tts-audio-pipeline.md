@@ -1216,7 +1216,7 @@ print('items', len(items), '-> clips', len(clips))
 print(collections.Counter(c.profile for c in clips))
 "
 ```
-Expected: 891 Items werden zu rund 530 Clips; das `phoneme`-Profil hat 37 Clips (nicht 57 — `stretchTts` und `phonemeTts` überschneiden sich).
+Expected: 891 Items (ohne `extra-strings.json`) werden zu 692 Clips; das `phoneme`-Profil hat 37 Clips (nicht 57 — `stretchTts` und `phonemeTts` überschneiden sich). Dedupliziert wird pro `(Profil, Text)`, nicht über alle Texte hinweg — deshalb ist die Clip-Zahl die Summe der Profil-Uniques: word 260 · prompt 223 · miss 81 · reward 47 · phoneme 37 · sentence 26 · finale 18.
 
 - [ ] **Step 7: Commit**
 
@@ -1702,7 +1702,7 @@ Run:
 ```bash
 cd tools/tts && ~/qwen-tts-test/.venv/bin/python ./tts extract && ~/qwen-tts-test/.venv/bin/python ./tts status
 ```
-Expected: „891 Items → ~530 Clips", danach eine Tabelle mit acht Profilen, überall `fehlt`, der Hinweis auf leere Seed-Pools und der Hinweis auf fehlende Template-Expansionen.
+Expected: „893 Items → 694 Clips" (893 statt 891, weil `extra-strings.json` zwei `ui:`-Items beisteuert), danach eine Tabelle mit acht Profilen, überall `fehlt`, der Hinweis auf leere Seed-Pools und der Hinweis auf fehlende Template-Expansionen.
 
 - [ ] **Step 8: Sicherstellen, dass `out/` nicht im Git landet**
 
@@ -2449,7 +2449,7 @@ Expected: PASS, alle Tests aus den Tasks 1–7 (Engine-Smoke skipped)
 - [ ] **Step 6: Dry-Run gegen das echte Content-Pack**
 
 Run: `cd tools/tts && ~/qwen-tts-test/.venv/bin/python ./tts render --dry-run`
-Expected: „~530 Clips würden gerendert, 0 übersprungen." — ohne Modell-Load, in unter einer Sekunde.
+Expected: „694 Clips würden gerendert, 0 übersprungen." — ohne Modell-Load, in unter einer Sekunde.
 
 - [ ] **Step 7: Echten Teil-Lauf gegen ein kleines Profil**
 
@@ -3065,7 +3065,7 @@ Server ausgeliefert. Der Kern ist die Review-Schleife: Clip wählen, hören, Kan
 würfeln, den besten in den Pool oder als Lock. Tastatur-Shortcuts sind kein Luxus, sondern
 der Unterschied zwischen einer Stunde und drei Stunden Kuratieren.
 
-Die Liste hat bis zu ~530 Zeilen. Kein Virtual Scrolling nötig, aber die Liste wird bei
+Die Liste hat bis zu ~694 Zeilen. Kein Virtual Scrolling nötig, aber die Liste wird bei
 Filteränderung komplett neu gebaut, nicht Zeile für Zeile mutiert.
 
 - [ ] **Step 1: `style.css` schreiben**
@@ -3440,7 +3440,7 @@ Expected: PASS, alles grün (Engine-Smoke skipped). `test_index_is_served` prüf
 Run: `cd tools/tts && ~/qwen-tts-test/.venv/bin/python ./tts web`
 
 Im Browser `http://127.0.0.1:8420` öffnen und durchgehen:
-1. Liste zeigt ~530 Clips, Filter nach Profil reduziert korrekt
+1. Liste zeigt ~694 Clips, Filter nach Profil reduziert korrekt
 2. `j`/`k` blättern, die aktive Zeile scrollt mit
 3. Bei einem `finale`-Clip (in Task 7 gerendert) spielt die Leertaste das Audio
 4. „🎲 4 Kandidaten" erzeugt vier Karten; `1`–`4` spielen sie ab
@@ -3616,10 +3616,10 @@ cd tools/tts
 ~/qwen-tts-test/.venv/bin/python ./tts extract
 ~/qwen-tts-test/.venv/bin/python ./tts sample --profile phoneme -n 8
 ~/qwen-tts-test/.venv/bin/python ./tts web       # kuratieren
-~/qwen-tts-test/.venv/bin/python ./tts render    # ~25 Minuten beim ersten Mal
+~/qwen-tts-test/.venv/bin/python ./tts render    # ~28 Minuten beim ersten Mal
 ```
 
 Das `phoneme`-Profil zuerst zu sampeln ist Absicht: es ist mit 37 Clips das kleinste und
 zugleich das riskanteste (Lautwert vs. Buchstabenname). Klappt es dort nicht per
 Instruktion, greift der `textOverride` im Lock — und das weiß man dann früh, nicht nach
-25 Minuten Rendern.
+28 Minuten Rendern.

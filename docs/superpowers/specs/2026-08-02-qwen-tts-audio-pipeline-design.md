@@ -40,7 +40,7 @@ Generate-Aufruf lieferte für Seed 42 zweimal bit-identische Wellenformen
 dieser Spec steht und fällt mit dieser Eigenschaft; ein Smoke-Test sichert sie ab
 (§9). Voraussetzung ist Batchgröße 1 — Batching würde die Zuordnung Seed↔Clip zerstören.
 
-Hochrechnung: ein vollständiger Lauf über ~530 Clips dauert rund **25 Minuten**.
+Hochrechnung: ein vollständiger Lauf über ~694 Clips dauert rund **28 Minuten**.
 
 ## 2. Textbestand
 
@@ -53,8 +53,27 @@ Hochrechnung: ein vollständiger Lauf über ~530 Clips dauert rund **25 Minuten*
 | `sentences.json` | 26 | `tts` |
 | `finales.json` | 18 | `tts` |
 
-Nach Deduplizierung bleiben ~530 eindeutige Texte — `promptTts` wiederholt sich innerhalb
-einer Aufgabe über alle Runden.
+Nach Deduplizierung bleiben **694 Clips**. Dedupliziert wird pro `(Profil, Text)`, nicht
+über alle Texte hinweg — derselbe String in zwei Profilen ist zwei Clips, weil das Profil
+Teil des `clipKey` ist (§5). Aufschlüsselung:
+
+| Profil | Items | Clips |
+| --- | --- | --- |
+| `word` | 261 | 260 |
+| `prompt` | 338 | 223 |
+| `miss` | 103 | 81 |
+| `reward` | 55 | 47 |
+| `phoneme` | 90 | 37 |
+| `sentence` | 26 | 26 |
+| `finale` | 18 | 18 |
+| `ui` | 2 | 2 |
+| **Summe** | **893** | **694** |
+
+Die 893 sind die 891 aus dem Content-Pack plus die zwei `ui:`-Items aus
+`extra-strings.json`.
+
+Den Löwenanteil der Einsparung trägt `promptTts`: dieselbe Frage wiederholt sich über
+alle Runden einer Aufgabe.
 
 Dazu kommen hartkodierte Kotlin-Strings (`SessionViewModel.lockedLessonCue()` =
 „Das üben wir später.", generisches Miss-Feedback), die in einer handgepflegten
@@ -93,7 +112,7 @@ ohne Risiko — nicht der blockierende Sonderfall, als der sie zunächst aussah.
 | --- | --- | --- |
 | **A — Eigene Python-Pipeline auf der `qwen_tts`-API** (gewählt) | Extractor + Renderer + FastAPI-UI auf denselben Bausteinen; Modell einmal geladen, Seeds selbst gesteuert | Volle Kontrolle über Seeds, Profile und inkrementelles Rendern; ohne Modell testbar |
 | B — Gradio-Demo scripten | Das mitgelieferte `qwen-tts-demo` per HTTP-Client fernsteuern | Kein Seed-Zugriff, keine Batch-Semantik, Modell-Reload pro Prozess; die Demo ist nicht als API gedacht |
-| C — Nur CLI, kein Web-Interface | Batch-Rendern und im Dateimanager durchhören | Das Kuratieren von Seeds über ~530 Clips ist genau die Arbeit, die eine UI trägt; ohne A/B-Vergleich unbedienbar |
+| C — Nur CLI, kein Web-Interface | Batch-Rendern und im Dateimanager durchhören | Das Kuratieren von Seeds über ~694 Clips ist genau die Arbeit, die eine UI trägt; ohne A/B-Vergleich unbedienbar |
 
 Innerhalb von A wurde für die UI **FastAPI + Vanilla HTML/JS** gegenüber Gradio gewählt
 (beides bereits im venv): eine Review-Queue mit Filtern, Statusspalten, A/B-Vergleich und
@@ -251,7 +270,7 @@ seed = locks[clipKey].seed
        ?? seedPool[ int(sha256(clipKey + poolSalt), 16) % len(seedPool) ]
 ```
 
-Das streut über die guten Seeds — nicht alle 530 Clips klingen identisch — bleibt aber
+Das streut über die guten Seeds — nicht alle 694 Clips klingen identisch — bleibt aber
 reproduzierbar: derselbe Clip bekommt bei jedem Lauf denselben Seed. Ein Bump von
 `poolSalt` würfelt bewusst alles neu.
 
@@ -277,7 +296,7 @@ dessen Hash sich geändert hat.
 
 Praktische Folge: eine geänderte Instruktion rendert nur ihr Profil neu, ein geänderter
 Satz in `tasks.json` nur den einen Clip. Der Regelfall ist damit ein Lauf von Sekunden,
-nicht von 25 Minuten.
+nicht von 28 Minuten.
 
 ## 8. Audio-Nachbearbeitung
 
@@ -290,7 +309,7 @@ Vor dem Schreiben, abschaltbar per Flag und per Profil konfigurierbar:
 - **Peak-Normalisierung** — auf −1 dBFS, damit `word`- und `reward`-Clips nicht
   unterschiedlich laut sind.
 
-Master-Format: **24 kHz mono WAV, 16 bit PCM**. Verlustfrei, gesamt ~45 MB. Eine
+Master-Format: **24 kHz mono WAV, 16 bit PCM**. Verlustfrei, gesamt ~57 MB. Eine
 Konvertierung nach OGG/Opus gehört zur App-Integration und ist hier nicht enthalten.
 
 Die Nachbearbeitungsparameter fließen in den Render-State-Hash ein — ein geänderter
