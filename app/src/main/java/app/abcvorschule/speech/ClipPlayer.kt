@@ -15,11 +15,15 @@ class ClipPlayer(context: Context) {
     private val appContext = context.applicationContext
     private var player: MediaPlayer? = null
 
+    /** onComplete der laufenden Wiedergabe — noch nicht aufgerufen. */
+    private var pendingOnComplete: (() -> Unit)? = null
+
     /**
-     * Startet [file]; ruft [onComplete] genau einmal auf, wenn die Wiedergabe
-     * endet oder scheitert. Liefert false, wenn sie gar nicht erst startet —
-     * dann wurde [onComplete] nicht aufgerufen und der Aufrufer übernimmt
-     * (Fallback auf Android-TTS).
+     * Startet [file]; ruft [onComplete] GENAU EINMAL auf, wenn die Wiedergabe
+     * endet, scheitert oder abgebrochen wird ([stop], oder ein neuer [play]-
+     * Aufruf, der intern über [stop] geht). Liefert false, wenn sie gar nicht
+     * erst startet — dann wurde [onComplete] nicht aufgerufen und der
+     * Aufrufer übernimmt (Fallback auf Android-TTS).
      */
     fun play(file: String, onComplete: () -> Unit): Boolean {
         stop()
@@ -37,24 +41,41 @@ class ClipPlayer(context: Context) {
             )
             mp.setOnCompletionListener {
                 release()
-                onComplete()
+                finish()
             }
             mp.setOnErrorListener { _, _, _ ->
                 release()
-                onComplete()
+                finish()
                 true
             }
+            pendingOnComplete = onComplete
             mp.prepare()
             mp.start()
             true
         } catch (_: Exception) {
+            pendingOnComplete = null
             release()
             false
         }
     }
 
+    /**
+     * Stoppt eine laufende Wiedergabe. Ruft — falls eine lief — das
+     * ausstehende `onComplete` GENAU EINMAL auf, dieselbe Garantie wie bei
+     * natürlichem Ende oder Fehler. Ohne das bliebe eine wartende
+     * `speakAndAwait`-Coroutine bis zum Timeout hängen, wenn `stop()` (oder
+     * ein neuer `play()`, der intern hierüber geht) die Wiedergabe beendet.
+     */
     fun stop() {
         release()
+        finish()
+    }
+
+    /** Feuert das ausstehende onComplete genau einmal und räumt es dann weg. */
+    private fun finish() {
+        val callback = pendingOnComplete ?: return
+        pendingOnComplete = null
+        callback()
     }
 
     private fun release() {
