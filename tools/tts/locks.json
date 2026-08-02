@@ -1,4 +1,230 @@
 {
   "version": 1,
-  "locks": {}
+  "locks": {
+    "phoneme:59548661e252": {
+      "seed": 252801214,
+      "textOverride": "ka es",
+      "sourceText": "ks"
+    },
+    "phoneme:5c62e091b8c0": {
+      "seed": 32296145,
+      "speaker": "sohee",
+      "textOverride": "Pe",
+      "sourceText": "P"
+    },
+    "prompt:0096fcfb79a3": {
+      "seed": 841739473,
+      "textOverride": "Zeichne den Buchstaben N nach und sammle dabei alle Sterne.",
+      "sourceText": "Zeichne den Buchstaben - N - nach und sammle dabei alle Sterne."
+    },
+    "prompt:0131504e9743": {
+      "seed": 1627102821,
+      "sourceText": "Zeichne den Laut - Sch - nach und sammle dabei alle Sterne."
+    },
+    "prompt:03730ade6177": {
+      "seed": 634912039,
+      "sourceText": "Zeichne den Laut - Pf - nach und sammle dabei alle Sterne."
+    },
+    "prompt:0845c380bb11": {
+      "seed": 456642538,
+      "textOverride": "Wo hörst du den Buchstaben Ih? Am Anfang, in der Mitte oder am Ende.",
+      "sourceText": "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:099a34df3bd6": {
+      "seed": 634912039,
+      "textOverride": "Zeichne den Buchstaben  Äh nach und sammle dabei alle Sterne.",
+      "sourceText": "Zeichne den Buchstaben - Ä - nach und sammle dabei alle Sterne."
+    },
+    "prompt:09c5df39f465": {
+      "seed": 1343611678,
+      "sourceText": "Baue das Wort am. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
+    },
+    "prompt:0becb71d5e8b": {
+      "seed": 122602205,
+      "sourceText": "Dreizehn Dosen und sieben Dosen. Wie viele Dosen sind das."
+    },
+    "prompt:0c7bdb3341bb": {
+      "seed": 122602205,
+      "textOverride": "Zeichne den Buchstaben W nach und sammle dabei alle Sterne.",
+      "sourceText": "Zeichne den Buchstaben - W - nach und sammle dabei alle Sterne."
+    },
+    "prompt:0f47d6de53ad": {
+      "seed": 881616687,
+      "sourceText": "Schiebe sch und a zusammen. Welche Silbe entsteht."
+    },
+    "prompt:11bc85fc22b6": {
+      "seed": 1070235000,
+      "sourceText": "Wo hörst du den Buchstaben - L? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:126764115645": {
+      "seed": 573801264,
+      "sourceText": "Vierzehn Häuser und neun Häuser. Wie viele Häuser sind das."
+    },
+    "prompt:141d639bc4d4": {
+      "seed": 1991865418,
+      "sourceText": "Sechzehn Spinnen und vierzehn Spinnen. Wie viele Spinnen sind das."
+    },
+    "prompt:14a73343a0ea": {
+      "seed": 837250200,
+      "sourceText": "Baue das Wort Pferd. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
+    },
+    "prompt:15afce80024a": {
+      "seed": 837250200,
+      "sourceText": "Zeichne den Buchstaben - Ü - nach und sammle dabei alle Sterne."
+    },
+    "prompt:164e6d5ad595": {
+      "seed": 2058555455,
+      "sourceText": "Dreiundzwanzig Ameisen krabbeln im Bau. Acht krabbeln hinaus. Wie viele Ameisen bleiben."
+    },
+    "prompt:16551c2f4d33": {
+      "seed": 1512805924,
+      "sourceText": "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:16690400e619": {
+      "seed": 888700001,
+      "sourceText": "Baue das Wort Qualle. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
+    },
+    "prompt:1684a2eff3f3": {
+      "seed": 888700001,
+      "textOverride": "Schiebe \"B\" und \"Au\" zusammen. Welche Silbe entsteht.",
+      "sourceText": "Schiebe b und au zusammen. Welche Silbe entsteht."
+    },
+    "prompt:19428c2459aa": {
+      "seed": 1061282096,
+      "sourceText": "Zeichne den Laut - Au - nach und sammle dabei alle Sterne."
+    },
+    "prompt:19e9af6a4aee": {
+      "seed": 634912039,
+      "textOverride": "4 Reihen mit je 6 Omas singen im Chor. Wie viele Omas singen.",
+      "sourceText": "Vier Reihen mit je sechs Omas singen im Chor. Wie viele Omas singen."
+    },
+    "prompt:1a6f6b9c07a9": {
+      "seed": 258571559,
+      "sourceText": "Wo hörst du den Laut - Pf? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:1ac28f3a7750": {
+      "seed": 122602205,
+      "textOverride": "Ordne das Wort Mama dem Bild zu.",
+      "sourceText": "Ordne das Wort - Mama - dem Bild zu."
+    },
+    "prompt:1eb1ad800136": {
+      "seed": 538794185,
+      "sourceText": "Baue das Wort Pony. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
+    },
+    "prompt:1ec405c1df3a": {
+      "seed": 611051227,
+      "sourceText": "Wo hörst du den Buchstaben - S? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:1fd1dc6575a8": {
+      "seed": 1375581169,
+      "textOverride": "\"Wir gehen den Weg.\" - Ordne die Wörter in die richtige Reihenfolge.",
+      "sourceText": "Wir gehen den Weg. - Ordne die Wörter in die richtige Reihenfolge."
+    },
+    "prompt:206bc14a3673": {
+      "seed": 784351524,
+      "sourceText": "Baue das Wort Eis. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
+    },
+    "prompt:24bcc5fc883e": {
+      "seed": 1521286730,
+      "textOverride": "Zeichne den Buchstaben L nach und sammle dabei alle Sterne.",
+      "sourceText": "Zeichne den Buchstaben - L - nach und sammle dabei alle Sterne."
+    },
+    "prompt:2550616c90ca": {
+      "seed": 742524555,
+      "sourceText": "Vierundzwanzig Eulen sitzen im Wald. Neun fliegen weg. Wie viele Eulen bleiben."
+    },
+    "prompt:25ecae006efe": {
+      "seed": 1351436046,
+      "sourceText": "Zeichne den Laut - Ei - nach und sammle dabei alle Sterne."
+    },
+    "prompt:26a3d65bcbcc": {
+      "seed": 272563471,
+      "sourceText": "Zwölf Eis und neun Eis. Wie viele Eis sind das zusammen."
+    },
+    "prompt:2811c87d47db": {
+      "seed": 2061156809,
+      "sourceText": "Baue das Wort Fisch. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
+    },
+    "sentence:0620b64d3955": {
+      "seed": 447155165,
+      "sourceText": "Wir gehen den Weg."
+    },
+    "sentence:0f7df5461bdf": {
+      "seed": 1095904114,
+      "sourceText": "Der Löwe ist da."
+    },
+    "sentence:147f2a0d4995": {
+      "seed": 1711854709,
+      "sourceText": "Die Spinne spielt."
+    },
+    "sentence:20074d0c7579": {
+      "seed": 1601555549,
+      "sourceText": "Das Herz ist rot."
+    },
+    "sentence:25e52f9570c2": {
+      "seed": 1776987163,
+      "sourceText": "Das ist mein Ei."
+    },
+    "sentence:2723db5e341b": {
+      "seed": 1502192888,
+      "sourceText": "Der Fisch schwimmt."
+    },
+    "sentence:37aa13fdf05d": {
+      "seed": 1273693101,
+      "sourceText": "Das Dreieck ist rot."
+    },
+    "sentence:3dc7bd551f44": {
+      "seed": 404743588,
+      "sourceText": "Hier sind Häuser."
+    },
+    "sentence:3ff48545b9c4": {
+      "seed": 1624620892,
+      "sourceText": "Hallo Lama!"
+    },
+    "sentence:410190d7c985": {
+      "seed": 939057873,
+      "sourceText": "Das Pferd läuft."
+    },
+    "sentence:5da5adfeaff0": {
+      "seed": 432945842,
+      "sourceText": "Der Fuß ist groß."
+    },
+    "sentence:6c731de28695": {
+      "seed": 1674724842,
+      "sourceText": "Mama."
+    },
+    "sentence:b309c28c2c33": {
+      "seed": 439084397,
+      "sourceText": "Das ist mein Brot."
+    },
+    "sentence:b76ede73be92": {
+      "seed": 1659905595,
+      "sourceText": "Tom ruft Opa."
+    },
+    "sentence:ba35c984dbf8": {
+      "seed": 1125768222,
+      "sourceText": "Oma."
+    },
+    "sentence:bbe4245523dc": {
+      "seed": 312820997,
+      "sourceText": "Der Kreis ist blau."
+    },
+    "sentence:ea0d0f938a70": {
+      "seed": 1585345271,
+      "sourceText": "Mama ist im Haus."
+    },
+    "sentence:f8d91895467d": {
+      "seed": 1228004130,
+      "sourceText": "Oma hat einen Hut."
+    },
+    "sentence:fb7b8002bf06": {
+      "seed": 1313172770,
+      "sourceText": "Das Auto ist gelb."
+    },
+    "word:006a933c950f": {
+      "seed": 1325935821,
+      "speaker": "aiden",
+      "sourceText": "Sack"
+    }
+  }
 }
