@@ -80,6 +80,10 @@ Kernpunkte (Kurzfassung):
 - Content-Schema v2: ein polymorpher `TaskSpec` pro Trainer (`trainer`-Diskriminator), Lektionen in `lessons.json`
 - Lektions-Freischaltung wird aus `taskStats` abgeleitet (`progress/LessonGating.kt`) — keine Extra-Persistenz
 - Tests: `./gradlew :app:testDebugUnitTest`
+- Sprachaufnahmen: `tools/tts/` erzeugt mit lokalem Qwen3-TTS ein Audio-Paket aus dem
+  Content-Pack (`tools/tts/README.md`). Läuft mit `~/qwen-tts-test/.venv/bin/python`,
+  nicht mit dem System-Python. `tools/tts/profiles.json` und `tools/tts/locks.json`
+  enthalten kuratierte Entscheidungen — nie automatisiert überschreiben.
 - Build: `./gradlew :app:assembleDebug`
 
 
