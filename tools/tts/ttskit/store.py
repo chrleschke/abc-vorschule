@@ -216,6 +216,8 @@ class Lock:
     text_override: str | None = None
     note: str | None = None
     source_text: str | None = None
+    #: Stimme nur für diesen Clip. None heißt „die des Profils" — nicht „keine".
+    speaker: str | None = None
 
     @classmethod
     def from_dict(cls, raw: dict[str, Any], *, key: str = "?",
@@ -237,11 +239,13 @@ class Lock:
             text_override=raw.get("textOverride"),
             note=raw.get("note"),
             source_text=raw.get("sourceText"),
+            speaker=raw.get("speaker"),
         )
 
     def to_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"seed": self.seed}
         for key, value in (("profile", self.profile),
+                           ("speaker", self.speaker),
                            ("textOverride", self.text_override),
                            ("note", self.note),
                            ("sourceText", self.source_text)):

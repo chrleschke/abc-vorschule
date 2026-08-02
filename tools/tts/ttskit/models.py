@@ -36,3 +36,8 @@ class Clip:
     item_ids: tuple[str, ...]
     fields: tuple[str, ...]
     lessons: tuple[str, ...]
+    #: Die Stimme, mit der wirklich synthetisiert wird — normalerweise die des
+    #: Profils, per Lock aber für diesen einen Clip austauschbar. Aufgelöst,
+    #: nicht optional: wer den Clip in der Hand hat, soll die Stimme nicht noch
+    #: einmal aus Profil plus Lock zusammensuchen müssen.
+    speaker: str

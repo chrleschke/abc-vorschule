@@ -276,3 +276,67 @@ def test_candidate_infos_reports_freshness(setup):
     profile.instruct = "Ganz anders."
     infos = candidate_infos(paths, clip, profile)
     assert {i["seed"]: i["fresh"] for i in infos} == {11: False, 99: None}
+
+
+def test_the_clip_voice_reaches_the_engine_not_the_profile_default(tmp_path):
+    """Ein Stimm-Override im Lock ist nur dann etwas wert, wenn er auch am
+    Modell ankommt — der Fingerprint allein macht den Clip bloß stale."""
+    from ttskit.plan import clip_key
+    from ttskit.store import Lock
+
+    class VoiceRecordingEngine(FakeEngine):
+        def __init__(self):
+            super().__init__()
+            self.speakers = []
+
+        def generate(self, text, profile, seed):
+            self.speakers.append(profile.speaker)
+            return super().generate(text, profile, seed)
+
+    paths = Paths(root=tmp_path, content_dir=tmp_path / "content")
+    profiles = Profiles.load(tmp_path / "nope.json")
+    items = [
+        Item("task:t1:round:0:promptTts", "Frage eins?", "promptTts",
+             "tasks.json", "l01", "a"),
+        Item("task:t2:round:0:promptTts", "Frage zwei?", "promptTts",
+             "tasks.json", "l01", "b"),
+    ]
+    locks = Locks()
+    locks.set(clip_key("prompt", "Frage eins?"), Lock(seed=7, speaker="serena"))
+    clips = build_clips(items, profiles, locks)
+
+    engine = VoiceRecordingEngine()
+    render_clips(clips, profiles, engine, RenderState(), paths)
+
+    spoken = dict(zip([text for text, _ in engine.calls], engine.speakers))
+    assert spoken["Frage eins?"] == "serena"
+    assert spoken["Frage zwei?"] == profiles.profiles["prompt"].speaker
+    assert profiles.profiles["prompt"].speaker != "serena", \
+        "the shared profile must survive the override untouched"
+
+
+def test_candidates_use_the_clip_voice_too(tmp_path):
+    """Sonst hört man beim Kuratieren eine andere Stimme als die, die der
+    finale Lauf später erzeugt."""
+    from ttskit.plan import clip_key
+    from ttskit.store import Lock
+
+    class VoiceRecordingEngine(FakeEngine):
+        def __init__(self):
+            super().__init__()
+            self.speakers = []
+
+        def generate(self, text, profile, seed):
+            self.speakers.append(profile.speaker)
+            return super().generate(text, profile, seed)
+
+    paths = Paths(root=tmp_path, content_dir=tmp_path / "content")
+    profiles = Profiles.load(tmp_path / "nope.json")
+    items = [Item("task:t1:phonemeTts", "M", "phonemeTts", "tasks.json", "l01", "m")]
+    locks = Locks()
+    locks.set(clip_key("phoneme", "M"), Lock(seed=7, speaker="ryan"))
+    clip = build_clips(items, profiles, locks)[0]
+
+    engine = VoiceRecordingEngine()
+    sample_candidates(clip, profiles.profiles["phoneme"], engine, paths, [1, 2])
+    assert engine.speakers == ["ryan", "ryan"]

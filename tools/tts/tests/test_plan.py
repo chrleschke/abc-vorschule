@@ -286,3 +286,105 @@ def test_a_missing_default_profile_is_rejected_without_blaming_the_lock():
     del prof.profiles["phoneme"]
     with pytest.raises(ValueError, match="defaults to the unknown profile 'phoneme'"):
         build_clips([item("task:t1:phonemeTts", "M", "phonemeTts")], prof, Locks())
+
+
+def test_clip_speaker_defaults_to_the_profile_voice():
+    prof = profiles()
+    clip = build_clips([item("task:t1:phonemeTts", "M", "phonemeTts")], prof, Locks())[0]
+    assert clip.speaker == prof.profiles["phoneme"].speaker
+
+
+def test_lock_can_swap_the_voice_for_one_clip_without_moving_the_key():
+    items = [item("task:t1:phonemeTts", "M", "phonemeTts")]
+    key = clip_key("phoneme", "M")
+    locks = Locks()
+    locks.set(key, Lock(seed=5, speaker="serena"))
+    clip = build_clips(items, profiles(), locks)[0]
+    assert clip.key == key, "the key must not move — the lock is found by it"
+    assert clip.speaker == "serena"
+
+
+def test_a_voice_override_makes_only_that_clip_stale():
+    """The profile is shared; the override is not. Both clips of the profile
+    must not go stale because one of them got a different voice."""
+    prof = profiles()
+    items = [item("task:t1:phonemeTts", "M", "phonemeTts"),
+             item("task:t2:phonemeTts", "A", "phonemeTts")]
+    profile = prof.profiles["phoneme"]
+    before = {c.source_text: fingerprint(c, profile)
+              for c in build_clips(items, prof, Locks())}
+
+    locks = Locks()
+    locks.set(clip_key("phoneme", "M"), Lock(seed=5, speaker="serena"))
+    after = {c.source_text: fingerprint(c, profile)
+             for c in build_clips(items, prof, locks)}
+
+    assert after["A"] == before["A"], "the untouched clip must stay rendered"
+    assert after["M"] != before["M"]
+
+
+def test_fingerprint_follows_the_profile_voice_when_nothing_is_overridden():
+    prof = profiles()
+    clip = build_clips([item("task:t1:phonemeTts", "M", "phonemeTts")], prof, Locks())[0]
+    profile = prof.profiles["phoneme"]
+    base = fingerprint(clip, profile)
+    profile.speaker = "serena"
+    # The clip still carries the old voice, so re-deriving it is what changes
+    # the fingerprint — exactly what a profile-wide voice switch must do.
+    switched = build_clips([item("task:t1:phonemeTts", "M", "phonemeTts")], prof, Locks())[0]
+    assert fingerprint(switched, profile) != base
+
+
+def test_fingerprint_follows_the_profile_language():
+    prof = profiles()
+    clip = build_clips([item("task:t1:phonemeTts", "M", "phonemeTts")], prof, Locks())[0]
+    profile = prof.profiles["phoneme"]
+    base = fingerprint(clip, profile)
+    profile.language = "english"
+    assert fingerprint(clip, profile) != base
+
+
+def test_effective_profile_swaps_the_voice_and_nothing_else():
+    from ttskit.plan import effective_profile
+
+    prof = profiles()
+    profile = prof.profiles["phoneme"]
+    plain = build_clips([item("task:t1:phonemeTts", "M", "phonemeTts")],
+                        prof, Locks())[0]
+    assert effective_profile(plain, profile) is profile, "no override, no copy"
+
+    locks = Locks()
+    locks.set(clip_key("phoneme", "M"), Lock(seed=5, speaker="serena"))
+    overridden = build_clips([item("task:t1:phonemeTts", "M", "phonemeTts")],
+                             prof, locks)[0]
+    swapped = effective_profile(overridden, profile)
+    assert swapped.speaker == "serena"
+    assert swapped.instruct == profile.instruct
+    assert swapped.language == profile.language
+    assert swapped.sampling == profile.sampling
+    assert profile.speaker != "serena", "the shared profile must not be mutated"
+
+
+def test_a_lock_naming_an_unknown_voice_is_rejected_by_name(tmp_path):
+    import pytest
+
+    items = [item("task:t1:phonemeTts", "M", "phonemeTts")]
+    key = clip_key("phoneme", "M")
+    locks = Locks({key: Lock(seed=5, speaker="brunhilde")},
+                  source=tmp_path / "locks.json")
+    with pytest.raises(ValueError) as excinfo:
+        build_clips(items, profiles(), locks)
+    message = str(excinfo.value)
+    assert "locks.json" in message
+    assert key in message
+    assert "brunhilde" in message
+    assert "serena" in message, "the valid options must be listed"
+
+
+def test_a_profile_naming_an_unknown_voice_is_rejected_without_blaming_the_lock():
+    import pytest
+
+    prof = profiles()
+    prof.profiles["phoneme"].speaker = "brunhilde"
+    with pytest.raises(ValueError, match="profile 'phoneme' names the unknown speaker"):
+        build_clips([item("task:t1:phonemeTts", "M", "phonemeTts")], prof, Locks())

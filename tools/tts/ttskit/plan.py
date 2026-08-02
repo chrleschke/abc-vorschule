@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 
+from . import voices
 from .audio import POSTPROCESS_VERSION
 from .extract import FIELD_TO_PROFILE
 from .models import Clip, Item
@@ -68,6 +70,17 @@ def build_clips(items: list[Item], profiles: Profiles, locks: Locks) -> list[Cli
             raise ValueError(
                 f"{origin} the unknown profile {profile_name!r}. "
                 f"Known profiles: {', '.join(sorted(profiles.profiles))}")
+        # Dieselbe Begründung wie beim Profil eine Zeile höher: ein Tippfehler
+        # in der Stimme würde sonst erst tief in `generate_custom_voice` als
+        # NotImplementedError auffallen — pro Clip, mitten im Render-Lauf.
+        speaker = lock.speaker if lock and lock.speaker else profiles.profiles[profile_name].speaker
+        if voices.voice(speaker) is None:
+            origin = (f"{where}: lock {key!r} names"
+                      if lock and lock.speaker == speaker
+                      else f"profile {profile_name!r} names")
+            raise ValueError(
+                f"{origin} the unknown speaker {speaker!r}. "
+                f"Known speakers: {', '.join(voices.speaker_names())}")
         text = lock.text_override if lock and lock.text_override else bucket["source_text"]
         clips.append(Clip(
             key=key,
@@ -79,8 +92,22 @@ def build_clips(items: list[Item], profiles: Profiles, locks: Locks) -> list[Cli
             item_ids=tuple(sorted(bucket["item_ids"])),
             fields=tuple(sorted(bucket["fields"])),
             lessons=tuple(sorted(bucket["lessons"])),
+            speaker=speaker,
         ))
     return clips
+
+
+def effective_profile(clip: Clip, profile: Profile) -> Profile:
+    """Das Profil, mit dem für genau diesen Clip synthetisiert wird.
+
+    Ein Lock darf die Stimme einzeln austauschen; Instruktion, Sampling und
+    Sprache bleiben die des Profils. Ohne Override wird das Profil unverändert
+    zurückgegeben, damit die Identität erhalten bleibt — Tests, die ein Profil
+    mutieren und danach den Fingerprint vergleichen, hängen daran.
+    """
+    if profile.speaker == clip.speaker:
+        return profile
+    return replace(profile, speaker=clip.speaker)
 
 
 def fingerprint(clip: Clip, profile: Profile) -> str:
@@ -93,7 +120,10 @@ def fingerprint(clip: Clip, profile: Profile) -> str:
         "text": clip.text,
         "profile": clip.profile,
         "seed": clip.seed,
-        "speaker": profile.speaker,
+        # clip.speaker, nicht profile.speaker: ein Stimm-Override im Lock gilt
+        # nur für diesen Clip und muss trotzdem genau ihn stale machen. Ohne
+        # Override sind beide gleich, alte Fingerprints bleiben also gültig.
+        "speaker": clip.speaker,
         "language": profile.language,
         "instruct": profile.instruct,
         "sampling": dict(sorted(profile.sampling.items())),
