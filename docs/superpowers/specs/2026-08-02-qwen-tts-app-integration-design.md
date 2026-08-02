@@ -113,3 +113,26 @@ Konstruktion weiterhin einzig in `MainActivity` — kein neuer DI-Mechanismus.
   sind. Bleibt ein Tooling-/Debug-Thema (residual-review-findings).
 - itemId-basierte Sprech-API (Call-Sites tragen weiterhin nur Text).
 - APK-Größen-Optimierung — bei 22 Clips (~32 s Audio) irrelevant.
+
+## 7. Amendments während der Umsetzung
+
+- **Fingerprint im Index:** Jeder Index-Eintrag trägt zusätzlich zu `file` und
+  `profile` ein `fingerprint`-Feld (derselbe 16-stellige Wert wie in
+  `render-state.json`). Der Export ist dadurch inkrementell: die OGG/Opus-Bytes
+  sind pro Encode NICHT reproduzierbar (`soundfile`/libsndfile schreibt eine
+  zufällige Ogg-Bitstream-Seriennummer), ohne Fingerprint-Vergleich würde jeder
+  Lauf also alle Dateien neu schreiben, obwohl sich inhaltlich nichts geändert
+  hat.
+- **41 statt 22 Clips exportiert:** Die Kuratierung lief nach diesem Design
+  weiter — inzwischen liegen 53 Locks vor, davon 41 gelockt und rendered.
+  §4 nennt noch den Stand zum Zeitpunkt des Designs.
+- **Lösch-Semantik folgt Unlocks, nicht dem lokalen Render-Stand:** `out/`
+  (WAV, `render-state.json`) ist gitignored. Auf einem frischen Checkout hat
+  jeder gelockte Clip lokal den Status `missing`, obwohl seine Datei längst in
+  `assets/audio/` committet ist. Der Export löscht deshalb nur noch Dateien,
+  die zu keinem aktuell gelockten Clip mehr gehören (z. B. nach einem Unlock
+  oder einer Textänderung) sowie Dateien ohne jeden zugehörigen Lock. Ein
+  gelockter, aber lokal nicht (mehr) gerenderter Clip (`missing`/`stale`)
+  behält seine bereits exportierte Datei und seinen Index-Eintrag unangetastet
+  bei — sonst würde ein einzelner Export-Lauf auf einem frischen Checkout ohne
+  `out/` sämtliche committeten Clips löschen.
