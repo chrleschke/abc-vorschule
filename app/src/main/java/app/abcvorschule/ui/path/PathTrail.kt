@@ -7,8 +7,16 @@ data class TrailDot(
     val x: Float,
     val y: Float,
     val radius: Float,
-    /** True for dots the child has already walked past — drawn warm, not dimmed. */
-    val walked: Boolean,
+    /**
+     * Where this dot sits on the chain of nodes: 3.5 is halfway between node 3 and
+     * node 4.
+     *
+     * Deliberately a position and not a `walked` flag: the trail lights up as the
+     * marker hops to the next sign, and comparing this against an animated head
+     * ([PathFocus.headIndex]) keeps that a draw-phase float instead of rebuilding
+     * a 600-point dot list on every frame.
+     */
+    val nodeProgress: Float,
 )
 
 /**
@@ -54,18 +62,18 @@ object PathTrail {
      * Footprint dots at a constant arc-length [spacing]. Spacing is measured along
      * the curve, not per sample — otherwise dots would bunch up in the bends.
      *
-     * [walkedUpTo] is the index of the last node the child has reached; -1 means
-     * none. Dots on earlier segments come back with `walked = true`.
+     * [samplesPerSegment] must be the one [polyline] was built with, or every dot's
+     * [TrailDot.nodeProgress] — and with it the warm/cold boundary — drifts off the
+     * actual nodes. Both default to [SamplesPerSegment]; give one a custom value
+     * only together with the other.
      */
     fun dots(
         polyline: List<PathPoint>,
-        walkedUpTo: Int,
         samplesPerSegment: Int = SamplesPerSegment,
         spacing: Float = DefaultDotSpacing,
         radius: Float = DefaultDotRadius,
     ): List<TrailDot> {
         if (polyline.size < 2 || spacing <= 0f) return emptyList()
-        val walkedSamples = if (walkedUpTo <= 0) 0 else walkedUpTo * samplesPerSegment
         val out = ArrayList<TrailDot>()
         var carry = 0f
         for (i in 0 until polyline.size - 1) {
@@ -80,7 +88,10 @@ object PathTrail {
                     x = a.x + (b.x - a.x) * t,
                     y = a.y + (b.y - a.y) * t,
                     radius = radius * (1f + RadiusJitterFraction * PathNoise.signed(out.size, salt = 11)),
-                    walked = i < walkedSamples,
+                    // Sample i of the polyline is node i / samplesPerSegment by
+                    // construction (see polyline()), so this maps a dot onto the
+                    // node chain the marker's index lives on.
+                    nodeProgress = (i + t) / samplesPerSegment,
                 )
                 travelled += spacing
             }

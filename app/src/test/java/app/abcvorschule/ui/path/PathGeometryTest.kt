@@ -86,6 +86,19 @@ class PathGeometryTest {
     }
 
     @Test
+    fun defaultMarginLeavesRoomForASignAndItsMarker() {
+        // The first node sits exactly DefaultMargin below the top of the scroll
+        // content, and everything a node carries is drawn *above* it: the sign, and
+        // above that the "you are here" marker. Too small a margin silently clips the
+        // marker off the top of the path — the one place it must never be invisible.
+        val needed = PathSignDimens.TotalHeight.value + PathMarkerDimens.Headroom.value
+        assertTrue(
+            "DefaultMargin ${PathGeometry.DefaultMargin} must cover sign + marker ($needed dp)",
+            PathGeometry.DefaultMargin >= needed,
+        )
+    }
+
+    @Test
     fun narrowScreenCollapsesToAStraightLine() {
         // Amplitude 0 must swallow the organic jitter too, otherwise nodes would
         // wander off a screen that has no room to swing. A screen has no room to

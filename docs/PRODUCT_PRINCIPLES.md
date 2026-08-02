@@ -109,9 +109,24 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
   Gesperrte Schilder zeigen ihre Emojis nur als Silhouette.
 Gesperrte und noch nicht autorierte Schilder reagieren auf Tippen mit einem gesprochenen Hinweis —
 niemals mit einem stummen No-Op.
-- Mit der Eltern-Freigabe der Reihenfolge bleiben gesperrte Schilder abgedunkelt und behalten ihre
-  Silhouetten, verlieren aber Schloss und „später“-Hinweis und sind antippbar. Noch nicht autorierte
-  Lektionen bleiben in jedem Fall gesperrt — sie haben keinen Inhalt.
+- **„Du bist hier“-Marker**: über dem Schild der aktuellen Lektion steht eine Pin-Nadel
+  (`SunCoral` mit Cream-Kontur), die sanft auf und ab wippt — das Kind soll auf einem Screen
+  voller Wegweiser ohne Text erkennen, welches Schild dran ist. Der Pfad scrollt beim Öffnen
+  automatisch zu diesem Schild; wer selbst weiterscrollt, wird nicht zurückgerissen.
+- **Nach dem Abschluss animiert der Fortschritt**: der Marker hüpft in einem Bogen vom gerade
+  geschafften Schild zum nächsten, und die Trittspuren dazwischen werden dabei warm. Woher das
+  Kind kam und was jetzt dran ist, wird also gezeigt statt geschrieben. Der Sprung läuft genau
+  einmal pro Rückkehr auf den Pfad.
+- Mit der Eltern-Freigabe der Reihenfolge bleiben **noch nicht erreichte** gesperrte Schilder
+  abgedunkelt und behalten ihre Silhouetten, verlieren aber Schloss und „später“-Hinweis und sind
+  antippbar. Noch nicht autorierte Lektionen bleiben in jedem Fall gesperrt — sie haben keinen Inhalt.
+- **Eigener Fortschritt schlägt die Reihenfolgesperre**: was das Kind in einer Lektion getan hat,
+  ist die stärkere Aussage. Eine frei gespielte Lektion zeigt danach ihren echten Zustand
+  (angefangen bzw. geschafft mit Stern), bleibt antippbar und schaltet die folgende Lektion frei —
+  auch wenn die Eltern-Freigabe später wieder ausgeht. „Gesperrt“ heißt damit: in der
+  Fibel-Reihenfolge noch nicht erreicht **und** hier noch nichts getan. Der Marker folgt trotzdem
+  weiter der Fibel-Reihenfolge (erste nicht gemeisterte Lektion) und springt nicht zum Ausflug
+  voraus.
 - Tippen auf ein freigeschaltetes Schild startet die Trainer-Session dieser Lektion — die
   sechs autorierten Typen (Abschnitt 3), ergänzt um etwaige abgeleitete Zusatz-Trainer
   (Jagd, Wort-Detektiv).
@@ -223,7 +238,8 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - Übungen nutzen `ExerciseStage` für klare Trennung Aufgabenblock / Antwortblock.
 - Farbrollen (verbindlich): `StarGold` = Sterne/Punkte/Belohnung (`StarGoldDeep` als Kontur-/
   Tiefton für den Stern-Glyph auf hellem Grund), `LeafGreen` = richtig/erledigt, `SkyBlue` =
-  Fortschritt/aktiv, `SunCoral` = Handlungs-CTA, `ClayRed` = Fehlertext (Erwachsene).
+  Fortschritt/aktiv, `SunCoral` = Handlungs-CTA (auch der „Du bist hier“-Marker auf dem Pfad —
+  er sagt „hier tippen“), `ClayRed` = Fehlertext (Erwachsene).
   `LeafGreenLight`/`SkyBlueLight` sind helle Ring-Varianten ausschließlich für Akzente AUF
   dunklen Flächen (Holzschilder auf dem Pfad) — nie als Fläche oder Akzent auf Cream.
   Eine Bedeutung pro Farbe — Sterne und Progress greifen nie auf `primary` zu.
@@ -330,6 +346,8 @@ Wenn eine Änderung vorgeschlagen wird, prüfen:
 | Ist ein neuer Finale-Satz länger als 7 Wörter oder eine Mini-Geschichte?     | Nein → Abschnitt 12, Validator prüft |
 | Wäre das Bild des Finale-Satzes in einem Kinderbuch denkbar?                 | Ja — sonst AI-Slop                   |
 | Zeigt der End-Screen eine Punktezahl?                                        | Nein → Punkte leben im Chrome/Pfad   |
+| Sieht eine geschaffte Lektion danach noch gesperrt aus (frei gewählte Reihenfolge)? | Nein → eigener Fortschritt schlägt die Sperre |
+| Erkennt das Kind ohne Text, welches Schild jetzt dran ist?                   | Ja → wippender Marker + Auto-Scroll  |
 | Zeigt ein abgeleiteter Trainer ein Graphem, das die Lektion noch nicht kennt?  | Nein → Graphem-Tabelle ist lektionsbeschränkt |
 | Verlangt der Wort-Detektiv einen Tipp auf eine Form, die er nicht zeigt?       | Buchstaben nein → Paar `P / p`; Silben zeigen nur die Kleinform, der Treffer darf die Großform sein |
 

@@ -57,7 +57,8 @@ Strichdaten fehlen oder Referenzen ins Leere zeigen.
 ## Offline-Smoke-Skript (manuell)
 
 1. `./gradlew :app:installDebug`, Gerät in den Flugmodus.
-2. App öffnen → **Pfad-Screen** erscheint, Lektion 1 pulsiert, Lektionen 2–26 sind gesperrt (entsperren sich nach Mastery).
+2. App öffnen → **Pfad-Screen** erscheint, der Pfad ist auf Lektion 1 gescrollt, ihr Schild pulsiert
+   und trägt den wippenden „Du bist hier“-Marker; Lektionen 2–26 sind gesperrt (entsperren sich nach Mastery).
 3. Gesperrten Knoten antippen → gesprochener Hinweis, kein stummes No-Op.
 4. Lektion 1 öffnen und die Trainer der Reihenfolge nach durchspielen:
    Auditiver Finder (Waggon-Zuordnung) · Visueller Spurensucher (Buchstaben nachspuren) ·
@@ -74,8 +75,12 @@ Strichdaten fehlen oder Referenzen ins Leere zeigen.
    System-Zahlentastatur; **Mit Hilfe** → drei visuelle Antworten.
 8. Mitten in der Lektion App killen und neu öffnen → dieselbe Lektion, dieselbe Runde.
 9. Lektion beenden → Belohnungszusammenfassung → Weiter → zurück auf dem Pfad, Lektion 1
-   als gemeistert markiert, Lektion 2 freigeschaltet.
-10. Back auf dem Pfad verlässt die App; erneutes Öffnen zeigt den Fortschritt unverändert.
+   als gemeistert markiert, Lektion 2 freigeschaltet. Der Marker hüpft dabei von Schild 1 zu
+   Schild 2, die Trittspuren dazwischen werden warm, der Pfad scrollt mit.
+10. Langer Druck auf ⋯ → „Reihenfolge frei wählbar“ an → eine späte Lektion (z. B. 12) öffnen und
+    durchspielen → zurück auf dem Pfad ist ihr Schild hell mit Stern (nicht mehr abgedunkelt),
+    Lektion 13 ist frei, der Marker bleibt aber auf Lektion 2.
+11. Back auf dem Pfad verlässt die App; erneutes Öffnen zeigt den Fortschritt unverändert.
 
 ## Product notes
 

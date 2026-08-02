@@ -146,6 +146,9 @@ fun PathSignNode(
         },
     )
     val nodeDesc = stringResource(R.string.path_node)
+    // The marker above the board is decorative for TalkBack, so "this is the one" has
+    // to reach a screen-reader user here, on the sign itself.
+    val currentDesc = if (highlighted) ", ${stringResource(R.string.lesson_current)}" else ""
 
     Column(
         modifier = modifier
@@ -153,7 +156,7 @@ fun PathSignNode(
             // does not re-tilt on recomposition.
             .graphicsLayer { rotationZ = 3f * PathNoise.signed(index, salt = 5) }
             .clickable(onClick = onClick)
-            .semantics { contentDescription = "$nodeDesc $label, $stateDesc" }
+            .semantics { contentDescription = "$nodeDesc $label, $stateDesc$currentDesc" }
             .testTag("path_node_$label"),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

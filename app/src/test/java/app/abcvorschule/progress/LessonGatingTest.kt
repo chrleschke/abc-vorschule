@@ -114,10 +114,57 @@ class LessonGatingTest {
     @Test
     fun statesKeepReportingLockedWhileUnlockAllIsSet() {
         // The dimmed sign look hangs off LessonState, so the override must not
-        // rewrite Locked into Available — only the padlock disappears.
+        // rewrite Locked into Available — only the padlock disappears. This holds
+        // for a lesson the child has *not* touched; see
+        // [progressOutranksTheOrderLockSoAnOutOfOrderLessonStopsLookingLocked].
         val second = pack.authoredLessons.getOrNull(1) ?: return
         val states = LessonGating.states(pack, LearnerProgress(unlockAllLessons = true))
         assertEquals(LessonState.Locked, states[second.id])
+    }
+
+    @Test
+    fun progressOutranksTheOrderLockSoAnOutOfOrderLessonStopsLookingLocked() {
+        // With "Reihenfolge frei wählbar" the child can finish a lesson whose
+        // predecessor is untouched. Its own progress is the stronger fact: a
+        // completed lesson must report Mastered, or its sign stays dimmed and
+        // padlocked-looking forever.
+        val second = pack.authoredLessons.getOrNull(1) ?: return
+        val progress = mastering(second.id).copy(unlockAllLessons = true)
+        val states = LessonGating.states(pack, progress)
+        assertEquals(LessonState.Mastered, states[second.id])
+        assertEquals(LessonState.Available, states[first.id])
+    }
+
+    @Test
+    fun aTouchedButLockedLessonReportsInProgress() {
+        val second = pack.authoredLessons.getOrNull(1) ?: return
+        val progress = LearnerProgress(
+            unlockAllLessons = true,
+            taskStats = mapOf(
+                pack.playableTasksOf(second).first().id to SkillStats(attempts = 1, correct = 0),
+            ),
+        )
+        assertEquals(LessonState.InProgress, LessonGating.states(pack, progress)[second.id])
+    }
+
+    @Test
+    fun masteringOutOfOrderUnlocksTheFollowingLesson() {
+        // Consequence of progress outranking the lock, and the intended one: the
+        // child finished this sign, so the next sign opens — even if the parent
+        // switch is turned off again afterwards.
+        val second = pack.authoredLessons.getOrNull(1) ?: return
+        val third = pack.authoredLessons.getOrNull(2) ?: return
+        val states = LessonGating.states(pack, mastering(second.id))
+        assertEquals(LessonState.Available, states[third.id])
+    }
+
+    @Test
+    fun highlightStaysOnTheLinearFrontierWhenALaterLessonWasFinished() {
+        // The "you are here" marker follows the Fibel order, not the out-of-order
+        // detour: the first unmastered authored lesson stays the anchor.
+        val second = pack.authoredLessons.getOrNull(1) ?: return
+        val progress = mastering(second.id).copy(unlockAllLessons = true)
+        assertEquals(first.id, LessonGating.nextPlayable(pack, progress)?.id)
     }
 
     @Test

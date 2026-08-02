@@ -52,14 +52,29 @@ object LessonGating {
     fun stateOf(pack: ContentPack, progress: LearnerProgress, lessonId: String): LessonState =
         states(pack, progress).getValue(lessonId)
 
+    /**
+     * Deliberately checks the lesson's own progress *before* the order lock: with the
+     * parent's "Reihenfolge frei wählbar" the child can play a lesson whose predecessor
+     * is untouched, and what it did there is the stronger fact. Locked first meant a
+     * finished lesson kept reporting [LessonState.Locked] — a dimmed sign with faint
+     * silhouettes that never acknowledged the completion.
+     *
+     * [LessonState.Locked] therefore means "not reached in the Fibel order *and*
+     * nothing done here yet". Two consequences, both intended:
+     * - mastering a lesson out of order unlocks the one after it, since the chain
+     *   below reads the same state;
+     * - a lesson touched out of order stays playable after the parent switch goes
+     *   off again. The child has already seen it; re-locking it would read as the
+     *   app taking something away.
+     */
     fun states(pack: ContentPack, progress: LearnerProgress): Map<String, LessonState> {
         var previousMastered = true
         return pack.lessons.associate { lesson ->
             val state = when {
                 lesson.status == LessonStatus.planned -> LessonState.Planned
-                !previousMastered -> LessonState.Locked
                 isMastered(pack, lesson, progress) -> LessonState.Mastered
                 isTouched(pack, lesson, progress) -> LessonState.InProgress
+                !previousMastered -> LessonState.Locked
                 else -> LessonState.Available
             }
             if (lesson.status == LessonStatus.authored) {
