@@ -28,7 +28,7 @@ weiteren Befehle nötig. `tts extract` und `tts status` laufen bereits beim Star
 
 ```bash
 tts extract                        # Content-JSON → out/manifest.json
-tts status                         # Überblick: fehlt / stale / fertig / Pools / Locks
+tts status                         # Überblick: fehlt / fertig / Pools / Locks
                                    # plus Fehlschläge des letzten Laufs und leere Texte
 tts sample --profile prompt -n 8   # 8 Seeds an 3 Beispielen des Profils ausprobieren
 tts web                            # Kuratieren unter http://127.0.0.1:8420
@@ -47,11 +47,11 @@ und lockt ihren Seed (kein Re-Render, kein erneutes Anhören nötig).
 
 Erzeugt wird über den **Batch-Lauf**: links in der Liste Clips ankreuzen (einzeln
 oder über „Sichtbare / Alle / Keine"), Anzahl Beispiele pro Clip einstellen (Default 2),
-dann „▶ Batch-Lauf" in der Kopfzeile — angefasst wird nur, was fehlt oder veraltet ist.
+dann „▶ Batch-Lauf" in der Kopfzeile — angefasst wird nur, was noch fehlt.
 Der Lauf erzeugt Kandidaten wie „🎲 Kandidaten würfeln", aber für alle ausgewählten Clips
 auf einmal; er schreibt nie direkt in die Produktion. Die Entwürfe stehen danach in
 derselben Kandidaten-Tabelle wie jede andere Probeaufnahme — dort per Radio-Button
-„Produktion" bestätigen. Ohne Bestätigung bleibt der Clip „fehlt"/„veraltet"; eine
+„Produktion" bestätigen. Ohne Bestätigung bleibt der Clip „fehlt"; eine
 Festlegung fällt von selbst weg, sobald keine Aufnahme des Clips mehr übrig ist (keine
 eigene „Lock entfernen"-Aktion nötig). Da viel von Hand korrigiert wird, gibt es bewusst
 keinen „finalen Lauf" über alles mehr; die Auswahl bestimmt den Umfang.
@@ -106,8 +106,8 @@ warnt die Oberfläche an Ort und Stelle.
 
 Die Stimmtabelle steht in `ttskit/voices.py` und wird von `tests/test_voices.py` gegen die
 Modell-Config im HF-Cache abgeglichen, damit sie nicht auseinanderläuft. Ein Stimmwechsel
-pro Profil macht alle seine Clips veraltet und wird deshalb rückgefragt; ein Wechsel pro
-Clip trifft nur diesen einen.
+pro Profil gilt für neue Kandidaten aller seiner Clips; ein Wechsel pro Clip trifft nur
+diesen einen.
 
 ## Umfang
 
@@ -165,10 +165,12 @@ Kandidaten unter `out/candidates/` tragen seit dem UI-Redesign eine Sidecar-Date
 `{seed}.json` mit dem Erzeugungs-Fingerprint — inzwischen zusätzlich mit
 Erzeugungszeitpunkt, Stimme, Text und der 👍-Bewertung (`rating: "good"`), damit die
 Kandidaten-Tabelle mehrere Würfel-Runden auseinanderhalten kann und Bewertungen einen
-Neustart überleben. Der Produktions-Radio-Button markiert einen Clip nur dann als
-fertig, wenn der Fingerprint noch den aktuellen Einstellungen entspricht — sonst wird
-die Aufnahme zwar übernommen und der Seed gelockt, der Clip bleibt aber „veraltet"
-(in der UI) bzw. `stale`.
+Neustart überleben. Der Produktions-Radio-Button übernimmt die Aufnahme immer sofort
+als Produktion und lockt den Seed; passt der Sidecar-Fingerprint nicht mehr zu den
+aktuellen Einstellungen, markiert die Zeile das nur mit dem Hinweis-Chip „⚠️ alt" —
+rein informativ, der Clip gilt trotzdem als fertig. Ein späteres Profil-Update
+invalidiert nie bereits bestätigten Content (siehe „Profil-Updates und bestätigter
+Content" unten).
 
 Beide Dateien werden beim Laden geprüft. Ein Tippfehler — ein Lock auf ein Profil, das es
 nicht gibt; ein Lock ohne `seed`; ein fehlendes `label` — bricht mit einer Meldung ab, die
@@ -194,16 +196,21 @@ mitlöschen — die UI bearbeitet beides an getrennten Stellen.
 Aktuell liegen unter `out/audio/` bereits 18 gerenderte `finale`-Clips sowie ein
 `candidates/`-Verzeichnis aus der Entwicklung (probeweise gewürfelte Kandidaten-Seeds).
 Beides ist jederzeit löschbar; `tts render` bzw. `tts sample` erzeugen es bei Bedarf neu.
-Die 18 Clips stehen momentan auf `stale`, weil die Nachbearbeitungs-Version in den
-Fingerprint aufgenommen wurde (siehe unten) — der nächste Lauf erzeugt sie neu.
 
-## Nachbearbeitung ändern
+## Profil-Updates und bestätigter Content
 
-Trim-Schwellwert, Trim-Polster und Normalisierungsziel sind Konstanten in
-`ttskit/audio.py`. Sie fließen über `POSTPROCESS_VERSION` in den Render-Fingerprint ein:
-**wer eine dieser Konstanten ändert, muss `POSTPROCESS_VERSION` hochzählen.** Sonst hält
-`render` alle Clips für aktuell, rendert nichts neu, und unter `out/audio/` liegen zwei
-Nachbearbeitungs-Generationen nebeneinander, die man nur noch am Klang unterscheidet.
+`tts status`, `render` und `export` kennen nur zwei Zustände: `missing` (keine Datei
+unter `out/audio/`) und `rendered` (Datei liegt da). Es gibt bewusst keinen dritten,
+automatisch erkannten Zustand mehr für „Einstellungen haben sich seither geändert" —
+eine Instruktion anpassen, einen Seed in den Pool aufnehmen oder Trim/Normalisierung
+verändern sind **immer nur Verbesserungen für künftige Renders**, nie ein Seiteneffekt,
+der bereits gerenderten oder gar bestätigten (gelockten) Content unbemerkt entwertet.
+Wer eine bestehende Aufnahme wirklich neu erzeugen will, tut das bewusst: `tts render
+--force` (ggf. mit `--only`) oder die Datei unter `out/audio/` löschen.
+
+Das gilt auch für `POSTPROCESS_VERSION` (Trim-Schwellwert, Trim-Polster,
+Normalisierungsziel in `ttskit/audio.py`): eine Änderung wirkt nur auf Clips, die
+danach neu gerendert werden, nie rückwirkend auf vorhandene Dateien.
 
 ## Tests
 
@@ -223,10 +230,6 @@ TTS_SMOKE=1 ~/qwen-tts-test/.venv/bin/python -m pytest tests/ -v # mit Modell
 - **„Festlegung (Lock) entfernen" entfernt alles.** Der Knopf löscht den ganzen
   Lock-Eintrag, also auch eine eigene Aussprache und eine eigene Stimme, nicht nur den
   Seed. Der Tooltip sagt es, der Knopftext nicht.
-- **Instruktion ändern setzt das ganze Profil auf stale.** Speichert man die Instruktion
-  eines Profils, werden alle seine Clips `stale`; der nächste `render`-Lauf erzeugt sie
-  komplett neu. Das ist so gewollt, aber gut zu wissen, bevor man eine Instruktion mal
-  eben nebenbei anpasst.
 - **Dateirechte wechseln auf 0600.** Nach einem Save bekommen `profiles.json` und
   `locks.json` die Rechte `0600` (Folge der atomaren Schreibimplementierung über
   `tempfile.mkstemp`), während Git sie mit `0644` auscheckt. Für ein Einzelnutzer-Tool

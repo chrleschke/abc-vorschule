@@ -1,7 +1,6 @@
 :root {
   --bg: #fdfaf5; --panel: #fff; --line: #e6ded2; --text: #2f2a24;
   --muted: #857a6c; --accent: #c4622d; --ok: #4f7a3f; --warn: #b8862b;
-  --stale: #9a5b8f;
 }
 * { box-sizing: border-box; }
 body {
@@ -44,7 +43,6 @@ main { flex: 1; display: grid; grid-template-columns: minmax(320px, 1fr) 1.4fr; 
 }
 .chip.missing { color: var(--muted); }
 .chip.rendered { color: var(--ok); border-color: var(--ok); }
-.chip.stale { color: var(--stale); border-color: var(--stale); }
 .chip.locked { color: var(--accent); border-color: var(--accent); }
 .chip.pool { color: var(--ok); border-color: var(--ok); }
 .chip.changed { color: var(--accent); border-color: var(--accent); }

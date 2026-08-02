@@ -80,15 +80,6 @@ def test_locks_remove(tmp_path):
     locks.remove("a:1")  # removing twice must not raise
 
 
-def test_render_state_roundtrip(tmp_path):
-    path = tmp_path / "render-state.json"
-    state = RenderState.load(path)
-    assert state.entries == {}
-    state.entries["prompt:abc123abc123"] = "fingerprint-1"
-    state.save(path)
-    assert RenderState.load(path).entries == {"prompt:abc123abc123": "fingerprint-1"}
-
-
 def test_corrupt_json_raises_with_the_path(tmp_path):
     path = tmp_path / "locks.json"
     path.write_text("{ not json", encoding="utf-8")
@@ -187,7 +178,7 @@ def test_locks_remember_where_they_came_from(tmp_path):
 
 def test_a_malformed_render_state_is_an_error_not_a_silent_reset(tmp_path):
     path = tmp_path / "render-state.json"
-    path.write_text(json.dumps({"entries": []}), encoding="utf-8")
+    path.write_text(json.dumps({"failures": []}), encoding="utf-8")
     with pytest.raises(ValueError, match="render-state.json"):
         RenderState.load(path)
 
@@ -195,16 +186,17 @@ def test_a_malformed_render_state_is_an_error_not_a_silent_reset(tmp_path):
 def test_render_state_roundtrips_failures(tmp_path):
     path = tmp_path / "render-state.json"
     state = RenderState.load(path)
-    state.entries["prompt:abc123abc123"] = "fp"
+    assert state.failures == {}
     state.failures["prompt:def456def456"] = "RuntimeError: kaputt"
     state.save(path)
 
     reloaded = RenderState.load(path)
-    assert reloaded.entries == {"prompt:abc123abc123": "fp"}
     assert reloaded.failures == {"prompt:def456def456": "RuntimeError: kaputt"}
 
 
-def test_an_old_render_state_without_failures_still_loads(tmp_path):
+def test_an_old_render_state_with_a_legacy_entries_key_still_loads(tmp_path):
+    """`entries` (Render-Fingerprints) gibt es nicht mehr — eine alte Datei mit
+    diesem Schlüssel darf trotzdem laden, statt mit einem Fehler abzubrechen."""
     path = tmp_path / "render-state.json"
     path.write_text(json.dumps({"version": 1, "entries": {"a:1": "fp"}}), encoding="utf-8")
     assert RenderState.load(path).failures == {}

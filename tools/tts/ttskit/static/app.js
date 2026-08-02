@@ -9,7 +9,7 @@ const state = {
 };
 const el = (id) => document.getElementById(id);
 
-const STATUS_LABELS = { missing: "fehlt", stale: "veraltet", rendered: "fertig" };
+const STATUS_LABELS = { missing: "fehlt", rendered: "fertig" };
 
 // Sprachen, in denen eine ostasiatische Stimme zu Hause ist. Nur außerhalb
 // davon ist ihre Herkunft ein Hinweis wert.
@@ -376,8 +376,8 @@ function wirePoolLinks(container) {
 const saveProfileFrom = (container, name) => guard(async () => {
   await put(`/api/profiles/${name}`, readProfileForm(container));
   await refresh();
-  showBanner(`Profil „${name}“ gespeichert — geänderte Clips sind jetzt veraltet ` +
-    `und werden beim nächsten Batch-Lauf neu gerendert.`, "ok");
+  showBanner(`Profil „${name}“ gespeichert — neue Kandidaten verwenden ab sofort ` +
+    `diese Einstellungen. Bereits produzierte Clips bleiben unverändert.`, "ok");
 });
 
 // ------------------------------------------------------------- Detailsicht
@@ -422,8 +422,8 @@ function profileSummaryCard(clip, profile) {
             <button id="btn-profile-save" class="primary">Speichern</button>
             <button id="btn-profile-reset"
                     title="Verwirft die Änderungen im Formular">Zurücksetzen</button>
-            <span class="muted small">Speichern macht alle
-              ${profileClipCount(clip.profile)} Clips dieses Profils veraltet.</span>
+            <span class="muted small">Speichern wirkt sich auf neue Kandidaten aus —
+              bereits produzierte Clips dieses Profils bleiben unverändert.</span>
           </p>
         </div>` : ""}
     </div>`;
@@ -464,7 +464,7 @@ function candidateRow(clip, cand, index) {
       <td class="text-cell" title="${escapeHtml(cand.text || "")}">
         ${cand.text ? escapeHtml(cand.text) : '<span class="muted">—</span>'}
         ${cand.fresh === false
-          ? '<span class="chip warn-chip" title="Mit älteren Einstellungen erzeugt — als Produktion übernommen bliebe der Clip „veraltet“.">⚠️ alt</span>' : ""}
+          ? '<span class="chip warn-chip" title="Mit älteren Einstellungen erzeugt — zum Vergleich mit einem neuen Versuch.">⚠️ alt</span>' : ""}
       </td>
     </tr>`;
 }
@@ -516,8 +516,8 @@ function renderDetail(key) {
               Zurücksetzen</button>
           </p>
           <p class="muted small">Ändert nur den Klang: in der App steht weiter der Satz
-            von oben. Speichern legt dabei den aktuellen Seed fest (Lock) und macht den
-            Clip veraltet — anhören lohnt sich über „🎲 Kandidaten würfeln“.</p>
+            von oben. Speichern legt dabei den aktuellen Seed fest (Lock) — anhören und
+            neu würfeln lohnt sich über „🎲 Kandidaten würfeln“.</p>
           <details class="help">
             <summary>Wie schreibt man eine Aussprache auf?</summary>
             <ul class="small">
@@ -653,8 +653,8 @@ function renderDetail(key) {
     }
     await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, textOverride: text });
     await refresh();
-    showBanner(`Aussprache gespeichert: „${text}“. Der Clip ist jetzt veraltet — ` +
-      `Kandidaten würfeln und anhören.`, "ok");
+    showBanner(`Aussprache gespeichert: „${text}“. Zum Anhören und Bestätigen ` +
+      `Kandidaten würfeln.`, "ok");
   });
   el("btn-reset-text").onclick = guard(async () => {
     await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, textOverride: null });
@@ -698,9 +698,9 @@ function renderDetail(key) {
                                 { seed: Number(radio.dataset.promote) });
       await refresh();
       showBanner(result.verified
-        ? "In Produktion übernommen — der Clip ist fertig, kein neues Rendern nötig."
-        : "Übernommen und Seed festgelegt — aber die Aufnahme entstand mit älteren " +
-          "Einstellungen, der Clip bleibt „veraltet“, bis neu gerendert wird.",
+        ? "In Produktion übernommen — der Clip ist fertig."
+        : "Übernommen und Seed festgelegt. Hinweis: die Aufnahme entstand mit " +
+          "älteren Einstellungen und ließ sich nicht verifizieren.",
         result.verified ? "ok" : "info");
     });
   });
@@ -737,8 +737,9 @@ function renderParams() {
       <h2 style="margin-top:0">⚙️ TTS-Parameter <button id="btn-params-close"
         style="float:right">Schließen</button></h2>
       <p class="muted small">Jede Änderung an Stimme, Sprache, Instruktion, Sampling,
-        Trim oder Normalisierung macht alle Clips des jeweiligen Profils
-        <b>veraltet</b> — der nächste Batch-Lauf rendert sie neu.</p>
+        Trim oder Normalisierung gilt für neue Kandidaten dieses Profils.
+        Bereits produzierte Clips bleiben unverändert, bis man sie bewusst
+        neu würfelt und übernimmt.</p>
       <p class="muted small">Hinter jeder Stimme steht ihre Herkunft. Die Sprache setzt
         die Phonologie, die Stimme bringt trotzdem den Akzent ihrer Kernsprache mit —
         bei ganzen Sätzen kaum hörbar, bei einem einzelnen Laut deutlich.</p>
@@ -761,7 +762,7 @@ function renderParams() {
         await put(`/api/profiles/${profileName}`, { sampling });
       }
       await refresh();
-      showBanner("Sampling-Werte auf alle Profile übertragen — betroffene Clips sind jetzt veraltet.", "ok");
+      showBanner("Sampling-Werte auf alle Profile übertragen — gilt ab sofort für neue Kandidaten.", "ok");
     });
   });
 }
@@ -888,7 +889,7 @@ el("btn-render").onclick = guard(async () => {
   if (keys.length === 0) return;
   const n = batchCount();
   if (!confirm(`Batch-Lauf für ${keys.length} ausgewählte Clips starten? ` +
-               `Erzeugt wird nur, was fehlt oder veraltet ist — fertige Clips ` +
+               `Erzeugt wird nur, was noch fehlt — fertige Clips ` +
                `werden übersprungen. Pro Clip entstehen ${n} Kandidaten, die du ` +
                `danach in der Liste als Produktion bestätigst.`)) return;
   await post("/api/render", { keys, n });
@@ -898,7 +899,7 @@ el("btn-export").onclick = guard(async () => {
   const report = await api("/api/export", { method: "POST" });
   const parts = [`${report.exported.length} Clips in die App exportiert`];
   if (report.unchanged.length) parts.push(`${report.unchanged.length} unverändert`);
-  if (report.removed.length) parts.push(`${report.removed.length} veraltete entfernt`);
+  if (report.removed.length) parts.push(`${report.removed.length} nicht mehr benötigte entfernt`);
   if (report.skipped.length) {
     parts.push(`${report.skipped.length} übersprungen: ` +
       report.skipped.map((s) => `${s.key} (${s.reason})`).join(", "));

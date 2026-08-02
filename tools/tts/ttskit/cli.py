@@ -72,15 +72,14 @@ def cmd_status(paths: Paths) -> int:
     ctx = load_context(paths)
     counts: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
     for clip in ctx.clips:
-        profile = ctx.profiles.profiles[clip.profile]
-        counts[clip.profile][status_of(clip, profile, ctx.state, paths.audio)] += 1
+        counts[clip.profile][status_of(clip, paths.audio)] += 1
 
-    print(f"{'Profil':<10} {'gesamt':>7} {'missing':>7} {'stale':>7} {'rendered':>8} {'Pool':>6}")
+    print(f"{'Profil':<10} {'gesamt':>7} {'missing':>7} {'rendered':>8} {'Pool':>6}")
     for name in sorted(counts):
         c = counts[name]
         total = sum(c.values())
         pool = len(ctx.profiles.profiles[name].seed_pool)
-        print(f"{name:<10} {total:>7} {c['missing']:>7} {c['stale']:>7} "
+        print(f"{name:<10} {total:>7} {c['missing']:>7} "
               f"{c['rendered']:>8} {pool:>6}")
 
     locked = sum(1 for c in ctx.clips if c.locked)
@@ -221,7 +220,7 @@ def cmd_export(paths: Paths) -> int:
         print(f"{len(report.unchanged)} Clips unverändert übersprungen "
               f"(Fingerprint gleich)")
     if report.removed:
-        print(f"{len(report.removed)} veraltete Dateien entfernt: "
+        print(f"{len(report.removed)} nicht mehr benötigte Dateien entfernt: "
               f"{', '.join(report.removed)}")
     for key, reason in report.skipped:
         print(f"  übersprungen {key}: {reason}")

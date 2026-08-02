@@ -59,15 +59,17 @@ def test_second_run_skips_everything(setup):
     assert report.skipped == 3
 
 
-def test_changing_an_instruct_re_renders_only_that_profile(setup):
+def test_changing_an_instruct_does_not_force_a_re_render(setup):
+    """Bereits gerenderter Content bleibt bestehen — eine geänderte
+    Instruktion gilt erst für Clips, die noch gerendert werden müssen."""
     paths, profiles, clips, state = setup
     engine = FakeEngine()
     render_clips(clips, profiles, engine, state, paths)
 
     profiles.profiles["prompt"].instruct = "Ganz anders sprechen."
     report = render_clips(clips, profiles, engine, state, paths)
-    assert report.rendered == 2, "the two prompt clips"
-    assert report.skipped == 1, "the reward clip is untouched"
+    assert report.rendered == 0
+    assert report.skipped == 3
 
 
 def test_force_re_renders_everything(setup):
@@ -173,16 +175,16 @@ def test_a_failing_clip_does_not_stop_the_batch(setup):
     assert "model exploded" in report.failed[0][1]
 
 
-def test_state_is_written_after_each_clip(setup):
+def test_audio_is_written_after_each_clip(setup):
     paths, profiles, clips, state = setup
 
     seen: list[int] = []
 
     def progress(p):
-        seen.append(len(RenderState.load(paths.render_state).entries))
+        seen.append(len(list(paths.audio.glob("*.wav"))))
 
     render_clips(clips, profiles, FakeEngine(), state, paths, progress=progress)
-    assert seen == [1, 2, 3], "state must grow as the run proceeds, not at the end"
+    assert seen == [1, 2, 3], "audio must land per clip, not at the end"
 
 
 def test_cancel_stops_the_run(setup):
@@ -292,16 +294,17 @@ def test_clip_audio_list_adds_a_synthetic_entry_for_unmirrored_production(setup)
     profile = profiles.profiles[clip.profile]
     render_clips([clip], profiles, FakeEngine(), state, paths)
 
-    infos = clip_audio_list(paths, clip, profile, state)
+    infos = clip_audio_list(paths, clip, profile)
     assert len(infos) == 1
     entry = infos[0]
     assert entry["seed"] == clip.seed
     assert entry["isProductionOnly"] is True
-    assert entry["fresh"] is True
     assert entry["createdAt"], "muss aus der Datei-mtime kommen"
 
 
-def test_clip_audio_list_is_stale_when_settings_changed_since(setup):
+def test_clip_audio_list_synthetic_entry_is_not_invalidated_by_settings_changes(setup):
+    """Bereits bestätigter Content wird nie durch ein späteres Profil-Update
+    als veraltet markiert — der Eintrag trägt deshalb gar kein `fresh`-Feld."""
     from ttskit.render import clip_audio_list
 
     paths, profiles, clips, state = setup
@@ -310,8 +313,8 @@ def test_clip_audio_list_is_stale_when_settings_changed_since(setup):
     render_clips([clip], profiles, FakeEngine(), state, paths)
 
     profile.instruct = "Ganz anders."
-    entry = clip_audio_list(paths, clip, profile, state)[0]
-    assert entry["fresh"] is False
+    entry = clip_audio_list(paths, clip, profile)[0]
+    assert "fresh" not in entry
 
 
 def test_clip_audio_list_skips_synthetic_entry_when_a_candidate_already_matches(setup):
@@ -325,7 +328,7 @@ def test_clip_audio_list_skips_synthetic_entry_when_a_candidate_already_matches(
     # er genau daraus per promote entstand.
     sample_candidates(clip, profile, FakeEngine(), paths, seeds=[clip.seed])
 
-    infos = clip_audio_list(paths, clip, profile, state)
+    infos = clip_audio_list(paths, clip, profile)
     assert len(infos) == 1
     assert "isProductionOnly" not in infos[0]
 
@@ -336,7 +339,7 @@ def test_clip_audio_list_without_any_audio_is_empty(setup):
     paths, profiles, clips, state = setup
     clip = clips[0]
     profile = profiles.profiles[clip.profile]
-    assert clip_audio_list(paths, clip, profile, state) == []
+    assert clip_audio_list(paths, clip, profile) == []
 
 
 def test_random_seeds_are_unique_and_avoid_exclusions():
@@ -477,7 +480,7 @@ def test_update_candidate_meta_sets_and_clears_rating_only(setup):
 
 def test_the_clip_voice_reaches_the_engine_not_the_profile_default(tmp_path):
     """Ein Stimm-Override im Lock ist nur dann etwas wert, wenn er auch am
-    Modell ankommt — der Fingerprint allein macht den Clip bloß stale."""
+    Modell ankommt — der Fingerprint allein ändert am erzeugten Audio nichts."""
     from ttskit.plan import clip_key
     from ttskit.store import Lock
 

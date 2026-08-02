@@ -11,7 +11,7 @@ from . import voices
 from .audio import POSTPROCESS_VERSION
 from .extract import FIELD_TO_PROFILE
 from .models import Clip, Item
-from .store import Locks, Profile, Profiles, RenderState
+from .store import Locks, Profile, Profiles
 
 
 def clip_key(profile: str, source_text: str) -> str:
@@ -121,8 +121,9 @@ def fingerprint(clip: Clip, profile: Profile) -> str:
         "profile": clip.profile,
         "seed": clip.seed,
         # clip.speaker, nicht profile.speaker: ein Stimm-Override im Lock gilt
-        # nur für diesen Clip und muss trotzdem genau ihn stale machen. Ohne
-        # Override sind beide gleich, alte Fingerprints bleiben also gültig.
+        # nur für diesen Clip — für Kandidaten-Frische darf sich nur sein
+        # eigener Fingerprint ändern. Ohne Override sind beide gleich, alte
+        # Fingerprints bleiben also gültig.
         "speaker": clip.speaker,
         "language": profile.language,
         "instruct": profile.instruct,
@@ -140,12 +141,17 @@ def fingerprint(clip: Clip, profile: Profile) -> str:
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
 
 
-def status_of(clip: Clip, profile: Profile, state: RenderState, audio_dir: Path) -> str:
-    if not (Path(audio_dir) / f"{clip.key}.wav").exists():
-        return "missing"
-    if state.entries.get(clip.key) != fingerprint(clip, profile):
-        return "stale"
-    return "rendered"
+def status_of(clip: Clip, audio_dir: Path) -> str:
+    """Missing, oder die Datei liegt schon da.
+
+    Absichtlich keine Fingerprint-Prüfung mehr: ein späteres Profil-Update
+    (Instruktion, Sampling, Seed-Pool, Nachbearbeitung) ist eine Verbesserung
+    für künftige Renders, invalidiert aber nie bereits gerenderten Content.
+    Ein Re-Render ist immer eine bewusste Handlung (`--force` oder Löschen
+    der Datei), nie ein stillschweigender Seiteneffekt eines geänderten
+    Profils.
+    """
+    return "rendered" if (Path(audio_dir) / f"{clip.key}.wav").exists() else "missing"
 
 
 def orphan_locks(locks: Locks, clips: list[Clip]) -> list[str]:
