@@ -27,14 +27,15 @@ from .paths import Paths
 from .plan import fingerprint, orphan_locks, status_of
 from .render import (
     candidate_fingerprint, candidate_meta, candidate_seeds, clip_audio_list,
-    random_seeds, render_batch_candidates, sample_candidates, update_candidate_meta,
+    pooled_seeds, random_seeds, render_batch_candidates, sample_candidates,
+    update_candidate_meta,
 )
 from .store import BASE_SAMPLING, Lock, Locks, Profiles
 
 STATIC = Path(__file__).resolve().parent / "static"
 
 #: Upper bound for one candidate batch — used both for a single clip's
-#: "Kandidaten würfeln" and per clip in a Batch-Lauf. Each seed is a full
+#: "Generate" and per clip in a Batch-Lauf. Each seed is a full
 #: model generation and `cancel` does not drain the queue, so an unbounded
 #: `n` would be a self-inflicted denial of service on a single-worker tool.
 MAX_CANDIDATES = 16
@@ -306,8 +307,15 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
         ctx, clip = clip_by_key(key)
         count = max(1, min(MAX_CANDIDATES, int(body.get("n", 4))))
         profile = ctx.profiles.profiles[clip.profile]
-        existing = set(candidate_seeds(paths, clip.key)) | set(profile.seed_pool)
-        seeds = random_seeds(count, exclude=existing)
+        # Ein Seed, für den es hier schon eine Aufnahme gibt, würde bei
+        # gleichen Einstellungen dieselbe Datei erzeugen — in beiden Modi
+        # ausgeschlossen. Der Pool ist nur im Zufallsmodus tabu, im anderen
+        # ist er ja die Quelle.
+        rendered = set(candidate_seeds(paths, clip.key))
+        if body.get("useKnownSeeds") and profile.seed_pool:
+            seeds = pooled_seeds(count, profile.seed_pool, exclude=rendered)
+        else:
+            seeds = random_seeds(count, exclude=rendered | set(profile.seed_pool))
 
         def run(is_cancelled) -> None:
             written = sample_candidates(

@@ -160,6 +160,10 @@ textarea.pron-input {
 .voice-line { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .voice-line label { display: flex; gap: 6px; align-items: center; }
 
+/* Beschriftung mit Checkbox mitten in einer Textzeile (z. B. „Use known seeds“) */
+label.inline { display: inline-flex; gap: 6px; align-items: center; margin-left: 10px; }
+label.inline input[type="checkbox"] { margin: 0; }
+
 /* Hilfetexte */
 details.help { margin: 4px 0 10px; }
 details.help summary { cursor: pointer; color: var(--muted); font-size: 13px; }

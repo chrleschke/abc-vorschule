@@ -39,7 +39,7 @@ tts export                         # bestätigte, fertige Clips nach app/.../ass
 Typisch: einmal `sample` pro Profil, im Web-Interface Kandidaten anhören und mit 👍
 bewerten — 👍 speichert die Bewertung **und** nimmt den Seed automatisch in den
 Seed-Pool des Profils auf (👎 löscht die Probeaufnahme und räumt den Pool wieder auf).
-Einzelne schlechte Clips mit „🎲 Kandidaten würfeln" (Anzahl einstellbar, 1–16) neu
+Einzelne schlechte Clips mit „🎲 Generate" (Anzahl einstellbar, 1–16) neu
 erzeugen: die Probeaufnahmen stehen als Tabelle, neueste zuerst, mit Erzeugungszeitpunkt,
 Stimme und Text — so bleiben mehrere Würfel-Runden auseinanderhaltbar. Der
 Radio-Button „Produktion" übernimmt genau eine Aufnahme sofort als Produktions-Audio
@@ -48,7 +48,7 @@ und lockt ihren Seed (kein Re-Render, kein erneutes Anhören nötig).
 Erzeugt wird über den **Batch-Lauf**: links in der Liste Clips ankreuzen (einzeln
 oder über „Sichtbare / Alle / Keine"), Anzahl Beispiele pro Clip einstellen (Default 2),
 dann „▶ Batch-Lauf" in der Kopfzeile — angefasst wird nur, was noch fehlt.
-Der Lauf erzeugt Kandidaten wie „🎲 Kandidaten würfeln", aber für alle ausgewählten Clips
+Der Lauf erzeugt Kandidaten wie „🎲 Generate", aber für alle ausgewählten Clips
 auf einmal; er schreibt nie direkt in die Produktion. Die Entwürfe stehen danach in
 derselben Kandidaten-Tabelle wie jede andere Probeaufnahme — dort per Radio-Button
 „Produktion" bestätigen. Ohne Bestätigung bleibt der Clip „fehlt"; eine

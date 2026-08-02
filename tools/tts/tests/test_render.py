@@ -5,7 +5,8 @@ from ttskit.models import Item
 from ttskit.paths import Paths
 from ttskit.plan import build_clips
 from ttskit.render import (
-    random_seeds, render_batch_candidates, render_clips, sample_candidates,
+    pooled_seeds, random_seeds, render_batch_candidates, render_clips,
+    sample_candidates,
 )
 from ttskit.store import Locks, Profiles, RenderState
 
@@ -347,6 +348,30 @@ def test_random_seeds_are_unique_and_avoid_exclusions():
     assert len(seeds) == len(set(seeds)) == 6
     assert not ({1, 2, 3} & set(seeds))
     assert all(0 <= s < 2 ** 31 for s in seeds)
+
+
+def test_pooled_seeds_draws_from_the_pool():
+    pool = [11, 22, 33, 44]
+    seeds = pooled_seeds(3, pool)
+    assert len(seeds) == len(set(seeds)) == 3
+    assert set(seeds) <= set(pool)
+
+
+def test_pooled_seeds_skips_exclusions_and_duplicates_in_the_pool():
+    seeds = pooled_seeds(2, [11, 11, 22, 33], exclude={22})
+    assert sorted(seeds) == [11, 33]
+
+
+def test_pooled_seeds_fills_up_with_random_seeds_when_the_pool_is_too_small():
+    seeds = pooled_seeds(4, [11, 22], exclude={22})
+    assert len(seeds) == len(set(seeds)) == 4
+    assert 11 in seeds and 22 not in seeds
+    assert all(0 <= s < 2 ** 31 for s in seeds)
+
+
+def test_pooled_seeds_without_a_pool_is_pure_random():
+    seeds = pooled_seeds(3, [])
+    assert len(set(seeds)) == 3
 
 
 def test_sample_candidates_writes_one_file_per_seed(setup):
