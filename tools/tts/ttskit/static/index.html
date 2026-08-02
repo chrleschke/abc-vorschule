@@ -1,5 +1,31 @@
 <!doctype html>
 <html lang="de">
-  <head><meta charset="utf-8" /><title>Qwen-TTS Pipeline</title></head>
-  <body><p>UI folgt in Task 9.</p></body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Qwen-TTS Pipeline</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Qwen-TTS</h1>
+      <input id="search" type="search" placeholder="Text suchen …" />
+      <select id="filter-profile"><option value="">Alle Profile</option></select>
+      <select id="filter-status">
+        <option value="">Alle Status</option>
+        <option value="missing">fehlt</option>
+        <option value="stale">stale</option>
+        <option value="rendered">fertig</option>
+        <option value="locked">gelockt</option>
+      </select>
+      <button id="btn-render" class="primary">Finalen Lauf starten</button>
+      <button id="btn-cancel">Abbrechen</button>
+      <span id="progress"></span>
+    </header>
+    <main>
+      <div id="list"></div>
+      <div id="detail"><p class="muted">Links einen Clip wählen. Tasten: j/k blättern, Leertaste spielt, 1–4 spielen Kandidaten.</p></div>
+    </main>
+    <script src="/app.js"></script>
+  </body>
 </html>
