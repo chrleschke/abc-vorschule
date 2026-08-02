@@ -1,0 +1,125 @@
+{
+  "poolSalt": "v1",
+  "profiles": {
+    "word": {
+      "label": "Einzelwort",
+      "speaker": "sohee",
+      "language": "german",
+      "instruct": "Sprich das einzelne Wort klar und freundlich, in ruhigem Tempo, mit neutraler Betonung. Keine Übertreibung, keine Frage-Melodie.",
+      "sampling": {
+        "temperature": 0.6,
+        "top_k": 30,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05
+      },
+      "seedPool": [],
+      "trim": true,
+      "normalize": true
+    },
+    "phoneme": {
+      "label": "Laut / Buchstabe",
+      "speaker": "sohee",
+      "language": "german",
+      "instruct": "Sprich ausschließlich den Lautwert des Buchstabens, deutlich gedehnt und langsam — nicht den Buchstabennamen. Also 'mmmmm', nicht 'Em'. Kein Satz, kein Zusatz, nur der Laut.",
+      "sampling": {
+        "temperature": 0.6,
+        "top_k": 30,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05
+      },
+      "seedPool": [],
+      "trim": true,
+      "normalize": true
+    },
+    "prompt": {
+      "label": "Aufgaben-Frage",
+      "speaker": "sohee",
+      "language": "german",
+      "instruct": "Sprich wie eine freundliche Kindergärtnerin zu einem fünfjährigen Kind: warm, deutlich, ruhiges Tempo, leicht fragende Betonung am Satzende. Freundlich zugewandt, nicht übertrieben fröhlich.",
+      "sampling": {
+        "temperature": 0.6,
+        "top_k": 30,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05
+      },
+      "seedPool": [],
+      "trim": true,
+      "normalize": true
+    },
+    "miss": {
+      "label": "Sanftes Feedback",
+      "speaker": "sohee",
+      "language": "german",
+      "instruct": "Sprich ruhig und aufmunternd zu einem Kind, das gerade danebenlag. Kein Tadel, keine Enttäuschung — freundlich erklärend, warm, geduldig.",
+      "sampling": {
+        "temperature": 0.6,
+        "top_k": 30,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05
+      },
+      "seedPool": [],
+      "trim": true,
+      "normalize": true
+    },
+    "reward": {
+      "label": "Belohnung",
+      "speaker": "sohee",
+      "language": "german",
+      "instruct": "Sprich fröhlich und feiernd zu einem Kind, das etwas geschafft hat. Lebendig und mit Schwung, aber nicht schrill und nicht zu laut.",
+      "sampling": {
+        "temperature": 0.6,
+        "top_k": 30,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05
+      },
+      "seedPool": [],
+      "trim": true,
+      "normalize": true
+    },
+    "sentence": {
+      "label": "Einfacher Satz",
+      "speaker": "sohee",
+      "language": "german",
+      "instruct": "Sprich den kurzen Satz klar und einfach, in ruhigem Tempo, mit natürlicher Satzmelodie. Für ein Kind, das zuhört und mitliest.",
+      "sampling": {
+        "temperature": 0.6,
+        "top_k": 30,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05
+      },
+      "seedPool": [],
+      "trim": true,
+      "normalize": true
+    },
+    "finale": {
+      "label": "Lektions-Finale",
+      "speaker": "sohee",
+      "language": "german",
+      "instruct": "Sprich den lustigen Satz verspielt und pointiert, mit Schwung und einem Lächeln in der Stimme. Wie eine kleine Pointe am Ende einer Geschichte.",
+      "sampling": {
+        "temperature": 0.6,
+        "top_k": 30,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05
+      },
+      "seedPool": [],
+      "trim": true,
+      "normalize": true
+    },
+    "ui": {
+      "label": "Oberflächen-Ansage",
+      "speaker": "sohee",
+      "language": "german",
+      "instruct": "Sprich ruhig, freundlich und neutral. Kurze Ansage, keine Betonung auf einzelnen Wörtern, kein Drama.",
+      "sampling": {
+        "temperature": 0.6,
+        "top_k": 30,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05
+      },
+      "seedPool": [],
+      "trim": true,
+      "normalize": true
+    }
+  }
+}
