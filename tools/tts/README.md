@@ -33,6 +33,7 @@ tts status                         # Überblick: fehlt / stale / fertig / Pools 
 tts sample --profile prompt -n 8   # 8 Seeds an 3 Beispielen des Profils ausprobieren
 tts web                            # Kuratieren unter http://127.0.0.1:8420
 tts render                         # Batch-Lauf über alles, inkrementell, ca. 25–40 Minuten
+tts export                         # bestätigte, fertige Clips nach app/.../assets/audio/
 ```
 
 Typisch: einmal `sample` pro Profil, im Web-Interface Kandidaten anhören und mit 👍
@@ -237,6 +238,8 @@ Die Sprechtexte von Symbol-Jagd und Wort-Detektiv sind Templates
 (`"Finde den Buchstaben - %s - im Wort - %s."`), die erst zur Laufzeit befüllt werden.
 Sie sind nicht abgedeckt; `tts status` weist darauf hin. Geplant ist, sämtliche
 Kombinationen vollständig vorzurendern statt Clips zur Laufzeit aus Fragmenten
-zusammenzusetzen — aneinandergehängte Sprachfragmente klingen abgehackt. Das lohnt sich
-erst, sobald die App-Integration steht; bis dahin fällt die App für fehlende Clips auf
-System-TTS zurück, sodass die Abdeckung nicht vollständig sein muss.
+zusammenzusetzen — aneinandergehängte Sprachfragmente klingen abgehackt. „📦 In App
+exportieren" (oder `tts export`) schreibt alle bestätigten, fertig gerenderten Clips als
+OGG/Opus nach `app/src/main/assets/audio/` zusammen mit einer `index.json`; die App spielt
+diese Clips ab und fällt für alles andere weiterhin auf Android-TTS zurück, sodass die
+Abdeckung nicht vollständig sein muss.

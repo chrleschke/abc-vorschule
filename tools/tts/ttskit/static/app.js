@@ -894,6 +894,19 @@ el("btn-render").onclick = guard(async () => {
   await post("/api/render", { keys, n });
 });
 
+el("btn-export").onclick = guard(async () => {
+  const report = await api("/api/export", { method: "POST" });
+  const parts = [`${report.exported.length} Clips in die App exportiert`];
+  if (report.removed.length) parts.push(`${report.removed.length} veraltete entfernt`);
+  if (report.skipped.length) {
+    parts.push(`${report.skipped.length} übersprungen: ` +
+      report.skipped.map((s) => `${s.key} (${s.reason})`).join(", "));
+  }
+  parts.push(...report.warnings);
+  showBanner(parts.join(" — "), report.skipped.length || report.warnings.length
+    ? "warn" : "info");
+});
+
 el("btn-cancel").onclick = guard(() => post("/api/jobs/cancel", {}));
 
 // The last `job-summary` of the running job. render_clips keeps going after a

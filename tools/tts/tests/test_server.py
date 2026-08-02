@@ -37,7 +37,8 @@ def client(tmp_path, content_dir):
         shutil.copy(f, root / "content" / f.name)
     (root / "extra-strings.json").write_text(
         json.dumps({"version": 1, "strings": [], "templates": []}), encoding="utf-8")
-    paths = Paths(root=root, content_dir=root / "content")
+    paths = Paths(root=root, content_dir=root / "content",
+                  app_audio_dir=tmp_path / "app-audio")
     app = create_app(paths, engine=FakeEngine())
     with TestClient(app) as c:
         c.paths = paths
@@ -408,6 +409,13 @@ def test_index_is_served(client):
     response = client.get("/")
     assert response.status_code == 200
     assert "<html" in response.text.lower()
+
+
+def test_export_endpoint_returns_report(client):
+    response = client.post("/api/export")
+    assert response.status_code == 200
+    body = response.json()
+    assert set(body) == {"exported", "skipped", "removed", "warnings"}
 
 
 def test_events_route_is_wired_to_the_stream_generator(client, monkeypatch):
