@@ -3,16 +3,60 @@
 const state = {
   clips: [], profiles: {}, engine: {}, orphans: [], selected: null,
   jobs: { running: null, queued: 0 }, limits: { maxCandidates: 16 },
-  paramsOpen: false,
+  voices: [], languages: [], paramsOpen: false,
 };
 const el = (id) => document.getElementById(id);
 
 const STATUS_LABELS = { missing: "fehlt", stale: "veraltet", rendered: "fertig" };
 
+// Sprachen, in denen eine ostasiatische Stimme zu Hause ist. Nur außerhalb
+// davon ist ihre Herkunft ein Hinweis wert.
+const EAST_ASIAN = ["chinese", "japanese", "korean"];
+
 function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
+}
+
+// ------------------------------------------------------------- Stimmen
+
+const voiceOf = (name) => state.voices.find((v) => v.name === name);
+
+// Die Herkunft steht immer hinter dem Namen: `language` setzt zwar die
+// Phonologie, das Speaker-Embedding bringt aber den Akzent seiner Kernsprache
+// mit. Bei einem einzelnen Laut fehlt der Kontext, der das ausgleicht — und
+// genau dort fällt es auf.
+function voiceOptions(selected) {
+  const known = state.voices.map((v) =>
+    `<option value="${escapeHtml(v.name)}" ${v.name === selected ? "selected" : ""}>` +
+    `${escapeHtml(v.name)} (${escapeHtml(v.origin)})</option>`).join("");
+  // Eine von Hand eingetragene Stimme, die die Tabelle nicht kennt, darf beim
+  // Aufklappen nicht stillschweigend zu einer anderen werden.
+  return voiceOf(selected) || !selected
+    ? known
+    : `<option value="${escapeHtml(selected)}" selected>` +
+      `${escapeHtml(selected)} (unbekannte Herkunft)</option>${known}`;
+}
+
+function languageOptions(selected) {
+  return state.languages.map((name) =>
+    `<option value="${escapeHtml(name)}" ${name === selected ? "selected" : ""}>` +
+    `${escapeHtml(name)}</option>`).join("");
+}
+
+function accentBadge(speaker, language) {
+  const voice = voiceOf(speaker);
+  if (!voice) {
+    return '<span class="chip warn-chip" title="Diese Stimme kennt die ' +
+      'Stimmtabelle nicht — Herkunft und Eignung sind unbekannt.">⚠️ unbekannte Stimme</span>';
+  }
+  if (voice.european || EAST_ASIAN.includes(language)) return "";
+  return `<span class="chip warn-chip" title="Die Sprache setzt die Phonologie, ` +
+    `die Stimme bringt trotzdem den Akzent ihrer Kernsprache mit. Bei ganzen ` +
+    `Sätzen gleicht der Kontext das weitgehend aus, bei einem einzelnen Laut ` +
+    `nicht — dort schlägt der Akzent voll durch.">⚠️ Stimme ist ` +
+    `${escapeHtml(voice.origin)}, gesprochen wird ${escapeHtml(language)}</span>`;
 }
 
 // ---------------------------------------------------------------- Meldungen
@@ -102,8 +146,30 @@ async function refresh() {
     showBanner(`Engine offline: ${state.engine.error || "unbekannt"}`, "warn");
   }
   renderList();
-  if (state.selected) renderDetail(state.selected);
+  if (state.selected) withPreservedInput(() => renderDetail(state.selected));
   if (state.paramsOpen) renderParams();
+}
+
+// renderDetail() ersetzt die komplette Detailsicht. Ohne das hier verliert man
+// mitten im Tippen einer Aussprache seinen Text, sobald irgendein SSE-Ereignis
+// ein refresh() auslöst — und Aussprachen tippt man mit Pausen zum Nachdenken.
+function withPreservedInput(render) {
+  const active = document.activeElement;
+  const editing = active && active.id && el("detail").contains(active) &&
+    ["INPUT", "TEXTAREA"].includes(active.tagName);
+  const snapshot = editing
+    ? { id: active.id, value: active.value,
+        start: active.selectionStart, end: active.selectionEnd }
+    : null;
+  render();
+  if (snapshot === null) return;
+  const restored = el(snapshot.id);
+  if (!restored) return;
+  restored.value = snapshot.value;
+  restored.focus();
+  if (snapshot.start !== null && restored.setSelectionRange) {
+    restored.setSelectionRange(snapshot.start, snapshot.end);
+  }
 }
 
 function visibleClips() {
@@ -113,7 +179,10 @@ function visibleClips() {
   return state.clips.filter((clip) => {
     if (profile && clip.profile !== profile) return false;
     if (status === "locked" ? !clip.locked : status && clip.status !== status) return false;
-    if (needle && !clip.text.toLowerCase().includes(needle)) return false;
+    // Beide Texte durchsuchen: wer nach dem Satz aus der App sucht, findet den
+    // Clip sonst nicht mehr, sobald eine eigene Aussprache hinterlegt ist.
+    if (needle && !clip.text.toLowerCase().includes(needle) &&
+        !clip.sourceText.toLowerCase().includes(needle)) return false;
     return true;
   });
 }
@@ -125,9 +194,15 @@ function renderList() {
   clips.forEach((clip) => {
     const row = document.createElement("div");
     row.className = "row" + (clip.key === state.selected ? " active" : "");
+    const spoken = clip.text !== clip.sourceText;
+    const ownVoice = clip.speaker !== state.profiles[clip.profile].speaker;
     row.innerHTML = `
       <span class="chip">${clip.profile}</span>
-      <span class="text">${escapeHtml(clip.text)}</span>
+      <span class="text">
+        <span class="row-source">${escapeHtml(clip.sourceText)}</span>
+        ${spoken ? `<span class="row-tts">🔊 ${escapeHtml(clip.text)}</span>` : ""}
+      </span>
+      ${ownVoice ? `<span class="chip changed" title="Eigene Stimme: ${escapeHtml(clip.speaker)}">🎙</span>` : ""}
       ${clip.locked ? '<span class="chip locked" title="Seed ist festgelegt">📌</span>' : ""}
       <span class="chip ${clip.status}">${STATUS_LABELS[clip.status] || clip.status}</span>`;
     row.onclick = () => select(clip.key);
@@ -145,6 +220,9 @@ function select(key) {
 }
 
 // ------------------------------------------------------------- Detailsicht
+
+const profileClipCount = (name) =>
+  state.clips.filter((c) => c.profile === name).length;
 
 function seedOrigin(clip, profile) {
   if (clip.locked) return "festgelegt per Lock";
@@ -203,15 +281,62 @@ function renderDetail(key) {
   const good = goodSeeds(clip.key);
   const max = state.limits.maxCandidates || 16;
 
+  const spoken = clip.text !== clip.sourceText;
+  const ownVoice = clip.speaker !== profile.speaker;
+
   el("detail").innerHTML = `
     <div class="card">
       <div class="mono muted">${clip.key}</div>
-      <h2 style="margin:6px 0">${escapeHtml(clip.text)}</h2>
-      ${clip.text !== clip.sourceText
-        ? `<p class="muted">Original: ${escapeHtml(clip.sourceText)}</p>` : ""}
+
+      <div class="pron">
+        <div class="pron-block">
+          <div class="pron-head"><span class="pron-icon">📖</span>Satz
+            <span class="muted normal">— so steht er im Content-Pack der App</span></div>
+          <div class="pron-source">${escapeHtml(clip.sourceText)}</div>
+        </div>
+        <div class="pron-join">${spoken
+          ? "wird ausgesprochen als ↓"
+          : "geht unverändert ans Modell ↓"}</div>
+        <div class="pron-block ${spoken ? "changed" : ""}">
+          <div class="pron-head"><span class="pron-icon">🔊</span>TTS-Version
+            <span class="muted normal">— genau dieser Text geht ans Modell</span>
+            ${spoken
+              ? '<span class="chip changed">eigene Aussprache</span>'
+              : '<span class="chip">identisch mit dem Satz</span>'}
+          </div>
+          <textarea id="tts-text" class="pron-input" rows="2"
+                    spellcheck="false">${escapeHtml(clip.text)}</textarea>
+          <p class="pron-actions">
+            <button id="btn-save-text" class="primary"
+                    title="Speichert diesen Text als Aussprache dieses Clips">
+              Aussprache speichern</button>
+            <button id="btn-reset-text" ${spoken ? "" : "disabled"}
+                    title="Verwirft die eigene Aussprache — gesprochen wird wieder der Satz">
+              Auf den Satz zurücksetzen</button>
+          </p>
+          <p class="muted small">Ändert nur den Klang: in der App steht weiter der Satz
+            von oben. Speichern legt dabei den aktuellen Seed fest (Lock) und macht den
+            Clip veraltet — anhören lohnt sich über „🎲 Kandidaten würfeln“.</p>
+          <details class="help">
+            <summary>Wie schreibt man eine Aussprache auf?</summary>
+            <ul class="small">
+              <li><b>Laut statt Buchstabenname</b> — „M“ wird gern als „Em“ gelesen.
+                Ausgeschrieben als „Mmmmm“ kommt der Lautwert.</li>
+              <li><b>Satzzeichen steuern die Melodie</b> — Punkt beruhigt, Fragezeichen
+                hebt, Ausrufezeichen betont.</li>
+              <li><b>Komma setzt eine Pause</b>, Bindestrich trennt Silben: „Ma-ma“.</li>
+              <li><b>Alles ausschreiben</b>, was keine Buchstabenfolge ist: „5“ → „fünf“,
+                „z. B.“ → „zum Beispiel“.</li>
+              <li>Nichts davon ist garantiert — jede Änderung muss gehört werden.
+                Nach dem Speichern Kandidaten würfeln und vergleichen.</li>
+            </ul>
+          </details>
+        </div>
+      </div>
+
       <p class="muted">${clip.itemIds.length} Stelle(n) · Felder: ${clip.fields.join(", ")}
         ${clip.lessons.length ? " · Lektionen: " + clip.lessons.join(", ") : ""}</p>
-      <p>Profil:
+      <p class="voice-line">Profil:
         <select id="clip-profile"
                 title="Achtung: Profilwechsel legt den aktuellen Seed als Lock fest">
           ${Object.keys(state.profiles).sort().map((n) =>
@@ -221,15 +346,28 @@ function renderDetail(key) {
         <span class="muted">(${seedOrigin(clip, profile)})</span>
         · Status <span class="chip ${clip.status}">${STATUS_LABELS[clip.status] || clip.status}</span>
       </p>
+      <p class="voice-line">Stimme:
+        <select id="clip-speaker"
+                title="Stimme nur für diesen Clip — überschreibt die des Profils">
+          ${voiceOptions(clip.speaker)}
+        </select>
+        ${ownVoice
+          ? `<span class="chip changed" title="Das Profil „${escapeHtml(clip.profile)}“ ` +
+            `spricht sonst mit ${escapeHtml(profile.speaker)}">nur für diesen Clip</span>`
+          : ""}
+        · Sprache <span class="mono">${escapeHtml(profile.language)}</span>
+        <span class="muted">(aus dem Profil)</span>
+        ${accentBadge(clip.speaker, profile.language)}
+      </p>
       ${clip.status !== "missing"
         ? `<audio controls src="/audio/${encoded}.wav" id="main-audio"></audio>` +
           (clip.status === "stale"
-            ? '<p class="muted small">Diese Aufnahme ist veraltet — Text, Seed oder ' +
-              'Einstellungen haben sich seit dem Rendern geändert. Der nächste finale ' +
-              'Lauf ersetzt sie.</p>' : "")
+            ? '<p class="muted small">Diese Aufnahme ist veraltet — Text, Stimme, Seed ' +
+              'oder Einstellungen haben sich seit dem Rendern geändert. Der nächste ' +
+              'finale Lauf ersetzt sie.</p>' : "")
         : '<p class="muted">Noch nicht gerendert.</p>'}
       ${clip.locked
-        ? '<p><button id="btn-unlock" title="Festgelegten Seed wieder freigeben — der Clip bekommt dann automatisch einen Seed aus dem Pool">Festlegung (Lock) entfernen</button></p>' : ""}
+        ? '<p><button id="btn-unlock" title="Festgelegten Seed, eigene Aussprache und eigene Stimme wieder freigeben — der Clip fällt komplett auf sein Profil zurück">Festlegung (Lock) entfernen</button></p>' : ""}
     </div>
 
     <div class="card">
@@ -265,7 +403,16 @@ function renderDetail(key) {
     </div>
 
     <div class="card">
-      <h3 style="margin-top:0">Profil „${clip.profile}“ — ${profile.label}</h3>
+      <h3 style="margin-top:0">Profil „${clip.profile}“ — ${profile.label}
+        <span class="muted normal">— gilt für alle ${profileClipCount(clip.profile)} Clips
+          dieses Profils</span></h3>
+      <p class="voice-line">
+        <label>Stimme
+          <select id="profile-speaker">${voiceOptions(profile.speaker)}</select></label>
+        <label>Sprache
+          <select id="profile-language">${languageOptions(profile.language)}</select></label>
+        ${accentBadge(profile.speaker, profile.language)}
+      </p>
       <textarea id="profile-instruct">${escapeHtml(profile.instruct)}</textarea>
       <p>
         <button id="btn-save-profile" class="primary">Instruktion speichern</button>
@@ -304,6 +451,63 @@ function renderDetail(key) {
     await refresh();
     showBanner(`Profil gewechselt — Seed ${clip.seed} wurde dabei festgelegt (Lock).`, "info");
   });
+
+  // Aussprache: der eigentliche Grund für die getrennte Darstellung oben.
+  // Beides geht über denselben Lock-Endpunkt, der nur benannte Felder anfasst
+  // — Stimme, Profil und Notiz dieses Clips bleiben also unberührt.
+  el("btn-save-text").onclick = guard(async () => {
+    const text = el("tts-text").value.trim();
+    if (!text) {
+      showBanner("Leerer Text ergibt leere Audio — zum Verwerfen „Auf den Satz " +
+        "zurücksetzen“ nehmen.", "warn");
+      return;
+    }
+    if (text === clip.sourceText) {
+      // Denselben Text als Override zu speichern, sähe in der Liste aus wie
+      // eine Abweichung, wäre aber keine.
+      await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, textOverride: null });
+      await refresh();
+      showBanner("Text entspricht dem Satz — keine eigene Aussprache hinterlegt.", "info");
+      return;
+    }
+    await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, textOverride: text });
+    await refresh();
+    showBanner(`Aussprache gespeichert: „${text}“. Der Clip ist jetzt veraltet — ` +
+      `Kandidaten würfeln und anhören.`, "ok");
+  });
+  el("btn-reset-text").onclick = guard(async () => {
+    await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, textOverride: null });
+    await refresh();
+    showBanner(`Eigene Aussprache verworfen — gesprochen wird wieder „${clip.sourceText}“.`, "ok");
+  });
+
+  el("clip-speaker").onchange = guard(async (event) => {
+    const speaker = event.target.value;
+    await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, speaker });
+    await refresh();
+    showBanner(`Stimme dieses Clips: ${speaker} (${voiceOf(speaker).origin}). ` +
+      `Seed ${clip.seed} wurde dabei festgelegt (Lock).`, "ok");
+  });
+
+  // Stimme und Sprache des Profils wirken auf alle seine Clips. Anders als bei
+  // der Instruktion, die man beim Tippen noch verwerfen kann, greift ein
+  // Select sofort — deshalb hier eine Rückfrage.
+  const saveProfileVoice = (field, label) => guard(async (event) => {
+    const value = event.target.value;
+    const count = profileClipCount(clip.profile);
+    if (!confirm(`${label} des Profils „${clip.profile}“ auf „${value}“ ändern? ` +
+                 `Das macht alle ${count} Clips dieses Profils veraltet.`)) {
+      event.target.value = profile[field];
+      return;
+    }
+    await put(`/api/profiles/${clip.profile}`, { [field]: value });
+    await refresh();
+    showBanner(`${label} des Profils „${clip.profile}“ ist jetzt „${value}“ — ` +
+      `${count} Clips sind veraltet.`, "ok");
+  });
+  el("profile-speaker").onchange = saveProfileVoice("speaker", "Stimme");
+  el("profile-language").onchange = saveProfileVoice("language", "Sprache");
+
   el("btn-save-profile").onclick = guard(async () => {
     await put(`/api/profiles/${clip.profile}`,
               { instruct: el("profile-instruct").value });
@@ -388,7 +592,15 @@ function paramsCard(name) {
     </label>`).join("");
   return `
     <div class="card" data-profile="${name}">
-      <h3 style="margin-top:0">${name} — ${escapeHtml(profile.label)}</h3>
+      <h3 style="margin-top:0">${name} — ${escapeHtml(profile.label)}
+        <span class="muted normal">— ${profileClipCount(name)} Clips</span></h3>
+      <p class="voice-line">
+        <label>Stimme
+          <select data-speaker>${voiceOptions(profile.speaker)}</select></label>
+        <label>Sprache
+          <select data-language>${languageOptions(profile.language)}</select></label>
+        ${accentBadge(profile.speaker, profile.language)}
+      </p>
       <div class="params-grid">${sampling}</div>
       <p>
         <label><input type="checkbox" data-trim ${profile.trim ? "checked" : ""} />
@@ -422,9 +634,12 @@ function renderParams() {
     <div class="card">
       <h2 style="margin-top:0">⚙️ TTS-Parameter <button id="btn-params-close"
         style="float:right">Schließen</button></h2>
-      <p class="muted small">Jede Änderung an Instruktion, Sampling, Trim oder
-        Normalisierung macht alle Clips des jeweiligen Profils <b>veraltet</b> —
-        der nächste finale Lauf rendert sie neu.</p>
+      <p class="muted small">Jede Änderung an Stimme, Sprache, Instruktion, Sampling,
+        Trim oder Normalisierung macht alle Clips des jeweiligen Profils
+        <b>veraltet</b> — der nächste finale Lauf rendert sie neu.</p>
+      <p class="muted small">Hinter jeder Stimme steht ihre Herkunft. Die Sprache setzt
+        die Phonologie, die Stimme bringt trotzdem den Akzent ihrer Kernsprache mit —
+        bei ganzen Sätzen kaum hörbar, bei einem einzelnen Laut deutlich.</p>
     </div>
     ${Object.keys(state.profiles).sort().map(paramsCard).join("")}`;
 
@@ -453,6 +668,8 @@ function renderParams() {
       const name = card.dataset.profile;
       await put(`/api/profiles/${name}`, {
         instruct: card.querySelector("[data-instruct]").value,
+        speaker: card.querySelector("[data-speaker]").value,
+        language: card.querySelector("[data-language]").value,
         sampling: readSampling(card),
         trim: card.querySelector("[data-trim]").checked,
         normalize: card.querySelector("[data-norm]").checked,

@@ -18,7 +18,7 @@ import numpy as np
 from .audio import postprocess, write_wav
 from .models import Clip
 from .paths import Paths
-from .plan import fingerprint, status_of
+from .plan import effective_profile, fingerprint, status_of
 from .store import Profile, Profiles, RenderState
 
 
@@ -97,7 +97,8 @@ def render_clips(
         if cancel is not None and cancel():
             break
         try:
-            wav, sample_rate = engine.generate(clip.text, prof, clip.seed)
+            wav, sample_rate = engine.generate(
+                clip.text, effective_profile(clip, prof), clip.seed)
             wav = postprocess(wav, sample_rate, trim=prof.trim, normalize=prof.normalize)
             write_wav(paths.audio / f"{clip.key}.wav", wav, sample_rate)
             state.entries[clip.key] = stamp
@@ -148,7 +149,8 @@ def sample_candidates(
         if cancel is not None and cancel():
             break
         try:
-            wav, sample_rate = engine.generate(clip.text, profile, seed)
+            wav, sample_rate = engine.generate(
+                clip.text, effective_profile(clip, profile), seed)
             wav = postprocess(wav, sample_rate, trim=profile.trim,
                               normalize=profile.normalize)
             write_wav(paths.candidates / clip.key / f"{seed}.wav", wav, sample_rate)

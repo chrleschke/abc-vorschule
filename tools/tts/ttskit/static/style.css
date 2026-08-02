@@ -19,11 +19,15 @@ main { flex: 1; display: grid; grid-template-columns: minmax(320px, 1fr) 1.4fr; 
 #detail { overflow-y: auto; padding: 20px; }
 .row {
   padding: 8px 14px; border-bottom: 1px solid var(--line); cursor: pointer;
-  display: flex; gap: 10px; align-items: baseline;
+  display: flex; gap: 10px; align-items: center;
 }
 .row:hover { background: #f6f0e7; }
 .row.active { background: #f0e5d6; box-shadow: inset 3px 0 0 var(--accent); }
-.row .text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Zwei Zeilen, sobald der gesprochene Text vom Satz abweicht — das Abschneiden
+   sitzt deshalb auf den Kindern, nicht auf dem Container. */
+.row .text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.row-source, .row-tts { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row-tts { font-size: 12px; color: var(--accent); }
 .chip {
   font-size: 11px; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line);
   color: var(--muted); white-space: nowrap;
@@ -33,6 +37,8 @@ main { flex: 1; display: grid; grid-template-columns: minmax(320px, 1fr) 1.4fr; 
 .chip.stale { color: var(--stale); border-color: var(--stale); }
 .chip.locked { color: var(--accent); border-color: var(--accent); }
 .chip.pool { color: var(--ok); border-color: var(--ok); }
+.chip.changed { color: var(--accent); border-color: var(--accent); }
+.chip.warn-chip { color: var(--warn); border-color: var(--warn); background: #fdf6e7; }
 .card {
   background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
   padding: 14px; margin-bottom: 14px;
@@ -92,6 +98,31 @@ textarea { width: 100%; min-height: 90px; resize: vertical; }
 #banner.ok { background: #e9f2e4; color: #3c5e30; }
 #banner.info { background: #efe9f3; color: #5f4a68; }
 #banner button { margin-left: auto; border: none; background: none; font-size: 16px; }
+
+/* Satz vs. TTS-Version — die beiden Texte dürfen nie verwechselbar sein */
+.pron { margin: 10px 0 16px; }
+.pron-block {
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  background: #fffdf9;
+}
+.pron-block.changed { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.pron-head {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 6px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.03em; color: var(--muted);
+}
+/* Eigenes Flex-Item, damit `gap` das Emoji vom Wort trennt — im Textfluss
+   klebt die Emoji-Glyphe sonst am folgenden Buchstaben. */
+.pron-icon { font-size: 14px; }
+.pron-source { font-size: 19px; line-height: 1.35; overflow-wrap: anywhere; }
+.pron-join { padding: 6px 0; text-align: center; font-size: 12px; color: var(--muted); }
+textarea.pron-input {
+  min-height: 0; font-size: 19px; line-height: 1.35; background: var(--panel);
+}
+.pron-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 6px; }
+
+/* Zeilen mit Auswahlfeldern (Profil, Stimme, Sprache) */
+.voice-line { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.voice-line label { display: flex; gap: 6px; align-items: center; }
 
 /* Hilfetexte */
 details.help { margin: 4px 0 10px; }

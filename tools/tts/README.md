@@ -41,13 +41,54 @@ mit „🎲 Kandidaten würfeln" (Anzahl einstellbar, 1–16) neu erzeugen, mit 
 vorsortieren und dann entweder per „📌 Seed festlegen" fürs nächste Rendern locken —
 oder per „🚀 In Produktion" die gehörte Aufnahme direkt als Produktions-Audio
 übernehmen (kopiert die WAV, lockt den Seed, kein Re-Render und kein erneutes
-Anhören nötig). Sampling-Parameter, Trim/Normalisierung und Instruktionen aller
-Profile sind über „⚙️ TTS-Parameter" in der Kopfzeile editierbar.
+Anhören nötig). Stimme, Sprache, Sampling-Parameter, Trim/Normalisierung und
+Instruktionen aller Profile sind über „⚙️ TTS-Parameter" in der Kopfzeile editierbar;
+Stimme und Aussprache zusätzlich pro Clip in der Detailsicht.
 
 **Mit `phoneme` anfangen.** Das ist Absicht: mit 37 Clips ist es das kleinste Profil und
 zugleich das riskanteste — gefragt ist der *Lautwert*, nicht der Buchstabenname („mmmmm",
-nicht „Em"). Klappt das per Instruktion nicht, greift `textOverride` im Lock als
+nicht „Em"). Klappt das per Instruktion nicht, greift die Aussprache-Eingabe als
 Notausgang. Das weiß man dann nach ein paar Minuten und nicht nach 25–40 Minuten Rendern.
+
+## Aussprache und Stimme
+
+Die Detailsicht zeigt zwei Texte getrennt untereinander, weil sie verschiedene Dinge sind:
+
+- **Satz** — was im Content-Pack steht und in der App zu lesen ist. Nur lesbar.
+- **TTS-Version** — genau der Text, der ans Modell geht. Editierbar.
+
+Solange beide gleich sind, steht „identisch mit dem Satz" daran. Sobald man die
+TTS-Version ändert, wird sie farbig abgesetzt („eigene Aussprache") und taucht auch in
+der Liste als zweite Zeile auf. Gespeichert wird sie als `textOverride` im Lock; der Satz
+selbst bleibt unangetastet. Weil ein Lock zwingend einen Seed braucht, nagelt Speichern
+den aktuellen Seed mit fest.
+
+Die **Stimme** ist an drei Stellen wählbar — pro Clip in der Detailsicht, pro Profil in
+der Profilkarte darunter und in „⚙️ TTS-Parameter". Hinter jedem Namen steht die Herkunft
+der Stimme:
+
+| Stimme | Herkunft |
+| --- | --- |
+| `serena`, `vivian` | westlich, weiblich |
+| `ryan`, `aiden` | westlich, männlich |
+| `sohee` | koreanisch |
+| `ono_anna` | japanisch |
+| `uncle_fu` | chinesisch |
+| `eric` | chinesisch, Sichuan-Dialekt |
+| `dylan` | chinesisch, Peking-Dialekt |
+
+Das ist keine Kosmetik. `language` setzt im Modell ein Sprach-Token (`german` → 2053) und
+steuert damit die Phonologie; das Speaker-Embedding bringt trotzdem den Akzent seiner
+Kernsprache mit. Bei einem ganzen Satz gleicht der Kontext das weitgehend aus, bei einem
+einzelnen Laut gibt es keinen Kontext — dort schlägt der Akzent voll durch. Genau deshalb
+klangen die `phoneme`-Clips mit der Voreinstellung `sohee` asiatisch, obwohl `german`
+korrekt gesetzt war. Lässt eine nicht-europäische Stimme europäischen Text sprechen,
+warnt die Oberfläche an Ort und Stelle.
+
+Die Stimmtabelle steht in `ttskit/voices.py` und wird von `tests/test_voices.py` gegen die
+Modell-Config im HF-Cache abgeglichen, damit sie nicht auseinanderläuft. Ein Stimmwechsel
+pro Profil macht alle seine Clips veraltet und wird deshalb rückgefragt; ein Wechsel pro
+Clip trifft nur diesen einen.
 
 ## Umfang
 
@@ -110,15 +151,19 @@ ersetzt eine leere oder abgeschnittene `profiles.json` **nicht** stillschweigend
 kuratierten Seed-Pools durch die Defaults, sondern ist ein Fehler. Wer wirklich zurück auf
 die Defaults will, löscht die Datei.
 
-`textOverride` und `note` in `locks.json` setzt man per Hand — das Web-Interface schickt
-beide (noch) nicht:
+`textOverride` und `speaker` schickt das Web-Interface selbst (siehe „Aussprache und
+Stimme" unten); `note` setzt man weiterhin per Hand:
 
 ```json
 { "version": 1, "locks": {
-  "phoneme:9f2c1a7b4e08": { "seed": 991, "textOverride": "mmmmm",
+  "phoneme:9f2c1a7b4e08": { "seed": 991, "speaker": "serena", "textOverride": "mmmmm",
                             "note": "sprach sonst 'Em'", "sourceText": "M" }
 }}
 ```
+
+`POST /api/clips/{key}/lock` fasst nur die Felder an, die im Body stehen; `null` löscht
+ein Feld ausdrücklich. Sonst würde ein Stimmwechsel die von Hand eingetippte Aussprache
+mitlöschen — die UI bearbeitet beides an getrennten Stellen.
 
 Aktuell liegen unter `out/audio/` bereits 18 gerenderte `finale`-Clips sowie ein
 `candidates/`-Verzeichnis aus der Entwicklung (probeweise gewürfelte Kandidaten-Seeds).
@@ -144,11 +189,14 @@ TTS_SMOKE=1 ~/qwen-tts-test/.venv/bin/python -m pytest tests/ -v # mit Modell
 
 ## Bekannte Einschränkungen
 
-- **Profil-Override erzwingt ein Seed-Lock.** Ändert man im Web-Interface das Profil
-  eines Clips, entsteht automatisch ein *Lock*, das den zu diesem Zeitpunkt aufgelösten
-  Seed festnagelt — der kann ein ungeprüfter Hash-Fallback sein. Ursache: `store.Lock`
-  verlangt zwingend einen `seed`, ein Profil-Override lässt sich also nicht ohne
-  Seed-Pinning ausdrücken. Wie das sauber gelöst wird, ist noch offen.
+- **Jeder Override erzwingt ein Seed-Lock.** Ändert man im Web-Interface das Profil, die
+  Stimme oder die Aussprache eines Clips, entsteht automatisch ein *Lock*, das den zu
+  diesem Zeitpunkt aufgelösten Seed festnagelt — der kann ein ungeprüfter Hash-Fallback
+  sein. Ursache: `store.Lock` verlangt zwingend einen `seed`, ein Override lässt sich
+  also nicht ohne Seed-Pinning ausdrücken. Wie das sauber gelöst wird, ist noch offen.
+- **„Festlegung (Lock) entfernen" entfernt alles.** Der Knopf löscht den ganzen
+  Lock-Eintrag, also auch eine eigene Aussprache und eine eigene Stimme, nicht nur den
+  Seed. Der Tooltip sagt es, der Knopftext nicht.
 - **Instruktion ändern setzt das ganze Profil auf stale.** Speichert man die Instruktion
   eines Profils, werden alle seine Clips `stale`; der nächste `render`-Lauf erzeugt sie
   komplett neu. Das ist so gewollt, aber gut zu wissen, bevor man eine Instruktion mal

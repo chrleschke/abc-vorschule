@@ -489,3 +489,135 @@ def test_events_streams_the_initial_status_frame(client):
         assert "queued" in payload
     finally:
         gen.close()
+
+
+# ---------------------------------------------------- Stimme, Sprache, Text
+# Das Web-Interface schickt seit dem Aussprache-Umbau `textOverride` und
+# `speaker`. Beides landet in der git-verwalteten locks.json bzw.
+# profiles.json, beides ändert den Klang — entsprechend eng geprüft.
+
+def test_state_ships_the_voice_catalogue_with_origins(client):
+    body = client.get("/api/state").json()
+    names = [v["name"] for v in body["voices"]]
+    assert "serena" in names and "sohee" in names
+    by_name = {v["name"]: v for v in body["voices"]}
+    assert by_name["sohee"]["origin"] == "koreanisch"
+    assert by_name["sohee"]["european"] is False
+    assert by_name["serena"]["european"] is True
+    assert "german" in body["languages"]
+
+
+def test_state_reports_the_resolved_voice_per_clip(client):
+    body = client.get("/api/state").json()
+    clip = body["clips"][0]
+    assert clip["speaker"] == body["profiles"][clip["profile"]]["speaker"]
+
+
+def test_changing_a_profile_voice_persists_and_moves_its_clips(client):
+    before = client.get("/api/state").json()
+    key = next(c["key"] for c in before["clips"] if c["profile"] == "phoneme")
+
+    assert client.put("/api/profiles/phoneme",
+                      json={"speaker": "serena"}).status_code == 200
+    raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+    assert raw["profiles"]["phoneme"]["speaker"] == "serena"
+
+    after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert after["speaker"] == "serena"
+    assert after["key"] == key, "the voice must not move the clip key"
+
+
+def test_changing_a_profile_language_persists(client):
+    assert client.put("/api/profiles/word",
+                      json={"language": "english"}).status_code == 200
+    raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+    assert raw["profiles"]["word"]["language"] == "english"
+
+
+def test_an_unknown_voice_or_language_is_rejected_and_nothing_persists(client):
+    response = client.put("/api/profiles/word", json={"speaker": "brunhilde"})
+    assert response.status_code == 422
+    assert "brunhilde" in response.json()["detail"]
+    assert "serena" in response.json()["detail"], "the valid options must be named"
+
+    response = client.put("/api/profiles/word", json={"language": "klingonisch"})
+    assert response.status_code == 422
+    assert "german" in response.json()["detail"]
+
+    assert not client.paths.profiles.exists(), "nothing may have been persisted"
+    assert client.get("/api/state").status_code == 200
+
+
+def test_locking_a_voice_affects_one_clip_only(client):
+    body = client.get("/api/state").json()
+    clips = [c for c in body["clips"] if c["profile"] == "phoneme"]
+    assert len(clips) >= 1
+    key = clips[0]["key"]
+    default = body["profiles"]["phoneme"]["speaker"]
+
+    assert client.post(f"/api/clips/{key}/lock",
+                       json={"seed": 5, "speaker": "ryan"}).status_code == 200
+    after = client.get("/api/state").json()["clips"]
+    assert next(c for c in after if c["key"] == key)["speaker"] == "ryan"
+    for clip in after:
+        if clip["key"] != key:
+            assert clip["speaker"] == default
+
+    raw = json.loads(client.paths.locks.read_text(encoding="utf-8"))
+    assert raw["locks"][key]["speaker"] == "ryan"
+
+
+def test_locking_an_unknown_voice_is_rejected_and_nothing_breaks(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    response = client.post(f"/api/clips/{key}/lock",
+                           json={"seed": 1, "speaker": "brunhilde"})
+    assert response.status_code == 422
+    assert "brunhilde" in response.json()["detail"]
+    assert not client.paths.locks.exists() or "brunhilde" not in \
+        client.paths.locks.read_text(encoding="utf-8")
+    assert client.get("/api/state").status_code == 200
+
+
+def test_a_second_lock_call_keeps_the_fields_it_does_not_mention(client):
+    """Die UI bearbeitet Aussprache, Stimme und Profil an drei Stellen. Würde
+    jeder Aufruf den ganzen Lock ersetzen, löschte ein Stimmwechsel die von
+    Hand eingetippte Aussprache."""
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/lock",
+                json={"seed": 1, "textOverride": "mmmmm", "note": "Handarbeit"})
+    client.post(f"/api/clips/{key}/lock", json={"seed": 1, "speaker": "serena"})
+
+    lock = json.loads(client.paths.locks.read_text(encoding="utf-8"))["locks"][key]
+    assert lock["textOverride"] == "mmmmm"
+    assert lock["note"] == "Handarbeit"
+    assert lock["speaker"] == "serena"
+
+
+def test_an_explicit_null_clears_a_field(client):
+    """„Auf den Satz zurücksetzen" muss die Aussprache wirklich löschen — und
+    darf dabei die Stimme stehen lassen."""
+    clip = client.get("/api/state").json()["clips"][0]
+    key, source = clip["key"], clip["sourceText"]
+    client.post(f"/api/clips/{key}/lock",
+                json={"seed": 1, "textOverride": "mmmmm", "speaker": "serena"})
+    client.post(f"/api/clips/{key}/lock", json={"seed": 1, "textOverride": None})
+
+    lock = json.loads(client.paths.locks.read_text(encoding="utf-8"))["locks"][key]
+    assert "textOverride" not in lock
+    assert lock["speaker"] == "serena"
+    after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert after["text"] == source
+
+
+def test_promote_preserves_a_locked_voice(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/lock", json={"seed": 1, "speaker": "vivian"})
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    seed = clip["candidates"][0]["seed"]
+
+    assert client.post(f"/api/clips/{key}/promote", json={"seed": seed}).status_code == 200
+    lock = json.loads(client.paths.locks.read_text(encoding="utf-8"))["locks"][key]
+    assert lock["speaker"] == "vivian"
+    assert lock["seed"] == seed

@@ -21,6 +21,7 @@ from fastapi.responses import (
     FileResponse, HTMLResponse, JSONResponse, StreamingResponse,
 )
 
+from . import voices
 from .cli import load_context
 from .paths import Paths
 from .plan import fingerprint, orphan_locks, status_of
@@ -36,6 +37,22 @@ STATIC = Path(__file__).resolve().parent / "static"
 #: and `cancel` does not drain the queue, so an unbounded `n` would be a
 #: self-inflicted denial of service on a single-worker tool.
 MAX_CANDIDATES = 16
+
+
+def _checked_speaker(name: Any) -> str:
+    """Eine Stimme, die es im Modell wirklich gibt — sonst 422.
+
+    Ungeprüft landet ein Tippfehler in der git-verwalteten profiles.json bzw.
+    locks.json und bricht danach jeden Einstiegspunkt, der `build_clips`
+    aufruft: `status`, `render` und ausgerechnet das /api/state, mit dem man
+    den Fehler wieder wegklicken müsste.
+    """
+    if voices.voice(name) is None:
+        raise HTTPException(
+            status_code=422,
+            detail=f"unbekannte Stimme {name!r}. Bekannt: "
+                   f"{', '.join(voices.speaker_names())}")
+    return name
 
 
 def _copy_atomic(src: Path, dst: Path) -> None:
@@ -171,6 +188,7 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                 "profile": clip.profile,
                 "text": clip.text,
                 "sourceText": clip.source_text,
+                "speaker": clip.speaker,
                 "seed": clip.seed,
                 "locked": clip.locked,
                 "itemIds": list(clip.item_ids),
@@ -185,6 +203,9 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                        "device": getattr(engine, "device", None)},
             "profiles": {n: p.to_dict() for n, p in ctx.profiles.profiles.items()},
             "poolSalt": ctx.profiles.pool_salt,
+            "voices": [{"name": v.name, "origin": v.origin, "european": v.european}
+                       for v in voices.VOICES],
+            "languages": list(voices.LANGUAGES),
             "limits": {"maxCandidates": MAX_CANDIDATES},
             "clips": clips,
             "orphans": [
@@ -210,6 +231,16 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                     detail=f"'instruct' muss ein Text sein, nicht "
                            f"{type(body['instruct']).__name__}")
             profile.instruct = body["instruct"]
+        if "speaker" in body:
+            profile.speaker = _checked_speaker(body["speaker"])
+        if "language" in body:
+            language = body["language"]
+            if language not in voices.LANGUAGES:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"unbekannte Sprache {language!r}. Bekannt: "
+                           f"{', '.join(voices.LANGUAGES)}")
+            profile.language = language
         if "sampling" in body:
             sampling = body["sampling"]
             if not isinstance(sampling, dict):
@@ -290,7 +321,18 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
     @app.post("/api/clips/{key}/lock")
     def api_lock(key: str, body: dict = Body(...)) -> dict[str, str]:
         ctx, clip = clip_by_key(key)
-        override = body.get("profile")
+        locks = Locks.load(paths.locks)
+        existing = locks.get(key)
+
+        # Nur benannte Felder werden angefasst; `null` löscht ein Feld
+        # ausdrücklich. Die UI bearbeitet Aussprache, Stimme und Profil an drei
+        # verschiedenen Stellen — würde jeder dieser Aufrufe den ganzen Lock
+        # ersetzen, löschte ein Stimmwechsel stillschweigend die von Hand
+        # eingetippte Aussprache. Das gleiche Versprechen gibt schon `promote`.
+        def merged(field: str, current):
+            return body[field] if field in body else current
+
+        override = merged("profile", existing.profile if existing else None)
         # An unvalidated profile name here used to persist into locks.json and
         # then brick every entry point — `status`, `extract`, `render` and the
         # /api/state the UI needs to fix it again.
@@ -299,13 +341,18 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                 status_code=422,
                 detail=f"unbekanntes Profil {override!r}. Gültig: "
                        f"{', '.join(sorted(ctx.profiles.profiles))}")
-        locks = Locks.load(paths.locks)
+        speaker = merged("speaker", existing.speaker if existing else None)
+        if speaker is not None:
+            _checked_speaker(speaker)
+
         locks.set(key, Lock(
             seed=int(body["seed"]),
             profile=override,
-            text_override=body.get("textOverride"),
-            note=body.get("note"),
+            text_override=merged("textOverride",
+                                 existing.text_override if existing else None),
+            note=merged("note", existing.note if existing else None),
             source_text=clip.source_text,
+            speaker=speaker,
         ))
         locks.save(paths.locks)
         return {"ok": "locked"}
@@ -339,6 +386,7 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
             text_override=existing.text_override if existing else None,
             note=existing.note if existing else None,
             source_text=clip.source_text,
+            speaker=existing.speaker if existing else None,
         ))
         locks.save(paths.locks)
 
