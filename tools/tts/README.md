@@ -197,6 +197,43 @@ Aktuell liegen unter `out/audio/` bereits 18 gerenderte `finale`-Clips sowie ein
 `candidates/`-Verzeichnis aus der Entwicklung (probeweise gewürfelte Kandidaten-Seeds).
 Beides ist jederzeit löschbar; `tts render` bzw. `tts sample` erzeugen es bei Bedarf neu.
 
+## Maximale Dauer (`max_new_tokens`)
+
+Das Modell erfindet beim Aussprechen einzelner Buchstaben gelegentlich ganze
+Sätze dazu. `max_new_tokens` deckelt die Aufnahme-Länge und macht solche
+Ausrutscher hörbar kaputt statt unauffällig falsch.
+
+- **1 Token = 80 ms Audio.** Hergeleitet aus dem 12-Hz-Tokenizer:
+  `decode_upsample_rate 1920` bei 24 kHz, also `1920 / 24000`.
+- Der Wert gilt für die **Rohgenerierung**, bevor `trim_silence` die Stille am
+  Anfang und Ende wegschneidet. Die fertige Datei ist entsprechend kürzer.
+- Es ist ein **harter Schnitt**: das Modell will weitersprechen und wird mitten
+  drin gekappt. Erfundene Sätze werden also nicht verhindert, sondern fallen
+  beim Kuratieren sofort auf.
+- Fehlt der Schlüssel in `profiles.json`, gilt der Checkpoint-Default von 8192
+  Tokens ≈ 655 s, also praktisch unbegrenzt.
+
+Im ⚙️-Panel wird der Wert in Sekunden eingegeben; gespeichert werden Tokens.
+
+## Wertebereiche
+
+Alle Sampling-Parameter samt Grenzen, Typ und Erklärungstext stehen in
+`SAMPLING_SPEC` in `ttskit/store.py` — eine Stelle, aus der sowohl die
+Server-Prüfung als auch das ⚙️-Panel gespeist werden. Ein neuer Parameter
+braucht dort einen Eintrag und sonst nichts.
+
+`do_sample` und `subtalker_dosample` sind bewusst **nicht** editierbar:
+greedy Generierung macht den Seed wirkungslos, womit Seed-Pool und
+Kandidaten-Kuratierung ihren Sinn verlieren.
+
+## Neustart nötig?
+
+Nein. Das Modell wird einmal beim Serverstart geladen und hängt nur an
+Checkpoint und Device. Sampling-Werte reisen pro Aufruf mit, und der Server
+liest `profiles.json` bei jedem Request neu — gespeichert heißt ab der
+nächsten Generierung wirksam. Ein Neustart ist nur für einen anderen
+Checkpoint oder ein anderes Device nötig.
+
 ## Profil-Updates und bestätigter Content
 
 `tts status`, `render` und `export` kennen nur zwei Zustände: `missing` (keine Datei
