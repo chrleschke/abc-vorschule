@@ -1,5 +1,20 @@
 {
   "clips": {
+    "A - wie Ampel.": {
+      "file": "reward_801e163efb4c.ogg",
+      "fingerprint": "55a884c1ffda44aa",
+      "profile": "reward"
+    },
+    "Au - wie Auto.": {
+      "file": "reward_3baa94bb94fe.ogg",
+      "fingerprint": "5f5b74085a119f38",
+      "profile": "reward"
+    },
+    "B - wie Ball.": {
+      "file": "reward_c15c2f3980ee.ogg",
+      "fingerprint": "b7357ddc6eb31024",
+      "profile": "reward"
+    },
     "Baue das Wort Eis. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
       "file": "prompt_206bc14a3673.ogg",
       "fingerprint": "69d0c94cdd146f6a",
@@ -29,6 +44,21 @@
       "file": "prompt_09c5df39f465.ogg",
       "fingerprint": "b90c0682213f6eac",
       "profile": "prompt"
+    },
+    "C - wie Clown.": {
+      "file": "reward_fbabe6da0dd9.ogg",
+      "fingerprint": "97aa615ac645e85f",
+      "profile": "reward"
+    },
+    "Ch - wie Dach.": {
+      "file": "reward_d0d28be43a2b.ogg",
+      "fingerprint": "10b019d3b595c91c",
+      "profile": "reward"
+    },
+    "D - wie Dose.": {
+      "file": "reward_f6be5ef80851.ogg",
+      "fingerprint": "17e01c3af0b78b00",
+      "profile": "reward"
     },
     "Das Auto ist gelb.": {
       "file": "sentence_fb7b8002bf06.ogg",
@@ -95,6 +125,41 @@
       "fingerprint": "387a2fc0ff480f64",
       "profile": "prompt"
     },
+    "E - wie Ente.": {
+      "file": "reward_6f74e614425c.ogg",
+      "fingerprint": "31bf65dafef5286d",
+      "profile": "reward"
+    },
+    "Ei - wie Ei.": {
+      "file": "reward_623572d8f348.ogg",
+      "fingerprint": "171c5c80ad7b7dca",
+      "profile": "reward"
+    },
+    "Ei - wie Eis.": {
+      "file": "reward_ba4f72325712.ogg",
+      "fingerprint": "9115865eb8e10d25",
+      "profile": "reward"
+    },
+    "Eu - wie Eule.": {
+      "file": "reward_8689d018bc99.ogg",
+      "fingerprint": "d0812470108f19df",
+      "profile": "reward"
+    },
+    "F - wie Fuchs.": {
+      "file": "reward_de84d7d20c82.ogg",
+      "fingerprint": "8a5d8594dc98b988",
+      "profile": "reward"
+    },
+    "G - wie Gabel.": {
+      "file": "reward_4113297732eb.ogg",
+      "fingerprint": "9b253483cee76c1c",
+      "profile": "reward"
+    },
+    "H - wie Hut.": {
+      "file": "reward_13ff0f7cdbab.ogg",
+      "fingerprint": "ea605138b9aa551e",
+      "profile": "reward"
+    },
     "Hallo Lama!": {
       "file": "sentence_3ff48545b9c4.ogg",
       "fingerprint": "9d639cb55c05834a",
@@ -104,6 +169,36 @@
       "file": "sentence_3dc7bd551f44.ogg",
       "fingerprint": "c52cc602cf997a6e",
       "profile": "sentence"
+    },
+    "I - wie Igel.": {
+      "file": "reward_6273482273f9.ogg",
+      "fingerprint": "c2f9281358581b80",
+      "profile": "reward"
+    },
+    "J - wie Jacke.": {
+      "file": "reward_cec5ae37e973.ogg",
+      "fingerprint": "fb395035f1d4cb8e",
+      "profile": "reward"
+    },
+    "K - wie Keks.": {
+      "file": "reward_877f9cffbb7f.ogg",
+      "fingerprint": "0faca0d0d3d99c11",
+      "profile": "reward"
+    },
+    "L - wie Lama.": {
+      "file": "reward_01798f83b4d8.ogg",
+      "fingerprint": "e9294730397ca839",
+      "profile": "reward"
+    },
+    "M - wie Maus.": {
+      "file": "reward_bfebc184cbd9.ogg",
+      "fingerprint": "3a088dcb878a8a0a",
+      "profile": "reward"
+    },
+    "M - wie Mond.": {
+      "file": "reward_9ba79d614c7c.ogg",
+      "fingerprint": "200198e08ed31077",
+      "profile": "reward"
     },
     "Mama ist im Haus.": {
       "file": "sentence_ea0d0f938a70.ogg",
@@ -119,6 +214,21 @@
       "file": "phoneme_8ce86a6ae65d.ogg",
       "fingerprint": "d6347bc174a9b2ed",
       "profile": "phoneme"
+    },
+    "N - wie Nase.": {
+      "file": "reward_efebb5e295cf.ogg",
+      "fingerprint": "3b4b47e823392e5a",
+      "profile": "reward"
+    },
+    "O - wie Ohr.": {
+      "file": "reward_b7f70cd2a8ea.ogg",
+      "fingerprint": "2978230b9b190216",
+      "profile": "reward"
+    },
+    "O - wie Oma.": {
+      "file": "reward_1f4d61aef3b9.ogg",
+      "fingerprint": "edc6144a1450dc98",
+      "profile": "reward"
     },
     "Oma hat einen Hut.": {
       "file": "sentence_f8d91895467d.ogg",
@@ -140,6 +250,46 @@
       "fingerprint": "e0090e2e137c3367",
       "profile": "phoneme"
     },
+    "P - wie Paket.": {
+      "file": "reward_72a86435fa66.ogg",
+      "fingerprint": "5b28ef5dc40cc8a5",
+      "profile": "reward"
+    },
+    "P - wie Papa.": {
+      "file": "reward_9ebfd7ef79a2.ogg",
+      "fingerprint": "be38ac172c529e84",
+      "profile": "reward"
+    },
+    "Pf - wie Pferd.": {
+      "file": "reward_80235c4e7eab.ogg",
+      "fingerprint": "f2ffa1c752f12bf0",
+      "profile": "reward"
+    },
+    "Qu - wie Qualle.": {
+      "file": "reward_7ab4d5238a5d.ogg",
+      "fingerprint": "ddd985cb98410c75",
+      "profile": "reward"
+    },
+    "R - wie Rose.": {
+      "file": "reward_77b0c4a17047.ogg",
+      "fingerprint": "62c0a09c2844ceba",
+      "profile": "reward"
+    },
+    "S - wie Sonne.": {
+      "file": "reward_376fd1093c8c.ogg",
+      "fingerprint": "2a69dc6f28adbfc8",
+      "profile": "reward"
+    },
+    "Sch - wie Schaf.": {
+      "file": "reward_09e1817de9e0.ogg",
+      "fingerprint": "7d6fbd5895f852c7",
+      "profile": "reward"
+    },
+    "Sch - wie Schule.": {
+      "file": "reward_9aa77a522bb6.ogg",
+      "fingerprint": "67439ab1d24afc13",
+      "profile": "reward"
+    },
     "Schiebe b und au zusammen. Welche Silbe entsteht.": {
       "file": "prompt_1684a2eff3f3.ogg",
       "fingerprint": "8edeabe72c231cb4",
@@ -155,15 +305,45 @@
       "fingerprint": "c56867c578aea1fd",
       "profile": "prompt"
     },
+    "Sp - wie Spinne.": {
+      "file": "reward_3db55144cb9c.ogg",
+      "fingerprint": "318804b1e53ced22",
+      "profile": "reward"
+    },
     "St": {
       "file": "phoneme_51de452ffffe.ogg",
       "fingerprint": "d5b4d51d470fb113",
       "profile": "phoneme"
     },
+    "St - wie Stern.": {
+      "file": "reward_13de3d45009c.ogg",
+      "fingerprint": "1fd52744a7afdb64",
+      "profile": "reward"
+    },
+    "T - wie Tom.": {
+      "file": "reward_f8b083af5066.ogg",
+      "fingerprint": "7353ed9949c14fef",
+      "profile": "reward"
+    },
+    "T - wie Tomate.": {
+      "file": "reward_391bb663b6c9.ogg",
+      "fingerprint": "f46f7a05afaa3845",
+      "profile": "reward"
+    },
     "Tom ruft Opa.": {
       "file": "sentence_b76ede73be92.ogg",
       "fingerprint": "f2bb2dff3b909a3f",
       "profile": "sentence"
+    },
+    "U - wie Uhu.": {
+      "file": "reward_d0d1ee4bce5c.ogg",
+      "fingerprint": "9ab221c7ec7ff0e7",
+      "profile": "reward"
+    },
+    "V - wie Vogel.": {
+      "file": "reward_4a21745e952d.ogg",
+      "fingerprint": "e3fd988b807cdb71",
+      "profile": "reward"
     },
     "Vier Reihen mit je sechs Omas singen im Chor. Wie viele Omas singen.": {
       "file": "prompt_19e9af6a4aee.ogg",
@@ -179,6 +359,11 @@
       "file": "prompt_126764115645.ogg",
       "fingerprint": "93ab2d6e1b14ce46",
       "profile": "prompt"
+    },
+    "W - wie Weg.": {
+      "file": "reward_9fd61a1e4083.ogg",
+      "fingerprint": "01da5f4acdbe714f",
+      "profile": "reward"
     },
     "Wir gehen den Weg.": {
       "file": "sentence_0620b64d3955.ogg",
@@ -214,6 +399,26 @@
       "file": "prompt_1a6f6b9c07a9.ogg",
       "fingerprint": "9b13ad26a94079ff",
       "profile": "prompt"
+    },
+    "X - wie Taxi.": {
+      "file": "reward_ca68e09ab818.ogg",
+      "fingerprint": "1b71f9a9080cf0f2",
+      "profile": "reward"
+    },
+    "X - wie Xylophon.": {
+      "file": "reward_6f6d00e1b28e.ogg",
+      "fingerprint": "c164bdc62ccfd4a2",
+      "profile": "reward"
+    },
+    "Y - wie Yacht.": {
+      "file": "reward_76198e73fcd4.ogg",
+      "fingerprint": "2adfb10e95c4c4b9",
+      "profile": "reward"
+    },
+    "Z - wie Zebra.": {
+      "file": "reward_6010341413e0.ogg",
+      "fingerprint": "351519a9fbc5bda4",
+      "profile": "reward"
     },
     "Zeichne den Buchstaben - L - nach und sammle dabei alle Sterne.": {
       "file": "prompt_24bcc5fc883e.ogg",
@@ -265,6 +470,11 @@
       "fingerprint": "a965da8908492386",
       "profile": "prompt"
     },
+    "ck - wie Sack.": {
+      "file": "reward_4073a31e3c4c.ogg",
+      "fingerprint": "964f60bee0a282af",
+      "profile": "reward"
+    },
     "ks": {
       "file": "phoneme_59548661e252.ogg",
       "fingerprint": "72f7a97dc8c0969e",
@@ -275,10 +485,35 @@
       "fingerprint": "7f803e2e080a770b",
       "profile": "phoneme"
     },
+    "Ä - wie Ähre.": {
+      "file": "reward_9f782d62be55.ogg",
+      "fingerprint": "8771c14a0ea9abcb",
+      "profile": "reward"
+    },
+    "Ö - wie Löwe.": {
+      "file": "reward_897a52853f3a.ogg",
+      "fingerprint": "04aae522ec1c2901",
+      "profile": "reward"
+    },
     "Ü": {
       "file": "phoneme_913d7314efae.ogg",
       "fingerprint": "c737dd7f35637614",
       "profile": "phoneme"
+    },
+    "Ü - wie Rübe.": {
+      "file": "reward_62faacec02f0.ogg",
+      "fingerprint": "68e6a0b8b77331b0",
+      "profile": "reward"
+    },
+    "Ü - wie Überraschung.": {
+      "file": "reward_89ab8a463570.ogg",
+      "fingerprint": "9a8144f6ba75510f",
+      "profile": "reward"
+    },
+    "ß - wie Fuß.": {
+      "file": "reward_a2fc36def4b8.ogg",
+      "fingerprint": "05d4e621df899d0b",
+      "profile": "reward"
     }
   },
   "version": 1

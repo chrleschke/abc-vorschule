@@ -165,6 +165,242 @@
       "seed": 2061156809,
       "sourceText": "Baue das Wort Fisch. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
     },
+    "reward:01798f83b4d8": {
+      "seed": 873012571,
+      "textOverride": "L wie Lama.",
+      "sourceText": "L - wie Lama."
+    },
+    "reward:09e1817de9e0": {
+      "seed": 1135500920,
+      "textOverride": "\"Sch\" wie Schaf.",
+      "sourceText": "Sch - wie Schaf."
+    },
+    "reward:13de3d45009c": {
+      "seed": 1771886242,
+      "textOverride": "\"Scht\" wie Stern.",
+      "sourceText": "St - wie Stern."
+    },
+    "reward:13ff0f7cdbab": {
+      "seed": 865403334,
+      "textOverride": "\"H\" wie Hut.",
+      "sourceText": "H - wie Hut."
+    },
+    "reward:1f4d61aef3b9": {
+      "seed": 873012571,
+      "textOverride": "\"O\" wie Oma.",
+      "sourceText": "O - wie Oma."
+    },
+    "reward:376fd1093c8c": {
+      "seed": 893467947,
+      "textOverride": "\"Es\" wie Sonne.",
+      "sourceText": "S - wie Sonne."
+    },
+    "reward:391bb663b6c9": {
+      "seed": 1995171,
+      "textOverride": "\"T\" wie Tomate.",
+      "sourceText": "T - wie Tomate."
+    },
+    "reward:3baa94bb94fe": {
+      "seed": 1771886242,
+      "textOverride": "\"Au\" wie Auto.",
+      "sourceText": "Au - wie Auto."
+    },
+    "reward:3db55144cb9c": {
+      "seed": 893467947,
+      "textOverride": "\"Schp\" wie Spinne.",
+      "sourceText": "Sp - wie Spinne."
+    },
+    "reward:4073a31e3c4c": {
+      "seed": 1995171,
+      "textOverride": "\"Zeh K\" wie in Sack.",
+      "sourceText": "ck - wie Sack."
+    },
+    "reward:4113297732eb": {
+      "seed": 807468455,
+      "textOverride": "\"Geh\" wie Gabel.",
+      "sourceText": "G - wie Gabel."
+    },
+    "reward:4a21745e952d": {
+      "seed": 244251654,
+      "textOverride": "\"Fau\" wie Vogel.",
+      "sourceText": "V - wie Vogel."
+    },
+    "reward:6010341413e0": {
+      "seed": 1904053378,
+      "textOverride": "Zett wie Zebra.",
+      "sourceText": "Z - wie Zebra."
+    },
+    "reward:623572d8f348": {
+      "seed": 1869530881,
+      "textOverride": "Ei wie Ei.",
+      "sourceText": "Ei - wie Ei."
+    },
+    "reward:6273482273f9": {
+      "seed": 893467947,
+      "textOverride": "\"Ih\" wie Igel.",
+      "sourceText": "I - wie Igel."
+    },
+    "reward:62faacec02f0": {
+      "seed": 1135500920,
+      "textOverride": "\"Ü\" wie in Rübe.",
+      "sourceText": "Ü - wie Rübe."
+    },
+    "reward:6f6d00e1b28e": {
+      "seed": 1869530881,
+      "textOverride": "Ix wie ksylofon",
+      "sourceText": "X - wie Xylophon."
+    },
+    "reward:6f74e614425c": {
+      "seed": 1995171,
+      "textOverride": "\"E\" wie Ente.",
+      "sourceText": "E - wie Ente."
+    },
+    "reward:72a86435fa66": {
+      "seed": 1179549907,
+      "textOverride": "\"P\" wie Paket.",
+      "sourceText": "P - wie Paket."
+    },
+    "reward:76198e73fcd4": {
+      "seed": 1904053378,
+      "textOverride": "\"Ypsilon\" wie Yacht.",
+      "sourceText": "Y - wie Yacht."
+    },
+    "reward:77b0c4a17047": {
+      "seed": 1084655494,
+      "speaker": "serena",
+      "textOverride": "Är wie Rhose",
+      "sourceText": "R - wie Rose."
+    },
+    "reward:7ab4d5238a5d": {
+      "seed": 1742555752,
+      "textOverride": "\"Kuh\" wie Qualle.",
+      "sourceText": "Qu - wie Qualle."
+    },
+    "reward:801e163efb4c": {
+      "seed": 1087946411,
+      "textOverride": "A wie Ampel.",
+      "sourceText": "A - wie Ampel."
+    },
+    "reward:80235c4e7eab": {
+      "seed": 873012571,
+      "textOverride": "\"Pf\"  wie Pferd.",
+      "sourceText": "Pf - wie Pferd."
+    },
+    "reward:8689d018bc99": {
+      "seed": 1257079766,
+      "textOverride": "\"Oy\" wie Eule.",
+      "sourceText": "Eu - wie Eule."
+    },
+    "reward:877f9cffbb7f": {
+      "seed": 1084655494,
+      "textOverride": "\"Ka\" wie Keks.",
+      "sourceText": "K - wie Keks."
+    },
+    "reward:897a52853f3a": {
+      "seed": 1179549907,
+      "textOverride": "\"Ö\" wie in Löwe.",
+      "sourceText": "Ö - wie Löwe."
+    },
+    "reward:89ab8a463570": {
+      "seed": 1869530881,
+      "textOverride": "Ü wie Überraschung.",
+      "sourceText": "Ü - wie Überraschung."
+    },
+    "reward:9aa77a522bb6": {
+      "seed": 671864064,
+      "textOverride": "\"Sch\" wie Schule.",
+      "sourceText": "Sch - wie Schule."
+    },
+    "reward:9ba79d614c7c": {
+      "seed": 1084655494,
+      "textOverride": "\"Em\" wie Mond.",
+      "sourceText": "M - wie Mond."
+    },
+    "reward:9ebfd7ef79a2": {
+      "seed": 244251654,
+      "textOverride": "\"P\" wie Papa.",
+      "sourceText": "P - wie Papa."
+    },
+    "reward:9f782d62be55": {
+      "seed": 1995171,
+      "textOverride": "\"Aeh\" wie Ähre.",
+      "sourceText": "Ä - wie Ähre."
+    },
+    "reward:9fd61a1e4083": {
+      "seed": 893467947,
+      "textOverride": "\"W\" wie der Weg.",
+      "sourceText": "W - wie Weg."
+    },
+    "reward:a2fc36def4b8": {
+      "seed": 244251654,
+      "textOverride": "\"S Z\" wie in Fuß.",
+      "sourceText": "ß - wie Fuß."
+    },
+    "reward:b7f70cd2a8ea": {
+      "seed": 244251654,
+      "textOverride": "O wie Ohr.",
+      "sourceText": "O - wie Ohr."
+    },
+    "reward:ba4f72325712": {
+      "seed": 1869530881,
+      "textOverride": "Ei wie Eis.",
+      "sourceText": "Ei - wie Eis."
+    },
+    "reward:bfebc184cbd9": {
+      "seed": 807468455,
+      "textOverride": "\"ÄM\" wie Maus.",
+      "sourceText": "M - wie Maus."
+    },
+    "reward:c15c2f3980ee": {
+      "seed": 873012571,
+      "textOverride": "\"B\" wie Ball.",
+      "sourceText": "B - wie Ball."
+    },
+    "reward:ca68e09ab818": {
+      "seed": 1869530881,
+      "textOverride": "\"X wie in Taxi.",
+      "sourceText": "X - wie Taxi."
+    },
+    "reward:cec5ae37e973": {
+      "seed": 1516666763,
+      "textOverride": "\"Jott\"  wie Jacke.",
+      "sourceText": "J - wie Jacke."
+    },
+    "reward:d0d1ee4bce5c": {
+      "seed": 1677039810,
+      "textOverride": "\"U\" wie Uhu.",
+      "sourceText": "U - wie Uhu."
+    },
+    "reward:d0d28be43a2b": {
+      "seed": 1869530881,
+      "textOverride": "\"c h\"  wie in Dach.",
+      "sourceText": "Ch - wie Dach."
+    },
+    "reward:de84d7d20c82": {
+      "seed": 1087946411,
+      "textOverride": "\"Ef\" wie Fuchs.",
+      "sourceText": "F - wie Fuchs."
+    },
+    "reward:efebb5e295cf": {
+      "seed": 1045943433,
+      "textOverride": "\"ÄN\" wie Nase.",
+      "sourceText": "N - wie Nase."
+    },
+    "reward:f6be5ef80851": {
+      "seed": 893467947,
+      "textOverride": "\"D\" wie Dose.",
+      "sourceText": "D - wie Dose."
+    },
+    "reward:f8b083af5066": {
+      "seed": 183009980,
+      "textOverride": "\"T\" wie Tom.",
+      "sourceText": "T - wie Tom."
+    },
+    "reward:fbabe6da0dd9": {
+      "seed": 1869530881,
+      "textOverride": "\"Zeh\" wie Clown.",
+      "sourceText": "C - wie Clown."
+    },
     "sentence:0620b64d3955": {
       "seed": 447155165,
       "sourceText": "Wir gehen den Weg."
