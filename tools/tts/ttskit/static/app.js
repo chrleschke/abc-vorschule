@@ -589,7 +589,8 @@ function renderDetail(key) {
           <li><b>Produktion</b> — es kann nur eine geben: die Auswahl übernimmt genau
             diese Aufnahme sofort als Produktions-Audio und legt ihren Seed fest.
             Die Festlegung entfällt von selbst, sobald keine Aufnahme dieses Clips
-            mehr übrig ist — dafür gibt es keinen eigenen Knopf.</li>
+            mehr übrig ist — dafür gibt es keinen eigenen Knopf. Eine eigene
+            Aussprache oder Stimme bleibt dabei erhalten.</li>
           <li><b>👍</b> — klingt gut: Bewertung wird gespeichert und der Seed automatisch
             in den Seed-Pool des Profils „${clip.profile}“ aufgenommen (Clips ohne Lock
             bekommen ihre Seeds aus diesem Pool).</li>
