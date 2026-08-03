@@ -2,208 +2,283 @@
   "clips": {
     "Baue das Wort Eis. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
       "file": "prompt_206bc14a3673.ogg",
-      "fingerprint": "eee077343238cf42",
+      "fingerprint": "69d0c94cdd146f6a",
       "profile": "prompt"
     },
     "Baue das Wort Fisch. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
       "file": "prompt_2811c87d47db.ogg",
-      "fingerprint": "aa4bad14165d1cce",
+      "fingerprint": "7e047f8c9e7773cb",
       "profile": "prompt"
     },
     "Baue das Wort Pferd. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
       "file": "prompt_14a73343a0ea.ogg",
-      "fingerprint": "d90d8761e1446086",
+      "fingerprint": "44a157084d102cde",
       "profile": "prompt"
     },
     "Baue das Wort Pony. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
       "file": "prompt_1eb1ad800136.ogg",
-      "fingerprint": "1e1218b4d320a26d",
+      "fingerprint": "66ef670002bc93e3",
       "profile": "prompt"
     },
     "Baue das Wort Qualle. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
       "file": "prompt_16690400e619.ogg",
-      "fingerprint": "6cf9440499611a63",
+      "fingerprint": "dc62c3aef19171a5",
       "profile": "prompt"
     },
     "Baue das Wort am. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
       "file": "prompt_09c5df39f465.ogg",
-      "fingerprint": "49a2b31381745278",
+      "fingerprint": "b90c0682213f6eac",
       "profile": "prompt"
     },
     "Das Auto ist gelb.": {
       "file": "sentence_fb7b8002bf06.ogg",
-      "fingerprint": "25a80eb2b370ae59",
+      "fingerprint": "c0c6ba4c8a3ef699",
       "profile": "sentence"
     },
     "Das Dreieck ist rot.": {
       "file": "sentence_37aa13fdf05d.ogg",
-      "fingerprint": "5eb7c6f0d0b96e3c",
+      "fingerprint": "153a6a0a3d8dd025",
       "profile": "sentence"
     },
     "Das Herz ist rot.": {
       "file": "sentence_20074d0c7579.ogg",
-      "fingerprint": "4a2f2c5d1dcbd0ea",
+      "fingerprint": "d58479867008b892",
       "profile": "sentence"
     },
     "Das Pferd läuft.": {
       "file": "sentence_410190d7c985.ogg",
-      "fingerprint": "f5284a42b879f5b6",
+      "fingerprint": "528ecfb1cd594d1c",
       "profile": "sentence"
     },
     "Das ist mein Brot.": {
       "file": "sentence_b309c28c2c33.ogg",
-      "fingerprint": "930ae050c040d515",
+      "fingerprint": "271e0fc61b7eec94",
       "profile": "sentence"
     },
     "Das ist mein Ei.": {
       "file": "sentence_25e52f9570c2.ogg",
-      "fingerprint": "b326ab52df4f5321",
+      "fingerprint": "34aad92c8d060b81",
       "profile": "sentence"
     },
     "Der Fisch schwimmt.": {
       "file": "sentence_2723db5e341b.ogg",
-      "fingerprint": "74ecad4b070c29e7",
+      "fingerprint": "18bd03adbdb5dac1",
       "profile": "sentence"
     },
     "Der Fuß ist groß.": {
       "file": "sentence_5da5adfeaff0.ogg",
-      "fingerprint": "c73d03a2ef7a157e",
+      "fingerprint": "b24acb9a5ac85ddc",
       "profile": "sentence"
     },
     "Der Kreis ist blau.": {
       "file": "sentence_bbe4245523dc.ogg",
-      "fingerprint": "fd0df634467e94ae",
+      "fingerprint": "37498abc13a4a108",
       "profile": "sentence"
     },
     "Der Löwe ist da.": {
       "file": "sentence_0f7df5461bdf.ogg",
-      "fingerprint": "0f60186803bcbdba",
+      "fingerprint": "ed07f4e0ffe75983",
       "profile": "sentence"
     },
     "Die Spinne spielt.": {
       "file": "sentence_147f2a0d4995.ogg",
-      "fingerprint": "aa4e28e38703760f",
+      "fingerprint": "3dc03f44a8de1cdb",
       "profile": "sentence"
     },
     "Dreiundzwanzig Ameisen krabbeln im Bau. Acht krabbeln hinaus. Wie viele Ameisen bleiben.": {
       "file": "prompt_164e6d5ad595.ogg",
-      "fingerprint": "a9bdb31d450924b0",
+      "fingerprint": "47572338490c3b1b",
       "profile": "prompt"
     },
     "Dreizehn Dosen und sieben Dosen. Wie viele Dosen sind das.": {
       "file": "prompt_0becb71d5e8b.ogg",
-      "fingerprint": "e69308bd036a2480",
+      "fingerprint": "387a2fc0ff480f64",
       "profile": "prompt"
     },
     "Hallo Lama!": {
       "file": "sentence_3ff48545b9c4.ogg",
-      "fingerprint": "b9712707919ba64f",
+      "fingerprint": "9d639cb55c05834a",
       "profile": "sentence"
     },
     "Hier sind Häuser.": {
       "file": "sentence_3dc7bd551f44.ogg",
-      "fingerprint": "0041042977c4628f",
+      "fingerprint": "c52cc602cf997a6e",
       "profile": "sentence"
     },
     "Mama ist im Haus.": {
       "file": "sentence_ea0d0f938a70.ogg",
-      "fingerprint": "6b60944b08947e1c",
+      "fingerprint": "19c5548488ca7a6e",
       "profile": "sentence"
     },
     "Mama.": {
       "file": "sentence_6c731de28695.ogg",
-      "fingerprint": "69924e781a480f39",
+      "fingerprint": "8288827622e05506",
       "profile": "sentence"
+    },
+    "N": {
+      "file": "phoneme_8ce86a6ae65d.ogg",
+      "fingerprint": "d6347bc174a9b2ed",
+      "profile": "phoneme"
     },
     "Oma hat einen Hut.": {
       "file": "sentence_f8d91895467d.ogg",
-      "fingerprint": "d8ffaf3bfcb6cc30",
+      "fingerprint": "51f6879057d9b639",
       "profile": "sentence"
     },
     "Oma.": {
       "file": "sentence_ba35c984dbf8.ogg",
-      "fingerprint": "84b69fae91b1abcd",
+      "fingerprint": "706380ec3677b34d",
       "profile": "sentence"
+    },
+    "Ordne das Wort - Mama - dem Bild zu.": {
+      "file": "prompt_1ac28f3a7750.ogg",
+      "fingerprint": "759ab7a8259b4541",
+      "profile": "prompt"
+    },
+    "P": {
+      "file": "phoneme_5c62e091b8c0.ogg",
+      "fingerprint": "e0090e2e137c3367",
+      "profile": "phoneme"
+    },
+    "Schiebe b und au zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_1684a2eff3f3.ogg",
+      "fingerprint": "8edeabe72c231cb4",
+      "profile": "prompt"
     },
     "Schiebe sch und a zusammen. Welche Silbe entsteht.": {
       "file": "prompt_0f47d6de53ad.ogg",
-      "fingerprint": "1e4145e10edc06ce",
+      "fingerprint": "ae45a3a8c40aea7a",
       "profile": "prompt"
     },
     "Sechzehn Spinnen und vierzehn Spinnen. Wie viele Spinnen sind das.": {
       "file": "prompt_141d639bc4d4.ogg",
-      "fingerprint": "177e2e16b9c7bc91",
+      "fingerprint": "c56867c578aea1fd",
       "profile": "prompt"
+    },
+    "St": {
+      "file": "phoneme_51de452ffffe.ogg",
+      "fingerprint": "d5b4d51d470fb113",
+      "profile": "phoneme"
     },
     "Tom ruft Opa.": {
       "file": "sentence_b76ede73be92.ogg",
-      "fingerprint": "a3b69c34eafc64d8",
+      "fingerprint": "f2bb2dff3b909a3f",
       "profile": "sentence"
+    },
+    "Vier Reihen mit je sechs Omas singen im Chor. Wie viele Omas singen.": {
+      "file": "prompt_19e9af6a4aee.ogg",
+      "fingerprint": "069baf373c7ce7a7",
+      "profile": "prompt"
     },
     "Vierundzwanzig Eulen sitzen im Wald. Neun fliegen weg. Wie viele Eulen bleiben.": {
       "file": "prompt_2550616c90ca.ogg",
-      "fingerprint": "ce3a02e605fa3ca7",
+      "fingerprint": "e3b5570d371482b5",
       "profile": "prompt"
     },
     "Vierzehn Häuser und neun Häuser. Wie viele Häuser sind das.": {
       "file": "prompt_126764115645.ogg",
-      "fingerprint": "219cc8e75662b281",
+      "fingerprint": "93ab2d6e1b14ce46",
       "profile": "prompt"
     },
     "Wir gehen den Weg.": {
       "file": "sentence_0620b64d3955.ogg",
-      "fingerprint": "5ba6f6c3e7b40e0b",
+      "fingerprint": "ae3495655c451016",
       "profile": "sentence"
+    },
+    "Wir gehen den Weg. - Ordne die Wörter in die richtige Reihenfolge.": {
+      "file": "prompt_1fd1dc6575a8.ogg",
+      "fingerprint": "85019cb94f04ab20",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_0845c380bb11.ogg",
+      "fingerprint": "7e732b0759b15525",
+      "profile": "prompt"
     },
     "Wo hörst du den Buchstaben - L? Am Anfang, in der Mitte oder am Ende.": {
       "file": "prompt_11bc85fc22b6.ogg",
-      "fingerprint": "71b85315bdccdacd",
+      "fingerprint": "d54510eeda2a5bf1",
       "profile": "prompt"
     },
     "Wo hörst du den Buchstaben - S? Am Anfang, in der Mitte oder am Ende.": {
       "file": "prompt_1ec405c1df3a.ogg",
-      "fingerprint": "0961f4314b2b83a6",
+      "fingerprint": "057e1ae5a0a56ba2",
       "profile": "prompt"
     },
     "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende.": {
       "file": "prompt_16551c2f4d33.ogg",
-      "fingerprint": "1d1a0bb305592579",
+      "fingerprint": "66303b91da36e6c2",
       "profile": "prompt"
     },
     "Wo hörst du den Laut - Pf? Am Anfang, in der Mitte oder am Ende.": {
       "file": "prompt_1a6f6b9c07a9.ogg",
-      "fingerprint": "3d48400de83b3d3b",
+      "fingerprint": "9b13ad26a94079ff",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - L - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_24bcc5fc883e.ogg",
+      "fingerprint": "d12f26755c2c8ac7",
       "profile": "prompt"
     },
     "Zeichne den Buchstaben - N - nach und sammle dabei alle Sterne.": {
       "file": "prompt_0096fcfb79a3.ogg",
-      "fingerprint": "c0c61110d4ce2893",
+      "fingerprint": "2c7879d9203ee3d6",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - W - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_0c7bdb3341bb.ogg",
+      "fingerprint": "9067b4d7a8deed02",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - Ä - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_099a34df3bd6.ogg",
+      "fingerprint": "3fbdc6cb797b308d",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - Ü - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_15afce80024a.ogg",
+      "fingerprint": "e870caf5c84f0354",
       "profile": "prompt"
     },
     "Zeichne den Laut - Au - nach und sammle dabei alle Sterne.": {
       "file": "prompt_19428c2459aa.ogg",
-      "fingerprint": "2eeddea66574fcc5",
+      "fingerprint": "1bf0bfcf660c2da0",
       "profile": "prompt"
     },
     "Zeichne den Laut - Ei - nach und sammle dabei alle Sterne.": {
       "file": "prompt_25ecae006efe.ogg",
-      "fingerprint": "5fddab131fec8fbd",
+      "fingerprint": "c01407fdc6924699",
       "profile": "prompt"
     },
     "Zeichne den Laut - Pf - nach und sammle dabei alle Sterne.": {
       "file": "prompt_03730ade6177.ogg",
-      "fingerprint": "e157670063048646",
+      "fingerprint": "6c417b6532fd10d1",
       "profile": "prompt"
     },
     "Zeichne den Laut - Sch - nach und sammle dabei alle Sterne.": {
       "file": "prompt_0131504e9743.ogg",
-      "fingerprint": "34c54f9c599df1f5",
+      "fingerprint": "d106ea4ef1435667",
       "profile": "prompt"
     },
     "Zwölf Eis und neun Eis. Wie viele Eis sind das zusammen.": {
       "file": "prompt_26a3d65bcbcc.ogg",
-      "fingerprint": "e527906bee0cb3ae",
+      "fingerprint": "a965da8908492386",
       "profile": "prompt"
+    },
+    "ks": {
+      "file": "phoneme_59548661e252.ogg",
+      "fingerprint": "72f7a97dc8c0969e",
+      "profile": "phoneme"
+    },
+    "Ä": {
+      "file": "phoneme_2fe5ca1c1a3d.ogg",
+      "fingerprint": "7f803e2e080a770b",
+      "profile": "phoneme"
+    },
+    "Ü": {
+      "file": "phoneme_913d7314efae.ogg",
+      "fingerprint": "c737dd7f35637614",
+      "profile": "phoneme"
     }
   },
   "version": 1

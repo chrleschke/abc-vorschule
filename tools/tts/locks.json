@@ -1,6 +1,16 @@
 {
   "version": 1,
   "locks": {
+    "phoneme:2fe5ca1c1a3d": {
+      "seed": 978878263,
+      "textOverride": "Ae",
+      "sourceText": "Ä"
+    },
+    "phoneme:51de452ffffe": {
+      "seed": 1370202921,
+      "textOverride": "S.T.",
+      "sourceText": "St"
+    },
     "phoneme:59548661e252": {
       "seed": 252801214,
       "textOverride": "ka es",
@@ -11,6 +21,16 @@
       "speaker": "sohee",
       "textOverride": "Pe",
       "sourceText": "P"
+    },
+    "phoneme:8ce86a6ae65d": {
+      "seed": 1381496200,
+      "textOverride": "en.",
+      "sourceText": "N"
+    },
+    "phoneme:913d7314efae": {
+      "seed": 874064776,
+      "textOverride": "Ü.",
+      "sourceText": "Ü"
     },
     "prompt:0096fcfb79a3": {
       "seed": 841739473,
