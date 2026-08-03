@@ -323,31 +323,131 @@ def test_a_profile_without_max_new_tokens_still_loads(tmp_path):
     assert profile.sampling == {"temperature": 0.6, "top_k": 30}
 
 
-def test_the_shipped_profiles_json_carries_the_new_parameters():
+# --------------------------------------------- Prüfung schon beim Laden
+
+
+def _profiles_file(tmp_path: Path, sampling: dict) -> Path:
+    path = tmp_path / "profiles.json"
+    path.write_text(json.dumps({
+        "poolSalt": "v1",
+        "profiles": {"word": {
+            "label": "Einzelwort", "speaker": "sohee", "language": "german",
+            "instruct": "Sprich das Wort.", "sampling": sampling,
+        }},
+    }), encoding="utf-8")
+    return path
+
+
+def test_a_hand_edited_max_new_tokens_below_the_minimum_is_rejected_at_load(tmp_path):
+    """min_new_tokens: 2 steckt fest in der Library.
+
+    Ein handgeschriebenes `1` erzeugt 0–1 Codec-Frames, also für jeden Clip
+    dieses Profils leere Audio — und ohne diese Prüfung sagte keine Meldung,
+    welche Datei schuld ist. Der HTTP-Schreibweg allein reicht dafür nicht.
+    """
+    path = _profiles_file(tmp_path, {"max_new_tokens": 1})
+    with pytest.raises(ValueError) as excinfo:
+        Profiles.load(path)
+    message = str(excinfo.value)
+    assert "profiles.json" in message
+    assert "'word'" in message
+    assert "max_new_tokens" in message
+
+
+def test_a_hand_added_do_sample_is_rejected_at_load(tmp_path):
+    """do_sample: false wäre im Panel unsichtbar und nicht entfernbar.
+
+    Weitergereicht würde es trotzdem (`**profile.sampling`): greedy erzeugt
+    für jeden Seed dieselbe Audio, womit Seed-Pool und Kuratierung wertlos
+    sind. Genau der Fußangel, die das Design ausdrücklich ausgeschlossen hat.
+    """
+    path = _profiles_file(tmp_path, {"do_sample": False})
+    with pytest.raises(ValueError) as excinfo:
+        Profiles.load(path)
+    message = str(excinfo.value)
+    assert "profiles.json" in message and "'word'" in message
+    assert "do_sample" in message
+
+
+def test_a_hand_edited_value_above_the_maximum_is_rejected_at_load(tmp_path):
+    path = _profiles_file(tmp_path, {"top_p": 3})
+    with pytest.raises(ValueError) as excinfo:
+        Profiles.load(path)
+    message = str(excinfo.value)
+    assert "profiles.json" in message and "'word'" in message
+    assert "top_p" in message
+
+
+def test_a_hand_edited_string_value_is_rejected_at_load(tmp_path):
+    path = _profiles_file(tmp_path, {"temperature": "heiß"})
+    with pytest.raises(ValueError, match="temperature"):
+        Profiles.load(path)
+
+
+def test_a_hand_edited_fractional_top_k_is_rejected_at_load(tmp_path):
+    path = _profiles_file(tmp_path, {"top_k": 30.5})
+    with pytest.raises(ValueError, match="top_k"):
+        Profiles.load(path)
+
+
+def test_a_hand_edited_null_for_a_non_nullable_parameter_is_rejected_at_load(tmp_path):
+    path = _profiles_file(tmp_path, {"temperature": None})
+    with pytest.raises(ValueError, match="temperature"):
+        Profiles.load(path)
+
+
+def test_a_null_max_new_tokens_still_loads_as_unlimited(tmp_path):
+    """Nur dieser eine Parameter darf null sein — das UI zeigt „unbegrenzt"."""
+    path = _profiles_file(tmp_path, {"max_new_tokens": None})
+    assert Profiles.load(path).profiles["word"].sampling == {"max_new_tokens": None}
+
+
+def test_the_declared_boundaries_themselves_still_load(tmp_path):
+    """Die Grenzen sind inklusiv — auch beim Laden.
+
+    subtalker_top_p steht ausgeliefert auf genau 1.0, seinem Maximum.
+    """
+    path = _profiles_file(tmp_path, {
+        "max_new_tokens": 2, "top_p": 1.0, "temperature": 0.1,
+        "repetition_penalty": 1.0, "subtalker_top_p": 1.0,
+    })
+    assert Profiles.load(path).profiles["word"].sampling["top_p"] == 1.0
+
+
+def test_a_non_object_sampling_block_names_the_file_and_the_profile(tmp_path):
+    path = _profiles_file(tmp_path, ["temperature"])
+    with pytest.raises(ValueError) as excinfo:
+        Profiles.load(path)
+    assert "profiles.json" in str(excinfo.value)
+    assert "'word'" in str(excinfo.value)
+
+
+def test_the_shipped_profiles_json_carries_every_registry_parameter():
     """Prüft die echte ausgelieferte Datei, nicht die Defaults.
 
     Profile.from_dict nimmt BASE_SAMPLING nur, wenn 'sampling' ganz fehlt.
     Die vorhandene profiles.json hat pro Profil vier Schlüssel — ohne diese
-    Prüfung erbt sie die neuen Parameter nie und das ⚙️-Panel zeigte
-    Felder, die in der Datei fehlen.
+    Prüfung erbt sie die neuen Parameter nie und das ⚙️ TTS-Parameter-Panel
+    zeigte Felder, die in der Datei fehlen.
+
+    Geprüft wird bewusst nur, dass jeder Parameter *dasteht*, nicht welchen
+    Wert er hat: die Datei existiert genau dazu, dass die Werte per Panel
+    nachgezogen werden — die Dauern von `miss`, `reward` und `ui` sind laut
+    Spec ausdrücklich Schätzungen zum Nachjustieren. Die exakten acht
+    Token-Werte sind nur gegen DEFAULT_PROFILES festgenagelt, wo sie
+    Konstanten des Codes sind (siehe
+    test_default_profiles_carry_the_measured_duration_limits), und ihr
+    Wertebereich steckt in test_every_shipped_value_is_inside_its_declared_range.
     """
     from ttskit.paths import Paths
 
     profiles = Profiles.load(Paths().profiles)
-    expected = {"phoneme": 25, "word": 38, "sentence": 50, "finale": 63,
-                "prompt": 125, "miss": 75, "reward": 63, "ui": 75}
-    assert set(profiles.profiles) == set(expected)
+    assert set(profiles.profiles) == {
+        "word", "phoneme", "prompt", "miss", "reward", "sentence", "finale", "ui",
+    }
     for name, profile in profiles.profiles.items():
-        sampling = profile.sampling
-        assert sampling["max_new_tokens"] == expected[name], name
-        assert sampling["subtalker_temperature"] == 0.9, name
-        assert sampling["subtalker_top_k"] == 50, name
-        assert sampling["subtalker_top_p"] == 1.0, name
-        # Die bestehenden Werte dürfen sich nicht mitverändert haben.
-        assert sampling["temperature"] == 0.6, name
-        assert sampling["top_k"] == 30, name
-        assert sampling["top_p"] == 0.9, name
-        assert sampling["repetition_penalty"] == 1.05, name
+        assert set(profile.sampling) == set(SAMPLING_PARAMS), name
+        assert profile.sampling["max_new_tokens"] is not None, name
 
 
 def test_every_shipped_value_is_inside_its_declared_range():

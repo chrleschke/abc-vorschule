@@ -256,6 +256,59 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
         raise
 
 
+def validate_sampling_values(sampling: dict[str, Any], *, name: str = "?",
+                             path: Path | None = None) -> None:
+    """Check the sampling values that are present against SAMPLING_SPEC.
+
+    Called from `Profile.from_dict`, i.e. on the *read* path. The HTTP handler
+    validates writes, but profiles.json is a documented hand-edit surface and
+    without this check a hand-typed value reached the model unexamined:
+
+    * `max_new_tokens: 1` against the library's hardcoded `min_new_tokens: 2`
+      yields 0–1 codec frames, so every clip of that profile came out as empty
+      audio with nothing naming the file.
+    * an added `do_sample: false` is invisible in the ⚙️-panel (which renders
+      registry keys only), cannot be removed through it, and is still passed on
+      by `**profile.sampling` — every seed then produces identical audio and
+      the whole seed-pool mechanic collapses.
+
+    An *incomplete* block is explicitly fine: a missing key means "model
+    default". Only what is written down is checked. `Lock.from_dict` and
+    `build_clips` work the same way, and like them the message names the file,
+    the profile and the parameter — these files are edited by hand, so an error
+    that does not say what is at fault is close to useless.
+    """
+    where = f"{path}: " if path is not None else ""
+    unknown = sorted(set(sampling) - set(SAMPLING_PARAMS))
+    if unknown:
+        raise ValueError(
+            f"{where}profile {name!r} has unknown sampling parameters: "
+            f"{', '.join(unknown)} — allowed: "
+            f"{', '.join(sorted(SAMPLING_PARAMS))}")
+    for key, spec in SAMPLING_PARAMS.items():
+        if key not in sampling:
+            continue
+        value = sampling[key]
+        if value is None:
+            if not spec.nullable:
+                raise ValueError(
+                    f"{where}profile {name!r} has sampling {key!r} set to null "
+                    f"— allowed is {spec.minimum} to {spec.maximum}")
+            continue
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise ValueError(
+                f"{where}profile {name!r} has a non-numeric sampling {key!r} "
+                f"{value!r}")
+        if spec.integer and float(value) != int(value):
+            raise ValueError(
+                f"{where}profile {name!r} has a fractional sampling {key!r} "
+                f"{value!r} — only whole numbers are allowed")
+        if not spec.minimum <= value <= spec.maximum:
+            raise ValueError(
+                f"{where}profile {name!r} has sampling {key!r} at {value!r}, "
+                f"outside the allowed range {spec.minimum} to {spec.maximum}")
+
+
 @dataclass
 class Profile:
     label: str
@@ -277,12 +330,18 @@ class Profile:
         for required in ("label", "speaker", "language", "instruct"):
             if required not in raw:
                 raise ValueError(f"{where}profile {name!r} is missing {required!r}")
+        raw_sampling = raw.get("sampling", BASE_SAMPLING)
+        if not isinstance(raw_sampling, dict):
+            raise ValueError(f"{where}profile {name!r}: 'sampling' must be an "
+                             f"object, got {type(raw_sampling).__name__}")
+        sampling = dict(raw_sampling)
+        validate_sampling_values(sampling, name=name, path=path)
         return cls(
             label=raw["label"],
             speaker=raw["speaker"],
             language=raw["language"],
             instruct=raw["instruct"],
-            sampling=dict(raw.get("sampling", BASE_SAMPLING)),
+            sampling=sampling,
             seed_pool=list(raw.get("seedPool", [])),
             trim=bool(raw.get("trim", True)),
             normalize=bool(raw.get("normalize", True)),
