@@ -919,6 +919,29 @@ def test_a_value_below_the_minimum_is_rejected(client):
     assert "0.05" in detail and "1.0" in detail
 
 
+def test_the_inclusive_range_boundaries_are_accepted(client):
+    """Die Grenzen selbst sind erlaubt — mit `<`/`>` statt `<=`/`>=` muss das hier scheitern.
+
+    Nicht akademisch: `subtalker_top_p` steht in allen acht ausgelieferten
+    Profilen auf genau 1.0, seinem Maximum, und `repetition_penalty: 1.0` ist
+    sein Minimum und der Wert, den sein eigener Hilfetext empfiehlt. Eine
+    strikte Prüfung machte also die eigenen Auslieferungswerte unspeicherbar —
+    und die übrigen Bereichstests treffen nur Werte weit außerhalb (top_p 0.0,
+    temperature 50, max_new_tokens 9000) und blieben dabei grün.
+    """
+    for param, value in (("top_p", 0.05), ("top_p", 1.0),
+                         ("temperature", 0.1), ("temperature", 2.0),
+                         ("repetition_penalty", 1.0),
+                         ("subtalker_top_p", 1.0),
+                         ("max_new_tokens", 2), ("max_new_tokens", 8192)):
+        response = client.put("/api/profiles/word",
+                              json={"sampling": {param: value}})
+        assert response.status_code == 200, (param, value, response.text)
+        raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+        stored = raw["profiles"]["word"]["sampling"][param]
+        assert stored == value, (param, value, stored)
+
+
 def test_a_value_above_the_maximum_is_rejected(client):
     response = client.put("/api/profiles/word",
                           json={"sampling": {"temperature": 50}})
