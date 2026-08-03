@@ -907,3 +907,92 @@ def test_state_ships_the_sampling_registry(client):
 def test_state_ships_the_seconds_per_token_factor(client):
     # Damit das JS die 80 ms nicht hartkodiert.
     assert client.get("/api/state").json()["secondsPerToken"] == 0.08
+
+
+def test_a_value_below_the_minimum_is_rejected(client):
+    response = client.put("/api/profiles/word", json={"sampling": {"top_p": 0.0}})
+    assert response.status_code == 422
+    detail = response.json()["detail"]
+    assert "top_p" in detail
+    # Die Meldung muss den erlaubten Bereich nennen — sie landet unverändert
+    # als Banner im UI.
+    assert "0.05" in detail and "1.0" in detail
+
+
+def test_a_value_above_the_maximum_is_rejected(client):
+    response = client.put("/api/profiles/word",
+                          json={"sampling": {"temperature": 50}})
+    assert response.status_code == 422
+    assert "temperature" in response.json()["detail"]
+
+
+def test_max_new_tokens_above_the_checkpoint_ceiling_is_rejected(client):
+    response = client.put("/api/profiles/word",
+                          json={"sampling": {"max_new_tokens": 9000}})
+    assert response.status_code == 422
+    assert "8192" in response.json()["detail"]
+
+
+def test_a_fractional_value_for_an_integer_parameter_is_rejected(client):
+    response = client.put("/api/profiles/word", json={"sampling": {"top_k": 30.5}})
+    assert response.status_code == 422
+    assert "Ganzzahl" in response.json()["detail"]
+
+
+def test_an_integer_parameter_is_stored_as_an_int(client):
+    # 40.0 kommt aus JSON als float an; in der git-verwalteten Datei soll
+    # kein "40.0" stehen.
+    assert client.put("/api/profiles/word",
+                      json={"sampling": {"max_new_tokens": 40.0}}).status_code == 200
+    raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+    stored = raw["profiles"]["word"]["sampling"]["max_new_tokens"]
+    assert stored == 40 and isinstance(stored, int)
+
+
+def test_null_deletes_max_new_tokens(client):
+    assert client.put("/api/profiles/word",
+                      json={"sampling": {"max_new_tokens": 40}}).status_code == 200
+    assert client.put("/api/profiles/word",
+                      json={"sampling": {"max_new_tokens": None}}).status_code == 200
+    raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+    sampling = raw["profiles"]["word"]["sampling"]
+    assert "max_new_tokens" not in sampling, "leeres Feld heißt unbegrenzt"
+    assert sampling["temperature"] == 0.6, "die übrigen Werte bleiben stehen"
+
+
+def test_null_for_a_non_nullable_parameter_is_rejected(client):
+    response = client.put("/api/profiles/word",
+                          json={"sampling": {"temperature": None}})
+    assert response.status_code == 422
+    assert "temperature" in response.json()["detail"]
+
+
+def test_the_subtalker_parameters_are_accepted(client):
+    assert client.put("/api/profiles/word", json={"sampling": {
+        "subtalker_temperature": 0.7, "subtalker_top_k": 40,
+        "subtalker_top_p": 0.95,
+    }}).status_code == 200
+    raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+    sampling = raw["profiles"]["word"]["sampling"]
+    assert sampling["subtalker_temperature"] == 0.7
+    assert sampling["subtalker_top_k"] == 40
+    assert sampling["subtalker_top_p"] == 0.95
+
+
+def test_the_two_sampling_booleans_stay_rejected(client):
+    # do_sample: false macht die Generierung greedy — der Seed wird
+    # wirkungslos und die ganze Kuratierung bricht.
+    for key in ("do_sample", "subtalker_dosample"):
+        response = client.put("/api/profiles/word", json={"sampling": {key: True}})
+        assert response.status_code == 422, key
+
+
+def test_one_bad_value_persists_nothing_at_all(client):
+    # Ein Sammel-Save aus dem Panel schickt alle Parameter zusammen. Wird
+    # einer abgelehnt, darf keiner der anderen durchrutschen.
+    response = client.put("/api/profiles/word", json={
+        "instruct": "Darf nicht gespeichert werden.",
+        "sampling": {"temperature": 0.8, "top_p": 99},
+    })
+    assert response.status_code == 422
+    assert not client.paths.profiles.exists(), "nichts darf geschrieben worden sein"

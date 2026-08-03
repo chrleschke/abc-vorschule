@@ -31,7 +31,7 @@ from .render import (
     update_candidate_meta,
 )
 from .store import (
-    BASE_SAMPLING, SAMPLING_PARAMS, SAMPLING_SPEC, SECONDS_PER_TOKEN,
+    SAMPLING_PARAMS, SAMPLING_SPEC, SECONDS_PER_TOKEN,
     Lock, Locks, Profiles,
 )
 
@@ -265,19 +265,54 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
             # Whitelist: an unknown key would reach
             # generate_custom_voice(**sampling) as a TypeError on every future
             # render of this profile.
-            unknown = sorted(set(sampling) - set(BASE_SAMPLING))
+            unknown = sorted(set(sampling) - set(SAMPLING_PARAMS))
             if unknown:
                 raise HTTPException(
                     status_code=422,
                     detail=f"unbekannte Sampling-Parameter: {', '.join(unknown)}. "
-                           f"Erlaubt: {', '.join(sorted(BASE_SAMPLING))}")
+                           f"Erlaubt: {', '.join(sorted(SAMPLING_PARAMS))}")
+            # Erst alles prüfen, dann alles anwenden. Das ⚙️-Panel schickt
+            # sämtliche Parameter in einem Save; würde mitten in der Schleife
+            # geschrieben, hinterließe ein einziger schlechter Wert ein halb
+            # aktualisiertes Profil im Speicher.
             for param, value in sampling.items():
+                spec = SAMPLING_PARAMS[param]
+                if value is None:
+                    if not spec.nullable:
+                        raise HTTPException(
+                            status_code=422,
+                            detail=f"Sampling-Parameter {param!r} darf nicht leer "
+                                   f"sein — erlaubt ist {spec.minimum} bis "
+                                   f"{spec.maximum}")
+                    continue
                 if isinstance(value, bool) or not isinstance(value, (int, float)):
                     raise HTTPException(
                         status_code=422,
                         detail=f"Sampling-Parameter {param!r} muss eine Zahl sein, "
                                f"nicht {type(value).__name__}")
-            profile.sampling.update(sampling)
+                if spec.integer and float(value) != int(value):
+                    raise HTTPException(
+                        status_code=422,
+                        detail=f"Sampling-Parameter {param!r} muss eine Ganzzahl "
+                               f"sein, nicht {value}")
+                # Ungeprüft landete ein top_p von 3 oder eine temperature von
+                # 50 in der git-verwalteten profiles.json und erzeugte danach
+                # still unbrauchbare Audios.
+                if not spec.minimum <= value <= spec.maximum:
+                    raise HTTPException(
+                        status_code=422,
+                        detail=f"Sampling-Parameter {param!r} liegt mit {value} "
+                               f"außerhalb des erlaubten Bereichs "
+                               f"{spec.minimum} bis {spec.maximum}")
+            for param, value in sampling.items():
+                if value is None:
+                    # Fehlender Schlüssel heißt „Modell-Default", bei
+                    # max_new_tokens also unbegrenzt.
+                    profile.sampling.pop(param, None)
+                elif SAMPLING_PARAMS[param].integer:
+                    profile.sampling[param] = int(value)
+                else:
+                    profile.sampling[param] = value
         if "trim" in body:
             profile.trim = bool(body["trim"])
         if "normalize" in body:
