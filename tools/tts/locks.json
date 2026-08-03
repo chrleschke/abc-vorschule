@@ -1,6 +1,10 @@
 {
   "version": 1,
   "locks": {
+    "finale:8b3b7e980b81": {
+      "seed": 159147157,
+      "sourceText": "Das Schaf steckt im Schuh!"
+    },
     "phoneme:2fe5ca1c1a3d": {
       "seed": 978878263,
       "textOverride": "Ae",
