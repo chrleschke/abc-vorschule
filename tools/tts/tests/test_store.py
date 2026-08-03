@@ -321,3 +321,42 @@ def test_a_profile_without_max_new_tokens_still_loads(tmp_path):
     profile = Profiles.load(path).profiles["word"]
     assert "max_new_tokens" not in profile.sampling
     assert profile.sampling == {"temperature": 0.6, "top_k": 30}
+
+
+def test_the_shipped_profiles_json_carries_the_new_parameters():
+    """Prüft die echte ausgelieferte Datei, nicht die Defaults.
+
+    Profile.from_dict nimmt BASE_SAMPLING nur, wenn 'sampling' ganz fehlt.
+    Die vorhandene profiles.json hat pro Profil vier Schlüssel — ohne diese
+    Prüfung erbt sie die neuen Parameter nie und das ⚙️-Panel zeigte
+    Felder, die in der Datei fehlen.
+    """
+    from ttskit.paths import Paths
+
+    profiles = Profiles.load(Paths().profiles)
+    expected = {"phoneme": 25, "word": 38, "sentence": 50, "finale": 63,
+                "prompt": 125, "miss": 75, "reward": 63, "ui": 75}
+    assert set(profiles.profiles) == set(expected)
+    for name, profile in profiles.profiles.items():
+        sampling = profile.sampling
+        assert sampling["max_new_tokens"] == expected[name], name
+        assert sampling["subtalker_temperature"] == 0.9, name
+        assert sampling["subtalker_top_k"] == 50, name
+        assert sampling["subtalker_top_p"] == 1.0, name
+        # Die bestehenden Werte dürfen sich nicht mitverändert haben.
+        assert sampling["temperature"] == 0.6, name
+        assert sampling["top_k"] == 30, name
+        assert sampling["top_p"] == 0.9, name
+        assert sampling["repetition_penalty"] == 1.05, name
+
+
+def test_every_shipped_value_is_inside_its_declared_range():
+    """Die Datei ist handgepflegt — sie muss die eigene Prüfung überleben."""
+    from ttskit.paths import Paths
+
+    for name, profile in Profiles.load(Paths().profiles).profiles.items():
+        for key, value in profile.sampling.items():
+            spec = SAMPLING_PARAMS[key]
+            assert spec.minimum <= value <= spec.maximum, f"{name}.{key} = {value}"
+            if spec.integer:
+                assert float(value) == int(value), f"{name}.{key} = {value}"
