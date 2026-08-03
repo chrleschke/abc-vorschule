@@ -329,6 +329,41 @@ def test_deleting_the_promoted_candidate_removes_production_and_unlocks(client):
     assert not (client.paths.audio / f"{key}.wav").exists()
 
 
+def test_deleting_the_last_candidate_keeps_a_curated_pronunciation(client):
+    """Die eigene Aussprache liegt im selben Lock wie der Seed — eine gelöschte
+    Probeaufnahme darf sie nicht mitnehmen."""
+    clip = client.get("/api/state").json()["clips"][0]
+    key = clip["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    wait_for_idle(client)
+    seed = next(c for c in client.get("/api/state").json()["clips"]
+                if c["key"] == key)["candidates"][0]["seed"]
+    client.post(f"/api/clips/{key}/lock", json={"seed": seed, "textOverride": "Mmmmm."})
+    client.post(f"/api/clips/{key}/promote", json={"seed": seed})
+
+    assert client.delete(f"/api/clips/{key}/candidates/{seed}").status_code == 200
+
+    after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert after["text"] == "Mmmmm."
+    assert after["candidates"] == []
+    assert not (client.paths.audio / f"{key}.wav").exists()
+
+
+def test_deleting_the_last_candidate_keeps_a_clip_specific_voice(client):
+    clip = client.get("/api/state").json()["clips"][0]
+    key = clip["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    wait_for_idle(client)
+    seed = next(c for c in client.get("/api/state").json()["clips"]
+                if c["key"] == key)["candidates"][0]["seed"]
+    client.post(f"/api/clips/{key}/lock", json={"seed": seed, "speaker": "serena"})
+
+    assert client.delete(f"/api/clips/{key}/candidates/{seed}").status_code == 200
+
+    after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert after["speaker"] == "serena"
+
+
 def test_deleting_the_promoted_candidate_keeps_the_lock_if_others_remain(client):
     key = client.get("/api/state").json()["clips"][0]["key"]
     client.post(f"/api/clips/{key}/candidates", json={"n": 2})

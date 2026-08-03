@@ -482,9 +482,18 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
         # Keine Probeaufnahme und keine Produktions-Datei mehr übrig — die
         # Festlegung hat nichts mehr, worauf sie zeigen könnte, und fällt
         # automatisch weg. Ein eigener "Lock entfernen"-Knopf erübrigt sich so.
+        #
+        # Aussprache, Stimme, Profil und Notiz hängen am selben Lock, sind aber
+        # von Hand kuratierte Entscheidungen — eine gelöschte Probeaufnahme sagt
+        # über sie nichts aus. Trägt der Lock eine davon, bleibt er also stehen,
+        # sonst hätte das Löschen des letzten Kandidaten stillschweigend den
+        # eingetippten TTS-Text mitgenommen.
         if not candidate_seeds(paths, key) and not (paths.audio / f"{key}.wav").exists():
             locks = Locks.load(paths.locks)
-            if locks.get(key) is not None:
+            lock = locks.get(key)
+            curated = lock is not None and any(
+                (lock.text_override, lock.speaker, lock.profile, lock.note))
+            if lock is not None and not curated:
                 locks.remove(key)
                 locks.save(paths.locks)
 
