@@ -111,6 +111,24 @@ Bei `phoneme` ist die Verteilung zweigipfelig: 48 der 50 validierten Werte liege
 1,0 s, die restlichen zwei bei 2,70 s (dieselbe Aufnahme doppelt gezählt — Produktions-
 datei plus ihr 👍-Kandidat, also ein einzelner Clip).
 
+### Nachträglicher Beleg am echten Modell
+
+Nach der Umsetzung gegengeprüft: derselbe Text `"M"` und dieselben vier Seeds, einmal
+mit dem ausgelieferten `phoneme`-Limit von 25 Tokens und einmal ohne Limit. Gemessen
+wurde die Rohdauer vor dem Trim.
+
+| Seed | mit Limit | ohne Limit |
+|---|---|---|
+| 11 | 0,72 s | 0,72 s |
+| 22 | **1,92 s** | **8,80 s** |
+| 33 | 0,72 s | 0,72 s |
+| 44 | **1,92 s** | **10,56 s** |
+
+Zwei der vier Seeds erfinden für einen einzelnen Buchstaben einen 9–10-Sekunden-Satz.
+Der Deckel kappt beide bei 1,92 s, die beiden von sich aus kurzen Aufnahmen bleiben
+unberührt. Damit ist belegt, was die Dauerverteilung oben nur nahegelegt hatte: die
+Ausreißer sind keine Messartefakte, und das Limit greift genau bei ihnen.
+
 ## A. Parameter-Registry auf dem Server
 
 `BASE_SAMPLING` in `store.py` ist heute ein nackter Wert-Dict. Es wird zu einer
