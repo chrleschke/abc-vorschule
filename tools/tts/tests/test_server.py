@@ -885,3 +885,25 @@ def test_batch_render_with_unknown_keys_is_422(client):
 def test_batch_render_with_a_non_list_keys_is_422(client):
     assert client.post("/api/render", json={"keys": "alles"}).status_code == 422
     assert client.post("/api/render", json={"keys": [1, 2]}).status_code == 422
+
+
+def test_state_ships_the_sampling_registry(client):
+    body = client.get("/api/state").json()
+    spec = body["samplingSpec"]
+    assert [p["key"] for p in spec] == [
+        "max_new_tokens", "temperature", "top_k", "top_p", "repetition_penalty",
+        "subtalker_temperature", "subtalker_top_k", "subtalker_top_p",
+    ]
+    # Das UI rendert aus dieser Liste, nicht aus den Schlüsseln eines
+    # Profils — sonst bleibt ein neuer Parameter an bestehenden Profilen
+    # unsichtbar. Also muss jeder Eintrag alles Nötige tragen.
+    for param in spec:
+        assert set(param) == {"key", "label", "group", "minimum", "maximum",
+                              "step", "help", "default", "integer", "nullable"}
+        assert param["help"], param["key"]
+        assert param["group"] in {"duration", "talker", "subtalker"}
+
+
+def test_state_ships_the_seconds_per_token_factor(client):
+    # Damit das JS die 80 ms nicht hartkodiert.
+    assert client.get("/api/state").json()["secondsPerToken"] == 0.08

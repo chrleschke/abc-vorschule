@@ -30,7 +30,10 @@ from .render import (
     pooled_seeds, random_seeds, render_batch_candidates, sample_candidates,
     update_candidate_meta,
 )
-from .store import BASE_SAMPLING, Lock, Locks, Profiles
+from .store import (
+    BASE_SAMPLING, SAMPLING_PARAMS, SAMPLING_SPEC, SECONDS_PER_TOKEN,
+    Lock, Locks, Profiles,
+)
 
 STATIC = Path(__file__).resolve().parent / "static"
 
@@ -214,6 +217,10 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                        for v in voices.VOICES],
             "languages": list(voices.LANGUAGES),
             "limits": {"maxCandidates": MAX_CANDIDATES},
+            # Das ⚙️-Panel rendert aus dieser Deklaration statt aus den
+            # Schlüsseln, die ein Profil zufällig schon besitzt.
+            "samplingSpec": [p.to_dict() for p in SAMPLING_SPEC],
+            "secondsPerToken": SECONDS_PER_TOKEN,
             "clips": clips,
             "orphans": [
                 {"key": k, "seed": ctx.locks.get(k).seed,
