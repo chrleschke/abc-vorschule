@@ -496,6 +496,13 @@ function formatWhen(iso) {
 function profileSummaryCard(clip, profile) {
   const instructShort = profile.instruct.length > 90
     ? profile.instruct.slice(0, 90) + "…" : profile.instruct;
+  // Ein gelöschtes Feld kommt von der API als fehlender Schlüssel (undefined),
+  // aus einer handbearbeiteten profiles.json aber als null — beides heißt
+  // „unbegrenzt".
+  const maxDuration = profile.sampling.max_new_tokens === undefined
+      || profile.sampling.max_new_tokens === null
+    ? "unbegrenzt"
+    : tokensToSeconds(profile.sampling.max_new_tokens) + " s";
   return `
     <div class="card profile-card">
       <div class="profile-summary">
@@ -505,9 +512,7 @@ function profileSummaryCard(clip, profile) {
           <div class="muted small">
             Stimme ${escapeHtml(profile.speaker)} · Sprache ${escapeHtml(profile.language)}
             · temperature ${profile.sampling.temperature}
-            · max ${profile.sampling.max_new_tokens === undefined
-                ? "unbegrenzt"
-                : tokensToSeconds(profile.sampling.max_new_tokens) + " s"}
+            · max ${maxDuration}
             · „${escapeHtml(instructShort)}“
           </div>
         </div>
