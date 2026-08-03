@@ -10,7 +10,11 @@
         "temperature": 0.6,
         "top_k": 30,
         "top_p": 0.9,
-        "repetition_penalty": 1.05
+        "repetition_penalty": 1.05,
+        "subtalker_temperature": 0.9,
+        "subtalker_top_k": 50,
+        "subtalker_top_p": 1.0,
+        "max_new_tokens": 38
       },
       "seedPool": [],
       "trim": true,
@@ -25,7 +29,11 @@
         "temperature": 0.6,
         "top_k": 30,
         "top_p": 0.9,
-        "repetition_penalty": 1.05
+        "repetition_penalty": 1.05,
+        "subtalker_temperature": 0.9,
+        "subtalker_top_k": 50,
+        "subtalker_top_p": 1.0,
+        "max_new_tokens": 25
       },
       "seedPool": [],
       "trim": true,
@@ -40,7 +48,11 @@
         "temperature": 0.6,
         "top_k": 30,
         "top_p": 0.9,
-        "repetition_penalty": 1.05
+        "repetition_penalty": 1.05,
+        "subtalker_temperature": 0.9,
+        "subtalker_top_k": 50,
+        "subtalker_top_p": 1.0,
+        "max_new_tokens": 125
       },
       "seedPool": [
         122602205,
@@ -77,7 +89,11 @@
         "temperature": 0.6,
         "top_k": 30,
         "top_p": 0.9,
-        "repetition_penalty": 1.05
+        "repetition_penalty": 1.05,
+        "subtalker_temperature": 0.9,
+        "subtalker_top_k": 50,
+        "subtalker_top_p": 1.0,
+        "max_new_tokens": 75
       },
       "seedPool": [],
       "trim": true,
@@ -92,7 +108,11 @@
         "temperature": 0.6,
         "top_k": 30,
         "top_p": 0.9,
-        "repetition_penalty": 1.05
+        "repetition_penalty": 1.05,
+        "subtalker_temperature": 0.9,
+        "subtalker_top_k": 50,
+        "subtalker_top_p": 1.0,
+        "max_new_tokens": 63
       },
       "seedPool": [],
       "trim": true,
@@ -107,7 +127,11 @@
         "temperature": 0.6,
         "top_k": 30,
         "top_p": 0.9,
-        "repetition_penalty": 1.05
+        "repetition_penalty": 1.05,
+        "subtalker_temperature": 0.9,
+        "subtalker_top_k": 50,
+        "subtalker_top_p": 1.0,
+        "max_new_tokens": 50
       },
       "seedPool": [
         58873926,
@@ -139,7 +163,11 @@
         "temperature": 0.6,
         "top_k": 30,
         "top_p": 0.9,
-        "repetition_penalty": 1.05
+        "repetition_penalty": 1.05,
+        "subtalker_temperature": 0.9,
+        "subtalker_top_k": 50,
+        "subtalker_top_p": 1.0,
+        "max_new_tokens": 63
       },
       "seedPool": [],
       "trim": true,
@@ -154,7 +182,11 @@
         "temperature": 0.6,
         "top_k": 30,
         "top_p": 0.9,
-        "repetition_penalty": 1.05
+        "repetition_penalty": 1.05,
+        "subtalker_temperature": 0.9,
+        "subtalker_top_k": 50,
+        "subtalker_top_p": 1.0,
+        "max_new_tokens": 75
       },
       "seedPool": [],
       "trim": true,

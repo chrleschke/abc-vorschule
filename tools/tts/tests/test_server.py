@@ -885,3 +885,137 @@ def test_batch_render_with_unknown_keys_is_422(client):
 def test_batch_render_with_a_non_list_keys_is_422(client):
     assert client.post("/api/render", json={"keys": "alles"}).status_code == 422
     assert client.post("/api/render", json={"keys": [1, 2]}).status_code == 422
+
+
+def test_state_ships_the_sampling_registry(client):
+    body = client.get("/api/state").json()
+    spec = body["samplingSpec"]
+    assert [p["key"] for p in spec] == [
+        "max_new_tokens", "temperature", "top_k", "top_p", "repetition_penalty",
+        "subtalker_temperature", "subtalker_top_k", "subtalker_top_p",
+    ]
+    # Das UI rendert aus dieser Liste, nicht aus den Schlüsseln eines
+    # Profils — sonst bleibt ein neuer Parameter an bestehenden Profilen
+    # unsichtbar. Also muss jeder Eintrag alles Nötige tragen.
+    for param in spec:
+        assert set(param) == {"key", "label", "group", "minimum", "maximum",
+                              "step", "help", "default", "integer", "nullable"}
+        assert param["help"], param["key"]
+        assert param["group"] in {"duration", "talker", "subtalker"}
+
+
+def test_state_ships_the_seconds_per_token_factor(client):
+    # Damit das JS die 80 ms nicht hartkodiert.
+    assert client.get("/api/state").json()["secondsPerToken"] == 0.08
+
+
+def test_a_value_below_the_minimum_is_rejected(client):
+    response = client.put("/api/profiles/word", json={"sampling": {"top_p": 0.0}})
+    assert response.status_code == 422
+    detail = response.json()["detail"]
+    assert "top_p" in detail
+    # Die Meldung muss den erlaubten Bereich nennen — sie landet unverändert
+    # als Banner im UI.
+    assert "0.05" in detail and "1.0" in detail
+
+
+def test_the_inclusive_range_boundaries_are_accepted(client):
+    """Die Grenzen selbst sind erlaubt — mit `<`/`>` statt `<=`/`>=` muss das hier scheitern.
+
+    Nicht akademisch: `subtalker_top_p` steht in allen acht ausgelieferten
+    Profilen auf genau 1.0, seinem Maximum, und `repetition_penalty: 1.0` ist
+    sein Minimum und der Wert, den sein eigener Hilfetext empfiehlt. Eine
+    strikte Prüfung machte also die eigenen Auslieferungswerte unspeicherbar —
+    und die übrigen Bereichstests treffen nur Werte weit außerhalb (top_p 0.0,
+    temperature 50, max_new_tokens 9000) und blieben dabei grün.
+    """
+    for param, value in (("top_p", 0.05), ("top_p", 1.0),
+                         ("temperature", 0.1), ("temperature", 2.0),
+                         ("repetition_penalty", 1.0),
+                         ("subtalker_top_p", 1.0),
+                         ("max_new_tokens", 2), ("max_new_tokens", 8192)):
+        response = client.put("/api/profiles/word",
+                              json={"sampling": {param: value}})
+        assert response.status_code == 200, (param, value, response.text)
+        raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+        stored = raw["profiles"]["word"]["sampling"][param]
+        assert stored == value, (param, value, stored)
+
+
+def test_a_value_above_the_maximum_is_rejected(client):
+    response = client.put("/api/profiles/word",
+                          json={"sampling": {"temperature": 50}})
+    assert response.status_code == 422
+    assert "temperature" in response.json()["detail"]
+
+
+def test_max_new_tokens_above_the_checkpoint_ceiling_is_rejected(client):
+    response = client.put("/api/profiles/word",
+                          json={"sampling": {"max_new_tokens": 9000}})
+    assert response.status_code == 422
+    assert "8192" in response.json()["detail"]
+
+
+def test_a_fractional_value_for_an_integer_parameter_is_rejected(client):
+    response = client.put("/api/profiles/word", json={"sampling": {"top_k": 30.5}})
+    assert response.status_code == 422
+    assert "Ganzzahl" in response.json()["detail"]
+
+
+def test_an_integer_parameter_is_stored_as_an_int(client):
+    # 40.0 kommt aus JSON als float an; in der git-verwalteten Datei soll
+    # kein "40.0" stehen.
+    assert client.put("/api/profiles/word",
+                      json={"sampling": {"max_new_tokens": 40.0}}).status_code == 200
+    raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+    stored = raw["profiles"]["word"]["sampling"]["max_new_tokens"]
+    assert stored == 40 and isinstance(stored, int)
+
+
+def test_null_deletes_max_new_tokens(client):
+    assert client.put("/api/profiles/word",
+                      json={"sampling": {"max_new_tokens": 40}}).status_code == 200
+    assert client.put("/api/profiles/word",
+                      json={"sampling": {"max_new_tokens": None}}).status_code == 200
+    raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+    sampling = raw["profiles"]["word"]["sampling"]
+    assert "max_new_tokens" not in sampling, "leeres Feld heißt unbegrenzt"
+    assert sampling["temperature"] == 0.6, "die übrigen Werte bleiben stehen"
+
+
+def test_null_for_a_non_nullable_parameter_is_rejected(client):
+    response = client.put("/api/profiles/word",
+                          json={"sampling": {"temperature": None}})
+    assert response.status_code == 422
+    assert "temperature" in response.json()["detail"]
+
+
+def test_the_subtalker_parameters_are_accepted(client):
+    assert client.put("/api/profiles/word", json={"sampling": {
+        "subtalker_temperature": 0.7, "subtalker_top_k": 40,
+        "subtalker_top_p": 0.95,
+    }}).status_code == 200
+    raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+    sampling = raw["profiles"]["word"]["sampling"]
+    assert sampling["subtalker_temperature"] == 0.7
+    assert sampling["subtalker_top_k"] == 40
+    assert sampling["subtalker_top_p"] == 0.95
+
+
+def test_the_two_sampling_booleans_stay_rejected(client):
+    # do_sample: false macht die Generierung greedy — der Seed wird
+    # wirkungslos und die ganze Kuratierung bricht.
+    for key in ("do_sample", "subtalker_dosample"):
+        response = client.put("/api/profiles/word", json={"sampling": {key: True}})
+        assert response.status_code == 422, key
+
+
+def test_one_bad_value_persists_nothing_at_all(client):
+    # Ein Sammel-Save aus dem Panel schickt alle Parameter zusammen. Wird
+    # einer abgelehnt, darf keiner der anderen durchrutschen.
+    response = client.put("/api/profiles/word", json={
+        "instruct": "Darf nicht gespeichert werden.",
+        "sampling": {"temperature": 0.8, "top_p": 99},
+    })
+    assert response.status_code == 422
+    assert not client.paths.profiles.exists(), "nichts darf geschrieben worden sein"

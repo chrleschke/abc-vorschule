@@ -4,6 +4,7 @@ const state = {
   clips: [], profiles: {}, engine: {}, orphans: [], selected: null,
   jobs: { running: null, queued: 0 }, limits: { maxCandidates: 16 },
   voices: [], languages: [], paramsOpen: false,
+  samplingSpec: [], secondsPerToken: 0.08,
   // Batch-Auswahl und aufgeklappter Profil-Editor überleben jedes refresh().
   selectedKeys: new Set(), profileEditOpen: false,
 };
@@ -15,10 +16,14 @@ const STATUS_LABELS = { missing: "fehlt", rendered: "fertig" };
 // davon ist ihre Herkunft ein Hinweis wert.
 const EAST_ASIAN = ["chinese", "japanese", "korean"];
 
+// textContent → innerHTML ersetzt & < >, aber keine Anführungszeichen. Fast
+// jeder Einsatzort hier ist ein Attribut (value="…", title="…"), und ohne die
+// beiden letzten Ersetzungen bricht ein Wert mit " aus seinem Attribut aus,
+// statt darin zu landen. Im Textfluss sind sie unschädlich.
 function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
-  return div.innerHTML;
+  return div.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
 // ------------------------------------------------------------- Stimmen
@@ -301,21 +306,105 @@ function select(key) {
 const profileClipCount = (name) =>
   state.clips.filter((c) => c.profile === name).length;
 
-const SAMPLING_HINTS = {
-  temperature: "Höher = mehr Variation zwischen Seeds, niedriger = gleichmäßiger",
-  top_k: "Nur die k wahrscheinlichsten Tokens werden gezogen",
-  top_p: "Nucleus-Sampling: kumulierte Wahrscheinlichkeitsmasse",
-  repetition_penalty: "Bestraft Wiederholungen (>1 = weniger Wiederholung)",
+// Die Erklärungstexte, Wertebereiche und Typen kommen aus der Registry im
+// Server (store.SAMPLING_SPEC), nicht aus einer zweiten Liste hier. Vorher
+// rendete das Panel aus Object.keys(profile.sampling) — ein Parameter, der
+// in profiles.json noch nicht stand, war damit unsichtbar.
+// Die Legende der Dauer-Gruppe sagt bewusst etwas anderes als das Feldlabel
+// („Maximale Dauer") — sonst stünde dieselbe Wortgruppe zweimal übereinander.
+const GROUP_LABELS = {
+  duration: "Dauer — harter Schnitt (wie lang es werden darf)",
+  talker: "Sampling — Haupt-Talker (was gesagt wird)",
+  subtalker: "Feinstruktur — Sub-Talker (wie es klingt)",
 };
+
+const specFor = (key) => state.samplingSpec.find((p) => p.key === key);
+
+const tokensToSeconds = (tokens) =>
+  (Number(tokens) * state.secondsPerToken).toFixed(2);
+
+// Zahlen im Fließtext des Panels werden deutsch geschrieben: die Hilfetexte
+// aus der Registry tun das auch („0,3–0,6"), ein Dezimalpunkt daneben liest
+// sich falsch. In den `value`/`min`/`max`/`step`-Attributen bleibt der Punkt —
+// dort erwartet <input type="number"> ihn.
+const germanNumber = (value) => String(value).replace(".", ",");
+
+// Nachkommastellen für einen Registry-Wert: mindestens eine, sobald der
+// Parameter überhaupt Kommazahlen erlaubt. JSON wirft die Null hinter 1.0 weg,
+// sonst stünde da „Bereich 0,05–1." und „Voreinstellung 1." — beides sieht wie
+// ein abgebrochener Satz aus.
+function paramNumber(spec, value) {
+  if (spec.integer) return germanNumber(value);
+  const text = String(Number(value));
+  const decimals = text.includes(".") ? text.split(".")[1].length : 0;
+  return germanNumber(Number(value).toFixed(Math.max(1, decimals)));
+}
+
+const secondsLabel = (tokens) => germanNumber(tokensToSeconds(tokens));
+
+// Ein Feld pro deklariertem Parameter. Die Dauer wird in Sekunden
+// eingegeben und in Tokens gespeichert — data-unit markiert das für
+// readProfileForm.
+function paramFieldHtml(profile, spec) {
+  const stored = profile.sampling[spec.key];
+  const absent = stored === undefined || stored === null;
+  // Fehlt der Schlüssel im Profil-Eintrag, steht die Voreinstellung im Feld —
+  // nicht nichts. Das Panel rendert aus der Registry, damit ein neuer
+  // Parameter auch an Profilen erscheint, die ihn noch nicht in profiles.json
+  // haben; ein leeres Feld wäre aber unspeicherbar (readProfileForm verlangt
+  // eine Zahl), womit sich an so einem Profil nicht einmal die Instruktion
+  // ändern ließe. Der Hilfetext nennt die Voreinstellung ohnehin. Nur die
+  // nullable Dauer bleibt leer: dort heißt leer „unbegrenzt".
+  const value = absent && !spec.nullable ? spec.default : stored;
+  const missing = value === undefined || value === null;
+  const seconds = spec.group === "duration";
+  const shown = missing ? "" : (seconds ? tokensToSeconds(value) : value);
+  const attrs = seconds
+    // Jeder legale Wert ist ein ganzzahliges Vielfaches von secondsPerToken.
+    // Genau das ist die Schrittweite — mit step="0.1" liefen die Pfeile auf
+    // 0,16 / 0,26 / 0,36 und jeder runde Sekundenwert war ein Step-Mismatch.
+    ? `data-unit="seconds" step="${state.secondsPerToken}" ` +
+      `min="${tokensToSeconds(spec.minimum)}" ` +
+      `max="${tokensToSeconds(spec.maximum)}" placeholder="unbegrenzt"`
+    : `step="${spec.step}" min="${spec.minimum}" max="${spec.maximum}"`;
+  const range = seconds
+    ? `${secondsLabel(spec.minimum)}–${secondsLabel(spec.maximum)} s`
+    : `${paramNumber(spec, spec.minimum)}–${paramNumber(spec, spec.maximum)}`;
+  const suffix = seconds
+    ? `<span class="muted small" data-tokens-for="${escapeHtml(spec.key)}">${
+        missing ? "unbegrenzt" : `= ${escapeHtml(String(value))} Tokens`}</span>`
+    : "";
+  // Label, Schlüssel und Wert laufen genau wie `help` durch escapeHtml.
+  // Profile.from_dict prüft die Sampling-Werte inzwischen beim Laden, ein
+  // handgeschriebener String kommt hier also nicht mehr an — aber
+  // profiles.json ist eine dokumentierte Handbearbeitungs-Fläche, und
+  // voiceOptions und profileFormHtml halten es für ihre Konfigurationsdaten
+  // genauso.
+  return `
+    <div class="param-row">
+      <label class="param">
+        <span>${escapeHtml(spec.label)}${seconds ? " (Sekunden, vor Trim)" : ""}</span>
+        <input type="number" data-param="${escapeHtml(spec.key)}" ${attrs}
+               value="${escapeHtml(String(shown))}" />
+        ${suffix}
+      </label>
+      <p class="param-help muted small">${escapeHtml(spec.help)}
+        <b>Bereich ${range}.</b>${spec.default === null ? ""
+          : ` Voreinstellung ${paramNumber(spec, spec.default)}.`}</p>
+    </div>`;
+}
 
 function profileFormHtml(name) {
   const profile = state.profiles[name];
-  const sampling = Object.keys(profile.sampling).sort().map((param) => `
-    <label class="param">
-      <span title="${SAMPLING_HINTS[param] || ""}">${param}</span>
-      <input type="number" step="any" data-param="${param}"
-             value="${profile.sampling[param]}" />
-    </label>`).join("");
+  const groups = ["duration", "talker", "subtalker"].map((group) => {
+    const fields = state.samplingSpec.filter((p) => p.group === group);
+    if (fields.length === 0) return "";
+    return `
+      <fieldset class="param-group">
+        <legend>${GROUP_LABELS[group]}</legend>
+        ${fields.map((spec) => paramFieldHtml(profile, spec)).join("")}
+      </fieldset>`;
+  }).join("");
   return `
     <p class="voice-line">
       <label>Stimme
@@ -326,7 +415,7 @@ function profileFormHtml(name) {
     </p>
     <label class="muted small">Instruktion — Sprechanweisung für alle Clips dieses Profils</label>
     <textarea data-instruct>${escapeHtml(profile.instruct)}</textarea>
-    <div class="params-grid">${sampling}</div>
+    ${groups}
     <p>
       <label><input type="checkbox" data-trim ${profile.trim ? "checked" : ""} />
         Stille am Anfang/Ende wegschneiden (trim)</label>
@@ -346,13 +435,34 @@ function profileFormHtml(name) {
 function readProfileForm(container) {
   const sampling = {};
   container.querySelectorAll("[data-param]").forEach((input) => {
-    const value = Number(input.value);
-    // Number("") ist 0 — ein geleertes Feld darf nicht stillschweigend als
-    // 0 gespeichert werden.
-    if (input.value.trim() === "" || Number.isNaN(value)) {
-      throw new Error(`Sampling-Parameter „${input.dataset.param}“ ist leer oder keine Zahl`);
+    const key = input.dataset.param;
+    const spec = specFor(key);
+    const raw = input.value.trim();
+    if (raw === "") {
+      // Number("") ist 0 — ein geleertes Feld darf nicht stillschweigend
+      // als 0 gespeichert werden. Bei der Dauer heißt leer „unbegrenzt",
+      // was der Server als null-Löschung entgegennimmt.
+      if (!spec.nullable) {
+        throw new Error(`„${spec.label}“ ist leer oder keine Zahl`);
+      }
+      sampling[key] = null;
+      return;
     }
-    sampling[input.dataset.param] = value;
+    const entered = Number(raw);
+    if (Number.isNaN(entered)) {
+      throw new Error(`„${spec.label}“ ist leer oder keine Zahl`);
+    }
+    // Die Dauer wird in Sekunden eingegeben, gespeichert werden Tokens.
+    const value = input.dataset.unit === "seconds"
+      ? Math.round(entered / state.secondsPerToken)
+      : entered;
+    if (value < spec.minimum || value > spec.maximum) {
+      const shown = input.dataset.unit === "seconds"
+        ? `${secondsLabel(spec.minimum)}–${secondsLabel(spec.maximum)} s`
+        : `${paramNumber(spec, spec.minimum)}–${paramNumber(spec, spec.maximum)}`;
+      throw new Error(`„${spec.label}“ muss im Bereich ${shown} liegen`);
+    }
+    sampling[key] = spec.integer ? Math.round(value) : value;
   });
   return {
     instruct: container.querySelector("[data-instruct]").value,
@@ -362,6 +472,33 @@ function readProfileForm(container) {
     trim: container.querySelector("[data-trim]").checked,
     normalize: container.querySelector("[data-norm]").checked,
   };
+}
+
+// Die Eingabe steht in Sekunden, gespeichert werden Tokens. Die Ableitung
+// muss beim Tippen sichtbar sein, sonst überrascht der Rundungssprung:
+// 2,05 s ergeben 26 Tokens und zeigen nach dem Speichern 2,08 s.
+function wireDurationField(container) {
+  container.querySelectorAll('[data-unit="seconds"]').forEach((input) => {
+    const readout = container.querySelector(
+      `[data-tokens-for="${input.dataset.param}"]`);
+    if (!readout) return;
+    const update = () => {
+      const raw = input.value.trim();
+      if (raw === "") {
+        readout.textContent = "unbegrenzt";
+        return;
+      }
+      const seconds = Number(raw);
+      if (Number.isNaN(seconds)) {
+        readout.textContent = "keine Zahl";
+        return;
+      }
+      const tokens = Math.round(seconds / state.secondsPerToken);
+      readout.textContent = `= ${tokens} Tokens (${secondsLabel(tokens)} s)`;
+    };
+    input.oninput = update;
+    update();
+  });
 }
 
 function wirePoolLinks(container) {
@@ -403,6 +540,20 @@ function formatWhen(iso) {
 function profileSummaryCard(clip, profile) {
   const instructShort = profile.instruct.length > 90
     ? profile.instruct.slice(0, 90) + "…" : profile.instruct;
+  // Ein gelöschtes Feld kommt von der API als fehlender Schlüssel (undefined),
+  // aus einer handbearbeiteten profiles.json aber als null — beides heißt
+  // „unbegrenzt".
+  const maxDuration = profile.sampling.max_new_tokens === undefined
+      || profile.sampling.max_new_tokens === null
+    ? "unbegrenzt"
+    : secondsLabel(profile.sampling.max_new_tokens) + " s";
+  // Auch hier deutsch, sonst stünden „0.6" und „2,00 s" in derselben Zeile.
+  // Fehlt der Schlüssel im Profil-Eintrag, steht ein Strich da statt
+  // „undefined" — die Voreinstellung greift dann im Modell.
+  const temperature = profile.sampling.temperature === undefined
+      || profile.sampling.temperature === null
+    ? "—"
+    : germanNumber(profile.sampling.temperature);
   return `
     <div class="card profile-card">
       <div class="profile-summary">
@@ -411,7 +562,8 @@ function profileSummaryCard(clip, profile) {
           <span class="muted">gilt für alle ${profileClipCount(clip.profile)} Clips dieses Profils</span>
           <div class="muted small">
             Stimme ${escapeHtml(profile.speaker)} · Sprache ${escapeHtml(profile.language)}
-            · temperature ${profile.sampling.temperature}
+            · temperature ${temperature}
+            · max ${maxDuration}
             · „${escapeHtml(instructShort)}“
           </div>
         </div>
@@ -629,6 +781,7 @@ function renderDetail(key) {
     el("btn-profile-save").onclick = saveProfileFrom(form, clip.profile);
     el("btn-profile-reset").onclick = () => renderDetail(key);
     wirePoolLinks(form);
+    wireDurationField(form);
   }
 
   // ---- Clip (lokal)
@@ -738,7 +891,7 @@ function paramsCard(name) {
         <button data-save class="primary">Speichern</button>
         <button data-reset title="Verwirft die Änderungen in dieser Karte">Zurücksetzen</button>
         <button data-save-all
-                title="Nur die Sampling-Werte dieser Karte auf alle Profile übertragen">
+                title="Nur die Sampling-Werte dieser Karte auf alle Profile übertragen — die maximale Dauer bleibt ausgenommen, die gilt pro Profil">
           Sampling auf alle Profile übertragen</button>
       </p>
     </div>`;
@@ -759,6 +912,12 @@ function renderParams() {
         Trim oder Normalisierung gilt für neue Kandidaten dieses Profils.
         Bereits produzierte Clips bleiben unverändert, bis man sie bewusst
         neu würfelt und übernimmt.</p>
+      <p class="muted small">Die maximale Dauer ist ein harter Schnitt, kein
+        Hinweis: läuft das Modell in einen erfundenen Satz, bricht die Aufnahme
+        mitten drin ab — hörbar kaputt statt unauffällig falsch. Der Wert gilt
+        für die Rohgenerierung, also bevor die Stille am Anfang und Ende
+        weggeschnitten wird; die fertige Datei ist entsprechend kürzer.
+        Intern zählt das Modell in Tokens à 80 ms.</p>
       <p class="muted small">Hinter jeder Stimme steht ihre Herkunft. Die Sprache setzt
         die Phonologie, die Stimme bringt trotzdem den Akzent ihrer Kernsprache mit —
         bei ganzen Sätzen kaum hörbar, bei einem einzelnen Laut deutlich.</p>
@@ -775,13 +934,23 @@ function renderParams() {
     card.querySelector("[data-save]").onclick = saveProfileFrom(card, name);
     card.querySelector("[data-reset]").onclick = () => renderParams();
     wirePoolLinks(card);
+    wireDurationField(card);
     card.querySelector("[data-save-all]").onclick = guard(async () => {
-      const sampling = readProfileForm(card).sampling;
+      // Ohne das Dauer-Limit: es ist bewusst pro Profil verschieden (phoneme
+      // 2,00 s, prompt 10,00 s), und es mitzuübertragen würde genau den Sinn
+      // des Limits aufheben — ein leeres Feld löschte es sogar überall. Das
+      // „Speichern" dieser Karte speichert die Dauer weiterhin mit.
+      const sampling = Object.fromEntries(
+        Object.entries(readProfileForm(card).sampling).filter(([key]) => {
+          const spec = specFor(key);
+          return !spec || spec.group !== "duration";
+        }));
       for (const profileName of Object.keys(state.profiles)) {
         await put(`/api/profiles/${profileName}`, { sampling });
       }
       await refresh();
-      showBanner("Sampling-Werte auf alle Profile übertragen — gilt ab sofort für neue Kandidaten.", "ok");
+      showBanner("Sampling-Werte auf alle Profile übertragen (ohne die maximale " +
+        "Dauer) — gilt ab sofort für neue Kandidaten.", "ok");
     });
   });
 }

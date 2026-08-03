@@ -13,21 +13,141 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-BASE_SAMPLING = {
-    "temperature": 0.6,
-    "top_k": 30,
-    "top_p": 0.9,
-    "repetition_penalty": 1.05,
-}
+#: Ein Codec-Token des Talkers entspricht so vielen Sekunden Audio.
+#: Hergeleitet aus dem 12-Hz-Tokenizer: decode_upsample_rate 1920 bei
+#: 24 kHz Ausgabe, also 1920 / 24000. Steht hier und nur hier — das UI
+#: bekommt den Wert über /api/state, damit die Kopplung an genau einer
+#: Stelle gepflegt wird.
+SECONDS_PER_TOKEN = 0.08
+
+#: Obergrenze für max_new_tokens: der Default aus generation_config.json
+#: des Checkpoints. Mehr anzubieten wäre unbelegt.
+MAX_NEW_TOKENS_CEILING = 8192
 
 
-def _profile(label: str, instruct: str) -> dict[str, Any]:
+@dataclass(frozen=True)
+class SamplingParam:
+    """Ein Sampling-Parameter samt allem, was UI und Prüfung brauchen.
+
+    Vorher war `BASE_SAMPLING` ein nacktes Wert-Dict. Damit konnte das UI nur
+    die Schlüssel anzeigen, die in einem Profil schon standen — ein neuer
+    Parameter blieb an bestehenden Profilen für immer unsichtbar. Und geprüft
+    wurde nur „ist eine Zahl", sodass ein `top_p: 3` in der git-verwalteten
+    profiles.json landete und danach still unbrauchbare Audios erzeugte.
+    """
+
+    key: str
+    label: str
+    #: "duration" | "talker" | "subtalker" — die Gruppierung im ⚙️-Panel.
+    group: str
+    minimum: float
+    maximum: float
+    step: float
+    help: str
+    #: None heißt „kein globaler Default" — der Wert ist profilabhängig und
+    #: sein Fehlen in profiles.json bedeutet „Modell-Default".
+    default: float | int | None = None
+    integer: bool = False
+    #: Darf per `null` gelöscht werden. Nur für max_new_tokens.
+    nullable: bool = False
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "key": self.key,
+            "label": self.label,
+            "group": self.group,
+            "minimum": self.minimum,
+            "maximum": self.maximum,
+            "step": self.step,
+            "help": self.help,
+            "default": self.default,
+            "integer": self.integer,
+            "nullable": self.nullable,
+        }
+
+
+SAMPLING_SPEC: tuple[SamplingParam, ...] = (
+    SamplingParam(
+        key="max_new_tokens", label="Maximale Dauer", group="duration",
+        minimum=2, maximum=MAX_NEW_TOKENS_CEILING, step=1,
+        integer=True, nullable=True, default=None,
+        help="Deckelt, wie lang die Aufnahme werden darf. 1 Token = 80 ms, "
+             "der Wert gilt vor dem Wegschneiden der Stille. Harter Schnitt: "
+             "erfindet das Modell einen Satz dazu, bricht die Aufnahme mitten "
+             "drin ab — sie ist dann hörbar kaputt statt unauffällig falsch. "
+             "Leer = unbegrenzt (655 s).",
+    ),
+    SamplingParam(
+        key="temperature", label="temperature", group="talker",
+        minimum=0.1, maximum=2.0, step=0.05, default=0.6,
+        help="Wie stark das Modell vom wahrscheinlichsten Klang abweicht. "
+             "Niedrig (0,3–0,6) = gleichmäßig und vorhersagbar, Seeds klingen "
+             "ähnlich. Hoch (1,0–1,5) = mehr Variation zwischen Seeds, aber "
+             "auch mehr Ausrutscher. Über 1,5 wird es unbrauchbar.",
+    ),
+    SamplingParam(
+        key="top_k", label="top_k", group="talker",
+        minimum=1, maximum=100, step=1, integer=True, default=30,
+        help="Nur die k wahrscheinlichsten Fortsetzungen kommen überhaupt in "
+             "Frage. Klein (10–30) = enger und sicherer, groß (50–100) = mehr "
+             "Spielraum. 1 macht die Generierung deterministisch und den Seed "
+             "damit wirkungslos.",
+    ),
+    SamplingParam(
+        key="top_p", label="top_p", group="talker",
+        minimum=0.05, maximum=1.0, step=0.05, default=0.9,
+        help="Nucleus-Sampling: es werden nur so viele Fortsetzungen "
+             "betrachtet, wie zusammen diesen Anteil der Wahrscheinlichkeit "
+             "ausmachen. 1,0 = keine Begrenzung, 0,9 = das unwahrscheinlichste "
+             "Zehntel fällt weg. Wirkt in dieselbe Richtung wie top_k, nur "
+             "relativ statt als feste Anzahl.",
+    ),
+    SamplingParam(
+        key="repetition_penalty", label="repetition_penalty", group="talker",
+        minimum=1.0, maximum=2.0, step=0.01, default=1.05,
+        help="Bestraft schon verwendete Klang-Tokens. 1,0 = keine Strafe. "
+             "Über 1,0 verringert Stottern und hängende Silben, zu hoch "
+             "(über ~1,3) macht die Sprechmelodie unruhig, weil das Modell "
+             "natürliche Wiederholungen vermeidet.",
+    ),
+    SamplingParam(
+        key="subtalker_temperature", label="subtalker_temperature",
+        group="subtalker", minimum=0.1, maximum=2.0, step=0.05, default=0.9,
+        help="Wie temperature, aber für die akustische Feinstruktur (Timbre, "
+             "Rauschen) statt für den Sprachinhalt. Niedriger = sauberere, "
+             "gleichmäßigere Stimme; höher = lebendiger, aber mit mehr "
+             "Artefakten. Ändert nicht, was gesagt wird.",
+    ),
+    SamplingParam(
+        key="subtalker_top_k", label="subtalker_top_k", group="subtalker",
+        minimum=1, maximum=100, step=1, integer=True, default=50,
+        help="Auswahlbreite für die Feinstruktur. Kleinere Werte glätten "
+             "Artefakte, gehen aber auf Kosten der Klangfülle.",
+    ),
+    SamplingParam(
+        key="subtalker_top_p", label="subtalker_top_p", group="subtalker",
+        minimum=0.05, maximum=1.0, step=0.05, default=1.0,
+        help="Nucleus-Sampling für die Feinstruktur. 1,0 ist der "
+             "Checkpoint-Default; absenken vor allem dann, wenn Aufnahmen rau "
+             "oder verrauscht klingen.",
+    ),
+)
+
+SAMPLING_PARAMS: dict[str, SamplingParam] = {p.key: p for p in SAMPLING_SPEC}
+
+#: Die Werte für ein frisch angelegtes Profil. Bewusst ohne max_new_tokens:
+#: das Limit ist profilabhängig und wird in DEFAULT_PROFILES gesetzt.
+BASE_SAMPLING: dict[str, Any] = {
+    p.key: p.default for p in SAMPLING_SPEC if p.default is not None}
+
+
+def _profile(label: str, instruct: str, max_tokens: int) -> dict[str, Any]:
     return {
         "label": label,
         "speaker": "sohee",
         "language": "german",
         "instruct": instruct,
-        "sampling": dict(BASE_SAMPLING),
+        "sampling": {**BASE_SAMPLING, "max_new_tokens": max_tokens},
         "seedPool": [],
         "trim": True,
         "normalize": True,
@@ -41,43 +161,51 @@ DEFAULT_PROFILES: dict[str, Any] = {
             "Einzelwort",
             "Sprich das einzelne Wort klar und freundlich, in ruhigem Tempo, "
             "mit neutraler Betonung. Keine Übertreibung, keine Frage-Melodie.",
+            38,  # 3,04 s
         ),
         "phoneme": _profile(
             "Laut / Buchstabe",
             "Sprich ausschließlich den Lautwert des Buchstabens, deutlich gedehnt "
             "und langsam — nicht den Buchstabennamen. Also 'mmmmm', nicht 'Em'. "
             "Kein Satz, kein Zusatz, nur der Laut.",
+            25,  # 2,00 s — 48 der 50 validierten Aufnahmen liegen unter 1,0 s
         ),
         "prompt": _profile(
             "Aufgaben-Frage",
             "Sprich wie eine freundliche Kindergärtnerin zu einem fünfjährigen Kind: "
             "warm, deutlich, ruhiges Tempo, leicht fragende Betonung am Satzende. "
             "Freundlich zugewandt, nicht übertrieben fröhlich.",
+            125,  # 10,00 s
         ),
         "miss": _profile(
             "Sanftes Feedback",
             "Sprich ruhig und aufmunternd zu einem Kind, das gerade danebenlag. "
             "Kein Tadel, keine Enttäuschung — freundlich erklärend, warm, geduldig.",
+            75,  # 6,00 s
         ),
         "reward": _profile(
             "Belohnung",
             "Sprich fröhlich und feiernd zu einem Kind, das etwas geschafft hat. "
             "Lebendig und mit Schwung, aber nicht schrill und nicht zu laut.",
+            63,  # 5,04 s
         ),
         "sentence": _profile(
             "Einfacher Satz",
             "Sprich den kurzen Satz klar und einfach, in ruhigem Tempo, "
             "mit natürlicher Satzmelodie. Für ein Kind, das zuhört und mitliest.",
+            50,  # 4,00 s
         ),
         "finale": _profile(
             "Lektions-Finale",
             "Sprich den lustigen Satz verspielt und pointiert, mit Schwung und "
             "einem Lächeln in der Stimme. Wie eine kleine Pointe am Ende einer Geschichte.",
+            63,  # 5,04 s
         ),
         "ui": _profile(
             "Oberflächen-Ansage",
             "Sprich ruhig, freundlich und neutral. Kurze Ansage, keine Betonung "
             "auf einzelnen Wörtern, kein Drama.",
+            75,  # 6,00 s
         ),
     },
 }
@@ -128,6 +256,59 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
         raise
 
 
+def validate_sampling_values(sampling: dict[str, Any], *, name: str = "?",
+                             path: Path | None = None) -> None:
+    """Check the sampling values that are present against SAMPLING_SPEC.
+
+    Called from `Profile.from_dict`, i.e. on the *read* path. The HTTP handler
+    validates writes, but profiles.json is a documented hand-edit surface and
+    without this check a hand-typed value reached the model unexamined:
+
+    * `max_new_tokens: 1` against the library's hardcoded `min_new_tokens: 2`
+      yields 0–1 codec frames, so every clip of that profile came out as empty
+      audio with nothing naming the file.
+    * an added `do_sample: false` is invisible in the ⚙️-panel (which renders
+      registry keys only), cannot be removed through it, and is still passed on
+      by `**profile.sampling` — every seed then produces identical audio and
+      the whole seed-pool mechanic collapses.
+
+    An *incomplete* block is explicitly fine: a missing key means "model
+    default". Only what is written down is checked. `Lock.from_dict` and
+    `build_clips` work the same way, and like them the message names the file,
+    the profile and the parameter — these files are edited by hand, so an error
+    that does not say what is at fault is close to useless.
+    """
+    where = f"{path}: " if path is not None else ""
+    unknown = sorted(set(sampling) - set(SAMPLING_PARAMS))
+    if unknown:
+        raise ValueError(
+            f"{where}profile {name!r} has unknown sampling parameters: "
+            f"{', '.join(unknown)} — allowed: "
+            f"{', '.join(sorted(SAMPLING_PARAMS))}")
+    for key, spec in SAMPLING_PARAMS.items():
+        if key not in sampling:
+            continue
+        value = sampling[key]
+        if value is None:
+            if not spec.nullable:
+                raise ValueError(
+                    f"{where}profile {name!r} has sampling {key!r} set to null "
+                    f"— allowed is {spec.minimum} to {spec.maximum}")
+            continue
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise ValueError(
+                f"{where}profile {name!r} has a non-numeric sampling {key!r} "
+                f"{value!r}")
+        if spec.integer and float(value) != int(value):
+            raise ValueError(
+                f"{where}profile {name!r} has a fractional sampling {key!r} "
+                f"{value!r} — only whole numbers are allowed")
+        if not spec.minimum <= value <= spec.maximum:
+            raise ValueError(
+                f"{where}profile {name!r} has sampling {key!r} at {value!r}, "
+                f"outside the allowed range {spec.minimum} to {spec.maximum}")
+
+
 @dataclass
 class Profile:
     label: str
@@ -149,12 +330,18 @@ class Profile:
         for required in ("label", "speaker", "language", "instruct"):
             if required not in raw:
                 raise ValueError(f"{where}profile {name!r} is missing {required!r}")
+        raw_sampling = raw.get("sampling", BASE_SAMPLING)
+        if not isinstance(raw_sampling, dict):
+            raise ValueError(f"{where}profile {name!r}: 'sampling' must be an "
+                             f"object, got {type(raw_sampling).__name__}")
+        sampling = dict(raw_sampling)
+        validate_sampling_values(sampling, name=name, path=path)
         return cls(
             label=raw["label"],
             speaker=raw["speaker"],
             language=raw["language"],
             instruct=raw["instruct"],
-            sampling=dict(raw.get("sampling", BASE_SAMPLING)),
+            sampling=sampling,
             seed_pool=list(raw.get("seedPool", [])),
             trim=bool(raw.get("trim", True)),
             normalize=bool(raw.get("normalize", True)),
