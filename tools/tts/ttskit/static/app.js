@@ -16,10 +16,14 @@ const STATUS_LABELS = { missing: "fehlt", rendered: "fertig" };
 // davon ist ihre Herkunft ein Hinweis wert.
 const EAST_ASIAN = ["chinese", "japanese", "korean"];
 
+// textContent → innerHTML ersetzt & < >, aber keine Anführungszeichen. Fast
+// jeder Einsatzort hier ist ein Attribut (value="…", title="…"), und ohne die
+// beiden letzten Ersetzungen bricht ein Wert mit " aus seinem Attribut aus,
+// statt darin zu landen. Im Textfluss sind sie unschädlich.
 function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
-  return div.innerHTML;
+  return div.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
 // ------------------------------------------------------------- Stimmen
@@ -306,8 +310,10 @@ const profileClipCount = (name) =>
 // Server (store.SAMPLING_SPEC), nicht aus einer zweiten Liste hier. Vorher
 // rendete das Panel aus Object.keys(profile.sampling) — ein Parameter, der
 // in profiles.json noch nicht stand, war damit unsichtbar.
+// Die Legende der Dauer-Gruppe sagt bewusst etwas anderes als das Feldlabel
+// („Maximale Dauer") — sonst stünde dieselbe Wortgruppe zweimal übereinander.
 const GROUP_LABELS = {
-  duration: "Maximale Dauer",
+  duration: "Dauer — harter Schnitt (wie lang es werden darf)",
   talker: "Sampling — Haupt-Talker (was gesagt wird)",
   subtalker: "Feinstruktur — Sub-Talker (wie es klingt)",
 };
@@ -317,36 +323,74 @@ const specFor = (key) => state.samplingSpec.find((p) => p.key === key);
 const tokensToSeconds = (tokens) =>
   (Number(tokens) * state.secondsPerToken).toFixed(2);
 
+// Zahlen im Fließtext des Panels werden deutsch geschrieben: die Hilfetexte
+// aus der Registry tun das auch („0,3–0,6"), ein Dezimalpunkt daneben liest
+// sich falsch. In den `value`/`min`/`max`/`step`-Attributen bleibt der Punkt —
+// dort erwartet <input type="number"> ihn.
+const germanNumber = (value) => String(value).replace(".", ",");
+
+// Nachkommastellen für einen Registry-Wert: mindestens eine, sobald der
+// Parameter überhaupt Kommazahlen erlaubt. JSON wirft die Null hinter 1.0 weg,
+// sonst stünde da „Bereich 0,05–1." und „Voreinstellung 1." — beides sieht wie
+// ein abgebrochener Satz aus.
+function paramNumber(spec, value) {
+  if (spec.integer) return germanNumber(value);
+  const text = String(Number(value));
+  const decimals = text.includes(".") ? text.split(".")[1].length : 0;
+  return germanNumber(Number(value).toFixed(Math.max(1, decimals)));
+}
+
+const secondsLabel = (tokens) => germanNumber(tokensToSeconds(tokens));
+
 // Ein Feld pro deklariertem Parameter. Die Dauer wird in Sekunden
 // eingegeben und in Tokens gespeichert — data-unit markiert das für
 // readProfileForm.
 function paramFieldHtml(profile, spec) {
   const stored = profile.sampling[spec.key];
-  const missing = stored === undefined || stored === null;
+  const absent = stored === undefined || stored === null;
+  // Fehlt der Schlüssel im Profil-Eintrag, steht die Voreinstellung im Feld —
+  // nicht nichts. Das Panel rendert aus der Registry, damit ein neuer
+  // Parameter auch an Profilen erscheint, die ihn noch nicht in profiles.json
+  // haben; ein leeres Feld wäre aber unspeicherbar (readProfileForm verlangt
+  // eine Zahl), womit sich an so einem Profil nicht einmal die Instruktion
+  // ändern ließe. Der Hilfetext nennt die Voreinstellung ohnehin. Nur die
+  // nullable Dauer bleibt leer: dort heißt leer „unbegrenzt".
+  const value = absent && !spec.nullable ? spec.default : stored;
+  const missing = value === undefined || value === null;
   const seconds = spec.group === "duration";
-  const value = missing ? "" : (seconds ? tokensToSeconds(stored) : stored);
+  const shown = missing ? "" : (seconds ? tokensToSeconds(value) : value);
   const attrs = seconds
-    ? `data-unit="seconds" step="0.1" min="${tokensToSeconds(spec.minimum)}" ` +
+    // Jeder legale Wert ist ein ganzzahliges Vielfaches von secondsPerToken.
+    // Genau das ist die Schrittweite — mit step="0.1" liefen die Pfeile auf
+    // 0,16 / 0,26 / 0,36 und jeder runde Sekundenwert war ein Step-Mismatch.
+    ? `data-unit="seconds" step="${state.secondsPerToken}" ` +
+      `min="${tokensToSeconds(spec.minimum)}" ` +
       `max="${tokensToSeconds(spec.maximum)}" placeholder="unbegrenzt"`
     : `step="${spec.step}" min="${spec.minimum}" max="${spec.maximum}"`;
   const range = seconds
-    ? `${tokensToSeconds(spec.minimum)}–${tokensToSeconds(spec.maximum)} s`
-    : `${spec.minimum}–${spec.maximum}`;
+    ? `${secondsLabel(spec.minimum)}–${secondsLabel(spec.maximum)} s`
+    : `${paramNumber(spec, spec.minimum)}–${paramNumber(spec, spec.maximum)}`;
   const suffix = seconds
-    ? `<span class="muted small" data-tokens-for="${spec.key}">${
-        missing ? "unbegrenzt" : `= ${stored} Tokens`}</span>`
+    ? `<span class="muted small" data-tokens-for="${escapeHtml(spec.key)}">${
+        missing ? "unbegrenzt" : `= ${escapeHtml(String(value))} Tokens`}</span>`
     : "";
+  // Label, Schlüssel und Wert laufen genau wie `help` durch escapeHtml.
+  // Profile.from_dict prüft die Sampling-Werte inzwischen beim Laden, ein
+  // handgeschriebener String kommt hier also nicht mehr an — aber
+  // profiles.json ist eine dokumentierte Handbearbeitungs-Fläche, und
+  // voiceOptions und profileFormHtml halten es für ihre Konfigurationsdaten
+  // genauso.
   return `
     <div class="param-row">
       <label class="param">
-        <span>${spec.label}${seconds ? " (Sekunden, vor Trim)" : ""}</span>
-        <input type="number" data-param="${spec.key}" ${attrs}
-               value="${value}" />
+        <span>${escapeHtml(spec.label)}${seconds ? " (Sekunden, vor Trim)" : ""}</span>
+        <input type="number" data-param="${escapeHtml(spec.key)}" ${attrs}
+               value="${escapeHtml(String(shown))}" />
         ${suffix}
       </label>
       <p class="param-help muted small">${escapeHtml(spec.help)}
-        <b>Bereich ${range}.</b>${
-          spec.default === null ? "" : ` Voreinstellung ${spec.default}.`}</p>
+        <b>Bereich ${range}.</b>${spec.default === null ? ""
+          : ` Voreinstellung ${paramNumber(spec, spec.default)}.`}</p>
     </div>`;
 }
 
@@ -414,9 +458,9 @@ function readProfileForm(container) {
       : entered;
     if (value < spec.minimum || value > spec.maximum) {
       const shown = input.dataset.unit === "seconds"
-        ? `${tokensToSeconds(spec.minimum)}–${tokensToSeconds(spec.maximum)} s`
-        : `${spec.minimum}–${spec.maximum}`;
-      throw new Error(`„${spec.label}“ muss zwischen ${shown} liegen`);
+        ? `${secondsLabel(spec.minimum)}–${secondsLabel(spec.maximum)} s`
+        : `${paramNumber(spec, spec.minimum)}–${paramNumber(spec, spec.maximum)}`;
+      throw new Error(`„${spec.label}“ muss im Bereich ${shown} liegen`);
     }
     sampling[key] = spec.integer ? Math.round(value) : value;
   });
@@ -450,7 +494,7 @@ function wireDurationField(container) {
         return;
       }
       const tokens = Math.round(seconds / state.secondsPerToken);
-      readout.textContent = `= ${tokens} Tokens (${tokensToSeconds(tokens)} s)`;
+      readout.textContent = `= ${tokens} Tokens (${secondsLabel(tokens)} s)`;
     };
     input.oninput = update;
     update();
@@ -502,7 +546,14 @@ function profileSummaryCard(clip, profile) {
   const maxDuration = profile.sampling.max_new_tokens === undefined
       || profile.sampling.max_new_tokens === null
     ? "unbegrenzt"
-    : tokensToSeconds(profile.sampling.max_new_tokens) + " s";
+    : secondsLabel(profile.sampling.max_new_tokens) + " s";
+  // Auch hier deutsch, sonst stünden „0.6" und „2,00 s" in derselben Zeile.
+  // Fehlt der Schlüssel im Profil-Eintrag, steht ein Strich da statt
+  // „undefined" — die Voreinstellung greift dann im Modell.
+  const temperature = profile.sampling.temperature === undefined
+      || profile.sampling.temperature === null
+    ? "—"
+    : germanNumber(profile.sampling.temperature);
   return `
     <div class="card profile-card">
       <div class="profile-summary">
@@ -511,7 +562,7 @@ function profileSummaryCard(clip, profile) {
           <span class="muted">gilt für alle ${profileClipCount(clip.profile)} Clips dieses Profils</span>
           <div class="muted small">
             Stimme ${escapeHtml(profile.speaker)} · Sprache ${escapeHtml(profile.language)}
-            · temperature ${profile.sampling.temperature}
+            · temperature ${temperature}
             · max ${maxDuration}
             · „${escapeHtml(instructShort)}“
           </div>
@@ -840,7 +891,7 @@ function paramsCard(name) {
         <button data-save class="primary">Speichern</button>
         <button data-reset title="Verwirft die Änderungen in dieser Karte">Zurücksetzen</button>
         <button data-save-all
-                title="Nur die Sampling-Werte dieser Karte auf alle Profile übertragen">
+                title="Nur die Sampling-Werte dieser Karte auf alle Profile übertragen — die maximale Dauer bleibt ausgenommen, die gilt pro Profil">
           Sampling auf alle Profile übertragen</button>
       </p>
     </div>`;
@@ -885,12 +936,21 @@ function renderParams() {
     wirePoolLinks(card);
     wireDurationField(card);
     card.querySelector("[data-save-all]").onclick = guard(async () => {
-      const sampling = readProfileForm(card).sampling;
+      // Ohne das Dauer-Limit: es ist bewusst pro Profil verschieden (phoneme
+      // 2,00 s, prompt 10,00 s), und es mitzuübertragen würde genau den Sinn
+      // des Limits aufheben — ein leeres Feld löschte es sogar überall. Das
+      // „Speichern" dieser Karte speichert die Dauer weiterhin mit.
+      const sampling = Object.fromEntries(
+        Object.entries(readProfileForm(card).sampling).filter(([key]) => {
+          const spec = specFor(key);
+          return !spec || spec.group !== "duration";
+        }));
       for (const profileName of Object.keys(state.profiles)) {
         await put(`/api/profiles/${profileName}`, { sampling });
       }
       await refresh();
-      showBanner("Sampling-Werte auf alle Profile übertragen — gilt ab sofort für neue Kandidaten.", "ok");
+      showBanner("Sampling-Werte auf alle Profile übertragen (ohne die maximale " +
+        "Dauer) — gilt ab sofort für neue Kandidaten.", "ok");
     });
   });
 }
