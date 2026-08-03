@@ -4,6 +4,7 @@ const state = {
   clips: [], profiles: {}, engine: {}, orphans: [], selected: null,
   jobs: { running: null, queued: 0 }, limits: { maxCandidates: 16 },
   voices: [], languages: [], paramsOpen: false,
+  samplingSpec: [], secondsPerToken: 0.08,
   // Batch-Auswahl und aufgeklappter Profil-Editor überleben jedes refresh().
   selectedKeys: new Set(), profileEditOpen: false,
 };
@@ -301,21 +302,65 @@ function select(key) {
 const profileClipCount = (name) =>
   state.clips.filter((c) => c.profile === name).length;
 
-const SAMPLING_HINTS = {
-  temperature: "Höher = mehr Variation zwischen Seeds, niedriger = gleichmäßiger",
-  top_k: "Nur die k wahrscheinlichsten Tokens werden gezogen",
-  top_p: "Nucleus-Sampling: kumulierte Wahrscheinlichkeitsmasse",
-  repetition_penalty: "Bestraft Wiederholungen (>1 = weniger Wiederholung)",
+// Die Erklärungstexte, Wertebereiche und Typen kommen aus der Registry im
+// Server (store.SAMPLING_SPEC), nicht aus einer zweiten Liste hier. Vorher
+// rendete das Panel aus Object.keys(profile.sampling) — ein Parameter, der
+// in profiles.json noch nicht stand, war damit unsichtbar.
+const GROUP_LABELS = {
+  duration: "Maximale Dauer",
+  talker: "Sampling — Haupt-Talker (was gesagt wird)",
+  subtalker: "Feinstruktur — Sub-Talker (wie es klingt)",
 };
+
+const specFor = (key) => state.samplingSpec.find((p) => p.key === key);
+
+const tokensToSeconds = (tokens) =>
+  (Number(tokens) * state.secondsPerToken).toFixed(2);
+
+// Ein Feld pro deklariertem Parameter. Die Dauer wird in Sekunden
+// eingegeben und in Tokens gespeichert — data-unit markiert das für
+// readProfileForm.
+function paramFieldHtml(profile, spec) {
+  const stored = profile.sampling[spec.key];
+  const missing = stored === undefined || stored === null;
+  const seconds = spec.group === "duration";
+  const value = missing ? "" : (seconds ? tokensToSeconds(stored) : stored);
+  const attrs = seconds
+    ? `data-unit="seconds" step="0.1" min="${tokensToSeconds(spec.minimum)}" ` +
+      `max="${tokensToSeconds(spec.maximum)}" placeholder="unbegrenzt"`
+    : `step="${spec.step}" min="${spec.minimum}" max="${spec.maximum}"`;
+  const range = seconds
+    ? `${tokensToSeconds(spec.minimum)}–${tokensToSeconds(spec.maximum)} s`
+    : `${spec.minimum}–${spec.maximum}`;
+  const suffix = seconds
+    ? `<span class="muted small" data-tokens-for="${spec.key}">${
+        missing ? "unbegrenzt" : `= ${stored} Tokens`}</span>`
+    : "";
+  return `
+    <div class="param-row">
+      <label class="param">
+        <span>${spec.label}${seconds ? " (Sekunden, vor Trim)" : ""}</span>
+        <input type="number" data-param="${spec.key}" ${attrs}
+               value="${value}" />
+        ${suffix}
+      </label>
+      <p class="param-help muted small">${escapeHtml(spec.help)}
+        <b>Bereich ${range}.</b>${
+          spec.default === null ? "" : ` Voreinstellung ${spec.default}.`}</p>
+    </div>`;
+}
 
 function profileFormHtml(name) {
   const profile = state.profiles[name];
-  const sampling = Object.keys(profile.sampling).sort().map((param) => `
-    <label class="param">
-      <span title="${SAMPLING_HINTS[param] || ""}">${param}</span>
-      <input type="number" step="any" data-param="${param}"
-             value="${profile.sampling[param]}" />
-    </label>`).join("");
+  const groups = ["duration", "talker", "subtalker"].map((group) => {
+    const fields = state.samplingSpec.filter((p) => p.group === group);
+    if (fields.length === 0) return "";
+    return `
+      <fieldset class="param-group">
+        <legend>${GROUP_LABELS[group]}</legend>
+        ${fields.map((spec) => paramFieldHtml(profile, spec)).join("")}
+      </fieldset>`;
+  }).join("");
   return `
     <p class="voice-line">
       <label>Stimme
@@ -326,7 +371,7 @@ function profileFormHtml(name) {
     </p>
     <label class="muted small">Instruktion — Sprechanweisung für alle Clips dieses Profils</label>
     <textarea data-instruct>${escapeHtml(profile.instruct)}</textarea>
-    <div class="params-grid">${sampling}</div>
+    ${groups}
     <p>
       <label><input type="checkbox" data-trim ${profile.trim ? "checked" : ""} />
         Stille am Anfang/Ende wegschneiden (trim)</label>
@@ -346,13 +391,34 @@ function profileFormHtml(name) {
 function readProfileForm(container) {
   const sampling = {};
   container.querySelectorAll("[data-param]").forEach((input) => {
-    const value = Number(input.value);
-    // Number("") ist 0 — ein geleertes Feld darf nicht stillschweigend als
-    // 0 gespeichert werden.
-    if (input.value.trim() === "" || Number.isNaN(value)) {
-      throw new Error(`Sampling-Parameter „${input.dataset.param}“ ist leer oder keine Zahl`);
+    const key = input.dataset.param;
+    const spec = specFor(key);
+    const raw = input.value.trim();
+    if (raw === "") {
+      // Number("") ist 0 — ein geleertes Feld darf nicht stillschweigend
+      // als 0 gespeichert werden. Bei der Dauer heißt leer „unbegrenzt",
+      // was der Server als null-Löschung entgegennimmt.
+      if (!spec.nullable) {
+        throw new Error(`„${spec.label}“ ist leer oder keine Zahl`);
+      }
+      sampling[key] = null;
+      return;
     }
-    sampling[input.dataset.param] = value;
+    const entered = Number(raw);
+    if (Number.isNaN(entered)) {
+      throw new Error(`„${spec.label}“ ist leer oder keine Zahl`);
+    }
+    // Die Dauer wird in Sekunden eingegeben, gespeichert werden Tokens.
+    const value = input.dataset.unit === "seconds"
+      ? Math.round(entered / state.secondsPerToken)
+      : entered;
+    if (value < spec.minimum || value > spec.maximum) {
+      const shown = input.dataset.unit === "seconds"
+        ? `${tokensToSeconds(spec.minimum)}–${tokensToSeconds(spec.maximum)} s`
+        : `${spec.minimum}–${spec.maximum}`;
+      throw new Error(`„${spec.label}“ muss zwischen ${shown} liegen`);
+    }
+    sampling[key] = spec.integer ? Math.round(value) : value;
   });
   return {
     instruct: container.querySelector("[data-instruct]").value,
