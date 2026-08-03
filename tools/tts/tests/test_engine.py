@@ -89,3 +89,31 @@ def test_same_seed_gives_bit_identical_audio():
     assert np.array_equal(first, second)
     assert not np.array_equal(first, third)
     assert np.max(np.abs(first)) > 0.01, "must not be silence"
+
+
+def test_generate_forwards_max_new_tokens_to_the_model():
+    """Das Limit muss den Weg bis in generate_custom_voice finden.
+
+    Die Zusage hängt an engine.generate's `**profile.sampling`. Wird die je
+    auf eine feste Parameterliste umgebaut, fällt max_new_tokens still weg —
+    das Limit stünde dann in profiles.json und wirkte trotzdem nicht.
+    """
+    class CapturingModel:
+        def __init__(self):
+            self.kwargs = None
+
+        def generate_custom_voice(self, **kwargs):
+            self.kwargs = kwargs
+            return [np.zeros(240, dtype=np.float32)], 24000
+
+    model = CapturingModel()
+    engine = Engine()
+    engine._model = model
+    engine.loaded = True
+
+    profile = Profiles.load(Path("nope.json")).profiles["phoneme"]
+    engine.generate("M", profile, seed=7)
+
+    assert model.kwargs["max_new_tokens"] == 25
+    assert model.kwargs["subtalker_temperature"] == 0.9
+    assert model.kwargs["temperature"] == 0.6
