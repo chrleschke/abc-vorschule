@@ -57,7 +57,7 @@ import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 import kotlinx.coroutines.delay
 
-private val GlyphBox = 260.dp
+private val GlyphBox = 350.dp
 
 /**
  * How long the finished glyph stays on screen before the reward page replaces it.
