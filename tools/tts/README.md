@@ -213,18 +213,35 @@ Ausrutscher hörbar kaputt statt unauffällig falsch.
 - Fehlt der Schlüssel in `profiles.json`, gilt der Checkpoint-Default von 8192
   Tokens ≈ 655 s, also praktisch unbegrenzt.
 
-Im ⚙️-Panel wird der Wert in Sekunden eingegeben; gespeichert werden Tokens.
+In „⚙️ TTS-Parameter" wird der Wert in Sekunden eingegeben; gespeichert werden
+Tokens.
 
 ## Wertebereiche
 
 Alle Sampling-Parameter samt Grenzen, Typ und Erklärungstext stehen in
 `SAMPLING_SPEC` in `ttskit/store.py` — eine Stelle, aus der sowohl die
-Server-Prüfung als auch das ⚙️-Panel gespeist werden. Ein neuer Parameter
+Server-Prüfung als auch „⚙️ TTS-Parameter" gespeist werden. Ein neuer Parameter
 braucht dort einen Eintrag und sonst nichts.
+
+Geprüft wird auf beiden Wegen: beim Speichern über das Panel (HTTP 422 mit
+Wertebereich in der Meldung) **und** beim Laden von `profiles.json`, weil die
+Datei von Hand bearbeitet wird. Ein handgeschriebenes `max_new_tokens: 1` oder
+ein nachträglich eingetragenes `do_sample: false` bricht darum mit einer Meldung
+ab, die Datei, Profil und Parameter nennt, statt still leere oder immer gleiche
+Audios zu erzeugen. Ein *unvollständiger* `sampling`-Block bleibt erlaubt — ein
+fehlender Schlüssel heißt „Modell-Default", und das Panel füllt das Feld dann
+mit der Voreinstellung aus der Registry.
 
 `do_sample` und `subtalker_dosample` sind bewusst **nicht** editierbar:
 greedy Generierung macht den Seed wirkungslos, womit Seed-Pool und
 Kandidaten-Kuratierung ihren Sinn verlieren.
+
+Weil `sampling` in den Fingerprint eines Clips eingeht, hat das Hinzufügen
+dieser Parameter den Fingerprint jedes Profils verändert: vorhandene
+Probeaufnahmen tragen in der Kandidaten-Tabelle deshalb jetzt den Hinweis-Chip
+„⚠️ alt" („Mit älteren Einstellungen erzeugt"), obwohl drei der vier neuen Werte
+die Checkpoint-Defaults des Modells sind und am Klang nichts ändern. Das ist
+kein Grund, Kandidaten neu zu würfeln.
 
 ## Neustart nötig?
 

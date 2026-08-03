@@ -226,7 +226,12 @@ Maßgeblich ist die Tokenzahl; die Sekundenangabe ist das, was das UI daraus anz
 
 Bei `phoneme` fällt der eine validierte 2,70-s-Clip unter das Limit. Das ist bewusst in
 Kauf genommen: er ist der einzige Ausreißer unter 50, und das Limit gilt ohnehin vor dem
-Trim. Sollte er neu gewürfelt werden müssen, ist er einzeln über das Panel freizugeben.
+Trim. Sollte er neu gewürfelt werden müssen, geht das so: in „⚙️ TTS-Parameter" die
+maximale Dauer von `phoneme` vorübergehend hochsetzen, den Clip neu würfeln und die
+passende Aufnahme als Produktion übernehmen, danach das Limit wieder senken. Die fertige
+Datei bleibt dabei gültig, weil `plan.status_of` allein die Dateiexistenz prüft und eine
+vorhandene Aufnahme nie nachträglich invalidiert. Eine Freigabe einzelner Clips gibt es
+nicht: Sampling ist ausschließlich profilweit, und `Lock` kennt keine Sampling-Werte.
 
 `miss`, `reward` und `ui` haben keine einzige validierte Aufnahme; ihre Werte sind
 Schätzungen aus der Rolle des Profils (kurze Ansagen, Feedback-Sätze) und im Panel
