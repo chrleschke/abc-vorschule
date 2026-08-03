@@ -430,6 +430,33 @@ function readProfileForm(container) {
   };
 }
 
+// Die Eingabe steht in Sekunden, gespeichert werden Tokens. Die Ableitung
+// muss beim Tippen sichtbar sein, sonst überrascht der Rundungssprung:
+// 2,05 s ergeben 26 Tokens und zeigen nach dem Speichern 2,08 s.
+function wireDurationField(container) {
+  container.querySelectorAll('[data-unit="seconds"]').forEach((input) => {
+    const readout = container.querySelector(
+      `[data-tokens-for="${input.dataset.param}"]`);
+    if (!readout) return;
+    const update = () => {
+      const raw = input.value.trim();
+      if (raw === "") {
+        readout.textContent = "unbegrenzt";
+        return;
+      }
+      const seconds = Number(raw);
+      if (Number.isNaN(seconds)) {
+        readout.textContent = "keine Zahl";
+        return;
+      }
+      const tokens = Math.round(seconds / state.secondsPerToken);
+      readout.textContent = `= ${tokens} Tokens (${tokensToSeconds(tokens)} s)`;
+    };
+    input.oninput = update;
+    update();
+  });
+}
+
 function wirePoolLinks(container) {
   container.querySelectorAll("[data-unpool]").forEach((link) => {
     link.onclick = guard(async (event) => {
@@ -478,6 +505,9 @@ function profileSummaryCard(clip, profile) {
           <div class="muted small">
             Stimme ${escapeHtml(profile.speaker)} · Sprache ${escapeHtml(profile.language)}
             · temperature ${profile.sampling.temperature}
+            · max ${profile.sampling.max_new_tokens === undefined
+                ? "unbegrenzt"
+                : tokensToSeconds(profile.sampling.max_new_tokens) + " s"}
             · „${escapeHtml(instructShort)}“
           </div>
         </div>
@@ -695,6 +725,7 @@ function renderDetail(key) {
     el("btn-profile-save").onclick = saveProfileFrom(form, clip.profile);
     el("btn-profile-reset").onclick = () => renderDetail(key);
     wirePoolLinks(form);
+    wireDurationField(form);
   }
 
   // ---- Clip (lokal)
@@ -825,6 +856,12 @@ function renderParams() {
         Trim oder Normalisierung gilt für neue Kandidaten dieses Profils.
         Bereits produzierte Clips bleiben unverändert, bis man sie bewusst
         neu würfelt und übernimmt.</p>
+      <p class="muted small">Die maximale Dauer ist ein harter Schnitt, kein
+        Hinweis: läuft das Modell in einen erfundenen Satz, bricht die Aufnahme
+        mitten drin ab — hörbar kaputt statt unauffällig falsch. Der Wert gilt
+        für die Rohgenerierung, also bevor die Stille am Anfang und Ende
+        weggeschnitten wird; die fertige Datei ist entsprechend kürzer.
+        Intern zählt das Modell in Tokens à 80 ms.</p>
       <p class="muted small">Hinter jeder Stimme steht ihre Herkunft. Die Sprache setzt
         die Phonologie, die Stimme bringt trotzdem den Akzent ihrer Kernsprache mit —
         bei ganzen Sätzen kaum hörbar, bei einem einzelnen Laut deutlich.</p>
@@ -841,6 +878,7 @@ function renderParams() {
     card.querySelector("[data-save]").onclick = saveProfileFrom(card, name);
     card.querySelector("[data-reset]").onclick = () => renderParams();
     wirePoolLinks(card);
+    wireDurationField(card);
     card.querySelector("[data-save-all]").onclick = guard(async () => {
       const sampling = readProfileForm(card).sampling;
       for (const profileName of Object.keys(state.profiles)) {
