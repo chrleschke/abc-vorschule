@@ -155,6 +155,55 @@ def test_candidates_with_known_seeds_but_an_empty_pool_are_random(client):
     assert len(set(_candidate_seeds_of(client, key))) == 2
 
 
+def _lock_seed(client, key, seed):
+    assert client.post(f"/api/clips/{key}/lock", json={"seed": seed}).status_code == 200
+
+
+def test_candidates_with_top_seeds_come_from_the_locked_ones(client):
+    clips = [c for c in client.get("/api/state").json()["clips"] if c["profile"] == "prompt"]
+    assert len(clips) >= 3, "fixture must offer enough prompt clips to lock"
+    for clip, seed in zip(clips[1:3], (4001, 4002)):
+        _lock_seed(client, clip["key"], seed)
+
+    key = clips[0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 2, "useTopSeeds": True})
+    wait_for_idle(client)
+    assert set(_candidate_seeds_of(client, key)) <= {4001, 4002}
+
+
+def test_top_seeds_win_over_the_known_pool(client):
+    clips = [c for c in client.get("/api/state").json()["clips"] if c["profile"] == "prompt"]
+    _lock_seed(client, clips[1]["key"], 5555)
+    client.post("/api/profiles/prompt/pool", json={"seed": 111})
+
+    key = clips[0]["key"]
+    client.post(f"/api/clips/{key}/candidates",
+                json={"n": 1, "useTopSeeds": True, "useKnownSeeds": True})
+    wait_for_idle(client)
+    assert _candidate_seeds_of(client, key) == [5555]
+
+
+def test_candidates_with_top_seeds_but_no_locks_are_random(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 2, "useTopSeeds": True})
+    wait_for_idle(client)
+    assert len(set(_candidate_seeds_of(client, key))) == 2
+
+
+def test_state_reports_top_seeds_per_profile(client):
+    body = client.get("/api/state").json()
+    assert set(body["topSeeds"]) == set(body["profiles"])
+    assert all(v == [] for v in body["topSeeds"].values()), "fixture starts unlocked"
+
+    clip = next(c for c in body["clips"] if c["profile"] == "prompt")
+    _lock_seed(client, clip["key"], 6006)
+    after = client.get("/api/state").json()
+    assert after["topSeeds"]["prompt"] == [6006]
+    # Der abgeleitete Wert gehört neben das Profil, nicht hinein: `profiles` ist
+    # genau das, was auch in die git-verwaltete profiles.json geschrieben wird.
+    assert "topSeeds" not in after["profiles"]["prompt"]
+
+
 def test_state_reports_candidate_freshness_and_limits(client):
     body = client.get("/api/state").json()
     assert body["limits"]["maxCandidates"] == 16

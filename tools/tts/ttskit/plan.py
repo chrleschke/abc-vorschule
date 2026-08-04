@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections import Counter
 from dataclasses import replace
 from pathlib import Path
 
@@ -35,6 +36,41 @@ def resolve_seed(key: str, profile_name: str, profiles: Profiles, locks: Locks) 
     if pool:
         return pool[value % len(pool)]
     return value % (2 ** 31)
+
+
+#: Wie viele Ränge „Top-Seeds" weit reicht. Zehn, weil ein Profil damit auch bei
+#: wenigen Locks noch eine Auswahl hat, aus der sich zufällig ziehen lässt.
+TOP_SEED_LIMIT = 10
+
+
+def top_seeds(locks: Locks, profile_name: str, limit: int = TOP_SEED_LIMIT) -> list[int]:
+    """Die am häufigsten bestätigten Seeds dieses Profils, häufigste zuerst.
+
+    Ein Lock ist eine getroffene Entscheidung: derselbe Seed unter mehreren
+    Locks desselben Profils hat also mehrfach überzeugt und ist ein besserer
+    Startpunkt als ein frischer Zufallswert.
+
+    `limit` schneidet bewusst nicht mitten in eine Punktgleichheit: teilen
+    mehrere Seeds den Rang an der Grenze, kommen sie alle mit. Zwischen ihnen
+    gibt es keinen Grund zu wählen — die Auswahl trifft später der Zufall.
+
+    Der Rückgabewert ist leer, wenn das Profil noch keinen einzigen Lock hat.
+    Der Aufrufer fällt dann auf Zufalls-Seeds zurück.
+    """
+    counts: Counter[int] = Counter()
+    for key, lock in locks.locks.items():
+        # Ein Lock darf das Profil überschreiben; der Key-Präfix ist nur das
+        # Default-Profil. Gezählt wird, womit tatsächlich synthetisiert wird.
+        effective = lock.profile or key.split(":", 1)[0]
+        if effective == profile_name:
+            counts[lock.seed] += 1
+    if not counts or limit < 1:
+        return []
+    # Sekundär nach Seed sortiert, damit die Reihenfolge bei Gleichstand
+    # reproduzierbar ist — sonst wäre schon das Abschneiden zufällig.
+    ranked = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+    cutoff = ranked[min(limit, len(ranked)) - 1][1]
+    return [seed for seed, count in ranked if count >= cutoff]
 
 
 def build_clips(items: list[Item], profiles: Profiles, locks: Locks) -> list[Clip]:

@@ -134,6 +134,11 @@ function candidateCount() {
 }
 
 const useKnownSeeds = () => readLocal("ttsUseKnownSeeds", false) === true;
+const useTopSeeds = () => readLocal("ttsUseTopSeeds", false) === true;
+
+//: Nur für die Beschriftung. Die Auswahl selbst trifft der Server
+//: (plan.TOP_SEED_LIMIT) — hier steht die Zahl, die dort steht.
+const TOP_SEED_LIMIT = 10;
 
 // Eigener Zähler für den Batch-Lauf: klein gehalten, weil er über mehrere
 // ausgewählte Clips hinweg multipliziert — anders als „Generate“,
@@ -630,6 +635,7 @@ function renderDetail(key) {
   const encoded = encodeURIComponent(clip.key);
   const max = state.limits.maxCandidates || 16;
   const poolSize = profile.seedPool.length;
+  const topSize = (state.topSeeds?.[clip.profile] || []).length;
 
   const spoken = clip.text !== clip.sourceText;
   const ownVoice = clip.speaker !== profile.speaker;
@@ -733,6 +739,18 @@ function renderDetail(key) {
             ? `(${poolSize} im Pool)`
             : "(Pool leer — es kommen Zufalls-Seeds)"}</span>
         </label>
+        <label id="cand-top" class="inline"
+               title="Zieht die Seeds zufällig aus den bestätigten Top-Seeds von „${escapeHtml(clip.profile)}“ ${
+                 topSize
+                   ? `(${topSize} Seeds auf den besten ${TOP_SEED_LIMIT} Rängen, `
+                     + "Punktgleiche zählen mit) — schlägt „Use known seeds“"
+                   : "— es gibt noch keine Locks für dieses Profil, es werden also Zufalls-Seeds erzeugt"}">
+          <input id="cand-top-seeds" type="checkbox" ${useTopSeeds() ? "checked" : ""} />
+          Use top seeds
+          <span class="muted small">${topSize
+            ? `(${topSize} Top-Seeds)`
+            : "(keine Locks — es kommen Zufalls-Seeds)"}</span>
+        </label>
         <span id="cand-progress" class="muted small"></span>
       </p>
       <details class="help">
@@ -748,6 +766,9 @@ function renderDetail(key) {
             bekommen ihre Seeds aus diesem Pool).</li>
           <li><b>👎</b> — klingt schlecht: Probeaufnahme löschen (nimmt einen
             👍-Seed auch wieder aus dem Pool).</li>
+          <li><b>Use top seeds</b> — zieht aus den Seeds, die in „${clip.profile}“ schon
+            am häufigsten als Produktion festgelegt wurden. Zwei verschiedene Quellen:
+            der Pool sammelt 👍-Bewertungen, die Top-Seeds zählen echte Locks.</li>
           <li><b>Erzeugt / Stimme / Text</b> — womit die Aufnahme entstand.
             So bleiben mehrere Generate- und Batch-Läufe auseinanderhaltbar.</li>
         </ul>
@@ -789,15 +810,31 @@ function renderDetail(key) {
     const count = Math.min(max, Math.max(1, Number(el("cand-count").value) || 4));
     writeLocal("ttsCandCount", count);
     const known = el("cand-known-seeds").checked;
-    await post(`/api/clips/${encoded}/candidates`, { n: count, useKnownSeeds: known });
+    const top = el("cand-top-seeds").checked;
+    await post(`/api/clips/${encoded}/candidates`,
+               { n: count, useKnownSeeds: known, useTopSeeds: top });
     el("cand-progress").textContent = state.jobs.running
       ? "eingereiht — wartet auf den laufenden Job …" : "eingereiht …";
   });
   el("cand-count").onchange = () => {
     writeLocal("ttsCandCount", Number(el("cand-count").value));
   };
+  // Beide Quellen gleichzeitig anzuhaken hätte keine sichtbare Bedeutung — der
+  // Server nähme ohnehin die Top-Seeds. Statt das stillschweigend zu tun,
+  // hakt das Anhaken der einen Quelle die andere ab.
   el("cand-known-seeds").onchange = (event) => {
     writeLocal("ttsUseKnownSeeds", event.target.checked);
+    if (event.target.checked) {
+      el("cand-top-seeds").checked = false;
+      writeLocal("ttsUseTopSeeds", false);
+    }
+  };
+  el("cand-top-seeds").onchange = (event) => {
+    writeLocal("ttsUseTopSeeds", event.target.checked);
+    if (event.target.checked) {
+      el("cand-known-seeds").checked = false;
+      writeLocal("ttsUseKnownSeeds", false);
+    }
   };
   el("clip-profile").onchange = guard(async (event) => {
     await post(`/api/clips/${encoded}/lock`,

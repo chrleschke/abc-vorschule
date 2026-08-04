@@ -45,6 +45,23 @@ Stimme und Text — so bleiben mehrere Würfel-Runden auseinanderhaltbar. Der
 Radio-Button „Produktion" übernimmt genau eine Aufnahme sofort als Produktions-Audio
 und lockt ihren Seed (kein Re-Render, kein erneutes Anhören nötig).
 
+Woher die Seeds beim Würfeln kommen, entscheiden zwei Häkchen neben „🎲 Generate" —
+angehakt wird höchstens eines, das UI hakt das andere ab:
+
+| Häkchen | Quelle | Leer? |
+| ------- | ------ | ----- |
+| *(keins)* | frische Zufalls-Seeds, Pool ausgenommen | — |
+| `Use known seeds` | Seed-Pool des Profils (die 👍-Bewertungen) | Zufalls-Seeds |
+| `Use top seeds` | die am häufigsten **gelockten** Seeds des Profils, zufällig gezogen | Zufalls-Seeds |
+
+„Top-Seeds" zählt echte Produktions-Entscheidungen statt Bewertungen: derselbe Seed
+unter mehreren Locks desselben Profils hat mehrfach überzeugt. Genommen werden die
+besten `TOP_SEED_LIMIT` (10) Ränge; punktgleiche Seeds am Schnitt kommen alle mit,
+denn zwischen ihnen gibt es keinen Grund zu wählen. Beide Häkchen zusammen wären
+bedeutungslos — Top-Seeds gewinnen —, deshalb schließen sie sich im UI aus.
+Reicht die Quelle nicht für die bestellte Anzahl, wird mit Zufalls-Seeds aufgefüllt,
+statt stillschweigend weniger zu liefern.
+
 Erzeugt wird über den **Batch-Lauf**: links in der Liste Clips ankreuzen (einzeln
 oder über „Sichtbare / Alle / Keine"), Anzahl Beispiele pro Clip einstellen (Default 2),
 dann „▶ Batch-Lauf" in der Kopfzeile — angefasst wird nur, was noch fehlt.

@@ -24,7 +24,7 @@ from fastapi.responses import (
 from . import voices
 from .cli import load_context
 from .paths import Paths
-from .plan import fingerprint, orphan_locks, status_of
+from .plan import fingerprint, orphan_locks, status_of, top_seeds
 from .render import (
     candidate_fingerprint, candidate_meta, candidate_seeds, clip_audio_list,
     pooled_seeds, random_seeds, render_batch_candidates, sample_candidates,
@@ -212,6 +212,10 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                        "error": getattr(engine, "load_error", None),
                        "device": getattr(engine, "device", None)},
             "profiles": {n: p.to_dict() for n, p in ctx.profiles.profiles.items()},
+            # Abgeleitet aus den Locks, nicht Teil des Profils — bewusst neben
+            # `profiles` und nicht darin, denn `to_dict()` schreibt auch
+            # profiles.json, und dort hätte ein errechneter Wert nichts zu suchen.
+            "topSeeds": {n: top_seeds(ctx.locks, n) for n in ctx.profiles.profiles},
             "poolSalt": ctx.profiles.pool_salt,
             "voices": [{"name": v.name, "origin": v.origin, "european": v.european}
                        for v in voices.VOICES],
@@ -354,7 +358,14 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
         # ausgeschlossen. Der Pool ist nur im Zufallsmodus tabu, im anderen
         # ist er ja die Quelle.
         rendered = set(candidate_seeds(paths, clip.key))
-        if body.get("useKnownSeeds") and profile.seed_pool:
+        # Top-Seeds gehen vor: die engere, belegte Auswahl schlägt den ganzen
+        # Pool, wenn beides gesetzt ist. Sind es zu wenige für `count`, füllt
+        # `pooled_seeds` selbst mit Zufalls-Seeds auf — leere Liste heißt also
+        # „einfach Zufall wie gehabt".
+        top = top_seeds(ctx.locks, clip.profile) if body.get("useTopSeeds") else []
+        if top:
+            seeds = pooled_seeds(count, top, exclude=rendered)
+        elif body.get("useKnownSeeds") and profile.seed_pool:
             seeds = pooled_seeds(count, profile.seed_pool, exclude=rendered)
         else:
             seeds = random_seeds(count, exclude=rendered | set(profile.seed_pool))

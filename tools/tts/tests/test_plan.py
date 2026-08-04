@@ -3,6 +3,7 @@ from pathlib import Path
 from ttskit.models import Item
 from ttskit.plan import (
     build_clips, clip_key, fingerprint, orphan_locks, resolve_seed, status_of,
+    top_seeds,
 )
 from ttskit.store import Lock, Locks, Profiles
 
@@ -397,3 +398,57 @@ def test_a_profile_naming_an_unknown_voice_is_rejected_without_blaming_the_lock(
     prof.profiles["phoneme"].speaker = "brunhilde"
     with pytest.raises(ValueError, match="profile 'phoneme' names the unknown speaker"):
         build_clips([item("task:t1:phonemeTts", "M", "phonemeTts")], prof, Locks())
+
+
+def _locks(*pairs: tuple[str, int, str | None]) -> Locks:
+    """Locks aus (Text, Seed, Profil-Override) — Key kommt aus dem Default-Profil."""
+    locks = Locks()
+    for text, seed, override in pairs:
+        locks.set(clip_key("prompt", text), Lock(seed=seed, profile=override))
+    return locks
+
+
+def test_top_seeds_are_ordered_by_how_often_they_were_locked():
+    locks = _locks(
+        ("a", 500, None), ("b", 500, None), ("c", 500, None),
+        ("d", 700, None), ("e", 700, None),
+        ("f", 900, None),
+    )
+    assert top_seeds(locks, "prompt") == [500, 700, 900]
+
+
+def test_top_seeds_of_a_profile_without_locks_is_empty():
+    assert top_seeds(Locks(), "prompt") == []
+    assert top_seeds(_locks(("a", 1, None)), "reward") == []
+
+
+def test_top_seeds_counts_the_profile_a_lock_overrides_to():
+    # Key-Präfix ist „prompt", synthetisiert wird aber als „reward" — dort muss
+    # der Seed zählen, sonst empfiehlt „Top-Seeds" Werte des falschen Profils.
+    locks = _locks(("a", 42, "reward"), ("b", 42, "reward"), ("c", 99, None))
+    assert top_seeds(locks, "reward") == [42]
+    assert top_seeds(locks, "prompt") == [99]
+
+
+def test_top_seeds_keeps_everyone_tied_at_the_cutoff():
+    # Rang 2 ist dreifach besetzt. Zwei davon mitzunehmen und den dritten
+    # abzuschneiden wäre eine Wahl ohne Grund — also kommen alle drei mit.
+    locks = _locks(
+        ("a", 10, None), ("b", 10, None),
+        ("c", 20, None), ("d", 30, None), ("e", 40, None),
+    )
+    assert top_seeds(locks, "prompt", limit=2) == [10, 20, 30, 40]
+
+
+def test_top_seeds_limit_cuts_where_the_score_actually_drops():
+    locks = _locks(
+        ("a", 10, None), ("b", 10, None), ("c", 10, None),
+        ("d", 20, None), ("e", 20, None),
+        ("f", 30, None),
+    )
+    assert top_seeds(locks, "prompt", limit=2) == [10, 20]
+
+
+def test_top_seeds_never_returns_more_than_it_has():
+    locks = _locks(("a", 7, None))
+    assert top_seeds(locks, "prompt", limit=10) == [7]
