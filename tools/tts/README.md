@@ -96,6 +96,10 @@ Locks und Profile liegen in Dateien (Sidecar-JSONs, `locks.json`, `profiles.json
 überleben damit Server- und Browser-Neustart; Filter und Batch-Auswahl merkt sich der
 Browser lokal.
 
+**Wichtig:** Instruktion/Sampling im Profil zu ändern, wirkt sich **nicht** auf schon
+gerenderte oder bestätigte Clips aus — nur auf künftige Generierungen. Details dazu und
+warum das Absicht ist: „Profil-Updates und bestätigter Content" unten.
+
 **Mit `phoneme` anfangen.** Das ist Absicht: mit 37 Clips ist es das kleinste Profil und
 zugleich das riskanteste — gefragt ist der *Lautwert*, nicht der Buchstabenname („mmmmm",
 nicht „Em"). Klappt das per Instruktion nicht, greift die Aussprache-Eingabe als
@@ -310,6 +314,15 @@ der bereits gerenderten oder gar bestätigten (gelockten) Content unbemerkt entw
 Wer eine bestehende Aufnahme wirklich neu erzeugen will, tut das bewusst: `tts render
 --force` (ggf. mit `--only`) oder die Datei unter `out/audio/` löschen.
 
+Instruktion und Sampling-Parameter werden in der Praxis nur angefasst, wenn man mit
+dem aktuellen Ergebnis nicht weiterkommt — nicht routinemäßig. Ein bereits verifizierter
+(gehörter, bestätigter) Clip ist mit **seinen** damaligen Einstellungen korrekt und bleibt
+es auch nach einer späteren Profil-Änderung; er muss dafür nicht neu gerendert werden.
+Änderungen an Profil-Werten sind also gezielt und wirken nur nach vorn, nie rückwirkend
+auf schon abgenommene Arbeit — deshalb bleibt „ich ändere die Instruktion und höre keinen
+Unterschied" am erwarteten Verhalten, solange man nicht bewusst `--force` neu rendert
+(oder die Kandidaten-/Promote-Route über „🎲 Generate" nutzt).
+
 Das gilt auch für `POSTPROCESS_VERSION` (Trim-Schwellwert, Trim-Polster,
 Normalisierungsziel in `ttskit/audio.py`): eine Änderung wirkt nur auf Clips, die
 danach neu gerendert werden, nie rückwirkend auf vorhandene Dateien.
@@ -336,6 +349,14 @@ TTS_SMOKE=1 ~/qwen-tts-test/.venv/bin/python -m pytest tests/ -v # mit Modell
   `locks.json` die Rechte `0600` (Folge der atomaren Schreibimplementierung über
   `tempfile.mkstemp`), während Git sie mit `0644` auscheckt. Für ein Einzelnutzer-Tool
   harmlos; Git verfolgt den Unterschied ohnehin nicht.
+- **Kein Lernen aus bewährten Werten außer Seeds.** „Top-Seeds" (siehe oben) wertet
+  gelockte Produktions-Entscheidungen aus, aber nur für den Seed. Für Instruktion und
+  Sampling-Parameter gibt es keine Entsprechung: welche Formulierung oder welcher
+  Parameterwert über mehrere Profile/Clips hinweg tatsächlich zu einer Bestätigung
+  geführt hat, wird nirgends erfasst oder vorgeschlagen — jede Anpassung stützt sich
+  allein auf Erinnerung und erneutes Anhören. Idee für später: analog zu Top-Seeds
+  auswerten, welche Instruktions- bzw. Sampling-Werte bei gelockten Clips gehäuft
+  auftreten, und das beim Bearbeiten eines Profils als Vorschlag anzeigen.
 
 ## Bekannte Lücke
 
