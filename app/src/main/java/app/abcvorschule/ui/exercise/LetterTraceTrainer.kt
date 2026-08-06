@@ -94,6 +94,8 @@ fun LetterTraceTrainer(
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var sparkSeq by remember(roundKey) { mutableLongStateOf(0L) }
     var spark by remember(roundKey) { mutableStateOf<Pair<TracePoint, Long>?>(null) }
+    // Last accepted on-road sample — bridges fast swipes that jump past a star.
+    var lastFinger by remember(roundKey) { mutableStateOf<TracePoint?>(null) }
     val haptics = LocalAbcHaptics.current
 
     val morph by animateFloatAsState(
@@ -134,7 +136,14 @@ fun LetterTraceTrainer(
                             vehicle = vehicle,
                             onFinger = { finger, boxSize, strokes, stars ->
                                 if (done || resolved) return@TraceCanvas
-                                val update = TraceProgress.update(state, finger, strokes, stars, boxSize)
+                                val update = TraceProgress.update(
+                                    state = state,
+                                    finger = finger,
+                                    strokes = strokes,
+                                    stars = stars,
+                                    boxSize = boxSize,
+                                    previousFinger = lastFinger,
+                                )
                                 if (update.offCorridor) {
                                     // Edge-triggered: one short nudge per excursion, never one per
                                     // pointer sample. Otherwise the device buzzes continuously and a
@@ -144,6 +153,9 @@ fun LetterTraceTrainer(
                                         offRoadCount += 1
                                         haptics.nudge()
                                     }
+                                    // Drop the bridge so an off-road hop cannot "tunnel" through
+                                    // a star when the finger comes back onto a later stretch.
+                                    lastFinger = null
                                     return@TraceCanvas
                                 }
                                 wasOffCorridor = false
@@ -151,8 +163,12 @@ fun LetterTraceTrainer(
                                 // where it is, so the start dot of a fresh bar keeps
                                 // marking that bar's beginning instead of following the
                                 // finger to wherever it entered the road.
-                                if (update.ahead) return@TraceCanvas
+                                if (update.ahead) {
+                                    lastFinger = finger
+                                    return@TraceCanvas
+                                }
                                 vehicle = finger
+                                lastFinger = finger
                                 if (update.collectedStar) {
                                     // Read before the state write below, which is visible immediately.
                                     val barFinished = update.state.strokeIndex != state.strokeIndex
@@ -172,7 +188,12 @@ fun LetterTraceTrainer(
                                     // for it with the dot left behind at the previous bar's end.
                                     if (barFinished) {
                                         strokes.getOrNull(update.state.strokeIndex)?.firstOrNull()
-                                            ?.let { vehicle = it }
+                                            ?.let {
+                                                vehicle = it
+                                                // Fresh bar: do not bridge from the previous
+                                                // stroke's end into this one's star window.
+                                                lastFinger = it
+                                            }
                                     }
                                 }
                                 if (update.glyphDone) {
@@ -329,6 +350,18 @@ private fun TraceCanvas(
             val active = index == state.strokeIndex
             val fill = (filled - index).coerceIn(0f, 1f)
             val outer = if (fill > 0f) SkyBlue else WarmMuted
+            // Umlaut ticks and other diacritics are tiny; the full road width with round
+            // caps turns them into overlapping blobs that collide with the letter body.
+            val widthScale = if (
+                TraceProgress.isShortStroke(
+                    TraceGeometry.polylineLength(stroke),
+                    layout.boxSize,
+                )
+            ) {
+                TraceProgress.ShortStrokeWidthScale
+            } else {
+                1f
+            }
             // Hollow road: a wide band with a dark inner lane. On the cream background
             // the band needs more opacity than the old dark-theme calibration to stay
             // legible, hence the higher alphas below.
@@ -336,7 +369,7 @@ private fun TraceCanvas(
                 path = path,
                 color = outer.copy(alpha = if (active) 0.45f else 0.22f),
                 style = Stroke(
-                    width = corridor * 2f,
+                    width = corridor * 2f * widthScale,
                     cap = StrokeCap.Round,
                     join = StrokeJoin.Round,
                 ),
@@ -347,7 +380,7 @@ private fun TraceCanvas(
                 path = path,
                 color = lerp(CreamElevated, LeafGreen, fill),
                 style = Stroke(
-                    width = corridor * 1.25f,
+                    width = corridor * 1.25f * widthScale,
                     cap = StrokeCap.Round,
                     join = StrokeJoin.Round,
                 ),

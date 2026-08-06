@@ -169,6 +169,47 @@ class SymbolInWordDerivationTest {
     }
 
     @Test
+    fun aMultiLetterGraphemeUsesLautWording() {
+        val schuh = rounds("l13").first()
+        assertEquals("letter-sch", schuh.targetAtomId)
+        assertEquals("Finde den Laut - Sch - im Wort - Schuh.", schuh.promptTts)
+    }
+
+    @Test
+    fun letterModePromptsDistinguishBuchstabeFromLaut() {
+        pack.authoredLessons.forEach { lesson ->
+            rounds(lesson.id).forEach { round ->
+                if (round.mode != SymbolInWordMode.letter) return@forEach
+                val display = pack.atom(round.targetAtomId).display
+                val multi = display.length > 1
+                val plural = round.targetIndices.size > 1
+                when {
+                    multi && plural ->
+                        assertTrue(
+                            "${round.promptTts} should use plural Laut wording",
+                            round.promptTts.startsWith("Finde alle Laute"),
+                        )
+                    multi ->
+                        assertTrue(
+                            "${round.promptTts} should use singular Laut wording",
+                            round.promptTts.startsWith("Finde den Laut"),
+                        )
+                    plural ->
+                        assertTrue(
+                            "${round.promptTts} should use plural Buchstabe wording",
+                            round.promptTts.startsWith("Finde alle Buchstaben"),
+                        )
+                    else ->
+                        assertTrue(
+                            "${round.promptTts} should use singular Buchstabe wording",
+                            round.promptTts.startsWith("Finde den Buchstaben"),
+                        )
+                }
+            }
+        }
+    }
+
+    @Test
     fun theSyllableModeUsesTheAuthoredBlocksNotAGraphemeSplit() {
         val opa = rounds("l03")[1]
         // Corrected from the brief's literal "Pa": the authored word_build block

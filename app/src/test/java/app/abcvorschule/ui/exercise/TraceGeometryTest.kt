@@ -23,6 +23,68 @@ class TraceGeometryTest {
     }
 
     @Test
+    fun refineStrokeDensifiesCoarseBowlsButKeepsEndpoints() {
+        // Six-point B-bowl style: long chords and gentle turns — under-sampled.
+        val coarse = listOf(
+            TracePoint(0.22f, 0.08f),
+            TracePoint(0.62f, 0.10f),
+            TracePoint(0.74f, 0.24f),
+            TracePoint(0.74f, 0.38f),
+            TracePoint(0.62f, 0.48f),
+            TracePoint(0.22f, 0.50f),
+        )
+        val refined = TraceGeometry.refineStroke(coarse)
+        assertTrue("expected denser bowl, was ${refined.size}", refined.size > coarse.size)
+        assertEquals(coarse.first().x, refined.first().x, 0.001f)
+        assertEquals(coarse.first().y, refined.first().y, 0.001f)
+        assertEquals(coarse.last().x, refined.last().x, 0.001f)
+        assertEquals(coarse.last().y, refined.last().y, 0.001f)
+    }
+
+    @Test
+    fun refineStrokeLeavesSharpPedagogicalCornersAlone() {
+        // M peaks are intentional corners, not bowls.
+        val m = listOf(
+            TracePoint(0.1f, 0.92f),
+            TracePoint(0.1f, 0.08f),
+            TracePoint(0.5f, 0.55f),
+            TracePoint(0.9f, 0.08f),
+            TracePoint(0.9f, 0.92f),
+        )
+        assertEquals(m, TraceGeometry.refineStroke(m))
+    }
+
+    @Test
+    fun refineStrokeDoesNotBendLongStraightStems() {
+        // J-like: long upright + short hook. Arcing through the stem would bow the letter.
+        val j = listOf(
+            TracePoint(0.62f, 0.10f),
+            TracePoint(0.62f, 0.70f),
+            TracePoint(0.58f, 0.85f),
+            TracePoint(0.42f, 0.90f),
+            TracePoint(0.28f, 0.82f),
+        )
+        val refined = TraceGeometry.refineStroke(j)
+        // Stem start→junction must remain a straight vertical (no arc bulge).
+        val stem = refined.takeWhile { kotlin.math.abs(it.x - 0.62f) < 0.001f }
+        assertTrue("stem should stay vertical, got $refined", stem.size >= 2)
+        assertTrue(stem.all { kotlin.math.abs(it.x - 0.62f) < 0.001f })
+    }
+
+    @Test
+    fun refineStrokeLeavesAnAlreadyDenseOvalAlone() {
+        // letter-o density (~17 samples, chords < RefineMinChord) is the quality bar.
+        val oval = (0..16).map { i ->
+            val ang = (i / 16.0) * 2 * Math.PI
+            TracePoint(
+                x = (0.5 + 0.36 * kotlin.math.cos(ang)).toFloat(),
+                y = (0.5 + 0.42 * kotlin.math.sin(ang)).toFloat(),
+            )
+        }
+        assertEquals(oval.size, TraceGeometry.refineStroke(oval).size)
+    }
+
+    @Test
     fun polylineLengthSumsEverySegment() {
         assertEquals(100f, TraceGeometry.polylineLength(horizontal), 0.01f)
         assertEquals(200f, TraceGeometry.polylineLength(elbow), 0.01f)

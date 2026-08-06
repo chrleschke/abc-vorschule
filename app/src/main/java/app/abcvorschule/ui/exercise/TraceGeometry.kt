@@ -2,6 +2,9 @@ package app.abcvorschule.ui.exercise
 
 import app.abcvorschule.content.GlyphStroke
 import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.acos
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.sin
@@ -11,17 +14,180 @@ data class TracePoint(val x: Float, val y: Float)
 
 /** Pure polyline maths for the letter road: scaling, star placement, corridor distance. */
 object TraceGeometry {
+    /**
+     * Corners gentler than this (degrees of direction change) stay as authored — they are
+     * near-straight and must not be bowed by arc densification.
+     */
+    const val RefineMinTurnDegrees = 18f
+
+    /**
+     * Corners sharper than this stay as authored — M/W/N peaks and K junctions are
+     * pedagogical letterforms, not bowls.
+     */
+    const val RefineMaxTurnDegrees = 72f
+
+    /**
+     * A corner is densified only when at least one adjacent chord is longer than this
+     * fraction of the glyph box (coarse polygonal bowls).
+     */
+    const val RefineMinChord = 0.19f
+
+    /**
+     * And neither adjacent chord may exceed this — otherwise a long straight stem
+     * (J, U uprights) would be bent into a circular arc through the junction.
+     */
+    const val RefineMaxChord = 0.45f
+
+    /** Target chord length when sampling a densified circular arc, as a box fraction. */
+    const val RefineTargetChord = 0.09f
+
     fun toPixels(
         strokes: List<GlyphStroke>,
         boxSize: Float,
         origin: TracePoint,
     ): List<List<TracePoint>> = strokes.map { stroke ->
-        stroke.points.map { p ->
+        val normalized = stroke.points.map { p ->
             TracePoint(
-                x = origin.x + (p.getOrElse(0) { 0.0 }).toFloat() * boxSize,
-                y = origin.y + (p.getOrElse(1) { 0.0 }).toFloat() * boxSize,
+                x = (p.getOrElse(0) { 0.0 }).toFloat(),
+                y = (p.getOrElse(1) { 0.0 }).toFloat(),
             )
         }
+        // Densify coarse bowls in unit space so chord thresholds stay independent of
+        // the on-screen glyph box; hit-testing and drawing then share the same road.
+        refineStroke(normalized).map { p ->
+            TracePoint(
+                x = origin.x + p.x * boxSize,
+                y = origin.y + p.y * boxSize,
+            )
+        }
+    }
+
+    /**
+     * Replace coarse polygonal corners with circular-arc samples. Straight letters and
+     * already-dense curves (O, refined U) are left alone; only corners whose turn and
+     * chord lengths look like an undersampled bowl are touched.
+     */
+    fun refineStroke(points: List<TracePoint>): List<TracePoint> {
+        if (points.size < 3) return points
+        val out = ArrayList<TracePoint>(points.size * 2)
+        out.add(points.first())
+        var i = 1
+        while (i < points.size - 1) {
+            val a = points[i - 1]
+            val b = points[i]
+            val c = points[i + 1]
+            val ab = hypot(b.x - a.x, b.y - a.y)
+            val bc = hypot(c.x - b.x, c.y - b.y)
+            val turn = turnDegrees(a, b, c)
+            val needsRefine = turn in RefineMinTurnDegrees..RefineMaxTurnDegrees &&
+                (ab > RefineMinChord || bc > RefineMinChord) &&
+                ab <= RefineMaxChord &&
+                bc <= RefineMaxChord
+            if (needsRefine) {
+                val samples = ((ab + bc) / RefineTargetChord).toInt()
+                    .coerceIn(3, 6)
+                val arc = circularArcThrough(a, b, c, samples)
+                if (hypot(out.last().x - a.x, out.last().y - a.y) > 1e-3f) {
+                    out.add(a)
+                }
+                // Drop arc endpoints (exact a/c); keep only interior samples, then the
+                // authored corner end so joins between strokes stay bitwise identical.
+                for (p in arc.drop(1).dropLast(1)) out.add(p)
+                out.add(c)
+                // Skip the next vertex — it is the arc's end and must not be a second center.
+                i += 2
+            } else {
+                out.add(b)
+                i += 1
+            }
+        }
+        val last = points.last()
+        if (out.last() != last) {
+            // Replace a near-duplicate float reconstruction with the authored endpoint.
+            if (hypot(out.last().x - last.x, out.last().y - last.y) <= 1e-3f) {
+                out[out.lastIndex] = last
+            } else {
+                out.add(last)
+            }
+        }
+        return dedupeConsecutive(out)
+    }
+
+    private fun turnDegrees(a: TracePoint, b: TracePoint, c: TracePoint): Float {
+        val ax = b.x - a.x
+        val ay = b.y - a.y
+        val bx = c.x - b.x
+        val by = c.y - b.y
+        val la = hypot(ax, ay)
+        val lb = hypot(bx, by)
+        if (la <= 1e-6f || lb <= 1e-6f) return 0f
+        val cos = ((ax * bx + ay * by) / (la * lb)).coerceIn(-1f, 1f)
+        return (acos(cos) * 180f / PI).toFloat()
+    }
+
+    /**
+     * Sample the unique circle through [a], [b], [c] along the arc from [a] to [c] that
+     * passes near [b]. Endpoints are preserved so compound glyphs keep their joins.
+     */
+    private fun circularArcThrough(
+        a: TracePoint,
+        b: TracePoint,
+        c: TracePoint,
+        samples: Int,
+    ): List<TracePoint> {
+        val det = 2f * (a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y))
+        if (kotlin.math.abs(det) < 1e-6f) return listOf(a, b, c)
+        val a2 = a.x * a.x + a.y * a.y
+        val b2 = b.x * b.x + b.y * b.y
+        val c2 = c.x * c.x + c.y * c.y
+        val cx = (a2 * (b.y - c.y) + b2 * (c.y - a.y) + c2 * (a.y - b.y)) / det
+        val cy = (a2 * (c.x - b.x) + b2 * (a.x - c.x) + c2 * (b.x - a.x)) / det
+        val radius = hypot(a.x - cx, a.y - cy)
+        fun angle(p: TracePoint) = atan2(p.y - cy, p.x - cx)
+        val start = angle(a)
+        val mid = angle(b)
+        val endTarget = angle(c)
+        var best: List<Float>? = null
+        var bestScore = Float.MAX_VALUE
+        for (direction in intArrayOf(1, -1)) {
+            var end = endTarget
+            if (direction > 0) {
+                while (end < start) end += (2f * PI).toFloat()
+            } else {
+                while (end > start) end -= (2f * PI).toFloat()
+            }
+            val seq = (0..samples).map { i -> start + (end - start) * i / samples }
+            val err = seq.minOf { abs(normalizeAngle(it - mid)) }
+            val score = err + 0.001f * abs(end - start)
+            if (score < bestScore) {
+                bestScore = score
+                best = seq
+            }
+        }
+        return best!!.map { ang ->
+            TracePoint(
+                x = cx + radius * cos(ang),
+                y = cy + radius * sin(ang),
+            )
+        }
+    }
+
+    private fun normalizeAngle(angle: Float): Float {
+        var a = angle
+        val tau = (2f * PI).toFloat()
+        while (a <= -PI) a += tau
+        while (a > PI) a -= tau
+        return a
+    }
+
+    private fun dedupeConsecutive(points: List<TracePoint>): List<TracePoint> {
+        if (points.isEmpty()) return points
+        val out = ArrayList<TracePoint>(points.size)
+        out.add(points.first())
+        for (p in points.drop(1)) {
+            if (hypot(p.x - out.last().x, p.y - out.last().y) > 1e-4f) out.add(p)
+        }
+        return out
     }
 
     fun polylineLength(points: List<TracePoint>): Float =
@@ -183,6 +349,16 @@ object TraceProgress {
     /** Star pick-up radius as a fraction of the glyph box. */
     const val StarHitFraction = 0.12f
 
+    /**
+     * Strokes shorter than this fraction of the glyph box are diacritic ticks (umlaut
+     * dots). They share the same corridor maths as long bars but are drawn thinner so
+     * the round road caps do not turn a 0.04-long tick into a blob that eats the letter.
+     */
+    const val ShortStrokeFraction = 0.12f
+
+    /** Visual road-width scale for [ShortStrokeFraction] ticks relative to a full bar. */
+    const val ShortStrokeWidthScale = 0.35f
+
     /** Stars scale with how much road there actually is to drive. */
     fun starCountFor(strokeLength: Float, boxSize: Float): Int {
         if (boxSize <= 0f) return MinStars
@@ -191,12 +367,22 @@ object TraceProgress {
         return (strokeLength / spacing).toInt().coerceIn(MinStars, MaxStars)
     }
 
+    fun isShortStroke(strokeLength: Float, boxSize: Float): Boolean =
+        boxSize > 0f && strokeLength < boxSize * ShortStrokeFraction
+
     fun update(
         state: TraceState,
         finger: TracePoint,
         strokes: List<List<TracePoint>>,
         stars: List<List<TracePoint>>,
         boxSize: Float,
+        /**
+         * Previous pointer sample on this drag. When the finger jumps past a star between
+         * two samples (common on a fast preschool swipe), the segment from here to
+         * [finger] still counts as collecting — otherwise the ahead-gate freezes the
+         * vehicle and the red dot "runs past" the star.
+         */
+        previousFinger: TracePoint? = null,
     ): TraceUpdate {
         if (state.strokeIndex >= strokes.size) {
             return TraceUpdate(state, collectedStar = false, offCorridor = false, glyphDone = true)
@@ -206,7 +392,7 @@ object TraceProgress {
         if (TraceGeometry.distanceToPolyline(finger, stroke) > corridor) {
             return TraceUpdate(state, collectedStar = false, offCorridor = true, glyphDone = false)
         }
-        val target = stars.getOrNull(state.strokeIndex)?.getOrNull(state.starIndex)
+        stars.getOrNull(state.strokeIndex)?.getOrNull(state.starIndex)
             ?: return TraceUpdate(state, collectedStar = false, offCorridor = false, glyphDone = false)
         val starHit = boxSize * StarHitFraction
         // A corridor runs the whole length of its stroke, so being inside it says nothing
@@ -216,11 +402,25 @@ object TraceProgress {
         // with its own start.
         val targetArc = TraceGeometry.polylineLength(stroke) *
             (state.starIndex + 1).toFloat() / stars[state.strokeIndex].size
+        val fingerArc = TraceGeometry.arcLengthAt(stroke, finger)
+        // Collect by along-path proximity, not Euclidean distance to the star centre.
+        // The road is wider than the old point-hit radius, so a finger riding the outer
+        // edge of the corridor (legal) used to miss stars that sit on the centreline.
+        val onStar = kotlin.math.abs(fingerArc - targetArc) <= starHit
+        val crossedStar = previousFinger != null &&
+            TraceGeometry.distanceToPolyline(previousFinger, stroke) <= corridor &&
+            run {
+                val prevArc = TraceGeometry.arcLengthAt(stroke, previousFinger)
+                val lo = minOf(prevArc, fingerArc)
+                val hi = maxOf(prevArc, fingerArc)
+                lo <= targetArc + starHit && hi >= targetArc - starHit
+            }
+        val hit = onStar || crossedStar
         // Ahead of that star the finger marks no progress — the pick-up radius is the only
         // allowance, so a small overshoot still collects. Without this the drag that leaves
         // the E of "Ei" at the bottom right slides on into the i's road at its foot and
         // takes the vehicle with it, parking the start dot at the foot of the i.
-        if (TraceGeometry.arcLengthAt(stroke, finger) > targetArc + starHit) {
+        if (!hit && fingerArc > targetArc + starHit) {
             return TraceUpdate(
                 state = state,
                 collectedStar = false,
@@ -229,7 +429,6 @@ object TraceProgress {
                 ahead = true,
             )
         }
-        val hit = TraceGeometry.distanceToPolyline(finger, listOf(target)) <= starHit
         if (!hit) {
             return TraceUpdate(state, collectedStar = false, offCorridor = false, glyphDone = false)
         }

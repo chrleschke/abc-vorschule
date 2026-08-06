@@ -80,4 +80,50 @@ class GlyphLetterformTest {
         assertFalse(atHead.ahead)
         assertFalse(atHead.offCorridor)
     }
+
+    @Test
+    fun theUBowlIsADenseCurveNotACoarsePolygon() {
+        // The road is drawn with lineTo between authored points; six bowl vertices left
+        // visible corners. O uses ~17 samples — U/Ü should be in that ballpark.
+        val u = strokesOf("letter-u").single()
+        val ue = strokesOf("letter-ue").first()
+        assertTrue("U has only ${u.size} points", u.size >= 14)
+        assertTrue("Ü body has only ${ue.size} points", ue.size >= 14)
+    }
+
+    @Test
+    fun compoundGlyphsCarryADenseUNotACoarsePolygon() {
+        listOf("letter-au", "letter-eu", "letter-qu").forEach { id ->
+            val uStroke = strokesOf(id).last()
+            assertTrue("$id U has only ${uStroke.size} points", uStroke.size >= 14)
+        }
+    }
+
+    @Test
+    fun theJHookIsDenselySampled() {
+        assertTrue(strokesOf("letter-j").single().size >= 7)
+    }
+
+    @Test
+    fun umlautTicksAreShortVerticalAndClearOfTheLetterBody() {
+        // Diagonal ticks under a full-width road bled into the Ü/Ö/Ä body. Vertical short
+        // ticks higher up stay clear once ShortStrokeWidthScale thins the drawing.
+        listOf("letter-ae", "letter-oe", "letter-ue").forEach { id ->
+            val strokes = strokesOf(id)
+            val ticks = strokes.takeLast(2)
+            ticks.forEach { tick ->
+                assertEquals(2, tick.size)
+                assertEquals(tick.first().x, tick.last().x, 0.01f)
+                val length = hypot(tick.last().x - tick.first().x, tick.last().y - tick.first().y)
+                assertTrue("$id tick length $length", length < boxSize * TraceProgress.ShortStrokeFraction)
+                assertTrue("$id tick too low (${tick.last().y})", tick.last().y < boxSize * 0.12f)
+            }
+            val bodyTop = strokes.first().minOf { it.y }
+            val tickBottom = ticks.maxOf { it.maxOf { p -> p.y } }
+            assertTrue(
+                "$id: tick bottom $tickBottom collides with body top $bodyTop",
+                tickBottom < bodyTop - boxSize * 0.05f,
+            )
+        }
+    }
 }

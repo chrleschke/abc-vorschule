@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -203,6 +204,11 @@ private fun SymbolHuntField(
                 modifier = Modifier
                     .offset(x = offsetX, y = offsetY)
                     .size(tileDp)
+                    // Without this clip, the tile's click/ripple bounds default to the
+                    // Box's full square size instead of the CircleShape drawn below —
+                    // the touch feedback flashes as a square and, where scattered tiles
+                    // sit close together, can spill visibly into a neighbouring tile.
+                    .clip(CircleShape)
                     .background(color = color.copy(alpha = 0.22f), shape = CircleShape)
                     .border(width = 3.dp, color = color, shape = CircleShape)
                     .clickable(enabled = enabled) { onTap(tile.instanceId) }

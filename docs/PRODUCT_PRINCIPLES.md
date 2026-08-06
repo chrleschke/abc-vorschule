@@ -45,6 +45,11 @@ Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede 
   Stern hält der fertige Buchstabe eine halbe
   Sekunde, dann folgt die Belohnungsseite: Bild groß, darunter die Wortzeile („**T** wie Tomate")
   mit fettem Graphem. Kein zusätzlicher Buchstaben-Text unter dem Pfad.
+  Umlaut-Pünktchen und andere kurze Diakritika (Strichlänge < ~12 % der Glyphenbox) werden
+  dünner gezeichnet als die Hauptbalken — sonst machen die runden Straßenkappen aus einem
+  kurzen Tick einen dicken Blob, der den Buchstabenkörper frisst. Sterne werden entlang der
+  Mittellinie eingesammelt (Korridor reicht seitlich); ein schneller Wisch, der zwischen zwei
+  Pointer-Samples über einen Stern springt, zählt trotzdem.
 3. **Silben-Verschmelzer** — beide Laut-Kacheln sind schiebbar und wandern symmetrisch
   aufeinander zu (Magnet-Metapher); eine gepunktete Schiebespur mit einwärts laufender
   Lichtwelle und ein Idle-„Atmen" laden ohne Text zum Schieben ein. Ab 60 % Nähe schnappen
@@ -59,7 +64,7 @@ Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede 
 Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Treffer füllen eine Batterie, Fehltipp mischt neu ohne Batterieverlust.
 
 Ebenfalls abgeleitet und nicht autoriert: der **Wort-Detektiv** direkt nach dem letzten
-Wort-Bauer — „Finde den Buchstaben / die Silbe im Wort". Eine Runde pro eingeführtem Wort,
+Wort-Bauer — „Finde den Buchstaben / den Laut / die Silbe im Wort". Eine Runde pro eingeführtem Wort,
 der Modus wechselt zwischen Buchstabe und Silbe, mit Rückfall auf Buchstabe, wenn die
 Silbe nicht sauber benannt werden kann (z. B. wenn der autorierte Wort-Bauer-Block anders
 geschrieben ist als sein Silben-Atom). Das Wort steht in farbige Segmente zerlegt da, jedes
@@ -89,6 +94,12 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
   kappt, teilt dessen y-Wert (E/F/Ei/Eu/Pf: obere Balken auf `0.08` wie der Stamm, untere auf
   `0.92`); ein Beinahe-Treffer von 0.02 liest sich als Wackler in der Buchstabenform. Getestet in
   `GlyphLetterformTest` gegen das Pack, nicht gegen abgeschriebene Zahlen.
+- **Runde Bögen (U/Ü/O/…)** brauchen genug Stützpunkte — grobe Polygone lesen sich eckig, weil
+  die Straße mit `lineTo` gezeichnet wird. Umlaut-Punkte sind kurze senkrechte Ticks oben mit
+  Abstand zum Körper; die Zeichenbreite für kurze Striche skaliert die App herunter
+  (`TraceProgress.ShortStrokeWidthScale`). Grobe Bögen (B/C/D/G/P/R/S/…) werden zur Laufzeit
+  in `TraceGeometry.refineStroke` selektiv mit Kreisbögen verdichtet — spitze pädagogische
+  Ecken (M/W/N) und lange Gerade (J-Stamm, U-Beine) bleiben unangetastet.
 - Orthografie: Silben eher klein; zusammengesetzte Wörter/Sätze korrekt großgeschrieben.
 - Rechnen nutzt die Bild-Ikonen derselben Lektion; Details zu Singular/Plural siehe Abschnitt 8.
 - Jede autorierte Lektion verweist über `finaleId` auf einen **Finale-Satz** in
@@ -171,7 +182,7 @@ niemals mit einem stummen No-Op.
   `Au`, `Ei`, `Eu`, `Pf`, `Qu`, `ck`, `ks` …) sind kein „Buchstabe" — das Wort ist fachlich falsch
   und für Vorschulkinder irreführend. Prompts, die einen solchen Mehrzeichen-Laut ansprechen,
   heißen „…den Laut …" statt „…den Buchstaben …" (Auditiver Finder, Spurensucher,
-  Buchstaben-/Silben-Jagd). Umlaute (`Ä`, `Ö`, `Ü`) und `ß` bleiben „Buchstabe" — sie sind je ein
+  Buchstaben-/Silben-Jagd, Wort-Detektiv). Umlaute (`Ä`, `Ö`, `Ü`) und `ß` bleiben „Buchstabe" — sie sind je ein
   einzelnes Zeichen. Silben (`kind: syllable`, z. B. `ma`, `sp`, `st` als verschmolzenes Ergebnis
   im Silben-Verschmelzer) heißen weiterhin „Silbe", nie „Laut" oder „Buchstabe".
 - **Einzelbuchstaben-Betonung:** Steht ein einzelner Buchstabe/Graphem als eigenständiges Wort in einem

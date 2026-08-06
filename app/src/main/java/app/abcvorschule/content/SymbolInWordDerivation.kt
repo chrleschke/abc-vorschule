@@ -9,6 +9,8 @@ package app.abcvorschule.content
 object SymbolInWordDerivation {
     private const val PromptLetterOne = "Finde den Buchstaben - %s - im Wort - %s."
     private const val PromptLetterMany = "Finde alle Buchstaben - %s - im Wort - %s."
+    private const val PromptDigraphOne = "Finde den Laut - %s - im Wort - %s."
+    private const val PromptDigraphMany = "Finde alle Laute - %s - im Wort - %s."
     private const val PromptSyllableOne = "Finde die Silbe - %s - im Wort - %s."
     private const val PromptSyllableMany = "Finde alle Silben - %s - im Wort - %s."
 
@@ -118,7 +120,12 @@ object SymbolInWordDerivation {
         val targetAtomId = focusLetterAtomIds[focusIndex]
         val display = pack.atom(targetAtomId).display
         val hits = graphemes.indices.filter { graphemes[it].equals(display, ignoreCase = true) }
-        val template = if (hits.size > 1) PromptLetterMany else PromptLetterOne
+        val template = when {
+            hits.size > 1 && display.length > 1 -> PromptDigraphMany
+            hits.size > 1 -> PromptLetterMany
+            display.length > 1 -> PromptDigraphOne
+            else -> PromptLetterOne
+        }
         return Built(
             SymbolInWordRound(
                 promptTts = template.format(display, wordAtom.display),

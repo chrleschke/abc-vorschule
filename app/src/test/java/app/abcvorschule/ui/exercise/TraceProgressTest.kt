@@ -118,10 +118,55 @@ class TraceProgressTest {
     }
 
     @Test
+    fun aFingerOnTheRoadBesideAStarStillCollectsIt() {
+        // Stars sit on the centreline; the corridor is wider than the old Euclidean
+        // pick-up radius, so riding the outer edge of the road used to miss.
+        val lateral = boxSize * TraceProgress.CorridorFraction * 0.9f
+        val besideFirst = TracePoint(stars[0][0].x, stars[0][0].y + lateral)
+        val result = update(TraceState(), besideFirst)
+        assertFalse(result.offCorridor)
+        assertTrue(result.collectedStar)
+        assertEquals(TraceState(0, 1), result.state)
+    }
+
+    @Test
+    fun aFastSwipeThatJumpsPastAStarStillCollectsIt() {
+        // Pointer samples can skip the pick-up window; the previous sample bridges it.
+        val before = TracePoint(50f, 50f - boxSize * TraceProgress.StarHitFraction * 1.5f)
+        val after = TracePoint(50f, 50f + boxSize * TraceProgress.StarHitFraction * 1.5f)
+        val result = TraceProgress.update(
+            state = TraceState(1, 0),
+            finger = after,
+            strokes = strokes,
+            stars = stars,
+            boxSize = boxSize,
+            previousFinger = before,
+        )
+        assertTrue(result.collectedStar)
+        assertFalse(result.ahead)
+        assertEquals(TraceState(1, 1), result.state)
+    }
+
+    @Test
+    fun aJumpPastAStarWithoutAPreviousSampleIsStillAhead() {
+        val after = TracePoint(50f, 50f + boxSize * TraceProgress.StarHitFraction * 1.5f)
+        val result = update(TraceState(1, 0), after)
+        assertTrue(result.ahead)
+        assertFalse(result.collectedStar)
+    }
+
+    @Test
+    fun shortDiacriticStrokesAreDetectedForThinnerDrawing() {
+        // Umlaut ticks are ~0.04 of the glyph box after the geometry fix.
+        assertTrue(TraceProgress.isShortStroke(0.04f * 200f, 200f))
+        assertFalse(TraceProgress.isShortStroke(0.5f * 200f, 200f))
+    }
+
+    @Test
     fun aVeryShortStrokeGetsASingleStar() {
-        // The umlaut ticks of Ä/Ö/Ü are ~0.085 of the glyph box. Four stars there
+        // The umlaut ticks of Ä/Ö/Ü are ~0.04 of the glyph box. Four stars there
         // would all sit inside one another's pick-up radius.
-        val stars = TraceProgress.starCountFor(strokeLength = 0.085f * 200f, boxSize = 200f)
+        val stars = TraceProgress.starCountFor(strokeLength = 0.04f * 200f, boxSize = 200f)
         assertEquals(1, stars)
     }
 
