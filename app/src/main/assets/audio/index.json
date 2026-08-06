@@ -1,5 +1,260 @@
 {
   "clips": {
+    "12 Dosen": {
+      "file": "word_ee49e1b093e8.ogg",
+      "fingerprint": "5ad8c277347b57b0",
+      "profile": "word"
+    },
+    "12 Tomaten": {
+      "file": "word_bfd850eaaf62.ogg",
+      "fingerprint": "cc75f0f3823b0cb6",
+      "profile": "word"
+    },
+    "13 Frösche": {
+      "file": "word_e92ab3821d0c.ogg",
+      "fingerprint": "ae62c6d8af68c0f2",
+      "profile": "word"
+    },
+    "13 Säcke": {
+      "file": "word_c83accaa6052.ogg",
+      "fingerprint": "4e80bfacb4de4d6f",
+      "profile": "word"
+    },
+    "13 Taxis": {
+      "file": "word_f66299519275.ogg",
+      "fingerprint": "827ad72ae0a5d652",
+      "profile": "word"
+    },
+    "14 Lamas": {
+      "file": "word_d87da4304c4a.ogg",
+      "fingerprint": "c96125c27d5f29f3",
+      "profile": "word"
+    },
+    "14 Vögel": {
+      "file": "word_18847502691e.ogg",
+      "fingerprint": "4f7e04f64c236fcb",
+      "profile": "word"
+    },
+    "15 Ameisen": {
+      "file": "word_27b3b03e6b57.ogg",
+      "fingerprint": "8e7d6bca68fe3557",
+      "profile": "word"
+    },
+    "15 Eulen": {
+      "file": "word_add1aab338a8.ogg",
+      "fingerprint": "4b4bb168bd213eeb",
+      "profile": "word"
+    },
+    "15 Fische": {
+      "file": "word_9f6ef157aa9c.ogg",
+      "fingerprint": "2b5b82249508aa65",
+      "profile": "word"
+    },
+    "15 Füße": {
+      "file": "word_491b9dfec5e6.ogg",
+      "fingerprint": "a292d7043ebb26f4",
+      "profile": "word"
+    },
+    "15 Omas": {
+      "file": "word_3ed7e3585bf7.ogg",
+      "fingerprint": "0cf1031b5086918b",
+      "profile": "word"
+    },
+    "16 Bücher": {
+      "file": "word_2fb755ae20e0.ogg",
+      "fingerprint": "441b1c3edacd207c",
+      "profile": "word"
+    },
+    "16 Hüte": {
+      "file": "word_263ed44ceed0.ogg",
+      "fingerprint": "4fd7e47dec7d897c",
+      "profile": "word"
+    },
+    "18 Rosen": {
+      "file": "word_f65724d513c2.ogg",
+      "fingerprint": "fa415e97e98b548e",
+      "profile": "word"
+    },
+    "18 Spinnen": {
+      "file": "word_8cc3a3ea0583.ogg",
+      "fingerprint": "75659c8893d80629",
+      "profile": "word"
+    },
+    "18 Vögel": {
+      "file": "word_c6e2a9581008.ogg",
+      "fingerprint": "a8487ae5b9bbfc6f",
+      "profile": "word"
+    },
+    "20 Dosen": {
+      "file": "word_fe309e32e8a1.ogg",
+      "fingerprint": "3b574685704cb7d2",
+      "profile": "word"
+    },
+    "20 Eier": {
+      "file": "word_f506063e8efb.ogg",
+      "fingerprint": "a5000c7b548b0a1e",
+      "profile": "word"
+    },
+    "20 Fische": {
+      "file": "word_7d24c2087004.ogg",
+      "fingerprint": "c67e90f2f1411ea9",
+      "profile": "word"
+    },
+    "20 Häuser": {
+      "file": "word_e0c93d09e0c6.ogg",
+      "fingerprint": "70537299f519956c",
+      "profile": "word"
+    },
+    "21 Eis": {
+      "file": "word_82983ec810e2.ogg",
+      "fingerprint": "52ba4ad867b045ce",
+      "profile": "word"
+    },
+    "23 Häuser": {
+      "file": "word_938aaf48b67b.ogg",
+      "fingerprint": "4e7a645d144b32f0",
+      "profile": "word"
+    },
+    "24 Omas": {
+      "file": "word_19e51ee9eeb0.ogg",
+      "fingerprint": "eed1b2141b18b878",
+      "profile": "word"
+    },
+    "24 Säcke": {
+      "file": "word_f5c9347df608.ogg",
+      "fingerprint": "138d0cb2595413b6",
+      "profile": "word"
+    },
+    "24 Taxis": {
+      "file": "word_102a52d3ff7c.ogg",
+      "fingerprint": "a91b0b300c14c43a",
+      "profile": "word"
+    },
+    "25 Eulen": {
+      "file": "word_cfb022869ba4.ogg",
+      "fingerprint": "e068604b14688d38",
+      "profile": "word"
+    },
+    "25 Frösche": {
+      "file": "word_ecf465693113.ogg",
+      "fingerprint": "f332b2c82c121999",
+      "profile": "word"
+    },
+    "25 Taxis": {
+      "file": "word_447d5f2a9d57.ogg",
+      "fingerprint": "2f74fc568e541a32",
+      "profile": "word"
+    },
+    "26 Ameisen": {
+      "file": "word_36dd3613ecc9.ogg",
+      "fingerprint": "d83861232f20308e",
+      "profile": "word"
+    },
+    "28 Fische": {
+      "file": "word_d81e31f7f546.ogg",
+      "fingerprint": "a1816fdf9f6558c2",
+      "profile": "word"
+    },
+    "30 Fenster": {
+      "file": "word_03f09145ae76.ogg",
+      "fingerprint": "13f0fe62f91a690a",
+      "profile": "word"
+    },
+    "30 Fische": {
+      "file": "word_38ea8554ef28.ogg",
+      "fingerprint": "6e5f44bb2af81ae6",
+      "profile": "word"
+    },
+    "30 Füße": {
+      "file": "word_d3c2d1d49356.ogg",
+      "fingerprint": "2d63a90aa3632aff",
+      "profile": "word"
+    },
+    "30 Spinnen": {
+      "file": "word_37be568d02a0.ogg",
+      "fingerprint": "52aca792a5b8ab6a",
+      "profile": "word"
+    },
+    "30 Taxis": {
+      "file": "word_f26be819db48.ogg",
+      "fingerprint": "8626a0e2eb6e1e32",
+      "profile": "word"
+    },
+    "30 Tomaten": {
+      "file": "word_d82f1fe7ae68.ogg",
+      "fingerprint": "eb49354f16ce28f8",
+      "profile": "word"
+    },
+    "5 Ameisen": {
+      "file": "word_df12796da0cc.ogg",
+      "fingerprint": "fb6089996b3f5785",
+      "profile": "word"
+    },
+    "5 Omas": {
+      "file": "word_8a107bfa0f8b.ogg",
+      "fingerprint": "53a03ddaf579c3f0",
+      "profile": "word"
+    },
+    "5 Tomaten": {
+      "file": "word_463050750845.ogg",
+      "fingerprint": "96a4d6a2d1472fe6",
+      "profile": "word"
+    },
+    "7 Eis": {
+      "file": "word_f3102c6b2fc2.ogg",
+      "fingerprint": "e6a0e153e45040a8",
+      "profile": "word"
+    },
+    "7 Lamas": {
+      "file": "word_f0a8b22bfa64.ogg",
+      "fingerprint": "9dab199cf7f44f73",
+      "profile": "word"
+    },
+    "8 Hüte": {
+      "file": "word_2669494cfbb5.ogg",
+      "fingerprint": "611b1d22102fd113",
+      "profile": "word"
+    },
+    "8 Rosen": {
+      "file": "word_f3f1c1906d53.ogg",
+      "fingerprint": "49a5fed1681601f0",
+      "profile": "word"
+    },
+    "9 Ameisen": {
+      "file": "word_1a0ec6be9b6a.ogg",
+      "fingerprint": "469fe3c20af3652e",
+      "profile": "word"
+    },
+    "9 Bücher": {
+      "file": "word_7ea73c176410.ogg",
+      "fingerprint": "dc60b3fd1787e9d1",
+      "profile": "word"
+    },
+    "9 Eier": {
+      "file": "word_9b2735fec27a.ogg",
+      "fingerprint": "8d866abd75b14fde",
+      "profile": "word"
+    },
+    "9 Fenster": {
+      "file": "word_61dc14c4749b.ogg",
+      "fingerprint": "df0cc9f9b301b0b2",
+      "profile": "word"
+    },
+    "9 Omas": {
+      "file": "word_a903d240d9f1.ogg",
+      "fingerprint": "692f2dbcded859fd",
+      "profile": "word"
+    },
+    "9 Rosen": {
+      "file": "word_c0dc053b876d.ogg",
+      "fingerprint": "dcdead9b5d9f88ad",
+      "profile": "word"
+    },
+    "9 Tomaten": {
+      "file": "word_dac022cc81bc.ogg",
+      "fingerprint": "0aa184851f1a05eb",
+      "profile": "word"
+    },
     "A": {
       "file": "phoneme_559aead08264.ogg",
       "fingerprint": "4ef223c74592d9f7",
@@ -58,6 +313,11 @@
     "Au - wie Auto.": {
       "file": "reward_3baa94bb94fe.ogg",
       "fingerprint": "5f5b74085a119f38",
+      "profile": "reward"
+    },
+    "Ausgezeichnet": {
+      "file": "reward_29fde84fd167.ogg",
+      "fingerprint": "f512f9d85ff993f6",
       "profile": "reward"
     },
     "Auto": {
@@ -340,6 +600,11 @@
       "fingerprint": "f08a0da30f0fd878",
       "profile": "word"
     },
+    "Bravo": {
+      "file": "reward_8123f58e7248.ogg",
+      "fingerprint": "a6543dc2682007e9",
+      "profile": "reward"
+    },
     "Brot": {
       "file": "word_ef53751671e5.ogg",
       "fingerprint": "d0a29ffa80b27b45",
@@ -454,6 +719,11 @@
       "file": "finale_e606bd089e5c.ogg",
       "fingerprint": "a7cac790e1c171da",
       "profile": "finale"
+    },
+    "Das hast du toll gemacht": {
+      "file": "reward_85b4e4247877.ogg",
+      "fingerprint": "0484ac23a347fc2f",
+      "profile": "reward"
     },
     "Das ist mein Brot.": {
       "file": "sentence_b309c28c2c33.ogg",
@@ -725,6 +995,11 @@
       "fingerprint": "8a5d8594dc98b988",
       "profile": "reward"
     },
+    "Fantastisch": {
+      "file": "reward_aa551a457045.ogg",
+      "fingerprint": "0efb6facad308e7e",
+      "profile": "reward"
+    },
     "Feder": {
       "file": "word_8d0a36e2d012.ogg",
       "fingerprint": "0e48327743af0081",
@@ -753,6 +1028,21 @@
     "Finde alle Silben": {
       "file": "prompt_fabf6c755f14.ogg",
       "fingerprint": "c5f67a3d461c52a6",
+      "profile": "prompt"
+    },
+    "Finde den Buchstaben": {
+      "file": "prompt_1d68721d375a.ogg",
+      "fingerprint": "12dca7c0cb78a9b0",
+      "profile": "prompt"
+    },
+    "Finde den Laut": {
+      "file": "prompt_1fad37147e63.ogg",
+      "fingerprint": "9edfb43fd64aae6c",
+      "profile": "prompt"
+    },
+    "Finde die Silbe": {
+      "file": "prompt_7a5873c12453.ogg",
+      "fingerprint": "8d9118ecec5f0924",
       "profile": "prompt"
     },
     "Fisch": {
@@ -845,6 +1135,16 @@
       "fingerprint": "a72a59ce16dae12e",
       "profile": "word"
     },
+    "Genau richtig": {
+      "file": "reward_cb547321569e.ogg",
+      "fingerprint": "4efeaacb22212df4",
+      "profile": "reward"
+    },
+    "Genau so": {
+      "file": "reward_fb38c3dd8832.ogg",
+      "fingerprint": "13111d1149ff51f3",
+      "profile": "reward"
+    },
     "Giraffe": {
       "file": "word_56151fd50660.ogg",
       "fingerprint": "65646cbf31253c45",
@@ -854,6 +1154,16 @@
       "file": "word_9615231ee629.ogg",
       "fingerprint": "8e09283cad709159",
       "profile": "word"
+    },
+    "Großartig": {
+      "file": "reward_871533dc17f2.ogg",
+      "fingerprint": "3956f01a6529ad31",
+      "profile": "reward"
+    },
+    "Gut gemacht": {
+      "file": "reward_f5f4be6b7622.ogg",
+      "fingerprint": "f3bb73024f133842",
+      "profile": "reward"
     },
     "H": {
       "file": "phoneme_44bd7ae60f47.ogg",
@@ -984,6 +1294,16 @@
       "file": "word_42f3f7e9341e.ogg",
       "fingerprint": "25c8a9eeaf1b5978",
       "profile": "word"
+    },
+    "Klasse": {
+      "file": "reward_eebeec9dcb97.ogg",
+      "fingerprint": "54b2d18b4c48eb92",
+      "profile": "reward"
+    },
+    "Klasse gemacht": {
+      "file": "reward_92022f58860b.ogg",
+      "fingerprint": "093f5ecd62d0f6b1",
+      "profile": "reward"
     },
     "Klavier": {
       "file": "word_bb815bb06bef.ogg",
@@ -1270,6 +1590,11 @@
       "fingerprint": "e15de0ccedaca7f6",
       "profile": "word"
     },
+    "Perfekt": {
+      "file": "reward_75319a13529a.ogg",
+      "fingerprint": "62aae8835be67b52",
+      "profile": "reward"
+    },
     "Pf": {
       "file": "phoneme_495f851d2eed.ogg",
       "fingerprint": "4298fc9785c8c075",
@@ -1314,6 +1639,11 @@
       "file": "word_5cb47a9bbad3.ogg",
       "fingerprint": "7e892aeb97db2679",
       "profile": "word"
+    },
+    "Prima": {
+      "file": "reward_06e12cfbe9b6.ogg",
+      "fingerprint": "6ff7092c3722b127",
+      "profile": "reward"
     },
     "Probiere eine andere Antwort": {
       "file": "ui_5e62fdea5f0f.ogg",
@@ -1374,6 +1704,11 @@
       "file": "word_d29eb8ca21d7.ogg",
       "fingerprint": "524d5f4128a8c38a",
       "profile": "word"
+    },
+    "Richtig gut": {
+      "file": "reward_f3d687a5973d.ogg",
+      "fingerprint": "b7fea90d5e1a8f5d",
+      "profile": "reward"
     },
     "Rose": {
       "file": "word_e10d850954a8.ogg",
@@ -1625,6 +1960,11 @@
       "fingerprint": "c56867c578aea1fd",
       "profile": "prompt"
     },
+    "Sehr gut": {
+      "file": "reward_9f24cc311ede.ogg",
+      "fingerprint": "b30e130962116520",
+      "profile": "reward"
+    },
     "Sieben Tomaten und fünf Tomaten. Wie viele Tomaten sind das.": {
       "file": "prompt_0900f6d664ad.ogg",
       "fingerprint": "9e822a3cd86a0f2d",
@@ -1680,6 +2020,11 @@
       "fingerprint": "23aa15c91098cf2f",
       "profile": "word"
     },
+    "Spitze": {
+      "file": "reward_d6d519322a6a.ogg",
+      "fingerprint": "9111136e86b73a28",
+      "profile": "reward"
+    },
     "St": {
       "file": "phoneme_51de452ffffe.ogg",
       "fingerprint": "d5b4d51d470fb113",
@@ -1688,6 +2033,11 @@
     "St - wie Stern.": {
       "file": "reward_13de3d45009c.ogg",
       "fingerprint": "1fd52744a7afdb64",
+      "profile": "reward"
+    },
+    "Stark": {
+      "file": "reward_0857c7a77ba1.ogg",
+      "fingerprint": "f70a7fc72789fa42",
       "profile": "reward"
     },
     "Stern": {
@@ -1704,6 +2054,11 @@
       "file": "word_947f9e7b2620.ogg",
       "fingerprint": "3f87fd60da390753",
       "profile": "word"
+    },
+    "Super": {
+      "file": "reward_8185c8ac4656.ogg",
+      "fingerprint": "a759ad641b7c26a4",
+      "profile": "reward"
     },
     "Suppe": {
       "file": "word_99a603924290.ogg",
@@ -1759,6 +2114,11 @@
       "file": "word_354bc956b8a4.ogg",
       "fingerprint": "30deda3d95d7c0eb",
       "profile": "word"
+    },
+    "Toll gemacht": {
+      "file": "reward_7b6a1c76a257.ogg",
+      "fingerprint": "dbb89060d7042da6",
+      "profile": "reward"
     },
     "Tom": {
       "file": "word_81f3bf42a93c.ogg",
@@ -1894,6 +2254,11 @@
       "file": "word_fe3a5d0b9c4e.ogg",
       "fingerprint": "724bc51fceadb84c",
       "profile": "word"
+    },
+    "Weiter so": {
+      "file": "reward_16b8dc080113.ogg",
+      "fingerprint": "22acb9efeaaaba92",
+      "profile": "reward"
     },
     "Wespe": {
       "file": "word_38ba6262a672.ogg",
@@ -2094,6 +2459,11 @@
       "file": "word_3a1338ef215e.ogg",
       "fingerprint": "302e52941f282802",
       "profile": "word"
+    },
+    "Wunderbar": {
+      "file": "reward_2732e9286b3a.ogg",
+      "fingerprint": "a1fb6fa5de78fc8b",
+      "profile": "reward"
     },
     "X": {
       "file": "phoneme_4b68ab3847fe.ogg",

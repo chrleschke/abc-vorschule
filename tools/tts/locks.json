@@ -1957,13 +1957,17 @@
       "sourceText": "Eis"
     },
     "word:263ed44ceed0": {
-      "seed": 346919363,
-      "textOverride": "16 Hüte.",
+      "seed": 1820816805,
+      "textOverride": "16 Hüte!",
       "sourceText": "16 Hüte"
     },
     "word:2669494cfbb5": {
       "seed": 1017467044,
       "sourceText": "8 Hüte"
+    },
+    "word:27b3b03e6b57": {
+      "seed": 1229619544,
+      "sourceText": "15 Ameisen"
     },
     "word:2a7dfeb2f2b0": {
       "seed": 514015760,
@@ -1983,6 +1987,10 @@
       "textOverride": "Salat.",
       "sourceText": "Salat"
     },
+    "word:2fb755ae20e0": {
+      "seed": 144801741,
+      "sourceText": "16 Bücher"
+    },
     "word:33d0ffb3cdb7": {
       "seed": 603063517,
       "sourceText": "Erdbeere"
@@ -1990,6 +1998,14 @@
     "word:354bc956b8a4": {
       "seed": 114642735,
       "sourceText": "Tisch"
+    },
+    "word:36dd3613ecc9": {
+      "seed": 1389964126,
+      "sourceText": "26 Ameisen"
+    },
+    "word:37be568d02a0": {
+      "seed": 1017467044,
+      "sourceText": "30 Spinnen"
     },
     "word:3887a18984cb": {
       "seed": 1765179368,
@@ -2003,9 +2019,17 @@
       "seed": 940755680,
       "sourceText": "Schaf"
     },
+    "word:38ea8554ef28": {
+      "seed": 153000027,
+      "sourceText": "30 Fische"
+    },
     "word:3a1338ef215e": {
       "seed": 1781353031,
       "sourceText": "Wolke"
+    },
+    "word:3ed7e3585bf7": {
+      "seed": 1677023100,
+      "sourceText": "15 Omas"
     },
     "word:410f76d01d8a": {
       "seed": 1468051116,
@@ -2018,6 +2042,10 @@
     "word:430db59c91b3": {
       "seed": 1378116787,
       "sourceText": "Baum"
+    },
+    "word:447d5f2a9d57": {
+      "seed": 1765179368,
+      "sourceText": "25 Taxis"
     },
     "word:453c9aa8c895": {
       "seed": 254035842,
@@ -2037,10 +2065,18 @@
       "seed": 275897189,
       "sourceText": "Herz"
     },
+    "word:463050750845": {
+      "seed": 634327529,
+      "sourceText": "5 Tomaten"
+    },
     "word:469f97570d91": {
       "seed": 1931065732,
       "textOverride": "Kwark!",
       "sourceText": "Quark"
+    },
+    "word:491b9dfec5e6": {
+      "seed": 1389964126,
+      "sourceText": "15 Füße"
     },
     "word:49530e11d87d": {
       "seed": 1940105498,
@@ -2136,6 +2172,10 @@
       "seed": 2086737733,
       "sourceText": "ruft"
     },
+    "word:61dc14c4749b": {
+      "seed": 1389964126,
+      "sourceText": "9 Fenster"
+    },
     "word:63669810c995": {
       "seed": 144801741,
       "textOverride": "Affe.",
@@ -2206,6 +2246,10 @@
       "textOverride": "groß.",
       "sourceText": "groß"
     },
+    "word:7d24c2087004": {
+      "seed": 1365805799,
+      "sourceText": "20 Fische"
+    },
     "word:7d9b210c4436": {
       "seed": 935052277,
       "sourceText": "Fuchs"
@@ -2218,6 +2262,10 @@
       "seed": 712740068,
       "textOverride": "Lama.",
       "sourceText": "Lama"
+    },
+    "word:7ea73c176410": {
+      "seed": 144801741,
+      "sourceText": "9 Bücher"
     },
     "word:7ec879c8c860": {
       "seed": 179774350,
@@ -2237,6 +2285,10 @@
       "seed": 821256265,
       "textOverride": "SSanndd.",
       "sourceText": "Sand"
+    },
+    "word:82983ec810e2": {
+      "seed": 1677023100,
+      "sourceText": "21 Eis"
     },
     "word:82f1643a857d": {
       "seed": 2058271745,
@@ -2269,6 +2321,10 @@
       "seed": 697929606,
       "sourceText": "läuft"
     },
+    "word:8a107bfa0f8b": {
+      "seed": 1389964126,
+      "sourceText": "5 Omas"
+    },
     "word:8a8a1a9fe856": {
       "seed": 1255386736,
       "textOverride": "dehn.",
@@ -2282,6 +2338,10 @@
     "word:8baebabc53fb": {
       "seed": 2022971530,
       "sourceText": "Dach"
+    },
+    "word:8cc3a3ea0583": {
+      "seed": 634327529,
+      "sourceText": "18 Spinnen"
     },
     "word:8d0a36e2d012": {
       "seed": 1017467044,
@@ -2302,6 +2362,10 @@
       "seed": 1226140164,
       "textOverride": "Hund.",
       "sourceText": "Hund"
+    },
+    "word:938aaf48b67b": {
+      "seed": 1017467044,
+      "sourceText": "23 Häuser"
     },
     "word:9471c6375e05": {
       "seed": 1365805799,
@@ -2352,6 +2416,10 @@
       "seed": 1709727474,
       "sourceText": "Blatt"
     },
+    "word:9b2735fec27a": {
+      "seed": 1229619544,
+      "sourceText": "9 Eier"
+    },
     "word:9b58e68145a7": {
       "seed": 1888900194,
       "sourceText": "wind"
@@ -2359,6 +2427,10 @@
     "word:9c0d5d91b620": {
       "seed": 58331711,
       "sourceText": "Elefant"
+    },
+    "word:9f6ef157aa9c": {
+      "seed": 1677023100,
+      "sourceText": "15 Fische"
     },
     "word:a0aecdeeb95b": {
       "seed": 287812362,
@@ -2405,6 +2477,10 @@
       "textOverride": "die.",
       "sourceText": "die"
     },
+    "word:a903d240d9f1": {
+      "seed": 1229619544,
+      "sourceText": "9 Omas"
+    },
     "word:aa58b21b01d6": {
       "seed": 531240575,
       "sourceText": "da"
@@ -2417,6 +2493,10 @@
       "seed": 1365805799,
       "textOverride": "am.",
       "sourceText": "am"
+    },
+    "word:add1aab338a8": {
+      "seed": 144801741,
+      "sourceText": "15 Eulen"
     },
     "word:ae5859eceacb": {
       "seed": 144801741,
@@ -2462,10 +2542,18 @@
       "textOverride": "sind.",
       "sourceText": "sind"
     },
+    "word:bfd850eaaf62": {
+      "seed": 634327529,
+      "sourceText": "12 Tomaten"
+    },
     "word:c0bc1e08f974": {
       "seed": 1389964126,
       "textOverride": "es.",
       "sourceText": "es"
+    },
+    "word:c0dc053b876d": {
+      "seed": 1389964126,
+      "sourceText": "9 Rosen"
     },
     "word:c16f2f3b6f2d": {
       "seed": 2098672070,
@@ -2482,6 +2570,14 @@
     "word:c67a98fb5c20": {
       "seed": 713263381,
       "sourceText": "Eier"
+    },
+    "word:c6e2a9581008": {
+      "seed": 144801741,
+      "sourceText": "18 Vögel"
+    },
+    "word:c83accaa6052": {
+      "seed": 1017467044,
+      "sourceText": "13 Säcke"
     },
     "word:ca6744f733d5": {
       "seed": 1017467044,
@@ -2509,6 +2605,10 @@
       "seed": 1620915988,
       "sourceText": "Katze"
     },
+    "word:cfb022869ba4": {
+      "seed": 1365805799,
+      "sourceText": "25 Eulen"
+    },
     "word:cfbdb40cb7e4": {
       "seed": 1280490775,
       "sourceText": "lachen"
@@ -2528,6 +2628,10 @@
       "textOverride": "Raupe.",
       "sourceText": "Raupe"
     },
+    "word:d3c2d1d49356": {
+      "seed": 1765179368,
+      "sourceText": "30 Füße"
+    },
     "word:d4e20327678b": {
       "seed": 1252292467,
       "sourceText": "Oma"
@@ -2536,9 +2640,29 @@
       "seed": 158222434,
       "sourceText": "Opa"
     },
+    "word:d81e31f7f546": {
+      "seed": 1512463413,
+      "sourceText": "28 Fische"
+    },
+    "word:d82f1fe7ae68": {
+      "seed": 634327529,
+      "sourceText": "30 Tomaten"
+    },
+    "word:d87da4304c4a": {
+      "seed": 1365805799,
+      "sourceText": "14 Lamas"
+    },
+    "word:dac022cc81bc": {
+      "seed": 1389964126,
+      "sourceText": "9 Tomaten"
+    },
     "word:dd12db9683fb": {
       "seed": 1353624861,
       "sourceText": "Pilz"
+    },
+    "word:df12796da0cc": {
+      "seed": 1365805799,
+      "sourceText": "5 Ameisen"
     },
     "word:e006d852a61a": {
       "seed": 390941881,
@@ -2548,6 +2672,10 @@
     "word:e02636bed39a": {
       "seed": 207550357,
       "sourceText": "Fuß"
+    },
+    "word:e0c93d09e0c6": {
+      "seed": 1765179368,
+      "sourceText": "20 Häuser"
     },
     "word:e10d850954a8": {
       "seed": 387500886,
@@ -2592,6 +2720,10 @@
       "textOverride": "Ameise!",
       "sourceText": "Ameise"
     },
+    "word:e92ab3821d0c": {
+      "seed": 1365805799,
+      "sourceText": "13 Frösche"
+    },
     "word:eafaf309b341": {
       "seed": 634327529,
       "sourceText": "Hexe"
@@ -2599,6 +2731,14 @@
     "word:ebf2411bebda": {
       "seed": 388871546,
       "sourceText": "Äpfel"
+    },
+    "word:ecf465693113": {
+      "seed": 1365805799,
+      "sourceText": "25 Frösche"
+    },
+    "word:ee49e1b093e8": {
+      "seed": 1365805799,
+      "sourceText": "12 Dosen"
     },
     "word:ef53751671e5": {
       "seed": 1017467044,
@@ -2609,6 +2749,10 @@
       "seed": 1765179368,
       "textOverride": "Bär.",
       "sourceText": "Bär"
+    },
+    "word:f0a8b22bfa64": {
+      "seed": 1512463413,
+      "sourceText": "7 Lamas"
     },
     "word:f1142f0fdbdd": {
       "seed": 1924724194,
@@ -2623,13 +2767,41 @@
       "seed": 1094852413,
       "sourceText": "Gans"
     },
+    "word:f26be819db48": {
+      "seed": 1765179368,
+      "sourceText": "30 Taxis"
+    },
+    "word:f3102c6b2fc2": {
+      "seed": 1512463413,
+      "sourceText": "7 Eis"
+    },
+    "word:f3f1c1906d53": {
+      "seed": 1017467044,
+      "sourceText": "8 Rosen"
+    },
     "word:f4335a17539e": {
       "seed": 1409681767,
       "sourceText": "blau"
     },
+    "word:f506063e8efb": {
+      "seed": 144801741,
+      "sourceText": "20 Eier"
+    },
     "word:f5252953fc2d": {
       "seed": 605276852,
       "sourceText": "Bäume"
+    },
+    "word:f5c9347df608": {
+      "seed": 1677023100,
+      "sourceText": "24 Säcke"
+    },
+    "word:f65724d513c2": {
+      "seed": 144801741,
+      "sourceText": "18 Rosen"
+    },
+    "word:f66299519275": {
+      "seed": 1229619544,
+      "sourceText": "13 Taxis"
     },
     "word:f7d8232215e4": {
       "seed": 489055453,
@@ -2655,6 +2827,10 @@
     "word:fe263064ba02": {
       "seed": 1765179368,
       "sourceText": "grün"
+    },
+    "word:fe309e32e8a1": {
+      "seed": 153000027,
+      "sourceText": "20 Dosen"
     },
     "word:fe3a5d0b9c4e": {
       "seed": 1017467044,
