@@ -122,7 +122,8 @@ data class SessionUiState(
     /** Spoken-only miss/hint text — never rendered as chrome. */
     val speakCue: String? = null,
     val successPhase: SuccessPhase = SuccessPhase.Idle,
-    val successSpeakText: String? = null,
+    /** Ordered success speech — answer first, praise second for Rechnen. */
+    val successSpeakParts: List<String> = emptyList(),
     val error: String? = null,
 ) {
     val current: ScheduledTrainer? = trainers.getOrNull(trainerIndex)

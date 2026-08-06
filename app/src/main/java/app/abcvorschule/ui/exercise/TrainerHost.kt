@@ -12,6 +12,7 @@ import app.abcvorschule.content.SoundPositionSpec
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.content.SymbolInWordRound
 import app.abcvorschule.content.SyllableMergeRound
+import app.abcvorschule.content.SyllableMergeSpeech
 import app.abcvorschule.content.TrainerRound
 import app.abcvorschule.content.WordBuildRound
 import app.abcvorschule.progress.ProgressionEngine
@@ -66,6 +67,7 @@ fun TrainerHost(
         is SyllableMergeRound -> SyllableMergeTrainer(
             round = round,
             roundIndex = roundIndex,
+            resultSpeech = SyllableMergeSpeech.resultSpeech(round, pack.atoms[round.resultAtomId]),
             ttsAvailable = ttsAvailable,
             speaking = speaking,
             onSpeakPrompt = callbacks.onSpeakPrompt,

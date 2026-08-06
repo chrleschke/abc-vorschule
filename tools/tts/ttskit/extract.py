@@ -22,6 +22,7 @@ FIELD_TO_PROFILE: dict[str, str] = {
     "sentenceTts": "sentence",
     "finaleTts": "finale",
     "uiText": "ui",
+    "spokenAnswerTts": "word",
 }
 
 # Order matters: it decides the order of items within a round.
@@ -70,6 +71,18 @@ def _lesson_index(lessons: list[dict]) -> tuple[dict[str, str], dict[str, str]]:
     return by_task, by_finale
 
 
+def _spoken_answer(answer: int, icon: dict) -> str:
+    """Mirror CountAddRound.spokenAnswer in TaskSpecs.kt."""
+    if not icon:
+        return str(answer)
+    display = icon.get("display") or ""
+    if answer == 1:
+        noun = display
+    else:
+        noun = icon.get("pluralDisplay") or display
+    return f"{answer} {noun}".strip()
+
+
 def extract_items(content_dir: Path, extra_strings: dict | None = None,
                   blanks: list[str] | None = None) -> list[Item]:
     """Collect every authored TTS string from the content pack.
@@ -86,6 +99,7 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
     lessons = _load(content_dir, "lessons.json", "lessons")
 
     lesson_by_task, lesson_by_finale = _lesson_index(lessons)
+    atom_by_id = {atom["id"]: atom for atom in atoms}
     items: list[Item] = []
 
     def add(item_id: str, text: str, field: str, source: str,
@@ -123,6 +137,13 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
                     continue
                 add(f"task:{task_id}:round:{index}:{field}", round_[field], field,
                     "tasks.json", lesson, f"{task_id} · Runde {index + 1} · {field}")
+            if task.get("trainer") == "count_add":
+                icon_id = round_.get("iconAtomId")
+                icon = atom_by_id.get(icon_id, {})
+                spoken = _spoken_answer(round_.get("answer", 0), icon)
+                add(f"task:{task_id}:round:{index}:spokenAnswer", spoken,
+                    "spokenAnswerTts", "tasks.json", lesson,
+                    f"{task_id} · Runde {index + 1} · spokenAnswer")
 
     if extra_strings:
         for entry in extra_strings.get("strings", []):

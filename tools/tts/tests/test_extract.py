@@ -136,6 +136,45 @@ def test_blank_text_can_be_collected_for_reporting(tmp_path):
     assert blanks == ["atom:empty:lemma"]
 
 
+def test_extracts_count_add_spoken_answers(tmp_path):
+    import json
+
+    d = tmp_path / "content"
+    d.mkdir()
+    (d / "atoms.json").write_text(json.dumps({"atoms": [
+        {"id": "ameise", "lemma": "Ameise", "display": "Ameise", "emoji": "🐜",
+         "kind": "other", "pluralDisplay": "Ameisen"},
+    ]}), encoding="utf-8")
+    (d / "tasks.json").write_text(json.dumps({"tasks": [
+        {"trainer": "count_add", "id": "l01-t6", "rounds": [
+            {"promptTts": "Wie viele?", "iconAtomId": "ameise",
+             "left": 1, "right": 1, "answer": 2, "operation": "add"},
+        ]},
+    ]}), encoding="utf-8")
+    for name, key in (("sentences.json", "sentences"), ("finales.json", "finales"),
+                      ("lessons.json", "lessons")):
+        (d / name).write_text(json.dumps({key: []}), encoding="utf-8")
+
+    by_id = {i.id: i for i in extract_items(d)}
+    item = by_id["task:l01-t6:round:0:spokenAnswer"]
+    assert item.field == "spokenAnswerTts"
+    assert item.text == "2 Ameisen"
+    assert profile_for_item(item) == "word"
+
+
+def test_extra_strings_include_praise_phrases(content_dir):
+    from ttskit.paths import Paths
+    import json
+
+    extra = json.loads(Paths().extra_strings.read_text())
+    by_id = {i.id: i for i in extract_items(content_dir, extra_strings=extra)}
+    praise = [i for i in by_id.values()
+              if i.source == "extra-strings.json" and i.field == "rewardTts"]
+    assert len(praise) == 20
+    assert by_id["ui:praiseSuper"].text == "Super"
+    assert profile_for_item(by_id["ui:praiseSuper"]) == "reward"
+
+
 def test_a_missing_content_file_names_the_file(tmp_path):
     import pytest
 

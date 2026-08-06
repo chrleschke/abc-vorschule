@@ -197,21 +197,21 @@ private fun PracticeBody(
         }
         viewModel.clearSpeakCue()
     }
-    LaunchedEffect(state.successPhase, state.successSpeakText) {
+    LaunchedEffect(state.successPhase, state.successSpeakParts) {
         if (state.successPhase != SuccessPhase.SpeakAnswer) return@LaunchedEffect
-        val phrase = state.successSpeakText
-        if (ttsAvailable && !phrase.isNullOrBlank()) {
-            onSpeakAndAwait(phrase)
+        val parts = state.successSpeakParts
+        if (ttsAvailable && parts.isNotEmpty()) {
+            onSpeakPromptSequence(parts)
         } else {
             delay(350)
         }
         viewModel.onSuccessSpeechFinished()
     }
-    LaunchedEffect(state.successPhase, state.successSpeakText) {
+    LaunchedEffect(state.successPhase, state.successSpeakParts) {
         if (state.successPhase != SuccessPhase.RevealAnswer) return@LaunchedEffect
-        val phrase = state.successSpeakText
-        if (ttsAvailable && !phrase.isNullOrBlank()) {
-            onSpeakAndAwait(phrase)
+        val parts = state.successSpeakParts
+        if (ttsAvailable && parts.isNotEmpty()) {
+            onSpeakPromptSequence(parts)
             delay(900)
         } else {
             delay(1400)

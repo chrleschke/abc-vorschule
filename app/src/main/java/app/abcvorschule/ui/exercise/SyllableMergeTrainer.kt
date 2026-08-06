@@ -96,6 +96,7 @@ private const val TrackWaveMs = 1_400
 fun SyllableMergeTrainer(
     round: SyllableMergeRound,
     roundIndex: Int,
+    resultSpeech: String,
     ttsAvailable: Boolean,
     speaking: Boolean,
     onSpeakPrompt: () -> Unit,
@@ -234,7 +235,7 @@ fun SyllableMergeTrainer(
                     label = round.resultDisplay,
                     glow = 1f,
                     frozen = true,
-                    onTap = { onSpeak(round.resultDisplay) },
+                    onTap = { onSpeak(resultSpeech) },
                     modifier = Modifier
                         .graphicsLayer {
                             scaleX = resultScale.value

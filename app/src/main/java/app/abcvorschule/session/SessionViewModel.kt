@@ -20,7 +20,6 @@ import app.abcvorschule.content.TaskSpec
 import app.abcvorschule.content.WordBuildRound
 import app.abcvorschule.content.rounds
 import app.abcvorschule.content.scoredAtomIds
-import app.abcvorschule.content.spokenAnswer
 import app.abcvorschule.progress.AttemptOutcome
 import app.abcvorschule.progress.LearnerProgress
 import app.abcvorschule.progress.LessonGating
@@ -31,7 +30,6 @@ import app.abcvorschule.progress.ProgressionEngine
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.progress.SessionSnapshot
 import app.abcvorschule.ui.exercise.MathHinting
-import app.abcvorschule.ui.rewards.PraisePhrases
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -219,7 +217,7 @@ class SessionViewModel(
                     completedFinaleId = null,
                     speakCue = null,
                     successPhase = SuccessPhase.Idle,
-                    successSpeakText = null,
+                    successSpeakParts = emptyList(),
                     points = progress.points,
                 )
             }
@@ -258,7 +256,7 @@ class SessionViewModel(
                     roundIndex = step.roundIndex,
                     speakCue = null,
                     successPhase = SuccessPhase.Idle,
-                    successSpeakText = null,
+                    successSpeakParts = emptyList(),
                 )
             }
         }
@@ -279,7 +277,7 @@ class SessionViewModel(
                     roundIndex = step.roundIndex,
                     speakCue = null,
                     successPhase = SuccessPhase.Idle,
-                    successSpeakText = null,
+                    successSpeakParts = emptyList(),
                 )
             }
         }
@@ -323,41 +321,25 @@ class SessionViewModel(
     }
 
     /**
-     * @param praise Whether to lead with a random word of praise. Only Rechnen gets it,
-     * and only for an answer the child actually found — a resolve is not a success.
+     * @param praise Whether to append a random praise phrase after the answer.
+     * Only Rechnen gets praise, and only when the child found the answer — not on resolve.
      */
-    fun successSpeakTextForCurrent(praise: Boolean): String = when (val round = _ui.value.currentRound) {
-        // Speak the counted objects, not a bare number: "zwei Ameisen". The praise goes
-        // first so the quantity — the didactically relevant part — is heard last.
-        is CountAddRound -> {
-            val answer = round.spokenAnswer(pack.atoms[round.iconAtomId])
-            if (praise) "${PraisePhrases.pick()}! $answer" else answer
-        }
-        is SyllableMergeRound -> round.resultDisplay
-        is WordBuildRound -> pack.atoms[round.targetAtomId]?.display ?: round.promptTts
-        is SentenceOrderRound -> pack.sentence(round.sentenceId).tts
-        is LetterTraceRound -> round.rewardTts
-        is SoundPositionRound -> pack.atoms[round.atomId]?.lemma ?: round.promptTts
-        is SymbolHuntRound -> pack.atoms[round.targetAtomId]?.lemma ?: round.promptTts
-        // Speak the *word*, not the symbol: the child already heard the symbol on
-        // every tap, so the word is the new information and the didactic payoff.
-        is SymbolInWordRound -> pack.atoms[round.wordAtomId]?.display ?: round.promptTts
-        else -> ""
-    }
+    fun successSpeakPartsForCurrent(praise: Boolean): List<String> =
+        SuccessSpeech.partsForRound(_ui.value.currentRound, pack, praise)
 
     fun onSuccessSpeechFinished() {
         _ui.update {
             if (it.successPhase != SuccessPhase.SpeakAnswer) {
                 it
             } else {
-                it.copy(successPhase = SuccessPhase.ShowBurst, successSpeakText = null)
+                it.copy(successPhase = SuccessPhase.ShowBurst, successSpeakParts = emptyList())
             }
         }
     }
 
     fun onSuccessBurstFinished() {
         viewModelScope.launch {
-            _ui.update { it.copy(successPhase = SuccessPhase.Idle, successSpeakText = null) }
+            _ui.update { it.copy(successPhase = SuccessPhase.Idle, successSpeakParts = emptyList()) }
             advance()
         }
     }
@@ -365,7 +347,7 @@ class SessionViewModel(
     fun onRevealFinished() {
         viewModelScope.launch {
             if (_ui.value.successPhase != SuccessPhase.RevealAnswer) return@launch
-            _ui.update { it.copy(successPhase = SuccessPhase.Idle, successSpeakText = null) }
+            _ui.update { it.copy(successPhase = SuccessPhase.Idle, successSpeakParts = emptyList()) }
             advance()
         }
     }
@@ -476,13 +458,13 @@ class SessionViewModel(
         speakOverride: String? = null,
     ) {
         if (correct) {
-            val phrase = successSpeakTextForCurrent(praise = true)
+            val parts = successSpeakPartsForCurrent(praise = true)
             _ui.update {
                 it.copy(
                     points = progress.points,
                     sessionPoints = it.sessionPoints + POINTS_PER_CORRECT,
                     speakCue = null,
-                    successSpeakText = phrase,
+                    successSpeakParts = parts,
                     successPhase = SuccessPhase.SpeakAnswer,
                 )
             }
@@ -495,7 +477,7 @@ class SessionViewModel(
             _ui.update {
                 it.copy(
                     successPhase = SuccessPhase.RevealAnswer,
-                    successSpeakText = successSpeakTextForCurrent(praise = false),
+                    successSpeakParts = successSpeakPartsForCurrent(praise = false),
                 )
             }
             return
@@ -540,7 +522,7 @@ class SessionViewModel(
                     completedFinaleId = finaleId,
                     speakCue = null,
                     successPhase = SuccessPhase.Idle,
-                    successSpeakText = null,
+                    successSpeakParts = emptyList(),
                     points = progress.points,
                 )
             }
@@ -552,7 +534,7 @@ class SessionViewModel(
                 roundIndex = step.roundIndex,
                 speakCue = null,
                 successPhase = SuccessPhase.Idle,
-                successSpeakText = null,
+                successSpeakParts = emptyList(),
                 points = progress.points,
                 trainers = it.trainers.mapIndexed { i, trainer ->
                     if (i < step.trainerIndex) trainer else schedule(trainer.spec)

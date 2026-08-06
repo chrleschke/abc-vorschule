@@ -46,6 +46,126 @@
       "text": "Finde die Silbe",
       "field": "promptTts",
       "note": "SymbolInWordSpeech.introPhrase — Silbe"
+    },
+    {
+      "id": "praiseSuper",
+      "text": "Super",
+      "field": "rewardTts",
+      "note": "PraisePhrases — Rechnen Lob nach der Antwort"
+    },
+    {
+      "id": "praiseGutGemacht",
+      "text": "Gut gemacht",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseAusgezeichnet",
+      "text": "Ausgezeichnet",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseKlasse",
+      "text": "Klasse",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseGenauRichtig",
+      "text": "Genau richtig",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseTollGemacht",
+      "text": "Toll gemacht",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praisePerfekt",
+      "text": "Perfekt",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseStark",
+      "text": "Stark",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseBravo",
+      "text": "Bravo",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseWunderbar",
+      "text": "Wunderbar",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseSpitze",
+      "text": "Spitze",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseSehrGut",
+      "text": "Sehr gut",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praisePrima",
+      "text": "Prima",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseFantastisch",
+      "text": "Fantastisch",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseGrossartig",
+      "text": "Großartig",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseWeiterSo",
+      "text": "Weiter so",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseRichtigGut",
+      "text": "Richtig gut",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseGenauSo",
+      "text": "Genau so",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseKlasseGemacht",
+      "text": "Klasse gemacht",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseDasHastDuTollGemacht",
+      "text": "Das hast du toll gemacht",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
     }
   ],
   "templates": []

@@ -14,7 +14,7 @@ class PraisePhrasesTest {
 
     @Test
     fun phrasesCarryNoTrailingPunctuation() {
-        // The caller composes "<praise>! <answer>", so a phrase must not end in a mark.
+        // Praise is spoken as its own clip after the answer — no trailing punctuation.
         PraisePhrases.All.forEach { phrase ->
             assertTrue(phrase, phrase.isNotBlank())
             assertTrue(phrase, phrase.last().isLetter())
