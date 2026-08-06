@@ -82,6 +82,21 @@ def test_extra_strings_support_prompt_field(content_dir):
     assert profile_for_item(by_id["ui:huntPromptLetter"]) == "prompt"
 
 
+def test_extra_strings_include_detective_intro_phrases(content_dir):
+    from ttskit.paths import Paths
+    import json
+
+    extra = json.loads(Paths().extra_strings.read_text())
+    by_id = {i.id: i for i in extract_items(content_dir, extra_strings=extra)}
+    assert by_id["ui:detectivePromptLetter"].text == "Finde den Buchstaben"
+    assert by_id["ui:detectivePromptLaut"].text == "Finde den Laut"
+    assert by_id["ui:detectivePromptSilbe"].text == "Finde die Silbe"
+    for key in ("ui:detectivePromptLetter", "ui:detectivePromptLaut",
+                "ui:detectivePromptSilbe"):
+        assert by_id[key].field == "promptTts"
+        assert profile_for_item(by_id[key]) == "prompt"
+
+
 def test_extra_strings_become_ui_items(content_dir):
     extra = {"version": 1, "strings": [
         {"id": "lockedLessonCue", "text": "Das üben wir später.",

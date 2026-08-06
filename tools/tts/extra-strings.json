@@ -28,6 +28,24 @@
       "text": "Finde alle Silben",
       "field": "promptTts",
       "note": "SymbolHuntDerivation.PromptSyllable"
+    },
+    {
+      "id": "detectivePromptLetter",
+      "text": "Finde den Buchstaben",
+      "field": "promptTts",
+      "note": "SymbolInWordSpeech.introPhrase — Buchstabe"
+    },
+    {
+      "id": "detectivePromptLaut",
+      "text": "Finde den Laut",
+      "field": "promptTts",
+      "note": "SymbolInWordSpeech.introPhrase — Mehrzeichen-Graphem"
+    },
+    {
+      "id": "detectivePromptSilbe",
+      "text": "Finde die Silbe",
+      "field": "promptTts",
+      "note": "SymbolInWordSpeech.introPhrase — Silbe"
     }
   ],
   "templates": []

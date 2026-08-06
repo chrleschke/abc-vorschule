@@ -47,6 +47,12 @@ HUNT_PROMPTS = [
     ("huntPromptSilbe", "Finde alle Silben"),
 ]
 
+DETECTIVE_PROMPTS = [
+    ("detectivePromptLetter", "Finde den Buchstaben"),
+    ("detectivePromptLaut", "Finde den Laut"),
+    ("detectivePromptSilbe", "Finde die Silbe"),
+]
+
 
 def load_content(content_dir: Path) -> dict:
     return {name.removesuffix(".json"): read_json(content_dir / name)
@@ -375,7 +381,7 @@ def main() -> int:
     print(f"| **Total rows** | **{len(rows)}** |")
     print()
 
-    print("## Hunt intro prompts (the three new strings)\n")
+    print("## Hunt intro prompts (SymbolHuntSpeech)\n")
     for _id, ht in HUNT_PROMPTS:
         entry = index.get(ht)
         if entry and (paths.app_audio_dir / entry["file"]).exists():
@@ -386,6 +392,19 @@ def main() -> int:
             if locked and locked.locked:
                 st = f"locked ({status_of(locked, paths.audio)}) but not exported"
             print(f"- `{ht}` — **{st.upper()}**")
+    print()
+
+    print("## Wort-Detektiv intro prompts (SymbolInWordSpeech)\n")
+    for _id, dt in DETECTIVE_PROMPTS:
+        entry = index.get(dt)
+        if entry and (paths.app_audio_dir / entry["file"]).exists():
+            print(f"- `{dt}` — **shipped** (`{entry['file']}`)")
+        else:
+            locked = text_to_clip.get(dt)
+            st = "missing"
+            if locked and locked.locked:
+                st = f"locked ({status_of(locked, paths.audio)}) but not exported"
+            print(f"- `{dt}` — **{st.upper()}**")
     print()
 
     # Category breakdown for pipeline gaps only
