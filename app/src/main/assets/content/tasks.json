@@ -99,7 +99,7 @@
       "id": "l01-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Mama. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Mama.",
           "targetAtomId": "mama",
           "blocks": [
             {
@@ -261,7 +261,7 @@
       "id": "l02-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Oma. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Oma.",
           "targetAtomId": "oma",
           "blocks": [
             {
@@ -281,7 +281,7 @@
       "id": "l02-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Mimi. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Mimi.",
           "targetAtomId": "mimi",
           "blocks": [
             {
@@ -438,7 +438,7 @@
       "id": "l03-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Papa. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Papa.",
           "targetAtomId": "papa",
           "blocks": [
             {
@@ -458,7 +458,7 @@
       "id": "l03-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Opa. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Opa.",
           "targetAtomId": "opa",
           "blocks": [
             {
@@ -478,7 +478,7 @@
       "id": "l03-t9",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Tom. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Tom.",
           "targetAtomId": "tom",
           "blocks": [
             {
@@ -627,7 +627,7 @@
       "id": "l04-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Lama. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Lama.",
           "targetAtomId": "lama",
           "blocks": [
             {
@@ -647,7 +647,7 @@
       "id": "l04-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Hallo. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Hallo.",
           "targetAtomId": "hallo",
           "blocks": [
             {
@@ -675,7 +675,7 @@
       "id": "l04-t9",
       "rounds": [
         {
-          "promptTts": "Hallo Lama! - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Hallo Lama!",
           "sentenceId": "s-hallo-lama",
           "illustrationAtomId": "lama",
           "blocks": []
@@ -795,7 +795,7 @@
       "id": "l05-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Hut. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Hut.",
           "targetAtomId": "hut",
           "blocks": [
             {
@@ -819,7 +819,7 @@
       "id": "l05-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Ufo. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Ufo.",
           "targetAtomId": "ufo",
           "blocks": [
             {
@@ -843,7 +843,7 @@
       "id": "l05-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Hut. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Hut.",
           "targetAtomId": "hut",
           "blocks": [
             {
@@ -867,7 +867,7 @@
       "id": "l05-t9",
       "rounds": [
         {
-          "promptTts": "Oma hat einen Hut. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Oma hat einen Hut.",
           "sentenceId": "s-oma-hat-hut",
           "illustrationAtomId": "hut",
           "blocks": []
@@ -1004,7 +1004,7 @@
       "id": "l06-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort rot. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort rot.",
           "targetAtomId": "rot",
           "blocks": [
             {
@@ -1028,7 +1028,7 @@
       "id": "l06-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Tor. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Tor.",
           "targetAtomId": "tor",
           "blocks": [
             {
@@ -1052,7 +1052,7 @@
       "id": "l06-t9",
       "rounds": [
         {
-          "promptTts": "Tom ruft Opa. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Tom ruft Opa.",
           "sentenceId": "s-tom-ruft-opa",
           "illustrationAtomId": "tom",
           "blocks": []
@@ -1173,7 +1173,7 @@
       "id": "l07-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Nest. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Nest.",
           "targetAtomId": "nest",
           "blocks": [
             {
@@ -1201,7 +1201,7 @@
       "id": "l07-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Rose. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Rose.",
           "targetAtomId": "rose",
           "blocks": [
             {
@@ -1221,7 +1221,7 @@
       "id": "l07-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Rose. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Rose.",
           "targetAtomId": "rose",
           "blocks": [
             {
@@ -1249,7 +1249,7 @@
       "id": "l07-t9",
       "rounds": [
         {
-          "promptTts": "Lama ist da. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Lama ist da.",
           "sentenceId": "s-lama-ist-da",
           "illustrationAtomId": "lama",
           "blocks": []
@@ -1369,7 +1369,7 @@
       "id": "l08-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Dose. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Dose.",
           "targetAtomId": "dose",
           "blocks": [
             {
@@ -1389,7 +1389,7 @@
       "id": "l08-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Keks. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Keks.",
           "targetAtomId": "keks",
           "blocks": [
             {
@@ -1417,7 +1417,7 @@
       "id": "l08-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Dose. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Dose.",
           "targetAtomId": "dose",
           "blocks": [
             {
@@ -1445,7 +1445,7 @@
       "id": "l08-t9",
       "rounds": [
         {
-          "promptTts": "Oma ist da. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Oma ist da.",
           "sentenceId": "s-oma-ist-da",
           "illustrationAtomId": "oma",
           "blocks": []
@@ -1565,7 +1565,7 @@
       "id": "l09-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Eis. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Eis.",
           "targetAtomId": "eis",
           "blocks": [
             {
@@ -1585,7 +1585,7 @@
       "id": "l09-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Kleid. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Kleid.",
           "targetAtomId": "kleid",
           "blocks": [
             {
@@ -1613,7 +1613,7 @@
       "id": "l09-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Wolke. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Wolke.",
           "targetAtomId": "wolke",
           "blocks": [
             {
@@ -1645,7 +1645,7 @@
       "id": "l09-t9",
       "rounds": [
         {
-          "promptTts": "Das ist mein Papa. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Das ist mein Papa.",
           "sentenceId": "s-das-ist-mein-papa",
           "illustrationAtomId": "papa",
           "blocks": []
@@ -1765,7 +1765,7 @@
       "id": "l10-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Weg. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Weg.",
           "targetAtomId": "weg",
           "blocks": [
             {
@@ -1789,7 +1789,7 @@
       "id": "l10-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Dach. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Dach.",
           "targetAtomId": "dach",
           "blocks": [
             {
@@ -1809,7 +1809,7 @@
       "id": "l10-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort ich. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort ich.",
           "targetAtomId": "ich",
           "blocks": [
             {
@@ -1829,7 +1829,7 @@
       "id": "l10-t9",
       "rounds": [
         {
-          "promptTts": "Wir gehen den Weg. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Wir gehen den Weg.",
           "sentenceId": "s-wir-gehen",
           "illustrationAtomId": "weg",
           "blocks": []
@@ -1950,7 +1950,7 @@
       "id": "l11-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Haus. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Haus.",
           "targetAtomId": "haus",
           "blocks": [
             {
@@ -1974,7 +1974,7 @@
       "id": "l11-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Baum. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Baum.",
           "targetAtomId": "baum",
           "blocks": [
             {
@@ -1998,7 +1998,7 @@
       "id": "l11-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Baum. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Baum.",
           "targetAtomId": "baum",
           "blocks": [
             {
@@ -2022,7 +2022,7 @@
       "id": "l11-t9",
       "rounds": [
         {
-          "promptTts": "Mama ist im Haus. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Mama ist im Haus.",
           "sentenceId": "s-mama-im-haus",
           "illustrationAtomId": "haus",
           "blocks": []
@@ -2139,7 +2139,7 @@
       "id": "l12-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Häuser. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Häuser.",
           "targetAtomId": "haeusser",
           "blocks": [
             {
@@ -2171,7 +2171,7 @@
       "id": "l12-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Bäume. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Bäume.",
           "targetAtomId": "baeume",
           "blocks": [
             {
@@ -2199,7 +2199,7 @@
       "id": "l12-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Rübe. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Rübe.",
           "targetAtomId": "ruebe",
           "blocks": [
             {
@@ -2223,7 +2223,7 @@
       "id": "l12-t9",
       "rounds": [
         {
-          "promptTts": "Hier sind Häuser. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Hier sind Häuser.",
           "sentenceId": "s-viele-haeuser",
           "illustrationAtomId": "haus",
           "blocks": []
@@ -2325,7 +2325,7 @@
       "id": "l13-t5",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Schuh. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Schuh.",
           "targetAtomId": "schuh",
           "blocks": [
             {
@@ -2345,7 +2345,7 @@
       "id": "l13-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Fisch. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Fisch.",
           "targetAtomId": "fisch",
           "blocks": [
             {
@@ -2369,7 +2369,7 @@
       "id": "l13-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Schaf. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Schaf.",
           "targetAtomId": "schaf",
           "blocks": [
             {
@@ -2393,7 +2393,7 @@
       "id": "l13-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Schule. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Schule.",
           "targetAtomId": "schule",
           "blocks": [
             {
@@ -2413,7 +2413,7 @@
       "id": "l13-t9",
       "rounds": [
         {
-          "promptTts": "Der Fisch schwimmt. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Der Fisch schwimmt.",
           "sentenceId": "s-fisch-schwimmt",
           "illustrationAtomId": "fisch",
           "blocks": []
@@ -2547,7 +2547,7 @@
       "id": "l14-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Zebra. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Zebra.",
           "targetAtomId": "zebra",
           "blocks": [
             {
@@ -2571,7 +2571,7 @@
       "id": "l14-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Eule. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Eule.",
           "targetAtomId": "eule",
           "blocks": [
             {
@@ -2591,7 +2591,7 @@
       "id": "l14-t9",
       "rounds": [
         {
-          "promptTts": "Die Eule fliegt. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Die Eule fliegt.",
           "sentenceId": "s-eule-fliegt",
           "illustrationAtomId": "eule",
           "blocks": []
@@ -2712,7 +2712,7 @@
       "id": "l15-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Fuß. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Fuß.",
           "targetAtomId": "fuss",
           "blocks": [
             {
@@ -2732,7 +2732,7 @@
       "id": "l15-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Vogel. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Vogel.",
           "targetAtomId": "vogel",
           "blocks": [
             {
@@ -2752,7 +2752,7 @@
       "id": "l15-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Vase. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Vase.",
           "targetAtomId": "vase",
           "blocks": [
             {
@@ -2772,7 +2772,7 @@
       "id": "l15-t9",
       "rounds": [
         {
-          "promptTts": "Der Fuß ist groß. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Der Fuß ist groß.",
           "sentenceId": "s-fuss-ist-gross",
           "illustrationAtomId": "fuss",
           "blocks": []
@@ -2893,7 +2893,7 @@
       "id": "l16-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Sack. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Sack.",
           "targetAtomId": "sack",
           "blocks": [
             {
@@ -2913,7 +2913,7 @@
       "id": "l16-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Apfel. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Apfel.",
           "targetAtomId": "apfel",
           "blocks": [
             {
@@ -2937,7 +2937,7 @@
       "id": "l16-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Pferd. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Pferd.",
           "targetAtomId": "pferd",
           "blocks": [
             {
@@ -2961,7 +2961,7 @@
       "id": "l16-t9",
       "rounds": [
         {
-          "promptTts": "Das Pferd läuft. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Das Pferd läuft.",
           "sentenceId": "s-pferd-laeuft",
           "illustrationAtomId": "pferd",
           "blocks": []
@@ -3099,7 +3099,7 @@
       "id": "l17-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Stern. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Stern.",
           "targetAtomId": "stern",
           "blocks": [
             {
@@ -3119,7 +3119,7 @@
       "id": "l17-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Spinne. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Spinne.",
           "targetAtomId": "spinne",
           "blocks": [
             {
@@ -3139,7 +3139,7 @@
       "id": "l17-t9",
       "rounds": [
         {
-          "promptTts": "Die Spinne spielt. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Die Spinne spielt.",
           "sentenceId": "s-spinne-spielt",
           "illustrationAtomId": "spinne",
           "blocks": []
@@ -3287,7 +3287,7 @@
       "id": "l18-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Qualle. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Qualle.",
           "targetAtomId": "qualle",
           "blocks": [
             {
@@ -3311,7 +3311,7 @@
       "id": "l18-t9",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Taxi. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Taxi.",
           "targetAtomId": "taxi",
           "blocks": [
             {
@@ -3335,7 +3335,7 @@
       "id": "l18-t10",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Pony. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Pony.",
           "targetAtomId": "pony",
           "blocks": [
             {
@@ -3355,7 +3355,7 @@
       "id": "l18-t11",
       "rounds": [
         {
-          "promptTts": "Das Taxi ist gelb. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Das Taxi ist gelb.",
           "sentenceId": "s-taxi-ist-gelb",
           "illustrationAtomId": "taxi",
           "blocks": []
@@ -3485,7 +3485,7 @@
       "id": "l19-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Mama. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Mama.",
           "targetAtomId": "mama",
           "blocks": [
             {
@@ -3505,7 +3505,7 @@
       "id": "l19-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort am. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort am.",
           "targetAtomId": "am",
           "blocks": [
             {
@@ -3649,7 +3649,7 @@
       "id": "l20-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Oma. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Oma.",
           "targetAtomId": "oma",
           "blocks": [
             {
@@ -3669,7 +3669,7 @@
       "id": "l20-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Mimi. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Mimi.",
           "targetAtomId": "mimi",
           "blocks": [
             {
@@ -3818,7 +3818,7 @@
       "id": "l21-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Papa. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Papa.",
           "targetAtomId": "papa",
           "blocks": [
             {
@@ -3838,7 +3838,7 @@
       "id": "l21-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Tom. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Tom.",
           "targetAtomId": "tom",
           "blocks": [
             {
@@ -3858,7 +3858,7 @@
       "id": "l21-t9",
       "rounds": [
         {
-          "promptTts": "Tom ruft Opa. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Tom ruft Opa.",
           "sentenceId": "s-tom-ruft-opa",
           "illustrationAtomId": "tom"
         }
@@ -3986,7 +3986,7 @@
       "id": "l22-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Ei. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Ei.",
           "targetAtomId": "ei",
           "blocks": [
             {
@@ -4002,7 +4002,7 @@
       "id": "l22-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Baum. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Baum.",
           "targetAtomId": "baum",
           "blocks": [
             {
@@ -4022,7 +4022,7 @@
       "id": "l22-t9",
       "rounds": [
         {
-          "promptTts": "Das ist mein Ei. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Das ist mein Ei.",
           "sentenceId": "s-das-ist-mein-ei",
           "illustrationAtomId": "ei"
         }
@@ -4151,7 +4151,7 @@
       "id": "l23-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Schuh. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Schuh.",
           "targetAtomId": "schuh",
           "blocks": [
             {
@@ -4171,7 +4171,7 @@
       "id": "l23-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Fisch. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Fisch.",
           "targetAtomId": "fisch",
           "blocks": [
             {
@@ -4191,7 +4191,7 @@
       "id": "l23-t9",
       "rounds": [
         {
-          "promptTts": "Der Fisch schwimmt. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Der Fisch schwimmt.",
           "sentenceId": "s-fisch-schwimmt",
           "illustrationAtomId": "fisch"
         }
@@ -4319,7 +4319,7 @@
       "id": "l24-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Stern. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Stern.",
           "targetAtomId": "stern",
           "blocks": [
             {
@@ -4347,7 +4347,7 @@
       "id": "l24-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Spinne. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Spinne.",
           "targetAtomId": "spinne",
           "blocks": [
             {
@@ -4375,7 +4375,7 @@
       "id": "l24-t9",
       "rounds": [
         {
-          "promptTts": "Die Spinne spielt. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Die Spinne spielt.",
           "sentenceId": "s-spinne-spielt",
           "illustrationAtomId": "spinne"
         }
@@ -4504,7 +4504,7 @@
       "id": "l25-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Löwe. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Löwe.",
           "targetAtomId": "loewe",
           "blocks": [
             {
@@ -4528,7 +4528,7 @@
       "id": "l25-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Rübe. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Rübe.",
           "targetAtomId": "ruebe",
           "blocks": [
             {
@@ -4552,7 +4552,7 @@
       "id": "l25-t9",
       "rounds": [
         {
-          "promptTts": "Der Löwe ist da. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Der Löwe ist da.",
           "sentenceId": "s-der-loewe-ist-da",
           "illustrationAtomId": "loewe"
         }
@@ -4680,7 +4680,7 @@
       "id": "l26-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Qualle. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Qualle.",
           "targetAtomId": "qualle",
           "blocks": [
             {
@@ -4708,7 +4708,7 @@
       "id": "l26-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Taxi. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.",
+          "promptTts": "Baue das Wort Taxi.",
           "targetAtomId": "taxi",
           "blocks": [
             {
@@ -4732,7 +4732,7 @@
       "id": "l26-t9",
       "rounds": [
         {
-          "promptTts": "Das Taxi ist gelb. - Ordne die Wörter in die richtige Reihenfolge.",
+          "promptTts": "Das Taxi ist gelb.",
           "sentenceId": "s-taxi-ist-gelb",
           "illustrationAtomId": "taxi"
         }
