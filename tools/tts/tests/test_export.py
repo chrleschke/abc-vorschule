@@ -8,7 +8,7 @@ import soundfile as sf
 from ttskit.cli import load_context
 from ttskit.export import asset_name, export_to_app
 from ttskit.paths import Paths
-from ttskit.plan import fingerprint
+from ttskit.plan import clip_key, fingerprint
 
 
 def make_paths(tmp_path: Path, content_dir: Path) -> Paths:
@@ -107,24 +107,136 @@ def test_sync_removes_orphaned_ogg_but_keeps_foreign_files(tmp_path, content_dir
     assert report.removed == ["word_000000000000.ogg"]
 
 
-def test_collision_prefers_word_over_phoneme(tmp_path, content_dir):
-    # "M" existiert als lemma (word) und als phonemeTts/stretchTts (phoneme).
+def test_letter_lemma_exports_as_single_phoneme_clip(tmp_path, content_dir):
+    # "M" aus letter-lemma, phonemeTts und stretchTts kollabiert zu einem Clip.
     paths = make_paths(tmp_path, content_dir)
     ctx = load_context(paths)
-    word_key = next(c.key for c in ctx.clips
-                    if c.source_text == "M" and c.profile == "word")
-    phoneme_key = next(c.key for c in ctx.clips
-                       if c.source_text == "M" and c.profile == "phoneme")
+    m_clips = [c for c in ctx.clips if c.source_text == "M"]
+    assert len(m_clips) == 1
+    assert m_clips[0].profile == "phoneme"
+    key = m_clips[0].key
+    lock_and_render(paths, key)
+
+    report = export_to_app(paths)
+
+    index = json.loads((paths.app_audio_dir / "index.json").read_text())
+    assert index["clips"]["M"]["profile"] == "phoneme"
+    assert report.warnings == []
+    assert (paths.app_audio_dir / asset_name(key)).exists()
+
+
+def dual_profile_content(tmp_path: Path) -> Path:
+    """Mini pack where the same text exists as word-lemma and phonemeTts."""
+    d = tmp_path / "dual"
+    d.mkdir()
+    (d / "atoms.json").write_text(json.dumps({"atoms": [
+        {"id": "word-x", "lemma": "X", "display": "X", "kind": "word"},
+    ]}), encoding="utf-8")
+    for name, key in (
+        ("sentences.json", "sentences"),
+        ("finales.json", "finales"),
+        ("lessons.json", "lessons"),
+    ):
+        (d / name).write_text(json.dumps({key: []}), encoding="utf-8")
+    (d / "tasks.json").write_text(json.dumps({"tasks": [
+        {"trainer": "sound_position", "id": "t1", "phonemeTts": "X", "rounds": []},
+    ]}), encoding="utf-8")
+    return d
+
+
+def test_collision_prefers_phoneme_over_word(tmp_path):
+    """Legacy: zwei Profile für denselben Text — phoneme gewinnt."""
+    paths = make_paths(tmp_path, dual_profile_content(tmp_path))
+    word_key = clip_key("word", "X")
+    phoneme_key = clip_key("phoneme", "X")
     lock_and_render(paths, word_key)
     lock_and_render(paths, phoneme_key)
 
     report = export_to_app(paths)
 
     index = json.loads((paths.app_audio_dir / "index.json").read_text())
-    assert index["clips"]["M"]["profile"] == "word"
-    assert any("M" in w for w in report.warnings)
-    # Beide OGGs liegen trotzdem da — nur der Index-Eintrag ist eindeutig.
+    assert index["clips"]["X"]["profile"] == "phoneme"
+    assert not report.warnings
+    assert (paths.app_audio_dir / asset_name(word_key)).exists()
     assert (paths.app_audio_dir / asset_name(phoneme_key)).exists()
+
+
+def test_collision_prefers_verified_audio(tmp_path):
+    """Ohne pädagogische Regel gewinnt verified Audio vor PROFILE_PRIORITY."""
+    d = tmp_path / "verified"
+    d.mkdir()
+    (d / "atoms.json").write_text(json.dumps({"atoms": []}), encoding="utf-8")
+    (d / "sentences.json").write_text(json.dumps({"sentences": []}), encoding="utf-8")
+    (d / "lessons.json").write_text(json.dumps({"lessons": []}), encoding="utf-8")
+    (d / "finales.json").write_text(json.dumps({"finales": [
+        {"id": "f1", "tts": "Nur ein Finale."},
+    ]}), encoding="utf-8")
+    (d / "tasks.json").write_text(json.dumps({"tasks": [
+        {"trainer": "sentence_order", "id": "t1", "rounds": [
+            {"promptTts": "Nur ein Finale.", "sentenceId": "s", "blocks": []},
+        ]},
+    ]}), encoding="utf-8")
+
+    paths = make_paths(tmp_path, d)
+    prompt_key = clip_key("prompt", "Nur ein Finale.")
+    finale_key = clip_key("finale", "Nur ein Finale.")
+    lock_and_render(paths, prompt_key)
+    lock_and_render(paths, finale_key)
+
+    first = export_to_app(paths)
+    assert len(first.exported) == 2
+
+    index_path = paths.app_audio_dir / "index.json"
+    index = json.loads(index_path.read_text())
+    ctx = load_context(paths)
+    finale_clip = next(c for c in ctx.clips if c.key == finale_key)
+    finale_fp = fingerprint(finale_clip, ctx.profiles.profiles["finale"])
+    index["clips"]["Nur ein Finale."] = {
+        "file": asset_name(finale_key),
+        "profile": "finale",
+        "fingerprint": finale_fp,
+    }
+    index_path.write_text(json.dumps(index, indent=2, ensure_ascii=False,
+                                     sort_keys=True) + "\n", encoding="utf-8")
+
+    report = export_to_app(paths)
+
+    index_after = json.loads(index_path.read_text())
+    assert index_after["clips"]["Nur ein Finale."]["profile"] == "finale"
+    assert index_after["clips"]["Nur ein Finale."]["fingerprint"] == finale_fp
+    assert any("Nur ein Finale." in w for w in report.warnings)
+
+
+def prompt_sentence_content(tmp_path: Path) -> Path:
+    """Same spoken text as Satz-Architekt prompt and sentence entry."""
+    d = tmp_path / "prompt-sentence"
+    d.mkdir()
+    (d / "atoms.json").write_text(json.dumps({"atoms": []}), encoding="utf-8")
+    (d / "sentences.json").write_text(json.dumps({"sentences": [
+        {"id": "s-test", "atomIds": [], "tts": "Hallo Lama!"},
+    ]}), encoding="utf-8")
+    for name, key in (("finales.json", "finales"), ("lessons.json", "lessons")):
+        (d / name).write_text(json.dumps({key: []}), encoding="utf-8")
+    (d / "tasks.json").write_text(json.dumps({"tasks": [
+        {"trainer": "sentence_order", "id": "t1", "rounds": [
+            {"promptTts": "Hallo Lama!", "sentenceId": "s-test", "blocks": []},
+        ]},
+    ]}), encoding="utf-8")
+    return d
+
+
+def test_collision_prefers_sentence_over_prompt_for_bare_sentence(tmp_path):
+    paths = make_paths(tmp_path, prompt_sentence_content(tmp_path))
+    prompt_key = clip_key("prompt", "Hallo Lama!")
+    sentence_key = clip_key("sentence", "Hallo Lama!")
+    lock_and_render(paths, prompt_key)
+    lock_and_render(paths, sentence_key)
+
+    report = export_to_app(paths)
+
+    index = json.loads((paths.app_audio_dir / "index.json").read_text())
+    assert index["clips"]["Hallo Lama!"]["profile"] == "sentence"
+    assert not report.warnings
 
 
 def test_fresh_checkout_keeps_existing_assets_when_local_state_missing(tmp_path, content_dir):

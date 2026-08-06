@@ -134,7 +134,7 @@ fun LetterTraceTrainer(
                             atom = atom,
                             state = state,
                             vehicle = vehicle,
-                            onFinger = { finger, boxSize, strokes, stars ->
+                            onFinger = { finger, boxSize, corridorFraction, strokes, stars ->
                                 if (done || resolved) return@TraceCanvas
                                 val update = TraceProgress.update(
                                     state = state,
@@ -143,6 +143,7 @@ fun LetterTraceTrainer(
                                     stars = stars,
                                     boxSize = boxSize,
                                     previousFinger = lastFinger,
+                                    corridorFraction = corridorFraction,
                                 )
                                 if (update.offCorridor) {
                                     // Edge-triggered: one short nudge per excursion, never one per
@@ -263,16 +264,23 @@ private fun TraceRewardCard(
  * handler and the draw scope so hit-testing and rendering never drift apart. */
 private data class TraceLayout(
     val boxSize: Float,
+    val corridorFraction: Float,
     val strokes: List<List<TracePoint>>,
     val stars: List<List<TracePoint>>,
 )
 
 private fun buildTraceLayout(atom: Atom, boxSize: Float): TraceLayout {
-    val strokes = TraceGeometry.toPixels(atom.strokes, boxSize, TracePoint(0f, 0f))
+    val fit = TraceProgress.fitFor(atom.lemma)
+    val strokes = TraceGeometry.toPixels(
+        strokes = atom.strokes,
+        boxSize = boxSize,
+        origin = TracePoint(0f, 0f),
+        heightScale = fit.heightScale,
+    )
     val stars = strokes.map {
         TraceGeometry.starPositions(it, TraceProgress.starCountFor(TraceGeometry.polylineLength(it), boxSize))
     }
-    return TraceLayout(boxSize, strokes, stars)
+    return TraceLayout(boxSize, fit.corridorFraction, strokes, stars)
 }
 
 @Composable
@@ -283,6 +291,7 @@ private fun TraceCanvas(
     onFinger: (
         finger: TracePoint,
         boxSize: Float,
+        corridorFraction: Float,
         strokes: List<List<TracePoint>>,
         stars: List<List<TracePoint>>,
     ) -> Unit,
@@ -293,7 +302,7 @@ private fun TraceCanvas(
     // computed once and shared by both the gesture handler and the draw scope,
     // instead of each recomputing strokes/stars from their own size source.
     val boxSizePx = remember(density) { with(density) { GlyphBox.toPx() } }
-    val layout = remember(atom.id, boxSizePx) { buildTraceLayout(atom, boxSizePx) }
+    val layout = remember(atom.id, atom.lemma, boxSizePx) { buildTraceLayout(atom, boxSizePx) }
 
     // One animation for the whole glyph instead of one per stroke: animating the
     // stroke *index* keeps the number of animation calls independent of how many
@@ -313,6 +322,7 @@ private fun TraceCanvas(
                         onFinger(
                             TracePoint(change.position.x, change.position.y),
                             layout.boxSize,
+                            layout.corridorFraction,
                             layout.strokes,
                             layout.stars,
                         )
@@ -329,12 +339,20 @@ private fun TraceCanvas(
                         val target = layout.stars.getOrNull(state.strokeIndex)
                             ?.getOrNull(state.starIndex)
                             ?: return@detectTapGestures
-                        onFinger(target, layout.boxSize, layout.strokes, layout.stars)
+                        onFinger(
+                            target,
+                            layout.boxSize,
+                            layout.corridorFraction,
+                            layout.strokes,
+                            layout.stars,
+                        )
                     },
                 )
             },
     ) {
-        val corridor = layout.boxSize * TraceProgress.CorridorFraction
+        val corridor = layout.boxSize * layout.corridorFraction
+        // Keep the red vehicle and stars in proportion to the (possibly thinner) road.
+        val chromeScale = layout.corridorFraction / TraceProgress.CorridorFraction
 
         val order = TraceGeometry.strokeDrawOrder(layout.strokes.size, state.strokeIndex)
 
@@ -408,7 +426,7 @@ private fun TraceCanvas(
                     // "reward" hue. The inactive stars keep the same faded alpha on both
                     // fill and outline so they read as one dimmed shape, not two layers.
                     outline = if (active) StarGoldDeep else StarGoldDeep.copy(alpha = 0.35f),
-                    outerRadius = layout.boxSize * if (next) 0.055f else 0.042f,
+                    outerRadius = layout.boxSize * chromeScale * if (next) 0.055f else 0.042f,
                 )
             }
         }
@@ -416,7 +434,7 @@ private fun TraceCanvas(
         if (car != null) {
             drawCircle(
                 color = SunCoral,
-                radius = layout.boxSize * 0.055f,
+                radius = layout.boxSize * 0.055f * chromeScale,
                 center = Offset(car.x, car.y),
             )
         }

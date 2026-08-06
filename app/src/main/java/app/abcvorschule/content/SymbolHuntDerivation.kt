@@ -6,10 +6,26 @@ package app.abcvorschule.content
  * [SymbolHuntRound] itself. No JSON is read here beyond what [ContentPack] already
  * parsed — see design doc §3 for the rules this implements.
  */
+/** Which base hunt prompt applies — Buchstabe vs Laut vs Silbe naming. */
+enum class SymbolHuntPromptKind { Buchstabe, Laut, Silbe }
+
 object SymbolHuntDerivation {
-    private const val PromptLetterTemplate = "Finde alle Buchstaben - %s!"
-    private const val PromptDigraphTemplate = "Finde alle Laute - %s!"
-    private const val PromptSyllableTemplate = "Finde alle Silben %s!"
+    /** Base Qwen prompt clips — grapheme is spoken separately (phoneme lemma). */
+    const val PromptLetter = "Finde alle Buchstaben"
+    const val PromptDigraph = "Finde alle Laute"
+    const val PromptSyllable = "Finde alle Silben"
+
+    fun promptKind(mode: SymbolHuntMode, target: Atom): SymbolHuntPromptKind = when {
+        mode == SymbolHuntMode.syllable -> SymbolHuntPromptKind.Silbe
+        target.display.length > 1 -> SymbolHuntPromptKind.Laut
+        else -> SymbolHuntPromptKind.Buchstabe
+    }
+
+    fun promptText(kind: SymbolHuntPromptKind): String = when (kind) {
+        SymbolHuntPromptKind.Buchstabe -> PromptLetter
+        SymbolHuntPromptKind.Laut -> PromptDigraph
+        SymbolHuntPromptKind.Silbe -> PromptSyllable
+    }
 
     /**
      * Distractor pool for [targetAtomId]: atoms of the eligible kind for [mode],
@@ -69,13 +85,8 @@ object SymbolHuntDerivation {
         if (mode == SymbolHuntMode.syllable && target.kind != AtomKind.syllable) return null
         val pool = distractorPool(pack, currentLessonIndex, mode, targetAtomId)
         if (pool.isEmpty()) return null
-        val template = when {
-            mode == SymbolHuntMode.syllable -> PromptSyllableTemplate
-            target.display.length > 1 -> PromptDigraphTemplate
-            else -> PromptLetterTemplate
-        }
         return SymbolHuntRound(
-            promptTts = template.format(target.display),
+            promptTts = promptText(promptKind(mode, target)),
             targetAtomId = targetAtomId,
             mode = mode,
             distractorPool = pool,

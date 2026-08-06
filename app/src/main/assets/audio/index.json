@@ -1,29 +1,59 @@
 {
   "clips": {
     "A": {
-      "file": "word_559aead08264.ogg",
-      "fingerprint": "4572b13d60cdbff4",
-      "profile": "word"
+      "file": "phoneme_559aead08264.ogg",
+      "fingerprint": "4ef223c74592d9f7",
+      "profile": "phoneme"
     },
     "A - wie Ampel.": {
       "file": "reward_801e163efb4c.ogg",
       "fingerprint": "55a884c1ffda44aa",
       "profile": "reward"
     },
+    "Acht Lamas und sechs Lamas. Wie viele Lamas sind das.": {
+      "file": "prompt_6a071b523412.ogg",
+      "fingerprint": "29cb9b3a2f1b6204",
+      "profile": "prompt"
+    },
+    "Acht Omas winken. Drei Omas gehen nach Hause. Wie viele Omas bleiben.": {
+      "file": "prompt_b5001897a747.ogg",
+      "fingerprint": "a55fa1cae9d1ac09",
+      "profile": "prompt"
+    },
+    "Achtundzwanzig Omas sitzen im Bus. Dreizehn steigen aus. Wie viele Omas bleiben.": {
+      "file": "prompt_2ea792b257f1.ogg",
+      "fingerprint": "8e26cc70973a3b81",
+      "profile": "prompt"
+    },
+    "Achtzehn Bücher stehen im Regal. Neun werden ausgeliehen. Wie viele Bücher bleiben.": {
+      "file": "prompt_a07da5261a62.ogg",
+      "fingerprint": "fb0c25fdb3c0f4f9",
+      "profile": "prompt"
+    },
     "Affe": {
       "file": "word_63669810c995.ogg",
-      "fingerprint": "ad9a296577ae3de1",
+      "fingerprint": "a3e837bfe15e946f",
+      "profile": "word"
+    },
+    "Ameise": {
+      "file": "word_e89bbd48dc17.ogg",
+      "fingerprint": "0ffb4835bf5ebbcf",
       "profile": "word"
     },
     "Ampel": {
       "file": "word_85abd7fdb6fb.ogg",
-      "fingerprint": "f4115fbee583a4d1",
+      "fingerprint": "da43491e646eb2cd",
+      "profile": "word"
+    },
+    "Apfel": {
+      "file": "word_c55dcf4319da.ogg",
+      "fingerprint": "7f59e9f530c52bbc",
       "profile": "word"
     },
     "Au": {
-      "file": "word_3325c2b56f2b.ogg",
-      "fingerprint": "b9042c0b041eeee4",
-      "profile": "word"
+      "file": "phoneme_3325c2b56f2b.ogg",
+      "fingerprint": "a8bb8a63f23283ae",
+      "profile": "phoneme"
     },
     "Au - wie Auto.": {
       "file": "reward_3baa94bb94fe.ogg",
@@ -32,8 +62,13 @@
     },
     "Auto": {
       "file": "word_0286249762f7.ogg",
-      "fingerprint": "368c3f297400a952",
+      "fingerprint": "6a432a43f4840ce8",
       "profile": "word"
+    },
+    "B": {
+      "file": "phoneme_df7e70e50215.ogg",
+      "fingerprint": "954833d3ac06f072",
+      "profile": "phoneme"
     },
     "B - wie Ball.": {
       "file": "reward_c15c2f3980ee.ogg",
@@ -42,68 +77,308 @@
     },
     "Bahn": {
       "file": "word_457c6acc7a9f.ogg",
-      "fingerprint": "65c760473bc008d8",
+      "fingerprint": "a521f198a2fb95af",
       "profile": "word"
     },
-    "Baue das Wort Eis. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
-      "file": "prompt_206bc14a3673.ogg",
-      "fingerprint": "69d0c94cdd146f6a",
+    "Ball": {
+      "file": "word_ae5859eceacb.ogg",
+      "fingerprint": "25634d9b6859f995",
+      "profile": "word"
+    },
+    "Baue das Wort Apfel.": {
+      "file": "prompt_9dfc4e87e01d.ogg",
+      "fingerprint": "3b6e92d94b1fc07f",
       "profile": "prompt"
     },
-    "Baue das Wort Fisch. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
-      "file": "prompt_2811c87d47db.ogg",
-      "fingerprint": "7e047f8c9e7773cb",
+    "Baue das Wort Baum.": {
+      "file": "prompt_82b3474e488e.ogg",
+      "fingerprint": "b60773f5a77d46fa",
       "profile": "prompt"
     },
-    "Baue das Wort Pferd. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
-      "file": "prompt_14a73343a0ea.ogg",
-      "fingerprint": "44a157084d102cde",
+    "Baue das Wort Bäume.": {
+      "file": "prompt_c0d2012b82dd.ogg",
+      "fingerprint": "5b6c89b59e122765",
       "profile": "prompt"
     },
-    "Baue das Wort Pony. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
-      "file": "prompt_1eb1ad800136.ogg",
-      "fingerprint": "66ef670002bc93e3",
+    "Baue das Wort Dach.": {
+      "file": "prompt_8b3e3cbec164.ogg",
+      "fingerprint": "92d0b6000f925d4d",
       "profile": "prompt"
     },
-    "Baue das Wort Qualle. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
-      "file": "prompt_16690400e619.ogg",
-      "fingerprint": "dc62c3aef19171a5",
+    "Baue das Wort Dose.": {
+      "file": "prompt_8f690f34b4df.ogg",
+      "fingerprint": "9d3c9f1be27c1224",
       "profile": "prompt"
     },
-    "Baue das Wort am. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge.": {
-      "file": "prompt_09c5df39f465.ogg",
-      "fingerprint": "b90c0682213f6eac",
+    "Baue das Wort Ei.": {
+      "file": "prompt_e42717f14a4e.ogg",
+      "fingerprint": "90d6ccb694fd360c",
+      "profile": "prompt"
+    },
+    "Baue das Wort Eis.": {
+      "file": "prompt_0a6efa155470.ogg",
+      "fingerprint": "de3cdc15b820db6e",
+      "profile": "prompt"
+    },
+    "Baue das Wort Eule.": {
+      "file": "prompt_0707faec5679.ogg",
+      "fingerprint": "6e1737e29b41a074",
+      "profile": "prompt"
+    },
+    "Baue das Wort Fisch.": {
+      "file": "prompt_ec2b8744fa9f.ogg",
+      "fingerprint": "998e81e3c590b177",
+      "profile": "prompt"
+    },
+    "Baue das Wort Fuß.": {
+      "file": "prompt_01546e9fe28f.ogg",
+      "fingerprint": "08c570194826d367",
+      "profile": "prompt"
+    },
+    "Baue das Wort Hallo.": {
+      "file": "prompt_e2d9e26fc1a5.ogg",
+      "fingerprint": "88fd3193d97f57f0",
+      "profile": "prompt"
+    },
+    "Baue das Wort Haus.": {
+      "file": "prompt_7fe0dd6d004c.ogg",
+      "fingerprint": "980618d66580a48c",
+      "profile": "prompt"
+    },
+    "Baue das Wort Hut.": {
+      "file": "prompt_44d371ae00ce.ogg",
+      "fingerprint": "cc328a552470af48",
+      "profile": "prompt"
+    },
+    "Baue das Wort Häuser.": {
+      "file": "prompt_1a5f2b2f0f17.ogg",
+      "fingerprint": "5a7fc35292d13be4",
+      "profile": "prompt"
+    },
+    "Baue das Wort Keks.": {
+      "file": "prompt_11df2bbfe668.ogg",
+      "fingerprint": "fb324435a6b4e02a",
+      "profile": "prompt"
+    },
+    "Baue das Wort Kleid.": {
+      "file": "prompt_e4aa0b2d7a35.ogg",
+      "fingerprint": "4197d684d1b4ebe0",
+      "profile": "prompt"
+    },
+    "Baue das Wort Lama.": {
+      "file": "prompt_8bf7aca47f8d.ogg",
+      "fingerprint": "432b9310e7815c98",
+      "profile": "prompt"
+    },
+    "Baue das Wort Löwe.": {
+      "file": "prompt_c9a3e92020e7.ogg",
+      "fingerprint": "0826040b2d92fe5d",
+      "profile": "prompt"
+    },
+    "Baue das Wort Mama.": {
+      "file": "prompt_a6e0cc0680cc.ogg",
+      "fingerprint": "91740a7482f284c1",
+      "profile": "prompt"
+    },
+    "Baue das Wort Mimi.": {
+      "file": "prompt_9a122ef89769.ogg",
+      "fingerprint": "75b52ae184da0a76",
+      "profile": "prompt"
+    },
+    "Baue das Wort Nest.": {
+      "file": "prompt_933d817b0d4e.ogg",
+      "fingerprint": "677dff44df220ae9",
+      "profile": "prompt"
+    },
+    "Baue das Wort Oma.": {
+      "file": "prompt_2856adbf5b46.ogg",
+      "fingerprint": "a1d9f5ba314dd37f",
+      "profile": "prompt"
+    },
+    "Baue das Wort Opa.": {
+      "file": "prompt_a4f538f3cef1.ogg",
+      "fingerprint": "9c1937762668c8e5",
+      "profile": "prompt"
+    },
+    "Baue das Wort Papa.": {
+      "file": "prompt_973dab3ff238.ogg",
+      "fingerprint": "82ad1945d7d36e9c",
+      "profile": "prompt"
+    },
+    "Baue das Wort Pferd.": {
+      "file": "prompt_7438d9705028.ogg",
+      "fingerprint": "c98e4493e9ef37c5",
+      "profile": "prompt"
+    },
+    "Baue das Wort Pony.": {
+      "file": "prompt_66620186b3ef.ogg",
+      "fingerprint": "6390afcae7e364f7",
+      "profile": "prompt"
+    },
+    "Baue das Wort Qualle.": {
+      "file": "prompt_e686e893ca27.ogg",
+      "fingerprint": "e159dd981fce4337",
+      "profile": "prompt"
+    },
+    "Baue das Wort Rose.": {
+      "file": "prompt_cae0da484ea6.ogg",
+      "fingerprint": "4b527da5452711aa",
+      "profile": "prompt"
+    },
+    "Baue das Wort Rübe.": {
+      "file": "prompt_c2967347ec55.ogg",
+      "fingerprint": "41019773c765d980",
+      "profile": "prompt"
+    },
+    "Baue das Wort Sack.": {
+      "file": "prompt_c8fdff2401c5.ogg",
+      "fingerprint": "d157f816d195e9ca",
+      "profile": "prompt"
+    },
+    "Baue das Wort Schaf.": {
+      "file": "prompt_ac8e54317a0d.ogg",
+      "fingerprint": "9da7f3b7bca663be",
+      "profile": "prompt"
+    },
+    "Baue das Wort Schuh.": {
+      "file": "prompt_0e20fa25883b.ogg",
+      "fingerprint": "b2f37f70bea24dde",
+      "profile": "prompt"
+    },
+    "Baue das Wort Schule.": {
+      "file": "prompt_c7b443142a7e.ogg",
+      "fingerprint": "2391a425a00a5a1e",
+      "profile": "prompt"
+    },
+    "Baue das Wort Spinne.": {
+      "file": "prompt_8a82cbf13440.ogg",
+      "fingerprint": "d2258cdffefac7df",
+      "profile": "prompt"
+    },
+    "Baue das Wort Stern.": {
+      "file": "prompt_2c1e0264970e.ogg",
+      "fingerprint": "5405652846947fff",
+      "profile": "prompt"
+    },
+    "Baue das Wort Taxi.": {
+      "file": "prompt_b0622a492cdc.ogg",
+      "fingerprint": "9338abe303a52fda",
+      "profile": "prompt"
+    },
+    "Baue das Wort Tom.": {
+      "file": "prompt_dbd6a81752d5.ogg",
+      "fingerprint": "e14ffa296f78f624",
+      "profile": "prompt"
+    },
+    "Baue das Wort Tor.": {
+      "file": "prompt_cc4a08f91fa0.ogg",
+      "fingerprint": "8018b723d3f31be9",
+      "profile": "prompt"
+    },
+    "Baue das Wort Ufo.": {
+      "file": "prompt_54639eb75ea4.ogg",
+      "fingerprint": "48fd11072a0040db",
+      "profile": "prompt"
+    },
+    "Baue das Wort Vase.": {
+      "file": "prompt_b0bdf8a04cdb.ogg",
+      "fingerprint": "63589bb99b2159f2",
+      "profile": "prompt"
+    },
+    "Baue das Wort Vogel.": {
+      "file": "prompt_5ae3adaaec2c.ogg",
+      "fingerprint": "f43ca035ddde142d",
+      "profile": "prompt"
+    },
+    "Baue das Wort Weg.": {
+      "file": "prompt_0755cbe9db0e.ogg",
+      "fingerprint": "f463623bcc65640e",
+      "profile": "prompt"
+    },
+    "Baue das Wort Wolke.": {
+      "file": "prompt_46b322b41250.ogg",
+      "fingerprint": "668ecf9d3fa1cc11",
+      "profile": "prompt"
+    },
+    "Baue das Wort Zebra.": {
+      "file": "prompt_bf10feb3fdd8.ogg",
+      "fingerprint": "62c6c75e48ad6a0b",
+      "profile": "prompt"
+    },
+    "Baue das Wort am.": {
+      "file": "prompt_4e3e2a7fda4c.ogg",
+      "fingerprint": "7a104bda00900c1a",
+      "profile": "prompt"
+    },
+    "Baue das Wort ich.": {
+      "file": "prompt_409f4158455c.ogg",
+      "fingerprint": "45510fa801ff9824",
+      "profile": "prompt"
+    },
+    "Baue das Wort rot.": {
+      "file": "prompt_4a84bca05435.ogg",
+      "fingerprint": "519db39d3ac43eec",
       "profile": "prompt"
     },
     "Baum": {
       "file": "word_430db59c91b3.ogg",
-      "fingerprint": "8926a1e327a70965",
+      "fingerprint": "42634129fb06d24c",
       "profile": "word"
     },
     "Biene": {
       "file": "word_49530e11d87d.ogg",
-      "fingerprint": "7f7a91e44aea869a",
+      "fingerprint": "b97499fcef92ba17",
       "profile": "word"
     },
     "Blatt": {
       "file": "word_9aee3b7acf70.ogg",
-      "fingerprint": "9a4387141ab52177",
+      "fingerprint": "8c61e2bd6e2b1100",
+      "profile": "word"
+    },
+    "Blitz": {
+      "file": "word_ca6744f733d5.ogg",
+      "fingerprint": "f08a0da30f0fd878",
+      "profile": "word"
+    },
+    "Brot": {
+      "file": "word_ef53751671e5.ogg",
+      "fingerprint": "d0a29ffa80b27b45",
       "profile": "word"
     },
     "Buch": {
       "file": "word_5f36321c4299.ogg",
-      "fingerprint": "9b11ba7ccc90b923",
+      "fingerprint": "30285340f4f88b29",
+      "profile": "word"
+    },
+    "Bus": {
+      "file": "word_bb3d83ff198b.ogg",
+      "fingerprint": "39e3c7692c1d6b53",
+      "profile": "word"
+    },
+    "Bär": {
+      "file": "word_f00b1e56865e.ogg",
+      "fingerprint": "fdc7ec2220ae3344",
+      "profile": "word"
+    },
+    "Bäume": {
+      "file": "word_f5252953fc2d.ogg",
+      "fingerprint": "a9a8a9f96c1f0175",
       "profile": "word"
     },
     "C": {
-      "file": "word_6b23c0d5f35d.ogg",
-      "fingerprint": "19d86636ec0c078a",
-      "profile": "word"
+      "file": "phoneme_6b23c0d5f35d.ogg",
+      "fingerprint": "2638a00ee78f290c",
+      "profile": "phoneme"
     },
     "C - wie Clown.": {
       "file": "reward_fbabe6da0dd9.ogg",
       "fingerprint": "97aa615ac645e85f",
       "profile": "reward"
+    },
+    "Ch": {
+      "file": "phoneme_ddc7790c82c5.ogg",
+      "fingerprint": "9722fc65802ef4c5",
+      "profile": "phoneme"
     },
     "Ch - wie Dach.": {
       "file": "reward_d0d28be43a2b.ogg",
@@ -112,13 +387,13 @@
     },
     "Clown": {
       "file": "word_192da8644770.ogg",
-      "fingerprint": "abcadf55643359f3",
+      "fingerprint": "d8ca44ca82d790c3",
       "profile": "word"
     },
     "D": {
-      "file": "word_3f39d5c348e5.ogg",
-      "fingerprint": "dce5b99b2ef9b971",
-      "profile": "word"
+      "file": "phoneme_3f39d5c348e5.ogg",
+      "fingerprint": "a00fb1d58470cc8f",
+      "profile": "phoneme"
     },
     "D - wie Dose.": {
       "file": "reward_f6be5ef80851.ogg",
@@ -127,7 +402,7 @@
     },
     "Dach": {
       "file": "word_8baebabc53fb.ogg",
-      "fingerprint": "73099468c5b5d4a3",
+      "fingerprint": "79af06504782f442",
       "profile": "word"
     },
     "Das Auto ist gelb.": {
@@ -145,14 +420,39 @@
       "fingerprint": "d58479867008b892",
       "profile": "sentence"
     },
+    "Das Lama hat einen roten Hut!": {
+      "file": "finale_c485debfc347.ogg",
+      "fingerprint": "fabe85aa1180f100",
+      "profile": "finale"
+    },
+    "Das Pferd knackt den Sack!": {
+      "file": "finale_707f64819467.ogg",
+      "fingerprint": "0ad1f0f7b9bd72e5",
+      "profile": "finale"
+    },
     "Das Pferd läuft.": {
       "file": "sentence_410190d7c985.ogg",
       "fingerprint": "528ecfb1cd594d1c",
       "profile": "sentence"
     },
+    "Das Quadrat ist gelb.": {
+      "file": "sentence_a2b1bcad9ae8.ogg",
+      "fingerprint": "048d4daa9395dda7",
+      "profile": "sentence"
+    },
     "Das Schaf steckt im Schuh!": {
       "file": "finale_8b3b7e980b81.ogg",
       "fingerprint": "d3d66a340879baad",
+      "profile": "finale"
+    },
+    "Das Taxi ist gelb.": {
+      "file": "sentence_f4e12abcc256.ogg",
+      "fingerprint": "1f006776040669d5",
+      "profile": "sentence"
+    },
+    "Das Zebra jongliert mit dem Jojo!": {
+      "file": "finale_e606bd089e5c.ogg",
+      "fingerprint": "a7cac790e1c171da",
       "profile": "finale"
     },
     "Das ist mein Brot.": {
@@ -165,14 +465,49 @@
       "fingerprint": "34aad92c8d060b81",
       "profile": "sentence"
     },
+    "Das ist mein Papa.": {
+      "file": "sentence_dd996e27ce1b.ogg",
+      "fingerprint": "00532d5d135df5ee",
+      "profile": "sentence"
+    },
+    "Das üben wir später.": {
+      "file": "ui_8d0d96ca4976.ogg",
+      "fingerprint": "38314d1a9105594f",
+      "profile": "ui"
+    },
+    "Deine Nase ist rot wie eine Rose.": {
+      "file": "finale_349ab3496772.ogg",
+      "fingerprint": "c013a7ce0b3eb1ea",
+      "profile": "finale"
+    },
+    "Der Ball saust aus dem Haus!": {
+      "file": "finale_432530c2ebab.ogg",
+      "fingerprint": "5661a6262cbeb6b0",
+      "profile": "finale"
+    },
     "Der Fisch schwimmt.": {
       "file": "sentence_2723db5e341b.ogg",
       "fingerprint": "18bd03adbdb5dac1",
       "profile": "sentence"
     },
+    "Der Fuchs futtert den Kuchen!": {
+      "file": "finale_d10867c62ad2.ogg",
+      "fingerprint": "c99598491ba15cd0",
+      "profile": "finale"
+    },
+    "Der Fuchs schläft im Nest!": {
+      "file": "finale_2ec9117f069f.ogg",
+      "fingerprint": "67ad6fc03ec4982c",
+      "profile": "finale"
+    },
     "Der Fuß ist groß.": {
       "file": "sentence_5da5adfeaff0.ogg",
       "fingerprint": "b24acb9a5ac85ddc",
+      "profile": "sentence"
+    },
+    "Der Hase ist im Sand.": {
+      "file": "sentence_f35268d13ff1.ogg",
+      "fingerprint": "94921d96571ba74c",
       "profile": "sentence"
     },
     "Der Kreis ist blau.": {
@@ -185,6 +520,41 @@
       "fingerprint": "ed07f4e0ffe75983",
       "profile": "sentence"
     },
+    "Der Löwe klaut die Rübe!": {
+      "file": "finale_0e8f74fbfac5.ogg",
+      "fingerprint": "11d99fcf39864097",
+      "profile": "finale"
+    },
+    "Der Vogel klaut die Vase!": {
+      "file": "finale_f0c434302046.ogg",
+      "fingerprint": "2341d8be9207d987",
+      "profile": "finale"
+    },
+    "Der Wal will mein Eis!": {
+      "file": "finale_bd0296f21a30.ogg",
+      "fingerprint": "6558a02003007065",
+      "profile": "finale"
+    },
+    "Die Eule fliegt.": {
+      "file": "sentence_9d87d18b56ec.ogg",
+      "fingerprint": "e242444638879bdb",
+      "profile": "sentence"
+    },
+    "Die Giraffe angelt auf dem Dach!": {
+      "file": "finale_6d4e1b202977.ogg",
+      "fingerprint": "c16c42310e6e3add",
+      "profile": "finale"
+    },
+    "Die Katze klaut den Keks!": {
+      "file": "finale_172373132f57.ogg",
+      "fingerprint": "c2aff431c1cc9469",
+      "profile": "finale"
+    },
+    "Die Qualle quetscht sich ins Taxi!": {
+      "file": "finale_f7ea0a9a8437.ogg",
+      "fingerprint": "39ad95855d84e268",
+      "profile": "finale"
+    },
     "Die Spinne spielt.": {
       "file": "sentence_147f2a0d4995.ogg",
       "fingerprint": "3dc03f44a8de1cdb",
@@ -192,22 +562,42 @@
     },
     "Dino": {
       "file": "word_6fb86a981cf3.ogg",
-      "fingerprint": "7ac98d18dd859bd2",
+      "fingerprint": "acbed9ef5a00cbf6",
       "profile": "word"
     },
     "Dose": {
       "file": "word_6b942766c4e4.ogg",
-      "fingerprint": "402af6ffd9e4712c",
+      "fingerprint": "6236df1c9828c870",
       "profile": "word"
     },
     "Drache": {
       "file": "word_8adddb6ce265.ogg",
-      "fingerprint": "ef9b1cd88eadc5c0",
+      "fingerprint": "1ab91ea6c30e9786",
       "profile": "word"
+    },
+    "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das.": {
+      "file": "prompt_2f9dd72c4bd9.ogg",
+      "fingerprint": "65931ee389b2df33",
+      "profile": "prompt"
+    },
+    "Drei Reihen mit je drei Rosen blühen im Beet. Wie viele Rosen sind das.": {
+      "file": "prompt_fe60efbe2dc0.ogg",
+      "fingerprint": "a53b7ba963caa9ce",
+      "profile": "prompt"
+    },
+    "Drei Reihen mit je sechs Vögeln sitzen auf den Leitungen. Wie viele Vögel sind das.": {
+      "file": "prompt_7cc3b5a2d992.ogg",
+      "fingerprint": "6d3e135ece712f53",
+      "profile": "prompt"
+    },
+    "Drei Reihen mit je vier Dosen stehen im Regal. Wie viele Dosen sind das.": {
+      "file": "prompt_40d5b5a4d5c5.ogg",
+      "fingerprint": "5d5913f4890578bc",
+      "profile": "prompt"
     },
     "Dreieck": {
       "file": "word_be39f4733f40.ogg",
-      "fingerprint": "9776bc12dcad8634",
+      "fingerprint": "50f82baadf42d821",
       "profile": "word"
     },
     "Dreiundzwanzig Ameisen krabbeln im Bau. Acht krabbeln hinaus. Wie viele Ameisen bleiben.": {
@@ -215,10 +605,30 @@
       "fingerprint": "47572338490c3b1b",
       "profile": "prompt"
     },
+    "Dreiundzwanzig Vögel sitzen auf dem Dach. Neun fliegen weg. Wie viele Vögel bleiben.": {
+      "file": "prompt_28186eaa3467.ogg",
+      "fingerprint": "da1c8806674861e1",
+      "profile": "prompt"
+    },
     "Dreizehn Dosen und sieben Dosen. Wie viele Dosen sind das.": {
       "file": "prompt_0becb71d5e8b.ogg",
       "fingerprint": "387a2fc0ff480f64",
       "profile": "prompt"
+    },
+    "Dreißig Füße stampfen. Fünfzehn hören auf. Wie viele Füße stampfen noch.": {
+      "file": "prompt_fb1ab15a1e92.ogg",
+      "fingerprint": "1a0128bc05468d01",
+      "profile": "prompt"
+    },
+    "Dreißig Taxis warten am Bahnhof. Siebzehn fahren los. Wie viele Taxis bleiben.": {
+      "file": "prompt_551d6711fe39.ogg",
+      "fingerprint": "8c59120ad4cd4f5b",
+      "profile": "prompt"
+    },
+    "E": {
+      "file": "phoneme_a9f51566bd67.ogg",
+      "fingerprint": "8c6fd00a17f77151",
+      "profile": "phoneme"
     },
     "E - wie Ente.": {
       "file": "reward_6f74e614425c.ogg",
@@ -226,13 +636,13 @@
       "profile": "reward"
     },
     "Ei": {
-      "file": "word_a252f7aeeb24.ogg",
-      "fingerprint": "71194ea5ddc52e51",
-      "profile": "word"
+      "file": "phoneme_a252f7aeeb24.ogg",
+      "fingerprint": "d530fe0a8dd6e8fe",
+      "profile": "phoneme"
     },
-    "Ei - wie Ei.": {
-      "file": "reward_623572d8f348.ogg",
-      "fingerprint": "171c5c80ad7b7dca",
+    "Ei - wie Eimer.": {
+      "file": "reward_77257c5e8de1.ogg",
+      "fingerprint": "48b2ad3b89872c91",
       "profile": "reward"
     },
     "Ei - wie Eis.": {
@@ -240,30 +650,60 @@
       "fingerprint": "9115865eb8e10d25",
       "profile": "reward"
     },
+    "Ei.": {
+      "file": "miss_1bdb9dfabccf.ogg",
+      "fingerprint": "c8bbb49e1acfcd15",
+      "profile": "miss"
+    },
+    "Eier": {
+      "file": "word_c67a98fb5c20.ogg",
+      "fingerprint": "9f0307d78a6ad832",
+      "profile": "word"
+    },
     "Eimer": {
       "file": "word_05ffc5ee879c.ogg",
-      "fingerprint": "63fa9338a32398f1",
+      "fingerprint": "32945f7bceb78c3c",
       "profile": "word"
+    },
+    "Eine Spinne bewundert sich im Spiegel!": {
+      "file": "finale_b65d1769e248.ogg",
+      "fingerprint": "69bc1f2f077678d7",
+      "profile": "finale"
+    },
+    "Einundzwanzig Frösche sitzen am Teich. Acht hüpfen weg. Wie viele Frösche bleiben.": {
+      "file": "prompt_975e2eaeed5c.ogg",
+      "fingerprint": "183fa1f512842e0c",
+      "profile": "prompt"
     },
     "Eis": {
       "file": "word_257a1a2e4d6f.ogg",
-      "fingerprint": "fb3754a612394e82",
+      "fingerprint": "a4db581c62bb1c79",
       "profile": "word"
     },
     "Elefant": {
       "file": "word_9c0d5d91b620.ogg",
-      "fingerprint": "d4eb06606d91d124",
+      "fingerprint": "2224174e20de70a6",
       "profile": "word"
+    },
+    "Elf Rosen und sieben Rosen. Wie viele Rosen sind das.": {
+      "file": "prompt_5b4361b803e6.ogg",
+      "fingerprint": "9e6afcbec26200ae",
+      "profile": "prompt"
     },
     "Ente": {
       "file": "word_569642411fb7.ogg",
-      "fingerprint": "8f1c57211d5cd17c",
+      "fingerprint": "80b807d4bc6a3d0f",
       "profile": "word"
     },
     "Erdbeere": {
       "file": "word_33d0ffb3cdb7.ogg",
-      "fingerprint": "76660041dffc1fb2",
+      "fingerprint": "b440cd570263eebf",
       "profile": "word"
+    },
+    "Eu": {
+      "file": "phoneme_ff22e6c0c305.ogg",
+      "fingerprint": "59aa7d9ad248c4c0",
+      "profile": "phoneme"
     },
     "Eu - wie Eule.": {
       "file": "reward_8689d018bc99.ogg",
@@ -272,8 +712,13 @@
     },
     "Eule": {
       "file": "word_0ad448de77b6.ogg",
-      "fingerprint": "78d52f3f4ce3a80e",
+      "fingerprint": "d1c09d2cbbeff717",
       "profile": "word"
+    },
+    "F": {
+      "file": "phoneme_f67ab10ad4e4.ogg",
+      "fingerprint": "7c2edb5e6eb5cc48",
+      "profile": "phoneme"
     },
     "F - wie Fuchs.": {
       "file": "reward_de84d7d20c82.ogg",
@@ -282,28 +727,108 @@
     },
     "Feder": {
       "file": "word_8d0a36e2d012.ogg",
-      "fingerprint": "3e5d1983b2bfc1d2",
+      "fingerprint": "0e48327743af0081",
       "profile": "word"
     },
     "Fenster": {
       "file": "word_22c9783f5077.ogg",
-      "fingerprint": "ff924a219d585920",
+      "fingerprint": "95ee930981a66f94",
       "profile": "word"
     },
     "Feuer": {
       "file": "word_a191067c05e3.ogg",
-      "fingerprint": "9a0b3f8250c4de3e",
+      "fingerprint": "5ff0b2460406ec22",
+      "profile": "word"
+    },
+    "Finde alle Buchstaben": {
+      "file": "prompt_f17e480976d6.ogg",
+      "fingerprint": "8c07df15c52fc9e4",
+      "profile": "prompt"
+    },
+    "Finde alle Laute": {
+      "file": "prompt_e128ff3b2fa5.ogg",
+      "fingerprint": "3a04456cd6b12992",
+      "profile": "prompt"
+    },
+    "Finde alle Silben": {
+      "file": "prompt_fabf6c755f14.ogg",
+      "fingerprint": "c5f67a3d461c52a6",
+      "profile": "prompt"
+    },
+    "Fisch": {
+      "file": "word_e5c286bb5e83.ogg",
+      "fingerprint": "b7523f57af78b6d6",
+      "profile": "word"
+    },
+    "Frosch": {
+      "file": "word_e006d852a61a.ogg",
+      "fingerprint": "77bc53bdcd667ec8",
       "profile": "word"
     },
     "Fuchs": {
       "file": "word_7d9b210c4436.ogg",
-      "fingerprint": "6a33207a9a1307f4",
+      "fingerprint": "965d19f0ca9f1217",
       "profile": "word"
     },
-    "G": {
-      "file": "word_333e0a1e2781.ogg",
-      "fingerprint": "9a28050fb68d3858",
+    "Fuß": {
+      "file": "word_e02636bed39a.ogg",
+      "fingerprint": "5b0325f186ea663d",
       "profile": "word"
+    },
+    "Fünf Omas und vier Omas. Wie viele Omas sind das.": {
+      "file": "prompt_970f0fd9f7c9.ogg",
+      "fingerprint": "9e9ec1ff0bbabb6d",
+      "profile": "prompt"
+    },
+    "Fünf Reihen mit je fünf Eulen sitzen auf den Ästen. Wie viele Eulen sind das.": {
+      "file": "prompt_a296d46abea8.ogg",
+      "fingerprint": "c6267f17b74425d5",
+      "profile": "prompt"
+    },
+    "Fünf Reihen mit je fünf Taxis warten am Flughafen. Wie viele Taxis sind das.": {
+      "file": "prompt_9df0c5642c67.ogg",
+      "fingerprint": "4cfce8a92f2139f0",
+      "profile": "prompt"
+    },
+    "Fünf Reihen mit je sechs Fenstern glänzen am Haus. Wie viele Fenster sind das.": {
+      "file": "prompt_c1e0497390e4.ogg",
+      "fingerprint": "b91f608abe27d42e",
+      "profile": "prompt"
+    },
+    "Fünf Reihen mit je sechs Taxis warten am Bahnhof. Wie viele Taxis sind das.": {
+      "file": "prompt_a08292b542f0.ogg",
+      "fingerprint": "de8ae119e91551f0",
+      "profile": "prompt"
+    },
+    "Fünf Reihen mit je vier Eiern liegen im Karton. Wie viele Eier sind das.": {
+      "file": "prompt_7483d76a2972.ogg",
+      "fingerprint": "c1c43abba889b318",
+      "profile": "prompt"
+    },
+    "Fünf Reihen mit je vier Fischen schwimmen im Aquarium. Wie viele Fische sind das.": {
+      "file": "prompt_c21fff08b15b.ogg",
+      "fingerprint": "7c2c5922d50e9559",
+      "profile": "prompt"
+    },
+    "Fünfundzwanzig Tomaten hängen am Strauch. Sechzehn werden geerntet. Wie viele Tomaten bleiben.": {
+      "file": "prompt_38f76ee9c9cd.ogg",
+      "fingerprint": "0ebd14bd0b296a65",
+      "profile": "prompt"
+    },
+    "Fünfzehn Fische und fünfzehn Fische. Wie viele Fische sind das.": {
+      "file": "prompt_94ab9f8c0c01.ogg",
+      "fingerprint": "af242020614242a6",
+      "profile": "prompt"
+    },
+    "Fünfzehn Rosen blühen im Garten. Sieben werden gepflückt. Wie viele Rosen bleiben.": {
+      "file": "prompt_ac018d44e861.ogg",
+      "fingerprint": "fdf0b2ba362973ca",
+      "profile": "prompt"
+    },
+    "G": {
+      "file": "phoneme_333e0a1e2781.ogg",
+      "fingerprint": "255d55e7776903bf",
+      "profile": "phoneme"
     },
     "G - wie Gabel.": {
       "file": "reward_4113297732eb.ogg",
@@ -312,23 +837,28 @@
     },
     "Gabel": {
       "file": "word_64ad01258814.ogg",
-      "fingerprint": "635253cd54264d99",
+      "fingerprint": "4e3c61ed0b8af847",
+      "profile": "word"
+    },
+    "Gans": {
+      "file": "word_f13321c94b40.ogg",
+      "fingerprint": "a72a59ce16dae12e",
       "profile": "word"
     },
     "Giraffe": {
       "file": "word_56151fd50660.ogg",
-      "fingerprint": "02dd2959389d674a",
+      "fingerprint": "65646cbf31253c45",
       "profile": "word"
     },
     "Gras": {
       "file": "word_9615231ee629.ogg",
-      "fingerprint": "68ae75c6a9df6ecf",
+      "fingerprint": "8e09283cad709159",
       "profile": "word"
     },
     "H": {
-      "file": "word_44bd7ae60f47.ogg",
-      "fingerprint": "b95b8c7574a8af58",
-      "profile": "word"
+      "file": "phoneme_44bd7ae60f47.ogg",
+      "fingerprint": "5ba0d76277d8050d",
+      "profile": "phoneme"
     },
     "H - wie Hut.": {
       "file": "reward_13ff0f7cdbab.ogg",
@@ -337,12 +867,12 @@
     },
     "Hahn": {
       "file": "word_a14eac9161e5.ogg",
-      "fingerprint": "bc7ad2cbb3df17a4",
+      "fingerprint": "9f48c068f9047edf",
       "profile": "word"
     },
     "Hallo": {
       "file": "word_753692ec36ad.ogg",
-      "fingerprint": "7c506acce9095a44",
+      "fingerprint": "3abf834cf62f89c0",
       "profile": "word"
     },
     "Hallo Lama!": {
@@ -350,14 +880,24 @@
       "fingerprint": "9d639cb55c05834a",
       "profile": "sentence"
     },
+    "Hase": {
+      "file": "word_c16f2f3b6f2d.ogg",
+      "fingerprint": "0f271baa379da58b",
+      "profile": "word"
+    },
     "Haus": {
       "file": "word_50976ad58f5d.ogg",
-      "fingerprint": "7ab7cf288da909a4",
+      "fingerprint": "09fa7dd4b8b15096",
       "profile": "word"
     },
     "Herz": {
       "file": "word_45db9ecdfcda.ogg",
-      "fingerprint": "605beb1fa475c7d5",
+      "fingerprint": "ed9a7ca6f61824e2",
+      "profile": "word"
+    },
+    "Hexe": {
+      "file": "word_eafaf309b341.ogg",
+      "fingerprint": "43c668b4013111c7",
       "profile": "word"
     },
     "Hier sind Häuser.": {
@@ -365,30 +905,50 @@
       "fingerprint": "c52cc602cf997a6e",
       "profile": "sentence"
     },
+    "Himmel": {
+      "file": "word_cac219d63246.ogg",
+      "fingerprint": "a3faa8e3c9bf29f1",
+      "profile": "word"
+    },
     "Hund": {
       "file": "word_92a95fa02cbc.ogg",
-      "fingerprint": "305a8456f435f50f",
+      "fingerprint": "c35a8eaba5d3617d",
+      "profile": "word"
+    },
+    "Hut": {
+      "file": "word_caf054761428.ogg",
+      "fingerprint": "a0c31cb575362925",
       "profile": "word"
     },
     "Häuser": {
       "file": "word_140519912f05.ogg",
-      "fingerprint": "0084c95518867ec3",
+      "fingerprint": "57392f0e6918e269",
       "profile": "word"
+    },
+    "I": {
+      "file": "phoneme_a83dd0ccbffe.ogg",
+      "fingerprint": "8836aaabcbfd71b7",
+      "profile": "phoneme"
     },
     "I - wie Igel.": {
       "file": "reward_6273482273f9.ogg",
       "fingerprint": "c2f9281358581b80",
       "profile": "reward"
     },
+    "Igel": {
+      "file": "word_d09c3c3ea576.ogg",
+      "fingerprint": "f73c4a732f75c007",
+      "profile": "word"
+    },
     "Insel": {
       "file": "word_82f1643a857d.ogg",
-      "fingerprint": "015e8c41b13e5b71",
+      "fingerprint": "00a774f518229dd4",
       "profile": "word"
     },
     "J": {
-      "file": "word_6da43b944e49.ogg",
-      "fingerprint": "329bbdea47760213",
-      "profile": "word"
+      "file": "phoneme_6da43b944e49.ogg",
+      "fingerprint": "a4b1d5aef3043c83",
+      "profile": "phoneme"
     },
     "J - wie Jacke.": {
       "file": "reward_cec5ae37e973.ogg",
@@ -397,43 +957,73 @@
     },
     "Jacke": {
       "file": "word_2d3af8db3690.ogg",
-      "fingerprint": "8c4ca73f416e8de5",
+      "fingerprint": "cd9e11fa6e2c166f",
+      "profile": "word"
+    },
+    "Jojo": {
+      "file": "word_b4b7ccdb3223.ogg",
+      "fingerprint": "5dc38e6012df1801",
       "profile": "word"
     },
     "K": {
-      "file": "word_86be9a55762d.ogg",
-      "fingerprint": "536edffef9d0e3b6",
-      "profile": "word"
+      "file": "phoneme_86be9a55762d.ogg",
+      "fingerprint": "9a1fefa7b605f7ea",
+      "profile": "phoneme"
     },
     "K - wie Keks.": {
       "file": "reward_877f9cffbb7f.ogg",
       "fingerprint": "0faca0d0d3d99c11",
       "profile": "reward"
     },
+    "Katze": {
+      "file": "word_cf95e1c70fb2.ogg",
+      "fingerprint": "1df9b38ebed6c40e",
+      "profile": "word"
+    },
     "Keks": {
       "file": "word_42f3f7e9341e.ogg",
-      "fingerprint": "12fbe8359b0c247d",
+      "fingerprint": "25c8a9eeaf1b5978",
+      "profile": "word"
+    },
+    "Klavier": {
+      "file": "word_bb815bb06bef.ogg",
+      "fingerprint": "2b84f7bd8a6671d3",
+      "profile": "word"
+    },
+    "Kleid": {
+      "file": "word_b0034fdf5386.ogg",
+      "fingerprint": "94d8f8603b8b6cdc",
       "profile": "word"
     },
     "Kreis": {
       "file": "word_6574ac40ddcf.ogg",
-      "fingerprint": "d1435fa92441fdb3",
+      "fingerprint": "865143d3b349c34d",
+      "profile": "word"
+    },
+    "Krokodil": {
+      "file": "word_f1142f0fdbdd.ogg",
+      "fingerprint": "0e2db304059930da",
       "profile": "word"
     },
     "Kuchen": {
       "file": "word_5217cbb8e93d.ogg",
-      "fingerprint": "92e30c347be42ff1",
+      "fingerprint": "583b0bb77ebb3c15",
       "profile": "word"
     },
     "Kuh": {
       "file": "word_8d55bb870b65.ogg",
-      "fingerprint": "61e5bceb587e356f",
+      "fingerprint": "ef72ba9ebe14d636",
+      "profile": "word"
+    },
+    "Käse": {
+      "file": "word_f9eeb52c9bc4.ogg",
+      "fingerprint": "7d92847c84b042c2",
       "profile": "word"
     },
     "L": {
-      "file": "word_72dfcfb0c470.ogg",
-      "fingerprint": "536db2d616008414",
-      "profile": "word"
+      "file": "phoneme_72dfcfb0c470.ogg",
+      "fingerprint": "c6ca6b0e861d0ca0",
+      "profile": "phoneme"
     },
     "L - wie Lama.": {
       "file": "reward_01798f83b4d8.ogg",
@@ -442,23 +1032,33 @@
     },
     "Lama": {
       "file": "word_7e7c621a3034.ogg",
-      "fingerprint": "58baf3feae2d12cc",
+      "fingerprint": "e2edd5ae074fc738",
       "profile": "word"
+    },
+    "Lama ist da.": {
+      "file": "sentence_ae5b36c0b72a.ogg",
+      "fingerprint": "2ada33a3bd2a15f2",
+      "profile": "sentence"
     },
     "Lampe": {
       "file": "word_9471c6375e05.ogg",
-      "fingerprint": "40afb0b9ac8aee2b",
+      "fingerprint": "bfdeb20d65d8cf88",
       "profile": "word"
     },
     "Löffel": {
       "file": "word_07015b4f5662.ogg",
-      "fingerprint": "d7cab41f396c85e6",
+      "fingerprint": "279f837e81876804",
+      "profile": "word"
+    },
+    "Löwe": {
+      "file": "word_ce8c8bab8261.ogg",
+      "fingerprint": "482be6b6c23a7d2c",
       "profile": "word"
     },
     "M": {
-      "file": "word_08f271887ce9.ogg",
-      "fingerprint": "fba9b33fdca221aa",
-      "profile": "word"
+      "file": "phoneme_08f271887ce9.ogg",
+      "fingerprint": "b859c027b70f88b3",
+      "profile": "phoneme"
     },
     "M - wie Maus.": {
       "file": "reward_bfebc184cbd9.ogg",
@@ -472,8 +1072,13 @@
     },
     "Mama": {
       "file": "word_fb9aa9a7b3d8.ogg",
-      "fingerprint": "43205df1855c9c56",
+      "fingerprint": "d16517a0aa65f636",
       "profile": "word"
+    },
+    "Mama Maus mampft einen dicken Apfel!": {
+      "file": "finale_0e8ee2e401d0.ogg",
+      "fingerprint": "f1fa2a4513b95d9f",
+      "profile": "finale"
     },
     "Mama ist im Haus.": {
       "file": "sentence_ea0d0f938a70.ogg",
@@ -485,25 +1090,30 @@
       "fingerprint": "8288827622e05506",
       "profile": "sentence"
     },
+    "Markt": {
+      "file": "word_e45e09e0dd89.ogg",
+      "fingerprint": "9c3294a678eaa59c",
+      "profile": "word"
+    },
     "Maus": {
       "file": "word_51c62d69a62c.ogg",
-      "fingerprint": "3c3a7bdea9de4327",
+      "fingerprint": "b4fc2c4157b66df9",
       "profile": "word"
     },
     "Milch": {
       "file": "word_80619cbf258a.ogg",
-      "fingerprint": "5f80dced6d2cb150",
+      "fingerprint": "74857b4680cc8261",
       "profile": "word"
     },
     "Mimi": {
       "file": "word_15b73886c509.ogg",
-      "fingerprint": "59069000776d7cc3",
+      "fingerprint": "d72b34436f9eb672",
       "profile": "word"
     },
     "N": {
-      "file": "word_8ce86a6ae65d.ogg",
-      "fingerprint": "6778a805c092e905",
-      "profile": "word"
+      "file": "phoneme_8ce86a6ae65d.ogg",
+      "fingerprint": "9f48d2d5f6269d95",
+      "profile": "phoneme"
     },
     "N - wie Nase.": {
       "file": "reward_efebb5e295cf.ogg",
@@ -512,18 +1122,58 @@
     },
     "Nanu": {
       "file": "word_5380d1dd5931.ogg",
-      "fingerprint": "1b5dc49d209b8d15",
+      "fingerprint": "0e4f9953def423ca",
       "profile": "word"
     },
     "Nase": {
       "file": "word_16891dda0d98.ogg",
-      "fingerprint": "152295c35aa46875",
+      "fingerprint": "faf5e961e680255c",
+      "profile": "word"
+    },
+    "Nest": {
+      "file": "word_e5716be7dc8f.ogg",
+      "fingerprint": "fea852d8d7e0bdb2",
+      "profile": "word"
+    },
+    "Neun Hüte und sieben Hüte. Wie viele Hüte sind das.": {
+      "file": "prompt_bc91cf7f4b6e.ogg",
+      "fingerprint": "a1df8f6e2e9bf734",
+      "profile": "prompt"
+    },
+    "Neun Tomaten liegen im Korb. Vier werden gegessen. Wie viele Tomaten bleiben.": {
+      "file": "prompt_f486c3cf6f4e.ogg",
+      "fingerprint": "67e5bd26ca3b838d",
+      "profile": "prompt"
+    },
+    "Neunundzwanzig Fische schwimmen im See. Vierzehn schwimmen weg. Wie viele Fische bleiben.": {
+      "file": "prompt_a4ab20534065.ogg",
+      "fingerprint": "ea325260c51a9b87",
+      "profile": "prompt"
+    },
+    "Neunzehn Fische und neun Fische. Wie viele Fische sind das.": {
+      "file": "prompt_112ee5318665.ogg",
+      "fingerprint": "1215c8a43a3057f4",
+      "profile": "prompt"
+    },
+    "Neunzehn Tomaten und elf Tomaten. Wie viele Tomaten sind das.": {
+      "file": "prompt_5073fadea995.ogg",
+      "fingerprint": "abf365d290a41ca9",
+      "profile": "prompt"
+    },
+    "Nilpferd": {
+      "file": "word_f7d8232215e4.ogg",
+      "fingerprint": "fede88fa10803747",
       "profile": "word"
     },
     "Nuss": {
       "file": "word_a410d513bba1.ogg",
-      "fingerprint": "8338c94e627d8701",
+      "fingerprint": "757cfde4fa5e8194",
       "profile": "word"
+    },
+    "O": {
+      "file": "phoneme_c4694f2e93d5.ogg",
+      "fingerprint": "5cd66217da3286f3",
+      "profile": "phoneme"
     },
     "O - wie Ohr.": {
       "file": "reward_b7f70cd2a8ea.ogg",
@@ -537,12 +1187,17 @@
     },
     "Ofen": {
       "file": "word_a21c8cef86cd.ogg",
-      "fingerprint": "363546dcdca62f61",
+      "fingerprint": "d55aebfec539d1d6",
       "profile": "word"
     },
     "Ohr": {
       "file": "word_7e54f79addc1.ogg",
-      "fingerprint": "8c36e99eecb45696",
+      "fingerprint": "24e781c9d668631b",
+      "profile": "word"
+    },
+    "Oma": {
+      "file": "word_d4e20327678b.ogg",
+      "fingerprint": "6d7861b54e6bf618",
       "profile": "word"
     },
     "Oma hat einen Hut.": {
@@ -550,20 +1205,40 @@
       "fingerprint": "51f6879057d9b639",
       "profile": "sentence"
     },
+    "Oma ist da.": {
+      "file": "sentence_c74c8774dfc4.ogg",
+      "fingerprint": "b4e451fbf90b9c6e",
+      "profile": "sentence"
+    },
+    "Oma und Mimi fliegen im Ufo!": {
+      "file": "finale_64075e18e43e.ogg",
+      "fingerprint": "de4479828fca07ca",
+      "profile": "finale"
+    },
     "Oma.": {
       "file": "sentence_ba35c984dbf8.ogg",
       "fingerprint": "706380ec3677b34d",
       "profile": "sentence"
+    },
+    "Opa": {
+      "file": "word_d5968db704cf.ogg",
+      "fingerprint": "b07ac70b85ca48e9",
+      "profile": "word"
     },
     "Ordne das Wort - Mama - dem Bild zu.": {
       "file": "prompt_1ac28f3a7750.ogg",
       "fingerprint": "759ab7a8259b4541",
       "profile": "prompt"
     },
+    "Ordne das Wort - Oma - dem Bild zu.": {
+      "file": "prompt_c4b5f9462116.ogg",
+      "fingerprint": "10b716d017c4a1f8",
+      "profile": "prompt"
+    },
     "P": {
-      "file": "word_5c62e091b8c0.ogg",
-      "fingerprint": "f983f0c553141a05",
-      "profile": "word"
+      "file": "phoneme_5c62e091b8c0.ogg",
+      "fingerprint": "c56cad30cef9eb9f",
+      "profile": "phoneme"
     },
     "P - wie Paket.": {
       "file": "reward_72a86435fa66.ogg",
@@ -575,20 +1250,30 @@
       "fingerprint": "be38ac172c529e84",
       "profile": "reward"
     },
+    "Paket": {
+      "file": "word_b58bd16905d2.ogg",
+      "fingerprint": "7d0ef2f74c8c510f",
+      "profile": "word"
+    },
     "Papa": {
       "file": "word_4959de6ed9b8.ogg",
-      "fingerprint": "2e191e6d1ab1c7f8",
+      "fingerprint": "28bc0acfcd9e742c",
       "profile": "word"
+    },
+    "Papa und Opa tanzen auf dem Tisch!": {
+      "file": "finale_eb42f8849812.ogg",
+      "fingerprint": "03b1222ca683d7c5",
+      "profile": "finale"
     },
     "Park": {
       "file": "word_6565cb0e22d5.ogg",
-      "fingerprint": "9f81899f8a8603be",
+      "fingerprint": "e15de0ccedaca7f6",
       "profile": "word"
     },
     "Pf": {
-      "file": "word_495f851d2eed.ogg",
-      "fingerprint": "1743fcb40d247efb",
-      "profile": "word"
+      "file": "phoneme_495f851d2eed.ogg",
+      "fingerprint": "4298fc9785c8c075",
+      "profile": "phoneme"
     },
     "Pf - wie Pferd.": {
       "file": "reward_80235c4e7eab.ogg",
@@ -597,33 +1282,48 @@
     },
     "Pferd": {
       "file": "word_954f0a2d53ee.ogg",
-      "fingerprint": "7006faf43757f7ac",
+      "fingerprint": "a733a0a2d2c496d2",
       "profile": "word"
     },
     "Pflanze": {
       "file": "word_3887a18984cb.ogg",
-      "fingerprint": "9c83a5edc226d920",
+      "fingerprint": "a819a5807ca1c68a",
+      "profile": "word"
+    },
+    "Pilz": {
+      "file": "word_dd12db9683fb.ogg",
+      "fingerprint": "c4ff76a920da9e43",
       "profile": "word"
     },
     "Pinguin": {
       "file": "word_0bf83ff3617d.ogg",
-      "fingerprint": "70b7d20af06cf289",
+      "fingerprint": "5d93498e86aa7b5f",
+      "profile": "word"
+    },
+    "Pizza": {
+      "file": "word_f12958816a49.ogg",
+      "fingerprint": "a97a7c320b1f8a45",
       "profile": "word"
     },
     "Polizei": {
       "file": "word_2dc22265c9e7.ogg",
-      "fingerprint": "01626c8ffbdd83cc",
+      "fingerprint": "3e95af725c0f5cfa",
       "profile": "word"
     },
     "Pony": {
       "file": "word_5cb47a9bbad3.ogg",
-      "fingerprint": "25498a8f43c77d23",
+      "fingerprint": "7e892aeb97db2679",
       "profile": "word"
     },
+    "Probiere eine andere Antwort": {
+      "file": "ui_5e62fdea5f0f.ogg",
+      "fingerprint": "baa531c4ef583b4e",
+      "profile": "ui"
+    },
     "Qu": {
-      "file": "word_1897ba465985.ogg",
-      "fingerprint": "c2ffeb35ef3c86d5",
-      "profile": "word"
+      "file": "phoneme_1897ba465985.ogg",
+      "fingerprint": "057079ca2aff8844",
+      "profile": "phoneme"
     },
     "Qu - wie Qualle.": {
       "file": "reward_7ab4d5238a5d.ogg",
@@ -632,28 +1332,28 @@
     },
     "Quadrat": {
       "file": "word_a4f6cf282483.ogg",
-      "fingerprint": "3aee4b474a9b13e1",
+      "fingerprint": "f76d88d2fd0651c0",
       "profile": "word"
     },
     "Qualle": {
       "file": "word_59b4ec4ed7ea.ogg",
-      "fingerprint": "4ba19eeba074d524",
+      "fingerprint": "fa76917407b372cb",
       "profile": "word"
     },
     "Quark": {
       "file": "word_469f97570d91.ogg",
-      "fingerprint": "438ab22c36749387",
+      "fingerprint": "03671c0ec06433c3",
       "profile": "word"
     },
     "Quelle": {
       "file": "word_0378894a522e.ogg",
-      "fingerprint": "703d112d8bca615a",
+      "fingerprint": "c65e45cab7eb83f5",
       "profile": "word"
     },
     "R": {
-      "file": "word_8c2574892063.ogg",
-      "fingerprint": "67cb5efa52e63271",
-      "profile": "word"
+      "file": "phoneme_8c2574892063.ogg",
+      "fingerprint": "66a00ebc591aa8c5",
+      "profile": "phoneme"
     },
     "R - wie Rose.": {
       "file": "reward_77b0c4a17047.ogg",
@@ -662,18 +1362,33 @@
     },
     "Rad": {
       "file": "word_aaa6cab49ca4.ogg",
-      "fingerprint": "aa902a0b0156aa92",
+      "fingerprint": "def5ad6cc612f1b8",
       "profile": "word"
     },
     "Radio": {
       "file": "word_2a7dfeb2f2b0.ogg",
-      "fingerprint": "b57e980cbbcce5f1",
+      "fingerprint": "a621e47491132d0f",
+      "profile": "word"
+    },
+    "Raupe": {
+      "file": "word_d29eb8ca21d7.ogg",
+      "fingerprint": "524d5f4128a8c38a",
+      "profile": "word"
+    },
+    "Rose": {
+      "file": "word_e10d850954a8.ogg",
+      "fingerprint": "c724f0dbdc2875ed",
+      "profile": "word"
+    },
+    "Rübe": {
+      "file": "word_e49e3ccd94c8.ogg",
+      "fingerprint": "005b1895da1049f5",
       "profile": "word"
     },
     "S": {
-      "file": "word_8de0b3c47f11.ogg",
-      "fingerprint": "af9c33b8660b6de2",
-      "profile": "word"
+      "file": "phoneme_8de0b3c47f11.ogg",
+      "fingerprint": "20931b5c2ca88dee",
+      "profile": "phoneme"
     },
     "S - wie Sonne.": {
       "file": "reward_376fd1093c8c.ogg",
@@ -681,34 +1396,34 @@
       "profile": "reward"
     },
     "S t": {
-      "file": "word_40b46ee569c3.ogg",
-      "fingerprint": "5dd0b8f390a4ecb6",
-      "profile": "word"
+      "file": "phoneme_40b46ee569c3.ogg",
+      "fingerprint": "4124acb23fefaff0",
+      "profile": "phoneme"
     },
     "Sack": {
       "file": "word_006a933c950f.ogg",
-      "fingerprint": "397c191b403f1373",
+      "fingerprint": "90c04aaa09bb9ab6",
       "profile": "word"
     },
     "Salami": {
       "file": "word_4ec3c3ac2171.ogg",
-      "fingerprint": "0f057a52b489a2b5",
+      "fingerprint": "ffaeb1c0d87091e7",
       "profile": "word"
     },
     "Salat": {
       "file": "word_2f9a96d6ad90.ogg",
-      "fingerprint": "e4f0fbe77b340b9f",
+      "fingerprint": "807f63dd21eeb0c8",
       "profile": "word"
     },
     "Sand": {
       "file": "word_82855c11ae69.ogg",
-      "fingerprint": "1986613a3053f74e",
+      "fingerprint": "aabfbd99be9a44bf",
       "profile": "word"
     },
     "Sch": {
-      "file": "word_07af03fb0629.ogg",
-      "fingerprint": "e0b6847d50e06dcf",
-      "profile": "word"
+      "file": "phoneme_07af03fb0629.ogg",
+      "fingerprint": "9796605a9b15fdec",
+      "profile": "phoneme"
     },
     "Sch - wie Schaf.": {
       "file": "reward_09e1817de9e0.ogg",
@@ -722,12 +1437,117 @@
     },
     "Schaf": {
       "file": "word_38bf5d085dbe.ogg",
-      "fingerprint": "5cf9af9d548c594e",
+      "fingerprint": "b0bd5f192d926b17",
       "profile": "word"
+    },
+    "Schiebe a und m zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_e289901b20ba.ogg",
+      "fingerprint": "796a39cedc4b8e65",
+      "profile": "prompt"
     },
     "Schiebe b und au zusammen. Welche Silbe entsteht.": {
       "file": "prompt_1684a2eff3f3.ogg",
       "fingerprint": "8edeabe72c231cb4",
+      "profile": "prompt"
+    },
+    "Schiebe d und o zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_170550a32d84.ogg",
+      "fingerprint": "0df514e58a188cc7",
+      "profile": "prompt"
+    },
+    "Schiebe f und i zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_c744810a3a94.ogg",
+      "fingerprint": "fb1a05f59768af13",
+      "profile": "prompt"
+    },
+    "Schiebe f und u zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_559f7d778727.ogg",
+      "fingerprint": "619c1d66e92fc17b",
+      "profile": "prompt"
+    },
+    "Schiebe g und e zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_f2a2be0b5f0c.ogg",
+      "fingerprint": "f8779e8b4d413f9d",
+      "profile": "prompt"
+    },
+    "Schiebe h und o zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_7e2e970bc1e1.ogg",
+      "fingerprint": "a8e7437aab9c28a4",
+      "profile": "prompt"
+    },
+    "Schiebe l und a zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_fa9931c06132.ogg",
+      "fingerprint": "64efb769e8c88a28",
+      "profile": "prompt"
+    },
+    "Schiebe l und ö zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_9359c62b6e46.ogg",
+      "fingerprint": "e2b62ba84af3f3e0",
+      "profile": "prompt"
+    },
+    "Schiebe m und a zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_f30473f18d90.ogg",
+      "fingerprint": "3c32a9ce29b6dbe1",
+      "profile": "prompt"
+    },
+    "Schiebe m und ei zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_c32328da391f.ogg",
+      "fingerprint": "aeffb31343b8f9f1",
+      "profile": "prompt"
+    },
+    "Schiebe m und i zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_6b8ca5b71a6f.ogg",
+      "fingerprint": "59ad4ec3b8e07aed",
+      "profile": "prompt"
+    },
+    "Schiebe m und o zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_3ac24bd996ef.ogg",
+      "fingerprint": "c4eb4b2567fa706c",
+      "profile": "prompt"
+    },
+    "Schiebe n und a zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_a275f6b39820.ogg",
+      "fingerprint": "219cba4095b30eb5",
+      "profile": "prompt"
+    },
+    "Schiebe p und a zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_087c4b4843da.ogg",
+      "fingerprint": "12ceafa68cce30ae",
+      "profile": "prompt"
+    },
+    "Schiebe pf und a zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_ab454bef1046.ogg",
+      "fingerprint": "0620c146f9024160",
+      "profile": "prompt"
+    },
+    "Schiebe qu und a zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_7af8fe295c49.ogg",
+      "fingerprint": "da4c721552787ac2",
+      "profile": "prompt"
+    },
+    "Schiebe r und o zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_75675ba7ece4.ogg",
+      "fingerprint": "38663de545eb9a82",
+      "profile": "prompt"
+    },
+    "Schiebe r und ü zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_46f2585df5d2.ogg",
+      "fingerprint": "41a5a4e25ef079a1",
+      "profile": "prompt"
+    },
+    "Schiebe s und e zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_ce203393c972.ogg",
+      "fingerprint": "bfccee1eaccaa52d",
+      "profile": "prompt"
+    },
+    "Schiebe s und p zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_be5e0081fb1b.ogg",
+      "fingerprint": "2c4824687822ee0c",
+      "profile": "prompt"
+    },
+    "Schiebe s und t zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_8b788a56e60b.ogg",
+      "fingerprint": "53732d93d41e6d0d",
       "profile": "prompt"
     },
     "Schiebe sch und a zusammen. Welche Silbe entsteht.": {
@@ -735,35 +1555,115 @@
       "fingerprint": "ae45a3a8c40aea7a",
       "profile": "prompt"
     },
+    "Schiebe sch und u zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_699b1f9ac8ef.ogg",
+      "fingerprint": "bfedd2ce31c53881",
+      "profile": "prompt"
+    },
+    "Schiebe sp und i zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_b6e1ad57dff0.ogg",
+      "fingerprint": "96d85c6a76efa7ad",
+      "profile": "prompt"
+    },
+    "Schiebe st und e zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_a66ac5a4793d.ogg",
+      "fingerprint": "bd1c013889f07282",
+      "profile": "prompt"
+    },
+    "Schiebe t und a zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_02f1b83bd522.ogg",
+      "fingerprint": "ea1d8b0abd95b461",
+      "profile": "prompt"
+    },
+    "Schiebe t und o zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_0a6a4bed654c.ogg",
+      "fingerprint": "e234353ef2d7be0e",
+      "profile": "prompt"
+    },
+    "Schiebe v und o zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_d1a506b1fb2f.ogg",
+      "fingerprint": "29a8e6d7f6413f2c",
+      "profile": "prompt"
+    },
+    "Schiebe z und e zusammen. Welche Silbe entsteht.": {
+      "file": "prompt_377e327f9934.ogg",
+      "fingerprint": "e5ffbd5151332263",
+      "profile": "prompt"
+    },
     "Schuh": {
       "file": "word_6bc75e1bf7ef.ogg",
-      "fingerprint": "150ded1050777f3b",
+      "fingerprint": "10afd21ec17df011",
       "profile": "word"
     },
     "Schule": {
       "file": "word_5050f41029c8.ogg",
-      "fingerprint": "17811fcd7f0cbf7d",
+      "fingerprint": "5cf19c1dd3db276c",
       "profile": "word"
+    },
+    "Sechs Ameisen und drei Ameisen. Wie viele Ameisen sind das.": {
+      "file": "prompt_cc8c0069891b.ogg",
+      "fingerprint": "b5cf85fb36af4024",
+      "profile": "prompt"
+    },
+    "Sechsundzwanzig Eier liegen im Korb. Siebzehn werden gekocht. Wie viele Eier bleiben.": {
+      "file": "prompt_d161954782bd.ogg",
+      "fingerprint": "495c0cd137dd27f2",
+      "profile": "prompt"
+    },
+    "Sechsundzwanzig Säcke stehen im Lager. Dreizehn werden abgeholt. Wie viele Säcke bleiben.": {
+      "file": "prompt_5750025dc921.ogg",
+      "fingerprint": "bf4f56909fed939e",
+      "profile": "prompt"
+    },
+    "Sechzehn Eis sind im Gefrierfach. Neun werden gegessen. Wie viele Eis bleiben.": {
+      "file": "prompt_2a722ffb7aaa.ogg",
+      "fingerprint": "2f6f87220c353ad5",
+      "profile": "prompt"
     },
     "Sechzehn Spinnen und vierzehn Spinnen. Wie viele Spinnen sind das.": {
       "file": "prompt_141d639bc4d4.ogg",
       "fingerprint": "c56867c578aea1fd",
       "profile": "prompt"
     },
+    "Sieben Tomaten und fünf Tomaten. Wie viele Tomaten sind das.": {
+      "file": "prompt_0900f6d664ad.ogg",
+      "fingerprint": "9e822a3cd86a0f2d",
+      "profile": "prompt"
+    },
+    "Siebenundzwanzig Fenster hat das Haus. Achtzehn sind zu. Wie viele Fenster sind offen.": {
+      "file": "prompt_a951ad1f566b.ogg",
+      "fingerprint": "d783c8035ed1f6ab",
+      "profile": "prompt"
+    },
+    "Siebenundzwanzig Spinnen sitzen im Netz. Neun krabbeln weg. Wie viele Spinnen bleiben.": {
+      "file": "prompt_cb3dcc46101f.ogg",
+      "fingerprint": "7bd6c5e5981fc815",
+      "profile": "prompt"
+    },
+    "Siebzehn Ameisen und neun Ameisen. Wie viele Ameisen sind das.": {
+      "file": "prompt_c1a0aa5afae1.ogg",
+      "fingerprint": "b820daa6786f395f",
+      "profile": "prompt"
+    },
+    "Siebzehn Frösche und acht Frösche. Wie viele Frösche sind das.": {
+      "file": "prompt_70410dd03ecd.ogg",
+      "fingerprint": "e3866290d577e976",
+      "profile": "prompt"
+    },
     "Sofa": {
       "file": "word_643aa97e949c.ogg",
-      "fingerprint": "2c88bed75c15640e",
+      "fingerprint": "f59173496f4159aa",
       "profile": "word"
     },
     "Sonne": {
       "file": "word_85139e8cc79d.ogg",
-      "fingerprint": "16dedea7b9637125",
+      "fingerprint": "fb868ebfd33bdf3e",
       "profile": "word"
     },
     "Sp": {
-      "file": "word_8cce03ee816b.ogg",
-      "fingerprint": "47235bb16591f7f2",
-      "profile": "word"
+      "file": "phoneme_8cce03ee816b.ogg",
+      "fingerprint": "39913cca952c806c",
+      "profile": "phoneme"
     },
     "Sp - wie Spinne.": {
       "file": "reward_3db55144cb9c.ogg",
@@ -772,12 +1672,12 @@
     },
     "Spiegel": {
       "file": "word_5231a0fe3633.ogg",
-      "fingerprint": "8e97c7129cc43f43",
+      "fingerprint": "d1bac983d3448ce9",
       "profile": "word"
     },
     "Spinne": {
       "file": "word_67f17cffae0b.ogg",
-      "fingerprint": "23dda7ea759cb10f",
+      "fingerprint": "23aa15c91098cf2f",
       "profile": "word"
     },
     "St": {
@@ -790,20 +1690,30 @@
       "fingerprint": "1fd52744a7afdb64",
       "profile": "reward"
     },
+    "Stern": {
+      "file": "word_e4a41c66866b.ogg",
+      "fingerprint": "d1fcf44832f54191",
+      "profile": "word"
+    },
     "Straße": {
       "file": "word_58a3778c18c4.ogg",
-      "fingerprint": "c38c7430977082fa",
+      "fingerprint": "6ca890200875aa34",
       "profile": "word"
     },
     "Stuhl": {
       "file": "word_947f9e7b2620.ogg",
-      "fingerprint": "bc26259065ef2e89",
+      "fingerprint": "3f87fd60da390753",
       "profile": "word"
     },
     "Suppe": {
       "file": "word_99a603924290.ogg",
-      "fingerprint": "b2ae0a227e3b43a1",
+      "fingerprint": "d6080d95891e4b90",
       "profile": "word"
+    },
+    "T": {
+      "file": "phoneme_e632b7095b0b.ogg",
+      "fingerprint": "8acf61de7ba86a1a",
+      "profile": "phoneme"
     },
     "T - wie Tom.": {
       "file": "reward_f8b083af5066.ogg",
@@ -817,42 +1727,42 @@
     },
     "Tag": {
       "file": "word_1503916a2ab2.ogg",
-      "fingerprint": "ab1582f4dcec9bfd",
+      "fingerprint": "b7795ba17cf1c774",
       "profile": "word"
     },
     "Tal": {
       "file": "word_a0aecdeeb95b.ogg",
-      "fingerprint": "c5033646a12dcfd4",
+      "fingerprint": "bbd8d0030c692a83",
       "profile": "word"
     },
     "Taube": {
       "file": "word_6fcd1cc2cfbe.ogg",
-      "fingerprint": "caaaa16cc96a7e66",
+      "fingerprint": "943dbdc65f34bae7",
       "profile": "word"
     },
     "Taxi": {
       "file": "word_7793c31446e3.ogg",
-      "fingerprint": "5f71f1424f3769e2",
+      "fingerprint": "d5effbd6bf3eb8de",
       "profile": "word"
     },
     "Tee": {
       "file": "word_19c3fd6de646.ogg",
-      "fingerprint": "6e20225a29f1f7e1",
+      "fingerprint": "a619858fa1f6c6ce",
       "profile": "word"
     },
     "Tiger": {
       "file": "word_410f76d01d8a.ogg",
-      "fingerprint": "dda7bbfa9201a221",
+      "fingerprint": "edf45692d037b990",
       "profile": "word"
     },
     "Tisch": {
       "file": "word_354bc956b8a4.ogg",
-      "fingerprint": "06cd48b16778ff92",
+      "fingerprint": "30deda3d95d7c0eb",
       "profile": "word"
     },
     "Tom": {
       "file": "word_81f3bf42a93c.ogg",
-      "fingerprint": "6a7b8e302f774115",
+      "fingerprint": "db6111a567d8575a",
       "profile": "word"
     },
     "Tom ruft Opa.": {
@@ -862,18 +1772,28 @@
     },
     "Tomate": {
       "file": "word_96eaefafc3db.ogg",
-      "fingerprint": "d3fca4178b799c00",
+      "fingerprint": "fd9e4a10752a1e4a",
+      "profile": "word"
+    },
+    "Tor": {
+      "file": "word_e7121e9ff0bc.ogg",
+      "fingerprint": "6baa96a09289c55b",
       "profile": "word"
     },
     "Tram": {
       "file": "word_5a72462e41ab.ogg",
-      "fingerprint": "7194476ea84f3588",
+      "fingerprint": "a6377e9bbd9474f6",
       "profile": "word"
     },
     "Tür": {
       "file": "word_1cff8a95c840.ogg",
-      "fingerprint": "6d45fa454c5a1aef",
+      "fingerprint": "76146c6bb4c54d21",
       "profile": "word"
+    },
+    "U": {
+      "file": "phoneme_a25513c7e0f6.ogg",
+      "fingerprint": "b3daec472aec2314",
+      "profile": "phoneme"
     },
     "U - wie Uhu.": {
       "file": "reward_d0d1ee4bce5c.ogg",
@@ -882,13 +1802,18 @@
     },
     "Ufo": {
       "file": "word_1a3ae2b9d5bf.ogg",
-      "fingerprint": "9945d885d627fbd4",
+      "fingerprint": "cd4fe21eb53a8157",
       "profile": "word"
     },
     "Uhu": {
       "file": "word_990fa93a142a.ogg",
-      "fingerprint": "74fb2a033ba333bc",
+      "fingerprint": "7f5fcaf92ac80e5e",
       "profile": "word"
+    },
+    "V": {
+      "file": "phoneme_de5a6f78116e.ogg",
+      "fingerprint": "9c35757d2c72508b",
+      "profile": "phoneme"
     },
     "V - wie Vogel.": {
       "file": "reward_4a21745e952d.ogg",
@@ -897,12 +1822,32 @@
     },
     "Vase": {
       "file": "word_15f09dbff105.ogg",
-      "fingerprint": "4206211bd4536429",
+      "fingerprint": "c813f18dcce7f1b9",
       "profile": "word"
+    },
+    "Vier Reihen mit je fünf Häusern stehen in der Stadt. Wie viele Häuser sind das.": {
+      "file": "prompt_6d522d880401.ogg",
+      "fingerprint": "b9a996599534f5d2",
+      "profile": "prompt"
     },
     "Vier Reihen mit je sechs Omas singen im Chor. Wie viele Omas singen.": {
       "file": "prompt_19e9af6a4aee.ogg",
       "fingerprint": "069baf373c7ce7a7",
+      "profile": "prompt"
+    },
+    "Vier Reihen mit je sechs Säcken stehen im Lager. Wie viele Säcke sind das.": {
+      "file": "prompt_981f9b9bb548.ogg",
+      "fingerprint": "7ccf4b23c1e6bdaa",
+      "profile": "prompt"
+    },
+    "Vier Reihen mit je sechs Taxis warten am Flughafen. Wie viele Taxis sind das.": {
+      "file": "prompt_8630a5c0bbb0.ogg",
+      "fingerprint": "2c8a386b27b1c114",
+      "profile": "prompt"
+    },
+    "Vier Reihen mit je vier Büchern stehen im Bücherregal. Wie viele Bücher sind das.": {
+      "file": "prompt_f20077b6e51a.ogg",
+      "fingerprint": "684bc242cb3bfa13",
       "profile": "prompt"
     },
     "Vierundzwanzig Eulen sitzen im Wald. Neun fliegen weg. Wie viele Eulen bleiben.": {
@@ -910,15 +1855,30 @@
       "fingerprint": "e3b5570d371482b5",
       "profile": "prompt"
     },
+    "Vierundzwanzig Füße und sechs Füße. Wie viele Füße sind das.": {
+      "file": "prompt_fb145f731271.ogg",
+      "fingerprint": "c54ff3f0535e5bb0",
+      "profile": "prompt"
+    },
     "Vierzehn Häuser und neun Häuser. Wie viele Häuser sind das.": {
       "file": "prompt_126764115645.ogg",
       "fingerprint": "93ab2d6e1b14ce46",
       "profile": "prompt"
     },
+    "Vierzehn Hüte hängen am Haken. Sechs werden aufgesetzt. Wie viele Hüte bleiben.": {
+      "file": "prompt_6e7c6950368d.ogg",
+      "fingerprint": "e8582e066655e430",
+      "profile": "prompt"
+    },
     "Vogel": {
       "file": "word_568cfef57232.ogg",
-      "fingerprint": "c7543a8c10880181",
+      "fingerprint": "cd213719d43c5507",
       "profile": "word"
+    },
+    "W": {
+      "file": "phoneme_fcb5f40df9be.ogg",
+      "fingerprint": "30401de6e7c928bd",
+      "profile": "phoneme"
     },
     "W - wie Weg.": {
       "file": "reward_9fd61a1e4083.ogg",
@@ -927,12 +1887,17 @@
     },
     "Wal": {
       "file": "word_5ba98270917f.ogg",
-      "fingerprint": "f09e99c5feabfb1e",
+      "fingerprint": "dd5a74b46d56787b",
+      "profile": "word"
+    },
+    "Weg": {
+      "file": "word_fe3a5d0b9c4e.ogg",
+      "fingerprint": "724bc51fceadb84c",
       "profile": "word"
     },
     "Wespe": {
       "file": "word_38ba6262a672.ogg",
-      "fingerprint": "937a61d1333c32d5",
+      "fingerprint": "538a9c2ad54cf825",
       "profile": "word"
     },
     "Wir gehen den Weg.": {
@@ -940,9 +1905,39 @@
       "fingerprint": "ae3495655c451016",
       "profile": "sentence"
     },
-    "Wir gehen den Weg. - Ordne die Wörter in die richtige Reihenfolge.": {
-      "file": "prompt_1fd1dc6575a8.ogg",
-      "fingerprint": "85019cb94f04ab20",
+    "Wo hörst du den Buchstaben - A? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_7b188b50820e.ogg",
+      "fingerprint": "2ede90417860b984",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - B? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_a9f62754c733.ogg",
+      "fingerprint": "ca0b8ab60be3954a",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - D? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_d3a4513f8c9a.ogg",
+      "fingerprint": "eac25f8ef6bb23e6",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - E? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_9f29d23ec573.ogg",
+      "fingerprint": "cab37c146ef05d25",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - F? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_9705f375d308.ogg",
+      "fingerprint": "d1e038568af66f8b",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - G? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_96d68f8451f7.ogg",
+      "fingerprint": "9a191fc49a857400",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - H? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_900b49a17a1e.ogg",
+      "fingerprint": "69f8256f91a09efa",
       "profile": "prompt"
     },
     "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.": {
@@ -950,9 +1945,39 @@
       "fingerprint": "7e732b0759b15525",
       "profile": "prompt"
     },
+    "Wo hörst du den Buchstaben - K? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_a9abb07205aa.ogg",
+      "fingerprint": "7705a0cffee5d62f",
+      "profile": "prompt"
+    },
     "Wo hörst du den Buchstaben - L? Am Anfang, in der Mitte oder am Ende.": {
       "file": "prompt_11bc85fc22b6.ogg",
       "fingerprint": "d54510eeda2a5bf1",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_2eab93180bfb.ogg",
+      "fingerprint": "0c703eb9624baf14",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - N? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_e2c1b8ed3722.ogg",
+      "fingerprint": "3b7c45ff7f4d49a1",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - O? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_a1300d8ff0ec.ogg",
+      "fingerprint": "ec2bad0319992197",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - P? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_71e2030ff4d8.ogg",
+      "fingerprint": "98786130363116ad",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - R? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_b289a5260972.ogg",
+      "fingerprint": "937e6053d84b84f1",
       "profile": "prompt"
     },
     "Wo hörst du den Buchstaben - S? Am Anfang, in der Mitte oder am Ende.": {
@@ -965,20 +1990,115 @@
       "fingerprint": "66303b91da36e6c2",
       "profile": "prompt"
     },
+    "Wo hörst du den Buchstaben - U? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_3961ac453bda.ogg",
+      "fingerprint": "224ed55a58739dd9",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - V? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_321cf8512c93.ogg",
+      "fingerprint": "e4df25cf0067921f",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - W? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_fa6fd5c04915.ogg",
+      "fingerprint": "b8e192249596bdbd",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - X? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_b49820c08813.ogg",
+      "fingerprint": "b2ced895363d9b7a",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - Z? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_e4de6e1c5a0c.ogg",
+      "fingerprint": "a34a13f919372948",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - Ä? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_4108ef0c0324.ogg",
+      "fingerprint": "db3181f7892e4e8c",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - Ö? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_84ec3e8f06ab.ogg",
+      "fingerprint": "2c9bc27639083b16",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - Ü? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_844dd6651f8c.ogg",
+      "fingerprint": "b77b189338fad0ce",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Buchstaben - ß? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_dc9b335d2595.ogg",
+      "fingerprint": "9c0c4a049b29c6a8",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Laut - Au? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_d37d945d637f.ogg",
+      "fingerprint": "51b9bc9fa7bca534",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_7b33412b12da.ogg",
+      "fingerprint": "b0f0262e092d1c8f",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Laut - Ei? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_e00281474263.ogg",
+      "fingerprint": "726297834e0d8847",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Laut - Eu? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_923ee5c167b9.ogg",
+      "fingerprint": "87a1fc8db93a623a",
+      "profile": "prompt"
+    },
     "Wo hörst du den Laut - Pf? Am Anfang, in der Mitte oder am Ende.": {
       "file": "prompt_1a6f6b9c07a9.ogg",
       "fingerprint": "9b13ad26a94079ff",
       "profile": "prompt"
     },
+    "Wo hörst du den Laut - Qu? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_042f5f070491.ogg",
+      "fingerprint": "f29e510ef3c8b73d",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Laut - Sch? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_3773ebc27e85.ogg",
+      "fingerprint": "3490fe29bce7685a",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Laut - Sp? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_538c49ab6354.ogg",
+      "fingerprint": "2732ffaa81b028bf",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Laut - St? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_de433e65a6b3.ogg",
+      "fingerprint": "3ce65c0876c22cb8",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Laut - ck? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_71c013a32788.ogg",
+      "fingerprint": "82fc9e50c7f3eea9",
+      "profile": "prompt"
+    },
+    "Wo hörst du den Laut - ks? Am Anfang, in der Mitte oder am Ende.": {
+      "file": "prompt_dcfc83effbf7.ogg",
+      "fingerprint": "3574f0f61b3d4960",
+      "profile": "prompt"
+    },
     "Wolke": {
       "file": "word_3a1338ef215e.ogg",
-      "fingerprint": "a35755d425e80974",
+      "fingerprint": "302e52941f282802",
       "profile": "word"
     },
     "X": {
-      "file": "word_4b68ab3847fe.ogg",
-      "fingerprint": "fc9775c259dcf3a8",
-      "profile": "word"
+      "file": "phoneme_4b68ab3847fe.ogg",
+      "fingerprint": "64e8898d3fac6a12",
+      "profile": "phoneme"
     },
     "X - wie Taxi.": {
       "file": "reward_ca68e09ab818.ogg",
@@ -992,13 +2112,13 @@
     },
     "Xylofon": {
       "file": "word_700f4dce8c0c.ogg",
-      "fingerprint": "cd94be0b86d3a7c5",
+      "fingerprint": "5d75336b6c3b320c",
       "profile": "word"
     },
     "Y": {
-      "file": "word_18f5384d58bc.ogg",
-      "fingerprint": "24b462e1cd9a546b",
-      "profile": "word"
+      "file": "phoneme_18f5384d58bc.ogg",
+      "fingerprint": "41f6d33c255f3354",
+      "profile": "phoneme"
     },
     "Y - wie Yacht.": {
       "file": "reward_76198e73fcd4.ogg",
@@ -1007,8 +2127,13 @@
     },
     "Yacht": {
       "file": "word_6bda42dcd5d1.ogg",
-      "fingerprint": "cf606a013ca3161e",
+      "fingerprint": "9363a067243175d9",
       "profile": "word"
+    },
+    "Z": {
+      "file": "phoneme_bbeebd879e1d.ogg",
+      "fingerprint": "13b9dea3dcf13159",
+      "profile": "phoneme"
     },
     "Z - wie Zebra.": {
       "file": "reward_6010341413e0.ogg",
@@ -1017,17 +2142,77 @@
     },
     "Zahn": {
       "file": "word_02b4db5796e4.ogg",
-      "fingerprint": "a9f075081ad913c2",
+      "fingerprint": "2fa22aaedc340224",
       "profile": "word"
     },
     "Zebra": {
       "file": "word_459bed2926d0.ogg",
-      "fingerprint": "0be834c0b9eba68c",
+      "fingerprint": "fe4096f352c5122f",
       "profile": "word"
+    },
+    "Zeichne den Buchstaben - A - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_f938adb9d746.ogg",
+      "fingerprint": "c98d1c5bfb26c17c",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - B - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_f048b77515d4.ogg",
+      "fingerprint": "8466808534c67013",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - C - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_b82340a75599.ogg",
+      "fingerprint": "4b2b400a747d8575",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - D - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_ddbcee4e7e47.ogg",
+      "fingerprint": "58f39e80888e8e96",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - E - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_943d5d0f94ef.ogg",
+      "fingerprint": "438fac83b20a5f6a",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - F - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_2da233bf40d9.ogg",
+      "fingerprint": "ba1b09eef7c02fd0",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - G - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_70044d76ef95.ogg",
+      "fingerprint": "851659c22c70827a",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - H - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_673e4ba3e919.ogg",
+      "fingerprint": "04a4e18342949ff0",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - I - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_290be728bcfc.ogg",
+      "fingerprint": "61598e3f3e53cf7a",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - J - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_e046378ee798.ogg",
+      "fingerprint": "1afef316208cf3b9",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - K - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_ac2ea2232cfb.ogg",
+      "fingerprint": "89bf16ff15b1ceef",
+      "profile": "prompt"
     },
     "Zeichne den Buchstaben - L - nach und sammle dabei alle Sterne.": {
       "file": "prompt_24bcc5fc883e.ogg",
       "fingerprint": "d12f26755c2c8ac7",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - M - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_c10b548ec1a7.ogg",
+      "fingerprint": "fa8409e56619ab85",
       "profile": "prompt"
     },
     "Zeichne den Buchstaben - N - nach und sammle dabei alle Sterne.": {
@@ -1035,9 +2220,59 @@
       "fingerprint": "2c7879d9203ee3d6",
       "profile": "prompt"
     },
+    "Zeichne den Buchstaben - O - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_37ad2fe412d2.ogg",
+      "fingerprint": "91782d09c4146aab",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - P - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_64613a759339.ogg",
+      "fingerprint": "fcd3f86c3dfefac7",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - R - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_d92e1bcffbc8.ogg",
+      "fingerprint": "648b16de7f6a8cf5",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - S - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_d201545429fb.ogg",
+      "fingerprint": "11142630b5227c64",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - T - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_a5d10556dbc4.ogg",
+      "fingerprint": "ceb8578e00336103",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - U - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_7844c3de44f2.ogg",
+      "fingerprint": "4dee4834cc936abd",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - V - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_34be3255014f.ogg",
+      "fingerprint": "d8b9fcfb8f5fea57",
+      "profile": "prompt"
+    },
     "Zeichne den Buchstaben - W - nach und sammle dabei alle Sterne.": {
       "file": "prompt_0c7bdb3341bb.ogg",
       "fingerprint": "9067b4d7a8deed02",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - X - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_ad1a8751745a.ogg",
+      "fingerprint": "fe93645134fffec7",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - Y - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_c090c92873df.ogg",
+      "fingerprint": "21da8d7e648e988d",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - Z - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_2f501187e741.ogg",
+      "fingerprint": "2a1622444ffd4f39",
       "profile": "prompt"
     },
     "Zeichne den Buchstaben - Ä - nach und sammle dabei alle Sterne.": {
@@ -1045,9 +2280,19 @@
       "fingerprint": "3fbdc6cb797b308d",
       "profile": "prompt"
     },
+    "Zeichne den Buchstaben - Ö - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_eb60513ff8dd.ogg",
+      "fingerprint": "20d926b8c09908e8",
+      "profile": "prompt"
+    },
     "Zeichne den Buchstaben - Ü - nach und sammle dabei alle Sterne.": {
       "file": "prompt_15afce80024a.ogg",
       "fingerprint": "e870caf5c84f0354",
+      "profile": "prompt"
+    },
+    "Zeichne den Buchstaben - ß - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_38013d1fc8c2.ogg",
+      "fingerprint": "9ee1c9a0dcdd4baa",
       "profile": "prompt"
     },
     "Zeichne den Laut - Au - nach und sammle dabei alle Sterne.": {
@@ -1055,9 +2300,19 @@
       "fingerprint": "1bf0bfcf660c2da0",
       "profile": "prompt"
     },
+    "Zeichne den Laut - Ch - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_d09dd370947c.ogg",
+      "fingerprint": "094ed038a2b43400",
+      "profile": "prompt"
+    },
     "Zeichne den Laut - Ei - nach und sammle dabei alle Sterne.": {
       "file": "prompt_25ecae006efe.ogg",
       "fingerprint": "c01407fdc6924699",
+      "profile": "prompt"
+    },
+    "Zeichne den Laut - Eu - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_4ad741bace5d.ogg",
+      "fingerprint": "6bcff2ae976429d1",
       "profile": "prompt"
     },
     "Zeichne den Laut - Pf - nach und sammle dabei alle Sterne.": {
@@ -1065,275 +2320,485 @@
       "fingerprint": "6c417b6532fd10d1",
       "profile": "prompt"
     },
+    "Zeichne den Laut - Qu - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_e059c531b0af.ogg",
+      "fingerprint": "11913b6b2ce2ef1f",
+      "profile": "prompt"
+    },
     "Zeichne den Laut - Sch - nach und sammle dabei alle Sterne.": {
       "file": "prompt_0131504e9743.ogg",
       "fingerprint": "d106ea4ef1435667",
       "profile": "prompt"
     },
+    "Zeichne den Laut - Sp - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_94fc2252bc91.ogg",
+      "fingerprint": "5162e059f0dc0b4f",
+      "profile": "prompt"
+    },
+    "Zeichne den Laut - St - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_a3142fe9e207.ogg",
+      "fingerprint": "bd10bbd0bdb6bbb1",
+      "profile": "prompt"
+    },
+    "Zeichne den Laut - ck - nach und sammle dabei alle Sterne.": {
+      "file": "prompt_402818f1d988.ogg",
+      "fingerprint": "ef8ccc4e17ed0f19",
+      "profile": "prompt"
+    },
+    "Zitrone": {
+      "file": "word_d06917f3eee4.ogg",
+      "fingerprint": "183add4fbb6efbe7",
+      "profile": "word"
+    },
     "Zucker": {
       "file": "word_22e96d9a8d33.ogg",
-      "fingerprint": "ae235af5ea794acd",
+      "fingerprint": "23a6aa770ea22de0",
       "profile": "word"
+    },
+    "Zug": {
+      "file": "word_f8737ae629e3.ogg",
+      "fingerprint": "af91a39a9a869688",
+      "profile": "word"
+    },
+    "Zwei Reihen mit je vier Rosen blühen im Beet. Wie viele Rosen sind das.": {
+      "file": "prompt_8c2b7c6c4b52.ogg",
+      "fingerprint": "275c04a07454dcb1",
+      "profile": "prompt"
     },
     "Zwölf Eis und neun Eis. Wie viele Eis sind das zusammen.": {
       "file": "prompt_26a3d65bcbcc.ogg",
       "fingerprint": "a965da8908492386",
       "profile": "prompt"
     },
-    "bau": {
-      "file": "word_6c51ed231f6e.ogg",
-      "fingerprint": "163704022b423737",
+    "Zwölf Lamas stehen auf der Wiese. Fünf laufen weg. Wie viele Lamas bleiben.": {
+      "file": "prompt_f9b4b3a7dd54.ogg",
+      "fingerprint": "a7f4c3300be25584",
+      "profile": "prompt"
+    },
+    "am": {
+      "file": "word_ab6db599234d.ogg",
+      "fingerprint": "d9f4bbf2ff20250e",
       "profile": "word"
+    },
+    "bau": {
+      "file": "phoneme_6c51ed231f6e.ogg",
+      "fingerprint": "6a3fb6452288ec3f",
+      "profile": "phoneme"
     },
     "bei": {
       "file": "word_98970d1a1b80.ogg",
-      "fingerprint": "83d947c020c55bbd",
+      "fingerprint": "420d803d0535bd3d",
+      "profile": "word"
+    },
+    "blau": {
+      "file": "word_f4335a17539e.ogg",
+      "fingerprint": "33a72b0878326e86",
       "profile": "word"
     },
     "braun": {
       "file": "word_95b048a8eca0.ogg",
-      "fingerprint": "309152be01bffa91",
+      "fingerprint": "ce52a6eb417e2f80",
       "profile": "word"
+    },
+    "ck": {
+      "file": "phoneme_d93beca6efd0.ogg",
+      "fingerprint": "1b245c2687ae7856",
+      "profile": "phoneme"
     },
     "ck - wie Sack.": {
       "file": "reward_4073a31e3c4c.ogg",
       "fingerprint": "964f60bee0a282af",
       "profile": "reward"
     },
+    "da": {
+      "file": "word_aa58b21b01d6.ogg",
+      "fingerprint": "cd9d7aae6239f15d",
+      "profile": "word"
+    },
     "das": {
       "file": "word_0a7cb27e5292.ogg",
-      "fingerprint": "3182d9d1872f4fd0",
+      "fingerprint": "901b9952d5f9479a",
       "profile": "word"
     },
     "den": {
       "file": "word_8a8a1a9fe856.ogg",
-      "fingerprint": "0c46c8630cc9ca56",
+      "fingerprint": "43e014627383ff7b",
       "profile": "word"
     },
     "der": {
       "file": "word_5050d80d22ec.ogg",
-      "fingerprint": "d4f9e8eebdf792b4",
+      "fingerprint": "6a91e910cbba0264",
       "profile": "word"
+    },
+    "die": {
+      "file": "word_a8d79f40ddb7.ogg",
+      "fingerprint": "5dd530eb74c12642",
+      "profile": "word"
+    },
+    "dough": {
+      "file": "phoneme_cb9db87912c0.ogg",
+      "fingerprint": "7172e4810cf41ed5",
+      "profile": "phoneme"
     },
     "einen": {
       "file": "word_9227a87d17bb.ogg",
-      "fingerprint": "5167d774e7472067",
+      "fingerprint": "76218a67364ad13d",
+      "profile": "word"
+    },
+    "es": {
+      "file": "word_c0bc1e08f974.ogg",
+      "fingerprint": "0c8c784cb01c13f2",
       "profile": "word"
     },
     "fa": {
-      "file": "word_3097e26b7f3c.ogg",
-      "fingerprint": "2fe4b8e5be4d5eeb",
+      "file": "phoneme_3097e26b7f3c.ogg",
+      "fingerprint": "1b006d631b0b1d5e",
+      "profile": "phoneme"
+    },
+    "fi": {
+      "file": "phoneme_b4bdc8481097.ogg",
+      "fingerprint": "a1061797527a1b97",
+      "profile": "phoneme"
+    },
+    "fliegt": {
+      "file": "word_e7d7af0f1a0b.ogg",
+      "fingerprint": "7320af3af874dee7",
       "profile": "word"
     },
     "fo": {
-      "file": "word_9c3aee7110b7.ogg",
-      "fingerprint": "16b6f214636a5aa0",
-      "profile": "word"
+      "file": "phoneme_9c3aee7110b7.ogg",
+      "fingerprint": "7fd84c3f644377e0",
+      "profile": "phoneme"
     },
     "fu": {
-      "file": "word_a4d0ef23161b.ogg",
-      "fingerprint": "b6eb4f7d8064cc37",
-      "profile": "word"
+      "file": "phoneme_a4d0ef23161b.ogg",
+      "fingerprint": "2e1e6be2937976a8",
+      "profile": "phoneme"
     },
     "geh": {
-      "file": "word_94571cd5a810.ogg",
-      "fingerprint": "5be6d76262598b76",
-      "profile": "word"
+      "file": "phoneme_94571cd5a810.ogg",
+      "fingerprint": "f979cde33be2ab94",
+      "profile": "phoneme"
     },
     "gehen": {
       "file": "word_837ceb63da79.ogg",
-      "fingerprint": "8eeca55d30add46b",
+      "fingerprint": "5177079733af6e64",
+      "profile": "word"
+    },
+    "gelb": {
+      "file": "word_c55da5036006.ogg",
+      "fingerprint": "08491d2254d50528",
       "profile": "word"
     },
     "groß": {
       "file": "word_7b39b80f141a.ogg",
-      "fingerprint": "3120ae503c2b8930",
+      "fingerprint": "353f99ed49e94d3c",
+      "profile": "word"
+    },
+    "grün": {
+      "file": "word_fe263064ba02.ogg",
+      "fingerprint": "e2f57e597ab2cd5f",
       "profile": "word"
     },
     "gu": {
-      "file": "word_6152d43caa49.ogg",
-      "fingerprint": "05b7d805b0e3ad3c",
-      "profile": "word"
+      "file": "phoneme_6152d43caa49.ogg",
+      "fingerprint": "b66fef0dc8aeec7a",
+      "profile": "phoneme"
     },
     "gut": {
       "file": "word_77562953d4c8.ogg",
-      "fingerprint": "7a617b7187fed22e",
+      "fingerprint": "041113566afbdeee",
       "profile": "word"
+    },
+    "h": {
+      "file": "phoneme_aaa9402664f1.ogg",
+      "fingerprint": "6aa41751cd6f94a9",
+      "profile": "phoneme"
     },
     "hat": {
       "file": "word_18e1dd392168.ogg",
-      "fingerprint": "0bda7374f63a4e9c",
+      "fingerprint": "65807b308ae9577e",
       "profile": "word"
     },
     "hier": {
       "file": "word_529cbc8f2127.ogg",
-      "fingerprint": "93461a0a14140dc0",
+      "fingerprint": "11a23449f3b9aaa2",
+      "profile": "word"
+    },
+    "ho": {
+      "file": "phoneme_a821c62e8104.ogg",
+      "fingerprint": "d079b21d4723b0fb",
+      "profile": "phoneme"
+    },
+    "hol": {
+      "file": "word_cdc2def9aec4.ogg",
+      "fingerprint": "ac78fd2b80559cc3",
       "profile": "word"
     },
     "ich": {
       "file": "word_84c92d8abf32.ogg",
-      "fingerprint": "ba649c89f9048785",
+      "fingerprint": "5ff2d7bff1441239",
+      "profile": "word"
+    },
+    "im": {
+      "file": "word_a898df22bfc7.ogg",
+      "fingerprint": "667ebe55e371c304",
       "profile": "word"
     },
     "ist": {
       "file": "word_1da8321dcc9a.ogg",
-      "fingerprint": "a06aafd2049e3cb8",
+      "fingerprint": "7fc8e2e905da5fa5",
       "profile": "word"
     },
     "ka": {
-      "file": "word_3ebb1c99b12b.ogg",
-      "fingerprint": "8147d0d39015ab7d",
-      "profile": "word"
+      "file": "phoneme_3ebb1c99b12b.ogg",
+      "fingerprint": "45ff4369d323551b",
+      "profile": "phoneme"
     },
     "kei": {
-      "file": "word_368848dc82d1.ogg",
-      "fingerprint": "482f55c7e917a2f5",
-      "profile": "word"
+      "file": "phoneme_368848dc82d1.ogg",
+      "fingerprint": "82f9c7566dff7103",
+      "profile": "phoneme"
     },
     "ks": {
       "file": "phoneme_59548661e252.ogg",
       "fingerprint": "72f7a97dc8c0969e",
       "profile": "phoneme"
     },
+    "la": {
+      "file": "phoneme_b737ca7ee563.ogg",
+      "fingerprint": "5e8bfbe266ec165c",
+      "profile": "phoneme"
+    },
+    "lachen": {
+      "file": "word_cfbdb40cb7e4.ogg",
+      "fingerprint": "1351bbcd62fda73c",
+      "profile": "word"
+    },
+    "lila": {
+      "file": "word_e6ae6e617178.ogg",
+      "fingerprint": "fe7eb4dc14e3e308",
+      "profile": "word"
+    },
     "läuft": {
       "file": "word_870fa7cc6152.ogg",
-      "fingerprint": "7d97a23373b83485",
+      "fingerprint": "e1a55239fbd552d3",
       "profile": "word"
+    },
+    "lö": {
+      "file": "phoneme_edd62526d8ad.ogg",
+      "fingerprint": "7019d8420cc79f11",
+      "profile": "phoneme"
     },
     "ma": {
-      "file": "word_3c44c3e1b8b7.ogg",
-      "fingerprint": "903086f9f3e95540",
-      "profile": "word"
+      "file": "phoneme_3c44c3e1b8b7.ogg",
+      "fingerprint": "74052d48f7295fac",
+      "profile": "phoneme"
     },
     "mau": {
-      "file": "word_239be9e20e9a.ogg",
-      "fingerprint": "0990d9938d534412",
-      "profile": "word"
+      "file": "phoneme_239be9e20e9a.ogg",
+      "fingerprint": "3ba940c663906e7c",
+      "profile": "phoneme"
     },
     "mei": {
-      "file": "word_7717a57ec3d7.ogg",
-      "fingerprint": "9f557e60b09850f7",
-      "profile": "word"
+      "file": "phoneme_7717a57ec3d7.ogg",
+      "fingerprint": "aa2a9e65e5859f49",
+      "profile": "phoneme"
     },
     "mein": {
       "file": "word_25352d33fff0.ogg",
-      "fingerprint": "a6c7a2ca8d15b0d7",
+      "fingerprint": "10ff9f1caa9e01eb",
       "profile": "word"
     },
+    "mi": {
+      "file": "phoneme_eee1c1ade652.ogg",
+      "fingerprint": "9e7d0ee06f7dd049",
+      "profile": "phoneme"
+    },
+    "mo": {
+      "file": "phoneme_f4a4ce5fa634.ogg",
+      "fingerprint": "cd6562160f88af97",
+      "profile": "phoneme"
+    },
     "na": {
-      "file": "word_3d9fc4bde7ce.ogg",
-      "fingerprint": "46084209180fa075",
-      "profile": "word"
+      "file": "phoneme_3d9fc4bde7ce.ogg",
+      "fingerprint": "f35708b8cee6aff8",
+      "profile": "phoneme"
     },
     "orange": {
       "file": "word_1b4c9133da73.ogg",
-      "fingerprint": "6a7363c75b8a8a04",
+      "fingerprint": "88991de835e7df97",
       "profile": "word"
     },
     "pa": {
-      "file": "word_9513229d4359.ogg",
-      "fingerprint": "9894060c622b6f99",
-      "profile": "word"
+      "file": "phoneme_9513229d4359.ogg",
+      "fingerprint": "fcdb7b85033f645d",
+      "profile": "phoneme"
+    },
+    "qua": {
+      "file": "phoneme_f16b49f38336.ogg",
+      "fingerprint": "5e2a3f24bd443919",
+      "profile": "phoneme"
+    },
+    "que": {
+      "file": "phoneme_c57b7501cd84.ogg",
+      "fingerprint": "6b3495d3eee48e31",
+      "profile": "phoneme"
     },
     "roh": {
-      "file": "word_57fbb5e0d270.ogg",
-      "fingerprint": "2c14cf053aaadb39",
-      "profile": "word"
+      "file": "phoneme_57fbb5e0d270.ogg",
+      "fingerprint": "cf1fb9e03c9805cb",
+      "profile": "phoneme"
     },
     "rot": {
       "file": "word_7ec879c8c860.ogg",
-      "fingerprint": "dcb9dae081fc08dc",
+      "fingerprint": "695128377dc8ec9f",
       "profile": "word"
     },
     "ruf": {
       "file": "word_453c9aa8c895.ogg",
-      "fingerprint": "8f67d39cbef2144c",
+      "fingerprint": "e1d31ef2c2932e04",
       "profile": "word"
     },
     "ruft": {
       "file": "word_5fe72d4ce475.ogg",
-      "fingerprint": "bab0f9e0f6f62560",
+      "fingerprint": "895f7301033cf7a8",
       "profile": "word"
     },
     "ruh": {
-      "file": "word_84cdf478eb8a.ogg",
-      "fingerprint": "7381c479ec4cb8f6",
-      "profile": "word"
+      "file": "phoneme_84cdf478eb8a.ogg",
+      "fingerprint": "a65e89c2b29cdea6",
+      "profile": "phoneme"
+    },
+    "rü": {
+      "file": "phoneme_f3d953455a3d.ogg",
+      "fingerprint": "9115a2a79023eb00",
+      "profile": "phoneme"
     },
     "s t": {
-      "file": "word_4e60351e1f1a.ogg",
-      "fingerprint": "1bdaa9acae42d3c9",
-      "profile": "word"
+      "file": "phoneme_4e60351e1f1a.ogg",
+      "fingerprint": "09f8a1fa12b31306",
+      "profile": "phoneme"
     },
     "sa": {
-      "file": "word_4cf6829aa937.ogg",
-      "fingerprint": "e1ba9e7236cdbb4c",
-      "profile": "word"
+      "file": "phoneme_4cf6829aa937.ogg",
+      "fingerprint": "b6db2c109d3332dc",
+      "profile": "phoneme"
+    },
+    "scha": {
+      "file": "phoneme_f86d480308cb.ogg",
+      "fingerprint": "6d8d7f93f73f158f",
+      "profile": "phoneme"
+    },
+    "schu": {
+      "file": "phoneme_d5e955f91d28.ogg",
+      "fingerprint": "5a4276fcc54bb2f2",
+      "profile": "phoneme"
     },
     "schwimmt": {
       "file": "word_a510472311d2.ogg",
-      "fingerprint": "c5fa2265ffe3ebec",
+      "fingerprint": "6076b57c03dbb346",
       "profile": "word"
     },
+    "seh": {
+      "file": "phoneme_edb8d362b718.ogg",
+      "fingerprint": "320185f4fca92d42",
+      "profile": "phoneme"
+    },
+    "sind": {
+      "file": "word_bf586d886bcf.ogg",
+      "fingerprint": "cd6755aaad0c46f4",
+      "profile": "word"
+    },
+    "singt": {
+      "file": "word_f814933892ab.ogg",
+      "fingerprint": "c68021220d638da3",
+      "profile": "word"
+    },
+    "sp": {
+      "file": "phoneme_be18b85f77fc.ogg",
+      "fingerprint": "33efe6ad44da29d0",
+      "profile": "phoneme"
+    },
     "spie": {
-      "file": "word_553e8e5a74eb.ogg",
-      "fingerprint": "b88ac490cca64821",
+      "file": "phoneme_553e8e5a74eb.ogg",
+      "fingerprint": "1bb3c353b66c9bf6",
+      "profile": "phoneme"
+    },
+    "spielen": {
+      "file": "word_b98ccbb62227.ogg",
+      "fingerprint": "f39fa8debaa67c6d",
+      "profile": "word"
+    },
+    "spielt": {
+      "file": "word_b62bf2673545.ogg",
+      "fingerprint": "4ad64ad41b16d3c5",
       "profile": "word"
     },
     "steh": {
-      "file": "word_6aeb0b7ea8fb.ogg",
-      "fingerprint": "22fd7deba486e0c3",
-      "profile": "word"
+      "file": "phoneme_6aeb0b7ea8fb.ogg",
+      "fingerprint": "36f965c40357ed8c",
+      "profile": "phoneme"
     },
     "ta": {
-      "file": "word_76592b9de6d3.ogg",
-      "fingerprint": "56512d37407f27b3",
-      "profile": "word"
+      "file": "phoneme_76592b9de6d3.ogg",
+      "fingerprint": "7e641c1b81bd3532",
+      "profile": "phoneme"
     },
     "toe": {
-      "file": "word_6d0ef3950c22.ogg",
-      "fingerprint": "7dfabfe74b1fd728",
-      "profile": "word"
+      "file": "phoneme_6d0ef3950c22.ogg",
+      "fingerprint": "05c4021a4e60201a",
+      "profile": "phoneme"
     },
     "und": {
       "file": "word_856cc99d8734.ogg",
-      "fingerprint": "c89ebed7421cb345",
+      "fingerprint": "81c376f6c2257e7d",
       "profile": "word"
     },
     "wie": {
-      "file": "word_4a3f1139f614.ogg",
-      "fingerprint": "c603f0792ce7f121",
-      "profile": "word"
+      "file": "phoneme_4a3f1139f614.ogg",
+      "fingerprint": "036752649a8e4297",
+      "profile": "phoneme"
     },
     "wind": {
       "file": "word_9b58e68145a7.ogg",
-      "fingerprint": "8afee8e1a951e9ad",
+      "fingerprint": "a296c5f3045bf4a2",
       "profile": "word"
     },
     "wir": {
       "file": "word_999da4de4d65.ogg",
-      "fingerprint": "466482fa1a2b936d",
+      "fingerprint": "856e9237dc85cbdb",
       "profile": "word"
     },
     "zeh": {
-      "file": "word_2081c1f3fcd5.ogg",
-      "fingerprint": "060a4fb15f20d5ab",
-      "profile": "word"
+      "file": "phoneme_2081c1f3fcd5.ogg",
+      "fingerprint": "965ad1bf24caf83a",
+      "profile": "phoneme"
     },
     "zu": {
-      "file": "word_82cefa8283d3.ogg",
-      "fingerprint": "43aaecf90f73b341",
-      "profile": "word"
+      "file": "phoneme_82cefa8283d3.ogg",
+      "fingerprint": "447744201311853b",
+      "profile": "phoneme"
     },
     "Ä": {
-      "file": "word_2fe5ca1c1a3d.ogg",
-      "fingerprint": "c6d3e6bf3ebde028",
-      "profile": "word"
+      "file": "phoneme_2fe5ca1c1a3d.ogg",
+      "fingerprint": "3f1e20cd61a86b3c",
+      "profile": "phoneme"
     },
     "Ä - wie Ähre.": {
       "file": "reward_9f782d62be55.ogg",
       "fingerprint": "8771c14a0ea9abcb",
       "profile": "reward"
+    },
+    "Äpfel": {
+      "file": "word_ebf2411bebda.ogg",
+      "fingerprint": "8dcd023245a919c9",
+      "profile": "word"
+    },
+    "Ö": {
+      "file": "phoneme_ae8f3419f228.ogg",
+      "fingerprint": "300eeaf851c1dcc1",
+      "profile": "phoneme"
     },
     "Ö - wie Löwe.": {
       "file": "reward_897a52853f3a.ogg",
@@ -1341,9 +2806,9 @@
       "profile": "reward"
     },
     "Ü": {
-      "file": "word_913d7314efae.ogg",
-      "fingerprint": "4cc8f5990baf41ea",
-      "profile": "word"
+      "file": "phoneme_913d7314efae.ogg",
+      "fingerprint": "292d0f628b6cde31",
+      "profile": "phoneme"
     },
     "Ü - wie Rübe.": {
       "file": "reward_62faacec02f0.ogg",
@@ -1354,6 +2819,11 @@
       "file": "reward_89ab8a463570.ogg",
       "fingerprint": "9a8144f6ba75510f",
       "profile": "reward"
+    },
+    "ß": {
+      "file": "phoneme_cd3a7e92a911.ogg",
+      "fingerprint": "5ca3fc36441d60ca",
+      "profile": "phoneme"
     },
     "ß - wie Fuß.": {
       "file": "reward_a2fc36def4b8.ogg",

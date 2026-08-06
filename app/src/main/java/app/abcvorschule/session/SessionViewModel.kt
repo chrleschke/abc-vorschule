@@ -13,6 +13,7 @@ import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.SymbolHuntRound
+import app.abcvorschule.content.SymbolHuntSpeech
 import app.abcvorschule.content.SymbolInWordRound
 import app.abcvorschule.content.TaskSpec
 import app.abcvorschule.content.WordBuildRound
@@ -290,12 +291,29 @@ class SessionViewModel(
     fun currentPromptText(ttsAvailable: Boolean): String {
         val state = _ui.value
         val round = state.currentRound ?: return ""
-        if (ttsAvailable) return round.promptTts
+        if (ttsAvailable) return currentPromptParts().joinToString(" ")
         // No German voice: Rechnen falls back to a numeral prompt, others keep the text.
         return if (round is CountAddRound) {
             val symbol = app.abcvorschule.ui.exercise.MathOperation.fromWireName(round.operation)?.symbol ?: "+"
             "${round.left} $symbol ${round.right} = ?"
-        } else round.promptTts
+        } else if (round is SymbolHuntRound) {
+            val target = pack.atoms[round.targetAtomId]
+            "${round.promptTts} ${target?.display.orEmpty()}".trim()
+        } else {
+            round.promptTts
+        }
+    }
+
+    /** Ordered speech for the current round — hunt uses prompt clip + grapheme lemma. */
+    fun currentPromptParts(): List<String> {
+        val round = _ui.value.currentRound ?: return emptyList()
+        return when (round) {
+            is SymbolHuntRound -> SymbolHuntSpeech.promptParts(
+                round,
+                pack.atoms[round.targetAtomId],
+            )
+            else -> listOfNotNull(round.promptTts.takeIf { it.isNotBlank() })
+        }
     }
 
     /**

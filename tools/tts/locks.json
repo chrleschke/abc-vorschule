@@ -1,19 +1,206 @@
 {
   "version": 1,
   "locks": {
+    "finale:0e8ee2e401d0": {
+      "seed": 445173952,
+      "sourceText": "Mama Maus mampft einen dicken Apfel!"
+    },
+    "finale:0e8f74fbfac5": {
+      "seed": 421699219,
+      "sourceText": "Der Löwe klaut die Rübe!"
+    },
+    "finale:172373132f57": {
+      "seed": 1895541611,
+      "sourceText": "Die Katze klaut den Keks!"
+    },
+    "finale:2ec9117f069f": {
+      "seed": 176257191,
+      "sourceText": "Der Fuchs schläft im Nest!"
+    },
+    "finale:349ab3496772": {
+      "seed": 445173952,
+      "sourceText": "Deine Nase ist rot wie eine Rose."
+    },
+    "finale:432530c2ebab": {
+      "seed": 445173952,
+      "sourceText": "Der Ball saust aus dem Haus!"
+    },
+    "finale:64075e18e43e": {
+      "seed": 445173952,
+      "sourceText": "Oma und Mimi fliegen im Ufo!"
+    },
+    "finale:6d4e1b202977": {
+      "seed": 1412942643,
+      "sourceText": "Die Giraffe angelt auf dem Dach!"
+    },
+    "finale:707f64819467": {
+      "seed": 159147157,
+      "sourceText": "Das Pferd knackt den Sack!"
+    },
     "finale:8b3b7e980b81": {
       "seed": 159147157,
       "sourceText": "Das Schaf steckt im Schuh!"
     },
+    "finale:b65d1769e248": {
+      "seed": 682047698,
+      "sourceText": "Eine Spinne bewundert sich im Spiegel!"
+    },
+    "finale:bd0296f21a30": {
+      "seed": 1770890604,
+      "sourceText": "Der Wal will mein Eis!"
+    },
+    "finale:c485debfc347": {
+      "seed": 241093924,
+      "sourceText": "Das Lama hat einen roten Hut!"
+    },
+    "finale:d10867c62ad2": {
+      "seed": 1964793779,
+      "sourceText": "Der Fuchs futtert den Kuchen!"
+    },
+    "finale:e606bd089e5c": {
+      "seed": 1895541611,
+      "sourceText": "Das Zebra jongliert mit dem Jojo!"
+    },
+    "finale:eb42f8849812": {
+      "seed": 706808572,
+      "sourceText": "Papa und Opa tanzen auf dem Tisch!"
+    },
+    "finale:f0c434302046": {
+      "seed": 2031765628,
+      "sourceText": "Der Vogel klaut die Vase!"
+    },
+    "finale:f7ea0a9a8437": {
+      "seed": 301950401,
+      "sourceText": "Die Qualle quetscht sich ins Taxi!"
+    },
+    "miss:1bdb9dfabccf": {
+      "seed": 167081167,
+      "textOverride": "Ei",
+      "sourceText": "Ei."
+    },
+    "miss:608f99a77ce8": {
+      "seed": 2078418154,
+      "textOverride": "Ameise. Hörst du das M in der Mitte.",
+      "sourceText": "Ameise. Hörst du das - M - in der Mitte."
+    },
+    "phoneme:07af03fb0629": {
+      "seed": 1229924031,
+      "sourceText": "Sch"
+    },
+    "phoneme:08f271887ce9": {
+      "seed": 1819803021,
+      "textOverride": "Em.",
+      "sourceText": "M"
+    },
+    "phoneme:1897ba465985": {
+      "seed": 1157452082,
+      "textOverride": "Kuh",
+      "sourceText": "Qu"
+    },
+    "phoneme:18f5384d58bc": {
+      "seed": 818295292,
+      "textOverride": "üpsilonn.",
+      "sourceText": "Y"
+    },
+    "phoneme:2081c1f3fcd5": {
+      "seed": 2124478754,
+      "sourceText": "zeh"
+    },
+    "phoneme:239be9e20e9a": {
+      "seed": 363018813,
+      "sourceText": "mau"
+    },
     "phoneme:2fe5ca1c1a3d": {
-      "seed": 978878263,
-      "textOverride": "Ae",
+      "seed": 153000027,
+      "textOverride": "Ä.",
       "sourceText": "Ä"
+    },
+    "phoneme:3097e26b7f3c": {
+      "seed": 1197147303,
+      "sourceText": "fa"
+    },
+    "phoneme:3325c2b56f2b": {
+      "seed": 1813860740,
+      "sourceText": "Au"
+    },
+    "phoneme:333e0a1e2781": {
+      "seed": 1541917406,
+      "sourceText": "G"
+    },
+    "phoneme:368848dc82d1": {
+      "seed": 369609897,
+      "sourceText": "kei"
+    },
+    "phoneme:3c44c3e1b8b7": {
+      "seed": 1016093212,
+      "textOverride": "ma.",
+      "sourceText": "ma"
+    },
+    "phoneme:3d9fc4bde7ce": {
+      "seed": 1364072441,
+      "sourceText": "na"
+    },
+    "phoneme:3ebb1c99b12b": {
+      "seed": 1415142410,
+      "textOverride": "Kah!",
+      "sourceText": "ka"
+    },
+    "phoneme:3f39d5c348e5": {
+      "seed": 940755680,
+      "textOverride": "D!",
+      "sourceText": "D"
+    },
+    "phoneme:40b46ee569c3": {
+      "seed": 1314977224,
+      "sourceText": "S t"
+    },
+    "phoneme:44bd7ae60f47": {
+      "seed": 483386276,
+      "textOverride": "Ha.",
+      "sourceText": "H"
+    },
+    "phoneme:495f851d2eed": {
+      "seed": 1050821641,
+      "textOverride": "Pf.",
+      "sourceText": "Pf"
+    },
+    "phoneme:4a3f1139f614": {
+      "seed": 243544604,
+      "textOverride": "wie.",
+      "sourceText": "wie"
+    },
+    "phoneme:4b68ab3847fe": {
+      "seed": 955455870,
+      "sourceText": "X"
+    },
+    "phoneme:4cf6829aa937": {
+      "seed": 1765179368,
+      "textOverride": "sah!",
+      "sourceText": "sa"
+    },
+    "phoneme:4e60351e1f1a": {
+      "seed": 1314977224,
+      "textOverride": "Es T!",
+      "sourceText": "s t"
     },
     "phoneme:51de452ffffe": {
       "seed": 1370202921,
       "textOverride": "S.T.",
       "sourceText": "St"
+    },
+    "phoneme:553e8e5a74eb": {
+      "seed": 872505103,
+      "sourceText": "spie"
+    },
+    "phoneme:559aead08264": {
+      "seed": 16292186,
+      "textOverride": "A.",
+      "sourceText": "A"
+    },
+    "phoneme:57fbb5e0d270": {
+      "seed": 1171581113,
+      "textOverride": "ro.",
+      "sourceText": "roh"
     },
     "phoneme:59548661e252": {
       "seed": 252801214,
@@ -21,20 +208,244 @@
       "sourceText": "ks"
     },
     "phoneme:5c62e091b8c0": {
-      "seed": 32296145,
-      "speaker": "sohee",
-      "textOverride": "Pe",
+      "seed": 1678500400,
+      "textOverride": "Peh.",
       "sourceText": "P"
     },
+    "phoneme:6152d43caa49": {
+      "seed": 585589898,
+      "textOverride": "guh!",
+      "sourceText": "gu"
+    },
+    "phoneme:6aeb0b7ea8fb": {
+      "seed": 782997103,
+      "sourceText": "steh"
+    },
+    "phoneme:6b23c0d5f35d": {
+      "seed": 5382596,
+      "textOverride": "Zeh.",
+      "sourceText": "C"
+    },
+    "phoneme:6c51ed231f6e": {
+      "seed": 865860254,
+      "textOverride": "Bau.",
+      "sourceText": "bau"
+    },
+    "phoneme:6d0ef3950c22": {
+      "seed": 946424671,
+      "sourceText": "toe"
+    },
+    "phoneme:6da43b944e49": {
+      "seed": 942923981,
+      "textOverride": "Jott.",
+      "sourceText": "J"
+    },
+    "phoneme:72dfcfb0c470": {
+      "seed": 678814598,
+      "sourceText": "L"
+    },
+    "phoneme:76592b9de6d3": {
+      "seed": 514348669,
+      "sourceText": "ta"
+    },
+    "phoneme:7717a57ec3d7": {
+      "seed": 1774540729,
+      "sourceText": "mei"
+    },
+    "phoneme:82cefa8283d3": {
+      "seed": 208068725,
+      "textOverride": "tzu.",
+      "sourceText": "zu"
+    },
+    "phoneme:84cdf478eb8a": {
+      "seed": 346919363,
+      "textOverride": "ru.",
+      "sourceText": "ruh"
+    },
+    "phoneme:86be9a55762d": {
+      "seed": 243544604,
+      "textOverride": "Kah!",
+      "sourceText": "K"
+    },
+    "phoneme:8c2574892063": {
+      "seed": 1819803021,
+      "textOverride": "R.",
+      "sourceText": "R"
+    },
+    "phoneme:8cce03ee816b": {
+      "seed": 634327529,
+      "textOverride": "Schp!",
+      "sourceText": "Sp"
+    },
     "phoneme:8ce86a6ae65d": {
-      "seed": 1381496200,
-      "textOverride": "en.",
+      "seed": 905447715,
+      "textOverride": "En.",
       "sourceText": "N"
     },
+    "phoneme:8de0b3c47f11": {
+      "seed": 1079840589,
+      "textOverride": "Es.",
+      "sourceText": "S"
+    },
     "phoneme:913d7314efae": {
-      "seed": 874064776,
-      "textOverride": "Ü.",
+      "seed": 1504993665,
+      "textOverride": "üüh.",
       "sourceText": "Ü"
+    },
+    "phoneme:94571cd5a810": {
+      "seed": 1229619544,
+      "textOverride": "geh.",
+      "sourceText": "geh"
+    },
+    "phoneme:9513229d4359": {
+      "seed": 1301789325,
+      "textOverride": "Pah.",
+      "sourceText": "pa"
+    },
+    "phoneme:9c3aee7110b7": {
+      "seed": 343087039,
+      "textOverride": "!foh.",
+      "sourceText": "fo"
+    },
+    "phoneme:a252f7aeeb24": {
+      "seed": 1651707906,
+      "sourceText": "Ei"
+    },
+    "phoneme:a25513c7e0f6": {
+      "seed": 5382596,
+      "textOverride": "Ouh!",
+      "sourceText": "U"
+    },
+    "phoneme:a4d0ef23161b": {
+      "seed": 373640532,
+      "textOverride": "fuh",
+      "sourceText": "fu"
+    },
+    "phoneme:a821c62e8104": {
+      "seed": 1016093212,
+      "textOverride": "hoh.",
+      "sourceText": "ho"
+    },
+    "phoneme:a83dd0ccbffe": {
+      "seed": 1641853555,
+      "sourceText": "I"
+    },
+    "phoneme:a9f51566bd67": {
+      "seed": 916516890,
+      "sourceText": "E"
+    },
+    "phoneme:aaa9402664f1": {
+      "seed": 1016093212,
+      "textOverride": "Ha.",
+      "sourceText": "h"
+    },
+    "phoneme:ae8f3419f228": {
+      "seed": 32024185,
+      "sourceText": "Ö"
+    },
+    "phoneme:b4bdc8481097": {
+      "seed": 874064776,
+      "sourceText": "fi"
+    },
+    "phoneme:b737ca7ee563": {
+      "seed": 1314977224,
+      "textOverride": "lah.",
+      "sourceText": "la"
+    },
+    "phoneme:bbeebd879e1d": {
+      "seed": 1285524327,
+      "sourceText": "Z"
+    },
+    "phoneme:be18b85f77fc": {
+      "seed": 1364072441,
+      "textOverride": "schp",
+      "sourceText": "sp"
+    },
+    "phoneme:c4694f2e93d5": {
+      "seed": 1840266467,
+      "sourceText": "O"
+    },
+    "phoneme:c57b7501cd84": {
+      "seed": 1197147303,
+      "sourceText": "que"
+    },
+    "phoneme:cb9db87912c0": {
+      "seed": 634327529,
+      "textOverride": "do.",
+      "sourceText": "dough"
+    },
+    "phoneme:cd3a7e92a911": {
+      "seed": 1157983920,
+      "sourceText": "ß"
+    },
+    "phoneme:d5e955f91d28": {
+      "seed": 369609897,
+      "textOverride": "Shoe.",
+      "sourceText": "schu"
+    },
+    "phoneme:d93beca6efd0": {
+      "seed": 1290081121,
+      "sourceText": "ck"
+    },
+    "phoneme:ddc7790c82c5": {
+      "seed": 1561883485,
+      "sourceText": "Ch"
+    },
+    "phoneme:de5a6f78116e": {
+      "seed": 106749763,
+      "sourceText": "V"
+    },
+    "phoneme:df7e70e50215": {
+      "seed": 1541118536,
+      "sourceText": "B"
+    },
+    "phoneme:e632b7095b0b": {
+      "seed": 1402815107,
+      "sourceText": "T"
+    },
+    "phoneme:edb8d362b718": {
+      "seed": 363018813,
+      "textOverride": "See.",
+      "sourceText": "seh"
+    },
+    "phoneme:edd62526d8ad": {
+      "seed": 1750728656,
+      "sourceText": "lö"
+    },
+    "phoneme:eee1c1ade652": {
+      "seed": 157590664,
+      "sourceText": "mi"
+    },
+    "phoneme:f16b49f38336": {
+      "seed": 1301789325,
+      "textOverride": "kwa",
+      "sourceText": "qua"
+    },
+    "phoneme:f3d953455a3d": {
+      "seed": 124830265,
+      "textOverride": "rü.",
+      "sourceText": "rü"
+    },
+    "phoneme:f4a4ce5fa634": {
+      "seed": 153000027,
+      "textOverride": "Moe.",
+      "sourceText": "mo"
+    },
+    "phoneme:f67ab10ad4e4": {
+      "seed": 229331426,
+      "sourceText": "F"
+    },
+    "phoneme:f86d480308cb": {
+      "seed": 5382596,
+      "sourceText": "scha"
+    },
+    "phoneme:fcb5f40df9be": {
+      "seed": 1541118536,
+      "sourceText": "W"
+    },
+    "phoneme:ff22e6c0c305": {
+      "seed": 1402815107,
+      "sourceText": "Eu"
     },
     "prompt:0096fcfb79a3": {
       "seed": 841739473,
@@ -45,23 +456,59 @@
       "seed": 1627102821,
       "sourceText": "Zeichne den Laut - Sch - nach und sammle dabei alle Sterne."
     },
+    "prompt:01546e9fe28f": {
+      "seed": 1222659174,
+      "sourceText": "Baue das Wort Fuß."
+    },
+    "prompt:02f1b83bd522": {
+      "seed": 2146614455,
+      "sourceText": "Schiebe t und a zusammen. Welche Silbe entsteht."
+    },
     "prompt:03730ade6177": {
       "seed": 634912039,
       "sourceText": "Zeichne den Laut - Pf - nach und sammle dabei alle Sterne."
+    },
+    "prompt:042f5f070491": {
+      "seed": 1184124852,
+      "sourceText": "Wo hörst du den Laut - Qu? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:0620b64d3955": {
+      "seed": 94172901,
+      "sourceText": "Wir gehen den Weg."
+    },
+    "prompt:0707faec5679": {
+      "seed": 138134840,
+      "sourceText": "Baue das Wort Eule."
+    },
+    "prompt:0755cbe9db0e": {
+      "seed": 905134477,
+      "sourceText": "Baue das Wort Weg."
     },
     "prompt:0845c380bb11": {
       "seed": 456642538,
       "textOverride": "Wo hörst du den Buchstaben Ih? Am Anfang, in der Mitte oder am Ende.",
       "sourceText": "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende."
     },
+    "prompt:087c4b4843da": {
+      "seed": 1299926873,
+      "sourceText": "Schiebe p und a zusammen. Welche Silbe entsteht."
+    },
+    "prompt:0900f6d664ad": {
+      "seed": 582809577,
+      "sourceText": "Sieben Tomaten und fünf Tomaten. Wie viele Tomaten sind das."
+    },
     "prompt:099a34df3bd6": {
       "seed": 634912039,
       "textOverride": "Zeichne den Buchstaben  Äh nach und sammle dabei alle Sterne.",
       "sourceText": "Zeichne den Buchstaben - Ä - nach und sammle dabei alle Sterne."
     },
-    "prompt:09c5df39f465": {
-      "seed": 1343611678,
-      "sourceText": "Baue das Wort am. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
+    "prompt:0a6a4bed654c": {
+      "seed": 1088491871,
+      "sourceText": "Schiebe t und o zusammen. Welche Silbe entsteht."
+    },
+    "prompt:0a6efa155470": {
+      "seed": 1061282096,
+      "sourceText": "Baue das Wort Eis."
     },
     "prompt:0becb71d5e8b": {
       "seed": 122602205,
@@ -72,13 +519,29 @@
       "textOverride": "Zeichne den Buchstaben W nach und sammle dabei alle Sterne.",
       "sourceText": "Zeichne den Buchstaben - W - nach und sammle dabei alle Sterne."
     },
+    "prompt:0e20fa25883b": {
+      "seed": 1771246358,
+      "sourceText": "Baue das Wort Schuh."
+    },
     "prompt:0f47d6de53ad": {
       "seed": 881616687,
       "sourceText": "Schiebe sch und a zusammen. Welche Silbe entsteht."
     },
+    "prompt:0f7df5461bdf": {
+      "seed": 1396374524,
+      "sourceText": "Der Löwe ist da."
+    },
+    "prompt:112ee5318665": {
+      "seed": 2134744648,
+      "sourceText": "Neunzehn Fische und neun Fische. Wie viele Fische sind das."
+    },
     "prompt:11bc85fc22b6": {
       "seed": 1070235000,
       "sourceText": "Wo hörst du den Buchstaben - L? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:11df2bbfe668": {
+      "seed": 1212815306,
+      "sourceText": "Baue das Wort Keks."
     },
     "prompt:126764115645": {
       "seed": 573801264,
@@ -88,9 +551,9 @@
       "seed": 1991865418,
       "sourceText": "Sechzehn Spinnen und vierzehn Spinnen. Wie viele Spinnen sind das."
     },
-    "prompt:14a73343a0ea": {
-      "seed": 837250200,
-      "sourceText": "Baue das Wort Pferd. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
+    "prompt:147f2a0d4995": {
+      "seed": 1501021875,
+      "sourceText": "Die Spinne spielt."
     },
     "prompt:15afce80024a": {
       "seed": 837250200,
@@ -104,14 +567,14 @@
       "seed": 1512805924,
       "sourceText": "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende."
     },
-    "prompt:16690400e619": {
-      "seed": 888700001,
-      "sourceText": "Baue das Wort Qualle. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
-    },
     "prompt:1684a2eff3f3": {
       "seed": 888700001,
       "textOverride": "Schiebe \"B\" und \"Au\" zusammen. Welche Silbe entsteht.",
       "sourceText": "Schiebe b und au zusammen. Welche Silbe entsteht."
+    },
+    "prompt:170550a32d84": {
+      "seed": 635799362,
+      "sourceText": "Schiebe d und o zusammen. Welche Silbe entsteht."
     },
     "prompt:19428c2459aa": {
       "seed": 1061282096,
@@ -122,6 +585,10 @@
       "textOverride": "4 Reihen mit je 6 Omas singen im Chor. Wie viele Omas singen.",
       "sourceText": "Vier Reihen mit je sechs Omas singen im Chor. Wie viele Omas singen."
     },
+    "prompt:1a5f2b2f0f17": {
+      "seed": 1294888618,
+      "sourceText": "Baue das Wort Häuser."
+    },
     "prompt:1a6f6b9c07a9": {
       "seed": 258571559,
       "sourceText": "Wo hörst du den Laut - Pf? Am Anfang, in der Mitte oder am Ende."
@@ -131,22 +598,9 @@
       "textOverride": "Ordne das Wort Mama dem Bild zu.",
       "sourceText": "Ordne das Wort - Mama - dem Bild zu."
     },
-    "prompt:1eb1ad800136": {
-      "seed": 538794185,
-      "sourceText": "Baue das Wort Pony. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
-    },
     "prompt:1ec405c1df3a": {
       "seed": 611051227,
       "sourceText": "Wo hörst du den Buchstaben - S? Am Anfang, in der Mitte oder am Ende."
-    },
-    "prompt:1fd1dc6575a8": {
-      "seed": 1375581169,
-      "textOverride": "\"Wir gehen den Weg.\" - Ordne die Wörter in die richtige Reihenfolge.",
-      "sourceText": "Wir gehen den Weg. - Ordne die Wörter in die richtige Reihenfolge."
-    },
-    "prompt:206bc14a3673": {
-      "seed": 784351524,
-      "sourceText": "Baue das Wort Eis. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
     },
     "prompt:24bcc5fc883e": {
       "seed": 1521286730,
@@ -157,6 +611,10 @@
       "seed": 742524555,
       "sourceText": "Vierundzwanzig Eulen sitzen im Wald. Neun fliegen weg. Wie viele Eulen bleiben."
     },
+    "prompt:25e52f9570c2": {
+      "seed": 1521286730,
+      "sourceText": "Das ist mein Ei."
+    },
     "prompt:25ecae006efe": {
       "seed": 1351436046,
       "sourceText": "Zeichne den Laut - Ei - nach und sammle dabei alle Sterne."
@@ -165,9 +623,748 @@
       "seed": 272563471,
       "sourceText": "Zwölf Eis und neun Eis. Wie viele Eis sind das zusammen."
     },
-    "prompt:2811c87d47db": {
-      "seed": 2061156809,
-      "sourceText": "Baue das Wort Fisch. Suche die passenden Buchstaben und setze sie in die richtige Reihenfolge."
+    "prompt:2723db5e341b": {
+      "seed": 2098156998,
+      "sourceText": "Der Fisch schwimmt."
+    },
+    "prompt:28186eaa3467": {
+      "seed": 1251177417,
+      "sourceText": "Dreiundzwanzig Vögel sitzen auf dem Dach. Neun fliegen weg. Wie viele Vögel bleiben."
+    },
+    "prompt:2856adbf5b46": {
+      "seed": 1148811511,
+      "sourceText": "Baue das Wort Oma."
+    },
+    "prompt:290be728bcfc": {
+      "seed": 104290978,
+      "sourceText": "Zeichne den Buchstaben - I - nach und sammle dabei alle Sterne."
+    },
+    "prompt:2a722ffb7aaa": {
+      "seed": 2041777847,
+      "sourceText": "Sechzehn Eis sind im Gefrierfach. Neun werden gegessen. Wie viele Eis bleiben."
+    },
+    "prompt:2c1e0264970e": {
+      "seed": 354623259,
+      "sourceText": "Baue das Wort Stern."
+    },
+    "prompt:2da233bf40d9": {
+      "seed": 485888493,
+      "sourceText": "Zeichne den Buchstaben - F - nach und sammle dabei alle Sterne."
+    },
+    "prompt:2ea792b257f1": {
+      "seed": 786597938,
+      "sourceText": "Achtundzwanzig Omas sitzen im Bus. Dreizehn steigen aus. Wie viele Omas bleiben."
+    },
+    "prompt:2eab93180bfb": {
+      "seed": 266701721,
+      "sourceText": "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:2f501187e741": {
+      "seed": 715232770,
+      "sourceText": "Zeichne den Buchstaben - Z - nach und sammle dabei alle Sterne."
+    },
+    "prompt:2f9dd72c4bd9": {
+      "seed": 279883260,
+      "sourceText": "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das."
+    },
+    "prompt:321cf8512c93": {
+      "seed": 1230965277,
+      "sourceText": "Wo hörst du den Buchstaben - V? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:34be3255014f": {
+      "seed": 1224807488,
+      "sourceText": "Zeichne den Buchstaben - V - nach und sammle dabei alle Sterne."
+    },
+    "prompt:3773ebc27e85": {
+      "seed": 622994529,
+      "sourceText": "Wo hörst du den Laut - Sch? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:377e327f9934": {
+      "seed": 1211855472,
+      "sourceText": "Schiebe z und e zusammen. Welche Silbe entsteht."
+    },
+    "prompt:37ad2fe412d2": {
+      "seed": 1212711658,
+      "sourceText": "Zeichne den Buchstaben - O - nach und sammle dabei alle Sterne."
+    },
+    "prompt:38013d1fc8c2": {
+      "seed": 1313474187,
+      "sourceText": "Zeichne den Buchstaben - ß - nach und sammle dabei alle Sterne."
+    },
+    "prompt:38f76ee9c9cd": {
+      "seed": 800145432,
+      "sourceText": "Fünfundzwanzig Tomaten hängen am Strauch. Sechzehn werden geerntet. Wie viele Tomaten bleiben."
+    },
+    "prompt:3961ac453bda": {
+      "seed": 21244446,
+      "sourceText": "Wo hörst du den Buchstaben - U? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:3ac24bd996ef": {
+      "seed": 349038937,
+      "sourceText": "Schiebe m und o zusammen. Welche Silbe entsteht."
+    },
+    "prompt:3dc7bd551f44": {
+      "seed": 11126743,
+      "sourceText": "Hier sind Häuser."
+    },
+    "prompt:3ff48545b9c4": {
+      "seed": 1786778685,
+      "sourceText": "Hallo Lama!"
+    },
+    "prompt:402818f1d988": {
+      "seed": 1936471185,
+      "sourceText": "Zeichne den Laut - ck - nach und sammle dabei alle Sterne."
+    },
+    "prompt:409f4158455c": {
+      "seed": 41887805,
+      "sourceText": "Baue das Wort ich."
+    },
+    "prompt:40d5b5a4d5c5": {
+      "seed": 83261942,
+      "sourceText": "Drei Reihen mit je vier Dosen stehen im Regal. Wie viele Dosen sind das."
+    },
+    "prompt:410190d7c985": {
+      "seed": 1722084190,
+      "sourceText": "Das Pferd läuft."
+    },
+    "prompt:4108ef0c0324": {
+      "seed": 943388734,
+      "sourceText": "Wo hörst du den Buchstaben - Ä? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:44d371ae00ce": {
+      "seed": 485564181,
+      "sourceText": "Baue das Wort Hut."
+    },
+    "prompt:46b322b41250": {
+      "seed": 1898483666,
+      "sourceText": "Baue das Wort Wolke."
+    },
+    "prompt:46f2585df5d2": {
+      "seed": 256348359,
+      "sourceText": "Schiebe r und ü zusammen. Welche Silbe entsteht."
+    },
+    "prompt:4a84bca05435": {
+      "seed": 1651554606,
+      "sourceText": "Baue das Wort rot."
+    },
+    "prompt:4ad741bace5d": {
+      "seed": 839884355,
+      "sourceText": "Zeichne den Laut - Eu - nach und sammle dabei alle Sterne."
+    },
+    "prompt:4e3e2a7fda4c": {
+      "seed": 1583177374,
+      "sourceText": "Baue das Wort am."
+    },
+    "prompt:5073fadea995": {
+      "seed": 1235855775,
+      "sourceText": "Neunzehn Tomaten und elf Tomaten. Wie viele Tomaten sind das."
+    },
+    "prompt:538c49ab6354": {
+      "seed": 950025203,
+      "sourceText": "Wo hörst du den Laut - Sp? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:54639eb75ea4": {
+      "seed": 887871510,
+      "sourceText": "Baue das Wort Ufo."
+    },
+    "prompt:551d6711fe39": {
+      "seed": 94953815,
+      "sourceText": "Dreißig Taxis warten am Bahnhof. Siebzehn fahren los. Wie viele Taxis bleiben."
+    },
+    "prompt:559f7d778727": {
+      "seed": 344209604,
+      "sourceText": "Schiebe f und u zusammen. Welche Silbe entsteht."
+    },
+    "prompt:5750025dc921": {
+      "seed": 424248104,
+      "sourceText": "Sechsundzwanzig Säcke stehen im Lager. Dreizehn werden abgeholt. Wie viele Säcke bleiben."
+    },
+    "prompt:5ae3adaaec2c": {
+      "seed": 1408920713,
+      "sourceText": "Baue das Wort Vogel."
+    },
+    "prompt:5b4361b803e6": {
+      "seed": 156440210,
+      "sourceText": "Elf Rosen und sieben Rosen. Wie viele Rosen sind das."
+    },
+    "prompt:5da5adfeaff0": {
+      "seed": 888486522,
+      "sourceText": "Der Fuß ist groß."
+    },
+    "prompt:64613a759339": {
+      "seed": 844134317,
+      "sourceText": "Zeichne den Buchstaben - P - nach und sammle dabei alle Sterne."
+    },
+    "prompt:66620186b3ef": {
+      "seed": 2098422712,
+      "sourceText": "Baue das Wort Pony."
+    },
+    "prompt:673e4ba3e919": {
+      "seed": 1057289570,
+      "sourceText": "Zeichne den Buchstaben - H - nach und sammle dabei alle Sterne."
+    },
+    "prompt:699b1f9ac8ef": {
+      "seed": 486686498,
+      "sourceText": "Schiebe sch und u zusammen. Welche Silbe entsteht."
+    },
+    "prompt:6a071b523412": {
+      "seed": 1969913352,
+      "sourceText": "Acht Lamas und sechs Lamas. Wie viele Lamas sind das."
+    },
+    "prompt:6b8ca5b71a6f": {
+      "seed": 1468680224,
+      "sourceText": "Schiebe m und i zusammen. Welche Silbe entsteht."
+    },
+    "prompt:6d522d880401": {
+      "seed": 1673398693,
+      "sourceText": "Vier Reihen mit je fünf Häusern stehen in der Stadt. Wie viele Häuser sind das."
+    },
+    "prompt:6e7c6950368d": {
+      "seed": 419951012,
+      "sourceText": "Vierzehn Hüte hängen am Haken. Sechs werden aufgesetzt. Wie viele Hüte bleiben."
+    },
+    "prompt:70044d76ef95": {
+      "seed": 601831895,
+      "sourceText": "Zeichne den Buchstaben - G - nach und sammle dabei alle Sterne."
+    },
+    "prompt:70410dd03ecd": {
+      "seed": 251420939,
+      "sourceText": "Siebzehn Frösche und acht Frösche. Wie viele Frösche sind das."
+    },
+    "prompt:71c013a32788": {
+      "seed": 117708205,
+      "sourceText": "Wo hörst du den Laut - ck? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:71e2030ff4d8": {
+      "seed": 21585718,
+      "sourceText": "Wo hörst du den Buchstaben - P? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:7438d9705028": {
+      "seed": 662220618,
+      "sourceText": "Baue das Wort Pferd."
+    },
+    "prompt:7483d76a2972": {
+      "seed": 2007011190,
+      "sourceText": "Fünf Reihen mit je vier Eiern liegen im Karton. Wie viele Eier sind das."
+    },
+    "prompt:75675ba7ece4": {
+      "seed": 1856764454,
+      "sourceText": "Schiebe r und o zusammen. Welche Silbe entsteht."
+    },
+    "prompt:7844c3de44f2": {
+      "seed": 1300931298,
+      "sourceText": "Zeichne den Buchstaben - U - nach und sammle dabei alle Sterne."
+    },
+    "prompt:7af8fe295c49": {
+      "seed": 1145678980,
+      "sourceText": "Schiebe qu und a zusammen. Welche Silbe entsteht."
+    },
+    "prompt:7b188b50820e": {
+      "seed": 800997525,
+      "sourceText": "Wo hörst du den Buchstaben - A? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:7b33412b12da": {
+      "seed": 1557796273,
+      "sourceText": "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:7cc3b5a2d992": {
+      "seed": 1816915274,
+      "sourceText": "Drei Reihen mit je sechs Vögeln sitzen auf den Leitungen. Wie viele Vögel sind das."
+    },
+    "prompt:7e2e970bc1e1": {
+      "seed": 291125794,
+      "sourceText": "Schiebe h und o zusammen. Welche Silbe entsteht."
+    },
+    "prompt:7fe0dd6d004c": {
+      "seed": 620654724,
+      "sourceText": "Baue das Wort Haus."
+    },
+    "prompt:82b3474e488e": {
+      "seed": 1943746528,
+      "sourceText": "Baue das Wort Baum."
+    },
+    "prompt:844dd6651f8c": {
+      "seed": 28675494,
+      "sourceText": "Wo hörst du den Buchstaben - Ü? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:84ec3e8f06ab": {
+      "seed": 1614709381,
+      "sourceText": "Wo hörst du den Buchstaben - Ö? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:8630a5c0bbb0": {
+      "seed": 869251923,
+      "sourceText": "Vier Reihen mit je sechs Taxis warten am Flughafen. Wie viele Taxis sind das."
+    },
+    "prompt:8a82cbf13440": {
+      "seed": 1358646368,
+      "sourceText": "Baue das Wort Spinne."
+    },
+    "prompt:8b3e3cbec164": {
+      "seed": 1819219473,
+      "sourceText": "Baue das Wort Dach."
+    },
+    "prompt:8b788a56e60b": {
+      "seed": 589960119,
+      "sourceText": "Schiebe s und t zusammen. Welche Silbe entsteht."
+    },
+    "prompt:8bf7aca47f8d": {
+      "seed": 875862624,
+      "sourceText": "Baue das Wort Lama."
+    },
+    "prompt:8c2b7c6c4b52": {
+      "seed": 1607038802,
+      "sourceText": "Zwei Reihen mit je vier Rosen blühen im Beet. Wie viele Rosen sind das."
+    },
+    "prompt:8f690f34b4df": {
+      "seed": 1208583262,
+      "sourceText": "Baue das Wort Dose."
+    },
+    "prompt:900b49a17a1e": {
+      "seed": 29589449,
+      "sourceText": "Wo hörst du den Buchstaben - H? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:923ee5c167b9": {
+      "seed": 1659395842,
+      "sourceText": "Wo hörst du den Laut - Eu? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:933d817b0d4e": {
+      "seed": 762305165,
+      "sourceText": "Baue das Wort Nest."
+    },
+    "prompt:9359c62b6e46": {
+      "seed": 1354721084,
+      "sourceText": "Schiebe l und ö zusammen. Welche Silbe entsteht."
+    },
+    "prompt:943d5d0f94ef": {
+      "seed": 492066219,
+      "sourceText": "Zeichne den Buchstaben - E - nach und sammle dabei alle Sterne."
+    },
+    "prompt:94ab9f8c0c01": {
+      "seed": 279242415,
+      "sourceText": "Fünfzehn Fische und fünfzehn Fische. Wie viele Fische sind das."
+    },
+    "prompt:94fc2252bc91": {
+      "seed": 1811558172,
+      "sourceText": "Zeichne den Laut - Sp - nach und sammle dabei alle Sterne."
+    },
+    "prompt:96d68f8451f7": {
+      "seed": 822650500,
+      "sourceText": "Wo hörst du den Buchstaben - G? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:9705f375d308": {
+      "seed": 2015650844,
+      "sourceText": "Wo hörst du den Buchstaben - F? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:970f0fd9f7c9": {
+      "seed": 1059656879,
+      "sourceText": "Fünf Omas und vier Omas. Wie viele Omas sind das."
+    },
+    "prompt:973dab3ff238": {
+      "seed": 716323404,
+      "sourceText": "Baue das Wort Papa."
+    },
+    "prompt:975e2eaeed5c": {
+      "seed": 1323580493,
+      "sourceText": "Einundzwanzig Frösche sitzen am Teich. Acht hüpfen weg. Wie viele Frösche bleiben."
+    },
+    "prompt:981f9b9bb548": {
+      "seed": 914920784,
+      "sourceText": "Vier Reihen mit je sechs Säcken stehen im Lager. Wie viele Säcke sind das."
+    },
+    "prompt:9a122ef89769": {
+      "seed": 1302185031,
+      "sourceText": "Baue das Wort Mimi."
+    },
+    "prompt:9d87d18b56ec": {
+      "seed": 587557393,
+      "sourceText": "Die Eule fliegt."
+    },
+    "prompt:9df0c5642c67": {
+      "seed": 2010055253,
+      "sourceText": "Fünf Reihen mit je fünf Taxis warten am Flughafen. Wie viele Taxis sind das."
+    },
+    "prompt:9dfc4e87e01d": {
+      "seed": 1627656565,
+      "sourceText": "Baue das Wort Apfel."
+    },
+    "prompt:9f29d23ec573": {
+      "seed": 2068797141,
+      "sourceText": "Wo hörst du den Buchstaben - E? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:a07da5261a62": {
+      "seed": 717253512,
+      "sourceText": "Achtzehn Bücher stehen im Regal. Neun werden ausgeliehen. Wie viele Bücher bleiben."
+    },
+    "prompt:a08292b542f0": {
+      "seed": 298532852,
+      "sourceText": "Fünf Reihen mit je sechs Taxis warten am Bahnhof. Wie viele Taxis sind das."
+    },
+    "prompt:a1300d8ff0ec": {
+      "seed": 1186761860,
+      "sourceText": "Wo hörst du den Buchstaben - O? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:a275f6b39820": {
+      "seed": 620124846,
+      "sourceText": "Schiebe n und a zusammen. Welche Silbe entsteht."
+    },
+    "prompt:a296d46abea8": {
+      "seed": 688412821,
+      "sourceText": "Fünf Reihen mit je fünf Eulen sitzen auf den Ästen. Wie viele Eulen sind das."
+    },
+    "prompt:a3142fe9e207": {
+      "seed": 1679221999,
+      "sourceText": "Zeichne den Laut - St - nach und sammle dabei alle Sterne."
+    },
+    "prompt:a4ab20534065": {
+      "seed": 651350534,
+      "sourceText": "Neunundzwanzig Fische schwimmen im See. Vierzehn schwimmen weg. Wie viele Fische bleiben."
+    },
+    "prompt:a4f538f3cef1": {
+      "seed": 861869404,
+      "sourceText": "Baue das Wort Opa."
+    },
+    "prompt:a5d10556dbc4": {
+      "seed": 578273429,
+      "sourceText": "Zeichne den Buchstaben - T - nach und sammle dabei alle Sterne."
+    },
+    "prompt:a66ac5a4793d": {
+      "seed": 2000397672,
+      "sourceText": "Schiebe st und e zusammen. Welche Silbe entsteht."
+    },
+    "prompt:a6e0cc0680cc": {
+      "seed": 295545156,
+      "sourceText": "Baue das Wort Mama."
+    },
+    "prompt:a951ad1f566b": {
+      "seed": 501877366,
+      "sourceText": "Siebenundzwanzig Fenster hat das Haus. Achtzehn sind zu. Wie viele Fenster sind offen."
+    },
+    "prompt:a9abb07205aa": {
+      "seed": 286715467,
+      "sourceText": "Wo hörst du den Buchstaben - K? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:a9f62754c733": {
+      "seed": 458866785,
+      "sourceText": "Wo hörst du den Buchstaben - B? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:ab454bef1046": {
+      "seed": 660905640,
+      "sourceText": "Schiebe pf und a zusammen. Welche Silbe entsteht."
+    },
+    "prompt:ac018d44e861": {
+      "seed": 1238530504,
+      "sourceText": "Fünfzehn Rosen blühen im Garten. Sieben werden gepflückt. Wie viele Rosen bleiben."
+    },
+    "prompt:ac2ea2232cfb": {
+      "seed": 771478692,
+      "sourceText": "Zeichne den Buchstaben - K - nach und sammle dabei alle Sterne."
+    },
+    "prompt:ac8e54317a0d": {
+      "seed": 2089064797,
+      "sourceText": "Baue das Wort Schaf."
+    },
+    "prompt:ad1a8751745a": {
+      "seed": 91125271,
+      "sourceText": "Zeichne den Buchstaben - X - nach und sammle dabei alle Sterne."
+    },
+    "prompt:ae5b36c0b72a": {
+      "seed": 2118673009,
+      "sourceText": "Lama ist da."
+    },
+    "prompt:b0622a492cdc": {
+      "seed": 1467362234,
+      "sourceText": "Baue das Wort Taxi."
+    },
+    "prompt:b0bdf8a04cdb": {
+      "seed": 1936892529,
+      "sourceText": "Baue das Wort Vase."
+    },
+    "prompt:b289a5260972": {
+      "seed": 1453059999,
+      "sourceText": "Wo hörst du den Buchstaben - R? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:b49820c08813": {
+      "seed": 1493354105,
+      "sourceText": "Wo hörst du den Buchstaben - X? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:b5001897a747": {
+      "seed": 1784794645,
+      "sourceText": "Acht Omas winken. Drei Omas gehen nach Hause. Wie viele Omas bleiben."
+    },
+    "prompt:b6e1ad57dff0": {
+      "seed": 1147850176,
+      "sourceText": "Schiebe sp und i zusammen. Welche Silbe entsteht."
+    },
+    "prompt:b76ede73be92": {
+      "seed": 666085246,
+      "sourceText": "Tom ruft Opa."
+    },
+    "prompt:b82340a75599": {
+      "seed": 1293489915,
+      "sourceText": "Zeichne den Buchstaben - C - nach und sammle dabei alle Sterne."
+    },
+    "prompt:bc91cf7f4b6e": {
+      "seed": 437383222,
+      "sourceText": "Neun Hüte und sieben Hüte. Wie viele Hüte sind das."
+    },
+    "prompt:be5e0081fb1b": {
+      "seed": 132608883,
+      "sourceText": "Schiebe s und p zusammen. Welche Silbe entsteht."
+    },
+    "prompt:bf10feb3fdd8": {
+      "seed": 548253113,
+      "sourceText": "Baue das Wort Zebra."
+    },
+    "prompt:c090c92873df": {
+      "seed": 260588420,
+      "sourceText": "Zeichne den Buchstaben - Y - nach und sammle dabei alle Sterne."
+    },
+    "prompt:c0d2012b82dd": {
+      "seed": 322606547,
+      "sourceText": "Baue das Wort Bäume."
+    },
+    "prompt:c10b548ec1a7": {
+      "seed": 601979473,
+      "sourceText": "Zeichne den Buchstaben - M - nach und sammle dabei alle Sterne."
+    },
+    "prompt:c1a0aa5afae1": {
+      "seed": 74208507,
+      "sourceText": "Siebzehn Ameisen und neun Ameisen. Wie viele Ameisen sind das."
+    },
+    "prompt:c1e0497390e4": {
+      "seed": 797941530,
+      "sourceText": "Fünf Reihen mit je sechs Fenstern glänzen am Haus. Wie viele Fenster sind das."
+    },
+    "prompt:c21fff08b15b": {
+      "seed": 204113927,
+      "sourceText": "Fünf Reihen mit je vier Fischen schwimmen im Aquarium. Wie viele Fische sind das."
+    },
+    "prompt:c2967347ec55": {
+      "seed": 2129403586,
+      "sourceText": "Baue das Wort Rübe."
+    },
+    "prompt:c32328da391f": {
+      "seed": 767646998,
+      "sourceText": "Schiebe m und ei zusammen. Welche Silbe entsteht."
+    },
+    "prompt:c4b5f9462116": {
+      "seed": 1009613787,
+      "sourceText": "Ordne das Wort - Oma - dem Bild zu."
+    },
+    "prompt:c744810a3a94": {
+      "seed": 1095746550,
+      "sourceText": "Schiebe f und i zusammen. Welche Silbe entsteht."
+    },
+    "prompt:c74c8774dfc4": {
+      "seed": 716323404,
+      "sourceText": "Oma ist da."
+    },
+    "prompt:c7b443142a7e": {
+      "seed": 596113633,
+      "sourceText": "Baue das Wort Schule."
+    },
+    "prompt:c8fdff2401c5": {
+      "seed": 211345793,
+      "sourceText": "Baue das Wort Sack."
+    },
+    "prompt:c9a3e92020e7": {
+      "seed": 1537209840,
+      "sourceText": "Baue das Wort Löwe."
+    },
+    "prompt:cae0da484ea6": {
+      "seed": 21781570,
+      "sourceText": "Baue das Wort Rose."
+    },
+    "prompt:cb3dcc46101f": {
+      "seed": 1507914831,
+      "sourceText": "Siebenundzwanzig Spinnen sitzen im Netz. Neun krabbeln weg. Wie viele Spinnen bleiben."
+    },
+    "prompt:cc4a08f91fa0": {
+      "seed": 985379148,
+      "sourceText": "Baue das Wort Tor."
+    },
+    "prompt:cc8c0069891b": {
+      "seed": 1701300003,
+      "sourceText": "Sechs Ameisen und drei Ameisen. Wie viele Ameisen sind das."
+    },
+    "prompt:ce203393c972": {
+      "seed": 954459686,
+      "sourceText": "Schiebe s und e zusammen. Welche Silbe entsteht."
+    },
+    "prompt:d09dd370947c": {
+      "seed": 430140495,
+      "sourceText": "Zeichne den Laut - Ch - nach und sammle dabei alle Sterne."
+    },
+    "prompt:d161954782bd": {
+      "seed": 1264973388,
+      "sourceText": "Sechsundzwanzig Eier liegen im Korb. Siebzehn werden gekocht. Wie viele Eier bleiben."
+    },
+    "prompt:d1a506b1fb2f": {
+      "seed": 1245407260,
+      "sourceText": "Schiebe v und o zusammen. Welche Silbe entsteht."
+    },
+    "prompt:d201545429fb": {
+      "seed": 768079997,
+      "sourceText": "Zeichne den Buchstaben - S - nach und sammle dabei alle Sterne."
+    },
+    "prompt:d37d945d637f": {
+      "seed": 1755733529,
+      "sourceText": "Wo hörst du den Laut - Au? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:d3a4513f8c9a": {
+      "seed": 2063925321,
+      "sourceText": "Wo hörst du den Buchstaben - D? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:d92e1bcffbc8": {
+      "seed": 1170587610,
+      "sourceText": "Zeichne den Buchstaben - R - nach und sammle dabei alle Sterne."
+    },
+    "prompt:dbd6a81752d5": {
+      "seed": 1940139308,
+      "sourceText": "Baue das Wort Tom."
+    },
+    "prompt:dc9b335d2595": {
+      "seed": 1684176449,
+      "sourceText": "Wo hörst du den Buchstaben - ß? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:dcfc83effbf7": {
+      "seed": 95260953,
+      "sourceText": "Wo hörst du den Laut - ks? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:dd996e27ce1b": {
+      "seed": 444409294,
+      "sourceText": "Das ist mein Papa."
+    },
+    "prompt:ddbcee4e7e47": {
+      "seed": 1746058488,
+      "sourceText": "Zeichne den Buchstaben - D - nach und sammle dabei alle Sterne."
+    },
+    "prompt:de433e65a6b3": {
+      "seed": 1180294638,
+      "sourceText": "Wo hörst du den Laut - St? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:e00281474263": {
+      "seed": 513047806,
+      "sourceText": "Wo hörst du den Laut - Ei? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:e046378ee798": {
+      "seed": 2031461292,
+      "sourceText": "Zeichne den Buchstaben - J - nach und sammle dabei alle Sterne."
+    },
+    "prompt:e059c531b0af": {
+      "seed": 668984080,
+      "sourceText": "Zeichne den Laut - Qu - nach und sammle dabei alle Sterne."
+    },
+    "prompt:e128ff3b2fa5": {
+      "seed": 1467362234,
+      "textOverride": "Finde alle Laute (...)",
+      "sourceText": "Finde alle Laute"
+    },
+    "prompt:e289901b20ba": {
+      "seed": 643054273,
+      "sourceText": "Schiebe a und m zusammen. Welche Silbe entsteht."
+    },
+    "prompt:e2c1b8ed3722": {
+      "seed": 1185257820,
+      "sourceText": "Wo hörst du den Buchstaben - N? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:e2d9e26fc1a5": {
+      "seed": 772002789,
+      "sourceText": "Baue das Wort Hallo."
+    },
+    "prompt:e42717f14a4e": {
+      "seed": 1063129529,
+      "sourceText": "Baue das Wort Ei."
+    },
+    "prompt:e4aa0b2d7a35": {
+      "seed": 122602205,
+      "sourceText": "Baue das Wort Kleid."
+    },
+    "prompt:e4de6e1c5a0c": {
+      "seed": 1216911551,
+      "sourceText": "Wo hörst du den Buchstaben - Z? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:e686e893ca27": {
+      "seed": 172005766,
+      "sourceText": "Baue das Wort Qualle."
+    },
+    "prompt:ea0d0f938a70": {
+      "seed": 577107423,
+      "sourceText": "Mama ist im Haus."
+    },
+    "prompt:eb60513ff8dd": {
+      "seed": 1220561490,
+      "sourceText": "Zeichne den Buchstaben - Ö - nach und sammle dabei alle Sterne."
+    },
+    "prompt:ec2b8744fa9f": {
+      "seed": 1423925567,
+      "sourceText": "Baue das Wort Fisch."
+    },
+    "prompt:f048b77515d4": {
+      "seed": 582320157,
+      "sourceText": "Zeichne den Buchstaben - B - nach und sammle dabei alle Sterne."
+    },
+    "prompt:f17e480976d6": {
+      "seed": 21781570,
+      "textOverride": "Finde alle Buchstaben (...)",
+      "sourceText": "Finde alle Buchstaben"
+    },
+    "prompt:f20077b6e51a": {
+      "seed": 266965273,
+      "sourceText": "Vier Reihen mit je vier Büchern stehen im Bücherregal. Wie viele Bücher sind das."
+    },
+    "prompt:f2a2be0b5f0c": {
+      "seed": 529784176,
+      "sourceText": "Schiebe g und e zusammen. Welche Silbe entsteht."
+    },
+    "prompt:f30473f18d90": {
+      "seed": 1430542291,
+      "sourceText": "Schiebe m und a zusammen. Welche Silbe entsteht."
+    },
+    "prompt:f486c3cf6f4e": {
+      "seed": 1720327602,
+      "sourceText": "Neun Tomaten liegen im Korb. Vier werden gegessen. Wie viele Tomaten bleiben."
+    },
+    "prompt:f4e12abcc256": {
+      "seed": 728332993,
+      "sourceText": "Das Taxi ist gelb."
+    },
+    "prompt:f8d91895467d": {
+      "seed": 848883329,
+      "sourceText": "Oma hat einen Hut."
+    },
+    "prompt:f938adb9d746": {
+      "seed": 2110445096,
+      "sourceText": "Zeichne den Buchstaben - A - nach und sammle dabei alle Sterne."
+    },
+    "prompt:f9b4b3a7dd54": {
+      "seed": 1054632290,
+      "sourceText": "Zwölf Lamas stehen auf der Wiese. Fünf laufen weg. Wie viele Lamas bleiben."
+    },
+    "prompt:fa6fd5c04915": {
+      "seed": 1534979917,
+      "sourceText": "Wo hörst du den Buchstaben - W? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:fa9931c06132": {
+      "seed": 364355058,
+      "sourceText": "Schiebe l und a zusammen. Welche Silbe entsteht."
+    },
+    "prompt:fabf6c755f14": {
+      "seed": 1991865418,
+      "textOverride": "Finde alle Silben (...)",
+      "sourceText": "Finde alle Silben"
+    },
+    "prompt:fb145f731271": {
+      "seed": 1596956688,
+      "sourceText": "Vierundzwanzig Füße und sechs Füße. Wie viele Füße sind das."
+    },
+    "prompt:fb1ab15a1e92": {
+      "seed": 968474560,
+      "sourceText": "Dreißig Füße stampfen. Fünfzehn hören auf. Wie viele Füße stampfen noch."
+    },
+    "prompt:fe60efbe2dc0": {
+      "seed": 1549716648,
+      "sourceText": "Drei Reihen mit je drei Rosen blühen im Beet. Wie viele Rosen sind das."
     },
     "reward:01798f83b4d8": {
       "seed": 873012571,
@@ -234,11 +1431,6 @@
       "textOverride": "Zett wie Zebra.",
       "sourceText": "Z - wie Zebra."
     },
-    "reward:623572d8f348": {
-      "seed": 1869530881,
-      "textOverride": "Ei wie Ei.",
-      "sourceText": "Ei - wie Ei."
-    },
     "reward:6273482273f9": {
       "seed": 893467947,
       "textOverride": "\"Ih\" wie Igel.",
@@ -268,6 +1460,11 @@
       "seed": 1904053378,
       "textOverride": "\"Ypsilon\" wie Yacht.",
       "sourceText": "Y - wie Yacht."
+    },
+    "reward:77257c5e8de1": {
+      "seed": 1904053378,
+      "textOverride": "Ei wie Eimer.",
+      "sourceText": "Ei - wie Eimer."
     },
     "reward:77b0c4a17047": {
       "seed": 1084655494,
@@ -453,6 +1650,18 @@
       "seed": 1674724842,
       "sourceText": "Mama."
     },
+    "sentence:9d87d18b56ec": {
+      "seed": 1095904114,
+      "sourceText": "Die Eule fliegt."
+    },
+    "sentence:a2b1bcad9ae8": {
+      "seed": 58873926,
+      "sourceText": "Das Quadrat ist gelb."
+    },
+    "sentence:ae5b36c0b72a": {
+      "seed": 1711854709,
+      "sourceText": "Lama ist da."
+    },
     "sentence:b309c28c2c33": {
       "seed": 439084397,
       "sourceText": "Das ist mein Brot."
@@ -469,9 +1678,25 @@
       "seed": 312820997,
       "sourceText": "Der Kreis ist blau."
     },
+    "sentence:c74c8774dfc4": {
+      "seed": 432945842,
+      "sourceText": "Oma ist da."
+    },
+    "sentence:dd996e27ce1b": {
+      "seed": 1897889202,
+      "sourceText": "Das ist mein Papa."
+    },
     "sentence:ea0d0f938a70": {
       "seed": 1585345271,
       "sourceText": "Mama ist im Haus."
+    },
+    "sentence:f35268d13ff1": {
+      "seed": 1228004130,
+      "sourceText": "Der Hase ist im Sand."
+    },
+    "sentence:f4e12abcc256": {
+      "seed": 404743588,
+      "sourceText": "Das Taxi ist gelb."
     },
     "sentence:f8d91895467d": {
       "seed": 1228004130,
@@ -480,6 +1705,15 @@
     "sentence:fb7b8002bf06": {
       "seed": 1313172770,
       "sourceText": "Das Auto ist gelb."
+    },
+    "ui:5e62fdea5f0f": {
+      "seed": 173037020,
+      "textOverride": "Probier's noch mal...",
+      "sourceText": "Probiere eine andere Antwort"
+    },
+    "ui:8d0d96ca4976": {
+      "seed": 173037020,
+      "sourceText": "Das üben wir später."
     },
     "word:006a933c950f": {
       "seed": 1197660154,
@@ -507,15 +1741,6 @@
     "word:07015b4f5662": {
       "seed": 1229619544,
       "sourceText": "Löffel"
-    },
-    "word:07af03fb0629": {
-      "seed": 1229924031,
-      "sourceText": "Sch"
-    },
-    "word:08f271887ce9": {
-      "seed": 1819803021,
-      "textOverride": "Em.",
-      "sourceText": "M"
     },
     "word:0a7cb27e5292": {
       "seed": 942923981,
@@ -549,20 +1774,10 @@
       "seed": 585589898,
       "sourceText": "Nase"
     },
-    "word:1897ba465985": {
-      "seed": 1157452082,
-      "textOverride": "Kuh",
-      "sourceText": "Qu"
-    },
     "word:18e1dd392168": {
       "seed": 243544604,
       "textOverride": "hatt.",
       "sourceText": "hat"
-    },
-    "word:18f5384d58bc": {
-      "seed": 818295292,
-      "textOverride": "üpsilonn.",
-      "sourceText": "Y"
     },
     "word:192da8644770": {
       "seed": 153000027,
@@ -590,10 +1805,6 @@
       "textOverride": "ist.",
       "sourceText": "ist"
     },
-    "word:2081c1f3fcd5": {
-      "seed": 2124478754,
-      "sourceText": "zeh"
-    },
     "word:22c9783f5077": {
       "seed": 1540674070,
       "sourceText": "Fenster"
@@ -602,10 +1813,6 @@
       "seed": 208068725,
       "textOverride": "Zucker.",
       "sourceText": "Zucker"
-    },
-    "word:239be9e20e9a": {
-      "seed": 363018813,
-      "sourceText": "mau"
     },
     "word:25352d33fff0": {
       "seed": 1752272296,
@@ -634,23 +1841,6 @@
       "textOverride": "Salat.",
       "sourceText": "Salat"
     },
-    "word:2fe5ca1c1a3d": {
-      "seed": 153000027,
-      "textOverride": "Ä.",
-      "sourceText": "Ä"
-    },
-    "word:3097e26b7f3c": {
-      "seed": 1197147303,
-      "sourceText": "fa"
-    },
-    "word:3325c2b56f2b": {
-      "seed": 1813860740,
-      "sourceText": "Au"
-    },
-    "word:333e0a1e2781": {
-      "seed": 1541917406,
-      "sourceText": "G"
-    },
     "word:33d0ffb3cdb7": {
       "seed": 603063517,
       "sourceText": "Erdbeere"
@@ -658,10 +1848,6 @@
     "word:354bc956b8a4": {
       "seed": 114642735,
       "sourceText": "Tisch"
-    },
-    "word:368848dc82d1": {
-      "seed": 369609897,
-      "sourceText": "kei"
     },
     "word:3887a18984cb": {
       "seed": 1765179368,
@@ -679,29 +1865,6 @@
       "seed": 1781353031,
       "sourceText": "Wolke"
     },
-    "word:3c44c3e1b8b7": {
-      "seed": 1016093212,
-      "textOverride": "ma.",
-      "sourceText": "ma"
-    },
-    "word:3d9fc4bde7ce": {
-      "seed": 1364072441,
-      "sourceText": "na"
-    },
-    "word:3ebb1c99b12b": {
-      "seed": 1415142410,
-      "textOverride": "Kah!",
-      "sourceText": "ka"
-    },
-    "word:3f39d5c348e5": {
-      "seed": 940755680,
-      "textOverride": "D!",
-      "sourceText": "D"
-    },
-    "word:40b46ee569c3": {
-      "seed": 1314977224,
-      "sourceText": "S t"
-    },
     "word:410f76d01d8a": {
       "seed": 1468051116,
       "sourceText": "Tiger"
@@ -713,11 +1876,6 @@
     "word:430db59c91b3": {
       "seed": 1378116787,
       "sourceText": "Baum"
-    },
-    "word:44bd7ae60f47": {
-      "seed": 483386276,
-      "textOverride": "Ha.",
-      "sourceText": "H"
     },
     "word:453c9aa8c895": {
       "seed": 254035842,
@@ -749,30 +1907,6 @@
     "word:4959de6ed9b8": {
       "seed": 955950463,
       "sourceText": "Papa"
-    },
-    "word:495f851d2eed": {
-      "seed": 1050821641,
-      "textOverride": "Pf.",
-      "sourceText": "Pf"
-    },
-    "word:4a3f1139f614": {
-      "seed": 243544604,
-      "textOverride": "wie.",
-      "sourceText": "wie"
-    },
-    "word:4b68ab3847fe": {
-      "seed": 955455870,
-      "sourceText": "X"
-    },
-    "word:4cf6829aa937": {
-      "seed": 1765179368,
-      "textOverride": "sah!",
-      "sourceText": "sa"
-    },
-    "word:4e60351e1f1a": {
-      "seed": 1314977224,
-      "textOverride": "Es T!",
-      "sourceText": "s t"
     },
     "word:4ec3c3ac2171": {
       "seed": 139858617,
@@ -813,15 +1947,6 @@
       "seed": 85322428,
       "sourceText": "Nanu"
     },
-    "word:553e8e5a74eb": {
-      "seed": 872505103,
-      "sourceText": "spie"
-    },
-    "word:559aead08264": {
-      "seed": 16292186,
-      "textOverride": "A.",
-      "sourceText": "A"
-    },
     "word:56151fd50660": {
       "seed": 585388103,
       "textOverride": "Giraffe.",
@@ -835,11 +1960,6 @@
       "seed": 1468051116,
       "textOverride": "Ente.",
       "sourceText": "Ente"
-    },
-    "word:57fbb5e0d270": {
-      "seed": 1171581113,
-      "textOverride": "ro.",
-      "sourceText": "roh"
     },
     "word:58a3778c18c4": {
       "seed": 1893963240,
@@ -861,11 +1981,6 @@
       "textOverride": "Wahl.",
       "sourceText": "Wal"
     },
-    "word:5c62e091b8c0": {
-      "seed": 1678500400,
-      "textOverride": "Peh.",
-      "sourceText": "P"
-    },
     "word:5cb47a9bbad3": {
       "seed": 1512463413,
       "textOverride": "Pony.",
@@ -878,11 +1993,6 @@
     "word:5fe72d4ce475": {
       "seed": 2086737733,
       "sourceText": "ruft"
-    },
-    "word:6152d43caa49": {
-      "seed": 585589898,
-      "textOverride": "guh!",
-      "sourceText": "gu"
     },
     "word:63669810c995": {
       "seed": 144801741,
@@ -910,15 +2020,6 @@
       "textOverride": "Schpinne.",
       "sourceText": "Spinne"
     },
-    "word:6aeb0b7ea8fb": {
-      "seed": 782997103,
-      "sourceText": "steh"
-    },
-    "word:6b23c0d5f35d": {
-      "seed": 5382596,
-      "textOverride": "Zeh.",
-      "sourceText": "C"
-    },
     "word:6b942766c4e4": {
       "seed": 1144058823,
       "textOverride": "Dose.",
@@ -933,20 +2034,6 @@
       "seed": 1647504061,
       "sourceText": "Yacht"
     },
-    "word:6c51ed231f6e": {
-      "seed": 865860254,
-      "textOverride": "Bau.",
-      "sourceText": "bau"
-    },
-    "word:6d0ef3950c22": {
-      "seed": 946424671,
-      "sourceText": "toe"
-    },
-    "word:6da43b944e49": {
-      "seed": 942923981,
-      "textOverride": "Jott.",
-      "sourceText": "J"
-    },
     "word:6fb86a981cf3": {
       "seed": 1420845013,
       "sourceText": "Dino"
@@ -959,21 +2046,9 @@
       "seed": 818295292,
       "sourceText": "Xylofon"
     },
-    "word:72dfcfb0c470": {
-      "seed": 678814598,
-      "sourceText": "L"
-    },
     "word:753692ec36ad": {
       "seed": 1956026513,
       "sourceText": "Hallo"
-    },
-    "word:76592b9de6d3": {
-      "seed": 514348669,
-      "sourceText": "ta"
-    },
-    "word:7717a57ec3d7": {
-      "seed": 1774540729,
-      "sourceText": "mei"
     },
     "word:77562953d4c8": {
       "seed": 1389964126,
@@ -1021,11 +2096,6 @@
       "textOverride": "SSanndd.",
       "sourceText": "Sand"
     },
-    "word:82cefa8283d3": {
-      "seed": 208068725,
-      "textOverride": "tzu.",
-      "sourceText": "zu"
-    },
     "word:82f1643a857d": {
       "seed": 2058271745,
       "sourceText": "Insel"
@@ -1038,11 +2108,6 @@
     "word:84c92d8abf32": {
       "seed": 1418815255,
       "sourceText": "ich"
-    },
-    "word:84cdf478eb8a": {
-      "seed": 346919363,
-      "textOverride": "ru.",
-      "sourceText": "ruh"
     },
     "word:85139e8cc79d": {
       "seed": 1724253311,
@@ -1057,11 +2122,6 @@
       "seed": 2128207746,
       "textOverride": "Ampel.",
       "sourceText": "Ampel"
-    },
-    "word:86be9a55762d": {
-      "seed": 243544604,
-      "textOverride": "Kah!",
-      "sourceText": "K"
     },
     "word:870fa7cc6152": {
       "seed": 697929606,
@@ -1081,21 +2141,6 @@
       "seed": 2022971530,
       "sourceText": "Dach"
     },
-    "word:8c2574892063": {
-      "seed": 1819803021,
-      "textOverride": "R.",
-      "sourceText": "R"
-    },
-    "word:8cce03ee816b": {
-      "seed": 634327529,
-      "textOverride": "Schp!",
-      "sourceText": "Sp"
-    },
-    "word:8ce86a6ae65d": {
-      "seed": 905447715,
-      "textOverride": "En.",
-      "sourceText": "N"
-    },
     "word:8d0a36e2d012": {
       "seed": 1017467044,
       "textOverride": "Fehder",
@@ -1105,16 +2150,6 @@
       "seed": 238445762,
       "textOverride": "Quh.",
       "sourceText": "Kuh"
-    },
-    "word:8de0b3c47f11": {
-      "seed": 1079840589,
-      "textOverride": "Es.",
-      "sourceText": "S"
-    },
-    "word:913d7314efae": {
-      "seed": 1504993665,
-      "textOverride": "üüh.",
-      "sourceText": "Ü"
     },
     "word:9227a87d17bb": {
       "seed": 1012670721,
@@ -1126,11 +2161,6 @@
       "textOverride": "Hund.",
       "sourceText": "Hund"
     },
-    "word:94571cd5a810": {
-      "seed": 1229619544,
-      "textOverride": "geh.",
-      "sourceText": "geh"
-    },
     "word:9471c6375e05": {
       "seed": 1365805799,
       "sourceText": "Lampe"
@@ -1139,11 +2169,6 @@
       "seed": 913028903,
       "textOverride": "!Schtuhl",
       "sourceText": "Stuhl"
-    },
-    "word:9513229d4359": {
-      "seed": 1301789325,
-      "textOverride": "Pah.",
-      "sourceText": "pa"
     },
     "word:954f0a2d53ee": {
       "seed": 1389964126,
@@ -1193,11 +2218,6 @@
       "seed": 58331711,
       "sourceText": "Elefant"
     },
-    "word:9c3aee7110b7": {
-      "seed": 343087039,
-      "textOverride": "!foh.",
-      "sourceText": "fo"
-    },
     "word:a0aecdeeb95b": {
       "seed": 287812362,
       "sourceText": "Tal"
@@ -1224,11 +2244,6 @@
       "seed": 244473108,
       "sourceText": "Nuss"
     },
-    "word:a4d0ef23161b": {
-      "seed": 373640532,
-      "textOverride": "fuh",
-      "sourceText": "fu"
-    },
     "word:a4f6cf282483": {
       "seed": 315718800,
       "textOverride": "Kwadraaht",
@@ -1238,17 +2253,271 @@
       "seed": 1353816545,
       "sourceText": "schwimmt"
     },
+    "word:a898df22bfc7": {
+      "seed": 153000027,
+      "textOverride": "Im.",
+      "sourceText": "im"
+    },
+    "word:a8d79f40ddb7": {
+      "seed": 1677023100,
+      "textOverride": "die.",
+      "sourceText": "die"
+    },
+    "word:aa58b21b01d6": {
+      "seed": 531240575,
+      "sourceText": "da"
+    },
     "word:aaa6cab49ca4": {
       "seed": 1240188675,
       "sourceText": "Rad"
+    },
+    "word:ab6db599234d": {
+      "seed": 1365805799,
+      "textOverride": "am.",
+      "sourceText": "am"
+    },
+    "word:ae5859eceacb": {
+      "seed": 144801741,
+      "textOverride": "Ball.",
+      "sourceText": "Ball"
+    },
+    "word:b0034fdf5386": {
+      "seed": 2033479896,
+      "sourceText": "Kleid"
+    },
+    "word:b4b7ccdb3223": {
+      "seed": 1229619544,
+      "textOverride": "Yojo.",
+      "sourceText": "Jojo"
+    },
+    "word:b58bd16905d2": {
+      "seed": 738063405,
+      "sourceText": "Paket"
+    },
+    "word:b62bf2673545": {
+      "seed": 182928163,
+      "sourceText": "spielt"
+    },
+    "word:b98ccbb62227": {
+      "seed": 463204288,
+      "sourceText": "spielen"
+    },
+    "word:bb3d83ff198b": {
+      "seed": 1017467044,
+      "textOverride": "Bus.",
+      "sourceText": "Bus"
+    },
+    "word:bb815bb06bef": {
+      "seed": 877129697,
+      "sourceText": "Klavier"
     },
     "word:be39f4733f40": {
       "seed": 960095982,
       "sourceText": "Dreieck"
     },
+    "word:bf586d886bcf": {
+      "seed": 1765179368,
+      "textOverride": "sind.",
+      "sourceText": "sind"
+    },
+    "word:c0bc1e08f974": {
+      "seed": 1389964126,
+      "textOverride": "es.",
+      "sourceText": "es"
+    },
+    "word:c16f2f3b6f2d": {
+      "seed": 2098672070,
+      "sourceText": "Hase"
+    },
+    "word:c55da5036006": {
+      "seed": 2114714255,
+      "sourceText": "gelb"
+    },
+    "word:c55dcf4319da": {
+      "seed": 1977624608,
+      "sourceText": "Apfel"
+    },
+    "word:c67a98fb5c20": {
+      "seed": 713263381,
+      "sourceText": "Eier"
+    },
+    "word:ca6744f733d5": {
+      "seed": 1017467044,
+      "textOverride": "Blitz.",
+      "sourceText": "Blitz"
+    },
+    "word:cac219d63246": {
+      "seed": 2123915070,
+      "sourceText": "Himmel"
+    },
+    "word:caf054761428": {
+      "seed": 1829684699,
+      "sourceText": "Hut"
+    },
+    "word:cdc2def9aec4": {
+      "seed": 634327529,
+      "textOverride": "hohl.",
+      "sourceText": "hol"
+    },
+    "word:ce8c8bab8261": {
+      "seed": 1985915076,
+      "sourceText": "Löwe"
+    },
+    "word:cf95e1c70fb2": {
+      "seed": 1620915988,
+      "sourceText": "Katze"
+    },
+    "word:cfbdb40cb7e4": {
+      "seed": 1280490775,
+      "sourceText": "lachen"
+    },
+    "word:d06917f3eee4": {
+      "seed": 1765179368,
+      "textOverride": "Zitrone.",
+      "sourceText": "Zitrone"
+    },
+    "word:d09c3c3ea576": {
+      "seed": 1365805799,
+      "textOverride": "Igel.",
+      "sourceText": "Igel"
+    },
+    "word:d29eb8ca21d7": {
+      "seed": 1017467044,
+      "textOverride": "Raupe.",
+      "sourceText": "Raupe"
+    },
+    "word:d4e20327678b": {
+      "seed": 1252292467,
+      "sourceText": "Oma"
+    },
+    "word:d5968db704cf": {
+      "seed": 158222434,
+      "sourceText": "Opa"
+    },
+    "word:dd12db9683fb": {
+      "seed": 1353624861,
+      "sourceText": "Pilz"
+    },
+    "word:e006d852a61a": {
+      "seed": 390941881,
+      "textOverride": "Frosch.",
+      "sourceText": "Frosch"
+    },
+    "word:e02636bed39a": {
+      "seed": 207550357,
+      "sourceText": "Fuß"
+    },
+    "word:e10d850954a8": {
+      "seed": 387500886,
+      "textOverride": "Ro'se.",
+      "sourceText": "Rose"
+    },
+    "word:e45e09e0dd89": {
+      "seed": 1009374954,
+      "sourceText": "Markt"
+    },
+    "word:e49e3ccd94c8": {
+      "seed": 144801741,
+      "textOverride": "Rübe.",
+      "sourceText": "Rübe"
+    },
+    "word:e4a41c66866b": {
+      "seed": 182591860,
+      "sourceText": "Stern"
+    },
+    "word:e5716be7dc8f": {
+      "seed": 1842381315,
+      "sourceText": "Nest"
+    },
+    "word:e5c286bb5e83": {
+      "seed": 1854465165,
+      "sourceText": "Fisch"
+    },
+    "word:e6ae6e617178": {
+      "seed": 1366345099,
+      "sourceText": "lila"
+    },
+    "word:e7121e9ff0bc": {
+      "seed": 1023446385,
+      "sourceText": "Tor"
+    },
+    "word:e7d7af0f1a0b": {
+      "seed": 1002546988,
+      "sourceText": "fliegt"
+    },
+    "word:e89bbd48dc17": {
+      "seed": 1765179368,
+      "textOverride": "Ameise!",
+      "sourceText": "Ameise"
+    },
+    "word:eafaf309b341": {
+      "seed": 634327529,
+      "sourceText": "Hexe"
+    },
+    "word:ebf2411bebda": {
+      "seed": 388871546,
+      "sourceText": "Äpfel"
+    },
+    "word:ef53751671e5": {
+      "seed": 1017467044,
+      "textOverride": "Brot.",
+      "sourceText": "Brot"
+    },
+    "word:f00b1e56865e": {
+      "seed": 1765179368,
+      "textOverride": "Bär.",
+      "sourceText": "Bär"
+    },
+    "word:f1142f0fdbdd": {
+      "seed": 1924724194,
+      "textOverride": "Kro-ko-dil.",
+      "sourceText": "Krokodil"
+    },
+    "word:f12958816a49": {
+      "seed": 1167445636,
+      "sourceText": "Pizza"
+    },
+    "word:f13321c94b40": {
+      "seed": 1094852413,
+      "sourceText": "Gans"
+    },
+    "word:f4335a17539e": {
+      "seed": 1409681767,
+      "sourceText": "blau"
+    },
+    "word:f5252953fc2d": {
+      "seed": 605276852,
+      "sourceText": "Bäume"
+    },
+    "word:f7d8232215e4": {
+      "seed": 489055453,
+      "sourceText": "Nilpferd"
+    },
+    "word:f814933892ab": {
+      "seed": 627244297,
+      "sourceText": "singt"
+    },
+    "word:f8737ae629e3": {
+      "seed": 1365805799,
+      "textOverride": "Zugk.",
+      "sourceText": "Zug"
+    },
+    "word:f9eeb52c9bc4": {
+      "seed": 928440568,
+      "sourceText": "Käse"
+    },
     "word:fb9aa9a7b3d8": {
       "seed": 1069728556,
       "sourceText": "Mama"
+    },
+    "word:fe263064ba02": {
+      "seed": 1765179368,
+      "sourceText": "grün"
+    },
+    "word:fe3a5d0b9c4e": {
+      "seed": 1017467044,
+      "textOverride": "Weegk.",
+      "sourceText": "Weg"
     }
   }
 }

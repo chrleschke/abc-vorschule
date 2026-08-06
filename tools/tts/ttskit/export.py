@@ -33,10 +33,67 @@ import soundfile as sf
 from .paths import Paths
 from .plan import fingerprint, orphan_locks, status_of
 
-#: Bei gleichem Quelltext in mehreren Profilen gewinnt das frühere Profil.
-#: Die App kennt am Call-Site nur den Text — der Index muss eindeutig sein.
-PROFILE_PRIORITY = ("word", "phoneme", "prompt", "miss", "reward",
+#: Bei gleichem Quelltext in mehreren Profilen gewinnt das frühere Profil —
+#: nach verified-Audio (Fingerprint stimmt mit dem letzten Export überein).
+#: phoneme vor word, damit Buchstaben-/Silben-Laute nicht von Wort-Clips
+#: verdrängt werden. Die App kennt am Call-Site nur den Text — der Index
+#: muss eindeutig sein.
+PROFILE_PRIORITY = ("phoneme", "word", "prompt", "miss", "reward",
                     "sentence", "finale", "ui")
+
+#: Substrings that mark an authored task prompt — not a bare sentence even
+#: when the string ends with a full stop (Rechnen, Spurensucher, …).
+_INSTRUCTION_MARKERS = (
+    "Baue das Wort", "Ordne das Wort", "Ordne die Wörter",
+    "Finde den", "Finde alle", "Finde die",
+    "Schiebe ", "Zeichne den", "Wo hörst du", "Wie viele",
+)
+
+
+def _pedagogical_winner(text: str, prof_a: str, prof_b: str) -> str | None:
+    """Preferred index profile when the same text appears in two profiles."""
+    pair = {prof_a, prof_b}
+    if pair == {"phoneme", "word"}:
+        return "phoneme"
+    if pair == {"miss", "sentence"}:
+        return "sentence"
+    if pair == {"prompt", "sentence"}:
+        stripped = text.strip()
+        if any(marker in stripped for marker in _INSTRUCTION_MARKERS):
+            return "prompt"
+        if stripped.endswith((".", "!", "?")):
+            return "sentence"
+    return None
+
+
+def _clip_verified(asset_file: str, fingerprint: str,
+                   previous: dict[str, tuple[str, dict]]) -> bool:
+    """True when this clip's fingerprint matches the last committed export."""
+    prev = previous.get(asset_file)
+    return prev is not None and prev[1].get("fingerprint") == fingerprint
+
+
+def _collision_winner(text: str, existing: dict, existing_file: str,
+                      new_profile: str, new_file: str, new_fp: str,
+                      previous: dict[str, tuple[str, dict]]) -> dict:
+    """Pick the index entry when two locked clips share the same spoken text."""
+    preferred = _pedagogical_winner(text, existing["profile"], new_profile)
+    if preferred == existing["profile"]:
+        return existing
+    if preferred == new_profile:
+        return {"file": new_file, "profile": new_profile, "fingerprint": new_fp}
+
+    existing_verified = _clip_verified(existing_file, existing["fingerprint"], previous)
+    new_verified = _clip_verified(new_file, new_fp, previous)
+    if new_verified and not existing_verified:
+        return {"file": new_file, "profile": new_profile, "fingerprint": new_fp}
+    if existing_verified and not new_verified:
+        return existing
+    old_pri = PROFILE_PRIORITY.index(existing["profile"])
+    new_pri = PROFILE_PRIORITY.index(new_profile)
+    if new_pri < old_pri:
+        return {"file": new_file, "profile": new_profile, "fingerprint": new_fp}
+    return existing
 
 
 def asset_name(key: str) -> str:
@@ -152,14 +209,16 @@ def export_to_app(paths: Paths) -> ExportReport:
         if existing is None:
             index[text] = {"file": name, "profile": clip.profile, "fingerprint": fp}
             continue
-        old = PROFILE_PRIORITY.index(existing["profile"])
-        new = PROFILE_PRIORITY.index(clip.profile)
-        winner = existing["profile"] if old <= new else clip.profile
-        if old > new:
-            index[text] = {"file": name, "profile": clip.profile, "fingerprint": fp}
-        report.warnings.append(
-            f"Text {text!r} existiert in mehreren Profilen — "
-            f"App spielt {winner!r}")
+        winner_entry = _collision_winner(
+            text, existing, existing["file"], clip.profile, name, fp, previous)
+        winner = winner_entry["profile"]
+        if winner_entry is not existing:
+            index[text] = winner_entry
+        preferred = _pedagogical_winner(text, existing["profile"], clip.profile)
+        if preferred is None or preferred != winner:
+            report.warnings.append(
+                f"Text {text!r} existiert in mehreren Profilen — "
+                f"App spielt {winner!r}")
 
     # Zurückbehaltene Einträge dürfen frische (exportierte/unveränderte)
     # Einträge nie überschreiben — bei gleichem Text gewinnt der frische.

@@ -10,7 +10,7 @@ from pathlib import Path
 
 from . import voices
 from .audio import POSTPROCESS_VERSION
-from .extract import FIELD_TO_PROFILE
+from .extract import profile_for_item
 from .models import Clip, Item
 from .store import Locks, Profile, Profiles
 
@@ -76,7 +76,7 @@ def top_seeds(locks: Locks, profile_name: str, limit: int = TOP_SEED_LIMIT) -> l
 def build_clips(items: list[Item], profiles: Profiles, locks: Locks) -> list[Clip]:
     grouped: dict[str, dict] = {}
     for item in items:
-        default_profile = FIELD_TO_PROFILE[item.field]
+        default_profile = profile_for_item(item)
         key = clip_key(default_profile, item.text)
         bucket = grouped.setdefault(key, {
             "default_profile": default_profile,

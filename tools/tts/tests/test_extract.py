@@ -1,4 +1,5 @@
-from ttskit.extract import FIELD_TO_PROFILE, extract_items
+from ttskit.extract import FIELD_TO_PROFILE, extract_items, profile_for_item
+from ttskit.models import Item
 
 
 def test_extracts_every_authored_string(content_dir):
@@ -61,6 +62,24 @@ def test_every_field_has_a_profile(content_dir):
 def test_stretch_and_phoneme_share_the_phoneme_profile():
     assert FIELD_TO_PROFILE["stretchTts"] == "phoneme"
     assert FIELD_TO_PROFILE["phonemeTts"] == "phoneme"
+
+
+def test_letter_and_syllable_lemmas_use_phoneme_profile(content_dir):
+    by_id = {i.id: i for i in extract_items(content_dir)}
+    assert profile_for_item(by_id["atom:letter-m:lemma"]) == "phoneme"
+    assert by_id["atom:letter-m:lemma"].atom_kind == "letter"
+    assert profile_for_item(by_id["atom:maus:lemma"]) == "word"
+    assert by_id["atom:maus:lemma"].atom_kind == "word"
+
+
+def test_extra_strings_support_prompt_field(content_dir):
+    extra = {"version": 1, "strings": [
+        {"id": "huntPromptLetter", "text": "Finde alle Buchstaben",
+         "field": "promptTts", "note": "SymbolHuntDerivation.PromptLetter"},
+    ]}
+    by_id = {i.id: i for i in extract_items(content_dir, extra_strings=extra)}
+    assert by_id["ui:huntPromptLetter"].field == "promptTts"
+    assert profile_for_item(by_id["ui:huntPromptLetter"]) == "prompt"
 
 
 def test_extra_strings_become_ui_items(content_dir):

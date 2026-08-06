@@ -61,8 +61,34 @@ class SymbolHuntDerivationTest {
         val round = SymbolHuntDerivation.buildRound(
             pack, currentLessonIndex = 1, mode = SymbolHuntMode.letter, targetAtomId = "letter-a",
         )
-        assertEquals("Finde alle Buchstaben - A!", round?.promptTts)
+        assertEquals(SymbolHuntDerivation.PromptLetter, round?.promptTts)
         assertEquals(listOf("letter-m"), round?.distractorPool)
+    }
+
+    @Test
+    fun multiLetterTargetUsesLautPrompt() {
+        val round = SymbolHuntDerivation.buildRound(
+            pack, currentLessonIndex = 10, mode = SymbolHuntMode.letter, targetAtomId = "letter-sch",
+        )
+        assertEquals(SymbolHuntDerivation.PromptDigraph, round?.promptTts)
+    }
+
+    @Test
+    fun syllableTargetUsesSilbenPrompt() {
+        val round = SymbolHuntDerivation.buildRound(
+            pack, currentLessonIndex = 2, mode = SymbolHuntMode.syllable, targetAtomId = "ma",
+        )
+        assertEquals(SymbolHuntDerivation.PromptSyllable, round?.promptTts)
+    }
+
+    @Test
+    fun promptKindNamingMatchesPedagogy() {
+        val letterA = pack.atom("letter-a")
+        val sch = pack.atom("letter-sch")
+        val ma = pack.atom("ma")
+        assertEquals(SymbolHuntPromptKind.Buchstabe, SymbolHuntDerivation.promptKind(SymbolHuntMode.letter, letterA))
+        assertEquals(SymbolHuntPromptKind.Laut, SymbolHuntDerivation.promptKind(SymbolHuntMode.letter, sch))
+        assertEquals(SymbolHuntPromptKind.Silbe, SymbolHuntDerivation.promptKind(SymbolHuntMode.syllable, ma))
     }
 
     @Test

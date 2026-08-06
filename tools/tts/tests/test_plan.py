@@ -12,9 +12,10 @@ def profiles() -> Profiles:
     return Profiles.load(Path("does-not-exist.json"))
 
 
-def item(item_id: str, text: str, field: str, lesson: str | None = None) -> Item:
+def item(item_id: str, text: str, field: str, lesson: str | None = None,
+         atom_kind: str | None = None) -> Item:
     return Item(id=item_id, text=text, field=field, source="tasks.json",
-                lesson=lesson, label=item_id)
+                lesson=lesson, label=item_id, atom_kind=atom_kind)
 
 
 def test_clip_key_is_profile_plus_text_hash():
@@ -51,9 +52,20 @@ def test_stretch_and_phoneme_with_the_same_text_collapse():
     assert len(clips[0].item_ids) == 2
 
 
-def test_same_text_different_profile_stays_separate():
+def test_letter_lemma_collapses_with_phoneme_tts():
     items = [
-        item("atom:m:lemma", "M", "lemma"),
+        item("atom:letter-m:lemma", "M", "lemma", atom_kind="letter"),
+        item("task:t1:phonemeTts", "M", "phonemeTts"),
+    ]
+    clips = build_clips(items, profiles(), Locks())
+    assert len(clips) == 1
+    assert clips[0].profile == "phoneme"
+    assert len(clips[0].item_ids) == 2
+
+
+def test_word_lemma_stays_separate_from_phoneme_tts():
+    items = [
+        item("atom:m:lemma", "M", "lemma", atom_kind="word"),
         item("task:t1:phonemeTts", "M", "phonemeTts"),
     ]
     clips = build_clips(items, profiles(), Locks())

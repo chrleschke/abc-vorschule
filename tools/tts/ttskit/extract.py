@@ -7,6 +7,8 @@ from pathlib import Path
 from .models import Item
 from .store import read_json
 
+#: Logical field → default profile. Lemma is special: letter/syllable atoms use
+#: the phoneme profile (Lautwert); see profile_for_item().
 FIELD_TO_PROFILE: dict[str, str] = {
     "lemma": "word",
     "phonemeTts": "phoneme",
@@ -24,6 +26,15 @@ FIELD_TO_PROFILE: dict[str, str] = {
 
 # Order matters: it decides the order of items within a round.
 ROUND_FIELDS = ("promptTts", "missTts", "rewardTts", "stretchTts")
+
+_PHONEME_LEMMA_KINDS = frozenset({"letter", "syllable"})
+
+
+def profile_for_item(item: Item) -> str:
+    """Map an extracted item to its synthesis profile."""
+    if item.field == "lemma" and item.atom_kind in _PHONEME_LEMMA_KINDS:
+        return "phoneme"
+    return FIELD_TO_PROFILE[item.field]
 
 
 def _load(content_dir: Path, name: str, key: str) -> list[dict]:
@@ -78,17 +89,19 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
     items: list[Item] = []
 
     def add(item_id: str, text: str, field: str, source: str,
-            lesson: str | None, label: str) -> None:
+            lesson: str | None, label: str,
+            atom_kind: str | None = None) -> None:
         if not text or not text.strip():
             if blanks is not None:
                 blanks.append(item_id)
             return
         items.append(Item(id=item_id, text=text, field=field, source=source,
-                          lesson=lesson, label=label))
+                          lesson=lesson, label=label, atom_kind=atom_kind))
 
     for atom in sorted(atoms, key=lambda a: a["id"]):
         add(f"atom:{atom['id']}:lemma", atom.get("lemma", ""), "lemma",
-            "atoms.json", None, f"{atom.get('display', atom['id'])} ({atom.get('kind', '?')})")
+            "atoms.json", None, f"{atom.get('display', atom['id'])} ({atom.get('kind', '?')})",
+            atom_kind=atom.get("kind"))
 
     for sentence in sorted(sentences, key=lambda s: s["id"]):
         add(f"sentence:{sentence['id']}:tts", sentence.get("tts", ""), "sentenceTts",
@@ -113,7 +126,8 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
 
     if extra_strings:
         for entry in extra_strings.get("strings", []):
-            add(f"ui:{entry['id']}", entry.get("text", ""), "uiText",
+            field = entry.get("field", "uiText")
+            add(f"ui:{entry['id']}", entry.get("text", ""), field,
                 "extra-strings.json", None, entry.get("note") or entry["id"])
 
     return items

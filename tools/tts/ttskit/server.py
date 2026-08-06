@@ -12,6 +12,7 @@ import os
 import queue
 import tempfile
 import threading
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Callable
@@ -26,13 +27,13 @@ from .cli import load_context
 from .paths import Paths
 from .plan import fingerprint, orphan_locks, status_of, top_seeds
 from .render import (
-    candidate_fingerprint, candidate_meta, candidate_seeds, clip_audio_list,
-    pooled_seeds, random_seeds, render_batch_candidates, sample_candidates,
-    update_candidate_meta,
+    candidate_fingerprint, candidate_meta, candidate_seeds, clear_production,
+    clip_audio_list, deletable_candidate_seeds, delete_candidate_wav, pooled_seeds,
+    random_seeds, render_batch_candidates, sample_candidates, update_candidate_meta,
 )
 from .store import (
     SAMPLING_PARAMS, SAMPLING_SPEC, SECONDS_PER_TOKEN,
-    Lock, Locks, Profiles,
+    Lock, Locks, Profiles, parse_seed,
 )
 
 STATIC = Path(__file__).resolve().parent / "static"
@@ -47,6 +48,11 @@ MAX_CANDIDATES = 16
 #: weil er über mehrere ausgewählte Clips hinweg multipliziert — anders als
 #: das Kandidaten-Würfeln, das nur einen einzigen Clip trifft.
 DEFAULT_BATCH_COUNT = 2
+
+#: Wie oft `/events` auf neue Job-Events wartet. Kurz gehalten, damit Ctrl-C
+#: nicht am offenen Browser-Tab hängen bleibt — der alte 15-s-Timeout ließ
+#: uvicorn erst nach dem nächsten Keep-Alive-Zyklus sauber beenden.
+SSE_POLL_SECONDS = 1.0
 
 
 def _checked_speaker(name: Any) -> str:
@@ -92,6 +98,7 @@ class JobQueue:
     running: str | None = None
     last_progress: dict[str, Any] = field(default_factory=dict)
     _cancel: threading.Event = field(default_factory=threading.Event)
+    _shutdown: threading.Event = field(default_factory=threading.Event)
     _worker: threading.Thread | None = None
 
     def start(self) -> None:
@@ -103,6 +110,18 @@ class JobQueue:
 
     def cancel(self) -> None:
         self._cancel.set()
+
+    def shutdown(self) -> None:
+        """Stop accepting work and wake blocked SSE subscribers."""
+        self._shutdown.set()
+        self.cancel()
+        with self._lock:
+            for sub in list(self._subscribers):
+                sub.put({"type": "shutdown"})
+
+    @property
+    def shutting_down(self) -> bool:
+        return self._shutdown.is_set()
 
     def status(self) -> dict[str, Any]:
         return {"running": self.running, "progress": self.last_progress,
@@ -126,8 +145,11 @@ class JobQueue:
                 self._subscribers.remove(sub)
 
     def _run(self) -> None:
-        while True:
-            name, fn = self._queue.get()
+        while not self._shutdown.is_set():
+            try:
+                name, fn = self._queue.get(timeout=SSE_POLL_SECONDS)
+            except queue.Empty:
+                continue
             self.running = name
             self._cancel.clear()
             self.publish({"type": "job-start", "job": name})
@@ -142,8 +164,7 @@ class JobQueue:
                 self._queue.task_done()
 
 
-def create_app(paths: Paths, engine=None) -> FastAPI:
-    app = FastAPI(title="Qwen-TTS Pipeline")
+def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAPI:
     jobs = JobQueue()
     jobs.start()
 
@@ -151,8 +172,15 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
         from .engine import Engine
 
         engine = Engine()
-        engine.load()
+        if load_engine:
+            engine.load()
 
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        yield
+        jobs.shutdown()
+
+    app = FastAPI(title="Qwen-TTS Pipeline", lifespan=lifespan)
     app.state.paths = paths
     app.state.engine = engine
     app.state.jobs = jobs
@@ -193,6 +221,7 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
         clips = []
         for clip in ctx.clips:
             profile = ctx.profiles.profiles[clip.profile]
+            lock = ctx.locks.get(clip.key)
             clips.append({
                 "key": clip.key,
                 "profile": clip.profile,
@@ -200,6 +229,7 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
                 "sourceText": clip.source_text,
                 "speaker": clip.speaker,
                 "seed": clip.seed,
+                "generateSeed": lock.generate_seed if lock else None,
                 "locked": clip.locked,
                 "itemIds": list(clip.item_ids),
                 "fields": list(clip.fields),
@@ -329,7 +359,10 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
         profiles = Profiles.load(paths.profiles)
         if name not in profiles.profiles:
             raise HTTPException(status_code=404, detail=f"unbekanntes Profil {name!r}")
-        seed = int(body["seed"])
+        try:
+            seed = parse_seed(body["seed"])
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
         pool = profiles.profiles[name].seed_pool
         if seed not in pool:
             pool.append(seed)
@@ -351,24 +384,35 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
     @app.post("/api/clips/{key}/candidates", status_code=202)
     def api_candidates(key: str, body: dict = Body(default={})) -> dict[str, str]:
         ctx, clip = clip_by_key(key)
-        count = max(1, min(MAX_CANDIDATES, int(body.get("n", 4))))
         profile = ctx.profiles.profiles[clip.profile]
-        # Ein Seed, für den es hier schon eine Aufnahme gibt, würde bei
-        # gleichen Einstellungen dieselbe Datei erzeugen — in beiden Modi
-        # ausgeschlossen. Der Pool ist nur im Zufallsmodus tabu, im anderen
-        # ist er ja die Quelle.
-        rendered = set(candidate_seeds(paths, clip.key))
-        # Top-Seeds gehen vor: die engere, belegte Auswahl schlägt den ganzen
-        # Pool, wenn beides gesetzt ist. Sind es zu wenige für `count`, füllt
-        # `pooled_seeds` selbst mit Zufalls-Seeds auf — leere Liste heißt also
-        # „einfach Zufall wie gehabt".
-        top = top_seeds(ctx.locks, clip.profile) if body.get("useTopSeeds") else []
-        if top:
-            seeds = pooled_seeds(count, top, exclude=rendered)
-        elif body.get("useKnownSeeds") and profile.seed_pool:
-            seeds = pooled_seeds(count, profile.seed_pool, exclude=rendered)
+        fixed = body.get("fixedSeed")
+        if fixed is None:
+            lock = ctx.locks.get(key)
+            if lock and lock.generate_seed is not None:
+                fixed = lock.generate_seed
+        if fixed is not None:
+            try:
+                seeds = [parse_seed(fixed)]
+            except ValueError as exc:
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
         else:
-            seeds = random_seeds(count, exclude=rendered | set(profile.seed_pool))
+            count = max(1, min(MAX_CANDIDATES, int(body.get("n", 4))))
+            # Ein Seed, für den es hier schon eine Aufnahme gibt, würde bei
+            # gleichen Einstellungen dieselbe Datei erzeugen — in beiden Modi
+            # ausgeschlossen. Der Pool ist nur im Zufallsmodus tabu, im anderen
+            # ist er ja die Quelle.
+            rendered = set(candidate_seeds(paths, clip.key))
+            # Top-Seeds gehen vor: die engere, belegte Auswahl schlägt den ganzen
+            # Pool, wenn beides gesetzt ist. Sind es zu wenige für `count`, füllt
+            # `pooled_seeds` selbst mit Zufalls-Seeds auf — leere Liste heißt also
+            # „einfach Zufall wie gehabt".
+            top = top_seeds(ctx.locks, clip.profile) if body.get("useTopSeeds") else []
+            if top:
+                seeds = pooled_seeds(count, top, exclude=rendered)
+            elif body.get("useKnownSeeds") and profile.seed_pool:
+                seeds = pooled_seeds(count, profile.seed_pool, exclude=rendered)
+            else:
+                seeds = random_seeds(count, exclude=rendered | set(profile.seed_pool))
 
         def run(is_cancelled) -> None:
             written = sample_candidates(
@@ -412,14 +456,35 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
         if speaker is not None:
             _checked_speaker(speaker)
 
+        if "seed" not in body:
+            raise HTTPException(status_code=422, detail="'seed' fehlt im Request-Body")
+        try:
+            lock_seed = int(body["seed"])
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=422,
+                detail=f"'seed' muss eine Ganzzahl sein, nicht {type(body['seed']).__name__}",
+            ) from exc
+
+        generate_seed = merged("generateSeed",
+                               existing.generate_seed if existing else None)
+        if "generateSeed" in body and body["generateSeed"] is not None:
+            try:
+                generate_seed = parse_seed(body["generateSeed"])
+            except ValueError as exc:
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
+        elif "generateSeed" in body and body["generateSeed"] is None:
+            generate_seed = None
+
         locks.set(key, Lock(
-            seed=int(body["seed"]),
+            seed=lock_seed,
             profile=override,
             text_override=merged("textOverride",
                                  existing.text_override if existing else None),
             note=merged("note", existing.note if existing else None),
             source_text=clip.source_text,
             speaker=speaker,
+            generate_seed=generate_seed,
         ))
         locks.save(paths.locks)
         return {"ok": "locked"}
@@ -460,6 +525,7 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
             note=existing.note if existing else None,
             source_text=clip.source_text,
             speaker=existing.speaker if existing else None,
+            generate_seed=existing.generate_seed if existing else None,
         ))
         locks.save(paths.locks)
 
@@ -510,47 +576,38 @@ def create_app(paths: Paths, engine=None) -> FastAPI:
     @app.delete("/api/clips/{key}/candidates/{seed}")
     def api_delete_candidate(key: str, seed: int) -> dict[str, str]:
         ctx, clip = clip_by_key(key)
-        wav = paths.candidates / key / f"{seed}.wav"
-        if not wav.exists():
+        production = paths.audio / f"{key}.wav"
+        if seed == clip.seed and production.exists():
+            raise HTTPException(
+                status_code=409,
+                detail=f"Seed {seed} ist die Produktion — „Keine Produktion“ nutzen")
+        try:
+            delete_candidate_wav(paths, clip, seed)
+        except FileNotFoundError:
             raise HTTPException(status_code=404,
                                 detail=f"kein Kandidat mit Seed {seed} für {key!r}")
-        # 👍 hat den Seed in den Pool gelegt — das Löschen der Aufnahme nimmt
-        # ihn wieder heraus, sonst verteilt der Pool einen Seed, dessen Klang
-        # niemand mehr anhören kann.
-        if candidate_meta(paths, key, seed).get("rating") == "good":
-            profiles = Profiles.load(paths.profiles)
-            profiles.profiles[clip.profile].seed_pool = [
-                s for s in profiles.profiles[clip.profile].seed_pool if s != seed
-            ]
-            profiles.save(paths.profiles)
-        wav.unlink()
-        (paths.candidates / key / f"{seed}.json").unlink(missing_ok=True)
-
-        production = paths.audio / f"{key}.wav"
-        # Der gelöschte Kandidat war die aktuelle Produktion: die Datei, die
-        # die App ausliefern würde, darf keinen verworfenen Klang mehr enthalten.
-        if clip.seed == seed and production.exists():
-            production.unlink()
-
-        # Keine Probeaufnahme und keine Produktions-Datei mehr übrig — die
-        # Festlegung hat nichts mehr, worauf sie zeigen könnte, und fällt
-        # automatisch weg. Ein eigener "Lock entfernen"-Knopf erübrigt sich so.
-        #
-        # Aussprache, Stimme, Profil und Notiz hängen am selben Lock, sind aber
-        # von Hand kuratierte Entscheidungen — eine gelöschte Probeaufnahme sagt
-        # über sie nichts aus. Trägt der Lock eine davon, bleibt er also stehen,
-        # sonst hätte das Löschen des letzten Kandidaten stillschweigend den
-        # eingetippten TTS-Text mitgenommen.
-        if not candidate_seeds(paths, key) and not (paths.audio / f"{key}.wav").exists():
-            locks = Locks.load(paths.locks)
-            lock = locks.get(key)
-            curated = lock is not None and any(
-                (lock.text_override, lock.speaker, lock.profile, lock.note))
-            if lock is not None and not curated:
-                locks.remove(key)
-                locks.save(paths.locks)
-
         return {"ok": "deleted"}
+
+    @app.delete("/api/clips/{key}/candidates")
+    def api_delete_deletable_candidates(key: str) -> dict[str, Any]:
+        """Alle löschbaren Probeaufnahmen — ohne 👍 und ohne Produktion."""
+        ctx, clip = clip_by_key(key)
+        deletable, skipped = deletable_candidate_seeds(paths, clip)
+        deleted: list[int] = []
+        for seed in deletable:
+            delete_candidate_wav(paths, clip, seed)
+            deleted.append(seed)
+        return {"ok": "deleted", "deleted": len(deleted), "skipped": skipped,
+                "seeds": deleted}
+
+    @app.post("/api/clips/{key}/clear-production")
+    def api_clear_production(key: str) -> dict[str, str]:
+        """Produktion aufheben — Kandidaten und 👍 bleiben, Lock nur wenn kuratiert."""
+        ctx, clip = clip_by_key(key)
+        if not clear_production(paths, clip):
+            raise HTTPException(status_code=409,
+                                detail="keine Produktion zum Aufheben")
+        return {"ok": "cleared"}
 
     @app.post("/api/render", status_code=202)
     def api_render(body: dict = Body(default={})) -> dict[str, str]:
@@ -651,12 +708,16 @@ def _event_stream(jobs: JobQueue):
     sub = jobs.subscribe()
     try:
         yield f"data: {json.dumps(jobs.status())}\n\n"
-        while True:
+        while not jobs.shutting_down:
             try:
-                event = sub.get(timeout=15)
+                event = sub.get(timeout=SSE_POLL_SECONDS)
             except queue.Empty:
+                if jobs.shutting_down:
+                    break
                 yield ": keep-alive\n\n"
                 continue
+            if event.get("type") == "shutdown":
+                break
             yield f"data: {json.dumps(event)}\n\n"
     finally:
         jobs.unsubscribe(sub)

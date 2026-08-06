@@ -21,6 +21,8 @@ class Item:
     source: str
     lesson: str | None
     label: str
+    #: atoms.json only — drives lemma → phoneme vs word (see extract.profile_for_item).
+    atom_kind: str | None = None
 
 
 @dataclass(frozen=True)

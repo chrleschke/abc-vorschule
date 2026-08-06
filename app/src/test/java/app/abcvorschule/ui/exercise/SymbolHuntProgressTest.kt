@@ -1,5 +1,6 @@
 package app.abcvorschule.ui.exercise
 
+import app.abcvorschule.content.SymbolHuntDerivation
 import app.abcvorschule.content.SymbolHuntMode
 import app.abcvorschule.content.SymbolHuntRound
 import org.junit.Assert.assertEquals
@@ -9,7 +10,7 @@ import org.junit.Test
 
 class SymbolHuntProgressTest {
     private val roundWithThreeDistractors = SymbolHuntRound(
-        promptTts = "Finde alle Buchstaben A!",
+        promptTts = SymbolHuntDerivation.PromptLetter,
         targetAtomId = "letter-a",
         mode = SymbolHuntMode.letter,
         distractorPool = listOf("letter-m", "letter-i", "letter-o"),
@@ -120,7 +121,7 @@ class SymbolHuntProgressTest {
     // pool > 2 is always 6, per SymbolHuntDerivation.tileCounts), so only a subset of
     // the pool ever becomes tiles — the case where "which subset" can actually vary.
     private val roundWithLargeDistractorPool = SymbolHuntRound(
-        promptTts = "Finde alle Buchstaben A!",
+        promptTts = SymbolHuntDerivation.PromptLetter,
         targetAtomId = "letter-a",
         mode = SymbolHuntMode.letter,
         distractorPool = listOf(

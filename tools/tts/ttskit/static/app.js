@@ -7,6 +7,13 @@ const state = {
   samplingSpec: [], secondsPerToken: 0.08,
   // Batch-Auswahl und aufgeklappter Profil-Editor überleben jedes refresh().
   selectedKeys: new Set(), profileEditOpen: false,
+  // Laufende Detail-Aktion (👍, Produktion, 👎) — Buttons zeigen Pending/disabled.
+  actionPending: null,
+  // Kandidaten-Anzahl beim letzten Öffnen — Basis für ungelesene Badges in der Liste.
+  lastAcknowledgedCount: {},
+  // Erzeugung angefordert oder laufend (Generate, Batch-Lauf, Warteschlange).
+  generatingKeys: new Set(),
+  batchGeneratingKeys: new Set(),
 };
 const el = (id) => document.getElementById(id);
 
@@ -197,6 +204,8 @@ async function refresh() {
   // eines Batch-Laufs darf dann keine toten Keys mehr enthalten.
   const live = new Set(state.clips.map((c) => c.key));
   state.selectedKeys = new Set([...state.selectedKeys].filter((k) => live.has(k)));
+  ensureClipBaselines();
+  if (state.selected) acknowledgeClip(state.selected);
 
   if (!state.engine.loaded) {
     showBanner(`Engine offline: ${state.engine.error || "unbekannt"}`, "warn");
@@ -267,6 +276,8 @@ function renderList() {
     row.className = "row" + (clip.key === state.selected ? " active" : "");
     const spoken = clip.text !== clip.sourceText;
     const ownVoice = clip.speaker !== state.profiles[clip.profile].speaker;
+    const generating = isClipGenerating(clip.key);
+    const unseen = unseenCount(clip.key);
     row.innerHTML = `
       <input type="checkbox" class="sel" ${state.selectedKeys.has(clip.key) ? "checked" : ""}
              title="Für den Batch-Lauf auswählen" />
@@ -276,7 +287,13 @@ function renderList() {
         ${spoken ? `<span class="row-tts">🔊 ${escapeHtml(clip.text)}</span>` : ""}
       </span>
       ${ownVoice ? `<span class="chip changed" title="Eigene Stimme: ${escapeHtml(clip.speaker)}">🎙</span>` : ""}
-      ${clip.locked ? '<span class="chip locked" title="Seed ist festgelegt">📌</span>' : ""}
+      <span class="row-indicators">
+        ${generating
+          ? '<span class="spinner row-spinner" title="Erzeugung läuft …"></span>'
+          : unseen > 0
+            ? `<span class="badge-unseen" title="Neue Aufnahmen zum Anhören">${unseen}</span>`
+            : ""}
+      </span>
       <span class="chip ${clip.status}">${STATUS_LABELS[clip.status] || clip.status}</span>`;
     const checkbox = row.querySelector(".sel");
     checkbox.onclick = (event) => {
@@ -295,6 +312,7 @@ function renderList() {
 
 function select(key) {
   state.selected = key;
+  acknowledgeClip(key);
   persistViewState();
   renderList();
   renderDetail(key);
@@ -526,6 +544,69 @@ const saveProfileFrom = (container, name) => guard(async () => {
 
 // ------------------------------------------------------------- Detailsicht
 
+function isActionPending(type, clipKey, seed) {
+  const pending = state.actionPending;
+  if (!pending || pending.clipKey !== clipKey) return false;
+  if (type && pending.type !== type) return false;
+  if (seed !== undefined && pending.seed !== seed) return false;
+  return true;
+}
+
+function globalCandidateActionBusy(clipKey) {
+  const pending = state.actionPending;
+  if (!pending || pending.clipKey !== clipKey) return false;
+  return ["deleteAll", "clearProduction", "promote", "generate"].includes(pending.type);
+}
+
+function candidateRowBusy(clipKey, seed) {
+  if (globalCandidateActionBusy(clipKey)) return true;
+  return isActionPending("rate", clipKey, seed) || isActionPending("discard", clipKey, seed);
+}
+
+function candidateDiscardDisabled(clip, cand) {
+  return candidateRowBusy(clip.key, cand.seed)
+    || (clip.status === "rendered" && clip.seed === cand.seed);
+}
+
+async function refreshAfterDetailAction() {
+  state.actionPending = null;
+  await refresh();
+}
+
+function candidateJobRunning(clipKey) {
+  return state.jobs.running === `candidates:${clipKey}`;
+}
+
+function ensureClipBaselines() {
+  state.clips.forEach((clip) => {
+    if (state.lastAcknowledgedCount[clip.key] === undefined) {
+      state.lastAcknowledgedCount[clip.key] = clip.candidates.length;
+    }
+  });
+}
+
+function acknowledgeClip(key) {
+  const clip = state.clips.find((c) => c.key === key);
+  if (clip) state.lastAcknowledgedCount[key] = clip.candidates.length;
+}
+
+function unseenCount(key) {
+  if (key === state.selected) return 0;
+  const clip = state.clips.find((c) => c.key === key);
+  if (!clip) return 0;
+  const ack = state.lastAcknowledgedCount[key];
+  if (ack === undefined) return 0;
+  return Math.max(0, clip.candidates.length - ack);
+}
+
+function isClipGenerating(key) {
+  if (candidateJobRunning(key)) return true;
+  if (isActionPending("generate", key)) return true;
+  if (state.generatingKeys.has(key)) return true;
+  if (state.batchGeneratingKeys.has(key)) return true;
+  return false;
+}
+
 function seedOrigin(clip, profile) {
   if (clip.locked) return "festgelegt per Lock";
   if (profile.seedPool.includes(clip.seed)) return "automatisch aus dem Seed-Pool";
@@ -590,32 +671,52 @@ function profileSummaryCard(clip, profile) {
 
 function candidateRow(clip, cand, index) {
   const encoded = encodeURIComponent(clip.key);
-  // Nicht `clip.locked && ...`: auch ein noch unbestätigter Batch-Entwurf ist
-  // bereits die Aufnahme, die die App gerade ausliefert — das Radio zeigt das,
-  // unabhängig davon, ob der Seed schon per Lock geschützt ist.
-  const isProduction = clip.seed === cand.seed;
+  const isProduction = clip.status === "rendered" && clip.seed === cand.seed;
+  const pendingRate = isActionPending("rate", clip.key, cand.seed);
+  const pendingPromote = isActionPending("promote", clip.key, cand.seed);
+  const pendingDiscard = isActionPending("discard", clip.key, cand.seed);
+  const rowBusy = candidateRowBusy(clip.key, cand.seed);
+  const discardDisabled = candidateDiscardDisabled(clip, cand);
+  const promoteBusy = globalCandidateActionBusy(clip.key)
+    || isActionPending("promote", clip.key);
   const classes = [cand.good ? "good" : "", cand.fresh === false ? "outdated" : "",
-                    isProduction ? "production" : ""].join(" ").trim();
+                    isProduction ? "production" : "",
+                    pendingPromote ? "pending-promote" : ""].join(" ").trim();
   const src = cand.isProductionOnly
     ? `/audio/${encoded}.wav`
     : `/candidates/${encoded}/${cand.seed}.wav`;
+  const rateLabel = pendingRate ? "…" : (cand.good ? "✓" : "👍");
+  const discardLabel = pendingDiscard ? "…" : "👎";
   return `
-    <tr class="${classes}">
-      <td class="center">
-        <input type="radio" name="production" data-promote="${cand.seed}"
-               ${isProduction ? "checked" : ""}
-               title="Genau diese Aufnahme wird sofort die Produktions-Audio, der Seed wird festgelegt." />
+    <tr class="${classes}" data-cand-seed="${cand.seed}">
+      <td class="center production-cell">
+        <label class="production-pick ${pendingPromote ? "pending" : ""}"
+               title="${isProduction
+                 ? "Diese Aufnahme ist die Produktion"
+                 : "Genau diese Aufnahme wird sofort die Produktions-Audio, der Seed wird festgelegt."}">
+          <input type="radio" name="production" data-promote="${cand.seed}"
+                 ${isProduction ? "checked" : ""}
+                 ${promoteBusy ? "disabled" : ""} />
+          <span class="production-label">${isProduction ? "✓ fertig" : "wählen"}</span>
+        </label>
       </td>
-      <td><audio controls preload="metadata" src="${src}"
+      <td class="cand-audio-cell"><audio controls preload="metadata" src="${src}"
                  data-index="${index}" ${isProduction ? "data-current-production" : ""}></audio></td>
       <td class="nowrap">
         ${cand.isProductionOnly ? "" : `
-        <button data-rate="${cand.seed}" class="icon ${cand.good ? "active" : ""}"
+        <button data-rate="${cand.seed}"
+                class="icon ${cand.good ? "active" : ""} ${pendingRate ? "pending" : ""}"
+                ${rowBusy ? "disabled" : ""}
+                aria-pressed="${cand.good ? "true" : "false"}"
                 title="${cand.good
                   ? "Bewertung zurücknehmen — der Seed verlässt auch den Seed-Pool des Profils"
-                  : "Klingt gut — Bewertung wird gespeichert und der Seed in den Seed-Pool des Profils aufgenommen"}">👍</button>
-        <button data-discard="${cand.seed}" class="icon"
-                title="Klingt schlecht — Probeaufnahme löschen">👎</button>`}
+                  : "Klingt gut — Bewertung wird gespeichert und der Seed in den Seed-Pool des Profils aufgenommen"}">${rateLabel}</button>
+        <button data-discard="${cand.seed}"
+                class="icon ${pendingDiscard ? "pending" : ""}"
+                ${discardDisabled ? "disabled" : ""}
+                title="${clip.status === "rendered" && clip.seed === cand.seed
+                  ? "Produktion kann nicht gelöscht werden — „Keine Produktion“ nutzen"
+                  : "Klingt schlecht — Probeaufnahme löschen"}">${discardLabel}</button>`}
       </td>
       <td class="mono nowrap">${cand.seed}</td>
       <td class="nowrap muted" title="Zeitpunkt der Erzeugung">${formatWhen(cand.createdAt)}</td>
@@ -628,77 +729,64 @@ function candidateRow(clip, cand, index) {
     </tr>`;
 }
 
-function renderDetail(key) {
-  const clip = state.clips.find((c) => c.key === key);
-  if (!clip) return;
-  const profile = state.profiles[clip.profile];
-  const encoded = encodeURIComponent(clip.key);
-  const max = state.limits.maxCandidates || 16;
-  const poolSize = profile.seedPool.length;
-  const topSize = (state.topSeeds?.[clip.profile] || []).length;
+function candidatesTableHtml(clip) {
+  if (clip.candidates.length === 0) {
+    return `<p id="candidates-empty" class="muted">Noch keine Aufnahme. „🎲 Generate“ oder ` +
+      `„▶ Batch-Lauf“ erzeugt welche.</p>`;
+  }
+  return `<div class="cand-scroll"><table class="cand-table">
+      <thead><tr>
+        <th title="Genau eine Aufnahme kann Produktion sein">Produktion</th>
+        <th>Anhören</th>
+        <th>Bewertung</th>
+        <th>Seed</th>
+        <th>Erzeugt</th>
+        <th>Stimme</th>
+        <th>Text</th>
+      </tr></thead>
+      <tbody>
+        ${clip.candidates.map((cand, index) => candidateRow(clip, cand, index)).join("")}
+      </tbody>
+    </table></div>`;
+}
 
-  const spoken = clip.text !== clip.sourceText;
+function deletableCandidates(clip) {
+  return clip.candidates.filter((c) =>
+    !c.isProductionOnly
+    && !(clip.status === "rendered" && c.seed === clip.seed)
+    && !c.good);
+}
+
+function hasProduction(clip) {
+  return clip.status === "rendered" || clip.locked;
+}
+
+function detailTitleHtml(clip) {
+  return `<h2 class="detail-title">${escapeHtml(clip.sourceText)}</h2>`;
+}
+
+function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
   const ownVoice = clip.speaker !== profile.speaker;
-
-  el("detail").innerHTML = `
-    ${profileSummaryCard(clip, profile)}
-
-    <div class="card">
-      <div class="clip-head">
+  const genRunning = candidateJobRunning(clip.key);
+  const genQueued = isActionPending("generate", clip.key);
+  const generating = isClipGenerating(clip.key);
+  const deletableCount = deletableCandidates(clip).length;
+  const deleteBusy = globalCandidateActionBusy(clip.key)
+    || isActionPending("deleteAll", clip.key);
+  const fixedSeedActive = clip.generateSeed != null;
+  return `
+    <div class="card card-primary" id="candidates-card">
+      <h3 class="card-title">Aufnahmen erzeugen &amp; bestätigen</h3>
+      <div class="clip-head compact">
         <span class="mono muted">${clip.key}</span>
         <span class="chip ${clip.status}">${STATUS_LABELS[clip.status] || clip.status}</span>
         ${clip.locked ? '<span class="chip locked">📌 festgelegt</span>' : ""}
       </div>
-
-      <div class="pron">
-        <div class="pron-block">
-          <div class="pron-head"><span class="pron-icon">📖</span>Satz
-            <span class="muted normal">— so steht er im Content-Pack der App</span></div>
-          <div class="pron-source">${escapeHtml(clip.sourceText)}</div>
-        </div>
-        <div class="pron-join">${spoken
-          ? "wird ausgesprochen als ↓"
-          : "geht unverändert ans Modell ↓"}</div>
-        <div class="pron-block ${spoken ? "changed" : ""}">
-          <div class="pron-head"><span class="pron-icon">🔊</span>TTS-Version
-            <span class="muted normal">— genau dieser Text geht ans Modell</span>
-            ${spoken
-              ? '<span class="chip changed">eigene Aussprache</span>'
-              : '<span class="chip">identisch mit dem Satz</span>'}
-          </div>
-          <textarea id="tts-text" class="pron-input" rows="2"
-                    spellcheck="false">${escapeHtml(clip.text)}</textarea>
-          <p class="pron-actions">
-            <button id="btn-save-text" class="primary"
-                    title="Speichert diesen Text als Aussprache dieses Clips">
-              Speichern</button>
-            <button id="btn-reset-text" ${spoken ? "" : "disabled"}
-                    title="Verwirft die eigene Aussprache — gesprochen wird wieder der Satz">
-              Zurücksetzen</button>
-          </p>
-          <p class="muted small">Ändert nur den Klang: in der App steht weiter der Satz
-            von oben. Speichern legt dabei den aktuellen Seed fest (Lock) — anhören und
-            neue Aufnahmen lohnen sich über „🎲 Generate“.</p>
-          <details class="help">
-            <summary>Wie schreibt man eine Aussprache auf?</summary>
-            <ul class="small">
-              <li><b>Laut statt Buchstabenname</b> — „M“ wird gern als „Em“ gelesen.
-                Ausgeschrieben als „Mmmmm“ kommt der Lautwert.</li>
-              <li><b>Satzzeichen steuern die Melodie</b> — Punkt beruhigt, Fragezeichen
-                hebt, Ausrufezeichen betont.</li>
-              <li><b>Komma setzt eine Pause</b>, Bindestrich trennt Silben: „Ma-ma“.</li>
-              <li><b>Alles ausschreiben</b>, was keine Buchstabenfolge ist: „5“ → „fünf“,
-                „z. B.“ → „zum Beispiel“.</li>
-              <li>Nichts davon ist garantiert — jede Änderung muss gehört werden.
-                Nach dem Speichern „Generate“ drücken und vergleichen.</li>
-            </ul>
-          </details>
-        </div>
-      </div>
-
-      <p class="muted">${clip.itemIds.length} Stelle(n) · Felder: ${clip.fields.join(", ")}
-        ${clip.lessons.length ? " · Lektionen: " + clip.lessons.join(", ") : ""}</p>
-      <p class="voice-line">Profil:
+      <textarea id="tts-text" class="tts-text-input" rows="2" spellcheck="false"
+                title="Text, der ans Modell geht — wird automatisch gespeichert">${escapeHtml(clip.text)}</textarea>
+      <span id="tts-text-status" class="tts-text-status muted small" aria-live="polite"></span>
+      <p class="voice-line">
+        Profil:
         <select id="clip-profile"
                 title="Achtung: Profilwechsel legt den aktuellen Seed als Lock fest">
           ${Object.keys(state.profiles).sort().map((n) =>
@@ -718,22 +806,31 @@ function renderDetail(key) {
       <p class="muted small">Seed <span class="mono">${clip.seed}</span>
         <span>(${seedOrigin(clip, profile)})</span>
         · Sprache ${escapeHtml(profile.language)} (aus dem Profil)</p>
-    </div>
-
-    <div class="card">
-      <h3 style="margin-top:0">Aufnahmen
-        <span class="muted normal">— Probeaufnahmen und aktuelle Produktion, neueste zuerst</span></h3>
-      <p>
-        <button id="btn-candidates" class="primary">🎲 Generate</button>
+      <div class="generate-row">
+        <button id="btn-candidates" class="primary ${generating ? "pending" : ""}"
+                ${generating ? "disabled" : ""}>
+          ${genRunning ? "⏳ Erzeuge …" : generating ? "⏳ Starte …" : "🎲 Generate"}</button>
         <input id="cand-count" type="number" min="1" max="${max}"
                value="${candidateCount()}"
+               ${generating || fixedSeedActive ? "disabled" : ""}
                title="Anzahl der Probeaufnahmen (1–${max})" /> Stück
+        <label class="inline fixed-seed-label"
+               title="Nur dieser Seed beim Erzeugen — leer = wie bisher">
+          Fester Seed
+          <input id="cand-fixed-seed" type="number" min="0" max="${MAX_RANDOM_SEED}"
+                 value="${clip.generateSeed ?? ""}"
+                 placeholder="Zufall"
+                 ${generating ? "disabled" : ""} />
+        </label>
+        <span id="cand-fixed-seed-status" class="fixed-seed-status muted small"
+              aria-live="polite"></span>
         <label id="cand-known" class="inline"
                title="Zieht die Seeds zufällig aus dem Seed-Pool von „${escapeHtml(clip.profile)}“ ${
                  poolSize
                    ? `(${poolSize} gespeichert) statt neue zu erzeugen`
                    : "— der ist gerade leer, es werden also Zufalls-Seeds erzeugt"}">
-          <input id="cand-known-seeds" type="checkbox" ${useKnownSeeds() ? "checked" : ""} />
+          <input id="cand-known-seeds" type="checkbox" ${useKnownSeeds() ? "checked" : ""}
+                 ${generating || fixedSeedActive ? "disabled" : ""} />
           Use known seeds
           <span class="muted small">${poolSize
             ? `(${poolSize} im Pool)`
@@ -745,54 +842,333 @@ function renderDetail(key) {
                    ? `(${topSize} Seeds auf den besten ${TOP_SEED_LIMIT} Rängen, `
                      + "Punktgleiche zählen mit) — schlägt „Use known seeds“"
                    : "— es gibt noch keine Locks für dieses Profil, es werden also Zufalls-Seeds erzeugt"}">
-          <input id="cand-top-seeds" type="checkbox" ${useTopSeeds() ? "checked" : ""} />
+          <input id="cand-top-seeds" type="checkbox" ${useTopSeeds() ? "checked" : ""}
+                 ${generating || fixedSeedActive ? "disabled" : ""} />
           Use top seeds
           <span class="muted small">${topSize
             ? `(${topSize} Top-Seeds)`
             : "(keine Locks — es kommen Zufalls-Seeds)"}</span>
         </label>
         <span id="cand-progress" class="muted small"></span>
-      </p>
+      </div>
       <details class="help">
         <summary>Was bedeuten die Spalten?</summary>
         <ul class="small">
           <li><b>Produktion</b> — es kann nur eine geben: die Auswahl übernimmt genau
-            diese Aufnahme sofort als Produktions-Audio und legt ihren Seed fest.
-            Die Festlegung entfällt von selbst, sobald keine Aufnahme dieses Clips
-            mehr übrig ist — dafür gibt es keinen eigenen Knopf. Eine eigene
-            Aussprache oder Stimme bleibt dabei erhalten.</li>
-          <li><b>👍</b> — klingt gut: Bewertung wird gespeichert und der Seed automatisch
-            in den Seed-Pool des Profils „${clip.profile}“ aufgenommen (Clips ohne Lock
-            bekommen ihre Seeds aus diesem Pool).</li>
+            diese Aufnahme sofort als Produktions-Audio und legt ihren Seed fest.</li>
+          <li><b>👍 / ✓</b> — klingt gut: Bewertung wird gespeichert und der Seed automatisch
+            in den Seed-Pool des Profils „${clip.profile}“ aufgenommen.</li>
           <li><b>👎</b> — klingt schlecht: Probeaufnahme löschen (nimmt einen
             👍-Seed auch wieder aus dem Pool).</li>
-          <li><b>Use top seeds</b> — zieht aus den Seeds, die in „${clip.profile}“ schon
-            am häufigsten als Produktion festgelegt wurden. Zwei verschiedene Quellen:
-            der Pool sammelt 👍-Bewertungen, die Top-Seeds zählen echte Locks.</li>
-          <li><b>Erzeugt / Stimme / Text</b> — womit die Aufnahme entstand.
-            So bleiben mehrere Generate- und Batch-Läufe auseinanderhaltbar.</li>
+          <li><b>Alle löschen</b> — entfernt alle Probeaufnahmen ohne 👍 und ohne
+            Produktion; bewertete und bestätigte Aufnahmen bleiben.</li>
+          <li><b>Keine Produktion</b> — hebt die bestätigte Aufnahme auf; Kandidaten
+            und 👍 bleiben erhalten.</li>
+          <li><b>Erzeugt / Stimme / Text</b> — womit die Aufnahme entstand.</li>
         </ul>
       </details>
-      ${clip.candidates.length === 0
-        ? '<p class="muted">Noch keine Aufnahme. „🎲 Generate“ oder ' +
-          '„▶ Batch-Lauf“ erzeugt welche.</p>'
-        : `<div class="cand-scroll"><table class="cand-table">
-            <thead><tr>
-              <th title="Genau eine Aufnahme kann Produktion sein">Produktion</th>
-              <th>Anhören</th>
-              <th>Bewertung</th>
-              <th>Seed</th>
-              <th>Erzeugt</th>
-              <th>Stimme</th>
-              <th>Text</th>
-            </tr></thead>
-            <tbody>
-              ${clip.candidates.map((cand, index) => candidateRow(clip, cand, index)).join("")}
-            </tbody>
-          </table></div>`}
+      <div class="candidates-toolbar">
+        <button id="btn-delete-all-candidates"
+                class="${isActionPending("deleteAll", clip.key) ? "pending" : ""}"
+                ${deletableCount === 0 || deleteBusy ? "disabled" : ""}
+                title="Löscht alle Probeaufnahmen ohne 👍 und ohne Produktion">
+          ${isActionPending("deleteAll", clip.key)
+            ? "⏳ Lösche …"
+            : deletableCount
+              ? `Alle löschen (${deletableCount})`
+              : "Alle löschen"}</button>
+      </div>
+      <div id="candidates-body">${candidatesTableHtml(clip)}</div>
+      ${hasProduction(clip) ? `
+      <div class="candidates-footer">
+        <button id="btn-clear-production"
+                class="${isActionPending("clearProduction", clip.key) ? "pending" : ""}"
+                ${globalCandidateActionBusy(clip.key) ? "disabled" : ""}
+                title="Hebt die Produktions-Auswahl auf — Kandidaten und 👍 bleiben">
+          ${isActionPending("clearProduction", clip.key)
+            ? "⏳ Hebe auf …"
+            : "Keine Produktion"}</button>
+      </div>` : ""}
     </div>`;
+}
 
-  // ---- Profil-Zusammenfassung (global)
+function syncCandidatesBody(clip) {
+  const body = el("candidates-body");
+  if (!body) return;
+  body.innerHTML = candidatesTableHtml(clip);
+  wireCandidateHandlers(clip);
+}
+
+function wireCandidateHandlers(clip) {
+  const encoded = encodeURIComponent(clip.key);
+  el("detail").querySelectorAll("[data-rate]").forEach((button) => {
+    button.onclick = guard(async () => {
+      if (globalCandidateActionBusy(clip.key)) return;
+      const seed = Number(button.dataset.rate);
+      const cand = clip.candidates.find((c) => c.seed === seed);
+      const good = !(cand && cand.good);
+      state.actionPending = { type: "rate", clipKey: clip.key, seed };
+      if (cand) cand.good = good;
+      syncCandidatesBody(clip);
+      try {
+        await put(`/api/clips/${encoded}/candidates/${seed}/rating`, { good });
+        await refreshAfterDetailAction();
+        showBanner(good
+          ? `Seed ${seed} als gut markiert und in den Seed-Pool von „${clip.profile}“ ` +
+            `aufgenommen.`
+          : `Bewertung zurückgenommen — Seed ${seed} ist wieder aus dem Pool von ` +
+            `„${clip.profile}“ entfernt.`, "ok");
+      } catch (error) {
+        await refreshAfterDetailAction();
+        throw error;
+      }
+    });
+  });
+  el("detail").querySelectorAll("[data-discard]").forEach((button) => {
+    button.onclick = guard(async () => {
+      if (globalCandidateActionBusy(clip.key)) return;
+      const seed = Number(button.dataset.discard);
+      if (clip.status === "rendered" && clip.seed === seed) return;
+      state.actionPending = { type: "discard", clipKey: clip.key, seed };
+      syncCandidatesBody(clip);
+      try {
+        await api(`/api/clips/${encoded}/candidates/${seed}`, { method: "DELETE" });
+        await refreshAfterDetailAction();
+        showBanner(`Probeaufnahme Seed ${seed} gelöscht.`, "ok");
+      } catch (error) {
+        await refreshAfterDetailAction();
+        throw error;
+      }
+    });
+  });
+  el("detail").querySelectorAll("[data-promote]").forEach((radio) => {
+    radio.onclick = guard(async (event) => {
+      if (globalCandidateActionBusy(clip.key)) {
+        event.preventDefault();
+        return;
+      }
+      const seed = Number(radio.dataset.promote);
+      if (clip.seed === seed) {
+        showBanner("Diese Aufnahme ist bereits die Produktion.", "info");
+        return;
+      }
+      state.actionPending = { type: "promote", clipKey: clip.key, seed };
+      syncCandidatesBody(clip);
+      try {
+        const result = await post(`/api/clips/${encoded}/promote`, { seed });
+        await refreshAfterDetailAction();
+        showBanner(result.verified
+          ? "In Produktion übernommen — der Clip ist fertig."
+          : "Übernommen und Seed festgelegt. Hinweis: die Aufnahme entstand mit " +
+            "älteren Einstellungen und ließ sich nicht verifizieren.",
+          result.verified ? "ok" : "info");
+      } catch (error) {
+        await refreshAfterDetailAction();
+        throw error;
+      }
+    });
+  });
+}
+
+function wireDeleteAllCandidates(clip) {
+  const button = el("btn-delete-all-candidates");
+  if (!button) return;
+  const encoded = encodeURIComponent(clip.key);
+  button.onclick = guard(async () => {
+    if (globalCandidateActionBusy(clip.key)) return;
+    const deletable = deletableCandidates(clip);
+    if (deletable.length === 0) {
+      showBanner("Nichts löschbar — alle Aufnahmen sind bewertet oder Produktion.", "info");
+      return;
+    }
+    if (deletable.length > 1 &&
+        !confirm(`${deletable.length} löschbare Probeaufnahmen entfernen? ` +
+                 "Bewertete und Produktion bleiben erhalten.")) {
+      return;
+    }
+    state.actionPending = { type: "deleteAll", clipKey: clip.key };
+    try {
+      const result = await api(`/api/clips/${encoded}/candidates`, { method: "DELETE" });
+      await refreshAfterDetailAction();
+      if (result.deleted === 0) {
+        showBanner("Nichts gelöscht — alle Aufnahmen sind geschützt.", "info");
+      } else {
+        const skipped = result.skipped
+          ? `, ${result.skipped} geschützt belassen`
+          : "";
+        showBanner(`${result.deleted} Probeaufnahme(n) gelöscht${skipped}.`, "ok");
+      }
+    } catch (error) {
+      await refreshAfterDetailAction();
+      throw error;
+    }
+  });
+}
+
+function wireClearProduction(clip) {
+  const button = el("btn-clear-production");
+  if (!button) return;
+  const encoded = encodeURIComponent(clip.key);
+  button.onclick = guard(async () => {
+    if (globalCandidateActionBusy(clip.key)) return;
+    if (!confirm("Produktion aufheben? Kandidaten und 👍-Bewertungen bleiben erhalten.")) {
+      return;
+    }
+    state.actionPending = { type: "clearProduction", clipKey: clip.key };
+    renderDetail(clip.key);
+    try {
+      await post(`/api/clips/${encoded}/clear-production`, {});
+      await refreshAfterDetailAction();
+      showBanner("Produktion aufgehoben — keine Aufnahme ist mehr bestätigt.", "ok");
+    } catch (error) {
+      await refreshAfterDetailAction();
+      throw error;
+    }
+  });
+}
+
+const TEXT_SAVE_DELAY_MS = 600;
+const textSaveTimers = new Map();
+const fixedSeedSaveTimers = new Map();
+const MAX_RANDOM_SEED = 2147483647;
+
+function parseFixedSeedInput(input) {
+  const raw = input?.value.trim();
+  if (!raw) return { value: null, invalid: false };
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 0 || n > MAX_RANDOM_SEED) {
+    return { value: null, invalid: true };
+  }
+  return { value: n, invalid: false };
+}
+
+function setGenerateOptionsDisabled(disabled) {
+  const count = el("cand-count");
+  const known = el("cand-known-seeds");
+  const top = el("cand-top-seeds");
+  if (count) count.disabled = disabled;
+  if (known) known.disabled = disabled;
+  if (top) top.disabled = disabled;
+}
+
+function wireTtsTextAutosave(clip) {
+  const input = el("tts-text");
+  const status = el("tts-text-status");
+  if (!input) return;
+  const encoded = encodeURIComponent(clip.key);
+  let lastSaved = clip.text;
+
+  const setStatus = (message) => {
+    if (status) status.textContent = message;
+  };
+
+  const persist = guard(async () => {
+    const text = input.value.trim();
+    if (text === lastSaved) return;
+    if (!text) {
+      setStatus("Leer — nicht gespeichert");
+      return;
+    }
+    setStatus("Speichere …");
+    const body = text === clip.sourceText
+      ? { seed: clip.seed, textOverride: null }
+      : { seed: clip.seed, textOverride: text };
+    await post(`/api/clips/${encoded}/lock`, body);
+    lastSaved = text;
+    await refresh();
+    setStatus("Gespeichert");
+    window.setTimeout(() => {
+      if (status && status.textContent === "Gespeichert") setStatus("");
+    }, 1500);
+  });
+
+  const scheduleSave = () => {
+    setStatus("");
+    const pending = textSaveTimers.get(clip.key);
+    if (pending) window.clearTimeout(pending);
+    textSaveTimers.set(clip.key, window.setTimeout(() => {
+      textSaveTimers.delete(clip.key);
+      persist();
+    }, TEXT_SAVE_DELAY_MS));
+  };
+
+  input.oninput = scheduleSave;
+  if (input.value.trim() !== lastSaved.trim()) scheduleSave();
+}
+
+function wireFixedSeedAutosave(clip) {
+  const input = el("cand-fixed-seed");
+  const status = el("cand-fixed-seed-status");
+  if (!input) return;
+  const encoded = encodeURIComponent(clip.key);
+  let lastSaved = clip.generateSeed ?? null;
+
+  const setStatus = (message) => {
+    if (status) status.textContent = message;
+  };
+
+  const updateGenerateOptions = () => {
+    const parsed = parseFixedSeedInput(input);
+    setGenerateOptionsDisabled(parsed.value != null && !parsed.invalid);
+  };
+
+  const persist = guard(async () => {
+    const parsed = parseFixedSeedInput(input);
+    if (parsed.invalid) {
+      setStatus(`Ungültig — 0 bis ${MAX_RANDOM_SEED}`);
+      return;
+    }
+    if (parsed.value === lastSaved) return;
+    setStatus("Speichere …");
+    await post(`/api/clips/${encoded}/lock`, {
+      seed: clip.seed,
+      generateSeed: parsed.value,
+    });
+    lastSaved = parsed.value;
+    await refresh();
+    setStatus("Gespeichert");
+    window.setTimeout(() => {
+      if (status && status.textContent === "Gespeichert") setStatus("");
+    }, 1500);
+  });
+
+  const scheduleSave = () => {
+    updateGenerateOptions();
+    const parsed = parseFixedSeedInput(input);
+    if (parsed.invalid) {
+      setStatus(`Ungültig — 0 bis ${MAX_RANDOM_SEED}`);
+      return;
+    }
+    setStatus("");
+    const pending = fixedSeedSaveTimers.get(clip.key);
+    if (pending) window.clearTimeout(pending);
+    fixedSeedSaveTimers.set(clip.key, window.setTimeout(() => {
+      fixedSeedSaveTimers.delete(clip.key);
+      persist();
+    }, TEXT_SAVE_DELAY_MS));
+  };
+
+  input.oninput = scheduleSave;
+  updateGenerateOptions();
+  const initial = parseFixedSeedInput(input).value;
+  if (initial !== lastSaved) scheduleSave();
+}
+
+function renderDetail(key) {
+  const clip = state.clips.find((c) => c.key === key);
+  if (!clip) return;
+  const profile = state.profiles[clip.profile];
+  const encoded = encodeURIComponent(clip.key);
+  const max = state.limits.maxCandidates || 16;
+  const poolSize = profile.seedPool.length;
+  const topSize = (state.topSeeds?.[clip.profile] || []).length;
+
+  el("detail").innerHTML = `
+    ${detailTitleHtml(clip)}
+    ${candidatesCardHtml(clip, profile, max, poolSize, topSize)}
+    ${profileSummaryCard(clip, profile)}`;
+
+  // ---- Profil-Zusammenfassung (unten, sekundär)
   el("btn-profile-toggle").onclick = () => {
     state.profileEditOpen = !state.profileEditOpen;
     renderDetail(key);
@@ -805,23 +1181,43 @@ function renderDetail(key) {
     wireDurationField(form);
   }
 
-  // ---- Clip (lokal)
-  el("btn-candidates").onclick = guard(async () => {
+  // ---- Generate
+  const btnGenerate = el("btn-candidates");
+  btnGenerate.onclick = guard(async () => {
+    if (candidateJobRunning(clip.key)) return;
+    const fixedInput = el("cand-fixed-seed");
+    const fixedParsed = parseFixedSeedInput(fixedInput);
+    if (fixedParsed.invalid) {
+      const seedStatus = el("cand-fixed-seed-status");
+      if (seedStatus) {
+        seedStatus.textContent = `Ungültig — 0 bis ${MAX_RANDOM_SEED}`;
+      }
+      return;
+    }
     const count = Math.min(max, Math.max(1, Number(el("cand-count").value) || 4));
     writeLocal("ttsCandCount", count);
     const known = el("cand-known-seeds").checked;
     const top = el("cand-top-seeds").checked;
-    await post(`/api/clips/${encoded}/candidates`,
-               { n: count, useKnownSeeds: known, useTopSeeds: top });
-    el("cand-progress").textContent = state.jobs.running
-      ? "eingereiht — wartet auf den laufenden Job …" : "eingereiht …";
+    const body = { n: count, useKnownSeeds: known, useTopSeeds: top };
+    if (fixedParsed.value != null) body.fixedSeed = fixedParsed.value;
+    state.actionPending = { type: "generate", clipKey: clip.key };
+    state.generatingKeys.add(clip.key);
+    renderList();
+    btnGenerate.disabled = true;
+    btnGenerate.classList.add("pending");
+    btnGenerate.textContent = "⏳ Starte …";
+    try {
+      await post(`/api/clips/${encoded}/candidates`, body);
+      el("cand-progress").textContent = state.jobs.running
+        ? "eingereiht — wartet auf den laufenden Job …" : "eingereiht …";
+    } finally {
+      state.actionPending = null;
+      if (state.selected === clip.key) renderDetail(clip.key);
+    }
   });
   el("cand-count").onchange = () => {
     writeLocal("ttsCandCount", Number(el("cand-count").value));
   };
-  // Beide Quellen gleichzeitig anzuhaken hätte keine sichtbare Bedeutung — der
-  // Server nähme ohnehin die Top-Seeds. Statt das stillschweigend zu tun,
-  // hakt das Anhaken der einen Quelle die andere ab.
   el("cand-known-seeds").onchange = (event) => {
     writeLocal("ttsUseKnownSeeds", event.target.checked);
     if (event.target.checked) {
@@ -843,76 +1239,29 @@ function renderDetail(key) {
     showBanner(`Profil gewechselt — Seed ${clip.seed} wurde dabei festgelegt (Lock).`, "info");
   });
 
-  // Aussprache: der eigentliche Grund für die getrennte Darstellung oben.
-  // Beides geht über denselben Lock-Endpunkt, der nur benannte Felder anfasst
-  // — Stimme, Profil und Notiz dieses Clips bleiben also unberührt.
-  el("btn-save-text").onclick = guard(async () => {
-    const text = el("tts-text").value.trim();
-    if (!text) {
-      showBanner("Leerer Text ergibt leere Audio — zum Verwerfen „Zurücksetzen“ nehmen.", "warn");
-      return;
-    }
-    if (text === clip.sourceText) {
-      // Denselben Text als Override zu speichern, sähe in der Liste aus wie
-      // eine Abweichung, wäre aber keine.
-      await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, textOverride: null });
-      await refresh();
-      showBanner("Text entspricht dem Satz — keine eigene Aussprache hinterlegt.", "info");
-      return;
-    }
-    await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, textOverride: text });
-    await refresh();
-    showBanner(`Aussprache gespeichert: „${text}“. Zum Anhören und Bestätigen ` +
-      `„Generate“ drücken.`, "ok");
-  });
-  el("btn-reset-text").onclick = guard(async () => {
-    await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, textOverride: null });
-    await refresh();
-    showBanner(`Eigene Aussprache verworfen — gesprochen wird wieder „${clip.sourceText}“.`, "ok");
-  });
+  wireTtsTextAutosave(clip);
+  wireFixedSeedAutosave(clip);
 
   el("clip-speaker").onchange = guard(async (event) => {
     const speaker = event.target.value;
     await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, speaker });
     await refresh();
-    showBanner(`Stimme dieses Clips: ${speaker} (${voiceOf(speaker).origin}). ` +
+    const origin = voiceOf(speaker)?.origin || "unbekannt";
+    showBanner(`Stimme dieses Clips: ${speaker} (${origin}). ` +
       `Seed ${clip.seed} wurde dabei festgelegt (Lock).`, "ok");
   });
 
-  // ---- Kandidaten-Tabelle
-  el("detail").querySelectorAll("[data-rate]").forEach((button) => {
-    button.onclick = guard(async () => {
-      const seed = Number(button.dataset.rate);
-      const cand = clip.candidates.find((c) => c.seed === seed);
-      const good = !(cand && cand.good);
-      await put(`/api/clips/${encoded}/candidates/${seed}/rating`, { good });
-      await refresh();
-      showBanner(good
-        ? `Seed ${seed} als gut markiert und in den Seed-Pool von „${clip.profile}“ ` +
-          `aufgenommen — Clips ohne Lock verteilen sich automatisch auf die Pool-Seeds.`
-        : `Bewertung zurückgenommen — Seed ${seed} ist wieder aus dem Pool von ` +
-          `„${clip.profile}“ entfernt.`, "ok");
-    });
-  });
-  el("detail").querySelectorAll("[data-discard]").forEach((button) => {
-    button.onclick = guard(async () => {
-      await api(`/api/clips/${encoded}/candidates/${button.dataset.discard}`,
-                { method: "DELETE" });
-      await refresh();
-    });
-  });
-  el("detail").querySelectorAll("[data-promote]").forEach((radio) => {
-    radio.onchange = guard(async () => {
-      const result = await post(`/api/clips/${encoded}/promote`,
-                                { seed: Number(radio.dataset.promote) });
-      await refresh();
-      showBanner(result.verified
-        ? "In Produktion übernommen — der Clip ist fertig."
-        : "Übernommen und Seed festgelegt. Hinweis: die Aufnahme entstand mit " +
-          "älteren Einstellungen und ließ sich nicht verifizieren.",
-        result.verified ? "ok" : "info");
-    });
-  });
+  wireCandidateHandlers(clip);
+  wireDeleteAllCandidates(clip);
+  wireClearProduction(clip);
+
+  // Generate-Button während laufendem Job aktuell halten (SSE triggert refresh).
+  if (candidateJobRunning(clip.key)) {
+    const progress = el("cand-progress");
+    if (progress && !progress.textContent) {
+      progress.textContent = "Erzeuge Probeaufnahmen …";
+    }
+  }
 }
 
 // --------------------------------------------------------- Parameter-Panel
@@ -1117,6 +1466,8 @@ el("btn-render").onclick = guard(async () => {
                `Erzeugt wird nur, was noch fehlt — fertige Clips ` +
                `werden übersprungen. Pro Clip entstehen ${n} Kandidaten, die du ` +
                `danach in der Liste als Produktion bestätigst.`)) return;
+  keys.forEach((k) => state.batchGeneratingKeys.add(k));
+  renderList();
   await post("/api/render", { keys, n });
 });
 
@@ -1150,6 +1501,12 @@ events.onmessage = (message) => {
   } else if (event.type === "job-done") {
     const summary = lastSummary;
     lastSummary = null;
+    if (event.job?.startsWith("candidates:")) {
+      state.generatingKeys.delete(event.job.slice("candidates:".length));
+    }
+    if (event.job?.startsWith("render:")) {
+      state.batchGeneratingKeys.clear();
+    }
     if (summary && summary.failed > 0) {
       setJobIdle("");
       showBanner(`${summary.failed} von ${summary.failed + summary.rendered} ` +
@@ -1162,12 +1519,22 @@ events.onmessage = (message) => {
     refresh().catch(showError);
   } else if (event.type === "job-error") {
     lastSummary = null;
+    if (event.job?.startsWith("candidates:")) {
+      state.generatingKeys.delete(event.job.slice("candidates:".length));
+    }
+    if (event.job?.startsWith("render:")) {
+      state.batchGeneratingKeys.clear();
+    }
     setJobIdle("");
     showBanner(event.message, "warn");
     refresh().catch(showError);
   } else if (event.type === "job-start") {
     lastSummary = null;
+    if (event.job?.startsWith("candidates:")) {
+      state.generatingKeys.add(event.job.slice("candidates:".length));
+    }
     setJobRunning(event.job);
+    renderList();
   } else if ("running" in event) {
     if (event.running) {
       // Initialframe des SSE-Streams: es läuft bereits ein Job.

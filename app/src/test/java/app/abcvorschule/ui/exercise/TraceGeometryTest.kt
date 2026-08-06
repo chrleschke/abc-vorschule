@@ -23,6 +23,20 @@ class TraceGeometryTest {
     }
 
     @Test
+    fun heightScaleSqueezesTowardTheVerticalMidline() {
+        val strokes = TraceGeometry.toPixels(
+            strokes = listOf(GlyphStroke(listOf(listOf(0.0, 0.0), listOf(0.0, 1.0)))),
+            boxSize = 100f,
+            origin = TracePoint(0f, 0f),
+            heightScale = 0.5f,
+        )
+        // y=0 → 0.5 + (0-0.5)*0.5 = 0.25; y=1 → 0.5 + 0.5*0.5 = 0.75
+        assertEquals(25f, strokes[0][0].y, 0.01f)
+        assertEquals(75f, strokes[0][1].y, 0.01f)
+        assertEquals(0f, strokes[0][0].x, 0.01f)
+    }
+
+    @Test
     fun refineStrokeDensifiesCoarseBowlsButKeepsEndpoints() {
         // Six-point B-bowl style: long chords and gentle turns — under-sampled.
         val coarse = listOf(

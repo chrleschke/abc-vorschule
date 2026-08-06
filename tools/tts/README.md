@@ -23,11 +23,14 @@ cd /Users/cleschke/projects/abc-vorschul-app
 
 Das Skript `start-tts-ui.sh` im Project Root startet das Web-Interface direkt — keine
 weiteren Befehle nötig. `tts extract` und `tts status` laufen bereits beim Start.
+Beenden mit **Ctrl-C** im Terminal; offene Browser-Tabs blockieren den Exit nicht mehr.
 
 ## Ablauf
 
 ```bash
 tts extract                        # Content-JSON → out/manifest.json
+tts migrate-locks                  # word:*-Locks für Buchstaben/Silben → phoneme:*
+tts wire-locks                     # Produktions-WAV ohne Lock → Lock (Batch-Nachzügler)
 tts status                         # Überblick: fehlt / fertig / Pools / Locks
                                    # plus Fehlschläge des letzten Laufs und leere Texte
 tts sample --profile prompt -n 8   # 8 Seeds an 3 Beispielen des Profils ausprobieren
@@ -62,9 +65,19 @@ bedeutungslos — Top-Seeds gewinnen —, deshalb schließen sie sich im UI aus.
 Reicht die Quelle nicht für die bestellte Anzahl, wird mit Zufalls-Seeds aufgefüllt,
 statt stillschweigend weniger zu liefern.
 
+**Fester Seed:** Im Feld „Fester Seed" (Clip-Details, neben Generate) kann ein Wert
+0–2147483647 eingetragen werden — gespeichert in `locks.json` als `generateSeed`.
+Solange er gesetzt ist, erzeugt Generate **nur diesen einen** Seed (Anzahl und beide
+Häkchen werden ignoriert). Leer = wie bisher. Ungültige Werte werden abgewiesen.
+
 Erzeugt wird über den **Batch-Lauf**: links in der Liste Clips ankreuzen (einzeln
 oder über „Sichtbare / Alle / Keine"), Anzahl Beispiele pro Clip einstellen (Default 2),
 dann „▶ Batch-Lauf" in der Kopfzeile — angefasst wird nur, was noch fehlt.
+In der Clip-Liste zeigt ein **Spinner** pro Zeile, solange für diesen Clip Kandidaten
+erzeugt werden (Generate, Batch-Lauf oder Warteschlange); ist er fertig und der Clip
+noch nicht geöffnet, erscheint eine **Zahl** — wie viele neue Aufnahmen seit dem
+letzten Öffnen dazukamen (beim Anklicken verschwindet sie, auch ohne Anhören). Das
+📌-Symbol für festgelegte Seeds entfällt in der Liste (in der Detailsicht bleibt es).
 Der Lauf erzeugt Kandidaten wie „🎲 Generate", aber für alle ausgewählten Clips
 auf einmal; er schreibt nie direkt in die Produktion. Die Entwürfe stehen danach in
 derselben Kandidaten-Tabelle wie jede andere Probeaufnahme — dort per Radio-Button
@@ -73,10 +86,12 @@ Festlegung fällt von selbst weg, sobald keine Aufnahme des Clips mehr übrig is
 eigene „Lock entfernen"-Aktion nötig). Da viel von Hand korrigiert wird, gibt es bewusst
 keinen „finalen Lauf" über alles mehr; die Auswahl bestimmt den Umfang.
 
-Die Detailsicht zeigt oben eine Zusammenfassung der Profil-Einstellungen (Stimme,
-Sprache, Instruktion, Sampling) — „Bearbeiten" klappt das Formular auf. Dieselben
-Einstellungen aller Profile auf einmal gibt es über „⚙️ TTS-Parameter" in der
-Kopfzeile; Stimme und Aussprache zusätzlich pro Clip in der Detailsicht. Bewertungen,
+Die Detailsicht ist auf **Erzeugen und Bestätigen** ausgerichtet: ganz oben steht der
+Satz aus dem Content-Pack als Titel; in der Hauptkarte folgen TTS-Textfeld (Auto-Save),
+Profil- und Stimmenwahl, Generate und Kandidaten-Tabelle (👍/Produktion); „Alle löschen"
+entfernt nur ungeschützte Probeaufnahmen (ohne 👍, ohne Produktion); „Keine Produktion"
+hebt eine bestätigte Aufnahme wieder auf; darunter die
+Profil-Zusammenfassung (Bearbeiten klappt das Formular auf). Bewertungen,
 Locks und Profile liegen in Dateien (Sidecar-JSONs, `locks.json`, `profiles.json`) und
 überleben damit Server- und Browser-Neustart; Filter und Batch-Auswahl merkt sich der
 Browser lokal.
@@ -88,16 +103,14 @@ Notausgang. Das weiß man dann nach ein paar Minuten und nicht nach 25–40 Minu
 
 ## Aussprache und Stimme
 
-Die Detailsicht zeigt zwei Texte getrennt untereinander, weil sie verschiedene Dinge sind:
-
-- **Satz** — was im Content-Pack steht und in der App zu lesen ist. Nur lesbar.
-- **TTS-Version** — genau der Text, der ans Modell geht. Editierbar.
-
-Solange beide gleich sind, steht „identisch mit dem Satz" daran. Sobald man die
-TTS-Version ändert, wird sie farbig abgesetzt („eigene Aussprache") und taucht auch in
-der Liste als zweite Zeile auf. Gespeichert wird sie als `textOverride` im Lock; der Satz
-selbst bleibt unangetastet. Weil ein Lock zwingend einen Seed braucht, nagelt Speichern
-den aktuellen Seed mit fest.
+In der Detailsicht steht der **Satz** aus dem Content-Pack ganz oben als Titel; in der
+Hauptkarte darunter das **TTS-Textfeld** — genau der Text, der ans Modell geht. Änderungen
+speichert die Oberfläche nach kurzer Pause automatisch (600 ms Debounce) über
+`POST /api/clips/{key}/lock`; entspricht der Text wieder dem Satz, wird die
+eigene Aussprache (`textOverride`) gelöscht. Gespeichert wird als `textOverride`
+im Lock; der Satz selbst bleibt unangetastet. Weil ein Lock zwingend einen Seed
+braucht, nagelt Speichern den aktuellen Seed mit fest. Weicht der TTS-Text vom
+Satz ab, erscheint in der Clip-Liste eine zweite Zeile.
 
 Die **Stimme** ist an drei Stellen wählbar — pro Clip in der Detailsicht, pro Profil in
 der Profilkarte darunter und in „⚙️ TTS-Parameter". Hinter jedem Namen steht die Herkunft
@@ -125,6 +138,24 @@ Die Stimmtabelle steht in `ttskit/voices.py` und wird von `tests/test_voices.py`
 Modell-Config im HF-Cache abgeglichen, damit sie nicht auseinanderläuft. Ein Stimmwechsel
 pro Profil gilt für neue Kandidaten aller seiner Clips; ein Wechsel pro Clip trifft nur
 diesen einen.
+
+## Profil-Zuordnung
+
+`FIELD_TO_PROFILE` in `ttskit/extract.py` mappt logische Felder auf Synthese-Profile.
+**Lemma ist speziell:** Atome mit `kind: letter` oder `kind: syllable` landen im
+Profil `phoneme` (Lautwert), alle anderen Lemmata im Profil `word`. Damit kollidieren
+Buchstaben wie `M` und Silben wie `ma` nicht doppelt mit `phonemeTts`/`stretchTts` —
+identischer Text im selben Profil wird zu einem Clip zusammengefasst.
+
+Beim Export (`ttskit/export.py`) darf derselbe gesprochene Text trotzdem nur einmal
+im Index stehen. Gewinnt bei Kollisionen zuerst die pädagogisch passende Variante
+(kurzer Satz-Architekt-Text → `sentence`, Buchstaben-Laut → `phoneme`, …); danach
+verified Audio (Fingerprint = letzter Export); sonst `PROFILE_PRIORITY`
+(`phoneme` vor `word`, sonst wie gehabt).
+
+Bestehende `word:*`-Locks und Kandidaten-Ordner für Buchstaben/Silben einmalig
+umziehen: `tts migrate-locks` (siehe Ablauf oben). Clips mit Produktions-WAV aber
+ohne Lock (typisch nach Batch-`render`): `tts wire-locks`, danach `tts export`.
 
 ## Umfang
 
@@ -172,7 +203,7 @@ identisch. `poolSalt` in `profiles.json` hochzählen würfelt bewusst alles neu.
 | Datei | Im Git? | Inhalt |
 | --- | --- | --- |
 | `profiles.json` | ja | Instruktionen, Sampling, Seed-Pools — **kuratierte Entscheidungen** |
-| `locks.json` | ja | pro Clip festgenagelte Seeds — **kuratierte Entscheidungen** |
+| `locks.json` | ja | pro Clip festgenagelte Seeds, TTS-Overrides, optional `generateSeed` — **kuratierte Entscheidungen** |
 | `extra-strings.json` | ja | hartkodierte Kotlin-Strings |
 | `out/` | nein | Manifest, Render-State, Audio, Kandidaten — jederzeit neu erzeugbar |
 

@@ -5,7 +5,7 @@ import org.junit.Test
 
 class SymbolHuntSpecTest {
     private val round = SymbolHuntRound(
-        promptTts = "Finde alle Buchstaben M!",
+        promptTts = SymbolHuntDerivation.PromptLetter,
         targetAtomId = "letter-m",
         mode = SymbolHuntMode.letter,
         distractorPool = listOf("letter-a"),

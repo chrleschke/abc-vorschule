@@ -24,6 +24,21 @@ SECONDS_PER_TOKEN = 0.08
 #: des Checkpoints. Mehr anzubieten wäre unbelegt.
 MAX_NEW_TOKENS_CEILING = 8192
 
+#: Obergrenze für Zufalls-Seeds — entspricht `secrets.randbelow(2**31)`.
+MAX_RANDOM_SEED = 2 ** 31
+
+
+def parse_seed(value: Any) -> int:
+    """Ganzzahl im Bereich, den `random_seeds` erzeugt."""
+    try:
+        seed = int(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Seed muss eine Ganzzahl sein, nicht {value!r}") from exc
+    if seed < 0 or seed >= MAX_RANDOM_SEED:
+        raise ValueError(
+            f"Seed muss zwischen 0 und {MAX_RANDOM_SEED - 1} liegen, nicht {seed}")
+    return seed
+
 
 @dataclass(frozen=True)
 class SamplingParam:
@@ -405,6 +420,8 @@ class Lock:
     source_text: str | None = None
     #: Stimme nur für diesen Clip. None heißt „die des Profils" — nicht „keine".
     speaker: str | None = None
+    #: Fester Seed für Probeaufnahmen — Generate nutzt nur diesen, solange gesetzt.
+    generate_seed: int | None = None
 
     @classmethod
     def from_dict(cls, raw: dict[str, Any], *, key: str = "?",
@@ -420,6 +437,13 @@ class Lock:
         except (TypeError, ValueError) as exc:
             raise ValueError(f"{where}lock {key!r} has a non-numeric seed "
                              f"{raw['seed']!r}") from exc
+        generate_seed = None
+        if "generateSeed" in raw and raw["generateSeed"] is not None:
+            try:
+                generate_seed = parse_seed(raw["generateSeed"])
+            except ValueError as exc:
+                raise ValueError(
+                    f"{where}lock {key!r} has invalid generateSeed: {exc}") from exc
         return cls(
             seed=seed,
             profile=raw.get("profile"),
@@ -427,6 +451,7 @@ class Lock:
             note=raw.get("note"),
             source_text=raw.get("sourceText"),
             speaker=raw.get("speaker"),
+            generate_seed=generate_seed,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -435,7 +460,8 @@ class Lock:
                            ("speaker", self.speaker),
                            ("textOverride", self.text_override),
                            ("note", self.note),
-                           ("sourceText", self.source_text)):
+                           ("sourceText", self.source_text),
+                           ("generateSeed", self.generate_seed)):
             if value is not None:
                 out[key] = value
         return out

@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import fnmatch
 import json
+import os
 import secrets
+import tempfile
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,8 +21,8 @@ import numpy as np
 from .audio import postprocess, write_wav
 from .models import Clip
 from .paths import Paths
-from .plan import effective_profile, fingerprint, status_of
-from .store import Profile, Profiles, RenderState
+from .plan import effective_profile, fingerprint, resolve_seed, status_of
+from .store import Lock, Locks, Profile, Profiles, RenderState
 
 
 class SupportsGenerate(Protocol):
@@ -307,7 +309,19 @@ def update_candidate_meta(paths: Paths, clip_key: str, seed: int,
             meta[key] = value
     path = Path(paths.candidates) / clip_key / f"{seed}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(meta, ensure_ascii=False) + "\n", encoding="utf-8")
+    payload = json.dumps(meta, ensure_ascii=False) + "\n"
+    fd, tmp_name = tempfile.mkstemp(
+        dir=path.parent, prefix=f".{path.name}.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(payload)
+        os.replace(tmp_name, path)
+    except BaseException:
+        try:
+            os.unlink(tmp_name)
+        except OSError:
+            pass
+        raise
     return meta
 
 
@@ -371,3 +385,91 @@ def clip_audio_list(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
     })
     infos.sort(key=lambda info: (info["createdAt"] or "", info["seed"]), reverse=True)
     return infos
+
+
+def candidate_is_protected(paths: Paths, clip: Clip, seed: int, meta: dict) -> bool:
+    """Probeaufnahmen, die „Alle löschen" und 👎 nie anfassen dürfen."""
+    if meta.get("rating") == "good":
+        return True
+    production = paths.audio / f"{clip.key}.wav"
+    return seed == clip.seed and production.exists()
+
+
+def deletable_candidate_seeds(paths: Paths, clip: Clip) -> tuple[list[int], int]:
+    """Seeds unter `candidates/` ohne Produktion und ohne 👍."""
+    deletable: list[int] = []
+    protected = 0
+    for seed in candidate_seeds(paths, clip.key):
+        meta = candidate_meta(paths, clip.key, seed)
+        if candidate_is_protected(paths, clip, seed, meta):
+            protected += 1
+        else:
+            deletable.append(seed)
+    return deletable, protected
+
+
+def delete_candidate_wav(paths: Paths, clip: Clip, seed: int) -> None:
+    """Eine Probeaufnahme entfernen — Pool, Produktion und Lock wie im UI-👎."""
+    wav = paths.candidates / clip.key / f"{seed}.wav"
+    if not wav.exists():
+        raise FileNotFoundError(seed)
+
+    if candidate_meta(paths, clip.key, seed).get("rating") == "good":
+        profiles = Profiles.load(paths.profiles)
+        profiles.profiles[clip.profile].seed_pool = [
+            s for s in profiles.profiles[clip.profile].seed_pool if s != seed
+        ]
+        profiles.save(paths.profiles)
+
+    wav.unlink()
+    (paths.candidates / clip.key / f"{seed}.json").unlink(missing_ok=True)
+
+    production = paths.audio / f"{clip.key}.wav"
+    if clip.seed == seed and production.exists():
+        production.unlink()
+
+    if not candidate_seeds(paths, clip.key) and not production.exists():
+        locks = Locks.load(paths.locks)
+        lock = locks.get(clip.key)
+        curated = lock is not None and any(
+            (lock.text_override, lock.speaker, lock.profile, lock.note,
+             lock.generate_seed))
+        if lock is not None and not curated:
+            locks.remove(clip.key)
+            locks.save(paths.locks)
+
+
+def clear_production(paths: Paths, clip: Clip) -> bool:
+    """Produktions-Audio aufheben — 👍-Bewertungen und Kandidaten bleiben."""
+    production = paths.audio / f"{clip.key}.wav"
+    locks = Locks.load(paths.locks)
+    lock = locks.get(clip.key)
+    had_production = production.exists()
+
+    if not had_production and lock is None:
+        return False
+
+    if had_production:
+        production.unlink()
+
+    if lock is not None:
+        curated = any(
+            (lock.text_override, lock.speaker, lock.profile, lock.note,
+             lock.generate_seed))
+        if curated:
+            profiles = Profiles.load(paths.profiles)
+            auto = resolve_seed(clip.key, clip.profile, profiles, Locks())
+            locks.set(clip.key, Lock(
+                seed=auto,
+                profile=lock.profile,
+                text_override=lock.text_override,
+                note=lock.note,
+                source_text=clip.source_text,
+                speaker=lock.speaker,
+                generate_seed=lock.generate_seed,
+            ))
+        else:
+            locks.remove(clip.key)
+        locks.save(paths.locks)
+
+    return True

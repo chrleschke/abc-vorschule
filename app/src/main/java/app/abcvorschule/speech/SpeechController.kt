@@ -93,6 +93,11 @@ class SpeechController(
         utteranceWaiters.remove(id)
     }
 
+    /** Speaks each part in order — prompt clip then atom clip, etc. */
+    suspend fun speakAndAwaitSequence(texts: List<String>, timeoutMs: Long = 10_000L) {
+        texts.filter { it.isNotBlank() }.forEach { speakAndAwait(it, timeoutMs) }
+    }
+
     fun stop() {
         stopOutput()
         clearWaiters()

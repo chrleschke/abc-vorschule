@@ -45,6 +45,11 @@ object TraceGeometry {
         strokes: List<GlyphStroke>,
         boxSize: Float,
         origin: TracePoint,
+        /**
+         * Vertical squeeze toward y=0.5 in unit space. Multi-grapheme glyphs use a
+         * value below 1 so Au/Sch do not stretch to the full square height.
+         */
+        heightScale: Float = 1f,
     ): List<List<TracePoint>> = strokes.map { stroke ->
         val normalized = stroke.points.map { p ->
             TracePoint(
@@ -55,9 +60,10 @@ object TraceGeometry {
         // Densify coarse bowls in unit space so chord thresholds stay independent of
         // the on-screen glyph box; hit-testing and drawing then share the same road.
         refineStroke(normalized).map { p ->
+            val yNorm = 0.5f + (p.y - 0.5f) * heightScale
             TracePoint(
                 x = origin.x + p.x * boxSize,
-                y = origin.y + p.y * boxSize,
+                y = origin.y + yNorm * boxSize,
             )
         }
     }
@@ -346,6 +352,22 @@ object TraceProgress {
     /** Corridor half-width as a fraction of the glyph box. */
     const val CorridorFraction = 0.16f
 
+    /** Thinner road for two-character graphemes (Au, Ei, Ch, …). */
+    const val DigraphCorridorFraction = 0.10f
+
+    /** Even thinner for three-character graphemes (Sch). */
+    const val TrigraphCorridorFraction = 0.09f
+
+    /**
+     * Vertical squeeze toward the box mid-line for two-character graphemes, so Au/Ei
+     * do not fill the full square height and look stretched beside their side-by-side
+     * letters.
+     */
+    const val DigraphHeightScale = 0.72f
+
+    /** Stronger vertical squeeze for Sch (three letters in one square). */
+    const val TrigraphHeightScale = 0.62f
+
     /** Star pick-up radius as a fraction of the glyph box. */
     const val StarHitFraction = 0.12f
 
@@ -358,6 +380,31 @@ object TraceProgress {
 
     /** Visual road-width scale for [ShortStrokeFraction] ticks relative to a full bar. */
     const val ShortStrokeWidthScale = 0.35f
+
+    /**
+     * How a glyph sits in the square canvas: single letters keep the full square and
+     * thick road; multi-grapheme forms (Au, Sch, …) get a shorter height and a thinner
+     * corridor so the side-by-side letters have room.
+     */
+    data class Fit(
+        val heightScale: Float = 1f,
+        val corridorFraction: Float = CorridorFraction,
+    ) {
+        val isCompact: Boolean get() = heightScale < 1f || corridorFraction < CorridorFraction
+    }
+
+    /**
+     * Grapheme width from the atom lemma (spaces ignored so "S t" counts as St).
+     * Display is not used: `letter-ae` shows "Äh" but is still one letter (Ä).
+     */
+    fun graphemeUnits(lemma: String): Int =
+        lemma.replace(" ", "").length.coerceAtLeast(1)
+
+    fun fitFor(lemma: String): Fit = when (graphemeUnits(lemma)) {
+        1 -> Fit()
+        2 -> Fit(heightScale = DigraphHeightScale, corridorFraction = DigraphCorridorFraction)
+        else -> Fit(heightScale = TrigraphHeightScale, corridorFraction = TrigraphCorridorFraction)
+    }
 
     /** Stars scale with how much road there actually is to drive. */
     fun starCountFor(strokeLength: Float, boxSize: Float): Int {
@@ -383,12 +430,13 @@ object TraceProgress {
          * vehicle and the red dot "runs past" the star.
          */
         previousFinger: TracePoint? = null,
+        corridorFraction: Float = CorridorFraction,
     ): TraceUpdate {
         if (state.strokeIndex >= strokes.size) {
             return TraceUpdate(state, collectedStar = false, offCorridor = false, glyphDone = true)
         }
         val stroke = strokes[state.strokeIndex]
-        val corridor = boxSize * CorridorFraction
+        val corridor = boxSize * corridorFraction
         if (TraceGeometry.distanceToPolyline(finger, stroke) > corridor) {
             return TraceUpdate(state, collectedStar = false, offCorridor = true, glyphDone = false)
         }

@@ -1,5 +1,6 @@
 import json
 import shutil
+import time
 from pathlib import Path
 
 import numpy as np
@@ -190,6 +191,88 @@ def test_candidates_with_top_seeds_but_no_locks_are_random(client):
     assert len(set(_candidate_seeds_of(client, key))) == 2
 
 
+def test_candidates_with_fixed_seed_from_body(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    fixed = 123456789
+    client.post(f"/api/clips/{key}/candidates",
+                json={"n": 4, "useKnownSeeds": True, "fixedSeed": fixed})
+    wait_for_idle(client)
+    assert _candidate_seeds_of(client, key) == [fixed]
+
+
+def test_candidates_with_fixed_seed_from_lock(client):
+    clip = client.get("/api/state").json()["clips"][0]
+    key, seed = clip["key"], clip["seed"]
+    fixed = 987654321
+    client.post(f"/api/clips/{key}/lock",
+                json={"seed": seed, "generateSeed": fixed})
+    client.post(f"/api/clips/{key}/candidates",
+                json={"n": 3, "useKnownSeeds": True, "useTopSeeds": True})
+    wait_for_idle(client)
+    assert _candidate_seeds_of(client, key) == [fixed]
+    after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert after["generateSeed"] == fixed
+
+
+def test_body_fixed_seed_overrides_lock_generate_seed(client):
+    clip = client.get("/api/state").json()["clips"][0]
+    key, seed = clip["key"], clip["seed"]
+    client.post(f"/api/clips/{key}/lock",
+                json={"seed": seed, "generateSeed": 111111111})
+    client.post(f"/api/clips/{key}/candidates", json={"fixedSeed": 222222222})
+    wait_for_idle(client)
+    assert _candidate_seeds_of(client, key) == [222222222]
+
+
+def test_invalid_fixed_seed_is_rejected(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    for bad in (-1, 2 ** 31, "nope"):
+        response = client.post(f"/api/clips/{key}/candidates", json={"fixedSeed": bad})
+        assert response.status_code == 422
+
+
+def test_lock_persists_and_clears_generate_seed(client):
+    clip = client.get("/api/state").json()["clips"][0]
+    key, seed = clip["key"], clip["seed"]
+    client.post(f"/api/clips/{key}/lock",
+                json={"seed": seed, "generateSeed": 314159265})
+    lock = json.loads(client.paths.locks.read_text(encoding="utf-8"))["locks"][key]
+    assert lock["generateSeed"] == 314159265
+    after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert after["generateSeed"] == 314159265
+
+    client.post(f"/api/clips/{key}/lock", json={"seed": seed, "generateSeed": None})
+    lock = json.loads(client.paths.locks.read_text(encoding="utf-8"))["locks"][key]
+    assert "generateSeed" not in lock
+    after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert after["generateSeed"] is None
+
+
+def test_lock_merge_preserves_generate_seed(client):
+    clip = client.get("/api/state").json()["clips"][0]
+    key, seed = clip["key"], clip["seed"]
+    client.post(f"/api/clips/{key}/lock",
+                json={"seed": seed, "generateSeed": 424242, "textOverride": "mmmmm"})
+    client.post(f"/api/clips/{key}/lock", json={"seed": seed, "speaker": "serena"})
+    lock = json.loads(client.paths.locks.read_text(encoding="utf-8"))["locks"][key]
+    assert lock["generateSeed"] == 424242
+    assert lock["textOverride"] == "mmmmm"
+    assert lock["speaker"] == "serena"
+
+
+def test_promote_preserves_generate_seed(client):
+    clip = client.get("/api/state").json()["clips"][0]
+    key, seed = clip["key"], clip["seed"]
+    client.post(f"/api/clips/{key}/lock",
+                json={"seed": seed, "generateSeed": 808080})
+    client.post(f"/api/clips/{key}/candidates", json={"fixedSeed": 999})
+    wait_for_idle(client)
+    cand = _candidate_seeds_of(client, key)[0]
+    client.post(f"/api/clips/{key}/promote", json={"seed": cand})
+    lock = json.loads(client.paths.locks.read_text(encoding="utf-8"))["locks"][key]
+    assert lock["generateSeed"] == 808080
+
+
 def test_state_reports_top_seeds_per_profile(client):
     body = client.get("/api/state").json()
     assert set(body["topSeeds"]) == set(body["profiles"])
@@ -357,8 +440,7 @@ def test_deleting_a_candidate_removes_wav_and_sidecar(client):
 
 
 def test_deleting_the_promoted_candidate_removes_production_and_unlocks(client):
-    """Ohne eigenen 'Lock entfernen'-Knopf muss die Festlegung von selbst
-    verschwinden, sobald keine Audios mehr übrig sind."""
+    """Produktion lässt sich nicht per 👎 löschen — nur über „Keine Produktion“."""
     key = client.get("/api/state").json()["clips"][0]["key"]
     client.post(f"/api/clips/{key}/candidates", json={"n": 1})
     wait_for_idle(client)
@@ -370,11 +452,12 @@ def test_deleting_the_promoted_candidate_removes_production_and_unlocks(client):
     assert locked["locked"] is True
     assert (client.paths.audio / f"{key}.wav").exists()
 
-    assert client.delete(f"/api/clips/{key}/candidates/{seed}").status_code == 200
+    assert client.delete(f"/api/clips/{key}/candidates/{seed}").status_code == 409
+    assert client.post(f"/api/clips/{key}/clear-production").status_code == 200
 
     after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
-    assert after["locked"] is False, "keine Audios mehr → Festlegung fällt automatisch weg"
-    assert after["candidates"] == []
+    assert after["locked"] is False
+    assert len(after["candidates"]) == 1
     assert not (client.paths.audio / f"{key}.wav").exists()
 
 
@@ -390,11 +473,12 @@ def test_deleting_the_last_candidate_keeps_a_curated_pronunciation(client):
     client.post(f"/api/clips/{key}/lock", json={"seed": seed, "textOverride": "Mmmmm."})
     client.post(f"/api/clips/{key}/promote", json={"seed": seed})
 
-    assert client.delete(f"/api/clips/{key}/candidates/{seed}").status_code == 200
+    assert client.delete(f"/api/clips/{key}/candidates/{seed}").status_code == 409
+    assert client.post(f"/api/clips/{key}/clear-production").status_code == 200
 
     after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
     assert after["text"] == "Mmmmm."
-    assert after["candidates"] == []
+    assert len(after["candidates"]) == 1
     assert not (client.paths.audio / f"{key}.wav").exists()
 
 
@@ -421,12 +505,13 @@ def test_deleting_the_promoted_candidate_keeps_the_lock_if_others_remain(client)
     promoted_seed, other_seed = (c["seed"] for c in clip["candidates"])
     client.post(f"/api/clips/{key}/promote", json={"seed": promoted_seed})
 
-    assert client.delete(f"/api/clips/{key}/candidates/{promoted_seed}").status_code == 200
+    assert client.delete(f"/api/clips/{key}/candidates/{promoted_seed}").status_code == 409
+    assert client.delete(f"/api/clips/{key}/candidates/{other_seed}").status_code == 200
 
     after = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
-    assert after["locked"] is True, "es gibt noch eine Probeaufnahme — die Festlegung bleibt"
-    assert [c["seed"] for c in after["candidates"]] == [other_seed]
-    assert not (client.paths.audio / f"{key}.wav").exists()
+    assert after["locked"] is True, "Produktion bleibt — nur der andere Kandidat ist weg"
+    assert [c["seed"] for c in after["candidates"]] == [promoted_seed]
+    assert (client.paths.audio / f"{key}.wav").exists()
 
 
 def test_locking_a_clip_changes_its_seed(client):
@@ -701,6 +786,23 @@ def test_events_streams_the_initial_status_frame(client):
         gen.close()
 
 
+def test_event_stream_exits_promptly_when_jobs_shut_down():
+    from ttskit.server import SSE_POLL_SECONDS, JobQueue, _event_stream
+
+    jobs = JobQueue()
+    jobs.start()
+    gen = _event_stream(jobs)
+    try:
+        next(gen)
+        jobs.shutdown()
+        t0 = time.time()
+        with pytest.raises(StopIteration):
+            next(gen)
+        assert time.time() - t0 < SSE_POLL_SECONDS + 0.5
+    finally:
+        gen.close()
+
+
 # ---------------------------------------------------- Stimme, Sprache, Text
 # Das Web-Interface schickt seit dem Aussprache-Umbau `textOverride` und
 # `speaker`. Beides landet in der git-verwalteten locks.json bzw.
@@ -895,6 +997,142 @@ def test_deleting_a_rated_candidate_cleans_the_pool(client):
     assert client.delete(f"/api/clips/{key}/candidates/{seed}").status_code == 200
     raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
     assert seed not in raw["profiles"][profile]["seedPool"]
+
+
+def test_bulk_delete_removes_only_unprotected_candidates(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 3})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    seeds = [c["seed"] for c in clip["candidates"]]
+    assert len(seeds) == 3
+
+    production = seeds[0]
+    liked = seeds[1]
+    disposable = seeds[2]
+    assert client.post(f"/api/clips/{key}/promote",
+                       json={"seed": production}).status_code == 200
+    assert client.put(f"/api/clips/{key}/candidates/{liked}/rating",
+                      json={"good": True}).status_code == 200
+
+    response = client.delete(f"/api/clips/{key}/candidates")
+    assert response.status_code == 200
+    body = response.json()
+    assert body == {"ok": "deleted", "deleted": 1, "skipped": 2, "seeds": [disposable]}
+
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    remaining = {c["seed"] for c in clip["candidates"]}
+    assert production in remaining
+    assert liked in remaining
+    assert disposable not in remaining
+    assert (client.paths.candidates / key / f"{disposable}.wav").exists() is False
+    assert (client.paths.candidates / key / f"{production}.wav").exists()
+    assert (client.paths.candidates / key / f"{liked}.wav").exists()
+
+
+def test_bulk_delete_when_all_candidates_are_protected(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    seed = clip["candidates"][0]["seed"]
+    assert client.post(f"/api/clips/{key}/promote", json={"seed": seed}).status_code == 200
+
+    response = client.delete(f"/api/clips/{key}/candidates")
+    assert response.status_code == 200
+    assert response.json()["deleted"] == 0
+    assert response.json()["skipped"] == 1
+    assert response.json()["seeds"] == []
+
+
+def test_bulk_delete_on_clip_without_candidates_is_empty(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    response = client.delete(f"/api/clips/{key}/candidates")
+    assert response.status_code == 200
+    assert response.json() == {"ok": "deleted", "deleted": 0, "skipped": 0, "seeds": []}
+
+
+def test_clear_production_after_promote(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 2})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    promoted = clip["candidates"][0]["seed"]
+    assert client.post(f"/api/clips/{key}/promote",
+                       json={"seed": promoted}).status_code == 200
+
+    response = client.post(f"/api/clips/{key}/clear-production")
+    assert response.status_code == 200
+    assert response.json() == {"ok": "cleared"}
+
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert clip["status"] == "missing"
+    assert clip["locked"] is False
+    assert not (client.paths.audio / f"{key}.wav").exists()
+    assert len(clip["candidates"]) == 2
+    assert not any(c["seed"] == clip["seed"] and c.get("isProductionOnly")
+                   for c in clip["candidates"])
+
+
+def test_clear_production_preserves_liked_candidates(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 2})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    promoted, liked = clip["candidates"][0]["seed"], clip["candidates"][1]["seed"]
+    client.post(f"/api/clips/{key}/promote", json={"seed": promoted})
+    client.put(f"/api/clips/{key}/candidates/{liked}/rating", json={"good": True})
+
+    assert client.post(f"/api/clips/{key}/clear-production").status_code == 200
+
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    liked_entry = next(c for c in clip["candidates"] if c["seed"] == liked)
+    assert liked_entry["good"] is True
+    assert (client.paths.candidates / key / f"{liked}.wav").exists()
+
+
+def test_clear_production_preserves_curated_override(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    seed = clip["candidates"][0]["seed"]
+    client.post(f"/api/clips/{key}/lock", json={"seed": seed, "textOverride": "Mmmmm."})
+    client.post(f"/api/clips/{key}/promote", json={"seed": seed})
+
+    assert client.post(f"/api/clips/{key}/clear-production").status_code == 200
+
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert clip["text"] == "Mmmmm."
+    assert clip["status"] == "missing"
+    lock = json.loads(client.paths.locks.read_text(encoding="utf-8"))["locks"][key]
+    assert lock["textOverride"] == "Mmmmm."
+    assert lock["seed"] != seed
+
+
+def test_clear_production_when_nothing_to_clear_is_409(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    assert client.post(f"/api/clips/{key}/clear-production").status_code == 409
+
+
+def test_rate_and_delete_other_candidates_while_production_exists(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"n": 3})
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    promoted, second, third = (c["seed"] for c in clip["candidates"])
+    assert client.post(f"/api/clips/{key}/promote", json={"seed": promoted}).status_code == 200
+
+    assert client.put(f"/api/clips/{key}/candidates/{second}/rating",
+                      json={"good": True}).status_code == 200
+    assert client.delete(f"/api/clips/{key}/candidates/{third}").status_code == 200
+    assert client.delete(f"/api/clips/{key}/candidates/{promoted}").status_code == 409
+
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    seeds = {c["seed"]: c for c in clip["candidates"]}
+    assert promoted in seeds and second in seeds and third not in seeds
+    assert seeds[second]["good"] is True
+    assert clip["status"] == "rendered"
 
 
 def test_state_ships_candidate_metadata(client):

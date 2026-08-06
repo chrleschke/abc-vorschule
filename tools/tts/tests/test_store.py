@@ -7,6 +7,7 @@ from ttskit import store
 from ttskit.store import (
     BASE_SAMPLING, DEFAULT_PROFILES, MAX_NEW_TOKENS_CEILING, SAMPLING_PARAMS,
     SAMPLING_SPEC, SECONDS_PER_TOKEN, Lock, Locks, Profiles, RenderState,
+    parse_seed,
 )
 
 
@@ -59,7 +60,8 @@ def test_locks_roundtrip_with_optional_fields(tmp_path):
         seed=991, profile=None, text_override="mmmmm",
         note="sprach sonst 'Em'", source_text="M"))
     locks.set("prompt:aaaabbbbcccc", Lock(
-        seed=7, profile=None, text_override=None, note=None, source_text="Wo?"))
+        seed=7, profile=None, text_override=None, note=None, source_text="Wo?",
+        generate_seed=424242))
     locks.save(path)
 
     reloaded = Locks.load(path)
@@ -70,10 +72,24 @@ def test_locks_roundtrip_with_optional_fields(tmp_path):
 
     second = reloaded.get("prompt:aaaabbbbcccc")
     assert second.seed == 7
+    assert second.generate_seed == 424242
     assert second.text_override is None
     # Absent optional fields must not be written out as nulls.
     raw = json.loads(path.read_text(encoding="utf-8"))
-    assert raw["locks"]["prompt:aaaabbbbcccc"] == {"seed": 7, "sourceText": "Wo?"}
+    assert raw["locks"]["prompt:aaaabbbbcccc"] == {
+        "seed": 7, "sourceText": "Wo?", "generateSeed": 424242,
+    }
+
+
+def test_parse_seed_accepts_the_random_range_and_rejects_out_of_bounds():
+    assert parse_seed(0) == 0
+    assert parse_seed(2147483647) == 2147483647
+    with pytest.raises(ValueError, match="Ganzzahl"):
+        parse_seed("nope")
+    with pytest.raises(ValueError, match="0 und"):
+        parse_seed(-1)
+    with pytest.raises(ValueError, match="0 und"):
+        parse_seed(2 ** 31)
 
 
 def test_locks_remove(tmp_path):

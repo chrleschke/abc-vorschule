@@ -100,6 +100,11 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
   (`TraceProgress.ShortStrokeWidthScale`). Grobe Bögen (B/C/D/G/P/R/S/…) werden zur Laufzeit
   in `TraceGeometry.refineStroke` selektiv mit Kreisbögen verdichtet — spitze pädagogische
   Ecken (M/W/N) und lange Gerade (J-Stamm, U-Beine) bleiben unangetastet.
+- **Mehrzeichen-Grapheme (Au, Ei, Sch, …)** teilen dieselbe 1×1-Autorenbox, wirken dort aber
+  gestreckt und zu dick. Zur Laufzeit setzt `TraceProgress.fitFor(lemma)` sie kompakter:
+  vertikal zur Mitte gestaucht (Di-/Trigraph-Höhenfaktor) und mit dünnerem Straßenkorridor.
+  Einzelbuchstaben (inkl. Ä/Ö/Ü) bleiben unverändert; die Breite kommt aus dem Lemma
+  (Leerzeichen ignoriert, damit `S t` als Digraph zählt).
 - Orthografie: Silben eher klein; zusammengesetzte Wörter/Sätze korrekt großgeschrieben.
 - Rechnen nutzt die Bild-Ikonen derselben Lektion; Details zu Singular/Plural siehe Abschnitt 8.
 - Jede autorierte Lektion verweist über `finaleId` auf einen **Finale-Satz** in

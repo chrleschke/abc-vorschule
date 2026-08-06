@@ -12,6 +12,7 @@ from .extract import extract_items
 from .models import Clip, Item
 from .paths import Paths
 from .plan import build_clips, orphan_locks, status_of
+from .migrate import migrate_word_locks, wire_production_locks
 from .store import Locks, Profiles, RenderState, read_json
 
 
@@ -211,6 +212,34 @@ def cmd_sample(paths: Paths, args) -> int:
     return 0
 
 
+def cmd_migrate_locks(paths: Paths, dry_run: bool = False) -> int:
+    report = migrate_word_locks(paths, dry_run=dry_run)
+    moved = len(report.locks_moved) + len(report.locks_replaced)
+    dropped = len(report.locks_dropped)
+    print(f"{'(dry-run) ' if dry_run else ''}"
+          f"{moved} locks → phoneme:*, {dropped} redundant word:* removed, "
+          f"{len(report.audio_copied)} WAVs copied, "
+          f"{len(report.candidate_dirs_merged)} candidate dirs merged")
+    for word_key, phoneme_key in report.locks_moved + report.locks_replaced:
+        print(f"  {word_key} → {phoneme_key}")
+    for key in report.locks_dropped:
+        print(f"  dropped {key} (phoneme lock kept)")
+    return 0
+
+
+def cmd_wire_locks(paths: Paths, dry_run: bool = False) -> int:
+    report = wire_production_locks(paths, dry_run=dry_run)
+    print(f"{'(dry-run) ' if dry_run else ''}"
+          f"{len(report.locked)} Clips gesperrt (Produktions-WAV vorhanden, kein Lock)")
+    for key, seed in report.locked[:20]:
+        print(f"  {key} seed={seed}")
+    if len(report.locked) > 20:
+        print(f"  … und {len(report.locked) - 20} weitere")
+    if report.skipped:
+        print(f"{len(report.skipped)} übersprungen")
+    return 0
+
+
 def cmd_export(paths: Paths) -> int:
     from .export import export_to_app
 
@@ -237,7 +266,16 @@ def cmd_web(paths: Paths, args) -> int:
     print("Lade Modell — das dauert ein paar Sekunden ...")
     app = create_app(paths)
     print(f"Web-Interface auf http://{args.host}:{args.port}")
-    uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
+    print("Beenden mit Ctrl-C.")
+    uvicorn.run(
+        app,
+        host=args.host,
+        port=args.port,
+        log_level="warning",
+        # Offene Browser-Tabs halten `/events` (SSE) am Leben; ohne kurzes
+        # Grace-Timeout wirkt Ctrl-C, als ob nichts passiert.
+        timeout_graceful_shutdown=1,
+    )
     return 0
 
 
@@ -246,6 +284,18 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("extract", help="Content-JSON → out/manifest.json")
     sub.add_parser("status", help="Überblick über Clips, Pools und Locks")
+    migrate_parser = sub.add_parser(
+        "migrate-locks",
+        help="word:*-Locks für Buchstaben/Silben → phoneme:* (Option B)",
+    )
+    migrate_parser.add_argument("--dry-run", action="store_true",
+                              help="nur anzeigen, nichts schreiben")
+    wire_parser = sub.add_parser(
+        "wire-locks",
+        help="Produktions-WAV ohne Lock → Lock anlegen (Batch-Render-Nachzügler)",
+    )
+    wire_parser.add_argument("--dry-run", action="store_true",
+                             help="nur anzeigen, nichts schreiben")
     sub.add_parser("export", help="Approvete Clips als OGG in die App-Assets")
 
     render_parser = sub.add_parser("render", help="Finaler Lauf, inkrementell")
@@ -273,6 +323,10 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_extract(paths)
     if args.command == "status":
         return cmd_status(paths)
+    if args.command == "migrate-locks":
+        return cmd_migrate_locks(paths, dry_run=args.dry_run)
+    if args.command == "wire-locks":
+        return cmd_wire_locks(paths, dry_run=args.dry_run)
     if args.command == "export":
         return cmd_export(paths)
     if args.command == "render":

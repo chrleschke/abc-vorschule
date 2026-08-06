@@ -293,4 +293,5 @@ def test_web_builds_the_app_and_serves_it_on_the_requested_address(
     assert served["app"] is sentinel
     assert served["host"] == "0.0.0.0"
     assert served["port"] == 9999
+    assert served["timeout_graceful_shutdown"] == 1
     assert "http://0.0.0.0:9999" in capsys.readouterr().out

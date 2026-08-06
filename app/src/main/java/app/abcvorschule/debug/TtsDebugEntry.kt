@@ -4,6 +4,7 @@ import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SoundPositionSpec
+import app.abcvorschule.content.SymbolHuntDerivation
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.rounds
 
@@ -86,6 +87,28 @@ fun ContentPack.ttsDebugEntries(): List<TtsDebugEntry> {
             }
         }
     }
+
+    entries += TtsDebugEntry(
+        id = "ui:huntPromptLetter",
+        group = TtsDebugGroup.Task,
+        label = "Jagd · Finde alle Buchstaben",
+        originalText = SymbolHuntDerivation.PromptLetter,
+        sourceFile = "SymbolHuntDerivation.kt",
+    )
+    entries += TtsDebugEntry(
+        id = "ui:huntPromptLaut",
+        group = TtsDebugGroup.Task,
+        label = "Jagd · Finde alle Laute",
+        originalText = SymbolHuntDerivation.PromptDigraph,
+        sourceFile = "SymbolHuntDerivation.kt",
+    )
+    entries += TtsDebugEntry(
+        id = "ui:huntPromptSilbe",
+        group = TtsDebugGroup.Task,
+        label = "Jagd · Finde alle Silben",
+        originalText = SymbolHuntDerivation.PromptSyllable,
+        sourceFile = "SymbolHuntDerivation.kt",
+    )
 
     return entries
 }

@@ -195,4 +195,69 @@ class TraceProgressTest {
             assertTrue("stars $a and $b are only $gap apart (radius $radius)", gap > radius)
         }
     }
+
+    @Test
+    fun singleLettersKeepTheFullSquareAndThickRoad() {
+        val fit = TraceProgress.fitFor("A")
+        assertEquals(1f, fit.heightScale, 0.001f)
+        assertEquals(TraceProgress.CorridorFraction, fit.corridorFraction, 0.001f)
+        assertFalse(fit.isCompact)
+    }
+
+    @Test
+    fun digraphsGetAShorterThinnerFit() {
+        val fit = TraceProgress.fitFor("Au")
+        assertEquals(TraceProgress.DigraphHeightScale, fit.heightScale, 0.001f)
+        assertEquals(TraceProgress.DigraphCorridorFraction, fit.corridorFraction, 0.001f)
+        assertTrue(fit.isCompact)
+        assertTrue(fit.heightScale < 1f)
+        assertTrue(fit.corridorFraction < TraceProgress.CorridorFraction)
+    }
+
+    @Test
+    fun schGetsAnEvenMoreCompactFitThanAu() {
+        val au = TraceProgress.fitFor("Au")
+        val sch = TraceProgress.fitFor("Sch")
+        assertTrue(sch.heightScale < au.heightScale)
+        assertTrue(sch.corridorFraction <= au.corridorFraction)
+    }
+
+    @Test
+    fun lemmaSpacesDoNotInflateGraphemeWidth() {
+        // letter-st is authored as lemma "S t" but is still a digraph.
+        assertEquals(2, TraceProgress.graphemeUnits("S t"))
+        assertEquals(TraceProgress.DigraphHeightScale, TraceProgress.fitFor("S t").heightScale, 0.001f)
+    }
+
+    @Test
+    fun umlautLettersStayFullSizeDespiteMultiCharDisplay() {
+        // letter-ae displays "Äh" but lemma is Ä — one letter, full road.
+        assertEquals(1, TraceProgress.graphemeUnits("Ä"))
+        assertFalse(TraceProgress.fitFor("Ä").isCompact)
+    }
+
+    @Test
+    fun aNarrowerCorridorRejectsFingersTheFullRoadWouldAccept() {
+        val offset = TracePoint(10f, 26f) // ~0.13 of boxSize 200 — inside 0.16, outside 0.10
+        assertFalse(
+            TraceProgress.update(
+                TraceState(),
+                offset,
+                strokes,
+                stars,
+                boxSize,
+                corridorFraction = TraceProgress.CorridorFraction,
+            ).offCorridor,
+        )
+        assertTrue(
+            TraceProgress.update(
+                TraceState(),
+                offset,
+                strokes,
+                stars,
+                boxSize,
+                corridorFraction = TraceProgress.DigraphCorridorFraction,
+            ).offCorridor,
+        )
+    }
 }

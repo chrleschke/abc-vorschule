@@ -98,6 +98,7 @@ fun AbcApp(onFinish: () -> Unit = {}) {
             speaking = speaking,
             onSpeak = speech::speak,
             onSpeakAndAwait = speech::speakAndAwait,
+            onSpeakPromptSequence = speech::speakAndAwaitSequence,
             onStopSpeak = speech::stop,
             onOpenTtsDebug = { showTtsDebug = true },
         )

@@ -10,6 +10,24 @@
       "id": "genericMiss",
       "text": "Probiere eine andere Antwort",
       "note": "SessionViewModel — generisches Miss-Feedback"
+    },
+    {
+      "id": "huntPromptLetter",
+      "text": "Finde alle Buchstaben",
+      "field": "promptTts",
+      "note": "SymbolHuntDerivation.PromptLetter"
+    },
+    {
+      "id": "huntPromptLaut",
+      "text": "Finde alle Laute",
+      "field": "promptTts",
+      "note": "SymbolHuntDerivation.PromptDigraph"
+    },
+    {
+      "id": "huntPromptSilbe",
+      "text": "Finde alle Silben",
+      "field": "promptTts",
+      "note": "SymbolHuntDerivation.PromptSyllable"
     }
   ],
   "templates": []

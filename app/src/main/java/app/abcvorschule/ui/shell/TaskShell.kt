@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -46,6 +47,7 @@ import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun TaskShell(
@@ -56,6 +58,7 @@ fun TaskShell(
     speaking: Boolean,
     onSpeak: (String) -> Unit,
     onSpeakAndAwait: suspend (String) -> Unit,
+    onSpeakPromptSequence: suspend (List<String>) -> Unit,
     onStopSpeak: () -> Unit,
     onOpenTtsDebug: () -> Unit,
     modifier: Modifier = Modifier,
@@ -131,6 +134,7 @@ fun TaskShell(
                 speaking = speaking,
                 onSpeak = onSpeak,
                 onSpeakAndAwait = onSpeakAndAwait,
+                onSpeakPromptSequence = onSpeakPromptSequence,
                 onStopSpeak = onStopSpeak,
             )
         }
@@ -161,20 +165,25 @@ private fun PracticeBody(
     speaking: Boolean,
     onSpeak: (String) -> Unit,
     onSpeakAndAwait: suspend (String) -> Unit,
+    onSpeakPromptSequence: suspend (List<String>) -> Unit,
     onStopSpeak: () -> Unit,
 ) {
     val task = state.current
     val round = state.currentRound
     val haptics = LocalAbcHaptics.current
+    val scope = rememberCoroutineScope()
     val speakPrompt = {
-        onSpeak(viewModel.currentPromptText(ttsAvailable))
+        scope.launch {
+            onSpeakPromptSequence(viewModel.currentPromptParts())
+        }
+        Unit
     }
 
     LaunchedEffect(task?.spec?.id, state.roundIndex, ttsAvailable) {
         if (state.successPhase != SuccessPhase.Idle) return@LaunchedEffect
         onStopSpeak()
         if (ttsAvailable && task != null) {
-            onSpeak(viewModel.currentPromptText(ttsAvailable = true))
+            onSpeakPromptSequence(viewModel.currentPromptParts())
         }
     }
     LaunchedEffect(state.speakCue) {
