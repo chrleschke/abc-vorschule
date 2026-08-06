@@ -15,6 +15,7 @@ import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.content.SymbolHuntSpeech
 import app.abcvorschule.content.SymbolInWordRound
+import app.abcvorschule.content.SymbolInWordSpeech
 import app.abcvorschule.content.TaskSpec
 import app.abcvorschule.content.WordBuildRound
 import app.abcvorschule.content.rounds
@@ -311,6 +312,11 @@ class SessionViewModel(
             is SymbolHuntRound -> SymbolHuntSpeech.promptParts(
                 round,
                 pack.atoms[round.targetAtomId],
+            )
+            is SymbolInWordRound -> SymbolInWordSpeech.promptParts(
+                round,
+                pack.atoms[round.targetAtomId],
+                pack.atoms[round.wordAtomId],
             )
             else -> listOfNotNull(round.promptTts.takeIf { it.isNotBlank() })
         }

@@ -76,6 +76,7 @@ fun TrainerHost(
         is WordBuildRound -> WordBuildTrainer(
             round = round,
             roundIndex = roundIndex,
+            pack = pack,
             target = pack.atom(round.targetAtomId),
             scaffoldFor = scaffoldFor,
             ttsAvailable = ttsAvailable,

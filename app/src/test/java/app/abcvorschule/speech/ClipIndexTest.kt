@@ -39,6 +39,55 @@ class ClipIndexTest {
     }
 
     @Test
+    fun `eindeutige Gross-kleinschreibung findet Phonem-Clip`() {
+        val index = ClipIndex.parse(
+            """
+            {
+              "version": 1,
+              "clips": {
+                "Sch": { "file": "phoneme_07af03fb0629.ogg", "profile": "phoneme" }
+              }
+            }
+            """.trimIndent(),
+        )
+        assertEquals("phoneme_07af03fb0629.ogg", index.lookup("sch")?.file)
+        assertEquals("phoneme_07af03fb0629.ogg", index.lookup("Sch")?.file)
+    }
+
+    @Test
+    fun `mehrdeutige Gross-kleinschreibung bleibt exakt`() {
+        val index = ClipIndex.parse(
+            """
+            {
+              "version": 1,
+              "clips": {
+                "H": { "file": "phoneme_h.ogg", "profile": "phoneme" },
+                "h": { "file": "phoneme_h_lower.ogg", "profile": "phoneme" }
+              }
+            }
+            """.trimIndent(),
+        )
+        assertEquals("phoneme_h.ogg", index.lookup("H")?.file)
+        assertEquals("phoneme_h_lower.ogg", index.lookup("h")?.file)
+    }
+
+    @Test
+    fun `mehrdeutige Paare ohne exakten Treffer liefern null`() {
+        val index = ClipIndex.parse(
+            """
+            {
+              "version": 1,
+              "clips": {
+                "Sp": { "file": "phoneme_sp_upper.ogg", "profile": "phoneme" },
+                "sp": { "file": "phoneme_sp_lower.ogg", "profile": "phoneme" }
+              }
+            }
+            """.trimIndent(),
+        )
+        assertNull(index.lookup("SP"))
+    }
+
+    @Test
     fun `unbekannte JSON-Felder stoeren nicht`() {
         val withExtra = sample.replace("\"version\": 1", "\"version\": 1, \"neu\": true")
         assertEquals(2, ClipIndex.parse(withExtra).size)

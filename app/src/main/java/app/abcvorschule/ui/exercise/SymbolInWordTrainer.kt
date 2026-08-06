@@ -49,6 +49,7 @@ import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.SymbolInWordDerivation
 import app.abcvorschule.content.SymbolInWordRound
 import app.abcvorschule.progress.ScaffoldLevel
+import app.abcvorschule.speech.SpeechClipText
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
@@ -185,12 +186,12 @@ fun SymbolInWordTrainer(
 
     fun handleTap(index: Int) {
         if (resolved || complete) return
-        val segment = round.segments.getOrNull(index) ?: return
+        if (index !in round.segments.indices) return
         val result = SymbolInWordProgress.tap(state, index)
         // A tap on an already collected segment does nothing at all — not even
         // speech, so "already done" reads as inert rather than half-alive.
         if (result.outcome == SymbolInWordTapOutcome.Ignored) return
-        onSpeak(segment)
+        onSpeak(SpeechClipText.forSegment(pack, round, index))
         state = result.state
         when (result.outcome) {
             SymbolInWordTapOutcome.Miss -> {
@@ -246,7 +247,9 @@ fun SymbolInWordTrainer(
                 if (label != null) {
                     TargetLabelRow(
                         label = label,
-                        onClick = { onSpeak(target.display) },
+                        onClick = {
+                            target?.lemma?.let(onSpeak) ?: onSpeak(target.display)
+                        },
                     )
                 }
                 // Luft zwischen Frage und Arbeit. ExerciseStage setzt AbcDimens.blockGap

@@ -33,9 +33,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.Atom
+import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.WordBlock
 import app.abcvorschule.content.WordBuildRound
 import app.abcvorschule.progress.ScaffoldLevel
+import app.abcvorschule.speech.SpeechClipText
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.exercise.drag.DragCard
 import app.abcvorschule.ui.exercise.drag.DragFieldState
@@ -91,6 +93,7 @@ object WordBuildTray {
 fun WordBuildTrainer(
     round: WordBuildRound,
     roundIndex: Int,
+    pack: ContentPack,
     target: Atom,
     scaffoldFor: (String) -> ScaffoldLevel,
     ttsAvailable: Boolean,
@@ -119,7 +122,7 @@ fun WordBuildTrainer(
         if (OrderedPlacement.isCorrectPlacement(index, block.display, solution)) {
             placed[index] = block.display
             haptics.tick()
-            onSpeak(block.display)
+            onSpeak(SpeechClipText.forAtomId(pack, block.atomId, block.display))
             if (OrderedPlacement.isSolved(placed.toMap(), solution)) {
                 completed = true
                 onResult(true, false, scoredIds)
@@ -175,7 +178,15 @@ fun WordBuildTrainer(
                                 tiles.withIndex()
                                     .firstOrNull { (i, block) -> WordBuildTray.tileKey(i, block) == selected }
                                     ?.let { (_, block) -> place(index, block) }
-                                if (filled != null) onSpeak(filled)
+                                if (filled != null) {
+                                    onSpeak(
+                                        SpeechClipText.forAtomId(
+                                            pack,
+                                            round.blocks[index].atomId,
+                                            filled,
+                                        ),
+                                    )
+                                }
                             }, field, index, frameWidth, glyphSp)
                         }
                     }
@@ -196,7 +207,7 @@ fun WordBuildTrainer(
                             key = key,
                             onTap = {
                                 field.select(key)
-                                onSpeak(block.display)
+                                onSpeak(SpeechClipText.forAtomId(pack, block.atomId, block.display))
                             },
                             onDropped = { zoneKey ->
                                 WordBuildTray.frameIndex(zoneKey ?: "")?.let { place(it, block) }
