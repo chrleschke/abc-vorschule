@@ -133,6 +133,50 @@ class ContentValidatorTest {
     }
 
     @Test
+    fun wordBuildLongInstructionPromptIsRejected() {
+        val spec = pack.tasks.values.filterIsInstance<WordBuildSpec>().first()
+        val broken = spec.copy(
+            rounds = spec.rounds.map { round ->
+                round.copy(
+                    promptTts = "Baue das Wort Mama. Suche die passenden Buchstaben und " +
+                        "setze sie in die richtige Reihenfolge.",
+                )
+            },
+        )
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.any { it.contains("without build instructions") })
+    }
+
+    @Test
+    fun sentenceOrderOrdneSuffixIsRejected() {
+        val spec = pack.tasks.values.filterIsInstance<SentenceOrderSpec>().first {
+            it.rounds.any { round -> "dem Bild zu" !in round.promptTts }
+        }
+        val broken = spec.copy(
+            rounds = spec.rounds.map { round ->
+                round.copy(
+                    promptTts = "Hier sind Häuser. - Ordne die Wörter in die richtige Reihenfolge.",
+                )
+            },
+        )
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.any { it.contains("Ordne die Wörter") })
+    }
+
+    @Test
+    fun sentenceOrderPictureMatchPromptStaysAllowed() {
+        val spec = pack.tasks.values.filterIsInstance<SentenceOrderSpec>().first {
+            it.rounds.any { round -> "dem Bild zu" in round.promptTts }
+        }
+        assertTrue(
+            ContentValidator.validate(pack).none {
+                it.message.contains(spec.id) && it.message.contains("Ordne die Wörter")
+            },
+        )
+        assertTrue(spec.rounds.any { "Ordne das Wort" in it.promptTts && "dem Bild zu" in it.promptTts })
+    }
+
+    @Test
     fun countAddSumMustMatchAnswer() {
         val spec = pack.tasks.values.filterIsInstance<CountAddSpec>().first()
         val broken = spec.copy(rounds = spec.rounds.map { it.copy(answer = it.answer + 1) })

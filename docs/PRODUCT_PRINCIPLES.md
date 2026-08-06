@@ -161,7 +161,8 @@ niemals mit einem stummen No-Op.
   („Ausgezeichnet! zwei Ameisen"), damit die Menge das Letzte bleibt, was das Kind hört. Nie als Text
   anzeigen — das Kind kann nicht lesen. Auflösen („Zeig mir") bekommt kein Lob.
 - Wenn kein deutsches TTS: visuelle Fallbacks, Aufgabe bleibt spielbar.
-- Wort-Bauer (Trainer 4): Prompt „Bilde das Wort …“; Silben-/Buchstabenklötze in Schablonen tragen die Aufgabe, keine zusätzliche Lese-Titelzeile.
+- Wort-Bauer (Trainer 4): Prompt „Baue das Wort ….“ (ohne Tray-Instruktion); Silben-/Buchstabenklötze in Schablonen tragen die Aufgabe, keine zusätzliche Lese-Titelzeile.
+- Satz-Architekt (Trainer 5): Mehrwort-Prompt = Satztext ohne „Ordne die Wörter…“; Einwort-Bild-Zuordnung behält „Ordne das Wort … dem Bild zu.“
 - Feedback bei Fehlern (besonders Rechnen): **vorsprechen**, nicht als Fehler-Satz anzeigen.
 
 ### TTS-Grenzen und Autorierungs-Konventionen

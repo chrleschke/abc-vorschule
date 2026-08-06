@@ -162,6 +162,11 @@ object ContentValidator {
                 }
                 is WordBuildSpec -> spec.rounds.forEach { round ->
                     requireAtom("task $id", round.targetAtomId)
+                    if (!isShortWordBuildPrompt(round.promptTts)) {
+                        issues += ValidationIssue(
+                            "task $id word_build promptTts must be 'Baue das Wort ….' without build instructions",
+                        )
+                    }
                     if (round.blocks.isEmpty()) {
                         issues += ValidationIssue("task $id has a word_build round without blocks")
                     }
@@ -196,6 +201,11 @@ object ContentValidator {
                     val sentence = pack.sentences[round.sentenceId]
                     if (sentence == null) {
                         issues += ValidationIssue("task $id references missing sentence ${round.sentenceId}")
+                    }
+                    if ("Ordne die Wörter" in round.promptTts) {
+                        issues += ValidationIssue(
+                            "task $id sentence_order promptTts must not include 'Ordne die Wörter' instructions",
+                        )
                     }
                     round.illustrationAtomId?.let { requireAtom("task $id", it) }
                     round.distractors.forEach { requireAtom("task $id", it.atomId) }
@@ -327,5 +337,13 @@ object ContentValidator {
         val issues = validate(pack)
         if (issues.isNotEmpty()) throw ContentValidationException(issues)
         return pack
+    }
+
+    /** Prompt is exactly `Baue das Wort {Wort}.` — no tray-ordering instructions. */
+    private fun isShortWordBuildPrompt(promptTts: String): Boolean {
+        if (!promptTts.startsWith("Baue das Wort ") || !promptTts.endsWith(".")) return false
+        val word = promptTts.removePrefix("Baue das Wort ").removeSuffix(".")
+        if (word.isBlank() || '.' in word) return false
+        return "Suche die passenden" !in promptTts && "richtige Reihenfolge" !in promptTts
     }
 }

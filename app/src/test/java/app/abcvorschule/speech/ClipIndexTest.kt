@@ -93,9 +93,10 @@ class ClipIndexTest {
         // Falls dieser Text jemals entlockt wird, verschwindet der Eintrag aus
         // dem committeten index.json — dann muss dieser Test aktualisiert werden.
         assertEquals(
-            "prompt_206bc14a3673.ogg",
-            index.lookup("Baue das Wort Eis. Suche die passenden Buchstaben und " +
-                "setze sie in die richtige Reihenfolge.")?.file,
+            "prompt_0845c380bb11.ogg",
+            index.lookup(
+                "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.",
+            )?.file,
         )
     }
 }
