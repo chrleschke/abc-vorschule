@@ -598,9 +598,19 @@
       "textOverride": "Ordne das Wort Mama dem Bild zu.",
       "sourceText": "Ordne das Wort - Mama - dem Bild zu."
     },
+    "prompt:1d68721d375a": {
+      "seed": 279242415,
+      "textOverride": "Finde den Buchstaben (....)",
+      "sourceText": "Finde den Buchstaben"
+    },
     "prompt:1ec405c1df3a": {
       "seed": 611051227,
       "sourceText": "Wo hörst du den Buchstaben - S? Am Anfang, in der Mitte oder am Ende."
+    },
+    "prompt:1fad37147e63": {
+      "seed": 548253113,
+      "textOverride": "Finde den Laut (...)",
+      "sourceText": "Finde den Laut"
     },
     "prompt:24bcc5fc883e": {
       "seed": 1521286730,
@@ -854,6 +864,11 @@
     "prompt:7844c3de44f2": {
       "seed": 1300931298,
       "sourceText": "Zeichne den Buchstaben - U - nach und sammle dabei alle Sterne."
+    },
+    "prompt:7a5873c12453": {
+      "seed": 1521286730,
+      "textOverride": "Finde die Silbe (...)",
+      "sourceText": "Finde die Silbe"
     },
     "prompt:7af8fe295c49": {
       "seed": 1145678980,
@@ -1371,6 +1386,16 @@
       "textOverride": "L wie Lama.",
       "sourceText": "L - wie Lama."
     },
+    "reward:06e12cfbe9b6": {
+      "seed": 1135500920,
+      "textOverride": "Prima!",
+      "sourceText": "Prima"
+    },
+    "reward:0857c7a77ba1": {
+      "seed": 807468455,
+      "textOverride": "Stark!",
+      "sourceText": "Stark"
+    },
     "reward:09e1817de9e0": {
       "seed": 1135500920,
       "textOverride": "\"Sch\" wie Schaf.",
@@ -1386,10 +1411,25 @@
       "textOverride": "\"H\" wie Hut.",
       "sourceText": "H - wie Hut."
     },
+    "reward:16b8dc080113": {
+      "seed": 1995171,
+      "textOverride": "Weiter so!",
+      "sourceText": "Weiter so"
+    },
     "reward:1f4d61aef3b9": {
       "seed": 873012571,
       "textOverride": "\"O\" wie Oma.",
       "sourceText": "O - wie Oma."
+    },
+    "reward:2732e9286b3a": {
+      "seed": 1179549907,
+      "textOverride": "Wunderbar!",
+      "sourceText": "Wunderbar"
+    },
+    "reward:29fde84fd167": {
+      "seed": 873012571,
+      "textOverride": "Ausgezeichnet!",
+      "sourceText": "Ausgezeichnet"
     },
     "reward:376fd1093c8c": {
       "seed": 893467947,
@@ -1456,6 +1496,11 @@
       "textOverride": "\"P\" wie Paket.",
       "sourceText": "P - wie Paket."
     },
+    "reward:75319a13529a": {
+      "seed": 1771886242,
+      "textOverride": "Perfekt!",
+      "sourceText": "Perfekt"
+    },
     "reward:76198e73fcd4": {
       "seed": 1904053378,
       "textOverride": "\"Ypsilon\" wie Yacht.",
@@ -1477,6 +1522,11 @@
       "textOverride": "\"Kuh\" wie Qualle.",
       "sourceText": "Qu - wie Qualle."
     },
+    "reward:7b6a1c76a257": {
+      "seed": 1087946411,
+      "textOverride": "Toll gemacht!",
+      "sourceText": "Toll gemacht"
+    },
     "reward:801e163efb4c": {
       "seed": 1087946411,
       "textOverride": "A wie Ampel.",
@@ -1487,10 +1537,29 @@
       "textOverride": "\"Pf\"  wie Pferd.",
       "sourceText": "Pf - wie Pferd."
     },
+    "reward:8123f58e7248": {
+      "seed": 2110512963,
+      "textOverride": "Bravo!",
+      "sourceText": "Bravo"
+    },
+    "reward:8185c8ac4656": {
+      "seed": 1995171,
+      "textOverride": "Super!",
+      "sourceText": "Super"
+    },
+    "reward:85b4e4247877": {
+      "seed": 1179549907,
+      "sourceText": "Das hast du toll gemacht"
+    },
     "reward:8689d018bc99": {
       "seed": 1257079766,
       "textOverride": "\"Oy\" wie Eule.",
       "sourceText": "Eu - wie Eule."
+    },
+    "reward:871533dc17f2": {
+      "seed": 1771886242,
+      "textOverride": "Großartig!",
+      "sourceText": "Großartig"
     },
     "reward:877f9cffbb7f": {
       "seed": 1084655494,
@@ -1507,6 +1576,11 @@
       "textOverride": "Ü wie Überraschung.",
       "sourceText": "Ü - wie Überraschung."
     },
+    "reward:92022f58860b": {
+      "seed": 244251654,
+      "textOverride": "...klasse gemacht",
+      "sourceText": "Klasse gemacht"
+    },
     "reward:9aa77a522bb6": {
       "seed": 671864064,
       "textOverride": "\"Sch\" wie Schule.",
@@ -1522,6 +1596,11 @@
       "textOverride": "\"P\" wie Papa.",
       "sourceText": "P - wie Papa."
     },
+    "reward:9f24cc311ede": {
+      "seed": 807468455,
+      "textOverride": "Sehr gut!",
+      "sourceText": "Sehr gut"
+    },
     "reward:9f782d62be55": {
       "seed": 1995171,
       "textOverride": "\"Aeh\" wie Ähre.",
@@ -1536,6 +1615,10 @@
       "seed": 244251654,
       "textOverride": "\"S Z\" wie in Fuß.",
       "sourceText": "ß - wie Fuß."
+    },
+    "reward:aa551a457045": {
+      "seed": 1087946411,
+      "sourceText": "Fantastisch"
     },
     "reward:b7f70cd2a8ea": {
       "seed": 244251654,
@@ -1562,6 +1645,11 @@
       "textOverride": "\"X wie in Taxi.",
       "sourceText": "X - wie Taxi."
     },
+    "reward:cb547321569e": {
+      "seed": 1771886242,
+      "textOverride": "Genau richtig!",
+      "sourceText": "Genau richtig"
+    },
     "reward:cec5ae37e973": {
       "seed": 1516666763,
       "textOverride": "\"Jott\"  wie Jacke.",
@@ -1577,15 +1665,35 @@
       "textOverride": "\"c h\"  wie in Dach.",
       "sourceText": "Ch - wie Dach."
     },
+    "reward:d6d519322a6a": {
+      "seed": 1771886242,
+      "textOverride": "Das war Spitze!",
+      "sourceText": "Spitze"
+    },
     "reward:de84d7d20c82": {
       "seed": 1087946411,
       "textOverride": "\"Ef\" wie Fuchs.",
       "sourceText": "F - wie Fuchs."
     },
+    "reward:eebeec9dcb97": {
+      "seed": 1869530881,
+      "textOverride": "Klasse!",
+      "sourceText": "Klasse"
+    },
     "reward:efebb5e295cf": {
       "seed": 1045943433,
       "textOverride": "\"ÄN\" wie Nase.",
       "sourceText": "N - wie Nase."
+    },
+    "reward:f3d687a5973d": {
+      "seed": 1995171,
+      "textOverride": "Richtig gut!",
+      "sourceText": "Richtig gut"
+    },
+    "reward:f5f4be6b7622": {
+      "seed": 873012571,
+      "textOverride": "Gut gemacht!",
+      "sourceText": "Gut gemacht"
     },
     "reward:f6be5ef80851": {
       "seed": 893467947,
@@ -1596,6 +1704,11 @@
       "seed": 183009980,
       "textOverride": "\"T\" wie Tom.",
       "sourceText": "T - wie Tom."
+    },
+    "reward:fb38c3dd8832": {
+      "seed": 1904053378,
+      "textOverride": "Genau so!",
+      "sourceText": "Genau so"
     },
     "reward:fbabe6da0dd9": {
       "seed": 1869530881,
@@ -1734,6 +1847,10 @@
       "textOverride": "Kwelle",
       "sourceText": "Quelle"
     },
+    "word:03f09145ae76": {
+      "seed": 1365805799,
+      "sourceText": "30 Fenster"
+    },
     "word:05ffc5ee879c": {
       "seed": 1226140164,
       "sourceText": "Eimer"
@@ -1753,6 +1870,10 @@
     "word:0bf83ff3617d": {
       "seed": 344031560,
       "sourceText": "Pinguin"
+    },
+    "word:102a52d3ff7c": {
+      "seed": 1765179368,
+      "sourceText": "24 Taxis"
     },
     "word:140519912f05": {
       "seed": 905447715,
@@ -1774,6 +1895,10 @@
       "seed": 585589898,
       "sourceText": "Nase"
     },
+    "word:18847502691e": {
+      "seed": 1765179368,
+      "sourceText": "14 Vögel"
+    },
     "word:18e1dd392168": {
       "seed": 243544604,
       "textOverride": "hatt.",
@@ -1787,6 +1912,14 @@
       "seed": 1229619544,
       "textOverride": "\"T\"!",
       "sourceText": "Tee"
+    },
+    "word:19e51ee9eeb0": {
+      "seed": 144801741,
+      "sourceText": "24 Omas"
+    },
+    "word:1a0ec6be9b6a": {
+      "seed": 144801741,
+      "sourceText": "9 Ameisen"
     },
     "word:1a3ae2b9d5bf": {
       "seed": 747352466,
@@ -1822,6 +1955,15 @@
       "seed": 1366347915,
       "textOverride": "Eis.",
       "sourceText": "Eis"
+    },
+    "word:263ed44ceed0": {
+      "seed": 346919363,
+      "textOverride": "16 Hüte.",
+      "sourceText": "16 Hüte"
+    },
+    "word:2669494cfbb5": {
+      "seed": 1017467044,
+      "sourceText": "8 Hüte"
     },
     "word:2a7dfeb2f2b0": {
       "seed": 514015760,
