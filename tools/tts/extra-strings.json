@@ -48,6 +48,11 @@
       "note": "SymbolInWordSpeech.introPhrase — Silbe"
     },
     {
+      "id": "detectiveInConnector",
+      "text": "...im Wort...",
+      "note": "SymbolInWordSpeech.IN_CONNECTOR — between grapheme and word (ui:582967534d0f)"
+    },
+    {
       "id": "praiseSuper",
       "text": "Super",
       "field": "rewardTts",

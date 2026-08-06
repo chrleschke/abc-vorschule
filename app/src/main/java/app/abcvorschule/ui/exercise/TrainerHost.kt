@@ -24,6 +24,7 @@ data class TrainerCallbacks(
     val onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
     val onMathResult: (distance: Int?, resolved: Boolean, correct: Boolean) -> Unit,
     val onSpeak: (String) -> Unit,
+    val onSpeakAndAwait: suspend (String) -> Unit,
     val onSpeakPrompt: () -> Unit,
 )
 
@@ -85,6 +86,7 @@ fun TrainerHost(
             speaking = speaking,
             onSpeakPrompt = callbacks.onSpeakPrompt,
             onSpeak = callbacks.onSpeak,
+            onSpeakAndAwait = callbacks.onSpeakAndAwait,
             onResult = callbacks.onResult,
             modifier = modifier.fillMaxSize(),
         )

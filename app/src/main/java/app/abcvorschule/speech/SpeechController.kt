@@ -28,6 +28,10 @@ class SpeechController(
 
     private val utteranceWaiters = ConcurrentHashMap<String, CompletableDeferred<Unit>>()
 
+    /** While true, speak calls are ignored — set when the activity stops (background). */
+    @Volatile
+    private var blockedForBackground = false
+
     override fun onInit(status: Int) {
         val engine = tts ?: return
         if (status != TextToSpeech.SUCCESS) {
@@ -64,8 +68,19 @@ class SpeechController(
         })
     }
 
+    /** Activity no longer visible — stop output and block new speech until foreground. */
+    fun onBackground() {
+        blockedForBackground = true
+        stop()
+    }
+
+    /** Activity visible again — allow new speech (does not replay interrupted prompts). */
+    fun onForeground() {
+        blockedForBackground = false
+    }
+
     fun speak(text: String) {
-        if (text.isBlank()) return
+        if (text.isBlank() || blockedForBackground) return
         clearWaiters()
         stopOutput()
         if (playClip(text, onComplete = {})) return
@@ -76,7 +91,7 @@ class SpeechController(
 
     /** Speaks [text] and suspends until the utterance finishes (or times out). */
     suspend fun speakAndAwait(text: String, timeoutMs: Long = 10_000L) {
-        if (text.isBlank()) return
+        if (text.isBlank() || blockedForBackground) return
         clearWaiters()
         stopOutput()
         val deferred = CompletableDeferred<Unit>()

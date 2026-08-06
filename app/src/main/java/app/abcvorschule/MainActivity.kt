@@ -15,7 +15,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.abcvorschule.speech.observeBackgroundSpeechStop
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.speech.ClipIndex
@@ -58,8 +60,13 @@ fun AbcApp(onFinish: () -> Unit = {}) {
     val speech = remember {
         SpeechController(context, ClipIndex.load { path -> context.assets.open(path) })
     }
-    DisposableEffect(speech) {
-        onDispose { speech.shutdown() }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, speech) {
+        val observer = lifecycleOwner.observeBackgroundSpeechStop(speech)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            speech.shutdown()
+        }
     }
 
     val viewModel: SessionViewModel = viewModel(

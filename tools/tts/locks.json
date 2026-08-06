@@ -1819,6 +1819,11 @@
       "seed": 1313172770,
       "sourceText": "Das Auto ist gelb."
     },
+    "ui:582967534d0f": {
+      "seed": 843304287,
+      "textOverride": "...im Wort...",
+      "sourceText": "in"
+    },
     "ui:5e62fdea5f0f": {
       "seed": 173037020,
       "textOverride": "Probier's noch mal...",

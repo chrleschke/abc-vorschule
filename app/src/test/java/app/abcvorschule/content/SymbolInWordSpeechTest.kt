@@ -15,7 +15,7 @@ class SymbolInWordSpeechTest {
             pack.atom("letter-sch"),
             pack.atom("schuh"),
         )
-        assertEquals(listOf("Finde den Laut", "Sch", "Schuh"), parts)
+        assertEquals(listOf("Finde den Laut", "Sch", "...im Wort...", "Schuh"), parts)
     }
 
     @Test
@@ -27,7 +27,7 @@ class SymbolInWordSpeechTest {
             pack.atom("letter-p"),
             pack.atom(round.wordAtomId),
         )
-        assertEquals(listOf("Finde alle Buchstaben", "P", "Papa"), parts)
+        assertEquals(listOf("Finde alle Buchstaben", "P", "...im Wort...", "Papa"), parts)
     }
 
     @Test
@@ -39,6 +39,6 @@ class SymbolInWordSpeechTest {
             pack.atom(round.targetAtomId),
             pack.atom(round.wordAtomId),
         )
-        assertEquals(listOf("Finde die Silbe", "pa", "Opa"), parts)
+        assertEquals(listOf("Finde die Silbe", "pa", "...im Wort...", "Opa"), parts)
     }
 }

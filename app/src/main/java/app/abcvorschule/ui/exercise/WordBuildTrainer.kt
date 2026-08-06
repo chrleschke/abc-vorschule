@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +51,7 @@ import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
+import kotlinx.coroutines.launch
 
 object WordBuildTray {
     /** Preschoolers must be able to scan the whole tray at a glance. */
@@ -100,6 +102,7 @@ fun WordBuildTrainer(
     speaking: Boolean,
     onSpeakPrompt: () -> Unit,
     onSpeak: (String) -> Unit,
+    onSpeakAndAwait: suspend (String) -> Unit,
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -115,17 +118,30 @@ fun WordBuildTrainer(
     }
     val tiles = WordBuildTray.tiles(round, placed.values.toList(), seed = round.targetAtomId.hashCode())
     val haptics = LocalAbcHaptics.current
+    val scope = rememberCoroutineScope()
 
     fun place(index: Int, block: WordBlock) {
         if (resolved || placed[index] != null) return
         field.select(null)
         if (OrderedPlacement.isCorrectPlacement(index, block.display, solution)) {
+            val placedBefore = placed.toMap()
             placed[index] = block.display
             haptics.tick()
-            onSpeak(SpeechClipText.forAtomId(pack, block.atomId, block.display))
-            if (OrderedPlacement.isSolved(placed.toMap(), solution)) {
-                completed = true
-                onResult(true, false, scoredIds)
+            val blockSpeech = SpeechClipText.forAtomId(pack, block.atomId, block.display)
+            when (
+                WordBuildPlacementSpeech.blockSpeechMode(
+                    placedBefore,
+                    index,
+                    block.display,
+                    solution,
+                )
+            ) {
+                WordBuildPlacementSpeech.BlockSpeechMode.Immediate -> onSpeak(blockSpeech)
+                WordBuildPlacementSpeech.BlockSpeechMode.AwaitBeforeSuccess -> scope.launch {
+                    onSpeakAndAwait(blockSpeech)
+                    completed = true
+                    onResult(true, false, scoredIds)
+                }
             }
         } else {
             misses += 1

@@ -6,6 +6,9 @@ package app.abcvorschule.content
  * word's lemma clip — same sequenced pattern as [SymbolHuntSpeech].
  */
 object SymbolInWordSpeech {
+    /** Spoken connector between grapheme and word — e.g. „Finde den Buchstaben“ → „A“ → „…im Wort…“ → „Mama“. */
+    const val IN_CONNECTOR = "...im Wort..."
+
     /** Ordered strings for [app.abcvorschule.speech.SpeechController]. */
     fun promptParts(round: SymbolInWordRound, target: Atom?, word: Atom?): List<String> {
         val graphemeSpeech = target?.lemma?.takeIf { it.isNotBlank() }
@@ -15,7 +18,7 @@ object SymbolInWordSpeech {
             ?: word?.display?.takeIf { it.isNotBlank() }
         return when {
             intro != null && graphemeSpeech != null && wordSpeech != null ->
-                listOf(intro, graphemeSpeech, wordSpeech)
+                listOf(intro, graphemeSpeech, IN_CONNECTOR, wordSpeech)
             intro != null && graphemeSpeech != null ->
                 listOf(intro, graphemeSpeech)
             graphemeSpeech != null ->

@@ -299,6 +299,7 @@ private fun PracticeBody(
                         onResult = viewModel::submitRoundResult,
                         onMathResult = viewModel::submitMathResult,
                         onSpeak = onSpeak,
+                        onSpeakAndAwait = onSpeakAndAwait,
                         onSpeakPrompt = speakPrompt,
                     ),
                     modifier = Modifier.fillMaxSize(),
