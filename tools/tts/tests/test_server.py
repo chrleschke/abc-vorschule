@@ -1163,6 +1163,18 @@ def test_batch_render_renders_only_the_selected_clips(client):
         "der Batch-Lauf darf nicht ausgewählte Clips nicht anfassen"
 
 
+def test_batch_render_uses_top_seeds(client):
+    clips = [c for c in client.get("/api/state").json()["clips"] if c["profile"] == "prompt"]
+    assert len(clips) >= 3, "fixture must offer enough prompt clips to lock"
+    for clip, seed in zip(clips[1:3], (4001, 4002)):
+        _lock_seed(client, clip["key"], seed)
+
+    key = clips[0]["key"]
+    client.post("/api/render", json={"keys": [key], "n": 2})
+    wait_for_idle(client)
+    assert set(_candidate_seeds_of(client, key)) <= {4001, 4002}
+
+
 def test_batch_render_with_unknown_keys_is_422(client):
     response = client.post("/api/render", json={"keys": ["nope:000000000000"]})
     assert response.status_code == 422

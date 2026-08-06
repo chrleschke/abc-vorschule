@@ -6,9 +6,9 @@ from ttskit.paths import Paths
 from ttskit.plan import build_clips
 from ttskit.render import (
     pooled_seeds, random_seeds, render_batch_candidates, render_clips,
-    sample_candidates,
+    sample_candidates, seeds_for_candidates,
 )
-from ttskit.store import Locks, Profiles, RenderState
+from ttskit.store import Lock, Locks, Profiles, RenderState
 
 
 class FakeEngine:
@@ -211,7 +211,7 @@ def test_progress_reports_index_and_total(setup):
 def test_render_batch_candidates_writes_n_candidates_per_missing_clip(setup):
     paths, profiles, clips, state = setup
     engine = FakeEngine()
-    report = render_batch_candidates(clips, profiles, engine, state, paths, count=2)
+    report = render_batch_candidates(clips, profiles, engine, state, paths, Locks(), count=2)
     assert report.rendered == 3
     assert report.skipped == 0
     assert report.failed == []
@@ -226,7 +226,7 @@ def test_render_batch_candidates_skips_already_rendered_clips(setup):
     paths, profiles, clips, state = setup
     engine = FakeEngine()
     render_clips(clips, profiles, engine, state, paths)  # simulates a prior `tts render`
-    report = render_batch_candidates(clips, profiles, engine, state, paths, count=2)
+    report = render_batch_candidates(clips, profiles, engine, state, paths, Locks(), count=2)
     assert report.rendered == 0
     assert report.skipped == 3
 
@@ -235,7 +235,7 @@ def test_render_batch_candidates_force_ignores_rendered_status(setup):
     paths, profiles, clips, state = setup
     engine = FakeEngine()
     render_clips(clips, profiles, engine, state, paths)
-    report = render_batch_candidates(clips, profiles, engine, state, paths,
+    report = render_batch_candidates(clips, profiles, engine, state, paths, Locks(),
                                      count=2, force=True)
     assert report.rendered == 3
     assert report.skipped == 0
@@ -243,7 +243,7 @@ def test_render_batch_candidates_force_ignores_rendered_status(setup):
 
 def test_render_batch_candidates_dry_run_writes_nothing(setup):
     paths, profiles, clips, state = setup
-    report = render_batch_candidates(clips, profiles, None, state, paths,
+    report = render_batch_candidates(clips, profiles, None, state, paths, Locks(),
                                      count=2, dry_run=True)
     assert report.rendered == 3
     assert not paths.candidates.exists() or list(paths.candidates.iterdir()) == []
@@ -252,7 +252,7 @@ def test_render_batch_candidates_dry_run_writes_nothing(setup):
 def test_render_batch_candidates_needs_an_engine_unless_dry_run(setup):
     paths, profiles, clips, state = setup
     with pytest.raises(AssertionError, match="needs an engine"):
-        render_batch_candidates(clips, profiles, None, state, paths, count=2)
+        render_batch_candidates(clips, profiles, None, state, paths, Locks(), count=2)
 
 
 def test_render_batch_candidates_cancel_stops_the_run(setup):
@@ -263,7 +263,7 @@ def test_render_batch_candidates_cancel_stops_the_run(setup):
         calls["n"] += 1
         return calls["n"] > 1
 
-    report = render_batch_candidates(clips, profiles, FakeEngine(), state, paths,
+    report = render_batch_candidates(clips, profiles, FakeEngine(), state, paths, Locks(),
                                      count=2, cancel=cancel)
     assert report.rendered < 3
 
@@ -271,7 +271,7 @@ def test_render_batch_candidates_cancel_stops_the_run(setup):
 def test_render_batch_candidates_progress_spans_the_whole_batch(setup):
     paths, profiles, clips, state = setup
     seen = []
-    render_batch_candidates(clips, profiles, FakeEngine(), state, paths, count=2,
+    render_batch_candidates(clips, profiles, FakeEngine(), state, paths, Locks(), count=2,
                             progress=lambda p: seen.append((p.index, p.total)))
     assert seen == [(1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6)]
 
@@ -279,12 +279,61 @@ def test_render_batch_candidates_progress_spans_the_whole_batch(setup):
 def test_render_batch_candidates_reports_a_failing_clip(setup):
     paths, profiles, clips, state = setup
     engine = FakeEngine(fail_on={"Frage eins?"})
-    report = render_batch_candidates(clips, profiles, engine, state, paths, count=2)
+    report = render_batch_candidates(clips, profiles, engine, state, paths, Locks(), count=2)
     assert report.rendered == 2
     assert len(report.failed) == 1
     failed_key, message = report.failed[0]
     assert failed_key == next(c.key for c in clips if c.text == "Frage eins?")
     assert "fehlgeschlagen" in message
+
+
+def test_seeds_for_candidates_top_seeds_win_over_known_pool(setup):
+    paths, profiles, clips, state = setup
+    clip = next(c for c in clips if c.profile == "prompt")
+    profile = profiles.profiles[clip.profile]
+    profile.seed_pool = [111, 222]
+    locks = Locks()
+    other = next(c for c in clips if c.profile == "prompt" and c.key != clip.key)
+    locks.set(other.key, Lock(seed=5555))
+
+    seeds = seeds_for_candidates(
+        count=1, clip=clip, profile=profile, paths=paths, locks=locks,
+        use_top_seeds=True, use_known_seeds=True)
+    assert seeds == [5555]
+
+
+def test_render_batch_candidates_uses_top_seeds_when_available(setup):
+    paths, profiles, clips, state = setup
+    prompt_clips = [c for c in clips if c.profile == "prompt"]
+    reward_clip = next(c for c in clips if c.profile == "reward")
+    locks = Locks()
+    locks.set(prompt_clips[1].key, Lock(seed=5001))
+    # Zweiter Top-Seed über Profil-Override — im Fixture gibt es nur zwei Prompt-Clips.
+    locks.set(reward_clip.key, Lock(seed=5002, profile="prompt"))
+
+    clip = prompt_clips[0]
+    engine = FakeEngine()
+    render_batch_candidates([clip], profiles, engine, state, paths, locks, count=2)
+
+    used = {seed for text, seed in engine.calls if text == clip.text}
+    assert used <= {5001, 5002}
+    assert len(used) == 2
+
+
+def test_render_batch_candidates_prefers_top_seeds_over_seed_pool(setup):
+    paths, profiles, clips, state = setup
+    clip = next(c for c in clips if c.profile == "prompt")
+    profile = profiles.profiles[clip.profile]
+    profile.seed_pool = [111, 222]
+    locks = Locks()
+    other = next(c for c in clips if c.profile == "prompt" and c.key != clip.key)
+    locks.set(other.key, Lock(seed=7777))
+
+    engine = FakeEngine()
+    render_batch_candidates([clip], profiles, engine, state, paths, locks, count=1)
+
+    used = {seed for text, seed in engine.calls if text == clip.text}
+    assert used == {7777}
 
 
 def test_clip_audio_list_adds_a_synthetic_entry_for_unmirrored_production(setup):

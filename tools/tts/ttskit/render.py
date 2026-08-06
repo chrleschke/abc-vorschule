@@ -21,7 +21,7 @@ import numpy as np
 from .audio import postprocess, write_wav
 from .models import Clip
 from .paths import Paths
-from .plan import effective_profile, fingerprint, resolve_seed, status_of
+from .plan import effective_profile, fingerprint, resolve_seed, status_of, top_seeds
 from .store import Lock, Locks, Profile, Profiles, RenderState
 
 
@@ -130,6 +130,7 @@ def render_batch_candidates(
     engine: SupportsGenerate | None,
     state: RenderState,
     paths: Paths,
+    locks: Locks,
     *,
     count: int,
     force: bool = False,
@@ -175,8 +176,9 @@ def render_batch_candidates(
         if cancel is not None and cancel():
             break
         prof = profiles.profiles[clip.profile]
-        existing = set(candidate_seeds(paths, clip.key)) | set(prof.seed_pool)
-        seeds = random_seeds(count, exclude=existing)
+        seeds = seeds_for_candidates(
+            count=count, clip=clip, profile=prof, paths=paths, locks=locks,
+            use_top_seeds=True)
 
         base = units_done
 
@@ -195,6 +197,26 @@ def render_batch_candidates(
                 clip.key,
                 f"{len(seeds) - len(written)} von {len(seeds)} Kandidaten fehlgeschlagen"))
     return report
+
+
+def seeds_for_candidates(
+    *,
+    count: int,
+    clip: Clip,
+    profile: Profile,
+    paths: Paths,
+    locks: Locks,
+    use_top_seeds: bool = False,
+    use_known_seeds: bool = False,
+) -> list[int]:
+    """Seeds für neue Kandidaten — dieselbe Logik wie „🎲 Generate" in der UI."""
+    rendered = set(candidate_seeds(paths, clip.key))
+    top = top_seeds(locks, clip.profile) if use_top_seeds else []
+    if top:
+        return pooled_seeds(count, top, exclude=rendered)
+    if use_known_seeds and profile.seed_pool:
+        return pooled_seeds(count, profile.seed_pool, exclude=rendered)
+    return random_seeds(count, exclude=rendered | set(profile.seed_pool))
 
 
 def random_seeds(n: int, exclude: set[int] | None = None) -> list[int]:

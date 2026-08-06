@@ -28,8 +28,9 @@ from .paths import Paths
 from .plan import fingerprint, orphan_locks, status_of, top_seeds
 from .render import (
     candidate_fingerprint, candidate_meta, candidate_seeds, clear_production,
-    clip_audio_list, deletable_candidate_seeds, delete_candidate_wav, pooled_seeds,
-    random_seeds, render_batch_candidates, sample_candidates, update_candidate_meta,
+    clip_audio_list, deletable_candidate_seeds, delete_candidate_wav,
+    render_batch_candidates, sample_candidates, seeds_for_candidates,
+    update_candidate_meta,
 )
 from .store import (
     SAMPLING_PARAMS, SAMPLING_SPEC, SECONDS_PER_TOKEN,
@@ -397,22 +398,12 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
                 raise HTTPException(status_code=422, detail=str(exc)) from exc
         else:
             count = max(1, min(MAX_CANDIDATES, int(body.get("n", 4))))
-            # Ein Seed, für den es hier schon eine Aufnahme gibt, würde bei
-            # gleichen Einstellungen dieselbe Datei erzeugen — in beiden Modi
-            # ausgeschlossen. Der Pool ist nur im Zufallsmodus tabu, im anderen
-            # ist er ja die Quelle.
-            rendered = set(candidate_seeds(paths, clip.key))
-            # Top-Seeds gehen vor: die engere, belegte Auswahl schlägt den ganzen
-            # Pool, wenn beides gesetzt ist. Sind es zu wenige für `count`, füllt
-            # `pooled_seeds` selbst mit Zufalls-Seeds auf — leere Liste heißt also
-            # „einfach Zufall wie gehabt".
-            top = top_seeds(ctx.locks, clip.profile) if body.get("useTopSeeds") else []
-            if top:
-                seeds = pooled_seeds(count, top, exclude=rendered)
-            elif body.get("useKnownSeeds") and profile.seed_pool:
-                seeds = pooled_seeds(count, profile.seed_pool, exclude=rendered)
-            else:
-                seeds = random_seeds(count, exclude=rendered | set(profile.seed_pool))
+            seeds = seeds_for_candidates(
+                count=count, clip=clip, profile=profile, paths=paths,
+                locks=ctx.locks,
+                use_top_seeds=bool(body.get("useTopSeeds")),
+                use_known_seeds=bool(body.get("useKnownSeeds")),
+            )
 
         def run(is_cancelled) -> None:
             written = sample_candidates(
@@ -638,7 +629,8 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
             clips = (ctx.clips if selection is None
                      else [c for c in ctx.clips if c.key in selection])
             report = render_batch_candidates(
-                clips, ctx.profiles, engine, ctx.state, paths, count=count,
+                clips, ctx.profiles, engine, ctx.state, paths, ctx.locks,
+                count=count,
                 profile=profile, force=force, cancel=is_cancelled,
                 progress=lambda p: jobs.publish({
                     "type": "render", "clipKey": p.clip_key,

@@ -73,6 +73,9 @@ Häkchen werden ignoriert). Leer = wie bisher. Ungültige Werte werden abgewiese
 Erzeugt wird über den **Batch-Lauf**: links in der Liste Clips ankreuzen (einzeln
 oder über „Sichtbare / Alle / Keine"), Anzahl Beispiele pro Clip einstellen (Default 2),
 dann „▶ Batch-Lauf" in der Kopfzeile — angefasst wird nur, was noch fehlt.
+Der Batch-Lauf nutzt immer die **Top-Seeds**-Logik (wie „Use top seeds" bei Generate):
+zufällig gezogen aus den am häufigsten gelockten Seeds des Profils; hat das Profil
+noch keine Locks, fällt er wie Generate auf frische Zufalls-Seeds zurück.
 In der Clip-Liste zeigt ein **Spinner** pro Zeile, solange für diesen Clip Kandidaten
 erzeugt werden (Generate, Batch-Lauf oder Warteschlange); ist er fertig und der Clip
 noch nicht geöffnet, erscheint eine **Zahl** — wie viele neue Aufnahmen seit dem
