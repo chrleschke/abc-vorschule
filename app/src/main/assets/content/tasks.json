@@ -839,30 +839,6 @@
       ]
     },
     {
-      "trainer": "word_build",
-      "id": "l05-t8",
-      "rounds": [
-        {
-          "promptTts": "Baue das Wort Hut.",
-          "targetAtomId": "hut",
-          "blocks": [
-            {
-              "atomId": "letter-h",
-              "display": "H"
-            },
-            {
-              "atomId": "letter-u",
-              "display": "u"
-            },
-            {
-              "atomId": "letter-t",
-              "display": "t"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "trainer": "sentence_order",
       "id": "l05-t9",
       "rounds": [
@@ -1972,30 +1948,6 @@
     {
       "trainer": "word_build",
       "id": "l11-t7",
-      "rounds": [
-        {
-          "promptTts": "Baue das Wort Baum.",
-          "targetAtomId": "baum",
-          "blocks": [
-            {
-              "atomId": "letter-b",
-              "display": "B"
-            },
-            {
-              "atomId": "letter-au",
-              "display": "au"
-            },
-            {
-              "atomId": "letter-m",
-              "display": "m"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "trainer": "word_build",
-      "id": "l11-t8",
       "rounds": [
         {
           "promptTts": "Baue das Wort Baum.",
@@ -3931,8 +3883,8 @@
           "promptTts": "Zeichne den Laut - Ei - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ei",
           "glyph": "Ei",
-          "rewardTts": "Ei - wie Ei.",
-          "rewardEmoji": "🥚"
+          "rewardTts": "Ei - wie Eimer.",
+          "rewardEmoji": "🪣"
         }
       ]
     },
