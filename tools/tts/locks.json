@@ -482,9 +482,773 @@
       "sourceText": "Das Auto ist gelb."
     },
     "word:006a933c950f": {
-      "seed": 1325935821,
-      "speaker": "aiden",
+      "seed": 1197660154,
+      "speaker": "sohee",
+      "textOverride": "Sackg.",
       "sourceText": "Sack"
+    },
+    "word:0286249762f7": {
+      "seed": 1389618019,
+      "sourceText": "Auto"
+    },
+    "word:02b4db5796e4": {
+      "seed": 1619665835,
+      "sourceText": "Zahn"
+    },
+    "word:0378894a522e": {
+      "seed": 1699459866,
+      "textOverride": "Kwelle",
+      "sourceText": "Quelle"
+    },
+    "word:05ffc5ee879c": {
+      "seed": 1226140164,
+      "sourceText": "Eimer"
+    },
+    "word:07015b4f5662": {
+      "seed": 1229619544,
+      "sourceText": "Löffel"
+    },
+    "word:07af03fb0629": {
+      "seed": 1229924031,
+      "sourceText": "Sch"
+    },
+    "word:08f271887ce9": {
+      "seed": 1819803021,
+      "textOverride": "Em.",
+      "sourceText": "M"
+    },
+    "word:0a7cb27e5292": {
+      "seed": 942923981,
+      "sourceText": "das"
+    },
+    "word:0ad448de77b6": {
+      "seed": 1512463413,
+      "sourceText": "Eule"
+    },
+    "word:0bf83ff3617d": {
+      "seed": 344031560,
+      "sourceText": "Pinguin"
+    },
+    "word:140519912f05": {
+      "seed": 905447715,
+      "sourceText": "Häuser"
+    },
+    "word:1503916a2ab2": {
+      "seed": 78816047,
+      "sourceText": "Tag"
+    },
+    "word:15b73886c509": {
+      "seed": 153000027,
+      "sourceText": "Mimi"
+    },
+    "word:15f09dbff105": {
+      "seed": 1389618019,
+      "sourceText": "Vase"
+    },
+    "word:16891dda0d98": {
+      "seed": 585589898,
+      "sourceText": "Nase"
+    },
+    "word:1897ba465985": {
+      "seed": 1157452082,
+      "textOverride": "Kuh",
+      "sourceText": "Qu"
+    },
+    "word:18e1dd392168": {
+      "seed": 243544604,
+      "textOverride": "hatt.",
+      "sourceText": "hat"
+    },
+    "word:18f5384d58bc": {
+      "seed": 818295292,
+      "textOverride": "üpsilonn.",
+      "sourceText": "Y"
+    },
+    "word:192da8644770": {
+      "seed": 153000027,
+      "sourceText": "Clown"
+    },
+    "word:19c3fd6de646": {
+      "seed": 1229619544,
+      "textOverride": "\"T\"!",
+      "sourceText": "Tee"
+    },
+    "word:1a3ae2b9d5bf": {
+      "seed": 747352466,
+      "sourceText": "Ufo"
+    },
+    "word:1b4c9133da73": {
+      "seed": 514186716,
+      "sourceText": "orange"
+    },
+    "word:1cff8a95c840": {
+      "seed": 821256265,
+      "sourceText": "Tür"
+    },
+    "word:1da8321dcc9a": {
+      "seed": 1167117814,
+      "textOverride": "ist.",
+      "sourceText": "ist"
+    },
+    "word:2081c1f3fcd5": {
+      "seed": 2124478754,
+      "sourceText": "zeh"
+    },
+    "word:22c9783f5077": {
+      "seed": 1540674070,
+      "sourceText": "Fenster"
+    },
+    "word:22e96d9a8d33": {
+      "seed": 208068725,
+      "textOverride": "Zucker.",
+      "sourceText": "Zucker"
+    },
+    "word:239be9e20e9a": {
+      "seed": 363018813,
+      "sourceText": "mau"
+    },
+    "word:25352d33fff0": {
+      "seed": 1752272296,
+      "sourceText": "mein"
+    },
+    "word:257a1a2e4d6f": {
+      "seed": 1366347915,
+      "textOverride": "Eis.",
+      "sourceText": "Eis"
+    },
+    "word:2a7dfeb2f2b0": {
+      "seed": 514015760,
+      "textOverride": "Radio.",
+      "sourceText": "Radio"
+    },
+    "word:2d3af8db3690": {
+      "seed": 63383879,
+      "sourceText": "Jacke"
+    },
+    "word:2dc22265c9e7": {
+      "seed": 2062422771,
+      "sourceText": "Polizei"
+    },
+    "word:2f9a96d6ad90": {
+      "seed": 1819803021,
+      "textOverride": "Salat.",
+      "sourceText": "Salat"
+    },
+    "word:2fe5ca1c1a3d": {
+      "seed": 153000027,
+      "textOverride": "Ä.",
+      "sourceText": "Ä"
+    },
+    "word:3097e26b7f3c": {
+      "seed": 1197147303,
+      "sourceText": "fa"
+    },
+    "word:3325c2b56f2b": {
+      "seed": 1813860740,
+      "sourceText": "Au"
+    },
+    "word:333e0a1e2781": {
+      "seed": 1541917406,
+      "sourceText": "G"
+    },
+    "word:33d0ffb3cdb7": {
+      "seed": 603063517,
+      "sourceText": "Erdbeere"
+    },
+    "word:354bc956b8a4": {
+      "seed": 114642735,
+      "sourceText": "Tisch"
+    },
+    "word:368848dc82d1": {
+      "seed": 369609897,
+      "sourceText": "kei"
+    },
+    "word:3887a18984cb": {
+      "seed": 1765179368,
+      "sourceText": "Pflanze"
+    },
+    "word:38ba6262a672": {
+      "seed": 565457420,
+      "sourceText": "Wespe"
+    },
+    "word:38bf5d085dbe": {
+      "seed": 940755680,
+      "sourceText": "Schaf"
+    },
+    "word:3a1338ef215e": {
+      "seed": 1781353031,
+      "sourceText": "Wolke"
+    },
+    "word:3c44c3e1b8b7": {
+      "seed": 1016093212,
+      "textOverride": "ma.",
+      "sourceText": "ma"
+    },
+    "word:3d9fc4bde7ce": {
+      "seed": 1364072441,
+      "sourceText": "na"
+    },
+    "word:3ebb1c99b12b": {
+      "seed": 1415142410,
+      "textOverride": "Kah!",
+      "sourceText": "ka"
+    },
+    "word:3f39d5c348e5": {
+      "seed": 940755680,
+      "textOverride": "D!",
+      "sourceText": "D"
+    },
+    "word:40b46ee569c3": {
+      "seed": 1314977224,
+      "sourceText": "S t"
+    },
+    "word:410f76d01d8a": {
+      "seed": 1468051116,
+      "sourceText": "Tiger"
+    },
+    "word:42f3f7e9341e": {
+      "seed": 239974962,
+      "sourceText": "Keks"
+    },
+    "word:430db59c91b3": {
+      "seed": 1378116787,
+      "sourceText": "Baum"
+    },
+    "word:44bd7ae60f47": {
+      "seed": 483386276,
+      "textOverride": "Ha.",
+      "sourceText": "H"
+    },
+    "word:453c9aa8c895": {
+      "seed": 254035842,
+      "textOverride": "ruf!",
+      "sourceText": "ruf"
+    },
+    "word:457c6acc7a9f": {
+      "seed": 1209672188,
+      "sourceText": "Bahn"
+    },
+    "word:459bed2926d0": {
+      "seed": 1512463413,
+      "textOverride": "Zebra.",
+      "sourceText": "Zebra"
+    },
+    "word:45db9ecdfcda": {
+      "seed": 275897189,
+      "sourceText": "Herz"
+    },
+    "word:469f97570d91": {
+      "seed": 1931065732,
+      "textOverride": "Kwark!",
+      "sourceText": "Quark"
+    },
+    "word:49530e11d87d": {
+      "seed": 1940105498,
+      "sourceText": "Biene"
+    },
+    "word:4959de6ed9b8": {
+      "seed": 955950463,
+      "sourceText": "Papa"
+    },
+    "word:495f851d2eed": {
+      "seed": 1050821641,
+      "textOverride": "Pf.",
+      "sourceText": "Pf"
+    },
+    "word:4a3f1139f614": {
+      "seed": 243544604,
+      "textOverride": "wie.",
+      "sourceText": "wie"
+    },
+    "word:4b68ab3847fe": {
+      "seed": 955455870,
+      "sourceText": "X"
+    },
+    "word:4cf6829aa937": {
+      "seed": 1765179368,
+      "textOverride": "sah!",
+      "sourceText": "sa"
+    },
+    "word:4e60351e1f1a": {
+      "seed": 1314977224,
+      "textOverride": "Es T!",
+      "sourceText": "s t"
+    },
+    "word:4ec3c3ac2171": {
+      "seed": 139858617,
+      "sourceText": "Salami"
+    },
+    "word:5050d80d22ec": {
+      "seed": 16292186,
+      "textOverride": "der.",
+      "sourceText": "der"
+    },
+    "word:5050f41029c8": {
+      "seed": 714573674,
+      "textOverride": "Schule.",
+      "sourceText": "Schule"
+    },
+    "word:50976ad58f5d": {
+      "seed": 144801741,
+      "sourceText": "Haus"
+    },
+    "word:51c62d69a62c": {
+      "seed": 354675491,
+      "sourceText": "Maus"
+    },
+    "word:5217cbb8e93d": {
+      "seed": 1137961096,
+      "sourceText": "Kuchen"
+    },
+    "word:5231a0fe3633": {
+      "seed": 1677023100,
+      "textOverride": "Spiegel.",
+      "sourceText": "Spiegel"
+    },
+    "word:529cbc8f2127": {
+      "seed": 1816427025,
+      "sourceText": "hier"
+    },
+    "word:5380d1dd5931": {
+      "seed": 85322428,
+      "sourceText": "Nanu"
+    },
+    "word:553e8e5a74eb": {
+      "seed": 872505103,
+      "sourceText": "spie"
+    },
+    "word:559aead08264": {
+      "seed": 16292186,
+      "textOverride": "A.",
+      "sourceText": "A"
+    },
+    "word:56151fd50660": {
+      "seed": 585388103,
+      "textOverride": "Giraffe.",
+      "sourceText": "Giraffe"
+    },
+    "word:568cfef57232": {
+      "seed": 1636541220,
+      "sourceText": "Vogel"
+    },
+    "word:569642411fb7": {
+      "seed": 1468051116,
+      "textOverride": "Ente.",
+      "sourceText": "Ente"
+    },
+    "word:57fbb5e0d270": {
+      "seed": 1171581113,
+      "textOverride": "ro.",
+      "sourceText": "roh"
+    },
+    "word:58a3778c18c4": {
+      "seed": 1893963240,
+      "textOverride": "Straße.",
+      "sourceText": "Straße"
+    },
+    "word:59b4ec4ed7ea": {
+      "seed": 1081829151,
+      "textOverride": "Kwalle.",
+      "sourceText": "Qualle"
+    },
+    "word:5a72462e41ab": {
+      "seed": 732041981,
+      "textOverride": "Tramm.",
+      "sourceText": "Tram"
+    },
+    "word:5ba98270917f": {
+      "seed": 1032321648,
+      "textOverride": "Wahl.",
+      "sourceText": "Wal"
+    },
+    "word:5c62e091b8c0": {
+      "seed": 1678500400,
+      "textOverride": "Peh.",
+      "sourceText": "P"
+    },
+    "word:5cb47a9bbad3": {
+      "seed": 1512463413,
+      "textOverride": "Pony.",
+      "sourceText": "Pony"
+    },
+    "word:5f36321c4299": {
+      "seed": 1300021411,
+      "sourceText": "Buch"
+    },
+    "word:5fe72d4ce475": {
+      "seed": 2086737733,
+      "sourceText": "ruft"
+    },
+    "word:6152d43caa49": {
+      "seed": 585589898,
+      "textOverride": "guh!",
+      "sourceText": "gu"
+    },
+    "word:63669810c995": {
+      "seed": 144801741,
+      "textOverride": "Affe.",
+      "sourceText": "Affe"
+    },
+    "word:643aa97e949c": {
+      "seed": 1221809993,
+      "sourceText": "Sofa"
+    },
+    "word:64ad01258814": {
+      "seed": 516906183,
+      "sourceText": "Gabel"
+    },
+    "word:6565cb0e22d5": {
+      "seed": 346919363,
+      "sourceText": "Park"
+    },
+    "word:6574ac40ddcf": {
+      "seed": 1017467044,
+      "sourceText": "Kreis"
+    },
+    "word:67f17cffae0b": {
+      "seed": 1125498235,
+      "textOverride": "Schpinne.",
+      "sourceText": "Spinne"
+    },
+    "word:6aeb0b7ea8fb": {
+      "seed": 782997103,
+      "sourceText": "steh"
+    },
+    "word:6b23c0d5f35d": {
+      "seed": 5382596,
+      "textOverride": "Zeh.",
+      "sourceText": "C"
+    },
+    "word:6b942766c4e4": {
+      "seed": 1144058823,
+      "textOverride": "Dose.",
+      "sourceText": "Dose"
+    },
+    "word:6bc75e1bf7ef": {
+      "seed": 1239245134,
+      "textOverride": "Schu.",
+      "sourceText": "Schuh"
+    },
+    "word:6bda42dcd5d1": {
+      "seed": 1647504061,
+      "sourceText": "Yacht"
+    },
+    "word:6c51ed231f6e": {
+      "seed": 865860254,
+      "textOverride": "Bau.",
+      "sourceText": "bau"
+    },
+    "word:6d0ef3950c22": {
+      "seed": 946424671,
+      "sourceText": "toe"
+    },
+    "word:6da43b944e49": {
+      "seed": 942923981,
+      "textOverride": "Jott.",
+      "sourceText": "J"
+    },
+    "word:6fb86a981cf3": {
+      "seed": 1420845013,
+      "sourceText": "Dino"
+    },
+    "word:6fcd1cc2cfbe": {
+      "seed": 1913773839,
+      "sourceText": "Taube"
+    },
+    "word:700f4dce8c0c": {
+      "seed": 818295292,
+      "sourceText": "Xylofon"
+    },
+    "word:72dfcfb0c470": {
+      "seed": 678814598,
+      "sourceText": "L"
+    },
+    "word:753692ec36ad": {
+      "seed": 1956026513,
+      "sourceText": "Hallo"
+    },
+    "word:76592b9de6d3": {
+      "seed": 514348669,
+      "sourceText": "ta"
+    },
+    "word:7717a57ec3d7": {
+      "seed": 1774540729,
+      "sourceText": "mei"
+    },
+    "word:77562953d4c8": {
+      "seed": 1389964126,
+      "sourceText": "gut"
+    },
+    "word:7793c31446e3": {
+      "seed": 634327529,
+      "textOverride": "Taxi.",
+      "sourceText": "Taxi"
+    },
+    "word:7b39b80f141a": {
+      "seed": 2532180,
+      "textOverride": "groß.",
+      "sourceText": "groß"
+    },
+    "word:7d9b210c4436": {
+      "seed": 935052277,
+      "sourceText": "Fuchs"
+    },
+    "word:7e54f79addc1": {
+      "seed": 778508885,
+      "sourceText": "Ohr"
+    },
+    "word:7e7c621a3034": {
+      "seed": 712740068,
+      "textOverride": "Lama.",
+      "sourceText": "Lama"
+    },
+    "word:7ec879c8c860": {
+      "seed": 179774350,
+      "speaker": "sohee",
+      "textOverride": "Rot.",
+      "sourceText": "rot"
+    },
+    "word:80619cbf258a": {
+      "seed": 514043483,
+      "sourceText": "Milch"
+    },
+    "word:81f3bf42a93c": {
+      "seed": 1827038225,
+      "sourceText": "Tom"
+    },
+    "word:82855c11ae69": {
+      "seed": 821256265,
+      "textOverride": "SSanndd.",
+      "sourceText": "Sand"
+    },
+    "word:82cefa8283d3": {
+      "seed": 208068725,
+      "textOverride": "tzu.",
+      "sourceText": "zu"
+    },
+    "word:82f1643a857d": {
+      "seed": 2058271745,
+      "sourceText": "Insel"
+    },
+    "word:837ceb63da79": {
+      "seed": 1024574992,
+      "textOverride": "gehen.",
+      "sourceText": "gehen"
+    },
+    "word:84c92d8abf32": {
+      "seed": 1418815255,
+      "sourceText": "ich"
+    },
+    "word:84cdf478eb8a": {
+      "seed": 346919363,
+      "textOverride": "ru.",
+      "sourceText": "ruh"
+    },
+    "word:85139e8cc79d": {
+      "seed": 1724253311,
+      "sourceText": "Sonne"
+    },
+    "word:856cc99d8734": {
+      "seed": 1677023100,
+      "textOverride": "..und!",
+      "sourceText": "und"
+    },
+    "word:85abd7fdb6fb": {
+      "seed": 2128207746,
+      "textOverride": "Ampel.",
+      "sourceText": "Ampel"
+    },
+    "word:86be9a55762d": {
+      "seed": 243544604,
+      "textOverride": "Kah!",
+      "sourceText": "K"
+    },
+    "word:870fa7cc6152": {
+      "seed": 697929606,
+      "sourceText": "läuft"
+    },
+    "word:8a8a1a9fe856": {
+      "seed": 1255386736,
+      "textOverride": "dehn.",
+      "sourceText": "den"
+    },
+    "word:8adddb6ce265": {
+      "seed": 114642735,
+      "textOverride": "Drache!",
+      "sourceText": "Drache"
+    },
+    "word:8baebabc53fb": {
+      "seed": 2022971530,
+      "sourceText": "Dach"
+    },
+    "word:8c2574892063": {
+      "seed": 1819803021,
+      "textOverride": "R.",
+      "sourceText": "R"
+    },
+    "word:8cce03ee816b": {
+      "seed": 634327529,
+      "textOverride": "Schp!",
+      "sourceText": "Sp"
+    },
+    "word:8ce86a6ae65d": {
+      "seed": 905447715,
+      "textOverride": "En.",
+      "sourceText": "N"
+    },
+    "word:8d0a36e2d012": {
+      "seed": 1017467044,
+      "textOverride": "Fehder",
+      "sourceText": "Feder"
+    },
+    "word:8d55bb870b65": {
+      "seed": 238445762,
+      "textOverride": "Quh.",
+      "sourceText": "Kuh"
+    },
+    "word:8de0b3c47f11": {
+      "seed": 1079840589,
+      "textOverride": "Es.",
+      "sourceText": "S"
+    },
+    "word:913d7314efae": {
+      "seed": 1504993665,
+      "textOverride": "üüh.",
+      "sourceText": "Ü"
+    },
+    "word:9227a87d17bb": {
+      "seed": 1012670721,
+      "textOverride": "einen.",
+      "sourceText": "einen"
+    },
+    "word:92a95fa02cbc": {
+      "seed": 1226140164,
+      "textOverride": "Hund.",
+      "sourceText": "Hund"
+    },
+    "word:94571cd5a810": {
+      "seed": 1229619544,
+      "textOverride": "geh.",
+      "sourceText": "geh"
+    },
+    "word:9471c6375e05": {
+      "seed": 1365805799,
+      "sourceText": "Lampe"
+    },
+    "word:947f9e7b2620": {
+      "seed": 913028903,
+      "textOverride": "!Schtuhl",
+      "sourceText": "Stuhl"
+    },
+    "word:9513229d4359": {
+      "seed": 1301789325,
+      "textOverride": "Pah.",
+      "sourceText": "pa"
+    },
+    "word:954f0a2d53ee": {
+      "seed": 1389964126,
+      "sourceText": "Pferd"
+    },
+    "word:95b048a8eca0": {
+      "seed": 1503563029,
+      "sourceText": "braun"
+    },
+    "word:9615231ee629": {
+      "seed": 780461947,
+      "textOverride": "G'ras.",
+      "sourceText": "Gras"
+    },
+    "word:96eaefafc3db": {
+      "seed": 630856893,
+      "sourceText": "Tomate"
+    },
+    "word:98970d1a1b80": {
+      "seed": 2049458126,
+      "textOverride": "bei.",
+      "sourceText": "bei"
+    },
+    "word:990fa93a142a": {
+      "seed": 1591300623,
+      "textOverride": "U'hu.",
+      "sourceText": "Uhu"
+    },
+    "word:999da4de4d65": {
+      "seed": 1812763350,
+      "sourceText": "wir"
+    },
+    "word:99a603924290": {
+      "seed": 543308297,
+      "textOverride": "S'uppe",
+      "sourceText": "Suppe"
+    },
+    "word:9aee3b7acf70": {
+      "seed": 1709727474,
+      "sourceText": "Blatt"
+    },
+    "word:9b58e68145a7": {
+      "seed": 1888900194,
+      "sourceText": "wind"
+    },
+    "word:9c0d5d91b620": {
+      "seed": 58331711,
+      "sourceText": "Elefant"
+    },
+    "word:9c3aee7110b7": {
+      "seed": 343087039,
+      "textOverride": "!foh.",
+      "sourceText": "fo"
+    },
+    "word:a0aecdeeb95b": {
+      "seed": 287812362,
+      "sourceText": "Tal"
+    },
+    "word:a14eac9161e5": {
+      "seed": 744455929,
+      "textOverride": "Hahn.",
+      "sourceText": "Hahn"
+    },
+    "word:a191067c05e3": {
+      "seed": 374387671,
+      "sourceText": "Feuer"
+    },
+    "word:a21c8cef86cd": {
+      "seed": 370579947,
+      "textOverride": "Ofen.",
+      "sourceText": "Ofen"
+    },
+    "word:a252f7aeeb24": {
+      "seed": 1860324308,
+      "sourceText": "Ei"
+    },
+    "word:a410d513bba1": {
+      "seed": 244473108,
+      "sourceText": "Nuss"
+    },
+    "word:a4d0ef23161b": {
+      "seed": 373640532,
+      "textOverride": "fuh",
+      "sourceText": "fu"
+    },
+    "word:a4f6cf282483": {
+      "seed": 315718800,
+      "textOverride": "Kwadraaht",
+      "sourceText": "Quadrat"
+    },
+    "word:a510472311d2": {
+      "seed": 1353816545,
+      "sourceText": "schwimmt"
+    },
+    "word:aaa6cab49ca4": {
+      "seed": 1240188675,
+      "sourceText": "Rad"
+    },
+    "word:be39f4733f40": {
+      "seed": 960095982,
+      "sourceText": "Dreieck"
+    },
+    "word:fb9aa9a7b3d8": {
+      "seed": 1069728556,
+      "sourceText": "Mama"
     }
   }
 }

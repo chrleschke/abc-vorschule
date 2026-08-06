@@ -309,7 +309,8 @@ TTS_SMOKE=1 ~/qwen-tts-test/.venv/bin/python -m pytest tests/ -v # mit Modell
 ## Bekannte Lücke
 
 Die Sprechtexte von Symbol-Jagd und Wort-Detektiv sind Templates
-(`"Finde den Buchstaben - %s - im Wort - %s."`), die erst zur Laufzeit befüllt werden.
+(z. B. `"Finde den Buchstaben - %s - im Wort - %s."` bzw. `"Finde den Laut - %s - im Wort - %s."`
+für Mehrzeichen-Grapheme), die erst zur Laufzeit befüllt werden.
 Sie sind nicht abgedeckt; `tts status` weist darauf hin. Geplant ist, sämtliche
 Kombinationen vollständig vorzurendern statt Clips zur Laufzeit aus Fragmenten
 zusammenzusetzen — aneinandergehängte Sprachfragmente klingen abgehackt. „📦 In App
