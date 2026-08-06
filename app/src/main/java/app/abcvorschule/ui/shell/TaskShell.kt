@@ -122,7 +122,6 @@ fun TaskShell(
                     },
                     onAdvanceAnimated = viewModel::onPathAdvanceAnimated,
                     onParentGateUnlocked = viewModel::openDifficultySheet,
-                    onOpenTtsDebug = onOpenTtsDebug,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -146,6 +145,10 @@ fun TaskShell(
                 onSelectMode = viewModel::setParentMode,
                 onToggleUnlockAll = viewModel::setUnlockAllLessons,
                 onDismiss = viewModel::dismissDifficultySheet,
+                onOpenTtsDebug = {
+                    viewModel.dismissDifficultySheet()
+                    onOpenTtsDebug()
+                },
             )
         }
 

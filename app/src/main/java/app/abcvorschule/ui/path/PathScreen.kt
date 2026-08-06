@@ -5,7 +5,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -36,7 +35,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import app.abcvorschule.BuildConfig
 import app.abcvorschule.content.Lesson
 import app.abcvorschule.progress.LessonGating
 import app.abcvorschule.progress.LessonState
@@ -72,7 +70,6 @@ fun PathScreen(
     onLockedTap: () -> Unit,
     onAdvanceAnimated: () -> Unit,
     onParentGateUnlocked: () -> Unit,
-    onOpenTtsDebug: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -243,25 +240,6 @@ fun PathScreen(
                         PathHereMarker(nodePoints = nodePoints, index = { markerIndex.value })
                     }
                 }
-            }
-
-            if (BuildConfig.DEBUG) {
-                Text(
-                    text = "TTS Debug",
-                    style = MaterialTheme.typography.labelLarge,
-                    // Sits at the very bottom of the screen, i.e. over the front
-                    // hill: WarmInk on HillNear is 4.33:1, a hair under the 4.5:1
-                    // small-text bar and the darkest the warm palette goes. This is
-                    // a debug-build-only affordance for an adult developer, so the
-                    // shortfall is accepted rather than papered over with a
-                    // background plate.
-                    color = WarmInk,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .clickable(onClick = onOpenTtsDebug)
-                        .padding(vertical = 8.dp)
-                        .testTag("tts_debug_entry"),
-                )
             }
         }
     }
