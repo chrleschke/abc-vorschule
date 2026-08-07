@@ -77,6 +77,7 @@ fun SymbolHuntTrainer(
     pack: ContentPack,
     ttsAvailable: Boolean,
     speaking: Boolean,
+    interactionLocked: Boolean = false,
     onSpeakPrompt: () -> Unit,
     onSpeak: (String) -> Unit,
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
@@ -125,6 +126,11 @@ fun SymbolHuntTrainer(
         animationSpec = tween(durationMillis = 400),
         label = "hunt_field_fade",
     )
+    val interactionOpacity by animateFloatAsState(
+        targetValue = if (interactionLocked) 0.5f else 1f,
+        animationSpec = tween(durationMillis = 200),
+        label = "hunt_lock_opacity",
+    )
 
     // Auto-proceed: the battery filling up IS the success signal, so a "Weiter"
     // tap only added a dead end for a child who cannot read the button. The delay
@@ -150,9 +156,9 @@ fun SymbolHuntTrainer(
                     state = state,
                     initialTileCount = initialTileCount,
                     pack = pack,
-                    enabled = !batteryFull,
+                    enabled = !batteryFull && !interactionLocked,
                     onTap = ::handleTap,
-                    modifier = Modifier.fillMaxSize().alpha(fieldAlpha),
+                    modifier = Modifier.fillMaxSize().alpha(fieldAlpha * interactionOpacity),
                 )
             }
         },

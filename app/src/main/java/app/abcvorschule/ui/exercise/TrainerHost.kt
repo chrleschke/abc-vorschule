@@ -142,6 +142,7 @@ fun TrainerHost(
             pack = pack,
             ttsAvailable = ttsAvailable,
             speaking = speaking,
+            interactionLocked = interactionLocked,
             onSpeakPrompt = callbacks.onSpeakPrompt,
             onSpeak = callbacks.onSpeak,
             onResult = callbacks.onResult,
