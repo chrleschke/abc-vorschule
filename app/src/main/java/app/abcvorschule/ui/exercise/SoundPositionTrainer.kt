@@ -1,9 +1,11 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.ui.draw.alpha
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -77,6 +79,7 @@ fun SoundPositionTrainer(
     targetPhoneme: String,
     ttsAvailable: Boolean,
     speaking: Boolean,
+    interactionLocked: Boolean = false,
     onSpeakPrompt: () -> Unit,
     onSpeak: (String) -> Unit,
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
@@ -88,6 +91,12 @@ fun SoundPositionTrainer(
     var landedSlot by remember(roundKey) { mutableStateOf<SoundSlot?>(null) }
     var revealed by remember(roundKey) { mutableStateOf(false) }
     val cardKey = "picture-${round.atomId}"
+
+    val interactionOpacity by animateFloatAsState(
+        targetValue = if (interactionLocked) 0.5f else 1f,
+        animationSpec = tween(durationMillis = 200),
+        label = "sound_position_lock_opacity",
+    )
 
     fun place(slot: SoundSlot) {
         if (landedSlot != null || revealed) return
@@ -133,6 +142,8 @@ fun SoundPositionTrainer(
                         filledEmoji = if (landedSlot == slot) atom.emoji else null,
                         revealed = revealed && round.slot == slot,
                         armed = armed,
+                        enabled = !interactionLocked,
+                        opacity = interactionOpacity,
                         // An exploratory tap must never burn a miss. Only a wagon tap
                         // that follows picking the picture up counts as a placement.
                         onTap = { if (armed) place(slot) },
@@ -157,6 +168,7 @@ fun SoundPositionTrainer(
                 DragCard(
                     state = field,
                     key = cardKey,
+                    enabled = !interactionLocked,
                     onTap = {
                         field.select(cardKey)
                         onSpeak(atom.lemma)
@@ -166,6 +178,7 @@ fun SoundPositionTrainer(
                     },
                     modifier = Modifier
                         .size(AbcDimens.kidTouch + 20.dp)
+                        .alpha(interactionOpacity)
                         .background(
                             color = if (field.selectedKey == cardKey) LeafGreen.copy(alpha = 0.25f) else CreamElevated,
                             shape = RoundedCornerShape(24.dp),
@@ -228,6 +241,8 @@ private fun Wagon(
     filledEmoji: String?,
     revealed: Boolean,
     armed: Boolean,
+    enabled: Boolean,
+    opacity: Float,
     onTap: () -> Unit,
     registerWith: DragFieldState,
 ) {
@@ -240,17 +255,15 @@ private fun Wagon(
             SoundSlot.end -> R.string.wagon_end
         },
     )
-    // The border itself no longer dims for the idle state — at reduced alpha none of
-    // the three wagon colours clears 3:1 against CreamElevated (~1.67–2.18:1 measured
-    // at the old 0.55/0.7 alphas). The idle/armed distinction now lives in the fill
-    // below instead.
     val border = if (filledEmoji != null || revealed) LeafGreen else borderAccent
     DropZone(
         state = registerWith,
         key = SoundPositionLogic.slotKey(slot),
         onTap = onTap,
+        enabled = enabled,
         modifier = Modifier
             .size(WagonSize)
+            .alpha(opacity)
             .background(
                 // Alpha raised from the old dark-theme 0.18f: a light wash needs more
                 // coverage to read as "filled" against Cream than it did on night ink.

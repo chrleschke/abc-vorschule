@@ -58,6 +58,7 @@ fun TrainerHost(
             targetPhoneme = (trainer.spec as? SoundPositionSpec)?.phonemeTts.orEmpty(),
             ttsAvailable = ttsAvailable,
             speaking = speaking,
+            interactionLocked = interactionLocked,
             onSpeakPrompt = callbacks.onSpeakPrompt,
             onSpeak = callbacks.onSpeak,
             onResult = callbacks.onResult,
