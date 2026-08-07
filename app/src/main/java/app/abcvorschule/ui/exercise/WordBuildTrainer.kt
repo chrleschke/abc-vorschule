@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -100,6 +101,7 @@ fun WordBuildTrainer(
     scaffoldFor: (String) -> ScaffoldLevel,
     ttsAvailable: Boolean,
     speaking: Boolean,
+    interactionLocked: Boolean = false,
     onSpeakPrompt: () -> Unit,
     onSpeak: (String) -> Unit,
     onSpeakAndAwait: suspend (String) -> Unit,
@@ -119,6 +121,11 @@ fun WordBuildTrainer(
     val tiles = WordBuildTray.tiles(round, placed.values.toList(), seed = round.targetAtomId.hashCode())
     val haptics = LocalAbcHaptics.current
     val scope = rememberCoroutineScope()
+    val interactionOpacity by animateFloatAsState(
+        targetValue = if (interactionLocked) 0.5f else 1f,
+        animationSpec = tween(durationMillis = 200),
+        label = "word_build_lock_opacity",
+    )
 
     fun place(index: Int, block: WordBlock) {
         if (resolved || placed[index] != null) return
@@ -203,7 +210,7 @@ fun WordBuildTrainer(
                                         ),
                                     )
                                 }
-                            }, field, index, frameWidth, glyphSp)
+                            }, field, index, frameWidth, glyphSp, !interactionLocked, interactionOpacity)
                         }
                     }
                 }
@@ -221,6 +228,7 @@ fun WordBuildTrainer(
                         DragCard(
                             state = field,
                             key = key,
+                            enabled = !interactionLocked,
                             onTap = {
                                 field.select(key)
                                 onSpeak(SpeechClipText.forAtomId(pack, block.atomId, block.display))
@@ -233,6 +241,7 @@ fun WordBuildTrainer(
                                     minWidth = AbcDimens.tileMinWidth,
                                     minHeight = AbcDimens.kidTouch,
                                 )
+                                .alpha(interactionOpacity)
                                 .background(
                                     color = if (field.selectedKey == key) LeafGreen else CreamElevated,
                                     shape = RoundedCornerShape(22.dp),
@@ -284,14 +293,18 @@ private fun Frame(
     index: Int,
     frameWidthDp: Float,
     glyphSp: Float,
+    enabled: Boolean = true,
+    opacity: Float = 1f,
 ) {
     DropZone(
         state = registerWith,
         key = WordBuildTray.frameKey(index),
         onTap = onTap,
+        enabled = enabled,
         modifier = Modifier
             .width(frameWidthDp.dp)
             .defaultMinSize(minHeight = frameWidthDp.dp)
+            .alpha(opacity)
             .background(
                 color = if (armed) LeafGreen.copy(alpha = 0.22f) else CreamElevated,
                 shape = RoundedCornerShape(22.dp),

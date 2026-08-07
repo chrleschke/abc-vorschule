@@ -95,6 +95,7 @@ fun TrainerHost(
             scaffoldFor = scaffoldFor,
             ttsAvailable = ttsAvailable,
             speaking = speaking,
+            interactionLocked = interactionLocked,
             onSpeakPrompt = callbacks.onSpeakPrompt,
             onSpeak = callbacks.onSpeak,
             onSpeakAndAwait = callbacks.onSpeakAndAwait,
