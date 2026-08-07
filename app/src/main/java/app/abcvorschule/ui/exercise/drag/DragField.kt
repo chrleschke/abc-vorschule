@@ -116,6 +116,9 @@ fun DragCard(
     onTap: () -> Unit,
     onDropped: (zoneKey: String?) -> Unit,
     modifier: Modifier = Modifier,
+    /** False während der Aufgaben-Sperre — weder Tap noch Drag lösen dann etwas
+     * aus (design doc). */
+    enabled: Boolean = true,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val dragging = state.draggingKey == key
@@ -123,10 +126,6 @@ fun DragCard(
         onDispose { state.removeCard(key) }
     }
     Box(
-        // zIndex/offset/scale sit BEFORE the caller's modifier on purpose: a later
-        // `offset` would only move the content, leaving the caller's background and
-        // border painted at the tile's resting position — which made the dragged
-        // tile look like bare (near-black) text floating over the board.
         modifier = Modifier
             .zIndex(if (dragging) 1f else 0f)
             .offset {
@@ -140,18 +139,24 @@ fun DragCard(
             }
             .then(modifier)
             .onGloballyPositioned { state.putCard(key, it.boundsInRoot()) }
-            .pointerInput(key) {
-                detectDragGestures(
-                    onDragStart = { state.startDrag(key) },
-                    onDrag = { change, amount ->
-                        change.consume()
-                        state.drag(amount)
-                    },
-                    onDragEnd = { onDropped(state.endDrag(key)) },
-                    onDragCancel = { onDropped(state.endDrag(key)) },
-                )
-            }
-            .clickable { onTap() },
+            .then(
+                if (enabled) {
+                    Modifier.pointerInput(key) {
+                        detectDragGestures(
+                            onDragStart = { state.startDrag(key) },
+                            onDrag = { change, amount ->
+                                change.consume()
+                                state.drag(amount)
+                            },
+                            onDragEnd = { onDropped(state.endDrag(key)) },
+                            onDragCancel = { onDropped(state.endDrag(key)) },
+                        )
+                    }
+                } else {
+                    Modifier
+                },
+            )
+            .clickable(enabled = enabled) { onTap() },
         contentAlignment = Alignment.Center,
         content = content,
     )
@@ -164,21 +169,16 @@ fun DropZone(
     key: String,
     onTap: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     content: @Composable BoxScope.() -> Unit,
 ) {
     DisposableEffect(key) {
         onDispose { state.removeZone(key) }
     }
     Box(
-        // onGloballyPositioned/clickable wrap the caller's styled modifier chain
-        // (background/border/padding) so the registered bounds and the tappable
-        // area are the FULL frame box, not just the padded-in content area —
-        // otherwise a frame at the 56dp touch-target floor with 8dp padding on
-        // each side only had a ~40dp tappable center, silently dropping taps in
-        // an 8dp dead ring around every frame.
         modifier = Modifier
             .onGloballyPositioned { state.putZone(key, it.boundsInRoot()) }
-            .clickable { onTap() }
+            .clickable(enabled = enabled) { onTap() }
             .then(modifier),
         contentAlignment = Alignment.Center,
         content = content,
