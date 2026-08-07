@@ -4735,7 +4735,7 @@
         {
           "promptTts": "Oma hat Mama gerufen.",
           "correctAtomIds": ["oma", "mama"],
-          "wrongAtomIds": ["opa", "mama"]
+          "wrongAtomIds": ["oma", "tom"]
         }
       ]
     },
@@ -4757,7 +4757,7 @@
         {
           "promptTts": "Zwei Omas sitzen auf der Bank.",
           "correctAtomIds": ["oma", "oma"],
-          "wrongAtomIds": ["oma", "opa"]
+          "wrongAtomIds": ["mama", "mama"]
         },
         {
           "promptTts": "Oma hat Mimi gesucht und gefunden.",
@@ -4789,7 +4789,7 @@
         {
           "promptTts": "Tom warf den Ball zu Papa.",
           "correctAtomIds": ["tom", "ball", "papa"],
-          "wrongAtomIds": ["tom", "ball", "opa"]
+          "wrongAtomIds": ["tom", "tomate", "papa"]
         }
       ]
     },
