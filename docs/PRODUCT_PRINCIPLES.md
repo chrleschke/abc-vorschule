@@ -85,6 +85,16 @@ Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede 
     („Der Bär hat im Bett geschlafen", „Das Pferd sprang über das Tor") — nie erzwungen.
     „Zwei Vögel saßen auf dem Baum" ist der Fehlerfall: die Vergangenheitsform sagt, dass
     sie weg sind, das Bild zeigt sie aber.
+  - **Kartenoptik und Feedback.** Die Bildkarten sind Rahmen ohne Füllfläche (der
+    graue `CreamElevated`-Grund verdunkelte die Emojis, ohne die Kartengrenze
+    sichtbarer zu machen), stehen mit ihrer Oberkante knapp unterhalb der
+    Bildschirmmitte, und die Emoji-Reihe füllt die Karte so weit die Breite es
+    zulässt. Ein Fehltipp wird **bewegt** quittiert, nicht gefärbt: die getippte
+    Karte wackelt (`SentencePictureCardShake`), dazu `nudge`-Haptik und der Satz
+    erneut — kein Rot, §8 und §10 gelten unverändert. Ein Treffer zieht die
+    richtige Karte groß in die Bildschirmmitte und hält sie dort, solange der Satz
+    wiederholt wird; die andere Karte blendet aus. **Auflösen („Zeig mir")
+    markiert nur, es feiert nicht.**
 7. **Rechnen** — reine Mengen-Arithmetik in *jeder* Lektion, Icons aus dem Wortschatz
   derselben Lektion. **Keine Wörter zum Lesen oder Schreiben**; Singular/Plural nur gesprochen.
 
@@ -283,6 +293,12 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - Ausnahme Wort-Detektiv: der Antwortbereich trägt **Quittungs-Striche statt Wahloptionen**.
   Sie sind bloße Grundstriche ohne Rahmen und ohne Tray — die einzige Symbolquelle ist das
   Wort im Aufgabenblock. Damit sind sie von den Schablonen des Wort-Bauers unterscheidbar.
+- Ausnahme Satz-Versteher: der Antwortblock beginnt bei **52 % der Bühnenhöhe**
+  statt am unteren Rand (`ExerciseStage(answerAnchor = AnswerAnchor.BelowCenter)`).
+  Sein Aufgabenblock trägt nur den Speaker — kein Titel, keine Kacheln, kein Wort —
+  und am unteren Rand verdeckt die tippende Hand genau die Bildkarten, die die
+  ganze Aufgabe sind. Für alle anderen Übungen bleibt `AnswerAnchor.Bottom` die
+  Vorbelegung und damit die Grundform.
 
 
 
@@ -291,6 +307,8 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - Gemeinsame Komponenten unter `ui/components/` (`AbcContinueButton`, `AbcSpeakerButton`, `AbcNavChevron`, `AbcProgressBar`, Vektor-Icons inkl. `IconStar`).
 - Buttons: keine Emojis — nur ASCII oder Canvas/SVG-Vektoren. Punkte-/Erfolgs-Symbol ist der Vektor-Stern `IconStar`, kein Text-Asterisk.
 - Übungen nutzen `ExerciseStage` für klare Trennung Aufgabenblock / Antwortblock.
+  Der Parameter `answerAnchor` ist mit `Bottom` vorbelegt; `BelowCenter` ist die
+  eine benannte Ausnahme (§9, Satz-Versteher).
 - Farbrollen (verbindlich): `StarGold` = Sterne/Punkte/Belohnung (`StarGoldDeep` als Kontur-/
   Tiefton für den Stern-Glyph auf hellem Grund), `LeafGreen` = richtig/erledigt, `SkyBlue` =
   Fortschritt/aktiv, `SunCoral` = Handlungs-CTA (auch der „Du bist hier“-Marker auf dem Pfad —
