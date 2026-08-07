@@ -95,7 +95,7 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
 
 ## 4. Content-Graph
 
-- Atome (Buchstabe / Silbe / Wort + Emoji) sind wiederverwendbar über alle sechs Trainer-Typen einer Lektion.
+- Atome (Buchstabe / Silbe / Wort + Emoji) sind wiederverwendbar über alle sieben Trainer-Typen einer Lektion.
 - Atom-Emojis werden auch außerhalb der Trainer verwendet: die Pfad-Schilder zeigen drei
   Emojis je Lektion, abgeleitet aus sound_position → word_build → count_add → sentence_order
   (deterministisch, über den Emoji-Glyph dedupliziert). `letter_trace.rewardEmoji` bleibt
@@ -155,7 +155,7 @@ niemals mit einem stummen No-Op.
   weiter der Fibel-Reihenfolge (erste nicht gemeisterte Lektion) und springt nicht zum Ausflug
   voraus.
 - Tippen auf ein freigeschaltetes Schild startet die Trainer-Session dieser Lektion — die
-  sechs autorierten Typen (Abschnitt 3), ergänzt um etwaige abgeleitete Zusatz-Trainer
+  sieben autorierten Typen (Abschnitt 3), ergänzt um etwaige abgeleitete Zusatz-Trainer
   (Jagd, Wort-Detektiv).
 - Kein Domänen-Mix, keine Zufallsrotation: die Trainer-Reihenfolge ist didaktisch fix.
 - Vor/Zurück zwischen Runden ist **immer** möglich, unabhängig von Punkten/Fortschritt.
