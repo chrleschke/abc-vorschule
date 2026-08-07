@@ -105,6 +105,35 @@ class GlyphLetterformTest {
     }
 
     @Test
+    fun theBAndCompoundPBowlsAreDenseCurvesNotCoarsePolygons() {
+        // Six-point bowls next to 0.4-long straight bars made refineStroke bow the bars
+        // into big circular arcs — B's two bowed returns crossed at the waist. The
+        // half-width P bowls of Pf/Sp fell under RefineMinChord instead and stayed
+        // visibly polygonal. Densely authored bowls are drawn exactly as authored.
+        strokesOf("letter-b").drop(1).forEach { bowl ->
+            assertTrue("B bowl has only ${bowl.size} points", bowl.size >= 12)
+        }
+        assertTrue(strokesOf("letter-pf")[1].size >= 10)
+        assertTrue(strokesOf("letter-sp")[2].size >= 10)
+    }
+
+    @Test
+    fun theEszettClosesItsArchAndEndsOpenNearTheBaselineCentre() {
+        // The old ß never drew the arch between stem top and right side — the glyph
+        // read as a lowercase b with a floating flag. The single stroke goes up the
+        // stem, over the top, and ends open at the bottom, clear of the stem.
+        val stroke = strokesOf("letter-sz").single()
+        assertTrue("stem must start at the bottom", stroke.first().y > boxSize * 0.85f)
+        assertTrue("arch must reach the top of the box", stroke.minOf { it.y } < boxSize * 0.12f)
+        val end = stroke.last()
+        assertTrue("end must sit near the baseline", end.y > boxSize * 0.8f)
+        assertTrue(
+            "end must stay clear of the stem",
+            end.x > stroke.first().x + boxSize * 0.07f,
+        )
+    }
+
+    @Test
     fun umlautTicksAreShortVerticalAndClearOfTheLetterBody() {
         // Diagonal ticks under a full-width road bled into the Ü/Ö/Ä body. Vertical short
         // ticks higher up stay clear once ShortStrokeWidthScale thins the drawing.
