@@ -4272,6 +4272,90 @@
       "display": "sp",
       "emoji": "",
       "kind": "syllable"
+    },
+    {
+      "id": "banane",
+      "lemma": "Banane",
+      "display": "Banane",
+      "emoji": "🍌",
+      "kind": "other",
+      "pluralDisplay": "Bananen"
+    },
+    {
+      "id": "bett",
+      "lemma": "Bett",
+      "display": "Bett",
+      "emoji": "🛏️",
+      "kind": "other",
+      "pluralDisplay": "Betten"
+    },
+    {
+      "id": "brokkoli",
+      "lemma": "Brokkoli",
+      "display": "Brokkoli",
+      "emoji": "🥦",
+      "kind": "other"
+    },
+    {
+      "id": "busch",
+      "lemma": "Busch",
+      "display": "Busch",
+      "emoji": "🌿",
+      "kind": "other",
+      "pluralDisplay": "Büsche"
+    },
+    {
+      "id": "fahrrad",
+      "lemma": "Fahrrad",
+      "display": "Fahrrad",
+      "emoji": "🚲",
+      "kind": "other",
+      "pluralDisplay": "Fahrräder"
+    },
+    {
+      "id": "flugzeug",
+      "lemma": "Flugzeug",
+      "display": "Flugzeug",
+      "emoji": "✈️",
+      "kind": "other",
+      "pluralDisplay": "Flugzeuge"
+    },
+    {
+      "id": "mond",
+      "lemma": "Mond",
+      "display": "Mond",
+      "emoji": "🌙",
+      "kind": "other"
+    },
+    {
+      "id": "pirat",
+      "lemma": "Pirat",
+      "display": "Pirat",
+      "emoji": "🏴‍☠️",
+      "kind": "other",
+      "pluralDisplay": "Piraten"
+    },
+    {
+      "id": "strand",
+      "lemma": "Strand",
+      "display": "Strand",
+      "emoji": "🏖️",
+      "kind": "other",
+      "pluralDisplay": "Strände"
+    },
+    {
+      "id": "tropfen",
+      "lemma": "Tropfen",
+      "display": "Tropfen",
+      "emoji": "💦",
+      "kind": "other"
+    },
+    {
+      "id": "wasser",
+      "lemma": "Wasser",
+      "display": "Wasser",
+      "emoji": "🌊",
+      "kind": "other"
     }
   ]
 }

@@ -4720,7 +4720,7 @@
         {
           "promptTts": "Zwei Ameisen sind zu Mama gekrabbelt.",
           "correctAtomIds": ["ameise", "ameise", "mama"],
-          "wrongAtomIds": ["ameise", "mama"]
+          "wrongAtomIds": ["biene", "biene", "mama"]
         },
         {
           "promptTts": "Mama hat die Ameise gefunden.",
@@ -4755,14 +4755,14 @@
           "wrongAtomIds": ["hund", "sofa"]
         },
         {
-          "promptTts": "Zwei Omas saßen auf der Bank.",
+          "promptTts": "Zwei Omas sitzen auf der Bank.",
           "correctAtomIds": ["oma", "oma"],
-          "wrongAtomIds": ["oma"]
+          "wrongAtomIds": ["oma", "opa"]
         },
         {
           "promptTts": "Oma hat Mimi gesucht und gefunden.",
           "correctAtomIds": ["oma", "mimi"],
-          "wrongAtomIds": ["opa", "mimi"]
+          "wrongAtomIds": ["oma", "hund"]
         }
       ]
     },
@@ -4779,7 +4779,7 @@
         {
           "promptTts": "Papa hat zwei Tomaten geschnitten.",
           "correctAtomIds": ["papa", "tomate", "tomate"],
-          "wrongAtomIds": ["papa", "tomate"]
+          "wrongAtomIds": ["papa", "zitrone", "zitrone"]
         },
         {
           "promptTts": "Opa trug einen Topf voll Suppe.",
@@ -4801,12 +4801,12 @@
         {
           "promptTts": "Das Lama hat laut Hallo gerufen.",
           "correctAtomIds": ["lama", "hallo"],
-          "wrongAtomIds": ["pferd", "hallo"]
+          "wrongAtomIds": ["opa", "hallo"]
         },
         {
           "promptTts": "Zwei Lamas liefen über die Wiese.",
           "correctAtomIds": ["lama", "lama"],
-          "wrongAtomIds": ["lama"]
+          "wrongAtomIds": ["maus", "elefant"]
         },
         {
           "promptTts": "Das Lama hat einen Hut gefressen.",
@@ -4814,9 +4814,9 @@
           "wrongAtomIds": ["lama", "keks"]
         },
         {
-          "promptTts": "Oma hat dem Lama gewinkt.",
-          "correctAtomIds": ["oma", "hallo", "lama"],
-          "wrongAtomIds": ["oma", "hallo", "pferd"]
+          "promptTts": "Oma ist auf dem Lama geritten.",
+          "correctAtomIds": ["oma", "lama"],
+          "wrongAtomIds": ["opa", "pferd"]
         }
       ]
     },
@@ -4828,22 +4828,22 @@
         {
           "promptTts": "Ein Ufo ist im Tal gelandet.",
           "correctAtomIds": ["ufo", "tal"],
-          "wrongAtomIds": ["ufo", "haus"]
+          "wrongAtomIds": ["elefant", "haus"]
         },
         {
           "promptTts": "Papa hat zwei Hüte gekauft.",
-          "correctAtomIds": ["papa", "hut", "hut"],
-          "wrongAtomIds": ["papa", "hut"]
+          "correctAtomIds": ["papa", "hut"],
+          "wrongAtomIds": ["papa", "kleid"]
         },
         {
           "promptTts": "Der Wind trug Omas Hut davon.",
           "correctAtomIds": ["oma", "hut"],
-          "wrongAtomIds": ["oma", "schuh"]
+          "wrongAtomIds": ["oma", "kleid"]
         },
         {
-          "promptTts": "Drei Ufos flogen am Himmel.",
-          "correctAtomIds": ["ufo", "ufo", "ufo"],
-          "wrongAtomIds": ["ufo", "ufo"]
+          "promptTts": "Zwei Ufos fliegen am Himmel.",
+          "correctAtomIds": ["ufo", "ufo"],
+          "wrongAtomIds": ["flugzeug"]
         }
       ]
     },
@@ -4855,22 +4855,22 @@
         {
           "promptTts": "Tom hat den Ball ins Tor geworfen.",
           "correctAtomIds": ["tom", "ball", "tor"],
-          "wrongAtomIds": ["tom", "ball", "nest"]
+          "wrongAtomIds": ["tom", "apfel", "nest"]
         },
         {
-          "promptTts": "Oma hat zwei Rosen bekommen.",
-          "correctAtomIds": ["oma", "rose", "rose"],
-          "wrongAtomIds": ["oma", "rose"]
-        },
-        {
-          "promptTts": "Der Clown hatte eine rote Nase.",
-          "correctAtomIds": ["clown", "nase", "rot"],
-          "wrongAtomIds": ["clown", "nase", "blau"]
-        },
-        {
-          "promptTts": "Ein Vogel saß auf dem Tor.",
+          "promptTts": "Auf dem Tor saß ein kleiner Vogel.",
           "correctAtomIds": ["vogel", "tor"],
           "wrongAtomIds": ["vogel", "baum"]
+        },
+        {
+          "promptTts": "Die Rose wächst neben dem Tor.",
+          "correctAtomIds": ["rose", "tor"],
+          "wrongAtomIds": ["baum", "tor"]
+        },
+        {
+          "promptTts": "Tom hat sich die Nase geputzt.",
+          "correctAtomIds": ["tom", "nase"],
+          "wrongAtomIds": ["tom", "ohr"]
         }
       ]
     },
@@ -4885,19 +4885,19 @@
           "wrongAtomIds": ["nest", "maus"]
         },
         {
-          "promptTts": "Die Sonne schien auf die Rosen.",
-          "correctAtomIds": ["sonne", "rose", "rose"],
-          "wrongAtomIds": ["wolke", "rose", "rose"]
-        },
-        {
-          "promptTts": "Tom hat im Sand ein Nest gefunden.",
-          "correctAtomIds": ["tom", "sand", "nest"],
-          "wrongAtomIds": ["tom", "sand", "ball"]
-        },
-        {
           "promptTts": "Oma hat die Rosen gegossen.",
-          "correctAtomIds": ["oma", "rose", "rose"],
-          "wrongAtomIds": ["opa", "rose", "rose"]
+          "correctAtomIds": ["oma", "rose", "tropfen"],
+          "wrongAtomIds": ["opa", "rose"]
+        },
+        {
+          "promptTts": "Die Sonne scheint auf das Nest.",
+          "correctAtomIds": ["sonne", "nest"],
+          "wrongAtomIds": ["wolke", "nest"]
+        },
+        {
+          "promptTts": "Tom isst ein großes Eis.",
+          "correctAtomIds": ["tom", "eis"],
+          "wrongAtomIds": ["tom", "keks"]
         }
       ]
     },
@@ -4909,7 +4909,7 @@
         {
           "promptTts": "In der Dose waren zwei Kekse.",
           "correctAtomIds": ["dose", "keks", "keks"],
-          "wrongAtomIds": ["dose", "keks"]
+          "wrongAtomIds": ["dose", "eis"]
         },
         {
           "promptTts": "Der Hund hat einen Keks geklaut.",
@@ -4919,12 +4919,12 @@
         {
           "promptTts": "Tom aß den letzten Keks.",
           "correctAtomIds": ["tom", "keks"],
-          "wrongAtomIds": ["tom", "eis"]
+          "wrongAtomIds": ["tom", "kuchen"]
         },
         {
-          "promptTts": "Die Dosen standen im Regal.",
-          "correctAtomIds": ["dose", "dose"],
-          "wrongAtomIds": ["dose"]
+          "promptTts": "Wer hat die Kekse aus der Dose geklaut...",
+          "correctAtomIds": ["keks", "dose"],
+          "wrongAtomIds": ["keks", "pirat"]
         }
       ]
     },
@@ -4934,12 +4934,12 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "promptTts": "Die Wolken zogen über das Haus.",
-          "correctAtomIds": ["wolke", "wolke", "haus"],
-          "wrongAtomIds": ["wolke", "haus"]
+          "promptTts": "Die Wolke zieht über das Haus.",
+          "correctAtomIds": ["wolke", "haus"],
+          "wrongAtomIds": ["wolke", "baum"]
         },
         {
-          "promptTts": "Mama hat ein neues Kleid genäht.",
+          "promptTts": "Mama hat ein schönes, neues Kleid.",
           "correctAtomIds": ["mama", "kleid"],
           "wrongAtomIds": ["mama", "jacke"]
         },
@@ -4949,9 +4949,9 @@
           "wrongAtomIds": ["eis", "wolke"]
         },
         {
-          "promptTts": "Tom hat zwei Eier gefunden.",
+          "promptTts": "Tom hat zwei Eier versteckt.",
           "correctAtomIds": ["tom", "eier"],
-          "wrongAtomIds": ["tom", "ei"]
+          "wrongAtomIds": ["hase", "eier"]
         }
       ]
     },
@@ -4961,24 +4961,24 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "promptTts": "Die Giraffe hat aus dem Sack gefressen.",
+          "promptTts": "Die Giraffe frisst aus dem Sack.",
           "correctAtomIds": ["giraffe", "sack"],
           "wrongAtomIds": ["pferd", "sack"]
         },
         {
-          "promptTts": "Auf dem Dach saßen zwei Tauben.",
+          "promptTts": "Auf dem Dach sitzen zwei Tauben.",
           "correctAtomIds": ["dach", "taube", "taube"],
-          "wrongAtomIds": ["dach", "taube"]
+          "wrongAtomIds": ["dach", "eule"]
         },
         {
           "promptTts": "Opa hat mir ein Buch geschenkt.",
           "correctAtomIds": ["opa", "buch"],
-          "wrongAtomIds": ["opa", "paket"]
+          "wrongAtomIds": ["opa", "brokkoli"]
         },
         {
-          "promptTts": "Der Drache flog über den Weg.",
-          "correctAtomIds": ["drache", "weg"],
-          "wrongAtomIds": ["drache", "park"]
+          "promptTts": "Der Drache flog über den Park.",
+          "correctAtomIds": ["drache", "park"],
+          "wrongAtomIds": ["drache", "weg"]
         }
       ]
     },
@@ -4988,24 +4988,24 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "promptTts": "Vor dem Haus standen zwei Bäume.",
+          "promptTts": "Vor dem Haus wachsen zwei Bäume.",
           "correctAtomIds": ["haus", "baeume"],
-          "wrongAtomIds": ["haus", "baum"]
+          "wrongAtomIds": ["haus", "tal"]
         },
         {
-          "promptTts": "Der Bär hat im Haus geschlafen.",
-          "correctAtomIds": ["baer", "haus"],
+          "promptTts": "Der Bär hat im Bett geschlafen.",
+          "correctAtomIds": ["baer", "bett"],
           "wrongAtomIds": ["baer", "baum"]
         },
         {
-          "promptTts": "Auf dem Baum saß eine Eule.",
+          "promptTts": "Die Eule flog auf den Baum.",
           "correctAtomIds": ["baum", "eule"],
-          "wrongAtomIds": ["baum", "vogel"]
+          "wrongAtomIds": ["busch", "vogel"]
         },
         {
           "promptTts": "Aus dem Haus kamen zwei Mäuse.",
           "correctAtomIds": ["haus", "maus", "maus"],
-          "wrongAtomIds": ["haus", "maus"]
+          "wrongAtomIds": ["haus", "elefant"]
         }
       ]
     },
@@ -5017,22 +5017,22 @@
         {
           "promptTts": "Hier stehen viele Häuser.",
           "correctAtomIds": ["haeusser"],
-          "wrongAtomIds": ["haus"]
+          "wrongAtomIds": ["auto"]
         },
         {
-          "promptTts": "Der Frosch hat zwei Rüben geerntet.",
-          "correctAtomIds": ["frosch", "ruebe", "ruebe"],
+          "promptTts": "Der Frosch ist mit dem Fahrrad gefahren.",
+          "correctAtomIds": ["frosch", "fahrrad"],
           "wrongAtomIds": ["frosch", "ruebe"]
         },
         {
-          "promptTts": "Die Äpfel fielen vom Baum.",
+          "promptTts": "Die Äpfel sind vom Baum gefallen.",
           "correctAtomIds": ["aepfel", "baum"],
-          "wrongAtomIds": ["apfel", "baum"]
+          "wrongAtomIds": ["banane", "sack"]
         },
         {
-          "promptTts": "Die Mäuse aßen den Käse auf.",
-          "correctAtomIds": ["maus", "maus", "kaese"],
-          "wrongAtomIds": ["maus", "kaese"]
+          "promptTts": "Die Mäuse haben den Käse geklaut.",
+          "correctAtomIds": ["maus", "kaese"],
+          "wrongAtomIds": ["maus", "sack"]
         }
       ]
     },
@@ -5043,23 +5043,23 @@
       "rounds": [
         {
           "promptTts": "Das Schaf hat neue Schuhe bekommen.",
-          "correctAtomIds": ["schaf", "schuh", "schuh"],
+          "correctAtomIds": ["schaf", "schuh"],
           "wrongAtomIds": ["schaf", "hut"]
         },
         {
-          "promptTts": "Zwei Fische schwammen im Fluss.",
+          "promptTts": "Zwei Fische schwimmen im Fluss.",
           "correctAtomIds": ["fisch", "fisch"],
-          "wrongAtomIds": ["fisch"]
+          "wrongAtomIds": ["ente", "ente"]
         },
         {
           "promptTts": "Tom ist in die Schule gegangen.",
           "correctAtomIds": ["tom", "schule"],
-          "wrongAtomIds": ["tom", "haus"]
+          "wrongAtomIds": ["tom", "strand"]
         },
         {
           "promptTts": "Oma hat einen Schuh verloren.",
           "correctAtomIds": ["oma", "schuh"],
-          "wrongAtomIds": ["oma", "schuh", "schuh"]
+          "wrongAtomIds": ["opa", "kleid"]
         }
       ]
     },
@@ -5074,12 +5074,12 @@
           "wrongAtomIds": ["zebra", "ball"]
         },
         {
-          "promptTts": "Zwei Eulen saßen auf dem Baum.",
+          "promptTts": "Zwei Eulen sitzen auf dem Baum.",
           "correctAtomIds": ["eule", "eule", "baum"],
-          "wrongAtomIds": ["eule", "baum"]
+          "wrongAtomIds": ["maus", "baum"]
         },
         {
-          "promptTts": "Der Zug ist durch das Tal gefahren.",
+          "promptTts": "Der Zug fuhr durch das Tal.",
           "correctAtomIds": ["zug", "tal"],
           "wrongAtomIds": ["auto", "tal"]
         },
@@ -5096,24 +5096,24 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "promptTts": "Der Vogel ist gegen die Vase geflogen.",
-          "correctAtomIds": ["vogel", "vase"],
-          "wrongAtomIds": ["vogel", "lampe"]
-        },
-        {
-          "promptTts": "Papa ist in die Vase getreten.",
-          "correctAtomIds": ["papa", "fuss", "vase"],
-          "wrongAtomIds": ["papa", "fuss", "ball"]
-        },
-        {
-          "promptTts": "In der Vase standen zwei Rosen.",
-          "correctAtomIds": ["vase", "rose", "rose"],
-          "wrongAtomIds": ["vase", "rose"]
-        },
-        {
-          "promptTts": "Zwei Vögel badeten im Sand.",
+          "promptTts": "Zwei Vögel baden im Sand.",
           "correctAtomIds": ["vogel", "vogel", "sand"],
-          "wrongAtomIds": ["vogel", "sand"]
+          "wrongAtomIds": ["vogel", "wasser"]
+        },
+        {
+          "promptTts": "Die Rose steht in der Vase.",
+          "correctAtomIds": ["rose", "vase"],
+          "wrongAtomIds": ["rose", "dose"]
+        },
+        {
+          "promptTts": "Der Vogel setzt sich auf den Fuß.",
+          "correctAtomIds": ["vogel", "fuss"],
+          "wrongAtomIds": ["vogel", "hut"]
+        },
+        {
+          "promptTts": "Der Elefant hat große Füße.",
+          "correctAtomIds": ["elefant", "fuss"],
+          "wrongAtomIds": ["maus", "fuss"]
         }
       ]
     },
@@ -5123,24 +5123,24 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "promptTts": "Das Pferd hat zwei Äpfel gefressen.",
+          "promptTts": "Das Pferd hat zwei Äpfel gefuttert.",
           "correctAtomIds": ["pferd", "aepfel"],
-          "wrongAtomIds": ["pferd", "apfel"]
+          "wrongAtomIds": ["pferd", "banane"]
         },
         {
-          "promptTts": "Opa trug einen schweren Sack.",
-          "correctAtomIds": ["opa", "sack"],
-          "wrongAtomIds": ["opa", "paket"]
+          "promptTts": "Opa hat ein großes Paket bekommen.",
+          "correctAtomIds": ["opa", "paket"],
+          "wrongAtomIds": ["opa", "sack"]
         },
         {
-          "promptTts": "Das Pferd ist über das Tor gesprungen.",
+          "promptTts": "Das Pferd sprang über das Tor.",
           "correctAtomIds": ["pferd", "tor"],
           "wrongAtomIds": ["pferd", "haus"]
         },
         {
-          "promptTts": "Die Äpfel lagen im Sack.",
-          "correctAtomIds": ["aepfel", "sack"],
-          "wrongAtomIds": ["aepfel", "eimer"]
+          "promptTts": "Die Äpfel wurden aufgemampft.",
+          "correctAtomIds": ["aepfel"],
+          "wrongAtomIds": ["banane"]
         }
       ]
     },
@@ -5150,24 +5150,24 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "promptTts": "Die Spinne saß auf dem Spiegel.",
+          "promptTts": "Die Spinne hat sich im Spiegel gesehen.",
           "correctAtomIds": ["spinne", "spiegel"],
           "wrongAtomIds": ["spinne", "fenster"]
         },
         {
-          "promptTts": "Am Himmel standen viele Sterne.",
+          "promptTts": "Am Himmel stehen viele Sterne.",
           "correctAtomIds": ["stern", "stern", "stern"],
-          "wrongAtomIds": ["stern"]
+          "wrongAtomIds": ["mond"]
         },
         {
-          "promptTts": "Tom ist über den Stuhl gestolpert.",
-          "correctAtomIds": ["tom", "stuhl"],
-          "wrongAtomIds": ["tom", "sofa"]
+          "promptTts": "Tom springt auf dem Sofa.",
+          "correctAtomIds": ["tom", "sofa"],
+          "wrongAtomIds": ["tom", "stuhl"]
         },
         {
-          "promptTts": "Zwei Spinnen krabbelten langsam über die Straße.",
+          "promptTts": "Zwei Spinnen krabbeln über die Straße.",
           "correctAtomIds": ["spinne", "spinne", "strasse"],
-          "wrongAtomIds": ["spinne", "strasse"]
+          "wrongAtomIds": ["ameise", "ameise", "strasse"]
         }
       ]
     },
@@ -5182,9 +5182,9 @@
           "wrongAtomIds": ["pony", "bus"]
         },
         {
-          "promptTts": "Zwei Quallen schwammen im Wasser.",
+          "promptTts": "Zwei Quallen schwimmen im Meer.",
           "correctAtomIds": ["qualle", "qualle"],
-          "wrongAtomIds": ["qualle"]
+          "wrongAtomIds": ["fisch", "fisch"]
         },
         {
           "promptTts": "Der Clown hat Xylofon gespielt.",

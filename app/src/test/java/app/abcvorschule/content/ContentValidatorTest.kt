@@ -514,4 +514,24 @@ class ContentValidatorTest {
         )
         assertTrue(issues.any { "indistinguishable" in it.message })
     }
+
+    @Test
+    fun sentencePictureTasksMustShareOneInstruction() {
+        val rounds = List(4) { validSentencePictureRound() }
+        val issues = ContentValidator.validate(
+            packWithSentencePicture(
+                sentencePictureSpec(rounds, instruction = "Welches Bild passt zum Satz?"),
+            ),
+        )
+        assertTrue(issues.any { "share one instructionTts" in it.message })
+    }
+
+    @Test
+    fun shippedSentencePictureTasksNeedOnlyOneInstructionRecording() {
+        val instructions = ContentRepository.fromClasspath().load()
+            .tasks.values.filterIsInstance<SentencePictureSpec>()
+            .map { it.instructionTts }
+            .distinct()
+        assertEquals(listOf("Ordne das richtige Bild zu."), instructions)
+    }
 }

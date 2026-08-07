@@ -66,9 +66,21 @@ Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede 
   ein Miss liest den Satz erneut vor, nach 2 Misses gibt es „Zeig mir". Die Sätze
   leben im Task selbst (nicht in `sentences.json`) und dürfen wie die Finale-Sätze
   flektierte Formen und freie Verben nutzen — nur die Karten-Nomen sind Atome mit
-  Emoji. Redaktionsregeln: 4–8 Wörter, mindestens eine schwierige Form, Wörter der
-  Lektion, Cartoon-Logik (realistischer als die Finale-Sätze), die falsche Karte
-  unterscheidet sich genau in der geprüften Dimension (Menge, Akteur oder Objekt).
+  Emoji. Die Instruktion ist über alle Lektionen **wortgleich** (Validator prüft das),
+  damit sie nur eine einzige Aufnahme braucht. Redaktionsregeln:
+  - 4–8 Wörter, ein Hauptsatz, Wörter der Lektion, Cartoon-Logik (realistischer als
+    die Finale-Sätze).
+  - **Die falsche Karte tauscht eine Kategorie, nicht bloß die Anzahl.** Anderes Tier,
+    anderes Kleidungsstück, anderer Akteur, anderes Objekt, anderer Ort. Zwei Äpfel
+    gegen einen Apfel ist zu wenig Unterschied — das Kind rät die Menge, statt den
+    Satz zu verstehen. Auch die Beispielobjekte und Tätigkeiten selbst wechseln, statt
+    dieselbe Handlung durch die Lektionen zu tragen.
+  - **Zeitform folgt dem Bild, nicht dem Lernziel.** Beschreibt der Satz einen Zustand,
+    der auf der Karte zu sehen ist, steht er im Präsens („Zwei Eulen sitzen auf dem
+    Baum"). Partizip II und Präteritum kommen dort, wo sie ohnehin natürlich klingen
+    („Der Bär hat im Bett geschlafen", „Das Pferd sprang über das Tor") — nie erzwungen.
+    „Zwei Vögel saßen auf dem Baum" ist der Fehlerfall: die Vergangenheitsform sagt, dass
+    sie weg sind, das Bild zeigt sie aber.
 7. **Rechnen** — reine Mengen-Arithmetik in *jeder* Lektion, Icons aus dem Wortschatz
   derselben Lektion. **Keine Wörter zum Lesen oder Schreiben**; Singular/Plural nur gesprochen.
 
@@ -375,6 +387,9 @@ Wenn eine Änderung vorgeschlagen wird, prüfen:
 | Enthält der Rechen-Trainer Lesewörter?                              | Nein → nur Icons und Ziffern         |
 | Hält jede autorierte Lektion die sieben Trainer-Typen in nicht-fallender Rangfolge (Start Auditiver Finder, Ende Rechnen)? | Ja → Validator prüft das             |
 | Zeigt der Satz-Versteher zwei ununterscheidbare Karten oder liest sich seine Instruktion in jedem Satz wieder? | Nein → Validator prüft beides |
+| Unterscheiden sich die beiden Karten nur in der Anzahl desselben Bildes?      | Nein → Kategorie tauschen (Tier, Objekt, Akteur, Ort) |
+| Steht ein Satz-Versteher-Satz im Präteritum, obwohl die Karte den Zustand zeigt? | Nein → Präsens; Vergangenheit nur wo sie natürlich klingt |
+| Nutzen alle Satz-Versteher dieselbe Instruktion (eine Aufnahme)?              | Ja → Validator prüft das |
 | Ist ein neuer Finale-Satz länger als 7 Wörter oder eine Mini-Geschichte?     | Nein → Abschnitt 12, Validator prüft |
 | Wäre das Bild des Finale-Satzes in einem Kinderbuch denkbar?                 | Ja — sonst AI-Slop                   |
 | Zeigt der End-Screen eine Punktezahl?                                        | Nein → Punkte leben im Chrome/Pfad   |

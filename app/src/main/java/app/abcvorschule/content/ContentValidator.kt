@@ -388,6 +388,18 @@ object ContentValidator {
         (pack.finales.keys - referencedFinales).forEach {
             issues += ValidationIssue("finale $it is not referenced by any lesson")
         }
+
+        // Der Satz-Versteher sagt in jeder Lektion dasselbe, also braucht er
+        // genau eine Aufnahme: der Clip-Index schlüsselt nach Text, eine zweite
+        // Formulierung würde still eine zweite Aufnahme verlangen.
+        val instructions = pack.tasks.values.filterIsInstance<SentencePictureSpec>()
+            .map { it.instructionTts }
+            .distinct()
+        if (instructions.size > 1) {
+            issues += ValidationIssue(
+                "sentence_picture tasks must share one instructionTts, but hold $instructions",
+            )
+        }
         return issues
     }
 
