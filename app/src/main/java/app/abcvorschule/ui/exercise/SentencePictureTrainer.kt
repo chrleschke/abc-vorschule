@@ -1,6 +1,7 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
@@ -130,27 +131,43 @@ fun SentencePictureTrainer(
                     .testTag("sentence_picture_cards"),
             ) {
                 val leftIsCorrect = correctOnLeft
+                // Ein Fortschritt für beide Karten: die richtige wächst, die falsche
+                // verschwindet. Bei fast null Gewicht schrumpft der Slot der
+                // Verliererkarte mit; die 8dp Lücke bleibt, die Gewinnerkarte landet
+                // also 4dp neben der optischen Mitte — unter der Wahrnehmungsschwelle
+                // und billiger als eine zusätzlich animierte Arrangement-Lücke.
+                val celebrateProgress by animateFloatAsState(
+                    targetValue = if (solvedCorrect) 1f else 0f,
+                    animationSpec = tween(durationMillis = 360, easing = FastOutSlowInEasing),
+                    label = "sentence_picture_celebrate",
+                )
+                val correctWeight = 1f + 2f * celebrateProgress
+                val wrongWeight = (1f - celebrateProgress).coerceAtLeast(0.001f)
                 PictureCard(
                     atomIds = if (leftIsCorrect) round.correctAtomIds else round.wrongAtomIds,
                     pack = pack,
                     highlight = (solvedCorrect || resolved) && leftIsCorrect,
+                    celebrateProgress = if (leftIsCorrect) celebrateProgress else 0f,
                     enabled = !interactionLocked && !solvedCorrect && !resolved,
-                    opacity = interactionOpacity,
+                    opacity = interactionOpacity *
+                        if (leftIsCorrect) 1f else (1f - celebrateProgress),
                     shakeTick = if (wrongOnLeft) wrongTick else 0,
                     onTap = { choose(leftIsCorrect, tappedLeft = true) },
                     testTag = if (leftIsCorrect) "sentence_picture_card_correct" else "sentence_picture_card_wrong",
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(if (leftIsCorrect) correctWeight else wrongWeight),
                 )
                 PictureCard(
                     atomIds = if (leftIsCorrect) round.wrongAtomIds else round.correctAtomIds,
                     pack = pack,
                     highlight = (solvedCorrect || resolved) && !leftIsCorrect,
+                    celebrateProgress = if (leftIsCorrect) 0f else celebrateProgress,
                     enabled = !interactionLocked && !solvedCorrect && !resolved,
-                    opacity = interactionOpacity,
+                    opacity = interactionOpacity *
+                        if (leftIsCorrect) (1f - celebrateProgress) else 1f,
                     shakeTick = if (!wrongOnLeft) wrongTick else 0,
                     onTap = { choose(!leftIsCorrect, tappedLeft = false) },
                     testTag = if (leftIsCorrect) "sentence_picture_card_wrong" else "sentence_picture_card_correct",
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(if (leftIsCorrect) wrongWeight else correctWeight),
                 )
             }
             if (misses >= 2 && !resolved && !solvedCorrect) {
@@ -176,11 +193,15 @@ private const val CardPaddingHorizontalDp = 4f
 /** Abstand der beiden Karten in der Reihe, ebenfalls Breitenbudget der Emojis. */
 private const val CardGapDp = 8f
 
+/** Zuwachs der Emoji-Basisgröße, wenn die richtige Karte in die Mitte wächst. */
+private const val CelebrateBaseScaleGain = 0.6f
+
 @Composable
 private fun PictureCard(
     atomIds: List<String>,
     pack: ContentPack,
     highlight: Boolean,
+    celebrateProgress: Float,
     enabled: Boolean,
     opacity: Float,
     shakeTick: Int,
@@ -205,7 +226,20 @@ private fun PictureCard(
     // maxWidth die volle Kartenbreite ist und der Abzug hier sichtbar bleibt.
     BoxWithConstraints(modifier = modifier) {
         val contentWidthDp = (maxWidth.value - 2 * CardPaddingHorizontalDp).coerceAtLeast(1f)
-        val emojiSp = SentencePictureCardSizing.emojiSp(atomIds.size, contentWidthDp, fontScale)
+        // baseScale statt graphicsLayer-Skalierung: eine hochgezogene Bitmap wäre
+        // bei einem Glyphen, der die halbe Bühne füllt und dort mehrere hundert
+        // Millisekunden steht, sichtbar weich. Über das Row-Gewicht wird die Karte
+        // echt breiter gemessen, und dieselbe Funktion rechnet die Emoji-Größe für
+        // die neue Breite — der Glyph wird in Endgröße gerastert.
+        //
+        // Die Verbreiterung allein reicht dafür nicht: auf der breiten Karte
+        // bindet weiter die Basisgröße, nicht der Deckel. Erst baseScale hebt sie.
+        val emojiSp = SentencePictureCardSizing.emojiSp(
+            atomCount = atomIds.size,
+            contentWidthDp = contentWidthDp,
+            fontScale = fontScale,
+            baseScale = 1f + CelebrateBaseScaleGain * celebrateProgress,
+        )
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
