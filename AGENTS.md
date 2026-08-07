@@ -61,7 +61,7 @@ Plan nur anfassen, wenn der Contract selbst falsch oder unvollständig ist.
 
 Kernpunkte (Kurzfassung):
 
-- **Sechs autorierte Trainer-Typen** pro Lektion in fester Rangfolge (Auditiver Finder → Rechnen). Reihenfolge fällt nicht zurück; `ContentValidator` erzwingt Struktur. Zur Laufzeit können sich abgeleitete Zusatz-Trainer (Jagd, Wort-Detektiv, siehe unten) dazwischenschieben — sie sind keine siebten/achten autorierten Typen.
+- **Sieben autorierte Trainer-Typen** pro Lektion in fester Rangfolge (Auditiver Finder → … → Satz-Versteher → Rechnen). Reihenfolge fällt nicht zurück; `ContentValidator` erzwingt Struktur. Zur Laufzeit können sich abgeleitete Zusatz-Trainer (Jagd, Wort-Detektiv, siehe unten) dazwischenschieben — sie sind keine achten/neunten autorierten Typen.
 - **Buchstaben-/Silben-Jagd**: Optional bis zu 2× pro Lektion, keine separaten Autorierungen — wird zur Laufzeit aus letter_trace/syllable_merge abgeleitet (`SymbolHuntInsertion`). Batterie voll → kurze Feier, dann automatisch weiter — kein „Weiter"-Button, das Kind kann ihn nicht lesen.
 - **Wort-Detektiv**: „Finde den Buchstaben / den Laut / die Silbe im Wort", ebenfalls abgeleitet (`SymbolInWordInsertion`), eine Runde pro eingeführtem `word_build`-Wort, direkt nach dem letzten Wort-Bauer. Mehrzeichen-Grapheme (`Sch`, `ei`, …) heißen „Laut", nicht „Buchstabe". Grapheme kommen aus `WordGraphemes` — pack-abgeleitet und auf bereits eingeführte Lektionen beschränkt, sonst würde „Nest" in L07 zu `N·e·st` verschmelzen und das gesuchte `S` unantippbar machen.
 - **Distraktoren**: Im autorieren Content (Tray ≤ 5–6), oder verstreut im Hunt-Feld (bis 6, mit Wiederholungen).

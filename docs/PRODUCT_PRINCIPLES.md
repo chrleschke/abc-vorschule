@@ -29,7 +29,7 @@ Bei Konflikten mit Implementierungsdetails oder älteren Planabschnitten gelten 
 
 ## 3. Lernprogression (Fibel-Lernpfad)
 
-Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede Lektion führt die sechs Trainer-**Typen** unten in fester Rangfolge durch — ein Typ kann sich wiederholen oder ganz fehlen (z. B. keine Satzrunde in einer Lektion), die Reihenfolge geht aber nie zurück; jede Lektion beginnt mit dem Auditiven Finder und endet mit Rechnen:
+Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede Lektion führt die sieben Trainer-**Typen** unten in fester Rangfolge durch — ein Typ kann sich wiederholen oder ganz fehlen (z. B. keine Satzrunde in einer Lektion), die Reihenfolge geht aber nie zurück; jede Lektion beginnt mit dem Auditiven Finder und endet mit Rechnen:
 
 1. **Auditiver Finder** — Laut im gesprochenen Wort verorten (Lok mit Anfang/Mitte/Ende-Waggon). Der gesuchte Laut steht groß über dem Zug; darunter zeigt das Bildwort seine Graphemgruppen in den drei Waggonfarben.
 2. **Visueller Spurensucher** — Graphem nachzeichnen („Zeichne das große T nach …"), gelbe Sterne in
@@ -58,7 +58,18 @@ Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede 
   verschmelzen, es gibt keinen separaten Bestätigungs-Button.
 4. **Wort-Bauer** — Silben-/Buchstabenklötze in Schablonen unter dem Bild.
 5. **Satz-Architekt** — Wortschilder an die Wäscheleine; Einwort-Runden sind Wort-Bild-Zuordnung.
-6. **Rechnen** — reine Mengen-Arithmetik in *jeder* Lektion, Icons aus dem Wortschatz
+6. **Satz-Versteher** — „Ordne das richtige Bild zu": ein Satz mit bewusst
+  schwieriger Grammatik (Plural, Partizip II, Präteritum — auch kombiniert) wird
+  vorgelesen, das Kind tippt eine von zwei Bildkarten (Emoji-Reihen, 1–3 Bilder;
+  Wiederholung desselben Bildes drückt Menge aus). Die Instruktion kommt **einmal**
+  vor Runde 1, danach trägt jeder Satz die Aufgabe allein. Tippen ist die Antwort;
+  ein Miss liest den Satz erneut vor, nach 2 Misses gibt es „Zeig mir". Die Sätze
+  leben im Task selbst (nicht in `sentences.json`) und dürfen wie die Finale-Sätze
+  flektierte Formen und freie Verben nutzen — nur die Karten-Nomen sind Atome mit
+  Emoji. Redaktionsregeln: 4–8 Wörter, mindestens eine schwierige Form, Wörter der
+  Lektion, Cartoon-Logik (realistischer als die Finale-Sätze), die falsche Karte
+  unterscheidet sich genau in der geprüften Dimension (Menge, Akteur oder Objekt).
+7. **Rechnen** — reine Mengen-Arithmetik in *jeder* Lektion, Icons aus dem Wortschatz
   derselben Lektion. **Keine Wörter zum Lesen oder Schreiben**; Singular/Plural nur gesprochen.
 
 Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Treffer füllen eine Batterie, Fehltipp mischt neu ohne Batterieverlust.
@@ -77,7 +88,7 @@ Silben stehen nur klein. Details und Beispiele:
 Reihenfolge-Regeln, die Content und Validator erzwingen:
 
 - Der Wort-Bauer zeigt nie ein Graphem oder eine Silbe, die noch nicht eingeführt wurde.
-- Satzrunden nutzen nur gebaute Wörter, kleingeschriebene Funktionswörter oder ausdrücklich als `holisticAtomIds` markierte Ganzwort-Bilder (so führt die Fibel z. B. „Tor" vor dem R ein).
+- Satzrunden (Satz-Architekt) nutzen nur gebaute Wörter, kleingeschriebene Funktionswörter oder ausdrücklich als `holisticAtomIds` markierte Ganzwort-Bilder (so führt die Fibel z. B. „Tor" vor dem R ein). Der **Satz-Versteher ist davon ausgenommen** — wie die Finale-Sätze lebt er von grammatischer Freiheit (Hör-Trainer, keine Bauen-Anforderung).
 - Gemeisterte Lektionen bleiben zum Wiederholen antippbar.
 
 
@@ -362,7 +373,8 @@ Wenn eine Änderung vorgeschlagen wird, prüfen:
 | Buttons mit Emoji?                                                  | Nein → Vektor/ASCII                  |
 | Zeigt der Wort-Bauer ein noch nicht eingeführtes Graphem?           | Nein → Fibel-Reihenfolge             |
 | Enthält der Rechen-Trainer Lesewörter?                              | Nein → nur Icons und Ziffern         |
-| Hält jede autorierte Lektion die sechs Trainer-Typen in nicht-fallender Rangfolge (Start Auditiver Finder, Ende Rechnen)? | Ja → Validator prüft das             |
+| Hält jede autorierte Lektion die sieben Trainer-Typen in nicht-fallender Rangfolge (Start Auditiver Finder, Ende Rechnen)? | Ja → Validator prüft das             |
+| Zeigt der Satz-Versteher zwei ununterscheidbare Karten oder liest sich seine Instruktion in jedem Satz wieder? | Nein → Validator prüft beides |
 | Ist ein neuer Finale-Satz länger als 7 Wörter oder eine Mini-Geschichte?     | Nein → Abschnitt 12, Validator prüft |
 | Wäre das Bild des Finale-Satzes in einem Kinderbuch denkbar?                 | Ja — sonst AI-Slop                   |
 | Zeigt der End-Screen eine Punktezahl?                                        | Nein → Punkte leben im Chrome/Pfad   |
