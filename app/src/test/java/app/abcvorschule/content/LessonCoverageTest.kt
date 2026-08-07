@@ -113,4 +113,18 @@ class LessonCoverageTest {
             )
         }
     }
+
+    @Test
+    fun satzVersteherRunsOnceInEveryBaseLessonWithFourRounds() {
+        pack.authoredLessons.filter { it.index <= 18 }.forEach { lesson ->
+            val specs = pack.tasksOf(lesson).filterIsInstance<SentencePictureSpec>()
+            assertEquals("lesson ${lesson.id}", 1, specs.size)
+            assertEquals("lesson ${lesson.id}", 4, specs.single().rounds.size)
+            assertEquals(
+                "lesson ${lesson.id}",
+                "Ordne das richtige Bild zu.",
+                specs.single().instructionTts,
+            )
+        }
+    }
 }
