@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -136,11 +137,20 @@ fun SentencePictureTrainer(
                 // Verliererkarte mit; die 8dp Lücke bleibt, die Gewinnerkarte landet
                 // also 4dp neben der optischen Mitte — unter der Wahrnehmungsschwelle
                 // und billiger als eine zusätzlich animierte Arrangement-Lücke.
-                val celebrateProgress by animateFloatAsState(
-                    targetValue = if (solvedCorrect) 1f else 0f,
-                    animationSpec = tween(durationMillis = 360, easing = FastOutSlowInEasing),
-                    label = "sentence_picture_celebrate",
-                )
+                //
+                // key(roundKey) statt nur remember: dieselbe Runden-Reset-Disziplin wie
+                // beim remember(roundKey) der Zustände oben. Ohne den Key überlebt das
+                // Animatable den Rundenwechsel, der Zielwert springt beim neuen
+                // roundIndex von 1f auf 0f zurück und animiert sichtbar ab — die neue
+                // Runde würde mit vergrößerter Antwortkarte eröffnen, bevor der Satz
+                // überhaupt vorgelesen wurde.
+                val celebrateProgress by key(roundKey) {
+                    animateFloatAsState(
+                        targetValue = if (solvedCorrect) 1f else 0f,
+                        animationSpec = tween(durationMillis = 360, easing = FastOutSlowInEasing),
+                        label = "sentence_picture_celebrate",
+                    )
+                }
                 val correctWeight = 1f + 2f * celebrateProgress
                 val wrongWeight = (1f - celebrateProgress).coerceAtLeast(0.001f)
                 PictureCard(
