@@ -235,6 +235,14 @@ niemals mit einem stummen No-Op.
   nennt das Wort am Stück („Ameise.", nicht „A - M - eise."). Eine buchstabierte/segmentierte
   Wiederholung wird von der System-TTS Buchstabe für Buchstabe vorgelesen und ist für Vorschulkinder
   unverständlich.
+- **Der Feldname wählt das Synthese-Profil.** `tools/tts` leitet aus dem JSON-Feldnamen
+  ab, wie ein Text gesprochen wird (`ttskit/extract.py`, `profiles.json`). `promptTts`
+  ist die „Aufgaben-Frage" *mit fragender Betonung am Satzende* — richtig für „Baue das
+  Wort …", falsch für jeden Aussagesatz. Deshalb heißt der Rundentext des Satz-Verstehers
+  im JSON `sentenceTts` (Profil „Einfacher Satz", natürliche Satzmelodie), während seine
+  Aufgabenansage `instructionTts` bleibt und als `prompt` läuft. Wer künftig einen
+  Trainer autoriert, dessen Rundentext eine Aussage ist, benennt das Feld genauso —
+  ein `@SerialName` hält die Kotlin-Seite bei `promptTts`, damit `TrainerRound` einheitlich bleibt.
 - **`Sch`, `sp`, `st` sind bekannte, aber akzeptierte TTS-Lücken.** Die System-TTS spricht diese
   Zischlaut-Cluster nicht korrekt (kein sauberes „Sch"-/„Schp"-/„Scht"-Phonem, eher buchstabiert oder
   verschluckt) und lässt sich dafür auch nicht zuverlässig durch Schreibweisen-Tricks korrigieren.

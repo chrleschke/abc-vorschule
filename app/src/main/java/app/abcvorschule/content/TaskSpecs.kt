@@ -180,7 +180,16 @@ data class SentencePictureSpec(
 
 @Serializable
 data class SentencePictureRound(
-    /** Der Satz selbst — Ansage, Erfolgs-Echo und Miss-Wiederholung zugleich. */
+    /**
+     * Der Satz selbst — Ansage, Erfolgs-Echo und Miss-Wiederholung zugleich.
+     *
+     * Heißt im JSON `sentenceTts`, nicht `promptTts`: die Sprach-Pipeline leitet ihr
+     * Synthese-Profil aus dem Feldnamen ab, und `prompt` ist dort die „Aufgaben-Frage"
+     * mit fragender Betonung am Satzende. Das ist genau falsch für einen Aussagesatz,
+     * den das Kind verstehen soll — die Aufgabenansage steht separat in
+     * [SentencePictureSpec.instructionTts] und bleibt ein `prompt`.
+     */
+    @SerialName("sentenceTts")
     override val promptTts: String,
     /** Passende Karte: 1..3 Atom-IDs als Emoji-Reihe; Wiederholung = Menge (🍎🍎). */
     val correctAtomIds: List<String>,

@@ -45,7 +45,10 @@ data class SentencePictureSpec(
 
 @Serializable
 data class SentencePictureRound(
-    /** Der Satz selbst — Ansage, Erfolgs-Echo und Miss-Wiederholung zugleich. */
+    /** Der Satz selbst — Ansage, Erfolgs-Echo und Miss-Wiederholung zugleich.
+     *  Heißt im JSON `sentenceTts`: die Sprach-Pipeline leitet ihr Profil aus dem
+     *  Feldnamen ab, und `prompt` betont fragend am Satzende (siehe §9). */
+    @SerialName("sentenceTts")
     override val promptTts: String,
     /** Karte, die zum Satz passt: 1..3 Atom-IDs, als Emoji-Reihe gerendert.
      *  Wiederholung derselben ID ist erlaubt und drückt Menge aus (Plural: 🍎🍎). */
@@ -64,12 +67,12 @@ Beispiel-Content:
   "instructionTts": "Ordne das richtige Bild zu.",
   "rounds": [
     {
-      "promptTts": "Tom hat Opa gerufen.",
+      "sentenceTts": "Tom hat Opa gerufen.",
       "correctAtomIds": ["tom", "opa"],
       "wrongAtomIds": ["tom", "oma"]
     },
     {
-      "promptTts": "Auf dem Teller lagen zwei Tomaten.",
+      "sentenceTts": "Auf dem Teller lagen zwei Tomaten.",
       "correctAtomIds": ["tomate", "tomate"],
       "wrongAtomIds": ["tomate"]
     }
@@ -174,10 +177,14 @@ kompakt; eine spätere Erweiterung kann Tasks teilen.
 ## 9. Sprach-Pipeline (`tools/tts`)
 
 - `extract.py`: Task-Feld `instructionTts` extrahieren (Profil `prompt`,
-  analog `phonemeTts`); Runden-`promptTts` läuft über die bestehenden
-  `ROUND_FIELDS`.
-- `audit_missing_audio.py`: liest `tasks.json` generisch über `promptTts` —
-  prüfen, dass `instructionTts` dort ebenfalls auftaucht.
+  analog `phonemeTts`); der Rundentext heißt im JSON `sentenceTts` und steht in
+  `ROUND_FIELDS`, damit er das Profil `sentence` bekommt.
+- **Zwei Profile, zwei Rollen:** die Instruktion ist eine Aufgabenansage und bleibt
+  `prompt` („Aufgaben-Frage", fragende Betonung am Satzende). Der Rundensatz ist eine
+  Aussage, die das Kind verstehen soll, und braucht `sentence` („Einfacher Satz",
+  natürliche Satzmelodie). Ein Aussagesatz im `prompt`-Profil klingt wie eine Frage.
+- `audit_missing_audio.py`: konsumiert `extract_items` generisch, braucht keine
+  eigene Feldliste.
 - Ohne erzeugte Clips spricht die App wie überall Android-TTS.
 
 ## 10. Tests

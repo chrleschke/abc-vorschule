@@ -27,7 +27,10 @@ FIELD_TO_PROFILE: dict[str, str] = {
 }
 
 # Order matters: it decides the order of items within a round.
-ROUND_FIELDS = ("promptTts", "missTts", "rewardTts", "stretchTts")
+# sentenceTts is the Satz-Versteher's round text: an assertion the child has to
+# understand, so it takes the `sentence` profile rather than the fragende
+# Betonung of `prompt`. Its task-level instructionTts stays a prompt.
+ROUND_FIELDS = ("promptTts", "sentenceTts", "missTts", "rewardTts", "stretchTts")
 
 _PHONEME_LEMMA_KINDS = frozenset({"letter", "syllable"})
 

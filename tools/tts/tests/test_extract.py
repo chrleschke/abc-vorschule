@@ -174,7 +174,7 @@ def test_instruction_tts_is_extracted_with_prompt_profile(tmp_path):
     (d / "tasks.json").write_text(json.dumps({"tasks": [
         {"trainer": "sentence_picture", "id": "l01-sp1",
          "instructionTts": "Ordne das richtige Bild zu.",
-         "rounds": [{"promptTts": "Oma hat Mama gerufen.",
+         "rounds": [{"sentenceTts": "Oma hat Mama gerufen.",
                      "correctAtomIds": ["oma"], "wrongAtomIds": ["mama"]}]},
     ]}), encoding="utf-8")
     for name, key in (("sentences.json", "sentences"), ("finales.json", "finales"),
@@ -186,7 +186,13 @@ def test_instruction_tts_is_extracted_with_prompt_profile(tmp_path):
     instruction = by_id["task:l01-sp1:instructionTts"]
     assert instruction.text == "Ordne das richtige Bild zu."
     assert profile_for_item(instruction) == "prompt"
-    assert "task:l01-sp1:round:0:promptTts" in by_id
+
+    # Der Satz selbst ist eine Aussage, keine Aufgaben-Frage: das prompt-Profil
+    # weist ausdrücklich eine fragende Betonung am Satzende an.
+    sentence = by_id["task:l01-sp1:round:0:sentenceTts"]
+    assert sentence.text == "Oma hat Mama gerufen."
+    assert profile_for_item(sentence) == "sentence"
+    assert "task:l01-sp1:round:0:promptTts" not in by_id
 
 
 def test_extra_strings_include_praise_phrases(content_dir):

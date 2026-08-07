@@ -2,6 +2,7 @@ package app.abcvorschule.debug
 
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.LetterTraceRound
+import app.abcvorschule.content.SentencePictureRound
 import app.abcvorschule.content.SentencePictureSpec
 import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SoundPositionSpec
@@ -67,10 +68,15 @@ fun ContentPack.ttsDebugEntries(): List<TtsDebugEntry> {
         }
         task.rounds.forEachIndexed { index, round ->
             val roundNumber = index + 1
+            // Der Satz-Versteher nennt sein Rundenfeld `sentenceTts` (anderes
+            // Synthese-Profil, siehe SentencePictureRound). Die Debug-IDs folgen der
+            // Pipeline-Konvention `task:{id}:round:{n}:{feld}`, also muss der Name hier
+            // mitziehen — sonst zeigt der Screen eine ID, die es im Clip-Plan nicht gibt.
+            val roundField = if (round is SentencePictureRound) "sentenceTts" else "promptTts"
             entries += TtsDebugEntry(
-                id = "task:${task.id}:round:$index:promptTts",
+                id = "task:${task.id}:round:$index:$roundField",
                 group = TtsDebugGroup.Task,
-                label = "${task.id} · round $roundNumber · promptTts",
+                label = "${task.id} · round $roundNumber · $roundField",
                 originalText = round.promptTts,
                 sourceFile = "tasks.json",
             )

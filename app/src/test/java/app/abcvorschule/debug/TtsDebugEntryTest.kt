@@ -31,10 +31,23 @@ class TtsDebugEntryTest {
     }
 
     @Test
-    fun everyRoundHasAPromptTtsEntry() {
-        val expectedPromptCount = pack.tasks.values.sumOf { it.rounds.size }
-        val promptEntries = entries.count { it.id.endsWith(":promptTts") }
-        assertEquals(expectedPromptCount, promptEntries)
+    fun everyRoundHasARoundTextEntry() {
+        // Der Satz-Versteher nennt sein Rundenfeld `sentenceTts` statt `promptTts`
+        // (eigenes Synthese-Profil), also zählt hier die Summe beider Namen — jede
+        // Runde bleibt mit genau einem Eintrag vertreten.
+        val expected = pack.tasks.values.sumOf { it.rounds.size }
+        val actual = entries.count {
+            it.id.endsWith(":promptTts") || it.id.endsWith(":sentenceTts")
+        }
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun sentencePictureRoundsAreExposedAsSentenceNotPrompt() {
+        val spec = pack.tasks.values.filterIsInstance<SentencePictureSpec>().first()
+        val entry = entries.first { it.id == "task:${spec.id}:round:0:sentenceTts" }
+        assertEquals(spec.rounds.first().promptTts, entry.originalText)
+        assertTrue(entries.none { it.id == "task:${spec.id}:round:0:promptTts" })
     }
 
     @Test
