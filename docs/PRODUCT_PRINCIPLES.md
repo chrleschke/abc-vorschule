@@ -200,9 +200,13 @@ niemals mit einem stummen No-Op.
 - System-TTS für Prompts; Speaker (Vektor-Icon) **im Aufgabenbereich**, mittig über dem Aufgabentitel.
 - Tippen auf Aufgaben-Items (Buchstaben, Silben, Wörter, Antwortkacheln) liest sie vor.
 - Bei Erfolg: Antwort vorsprechen → Stern im oberen Drittel → erst danach nächste Aufgabe (Audio abwarten).
-- Lob (**nur Rechnen, nur gesprochen**): ein zufälliges Wort aus `PraisePhrases` steht vor der Antwort
-  („Ausgezeichnet! zwei Ameisen"), damit die Menge das Letzte bleibt, was das Kind hört. Nie als Text
-  anzeigen — das Kind kann nicht lesen. Auflösen („Zeig mir") bekommt kein Lob.
+- Lob (**nur Rechnen, nur gesprochen**): ein zufälliges Wort oder ein kurzer Ausruf aus
+  `PraisePhrases` steht vor der Antwort („Ausgezeichnet! zwei Ameisen"), damit die Menge das Letzte
+  bleibt, was das Kind hört. Nie als Text anzeigen — das Kind kann nicht lesen. Auflösen
+  („Zeig mir") bekommt kein Lob. Jeder Eintrag ist eine eigene Äußerung und bringt seine
+  Satzzeichen selbst mit („Bäääm! Volltreffer!"); zwei Einträge dürfen sich nicht nur durch
+  Satzzeichen oder Groß-/Kleinschreibung unterscheiden, sonst kuratiert und rendert die
+  TTS-Pipeline denselben Clip zweimal.
 - Wenn kein deutsches TTS: visuelle Fallbacks, Aufgabe bleibt spielbar.
 - Wort-Bauer (Trainer 4): Prompt „Baue das Wort ….“ (ohne Tray-Instruktion); Silben-/Buchstabenklötze in Schablonen tragen die Aufgabe, keine zusätzliche Lese-Titelzeile.
 - Satz-Architekt (Trainer 5): Mehrwort-Prompt = Satztext ohne „Ordne die Wörter…“; Einwort-Bild-Zuordnung behält „Ordne das Wort … dem Bild zu.“

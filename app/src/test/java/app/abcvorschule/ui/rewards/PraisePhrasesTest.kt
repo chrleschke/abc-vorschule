@@ -7,17 +7,35 @@ import kotlin.random.Random
 
 class PraisePhrasesTest {
     @Test
-    fun offersTwentyDistinctPhrases() {
-        assertEquals(20, PraisePhrases.All.size)
+    fun offersThirtyNineDistinctPhrases() {
+        // Mirrored by tools/tts/tests/test_extract.py, which counts the same phrases
+        // as rewardTts entries in extra-strings.json.
+        assertEquals(39, PraisePhrases.All.size)
         assertEquals(PraisePhrases.All.size, PraisePhrases.All.distinct().size)
     }
 
     @Test
-    fun phrasesCarryNoTrailingPunctuation() {
-        // Praise is spoken as its own clip after the answer — no trailing punctuation.
+    fun phrasesStayDistinctIgnoringPunctuationAndCase() {
+        // The dedup rule: "Spitze" and "Das war spitze!" are two different cheers, but the
+        // same words with different punctuation would be one clip curated and rendered twice.
+        val normalized = PraisePhrases.All.map { phrase ->
+            phrase.lowercase()
+                .map { if (it.isLetterOrDigit()) it else ' ' }
+                .joinToString("")
+                .split(" ")
+                .filter { it.isNotEmpty() }
+                .joinToString(" ")
+        }
+        assertEquals(normalized.toString(), normalized.size, normalized.distinct().size)
+    }
+
+    @Test
+    fun phrasesEndAsAStatementOrACheer() {
+        // Each phrase is spoken as its own utterance, so it ends either bare ("Klasse")
+        // or on its own sentence punctuation — never on "?", praise does not ask.
         PraisePhrases.All.forEach { phrase ->
             assertTrue(phrase, phrase.isNotBlank())
-            assertTrue(phrase, phrase.last().isLetter())
+            assertTrue(phrase, phrase.last().isLetterOrDigit() || phrase.last() in ".!")
         }
     }
 

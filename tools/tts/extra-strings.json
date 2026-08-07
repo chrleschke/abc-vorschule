@@ -171,6 +171,120 @@
       "text": "Das hast du toll gemacht",
       "field": "rewardTts",
       "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseEinfachCool",
+      "text": "Einfach cool!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseDaumenHoch",
+      "text": "Daumen hoch!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseDasWarSpitze",
+      "text": "Das war spitze!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseDuHastEsDrauf",
+      "text": "Du hast es drauf!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseLaeuftBeiDir",
+      "text": "Läuft bei dir!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseBaeaemVolltreffer",
+      "text": "Bäääm! Volltreffer!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseHighFive",
+      "text": "High-Five mit Schallgeschwindigkeit!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseGummibaerenSiegertanz",
+      "text": "Gummibären-Siegertanz, jetzt!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseRatzfatzWeggezaubert",
+      "text": "Ratzfatz weggezaubert!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseKopfGymnastik",
+      "text": "Kopf-Gymnastik: Note 1!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseUndTadaa",
+      "text": "Und... Tadaaa!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseGehirnExplosion",
+      "text": "Zack, Gehirn-Explosion!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseSchlauSchlumpf",
+      "text": "Schlau-Schlumpf-Modus aktiviert!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseKeksVerdient",
+      "text": "Keks verdient!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseHierHastDuEinenKeks",
+      "text": "Hier hast du einen Keks!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseDuKleinerEinstein",
+      "text": "Du kleiner Einstein!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseEinfachWeggemuckelt",
+      "text": "Einfach weggemuckelt!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseEinhornPower",
+      "text": "Einhorn-Power pur!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
+    },
+    {
+      "id": "praiseVollAbgeraeumt",
+      "text": "Voll abgeräumt!",
+      "field": "rewardTts",
+      "note": "PraisePhrases"
     }
   ],
   "templates": []

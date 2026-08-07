@@ -203,7 +203,8 @@ def test_extra_strings_include_praise_phrases(content_dir):
     by_id = {i.id: i for i in extract_items(content_dir, extra_strings=extra)}
     praise = [i for i in by_id.values()
               if i.source == "extra-strings.json" and i.field == "rewardTts"]
-    assert len(praise) == 20
+    # Mirrors PraisePhrasesTest.offersThirtyNineDistinctPhrases on the app side.
+    assert len(praise) == 39
     assert by_id["ui:praiseSuper"].text == "Super"
     assert profile_for_item(by_id["ui:praiseSuper"]) == "reward"
 
