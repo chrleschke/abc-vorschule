@@ -155,8 +155,10 @@ fun TrainerHost(
             scaffoldFor = scaffoldFor,
             ttsAvailable = ttsAvailable,
             speaking = speaking,
+            interactionLocked = interactionLocked,
             onSpeakPrompt = callbacks.onSpeakPrompt,
             onSpeak = callbacks.onSpeak,
+            onSpeakFeedback = callbacks.onSpeakFeedback,
             onResult = callbacks.onResult,
             modifier = modifier.fillMaxSize(),
         )

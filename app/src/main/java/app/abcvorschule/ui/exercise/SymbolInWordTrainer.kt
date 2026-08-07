@@ -5,6 +5,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -130,8 +131,12 @@ fun SymbolInWordTrainer(
     scaffoldFor: (String) -> ScaffoldLevel,
     ttsAvailable: Boolean,
     speaking: Boolean,
+    interactionLocked: Boolean = false,
     onSpeakPrompt: () -> Unit,
     onSpeak: (String) -> Unit,
+    /** Wie [onSpeak], aber auf dem Feedback-Kanal — läuft parallel zur noch
+     * laufenden Ansage (Konnektor + Wort), statt sie abzuwürgen (design doc). */
+    onSpeakFeedback: (String) -> Unit,
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -140,6 +145,11 @@ fun SymbolInWordTrainer(
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var complete by remember(roundKey) { mutableStateOf(false) }
     val haptics = LocalAbcHaptics.current
+    val interactionOpacity by animateFloatAsState(
+        targetValue = if (interactionLocked) 0.5f else 1f,
+        animationSpec = tween(durationMillis = 200),
+        label = "detective_lock_opacity",
+    )
 
     val target = pack.atoms[round.targetAtomId]
     val label = target?.let { SymbolInWordDerivation.targetLabel(it, round.mode) }
@@ -191,7 +201,7 @@ fun SymbolInWordTrainer(
         // A tap on an already collected segment does nothing at all — not even
         // speech, so "already done" reads as inert rather than half-alive.
         if (result.outcome == SymbolInWordTapOutcome.Ignored) return
-        onSpeak(SpeechClipText.forSegment(pack, round, index))
+        onSpeakFeedback(SpeechClipText.forSegment(pack, round, index))
         state = result.state
         when (result.outcome) {
             SymbolInWordTapOutcome.Miss -> {
@@ -261,10 +271,11 @@ fun SymbolInWordTrainer(
                 WordSegments(
                     round = round,
                     state = state,
-                    enabled = !complete && !resolved,
+                    enabled = !complete && !resolved && !interactionLocked,
                     onTap = ::handleTap,
                     onSegmentPlaced = { index, center -> segmentCenters[index] = center },
                     onGlyphSpMeasured = { segmentGlyphSp = it },
+                    modifier = Modifier.alpha(interactionOpacity),
                 )
             },
             answers = {
@@ -412,8 +423,9 @@ private fun WordSegments(
     onTap: (Int) -> Unit,
     onSegmentPlaced: (Int, Offset) -> Unit,
     onGlyphSpMeasured: (Float) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         // Measured rather than assumed: on a phone narrower than ExerciseStage's
         // 420dp cap the usable width is smaller, and overestimating it would push
         // the frames past the edge instead of wrapping them.
