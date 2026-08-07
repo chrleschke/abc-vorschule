@@ -9,6 +9,7 @@ import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.LessonEmojis
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.Lesson
+import app.abcvorschule.content.PromptUnlock
 import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SyllableMergeRound
@@ -318,6 +319,12 @@ class SessionViewModel(
             )
             else -> listOfNotNull(round.promptTts.takeIf { it.isNotBlank() })
         }
+    }
+
+    /** Freigabe-Index für die aktuelle Runde — siehe [PromptUnlock]. */
+    fun currentPromptUnlockIndex(): Int {
+        val round = _ui.value.currentRound ?: return 0
+        return PromptUnlock.unlockIndex(round, currentPromptParts())
     }
 
     /**
