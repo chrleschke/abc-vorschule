@@ -255,6 +255,10 @@ private fun Wagon(
             SoundSlot.end -> R.string.wagon_end
         },
     )
+    // The border itself no longer dims for the idle state — at reduced alpha none of
+    // the three wagon colours clears 3:1 against CreamElevated (~1.67–2.18:1 measured
+    // at the old 0.55/0.7 alphas). The idle/armed distinction now lives in the fill
+    // below instead.
     val border = if (filledEmoji != null || revealed) LeafGreen else borderAccent
     DropZone(
         state = registerWith,
@@ -263,6 +267,10 @@ private fun Wagon(
         enabled = enabled,
         modifier = Modifier
             .size(WagonSize)
+            // During interactionLocked (opacity 0.5f) this still dips the border under 3:1
+            // against CreamElevated again — an accepted, temporary trade-off: dimming ALL
+            // interactive elements to 50% while locked is the feature's whole visual signal
+            // (design doc), not specific to this wagon.
             .alpha(opacity)
             .background(
                 // Alpha raised from the old dark-theme 0.18f: a light wash needs more
