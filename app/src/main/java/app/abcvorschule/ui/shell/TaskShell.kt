@@ -20,7 +20,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -57,8 +61,10 @@ fun TaskShell(
     ttsAvailable: Boolean,
     speaking: Boolean,
     onSpeak: (String) -> Unit,
+    onSpeakFeedback: (String) -> Unit,
     onSpeakAndAwait: suspend (String) -> Unit,
     onSpeakPromptSequence: suspend (List<String>) -> Unit,
+    onSpeakIntroSequence: suspend (List<String>, onPartComplete: (Int) -> Unit) -> Unit,
     onStopSpeak: () -> Unit,
     onOpenTtsDebug: () -> Unit,
     modifier: Modifier = Modifier,
@@ -133,8 +139,10 @@ fun TaskShell(
                 ttsAvailable = ttsAvailable,
                 speaking = speaking,
                 onSpeak = onSpeak,
+                onSpeakFeedback = onSpeakFeedback,
                 onSpeakAndAwait = onSpeakAndAwait,
                 onSpeakPromptSequence = onSpeakPromptSequence,
+                onSpeakIntroSequence = onSpeakIntroSequence,
                 onStopSpeak = onStopSpeak,
             )
         }
@@ -164,8 +172,10 @@ private fun PracticeBody(
     ttsAvailable: Boolean,
     speaking: Boolean,
     onSpeak: (String) -> Unit,
+    onSpeakFeedback: (String) -> Unit,
     onSpeakAndAwait: suspend (String) -> Unit,
     onSpeakPromptSequence: suspend (List<String>) -> Unit,
+    onSpeakIntroSequence: suspend (List<String>, onPartComplete: (Int) -> Unit) -> Unit,
     onStopSpeak: () -> Unit,
 ) {
     val task = state.current
@@ -179,11 +189,32 @@ private fun PracticeBody(
         Unit
     }
 
+    // Zurückgesetzt auf true, sobald Runde/Task wechseln — sofort in derselben
+    // Composition, damit kein Frame lang die neue Runde fälschlich entsperrt
+    // aussieht, bevor der Effekt unten läuft (siehe design doc).
+    var interactionLocked by remember(task?.spec?.id, state.roundIndex) { mutableStateOf(true) }
+
     LaunchedEffect(task?.spec?.id, state.roundIndex, ttsAvailable) {
         if (state.successPhase != SuccessPhase.Idle) return@LaunchedEffect
         onStopSpeak()
+        // Auch nötig, nicht nur der `remember` oben: deckt den Fall ab, dass
+        // `ttsAvailable` MITTEN in der Runde von false auf true kippt (TTS-Engine
+        // wird erst nach dem Rundenstart bereit) — dann muss re-gesperrt werden,
+        // obwohl Task/Runde sich nicht geändert haben.
+        interactionLocked = true
         if (ttsAvailable && task != null) {
-            onSpeakPromptSequence(viewModel.currentPromptParts())
+            val parts = viewModel.currentPromptParts()
+            if (parts.isEmpty()) {
+                interactionLocked = false
+            } else {
+                val unlockIndex = viewModel.currentPromptUnlockIndex()
+                onSpeakIntroSequence(parts) { index ->
+                    if (index == unlockIndex) interactionLocked = false
+                }
+                interactionLocked = false
+            }
+        } else {
+            interactionLocked = false
         }
     }
     LaunchedEffect(state.speakCue) {
@@ -295,10 +326,12 @@ private fun PracticeBody(
                     scaffoldFor = viewModel::scaffoldFor,
                     ttsAvailable = ttsAvailable,
                     speaking = speaking,
+                    interactionLocked = interactionLocked,
                     callbacks = TrainerCallbacks(
                         onResult = viewModel::submitRoundResult,
                         onMathResult = viewModel::submitMathResult,
                         onSpeak = onSpeak,
+                        onSpeakFeedback = onSpeakFeedback,
                         onSpeakAndAwait = onSpeakAndAwait,
                         onSpeakPrompt = speakPrompt,
                     ),

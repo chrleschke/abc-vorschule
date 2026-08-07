@@ -21,6 +21,7 @@ import app.abcvorschule.speech.observeBackgroundSpeechStop
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.speech.ClipIndex
+import app.abcvorschule.speech.SpeechChannel
 import app.abcvorschule.speech.SpeechController
 import app.abcvorschule.ui.debug.TtsDebugScreen
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
@@ -104,8 +105,12 @@ fun AbcApp(onFinish: () -> Unit = {}) {
             ttsAvailable = ttsAvailable,
             speaking = speaking,
             onSpeak = speech::speak,
+            onSpeakFeedback = { text -> speech.speak(text, channel = SpeechChannel.Feedback) },
             onSpeakAndAwait = speech::speakAndAwait,
             onSpeakPromptSequence = speech::speakAndAwaitSequence,
+            onSpeakIntroSequence = { texts, onPartComplete ->
+                speech.speakAndAwaitSequence(texts, onPartComplete = onPartComplete)
+            },
             onStopSpeak = speech::stop,
             onOpenTtsDebug = { showTtsDebug = true },
         )

@@ -24,6 +24,9 @@ data class TrainerCallbacks(
     val onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
     val onMathResult: (distance: Int?, resolved: Boolean, correct: Boolean) -> Unit,
     val onSpeak: (String) -> Unit,
+    /** Wie [onSpeak], aber auf einem eigenen Audio-Kanal — für Tap-Echos, die eine
+     * noch laufende Rundenansage nicht abwürgen dürfen (Wort-Detektiv, design doc). */
+    val onSpeakFeedback: (String) -> Unit,
     val onSpeakAndAwait: suspend (String) -> Unit,
     val onSpeakPrompt: () -> Unit,
 )
@@ -38,6 +41,12 @@ fun TrainerHost(
     scaffoldFor: (String) -> ScaffoldLevel,
     ttsAvailable: Boolean,
     speaking: Boolean,
+    /** True, solange die Rundenansage (noch) nicht bis zu ihrem Freigabe-Index
+     * gelaufen ist — siehe design doc. LetterTraceTrainer liest das nicht, da seine
+     * Interaktion nie eigene Audio auslöst und die Ansage daher nie unterbrechen
+     * kann. Die restlichen 7 Trainer bekommen den Wert erst in ihren eigenen Tasks
+     * angeschlossen. */
+    interactionLocked: Boolean = false,
     callbacks: TrainerCallbacks,
     modifier: Modifier = Modifier,
 ) {
