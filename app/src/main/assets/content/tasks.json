@@ -5165,7 +5165,7 @@
           "wrongAtomIds": ["tom", "sofa"]
         },
         {
-          "promptTts": "Zwei Spinnen krabbelten über die Straße.",
+          "promptTts": "Zwei Spinnen krabbelten langsam über die Straße.",
           "correctAtomIds": ["spinne", "spinne", "strasse"],
           "wrongAtomIds": ["spinne", "strasse"]
         }
