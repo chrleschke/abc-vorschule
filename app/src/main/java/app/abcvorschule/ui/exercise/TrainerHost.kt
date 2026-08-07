@@ -81,6 +81,7 @@ fun TrainerHost(
             resultSpeech = SyllableMergeSpeech.resultSpeech(round, pack.atoms[round.resultAtomId]),
             ttsAvailable = ttsAvailable,
             speaking = speaking,
+            interactionLocked = interactionLocked,
             onSpeakPrompt = callbacks.onSpeakPrompt,
             onSpeak = callbacks.onSpeak,
             onResult = callbacks.onResult,

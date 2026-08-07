@@ -32,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -99,6 +100,7 @@ fun SyllableMergeTrainer(
     resultSpeech: String,
     ttsAvailable: Boolean,
     speaking: Boolean,
+    interactionLocked: Boolean = false,
     onSpeakPrompt: () -> Unit,
     onSpeak: (String) -> Unit,
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
@@ -124,6 +126,11 @@ fun SyllableMergeTrainer(
         listOf(round.leftAtomId, round.rightAtomId, round.resultAtomId).distinct()
     }
     val haptics = LocalAbcHaptics.current
+    val interactionOpacity by animateFloatAsState(
+        targetValue = if (interactionLocked) 0.5f else 1f,
+        animationSpec = tween(durationMillis = 200),
+        label = "syllable_merge_lock_opacity",
+    )
 
     fun commit() {
         if (merged) return
@@ -179,26 +186,27 @@ fun SyllableMergeTrainer(
         }
     }
 
-    fun Modifier.mergeDrag(fromRightTile: Boolean): Modifier = pointerInput(roundKey) {
-        detectDragGestures(
-            onDragStart = {
-                dragging = true
-                scope.launch { idleNudge.snapTo(0f) }
-                speakTile(fromRightTile)
-            },
-            onDrag = { change, amount ->
-                change.consume()
-                val target = MergeProgress.applyDrag(fraction.value, amount.x, tileTravelPx, fromRightTile)
-                scope.launch { fraction.snapTo(target) }
-                if (MergeProgress.isContact(target)) {
-                    dragging = false
-                    commit()
-                }
-            },
-            onDragEnd = { settle() },
-            onDragCancel = { settle() },
-        )
-    }
+    fun Modifier.mergeDrag(fromRightTile: Boolean, enabled: Boolean): Modifier =
+        if (!enabled) this else pointerInput(roundKey) {
+            detectDragGestures(
+                onDragStart = {
+                    dragging = true
+                    scope.launch { idleNudge.snapTo(0f) }
+                    speakTile(fromRightTile)
+                },
+                onDrag = { change, amount ->
+                    change.consume()
+                    val target = MergeProgress.applyDrag(fraction.value, amount.x, tileTravelPx, fromRightTile)
+                    scope.launch { fraction.snapTo(target) }
+                    if (MergeProgress.isContact(target)) {
+                        dragging = false
+                        commit()
+                    }
+                },
+                onDragEnd = { settle() },
+                onDragCancel = { settle() },
+            )
+        }
 
     // Invitation to slide: after a quiet moment the tiles breathe towards each
     // other once, and keep reminding until the child takes over.
@@ -258,9 +266,11 @@ fun SyllableMergeTrainer(
                             glow = glow,
                             frozen = false,
                             onTap = { nudgeTap(fromRightTile = false) },
+                            enabled = !interactionLocked,
+                            opacity = interactionOpacity,
                             modifier = Modifier
                                 .offset { IntOffset(inwardPx.roundToInt(), 0) }
-                                .mergeDrag(fromRightTile = false)
+                                .mergeDrag(fromRightTile = false, enabled = !interactionLocked)
                                 .testTag("merge_left"),
                         )
                         Spacer(Modifier.width(FloeGap))
@@ -269,9 +279,11 @@ fun SyllableMergeTrainer(
                             glow = glow,
                             frozen = false,
                             onTap = { nudgeTap(fromRightTile = true) },
+                            enabled = !interactionLocked,
+                            opacity = interactionOpacity,
                             modifier = Modifier
                                 .offset { IntOffset(-inwardPx.roundToInt(), 0) }
-                                .mergeDrag(fromRightTile = true)
+                                .mergeDrag(fromRightTile = true, enabled = !interactionLocked)
                                 .testTag("merge_right"),
                         )
                     }
@@ -323,12 +335,15 @@ private fun Floe(
     glow: Float,
     frozen: Boolean,
     onTap: () -> Unit,
+    enabled: Boolean = true,
+    opacity: Float = 1f,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .width(SyllableFrameSizing.widthDp(label).dp)
             .height(AbcDimens.letterFrame)
+            .alpha(opacity)
             .background(
                 color = if (frozen) LeafGreen.copy(alpha = 0.25f) else CreamElevated,
                 shape = RoundedCornerShape(26.dp),
@@ -338,7 +353,7 @@ private fun Floe(
                 color = (if (frozen) LeafGreen else SkyBlue).copy(alpha = glow),
                 shape = RoundedCornerShape(26.dp),
             )
-            .clickable(onClick = onTap),
+            .clickable(enabled = enabled, onClick = onTap),
         contentAlignment = Alignment.Center,
     ) {
         Text(
