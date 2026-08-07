@@ -4,6 +4,7 @@ import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.SentenceOrderRound
+import app.abcvorschule.content.SentencePictureRound
 import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.SyllableMergeSpeech
@@ -34,6 +35,7 @@ object SuccessSpeech {
             pack.atoms[round.targetAtomId]?.display ?: round.promptTts.takeIf { it.isNotBlank() },
         )
         is SentenceOrderRound -> listOf(pack.sentence(round.sentenceId).tts)
+        is SentencePictureRound -> listOfNotNull(round.promptTts.takeIf { it.isNotBlank() })
         is LetterTraceRound -> listOfNotNull(round.rewardTts.takeIf { it.isNotBlank() })
         is SoundPositionRound -> listOfNotNull(
             pack.atoms[round.atomId]?.lemma ?: round.promptTts.takeIf { it.isNotBlank() },

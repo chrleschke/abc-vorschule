@@ -31,6 +31,7 @@ enum class TrainerKind {
     syllable_merge,
     word_build,
     sentence_order,
+    sentence_picture,
     count_add,
     symbol_hunt,
     symbol_in_word,
@@ -159,7 +160,35 @@ data class SentenceOrderRound(
     val holisticAtomIds: List<String> = emptyList(),
 ) : TrainerRound
 
-// --- Trainer 6: Rechnen -----------------------------------------------------
+// --- Trainer 6: Satz-Versteher ------------------------------------------------
+
+/**
+ * Hörverstehen auf Satzebene: ein Satz mit bewusst schwieriger Grammatik
+ * (Plural, Partizip II, Präteritum) wird vorgelesen, das Kind tippt eine von
+ * zwei Bildkarten. Die Sätze leben im Round selbst statt in sentences.json —
+ * wie die Finale-Sätze enthalten sie flektierte Formen außerhalb des
+ * Atom-Graphen, die nie gebaut oder gelesen werden.
+ */
+@Serializable
+@SerialName("sentence_picture")
+data class SentencePictureSpec(
+    override val id: String,
+    /** Einmalige Aufgabenansage, gesprochen nur vor Runde 1. */
+    val instructionTts: String,
+    val rounds: List<SentencePictureRound>,
+) : TaskSpec
+
+@Serializable
+data class SentencePictureRound(
+    /** Der Satz selbst — Ansage, Erfolgs-Echo und Miss-Wiederholung zugleich. */
+    override val promptTts: String,
+    /** Passende Karte: 1..3 Atom-IDs als Emoji-Reihe; Wiederholung = Menge (🍎🍎). */
+    val correctAtomIds: List<String>,
+    /** Unpassende Karte — Kontrast in genau der geprüften Dimension. */
+    val wrongAtomIds: List<String>,
+) : TrainerRound
+
+// --- Trainer 7: Rechnen -----------------------------------------------------
 
 @Serializable
 @SerialName("count_add")
@@ -258,6 +287,7 @@ val TaskSpec.kind: TrainerKind
         is SyllableMergeSpec -> TrainerKind.syllable_merge
         is WordBuildSpec -> TrainerKind.word_build
         is SentenceOrderSpec -> TrainerKind.sentence_order
+        is SentencePictureSpec -> TrainerKind.sentence_picture
         is CountAddSpec -> TrainerKind.count_add
         is SymbolHuntSpec -> TrainerKind.symbol_hunt
         is SymbolInWordSpec -> TrainerKind.symbol_in_word
@@ -270,6 +300,7 @@ val TaskSpec.rounds: List<TrainerRound>
         is SyllableMergeSpec -> rounds
         is WordBuildSpec -> rounds
         is SentenceOrderSpec -> rounds
+        is SentencePictureSpec -> rounds
         is CountAddSpec -> rounds
         is SymbolHuntSpec -> rounds
         is SymbolInWordSpec -> rounds
@@ -301,6 +332,7 @@ fun TrainerRound.scoredAtomIds(): List<String> = when (this) {
     // Sentence atom ids are only resolvable via the pack, so SessionViewModel fills
     // them in; count_add scores against a math key, not against atoms.
     is SentenceOrderRound -> emptyList()
+    is SentencePictureRound -> correctAtomIds.distinct()
     is CountAddRound -> emptyList()
     is SymbolHuntRound -> listOf(targetAtomId)
     is SymbolInWordRound -> listOf(targetAtomId)

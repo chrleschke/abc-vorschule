@@ -7,6 +7,7 @@ import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.SentenceOrderRound
+import app.abcvorschule.content.SentencePictureRound
 import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SoundPositionSpec
 import app.abcvorschule.content.SymbolHuntRound
@@ -120,6 +121,17 @@ fun TrainerHost(
                 modifier = modifier.fillMaxSize(),
             )
         }
+        is SentencePictureRound -> SentencePictureTrainer(
+            round = round,
+            roundIndex = roundIndex,
+            pack = pack,
+            ttsAvailable = ttsAvailable,
+            speaking = speaking,
+            interactionLocked = interactionLocked,
+            onSpeakPrompt = callbacks.onSpeakPrompt,
+            onResult = callbacks.onResult,
+            modifier = modifier.fillMaxSize(),
+        )
         is CountAddRound -> MathExercise(
             trainer = trainer,
             round = round,

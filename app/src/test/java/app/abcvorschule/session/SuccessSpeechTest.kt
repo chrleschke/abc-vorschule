@@ -6,6 +6,7 @@ import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.ContentRepository
 import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.CountAddSpec
+import app.abcvorschule.content.SentencePictureRound
 import app.abcvorschule.ui.rewards.PraisePhrases
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -59,4 +60,17 @@ class SuccessSpeechTest {
     private fun packWithAmeise(): ContentPack = pack.copy(
         atoms = pack.atoms + (ameise.id to ameise),
     )
+
+    @Test
+    fun sentencePictureSuccessRepeatsTheSentence() {
+        val round = SentencePictureRound(
+            promptTts = "Tom hat Opa gerufen.",
+            correctAtomIds = listOf("tom", "opa"),
+            wrongAtomIds = listOf("tom", "oma"),
+        )
+        assertEquals(
+            listOf("Tom hat Opa gerufen."),
+            SuccessSpeech.partsForRound(round, pack, praise = false),
+        )
+    }
 }

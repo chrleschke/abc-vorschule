@@ -16,7 +16,7 @@ class ContentValidatorTest {
     }
 
     @Test
-    fun trainerOrderIsTheSixDidacticTrainers() {
+    fun sentencePictureRanksBetweenSentenceOrderAndCountAdd() {
         assertEquals(
             listOf(
                 TrainerKind.sound_position,
@@ -24,6 +24,7 @@ class ContentValidatorTest {
                 TrainerKind.syllable_merge,
                 TrainerKind.word_build,
                 TrainerKind.sentence_order,
+                TrainerKind.sentence_picture,
                 TrainerKind.count_add,
             ),
             ContentValidator.TrainerOrder,
@@ -400,5 +401,117 @@ class ContentValidatorTest {
             )
         }
         assertTrue(issues.toString(), issues.any { it.contains("f-orphan") && it.contains("not referenced") })
+    }
+
+    // --- sentence_picture -----------------------------------------------------
+
+    private fun sentencePictureSpec(
+        rounds: List<SentencePictureRound>,
+        instruction: String = "Ordne das richtige Bild zu.",
+    ) = SentencePictureSpec(id = "l01-spx", instructionTts = instruction, rounds = rounds)
+
+    private fun validSentencePictureRound() = SentencePictureRound(
+        promptTts = "Oma hat Mama gerufen.",
+        correctAtomIds = listOf("oma", "mama"),
+        wrongAtomIds = listOf("opa", "mama"),
+    )
+
+    /** Hängt den Spec vor das Rechnen der ersten autorierten Lektion. */
+    private fun packWithSentencePicture(spec: SentencePictureSpec): ContentPack {
+        val lesson = pack.authoredLessons.first()
+        val countIndex = lesson.taskIds.indexOfFirst { pack.tasks.getValue(it) is CountAddSpec }
+        val taskIds = lesson.taskIds.toMutableList().apply { add(countIndex, spec.id) }
+        return pack.copy(
+            tasks = pack.tasks + (spec.id to spec),
+            lessons = pack.lessons.map { if (it.id == lesson.id) it.copy(taskIds = taskIds) else it },
+        )
+    }
+
+    @Test
+    fun validSentencePictureTaskPasses() {
+        val rounds = List(4) { validSentencePictureRound() }
+        val issues = ContentValidator.validate(packWithSentencePicture(sentencePictureSpec(rounds)))
+        assertTrue(issues.joinToString { it.message }, issues.isEmpty())
+    }
+
+    @Test
+    fun sentencePictureBlankInstructionIsRejected() {
+        val rounds = List(4) { validSentencePictureRound() }
+        val issues = ContentValidator.validate(
+            packWithSentencePicture(sentencePictureSpec(rounds, instruction = " ")),
+        )
+        assertTrue(issues.any { "instructionTts" in it.message })
+    }
+
+    @Test
+    fun sentencePictureNeedsThreeToSixRounds() {
+        val tooFew = ContentValidator.validate(
+            packWithSentencePicture(sentencePictureSpec(List(2) { validSentencePictureRound() })),
+        )
+        assertTrue(tooFew.any { "rounds" in it.message })
+        val tooMany = ContentValidator.validate(
+            packWithSentencePicture(sentencePictureSpec(List(7) { validSentencePictureRound() })),
+        )
+        assertTrue(tooMany.any { "rounds" in it.message })
+    }
+
+    @Test
+    fun sentencePictureSentenceNeedsFourToEightWords() {
+        val short = validSentencePictureRound().copy(promptTts = "Oma ruft.")
+        val issues = ContentValidator.validate(
+            packWithSentencePicture(sentencePictureSpec(List(4) { short })),
+        )
+        assertTrue(issues.any { "words" in it.message })
+    }
+
+    @Test
+    fun sentencePictureInstructionInsideSentenceIsRejected() {
+        val round = validSentencePictureRound().copy(promptTts = "Ordne das Bild der Oma zu.")
+        val issues = ContentValidator.validate(
+            packWithSentencePicture(sentencePictureSpec(List(4) { round })),
+        )
+        assertTrue(issues.any { "Ordne" in it.message })
+    }
+
+    @Test
+    fun sentencePictureCardsNeedOneToThreeExistingEmojiAtoms() {
+        val emptyCard = validSentencePictureRound().copy(wrongAtomIds = emptyList())
+        assertTrue(
+            ContentValidator.validate(
+                packWithSentencePicture(sentencePictureSpec(List(4) { emptyCard })),
+            ).any { "card" in it.message },
+        )
+        val fourAtoms = validSentencePictureRound()
+            .copy(correctAtomIds = listOf("oma", "oma", "oma", "oma"))
+        assertTrue(
+            ContentValidator.validate(
+                packWithSentencePicture(sentencePictureSpec(List(4) { fourAtoms })),
+            ).any { "card" in it.message },
+        )
+        val missingAtom = validSentencePictureRound().copy(correctAtomIds = listOf("gibtsnicht"))
+        assertTrue(
+            ContentValidator.validate(
+                packWithSentencePicture(sentencePictureSpec(List(4) { missingAtom })),
+            ).any { "missing atom" in it.message },
+        )
+        // "ist" existiert, trägt aber kein Emoji.
+        val noEmoji = validSentencePictureRound().copy(correctAtomIds = listOf("ist"))
+        assertTrue(
+            ContentValidator.validate(
+                packWithSentencePicture(sentencePictureSpec(List(4) { noEmoji })),
+            ).any { "emoji" in it.message },
+        )
+    }
+
+    @Test
+    fun sentencePictureIdenticalCardsAreRejected() {
+        val same = validSentencePictureRound().copy(
+            correctAtomIds = listOf("oma", "mama"),
+            wrongAtomIds = listOf("oma", "mama"),
+        )
+        val issues = ContentValidator.validate(
+            packWithSentencePicture(sentencePictureSpec(List(4) { same })),
+        )
+        assertTrue(issues.any { "indistinguishable" in it.message })
     }
 }
