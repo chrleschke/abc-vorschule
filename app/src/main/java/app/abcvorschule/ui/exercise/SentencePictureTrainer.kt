@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -118,7 +121,7 @@ fun SentencePictureTrainer(
                     enabled = !interactionLocked && !solvedCorrect && !resolved,
                     opacity = interactionOpacity,
                     onTap = { choose(leftIsCorrect) },
-                    testTag = if (leftIsCorrect) "card_correct" else "card_wrong",
+                    testTag = if (leftIsCorrect) "sentence_picture_card_correct" else "sentence_picture_card_wrong",
                     modifier = Modifier.weight(1f),
                 )
                 PictureCard(
@@ -128,7 +131,7 @@ fun SentencePictureTrainer(
                     enabled = !interactionLocked && !solvedCorrect && !resolved,
                     opacity = interactionOpacity,
                     onTap = { choose(!leftIsCorrect) },
-                    testTag = if (leftIsCorrect) "card_wrong" else "card_correct",
+                    testTag = if (leftIsCorrect) "sentence_picture_card_wrong" else "sentence_picture_card_correct",
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -149,7 +152,10 @@ fun SentencePictureTrainer(
  * wie SentenceOrderTrainer.PegBorderGreen (voll-opakes LeafGreen erreicht auf
  * CreamElevated nur 2.87:1).
  */
-private val CardBorderGreen = androidx.compose.ui.graphics.Color(0xFF3A7A44)
+private val CardBorderGreen = Color(0xFF3A7A44)
+
+/** Innenabstand der Karte je Seite; zugleich der Abzug für die Emoji-Breitenrechnung. */
+private const val CardPaddingHorizontalDp = 10f
 
 @Composable
 private fun PictureCard(
@@ -163,26 +169,42 @@ private fun PictureCard(
     modifier: Modifier = Modifier,
 ) {
     val emojis = atomIds.joinToString("") { pack.atoms[it]?.emoji.orEmpty() }
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .defaultMinSize(minHeight = AbcDimens.kidTouch * 2)
-            .alpha(opacity)
-            .background(color = CreamElevated, shape = RoundedCornerShape(22.dp))
-            .border(
-                width = if (highlight) 4.dp else 3.dp,
-                color = if (highlight) CardBorderGreen else WarmMuted.copy(alpha = 0.9f),
-                shape = RoundedCornerShape(22.dp),
+    val fontScale = LocalDensity.current.fontScale
+    // Die Emoji-Größe hängt an der real gemessenen Kartenbreite, nicht an einer
+    // festen Staffelung: sonst überläuft die Reihe auf schmalen Geräten (siehe
+    // SentencePictureCardSizing). BoxWithConstraints außen, Padding innen, damit
+    // maxWidth die volle Kartenbreite ist und der Abzug hier sichtbar bleibt.
+    BoxWithConstraints(modifier = modifier) {
+        val contentWidthDp = (maxWidth.value - 2 * CardPaddingHorizontalDp).coerceAtLeast(1f)
+        val emojiSp = SentencePictureCardSizing.emojiSp(atomIds.size, contentWidthDp, fontScale)
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = AbcDimens.kidTouch * 2)
+                .alpha(opacity)
+                .background(color = CreamElevated, shape = RoundedCornerShape(22.dp))
+                .border(
+                    width = if (highlight) 4.dp else 3.dp,
+                    color = if (highlight) CardBorderGreen else WarmMuted.copy(alpha = 0.9f),
+                    shape = RoundedCornerShape(22.dp),
+                )
+                .clickable(enabled = enabled, onClick = onTap)
+                .padding(horizontal = CardPaddingHorizontalDp.dp, vertical = 18.dp)
+                .testTag(testTag),
+        ) {
+            Text(
+                text = emojis,
+                fontSize = emojiSp.sp,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                // Zweiter Riegel gegen den Überlauf: sollte die Breitenschätzung doch
+                // einmal danebenliegen, wird die Reihe angeschnitten statt umgebrochen.
+                // Mit maxLines = 1 fällt eine umgebrochene zweite Zeile komplett weg —
+                // das letzte Emoji wäre unsichtbar, und die beiden Karten sähen bei
+                // 16 der 72 Runden identisch aus. Angeschnitten ist harmloser.
+                softWrap = false,
             )
-            .clickable(enabled = enabled, onClick = onTap)
-            .padding(horizontal = 10.dp, vertical = 18.dp)
-            .testTag(testTag),
-    ) {
-        Text(
-            text = emojis,
-            fontSize = SentencePictureCardSizing.emojiSp(atomIds.size).sp,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-        )
+        }
     }
 }
