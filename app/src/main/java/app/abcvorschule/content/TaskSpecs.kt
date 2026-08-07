@@ -7,7 +7,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 
 /**
  * One playable step inside a trainer. Every round carries its own spoken prompt.
- * Sealed so that `when` over round types is exhaustive: adding a seventh trainer
+ * Sealed so that `when` over round types is exhaustive: adding an eighth trainer
  * must break the build at every dispatch site rather than silently no-op.
  */
 sealed interface TrainerRound {
