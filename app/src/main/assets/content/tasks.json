@@ -4912,14 +4912,14 @@
           "wrongAtomIds": ["dose", "eis"]
         },
         {
-          "promptTts": "Der Hund hat einen Keks geklaut.",
-          "correctAtomIds": ["hund", "keks"],
-          "wrongAtomIds": ["katze", "keks"]
+          "promptTts": "Der Dino hat den Kuchen gefressen.",
+          "correctAtomIds": ["dino", "kuchen"],
+          "wrongAtomIds": ["hund", "kuchen"]
         },
         {
           "promptTts": "Tom aß den letzten Keks.",
           "correctAtomIds": ["tom", "keks"],
-          "wrongAtomIds": ["tom", "kuchen"]
+          "wrongAtomIds": ["tom", "brokkoli"]
         },
         {
           "promptTts": "Wer hat die Kekse aus der Dose geklaut...",
@@ -4934,7 +4934,7 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "promptTts": "Die Wolke zieht über das Haus.",
+          "promptTts": "Die Wolken zogen über das Haus.",
           "correctAtomIds": ["wolke", "haus"],
           "wrongAtomIds": ["wolke", "baum"]
         },
@@ -5005,7 +5005,7 @@
         {
           "promptTts": "Aus dem Haus kamen zwei Mäuse.",
           "correctAtomIds": ["haus", "maus", "maus"],
-          "wrongAtomIds": ["haus", "elefant"]
+          "wrongAtomIds": ["haus", "dino"]
         }
       ]
     },
@@ -5022,7 +5022,7 @@
         {
           "promptTts": "Der Frosch ist mit dem Fahrrad gefahren.",
           "correctAtomIds": ["frosch", "fahrrad"],
-          "wrongAtomIds": ["frosch", "ruebe"]
+          "wrongAtomIds": ["dino", "fahrrad"]
         },
         {
           "promptTts": "Die Äpfel sind vom Baum gefallen.",
@@ -5135,7 +5135,7 @@
         {
           "promptTts": "Das Pferd sprang über das Tor.",
           "correctAtomIds": ["pferd", "tor"],
-          "wrongAtomIds": ["pferd", "haus"]
+          "wrongAtomIds": ["dino", "tor"]
         },
         {
           "promptTts": "Die Äpfel wurden aufgemampft.",
