@@ -17,6 +17,7 @@ FIELD_TO_PROFILE: dict[str, str] = {
     # the same 20 sounds get rendered and curated twice.
     "stretchTts": "phoneme",
     "promptTts": "prompt",
+    "instructionTts": "prompt",
     "missTts": "miss",
     "rewardTts": "reward",
     "sentenceTts": "sentence",
@@ -131,6 +132,9 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
         if "phonemeTts" in task:
             add(f"task:{task_id}:phonemeTts", task["phonemeTts"], "phonemeTts",
                 "tasks.json", lesson, f"{task_id} · phonemeTts")
+        if "instructionTts" in task:
+            add(f"task:{task_id}:instructionTts", task["instructionTts"], "instructionTts",
+                "tasks.json", lesson, f"{task_id} · instructionTts")
         for index, round_ in enumerate(task.get("rounds", [])):
             for field in ROUND_FIELDS:
                 if field not in round_:

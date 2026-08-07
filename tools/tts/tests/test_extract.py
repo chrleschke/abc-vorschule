@@ -162,6 +162,33 @@ def test_extracts_count_add_spoken_answers(tmp_path):
     assert profile_for_item(item) == "word"
 
 
+def test_instruction_tts_is_extracted_with_prompt_profile(tmp_path):
+    import json
+
+    d = tmp_path / "content"
+    d.mkdir()
+    (d / "atoms.json").write_text(json.dumps({"atoms": [
+        {"id": "oma", "lemma": "Oma", "display": "Oma", "emoji": "👵", "kind": "word"},
+        {"id": "mama", "lemma": "Mama", "display": "Mama", "emoji": "👩", "kind": "word"},
+    ]}), encoding="utf-8")
+    (d / "tasks.json").write_text(json.dumps({"tasks": [
+        {"trainer": "sentence_picture", "id": "l01-sp1",
+         "instructionTts": "Ordne das richtige Bild zu.",
+         "rounds": [{"promptTts": "Oma hat Mama gerufen.",
+                     "correctAtomIds": ["oma"], "wrongAtomIds": ["mama"]}]},
+    ]}), encoding="utf-8")
+    for name, key in (("sentences.json", "sentences"), ("finales.json", "finales"),
+                      ("lessons.json", "lessons")):
+        (d / name).write_text(json.dumps({key: []}), encoding="utf-8")
+
+    items = extract_items(d)
+    by_id = {item.id: item for item in items}
+    instruction = by_id["task:l01-sp1:instructionTts"]
+    assert instruction.text == "Ordne das richtige Bild zu."
+    assert profile_for_item(instruction) == "prompt"
+    assert "task:l01-sp1:round:0:promptTts" in by_id
+
+
 def test_extra_strings_include_praise_phrases(content_dir):
     from ttskit.paths import Paths
     import json
