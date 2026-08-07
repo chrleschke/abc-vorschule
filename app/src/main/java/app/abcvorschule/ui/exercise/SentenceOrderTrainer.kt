@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -103,6 +104,7 @@ fun SentenceOrderTrainer(
     scaffoldFor: (String) -> ScaffoldLevel,
     ttsAvailable: Boolean,
     speaking: Boolean,
+    interactionLocked: Boolean = false,
     onSpeakPrompt: () -> Unit,
     onSpeak: (String) -> Unit,
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
@@ -123,6 +125,11 @@ fun SentenceOrderTrainer(
         seed = round.sentenceId.hashCode(),
     )
     val haptics = LocalAbcHaptics.current
+    val interactionOpacity by animateFloatAsState(
+        targetValue = if (interactionLocked) 0.5f else 1f,
+        animationSpec = tween(durationMillis = 200),
+        label = "sentence_order_lock_opacity",
+    )
 
     fun place(index: Int, card: WordBlock) {
         if (resolved || placed[index] != null) return
@@ -197,6 +204,8 @@ fun SentenceOrderTrainer(
                                 filled = filled,
                                 showGhost = scaffoldFor(atomId) == ScaffoldLevel.Beginner,
                                 armed = field.selectedKey != null && filled == null,
+                                enabled = !interactionLocked,
+                                opacity = interactionOpacity,
                                 onTap = {
                                     val selected = field.selectedKey
                                     val card = cards.firstOrNull { cardKey(it) == selected }
@@ -224,6 +233,7 @@ fun SentenceOrderTrainer(
                         DragCard(
                             state = field,
                             key = key,
+                            enabled = !interactionLocked,
                             onTap = {
                                 field.select(key)
                                 onSpeak(card.display)
@@ -233,6 +243,7 @@ fun SentenceOrderTrainer(
                             },
                             modifier = Modifier
                                 .defaultMinSize(minHeight = AbcDimens.kidTouch - 8.dp)
+                                .alpha(interactionOpacity)
                                 .background(
                                     color = if (field.selectedKey == key) LeafGreen else CreamElevated,
                                     shape = RoundedCornerShape(18.dp),
@@ -280,6 +291,8 @@ private fun Peg(
     filled: String?,
     showGhost: Boolean,
     armed: Boolean,
+    enabled: Boolean,
+    opacity: Float,
     onTap: () -> Unit,
     registerWith: app.abcvorschule.ui.exercise.drag.DragFieldState,
     pegWidthDp: Float,
@@ -289,9 +302,11 @@ private fun Peg(
         state = registerWith,
         key = SentenceOrderTray.pegKey(index),
         onTap = onTap,
+        enabled = enabled,
         modifier = Modifier
             .width(pegWidthDp.dp)
             .defaultMinSize(minHeight = 64.dp)
+            .alpha(opacity)
             .background(
                 color = if (armed) LeafGreen.copy(alpha = 0.22f) else CreamElevated,
                 shape = RoundedCornerShape(16.dp),
