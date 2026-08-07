@@ -490,11 +490,15 @@ class SessionViewModel(
             return
         }
         if (missHint) {
-            // Both hunt trainers speak the tapped item synchronously in the
-            // Composable before onResult arrives here. Setting speakCue would queue
-            // the generic miss phrase right behind it, and SpeechController flushes
-            // on every speak() — so the item name would get cut off before the child
-            // heard it. Every other round type has no such synchronous speech.
+            // SymbolHuntRound speaks the tapped item synchronously on the Primary
+            // channel in its Composable before onResult arrives here. Setting speakCue
+            // would queue the generic miss phrase right behind it, and a Primary-channel
+            // speak() flushes any still-playing Primary utterance — so the item name
+            // would get cut off before the child heard it. SymbolInWordRound's tap echo
+            // now runs on the Feedback channel (which does not flush Primary), so this
+            // reason no longer applies to it; it stays lumped in with SymbolHuntRound
+            // here as a harmless, defensive suppression rather than a required one.
+            // Every other round type has no such synchronous speech.
             val speaksMissItself = _ui.value.currentRound.let {
                 it is SymbolHuntRound || it is SymbolInWordRound
             }

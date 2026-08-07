@@ -258,8 +258,10 @@ fun SymbolInWordTrainer(
                     TargetLabelRow(
                         label = label,
                         onClick = {
-                            target?.lemma?.let(onSpeak) ?: onSpeak(target.display)
+                            target?.lemma?.let(onSpeakFeedback) ?: onSpeakFeedback(target.display)
                         },
+                        interactionLocked = interactionLocked,
+                        modifier = Modifier.alpha(interactionOpacity),
                     )
                 }
                 // Luft zwischen Frage und Arbeit. ExerciseStage setzt AbcDimens.blockGap
@@ -379,6 +381,8 @@ private fun slotWidthDp(label: SymbolInWordDerivation.TargetLabel?): Dp =
 private fun TargetLabelRow(
     label: SymbolInWordDerivation.TargetLabel,
     onClick: () -> Unit,
+    interactionLocked: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val targetGlyphSp = WordFrameSizing.targetLabelSp(LocalDensity.current.fontScale).sp
     Row(
@@ -386,7 +390,7 @@ private fun TargetLabelRow(
         // Centred inside the enforced minimum, so a single narrow glyph does not sit
         // off to the left of its own touch target.
         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-        modifier = Modifier
+        modifier = modifier
             // A single-form single-glyph target ("ß" in L15's F·u·ß, where targetLabel
             // returns no alternate because the atom is already lowercase) is barely
             // one glyph wide, which is under the hit-box floor every touch target in
@@ -395,7 +399,7 @@ private fun TargetLabelRow(
                 minWidth = WordFrameSizing.MinFrameDp.dp,
                 minHeight = WordFrameSizing.MinFrameDp.dp,
             )
-            .clickable { onClick() }
+            .clickable(enabled = !interactionLocked) { onClick() }
             .testTag("detective_target"),
     ) {
         Text(text = label.primary, fontSize = targetGlyphSp, color = WarmInk)

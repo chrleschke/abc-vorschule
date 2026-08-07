@@ -90,7 +90,7 @@ class SpeechController(
 
     fun speak(text: String, channel: SpeechChannel = SpeechChannel.Primary) {
         if (text.isBlank() || blockedForBackground) return
-        clearWaiters()
+        if (channel == SpeechChannel.Primary) clearWaiters()
         stopOutput(channel)
         if (playClip(text, channel, onComplete = {})) return
         val engine = tts ?: return
@@ -105,7 +105,7 @@ class SpeechController(
         timeoutMs: Long = 10_000L,
     ) {
         if (text.isBlank() || blockedForBackground) return
-        clearWaiters()
+        if (channel == SpeechChannel.Primary) clearWaiters()
         stopOutput(channel)
         val deferred = CompletableDeferred<Unit>()
         if (playClip(text, channel, onComplete = { deferred.complete(Unit) })) {

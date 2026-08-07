@@ -126,6 +126,10 @@ fun DragCard(
         onDispose { state.removeCard(key) }
     }
     Box(
+        // zIndex/offset/scale sit BEFORE the caller's modifier on purpose: a later
+        // `offset` would only move the content, leaving the caller's background and
+        // border painted at the tile's resting position — which made the dragged
+        // tile look like bare (near-black) text floating over the board.
         modifier = Modifier
             .zIndex(if (dragging) 1f else 0f)
             .offset {
@@ -176,6 +180,12 @@ fun DropZone(
         onDispose { state.removeZone(key) }
     }
     Box(
+        // onGloballyPositioned/clickable wrap the caller's styled modifier chain
+        // (background/border/padding) so the registered bounds and the tappable
+        // area are the FULL frame box, not just the padded-in content area —
+        // otherwise a frame at the 56dp touch-target floor with 8dp padding on
+        // each side only had a ~40dp tappable center, silently dropping taps in
+        // an 8dp dead ring around every frame.
         modifier = Modifier
             .onGloballyPositioned { state.putZone(key, it.boundsInRoot()) }
             .clickable(enabled = enabled) { onTap() }

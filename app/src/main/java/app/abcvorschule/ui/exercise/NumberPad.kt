@@ -110,6 +110,12 @@ fun NumberPad(
                 unfocusedBorderColor = if (solved) LeafGreen else SkyBlue.copy(alpha = 0.5f),
                 focusedTextColor = WarmInk,
                 unfocusedTextColor = WarmInk,
+                // Explicit, matching the unfocused/enabled colours above: M3's own
+                // disabled-state alpha would otherwise stack on top of the outer
+                // `.alpha(opacity)` during the lock, compounding into an almost
+                // invisible field instead of one cleanly dimmed by a single signal.
+                disabledBorderColor = SkyBlue.copy(alpha = 0.5f),
+                disabledTextColor = WarmInk,
             ),
         )
         Spacer(Modifier.width(16.dp))
