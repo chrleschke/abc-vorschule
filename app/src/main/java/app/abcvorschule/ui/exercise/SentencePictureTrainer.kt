@@ -1,5 +1,6 @@
 package app.abcvorschule.ui.exercise
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
@@ -15,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
@@ -59,6 +62,12 @@ fun SentencePictureTrainer(
     var misses by remember(roundKey) { mutableIntStateOf(0) }
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var solvedCorrect by remember(roundKey) { mutableStateOf(false) }
+    // Welche Karte zuletzt falsch getippt wurde und wie oft überhaupt schon
+    // falsch getippt wurde. Der Zähler ist der Auslöser der Schüttel-Animation:
+    // ein Bool wäre beim zweiten Fehltipp auf dieselbe Karte schon true und
+    // würde keine neue Runde starten.
+    var wrongTick by remember(roundKey) { mutableIntStateOf(0) }
+    var wrongOnLeft by remember(roundKey) { mutableStateOf(false) }
     val haptics = LocalAbcHaptics.current
     val scoredIds = remember(roundKey) { round.correctAtomIds.distinct() }
     val correctOnLeft = remember(roundKey) {
@@ -70,7 +79,7 @@ fun SentencePictureTrainer(
         label = "sentence_picture_lock_opacity",
     )
 
-    fun choose(correct: Boolean) {
+    fun choose(correct: Boolean, tappedLeft: Boolean) {
         if (resolved || solvedCorrect) return
         if (correct) {
             solvedCorrect = true
@@ -78,6 +87,8 @@ fun SentencePictureTrainer(
             onResult(true, false, scoredIds)
         } else {
             misses += 1
+            wrongOnLeft = tappedLeft
+            wrongTick += 1
             haptics.nudge()
             onResult(false, false, scoredIds)
         }
@@ -125,7 +136,8 @@ fun SentencePictureTrainer(
                     highlight = (solvedCorrect || resolved) && leftIsCorrect,
                     enabled = !interactionLocked && !solvedCorrect && !resolved,
                     opacity = interactionOpacity,
-                    onTap = { choose(leftIsCorrect) },
+                    shakeTick = if (wrongOnLeft) wrongTick else 0,
+                    onTap = { choose(leftIsCorrect, tappedLeft = true) },
                     testTag = if (leftIsCorrect) "sentence_picture_card_correct" else "sentence_picture_card_wrong",
                     modifier = Modifier.weight(1f),
                 )
@@ -135,7 +147,8 @@ fun SentencePictureTrainer(
                     highlight = (solvedCorrect || resolved) && !leftIsCorrect,
                     enabled = !interactionLocked && !solvedCorrect && !resolved,
                     opacity = interactionOpacity,
-                    onTap = { choose(!leftIsCorrect) },
+                    shakeTick = if (!wrongOnLeft) wrongTick else 0,
+                    onTap = { choose(!leftIsCorrect, tappedLeft = false) },
                     testTag = if (leftIsCorrect) "sentence_picture_card_wrong" else "sentence_picture_card_correct",
                     modifier = Modifier.weight(1f),
                 )
@@ -170,12 +183,22 @@ private fun PictureCard(
     highlight: Boolean,
     enabled: Boolean,
     opacity: Float,
+    shakeTick: Int,
     onTap: () -> Unit,
     testTag: String,
     modifier: Modifier = Modifier,
 ) {
     val emojis = atomIds.joinToString("") { pack.atoms[it]?.emoji.orEmpty() }
     val fontScale = LocalDensity.current.fontScale
+    // Ein Animatable statt animateFloatAsState: die Schüttelrunde muss bei jedem
+    // neuen Tick von vorn beginnen, auch wenn die vorige noch läuft.
+    val shake = remember { Animatable(0f) }
+    LaunchedEffect(shakeTick) {
+        if (shakeTick == 0) return@LaunchedEffect
+        shake.snapTo(0f)
+        shake.animateTo(1f, tween(durationMillis = SentencePictureCardShake.DurationMs))
+        shake.snapTo(0f)
+    }
     // Die Emoji-Größe hängt an der real gemessenen Kartenbreite, nicht an einer
     // festen Staffelung: sonst überläuft die Reihe auf schmalen Geräten (siehe
     // SentencePictureCardSizing). BoxWithConstraints außen, Padding innen, damit
@@ -188,6 +211,12 @@ private fun PictureCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = AbcDimens.kidTouch * 2)
+                // graphicsLayer statt offset: eine reine Zeichenoperation, die
+                // kein Neu-Layout der Reihe auslöst und die Nachbarkarte
+                // deshalb nicht mitverschiebt.
+                .graphicsLayer {
+                    translationX = SentencePictureCardShake.offsetDp(shake.value).dp.toPx()
+                }
                 .alpha(opacity)
                 // Keine Füllfläche: CreamElevated auf Cream ist nur 1.22:1 — als
                 // Kartengrenze kaum sichtbar, aber genug, um die Emojis
