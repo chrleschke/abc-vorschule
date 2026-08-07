@@ -131,4 +131,62 @@ class SentencePictureSidesTest {
             }
         }
     }
+
+    @Test
+    fun shakeStartsAndEndsAtRest() {
+        // Der Versatz wird über graphicsLayer gezeichnet: bleibt am Ende etwas
+        // stehen, sitzt die Karte für den Rest der Runde schief.
+        assertEquals(0f, SentencePictureCardShake.offsetDp(0f), 0.001f)
+        assertEquals(0f, SentencePictureCardShake.offsetDp(1f), 0.001f)
+    }
+
+    @Test
+    fun shakeNeverLeavesItsAmplitude() {
+        // 12dp ist der Abstand, den die Karte zur Nachbarkarte hat (8dp Lücke,
+        // graphicsLayer clippt nicht) — mehr würde sichtbar überlappen.
+        (0..100).forEach { i ->
+            val p = i / 100f
+            val offset = SentencePictureCardShake.offsetDp(p)
+            assertTrue(
+                "offset $offset at progress $p exceeds ${SentencePictureCardShake.AmplitudeDp}dp",
+                kotlin.math.abs(offset) <= SentencePictureCardShake.AmplitudeDp + 0.001f,
+            )
+        }
+    }
+
+    @Test
+    fun shakeOscillatesAsOftenAsCyclesPromises() {
+        // 2.5 Zyklen einer Sinuskurve haben 5 Halbwellen, also 4 Nulldurchgänge
+        // im offenen Intervall. Weniger wäre ein Ausschlag statt eines Wackelns.
+        val samples = (1..999).map { SentencePictureCardShake.offsetDp(it / 1000f) }
+        val signChanges = (1 until samples.size).count { i ->
+            samples[i - 1] < 0f && samples[i] > 0f || samples[i - 1] > 0f && samples[i] < 0f
+        }
+        assertEquals(4, signChanges)
+    }
+
+    @Test
+    fun shakeAmplitudeDecaysSoTheCardComesToRest() {
+        // Ohne abklingende Hüllkurve stoppt die Karte mitten im vollen Ausschlag
+        // — das liest sich wie ein Ruck, nicht wie ein Auslaufen. Verglichen
+        // werden die Extrema der ersten und der letzten Halbwelle.
+        fun peakBetween(from: Float, to: Float): Float =
+            (0..200).map { from + (to - from) * it / 200f }
+                .maxOf { kotlin.math.abs(SentencePictureCardShake.offsetDp(it)) }
+
+        val firstHalfWave = peakBetween(0f, 0.2f)
+        val lastHalfWave = peakBetween(0.8f, 1f)
+        assertTrue(
+            "first peak $firstHalfWave should be clearly larger than last $lastHalfWave",
+            firstHalfWave > lastHalfWave * 1.5f,
+        )
+    }
+
+    @Test
+    fun shakeClampsProgressOutsideTheUnitInterval() {
+        // animateFloatAsState kann bei Spring-Overshoot über 1f laufen; ein
+        // Aufruf mit 1.05f darf keinen Sprung erzeugen.
+        assertEquals(0f, SentencePictureCardShake.offsetDp(-0.5f), 0.001f)
+        assertEquals(0f, SentencePictureCardShake.offsetDp(1.5f), 0.001f)
+    }
 }

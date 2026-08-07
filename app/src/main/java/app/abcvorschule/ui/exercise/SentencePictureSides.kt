@@ -1,6 +1,8 @@
 package app.abcvorschule.ui.exercise
 
+import kotlin.math.PI
 import kotlin.math.floor
+import kotlin.math.sin
 
 /**
  * Welche Seite die richtige Karte des Satz-Verstehers bekommt. Deterministisch
@@ -73,5 +75,45 @@ object SentencePictureCardSizing {
         // Abrunden statt runden: die Näherung darf nie über das Budget rutschen,
         // dieselbe Konvention wie die Ganzzahl-Kürzung in FinaleLayout.
         return floor(scaled).coerceAtLeast(MinEmojiSp)
+    }
+}
+
+/**
+ * Das Wackeln der falsch getippten Bildkarte. Compose-frei, damit die Kurve
+ * prüfbar ist — dasselbe Muster wie `BurstGeometry.sparkOffsets`, denn das Repo
+ * hat keine androidTests.
+ *
+ * Bewusst *nur* Bewegung, keine Farbe: die Produktprinzipien markieren eine
+ * falsche Antwort für Kinder nicht rot (§8), und `ClayRed` ist die Fehlerfarbe
+ * für Erwachsenentext (§10). Ein Fehltipp ist hier kein Fehler, der benannt
+ * wird, sondern eine Karte, die nicht nachgibt.
+ */
+object SentencePictureCardShake {
+    /**
+     * Größter horizontaler Ausschlag. Die Nachbarkarte ist nur 8dp entfernt und
+     * `graphicsLayer` clippt nicht — 12dp überlappt sie also sichtbar, und genau
+     * das macht das Wackeln auch am Rand des Blickfelds erkennbar. Mehr würde
+     * die Karten verschmelzen lassen.
+     */
+    const val AmplitudeDp = 12f
+
+    /** Kurz genug, dass die Wiederholung des Satzes nicht darauf warten muss. */
+    const val DurationMs = 420
+
+    /** 2.5 Zyklen = 5 Halbwellen: hin, zurück, hin, zurück, aus. */
+    const val Cycles = 2.5f
+
+    /**
+     * Horizontaler Versatz in dp für [progress] 0f..1f. Sinus mit linear
+     * abklingender Hüllkurve: die Karte läuft aus statt abrupt zu stoppen, und
+     * sie endet exakt auf ihrer Ausgangsposition (`offsetDp(1f) == 0f`) — sonst
+     * bliebe sie für den Rest der Runde schief stehen.
+     *
+     * Außerhalb von 0..1 geklemmt: `animateFloatAsState` kann überschwingen.
+     */
+    fun offsetDp(progress: Float): Float {
+        val p = progress.coerceIn(0f, 1f)
+        val decay = 1f - p
+        return (AmplitudeDp * decay * sin(2.0 * PI * Cycles * p)).toFloat()
     }
 }
