@@ -225,8 +225,16 @@ private fun PictureCard(
     // neuen Tick von vorn beginnen, auch wenn die vorige noch läuft.
     val shake = remember { Animatable(0f) }
     LaunchedEffect(shakeTick) {
-        if (shakeTick == 0) return@LaunchedEffect
+        // Erst zurücksetzen, dann der Frühausstieg — nicht zu „wenn 0, einfach
+        // return" vereinfachen: beim Rundenwechsel fällt shakeTick von 1 auf 0, der
+        // Effekt startet neu und bricht dabei ein noch laufendes animateTo ab, dessen
+        // abschließendes snapTo unten also nie mehr läuft. Die Chevrons wechseln die
+        // Runde ohne Verzögerung (SessionViewModel.goNextRound) und sind nach einem
+        // Fehltipp aktiv — falsche Karte tippen, innerhalb der 420ms den Chevron: die
+        // nächste Runde eröffnete sonst mit einer um bis zu 12dp verschobenen Karte,
+        // und die bliebe für alle folgenden Runden schief stehen.
         shake.snapTo(0f)
+        if (shakeTick == 0) return@LaunchedEffect
         shake.animateTo(1f, tween(durationMillis = SentencePictureCardShake.DurationMs))
         shake.snapTo(0f)
     }
@@ -262,11 +270,15 @@ private fun PictureCard(
                     translationX = SentencePictureCardShake.offsetDp(shake.value).dp.toPx()
                 }
                 .alpha(opacity)
-                // Keine Füllfläche: CreamElevated auf Cream ist nur 1.22:1 — als
+                // Keine Füllfläche: CreamElevated auf Cream ist nur 1.24:1 — als
                 // Kartengrenze kaum sichtbar, aber genug, um die Emojis
                 // abzudunkeln. Die Grenze wandert auf den Rahmen, wo sie mit
-                // 4.45:1 (WarmMuted auf Cream) tatsächlich zu sehen ist, und die
-                // Bilder stehen auf der hellsten Fläche der Übung.
+                // 3.70:1 tatsächlich zu sehen ist — gerechnet für die *gemalte*
+                // Farbe, also WarmMuted mit Alpha 0.9 über Cream (≈ #897C68), nicht
+                // für das deckende WarmMuted (das wären 4.45:1). Über der
+                // 3:1-Schwelle für UI-Komponenten und ein Vielfaches der Füllung,
+                // die er ersetzt; die Bilder stehen auf der hellsten Fläche der
+                // Übung.
                 //
                 // Damit fällt auch die Sonderfarbe weg, die es nur wegen der
                 // Füllung gab: LeafGreen erreichte auf CreamElevated bloß 2.87:1,

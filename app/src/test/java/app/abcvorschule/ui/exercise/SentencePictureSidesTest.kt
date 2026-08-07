@@ -102,13 +102,37 @@ class SentencePictureSidesTest {
     @Test
     fun emojiSizeIsTheFullBaseAtFontScaleOneWhenThereIsRoom() {
         // Kein-Regressions-Anker für die *Staffelung*, nicht für die Zahlen von
-        // gestern: auf einer Karte, die breit genug ist, greift die Basis.
-        // 400dp reicht dafür bei 1 und 2 Emojis; bei 3 deckelt schon hier die
-        // Breite (400 / 3.6 = 111), deshalb steht der 3er-Wert weiter unten in
-        // emojiRowFitsTheNarrowestSupportedCard…
+        // gestern: auf einer Karte, die breit genug ist, greift die Basis. 400dp
+        // reicht für alle drei Stufen (bei 3 Emojis liegt der Deckel bei
+        // 400 / 3.6 = 111sp, also über der Basis 56). Alle drei Werte müssen hier
+        // stehen — ohne den 3er-Wert ist die Basis 56 von keinem Test festgehalten,
+        // weil emojiShrinksWithMoreAtoms nur die Monotonie prüft.
         val wide = 400f
         assertEquals(110f, SentencePictureCardSizing.emojiSp(1, wide, 1f), 0f)
         assertEquals(76f, SentencePictureCardSizing.emojiSp(2, wide, 1f), 0f)
+        assertEquals(56f, SentencePictureCardSizing.emojiSp(3, wide, 1f), 0f)
+    }
+
+    @Test
+    fun theFloorBeatsTheWidthBudgetForDegenerateWidths() {
+        // Die eine benannte Ausnahme vom Breitenbudget: sobald weniger als
+        // 14.4dp × Atomzahl × fontScale übrig sind, gewinnt MinEmojiSp und die
+        // gerenderte Reihe wird breiter als die Karte. Das ist Absicht — der Boden
+        // verhindert 0sp (oder Negatives), wenn die Breite vor der ersten Messung
+        // noch 0 ist. Harmlos, weil im laufenden Layout nur ein Aufrufer in diese
+        // Zone kommt: die Verliererkarte der Erfolgsanimation, die auf weight 0.001f
+        // schrumpft. Die verblasst dabei ohnehin (Alpha ≤ 0.5), und softWrap = false
+        // schneidet die Reihe an statt sie umzubrechen.
+        val degenerateWidthDp = 20f
+        val fontScale = 1.3f
+        val sp = SentencePictureCardSizing.emojiSp(3, degenerateWidthDp, fontScale)
+        assertEquals(SentencePictureCardSizing.MinEmojiSp, sp, 0f)
+        val renderedDp = 3 * sp * SentencePictureCardSizing.EmojiAdvanceEm * fontScale
+        assertTrue(
+            "row renders ${renderedDp}dp into a ${degenerateWidthDp}dp card — that is " +
+                "the documented exception from the width budget, not a regression",
+            renderedDp > degenerateWidthDp,
+        )
     }
 
     @Test
