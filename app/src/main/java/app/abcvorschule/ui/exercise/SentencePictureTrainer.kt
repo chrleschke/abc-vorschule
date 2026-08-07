@@ -2,7 +2,6 @@ package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
@@ -35,7 +33,7 @@ import app.abcvorschule.content.SentencePictureRound
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.CreamElevated
+import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 
@@ -87,6 +85,10 @@ fun SentencePictureTrainer(
 
     ExerciseStage(
         modifier = modifier,
+        // Der Aufgabenblock trägt hier nur den Speaker — am unteren Rand
+        // verdeckt die tippende Hand sonst genau die Bildkarten, die die
+        // ganze Aufgabe sind.
+        answerAnchor = AnswerAnchor.BelowCenter,
         prompt = {
             TaskPromptChrome(
                 title = null,
@@ -108,7 +110,10 @@ fun SentencePictureTrainer(
         },
         answers = {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                // 8dp statt 14dp: die Lücke ist reines Breitenbudget, das den
+                // Emojis fehlt. Zwei Karten mit deutlichem Rahmen brauchen
+                // keinen breiten Graben, um auseinandergehalten zu werden.
+                horizontalArrangement = Arrangement.spacedBy(CardGapDp.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("sentence_picture_cards"),
@@ -148,14 +153,15 @@ fun SentencePictureTrainer(
 }
 
 /**
- * Bestätigungs-Grün der gewählten Karte — dieselbe dunklere LeafGreen-Variante
- * wie SentenceOrderTrainer.PegBorderGreen (voll-opakes LeafGreen erreicht auf
- * CreamElevated nur 2.87:1).
+ * Innenabstand der Karte je Seite; zugleich der Abzug für die Emoji-
+ * Breitenrechnung. 4dp statt vormals 10dp: ohne Füllfläche muss der Rahmen keine
+ * Fläche mehr einfassen, und jedes eingesparte dp landet direkt im Breitendeckel
+ * der Emoji-Reihe — bei drei Emojis ist die Breite die bindende Grenze.
  */
-private val CardBorderGreen = Color(0xFF3A7A44)
+private const val CardPaddingHorizontalDp = 4f
 
-/** Innenabstand der Karte je Seite; zugleich der Abzug für die Emoji-Breitenrechnung. */
-private const val CardPaddingHorizontalDp = 10f
+/** Abstand der beiden Karten in der Reihe, ebenfalls Breitenbudget der Emojis. */
+private const val CardGapDp = 8f
 
 @Composable
 private fun PictureCard(
@@ -183,10 +189,19 @@ private fun PictureCard(
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = AbcDimens.kidTouch * 2)
                 .alpha(opacity)
-                .background(color = CreamElevated, shape = RoundedCornerShape(22.dp))
+                // Keine Füllfläche: CreamElevated auf Cream ist nur 1.22:1 — als
+                // Kartengrenze kaum sichtbar, aber genug, um die Emojis
+                // abzudunkeln. Die Grenze wandert auf den Rahmen, wo sie mit
+                // 4.45:1 (WarmMuted auf Cream) tatsächlich zu sehen ist, und die
+                // Bilder stehen auf der hellsten Fläche der Übung.
+                //
+                // Damit fällt auch die Sonderfarbe weg, die es nur wegen der
+                // Füllung gab: LeafGreen erreichte auf CreamElevated bloß 2.87:1,
+                // auf Cream sind es 3.5:1 — die Rollenfarbe „richtig" aus §10
+                // gilt hier wieder direkt.
                 .border(
                     width = if (highlight) 4.dp else 3.dp,
-                    color = if (highlight) CardBorderGreen else WarmMuted.copy(alpha = 0.9f),
+                    color = if (highlight) LeafGreen else WarmMuted.copy(alpha = 0.9f),
                     shape = RoundedCornerShape(22.dp),
                 )
                 .clickable(enabled = enabled, onClick = onTap)
