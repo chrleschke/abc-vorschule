@@ -20,7 +20,7 @@ Fünf Beobachtungen am ausgelieferten Trainer:
    Atomzahl. Der Trainer ist ein *Bild*-Vergleich; die Bilder sind sein einziger
    Inhalt und dürfen die Bühne dominieren.
 3. **Grauer Kartengrund frisst Kontrast.** `CreamElevated` auf `Cream` ist ein
-   1.22:1-Unterschied — als Flächentrennung kaum sichtbar, aber genug, um die
+   1.24:1-Unterschied — als Flächentrennung kaum sichtbar, aber genug, um die
    Emojis abzudunkeln. Die Karte gewinnt nichts und die Bilder verlieren.
 4. **Fehltipp ist unsichtbar.** Ein Miss löst `nudge`-Haptik und erneutes
    Vorlesen aus. Beides ist richtig, aber nichts davon zeigt dem Kind, *welche*
@@ -71,17 +71,31 @@ fun ExerciseStage(
 - `Bottom` ist das heutige Verhalten, Zeichen für Zeichen: Aufgabenblock in einer
   `weight(1f)`-Box zentriert, Antwortblock unten mit 8dp Luft. **Alle bestehenden
   Aufrufer bleiben unverändert** und dürfen sich visuell nicht bewegen.
-- `BelowCenter` gibt dem Aufgabenblock eine **feste Bruchhöhe der Bühne** statt
-  eines Gewichts: `BoxWithConstraints` misst die Bühne, der Aufgabenblock erhält
-  `maxHeight * PromptHeightFraction` (0.52f), der Antwortblock schließt direkt
-  darunter an.
+- `BelowCenter` gibt dem **Antwortblock** eine Mindesthöhe aus einem Bruchteil der
+  Bühne: `BoxWithConstraints` misst die Bühne, der Antwortblock erhält
+  `heightIn(min = maxHeight * (1f - PromptHeightFraction))` (also min. 48 %), der
+  Aufgabenblock behält sein `weight(1f)` wie im `Bottom`-Modus.
 
-Warum eine Bruchhöhe und kein zweites `weight`: Gewichte teilen den *Restraum*
-nach Abzug der Karten auf. Die Kartenhöhe wächst hier mit der Emoji-Größe, also
-würde die Kartenoberkante mit jeder Größenänderung wandern — bei hohen Karten
-sogar über die Bildschirmmitte hinaus, also in die Gegenrichtung. Eine
-Bruchhöhe der Bühne ist von der Kartenhöhe unabhängig und liefert genau die
-Zusage: Oberkante der Karten bei 52 % der Bühnenhöhe, knapp unterhalb der Mitte.
+Warum die Untergrenze am Antwortblock hängt und nicht als feste Höhe am
+Aufgabenblock: Compose misst in einer `Column` die *ungewichteten* Kinder zuerst
+gegen die volle Höhe und verteilt erst den Rest auf die Gewichte. Behält der
+Aufgabenblock sein Gewicht, ist der Antwortblock das ungewichtete Kind — er kann
+also nie zusammengedrückt werden, und die Untergrenze ist das, was seine
+Oberkante auf 52 % setzt, solange sein Inhalt in die restlichen 48 % passt.
+Braucht er mehr (hohe Emoji-Karten, „Zeig mir", `font_scale` über 1.0, kurzes
+Gerät), wächst er nach oben weiter statt zu clippen. Eine feste Bruchhöhe am
+Aufgabenblock leistet das nicht: sie macht ihn zum ungewichteten Kind, und die
+48 % werden für den Antwortblock zum *Maximum* — auf 360×640dp reichen sie nicht
+für Karte (≥165dp) + 14dp Lücke + 56dp `AbcResolveButton` + 8dp Luft, der
+Auflösen-Knopf wird auf wenige dp gemessen und ist nach zwei Fehltipps nicht mehr
+tippbar; dieselbe Rechnung trifft die auf 1.6× gewachsene Feierkarte, die dann
+oben und unten angeschnitten wird.
+
+Was die ursprüngliche Begründung übersah: sie betrachtete nur, *wo die Oberkante
+des Antwortblocks landet*, nie seine *verbleibende Höhe* — auf kurzen Viewports
+verhungerte deshalb der „Zeig mir"-Knopf. Die Sorge, ein zweites Gewicht ließe
+die Oberkante mit der Kartenhöhe wandern, war richtig; die Untergrenze löst genau
+das, ohne die Höhe zu deckeln.
 
 `PromptHeightFraction` ist eine benannte Konstante in `ExerciseStage.kt`, damit
 der Wert eine Begründung tragen kann und nicht als nackte 0.52f im Layout steht.
@@ -95,11 +109,15 @@ Chevrons, Fortschrittsbalken) — dieser Bereich ist es, den `TaskShell` als
 `PictureCard` verliert `background(color = CreamElevated, …)`. Die Karte ist dann
 eine reine Rahmenfläche auf `Cream`.
 
-Der neutrale Rahmen bleibt `WarmMuted.copy(alpha = 0.9f)` bei 3dp — auf `Cream`
-sind das 4.45:1 und damit eine **stärkere** Kartengrenze als die 1.22:1-Füllung,
-die er ersetzt. Der Punkt der Änderung ist genau das: die Grenze wird von der
-Fläche auf die Linie verlagert, wo sie sichtbar ist, und die Emojis stehen auf
-der hellsten Fläche der Übung statt auf Beige.
+Der neutrale Rahmen bleibt `WarmMuted.copy(alpha = 0.9f)` bei 3dp. Gerechnet wird
+mit der Farbe, die tatsächlich auf dem Schirm landet: `WarmMuted` (#7C6F5A) mit
+Alpha 0.9 über `Cream` (#FBF3E4) ergibt ≈ #897C68, also **3.70:1** — über der
+3:1-Schwelle für UI-Komponenten und ein Vielfaches der 1.24:1-Füllung, die er
+ersetzt. (Die 4.45:1, die hier zuerst standen, sind der Wert des *deckenden*
+`WarmMuted` und für einen Rahmen mit Alpha 0.9 falsch.) Der Punkt der Änderung
+bleibt derselbe: die Grenze wird von der Fläche auf die Linie verlagert, wo sie
+sichtbar ist, und die Emojis stehen auf der hellsten Fläche der Übung statt auf
+Beige.
 
 **Mitzunehmen: `CardBorderGreen` entfällt.** Die Konstante `Color(0xFF3A7A44)`
 existiert ausschließlich, weil volles `LeafGreen` auf `CreamElevated` nur 2.87:1

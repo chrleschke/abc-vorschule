@@ -295,10 +295,16 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
   Wort im Aufgabenblock. Damit sind sie von den Schablonen des Wort-Bauers unterscheidbar.
 - Ausnahme Satz-Versteher: der Antwortblock beginnt bei **52 % der Bühnenhöhe**
   statt am unteren Rand (`ExerciseStage(answerAnchor = AnswerAnchor.BelowCenter)`).
-  Sein Aufgabenblock trägt nur den Speaker — kein Titel, keine Kacheln, kein Wort —
-  und am unteren Rand verdeckt die tippende Hand genau die Bildkarten, die die
-  ganze Aufgabe sind. Für alle anderen Übungen bleibt `AnswerAnchor.Bottom` die
-  Vorbelegung und damit die Grundform.
+  Sein Aufgabenblock trägt nur den Speaker — kein Titel, keine Kacheln, kein Wort
+  (**Ausnahme:** ohne deutsches TTS steht dort der Satz als Text, damit ein
+  Erwachsener vorlesen kann — der visuelle Fallback aus §7; er darf nicht als
+  Verstoß gegen „kein Wort" gelöscht werden) — und am unteren Rand verdeckt die
+  tippende Hand genau die Bildkarten, die die ganze Aufgabe sind. Die 52 % sind
+  eine **Untergrenze für den Antwortblock**, keine feste Höhe für den
+  Aufgabenblock: der Antwortblock darf über die Marke hinaus nach oben wachsen,
+  wenn Karten, „Zeig mir" und Systemschriftgröße mehr Platz brauchen. Für alle
+  anderen Übungen bleibt `AnswerAnchor.Bottom` die Vorbelegung und damit die
+  Grundform.
 
 
 
