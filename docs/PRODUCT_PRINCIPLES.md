@@ -75,6 +75,10 @@ Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede 
     gegen einen Apfel ist zu wenig Unterschied — das Kind rät die Menge, statt den
     Satz zu verstehen. Auch die Beispielobjekte und Tätigkeiten selbst wechseln, statt
     dieselbe Handlung durch die Lektionen zu tragen.
+  - **Ein Plural im Satz braucht nicht zwingend zwei Bilder.** „Die Wolken zogen über
+    das Haus" ist die sprachlich wertvollere Form und darf auf einer Karte mit einer
+    Wolke stehen — bei unscharfen Mengen (Wolken, Sand, Sterne) zählt niemand nach.
+    Die Doppelung ist ein Mittel, keine Pflicht.
   - **Zeitform folgt dem Bild, nicht dem Lernziel.** Beschreibt der Satz einen Zustand,
     der auf der Karte zu sehen ist, steht er im Präsens („Zwei Eulen sitzen auf dem
     Baum"). Partizip II und Präteritum kommen dort, wo sie ohnehin natürlich klingen
