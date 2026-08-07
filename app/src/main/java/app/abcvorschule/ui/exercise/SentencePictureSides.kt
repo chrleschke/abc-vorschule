@@ -27,7 +27,7 @@ object SentencePictureSides {
  * Rechnung testbar bleibt — das Repo hat keine androidTests.
  *
  * Der Breitendeckel ist der eigentliche Fix: vorher setzte die Karte ihre Emoji-
- * Reihe fest in 72/56/44sp. Auf einem schmalen Gerät oder bei System-Schrift-
+ * Reihe fest in 110/76/56sp. Auf einem schmalen Gerät oder bei System-Schrift-
  * skalierung über 1.0 passte die Reihe dann nicht mehr in eine Zeile, und weil
  * der `Text` `maxLines = 1` hat, wurde die zweite Zeile erzeugt, aber nie
  * gezeichnet: das letzte Emoji verschwand. Bei 16 der 72 ausgelieferten Runden
@@ -58,14 +58,27 @@ object SentencePictureCardSizing {
     /**
      * @param contentWidthDp Breite *innerhalb* der Karteninnenabstände.
      * @param fontScale System-Schriftskalierung ([androidx.compose.ui.unit.Density.fontScale]).
+     * @param baseScale Faktor auf die Basisgröße, den die Erfolgsanimation von 1f
+     *   auf 1.6f fährt. Er hebt die Basis, **nicht** den Breitendeckel: die Karte
+     *   wird beim Feiern echt breiter gemessen, aber ohne diesen Faktor bliebe die
+     *   Basis die bindende Grenze und das Emoji würde nicht wachsen.
      */
-    fun emojiSp(atomCount: Int, contentWidthDp: Float, fontScale: Float): Float {
+    fun emojiSp(
+        atomCount: Int,
+        contentWidthDp: Float,
+        fontScale: Float,
+        baseScale: Float = 1f,
+    ): Float {
         val count = atomCount.coerceAtLeast(1)
+        // Die 2er- und 3er-Werte liegen bewusst über dem, was ein 411dp-Telefon
+        // durchlässt (dort deckelt die Breite auf ~72 bzw. ~48sp). Auf breiteren
+        // Geräten darf die Karte den Gewinn mitnehmen; der Deckel unten ist die
+        // Instanz, die Überlauf verhindert, nicht diese Staffelung.
         val base = when {
-            count <= 1 -> 72f
-            count == 2 -> 56f
-            else -> 44f
-        }
+            count <= 1 -> 110f
+            count == 2 -> 76f
+            else -> 56f
+        } * baseScale.coerceAtLeast(0f)
         val widthCap = contentWidthDp / (count * EmojiAdvanceEm)
         // Emojis sind Bilder, keine Prosa — dieselbe Begründung wie
         // FinaleLayout.capEffectiveSize: sie geben ihre fontScale-Vergrößerung als

@@ -81,11 +81,11 @@ class SentencePictureSidesTest {
     @Test
     fun emojiRowFitsTheNarrowestSupportedCardForEveryValidatorPermittedCount() {
         // 320dp Gerät − 2 × 20dp AbcDimens.screenHorizontal = 280dp für die Reihe,
-        // − 14dp Kartenabstand, / 2 Karten = 133dp Karte, − 2 × 10dp Karteninnen-
-        // abstand = 113dp Inhaltsbreite. Der Validator erlaubt 1..3 Atome je Karte;
+        // − 8dp Kartenabstand, / 2 Karten = 136dp Karte, − 2 × 4dp Karteninnen-
+        // abstand = 128dp Inhaltsbreite. Der Validator erlaubt 1..3 Atome je Karte;
         // ein Test, der nur 2 prüft, würde die 3-Atom-Karten übersehen — genau die,
         // bei denen vorher das letzte Emoji verschwand.
-        val narrowestCardContentWidthDp = 113f
+        val narrowestCardContentWidthDp = 128f
         (1..3).forEach { count ->
             listOf(1f, 1.3f, 2f).forEach { fontScale ->
                 val sp = SentencePictureCardSizing.emojiSp(count, narrowestCardContentWidthDp, fontScale)
@@ -100,13 +100,15 @@ class SentencePictureSidesTest {
     }
 
     @Test
-    fun emojiSizeIsUnchangedAtFontScaleOneWhenThereIsRoom() {
-        // Kein-Regressions-Anker: auf einer breiten Karte bei fontScale 1.0 bleiben
-        // die ursprünglichen 72/56/44sp stehen.
+    fun emojiSizeIsTheFullBaseAtFontScaleOneWhenThereIsRoom() {
+        // Kein-Regressions-Anker für die *Staffelung*, nicht für die Zahlen von
+        // gestern: auf einer Karte, die breit genug ist, greift die Basis.
+        // 400dp reicht dafür bei 1 und 2 Emojis; bei 3 deckelt schon hier die
+        // Breite (400 / 3.6 = 111), deshalb steht der 3er-Wert weiter unten in
+        // emojiRowFitsTheNarrowestSupportedCard…
         val wide = 400f
-        assertEquals(72f, SentencePictureCardSizing.emojiSp(1, wide, 1f), 0f)
-        assertEquals(56f, SentencePictureCardSizing.emojiSp(2, wide, 1f), 0f)
-        assertEquals(44f, SentencePictureCardSizing.emojiSp(3, wide, 1f), 0f)
+        assertEquals(110f, SentencePictureCardSizing.emojiSp(1, wide, 1f), 0f)
+        assertEquals(76f, SentencePictureCardSizing.emojiSp(2, wide, 1f), 0f)
     }
 
     @Test
@@ -127,6 +129,36 @@ class SentencePictureSidesTest {
                     "emoji size grew from ${sizes[i - 1]} to ${sizes[i]} between " +
                         "scale ${scales[i - 1]} and ${scales[i]} at count $count",
                     sizes[i] <= sizes[i - 1],
+                )
+            }
+        }
+    }
+
+    @Test
+    fun baseScaleRaisesTheBaseButNotAboveTheWidthCap() {
+        // Die Erfolgsanimation zieht die Karte fast bühnenbreit; dort bindet
+        // weiter die Basisgröße, nicht der Deckel — ohne baseScale würde das
+        // Emoji also gar nicht wachsen.
+        val wide = 400f
+        assertEquals(76f * 1.6f, SentencePictureCardSizing.emojiSp(2, wide, 1f, 1.6f), 1f)
+
+        // Auf einer schmalen Karte bleibt der Deckel die Obergrenze: baseScale
+        // darf ihn nicht aushebeln, sonst kehrt der Überlauf-Bug zurück.
+        val narrow = 128f
+        val capped = SentencePictureCardSizing.emojiSp(3, narrow, 1f, 1.6f)
+        val renderedDp = 3 * capped * SentencePictureCardSizing.EmojiAdvanceEm
+        assertTrue("row renders ${renderedDp}dp into a ${narrow}dp card", renderedDp <= narrow)
+    }
+
+    @Test
+    fun baseScaleOfOneMatchesTheCallWithoutIt() {
+        // Der Normalpfad darf sich durch den neuen Parameter nicht verschieben.
+        listOf(1, 2, 3).forEach { count ->
+            listOf(128f, 173f, 400f).forEach { width ->
+                assertEquals(
+                    SentencePictureCardSizing.emojiSp(count, width, 1f),
+                    SentencePictureCardSizing.emojiSp(count, width, 1f, 1f),
+                    0f,
                 )
             }
         }
