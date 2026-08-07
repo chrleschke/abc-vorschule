@@ -1,6 +1,8 @@
 package app.abcvorschule.ui.exercise
 
+import kotlin.math.PI
 import kotlin.math.floor
+import kotlin.math.sin
 
 /**
  * Welche Seite die richtige Karte des Satz-Verstehers bekommt. Deterministisch
@@ -25,7 +27,7 @@ object SentencePictureSides {
  * Rechnung testbar bleibt — das Repo hat keine androidTests.
  *
  * Der Breitendeckel ist der eigentliche Fix: vorher setzte die Karte ihre Emoji-
- * Reihe fest in 72/56/44sp. Auf einem schmalen Gerät oder bei System-Schrift-
+ * Reihe fest in 110/76/56sp. Auf einem schmalen Gerät oder bei System-Schrift-
  * skalierung über 1.0 passte die Reihe dann nicht mehr in eine Zeile, und weil
  * der `Text` `maxLines = 1` hat, wurde die zweite Zeile erzeugt, aber nie
  * gezeichnet: das letzte Emoji verschwand. Bei 16 der 72 ausgelieferten Runden
@@ -56,14 +58,27 @@ object SentencePictureCardSizing {
     /**
      * @param contentWidthDp Breite *innerhalb* der Karteninnenabstände.
      * @param fontScale System-Schriftskalierung ([androidx.compose.ui.unit.Density.fontScale]).
+     * @param baseScale Faktor auf die Basisgröße, den die Erfolgsanimation von 1f
+     *   auf 1.6f fährt. Er hebt die Basis, **nicht** den Breitendeckel: die Karte
+     *   wird beim Feiern echt breiter gemessen, aber ohne diesen Faktor bliebe die
+     *   Basis die bindende Grenze und das Emoji würde nicht wachsen.
      */
-    fun emojiSp(atomCount: Int, contentWidthDp: Float, fontScale: Float): Float {
+    fun emojiSp(
+        atomCount: Int,
+        contentWidthDp: Float,
+        fontScale: Float,
+        baseScale: Float = 1f,
+    ): Float {
         val count = atomCount.coerceAtLeast(1)
+        // Die 2er- und 3er-Werte liegen bewusst über dem, was ein 411dp-Telefon
+        // durchlässt (dort deckelt die Breite auf ~72 bzw. ~48sp). Auf breiteren
+        // Geräten darf die Karte den Gewinn mitnehmen; der Deckel unten ist die
+        // Instanz, die Überlauf verhindert, nicht diese Staffelung.
         val base = when {
-            count <= 1 -> 72f
-            count == 2 -> 56f
-            else -> 44f
-        }
+            count <= 1 -> 110f
+            count == 2 -> 76f
+            else -> 56f
+        } * baseScale.coerceAtLeast(0f)
         val widthCap = contentWidthDp / (count * EmojiAdvanceEm)
         // Emojis sind Bilder, keine Prosa — dieselbe Begründung wie
         // FinaleLayout.capEffectiveSize: sie geben ihre fontScale-Vergrößerung als
@@ -73,5 +88,45 @@ object SentencePictureCardSizing {
         // Abrunden statt runden: die Näherung darf nie über das Budget rutschen,
         // dieselbe Konvention wie die Ganzzahl-Kürzung in FinaleLayout.
         return floor(scaled).coerceAtLeast(MinEmojiSp)
+    }
+}
+
+/**
+ * Das Wackeln der falsch getippten Bildkarte. Compose-frei, damit die Kurve
+ * prüfbar ist — dasselbe Muster wie `BurstGeometry.sparkOffsets`, denn das Repo
+ * hat keine androidTests.
+ *
+ * Bewusst *nur* Bewegung, keine Farbe: die Produktprinzipien markieren eine
+ * falsche Antwort für Kinder nicht rot (§8), und `ClayRed` ist die Fehlerfarbe
+ * für Erwachsenentext (§10). Ein Fehltipp ist hier kein Fehler, der benannt
+ * wird, sondern eine Karte, die nicht nachgibt.
+ */
+object SentencePictureCardShake {
+    /**
+     * Größter horizontaler Ausschlag. Die Nachbarkarte ist nur 8dp entfernt und
+     * `graphicsLayer` clippt nicht — 12dp überlappt sie also sichtbar, und genau
+     * das macht das Wackeln auch am Rand des Blickfelds erkennbar. Mehr würde
+     * die Karten verschmelzen lassen.
+     */
+    const val AmplitudeDp = 12f
+
+    /** Kurz genug, dass die Wiederholung des Satzes nicht darauf warten muss. */
+    const val DurationMs = 420
+
+    /** 2.5 Zyklen = 5 Halbwellen: hin, zurück, hin, zurück, aus. */
+    const val Cycles = 2.5f
+
+    /**
+     * Horizontaler Versatz in dp für [progress] 0f..1f. Sinus mit linear
+     * abklingender Hüllkurve: die Karte läuft aus statt abrupt zu stoppen, und
+     * sie endet exakt auf ihrer Ausgangsposition (`offsetDp(1f) == 0f`) — sonst
+     * bliebe sie für den Rest der Runde schief stehen.
+     *
+     * Außerhalb von 0..1 geklemmt: `animateFloatAsState` kann überschwingen.
+     */
+    fun offsetDp(progress: Float): Float {
+        val p = progress.coerceIn(0f, 1f)
+        val decay = 1f - p
+        return (AmplitudeDp * decay * sin(2.0 * PI * Cycles * p)).toFloat()
     }
 }

@@ -1,8 +1,9 @@
 package app.abcvorschule.ui.exercise
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,7 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
@@ -35,7 +38,7 @@ import app.abcvorschule.content.SentencePictureRound
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.CreamElevated
+import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 
@@ -61,6 +64,12 @@ fun SentencePictureTrainer(
     var misses by remember(roundKey) { mutableIntStateOf(0) }
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var solvedCorrect by remember(roundKey) { mutableStateOf(false) }
+    // Welche Karte zuletzt falsch getippt wurde und wie oft überhaupt schon
+    // falsch getippt wurde. Der Zähler ist der Auslöser der Schüttel-Animation:
+    // ein Bool wäre beim zweiten Fehltipp auf dieselbe Karte schon true und
+    // würde keine neue Runde starten.
+    var wrongTick by remember(roundKey) { mutableIntStateOf(0) }
+    var wrongOnLeft by remember(roundKey) { mutableStateOf(false) }
     val haptics = LocalAbcHaptics.current
     val scoredIds = remember(roundKey) { round.correctAtomIds.distinct() }
     val correctOnLeft = remember(roundKey) {
@@ -72,7 +81,7 @@ fun SentencePictureTrainer(
         label = "sentence_picture_lock_opacity",
     )
 
-    fun choose(correct: Boolean) {
+    fun choose(correct: Boolean, tappedLeft: Boolean) {
         if (resolved || solvedCorrect) return
         if (correct) {
             solvedCorrect = true
@@ -80,6 +89,8 @@ fun SentencePictureTrainer(
             onResult(true, false, scoredIds)
         } else {
             misses += 1
+            wrongOnLeft = tappedLeft
+            wrongTick += 1
             haptics.nudge()
             onResult(false, false, scoredIds)
         }
@@ -87,6 +98,10 @@ fun SentencePictureTrainer(
 
     ExerciseStage(
         modifier = modifier,
+        // Der Aufgabenblock trägt hier nur den Speaker — am unteren Rand
+        // verdeckt die tippende Hand sonst genau die Bildkarten, die die
+        // ganze Aufgabe sind.
+        answerAnchor = AnswerAnchor.BelowCenter,
         prompt = {
             TaskPromptChrome(
                 title = null,
@@ -108,31 +123,61 @@ fun SentencePictureTrainer(
         },
         answers = {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                // 8dp statt 14dp: die Lücke ist reines Breitenbudget, das den
+                // Emojis fehlt. Zwei Karten mit deutlichem Rahmen brauchen
+                // keinen breiten Graben, um auseinandergehalten zu werden.
+                horizontalArrangement = Arrangement.spacedBy(CardGapDp.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("sentence_picture_cards"),
             ) {
                 val leftIsCorrect = correctOnLeft
+                // Ein Fortschritt für beide Karten: die richtige wächst, die falsche
+                // verschwindet. Bei fast null Gewicht schrumpft der Slot der
+                // Verliererkarte mit; die 8dp Lücke bleibt, die Gewinnerkarte landet
+                // also 4dp neben der optischen Mitte — unter der Wahrnehmungsschwelle
+                // und billiger als eine zusätzlich animierte Arrangement-Lücke.
+                //
+                // key(roundKey) statt nur remember: dieselbe Runden-Reset-Disziplin wie
+                // beim remember(roundKey) der Zustände oben. Ohne den Key überlebt das
+                // Animatable den Rundenwechsel, der Zielwert springt beim neuen
+                // roundIndex von 1f auf 0f zurück und animiert sichtbar ab — die neue
+                // Runde würde mit vergrößerter Antwortkarte eröffnen, bevor der Satz
+                // überhaupt vorgelesen wurde.
+                val celebrateProgress by key(roundKey) {
+                    animateFloatAsState(
+                        targetValue = if (solvedCorrect) 1f else 0f,
+                        animationSpec = tween(durationMillis = 360, easing = FastOutSlowInEasing),
+                        label = "sentence_picture_celebrate",
+                    )
+                }
+                val correctWeight = 1f + 2f * celebrateProgress
+                val wrongWeight = (1f - celebrateProgress).coerceAtLeast(0.001f)
                 PictureCard(
                     atomIds = if (leftIsCorrect) round.correctAtomIds else round.wrongAtomIds,
                     pack = pack,
                     highlight = (solvedCorrect || resolved) && leftIsCorrect,
+                    celebrateProgress = if (leftIsCorrect) celebrateProgress else 0f,
                     enabled = !interactionLocked && !solvedCorrect && !resolved,
-                    opacity = interactionOpacity,
-                    onTap = { choose(leftIsCorrect) },
+                    opacity = interactionOpacity *
+                        if (leftIsCorrect) 1f else (1f - celebrateProgress),
+                    shakeTick = if (wrongOnLeft) wrongTick else 0,
+                    onTap = { choose(leftIsCorrect, tappedLeft = true) },
                     testTag = if (leftIsCorrect) "sentence_picture_card_correct" else "sentence_picture_card_wrong",
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(if (leftIsCorrect) correctWeight else wrongWeight),
                 )
                 PictureCard(
                     atomIds = if (leftIsCorrect) round.wrongAtomIds else round.correctAtomIds,
                     pack = pack,
                     highlight = (solvedCorrect || resolved) && !leftIsCorrect,
+                    celebrateProgress = if (leftIsCorrect) 0f else celebrateProgress,
                     enabled = !interactionLocked && !solvedCorrect && !resolved,
-                    opacity = interactionOpacity,
-                    onTap = { choose(!leftIsCorrect) },
+                    opacity = interactionOpacity *
+                        if (leftIsCorrect) (1f - celebrateProgress) else 1f,
+                    shakeTick = if (!wrongOnLeft) wrongTick else 0,
+                    onTap = { choose(!leftIsCorrect, tappedLeft = false) },
                     testTag = if (leftIsCorrect) "sentence_picture_card_wrong" else "sentence_picture_card_correct",
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(if (leftIsCorrect) wrongWeight else correctWeight),
                 )
             }
             if (misses >= 2 && !resolved && !solvedCorrect) {
@@ -148,45 +193,100 @@ fun SentencePictureTrainer(
 }
 
 /**
- * Bestätigungs-Grün der gewählten Karte — dieselbe dunklere LeafGreen-Variante
- * wie SentenceOrderTrainer.PegBorderGreen (voll-opakes LeafGreen erreicht auf
- * CreamElevated nur 2.87:1).
+ * Innenabstand der Karte je Seite; zugleich der Abzug für die Emoji-
+ * Breitenrechnung. 4dp statt vormals 10dp: ohne Füllfläche muss der Rahmen keine
+ * Fläche mehr einfassen, und jedes eingesparte dp landet direkt im Breitendeckel
+ * der Emoji-Reihe — bei drei Emojis ist die Breite die bindende Grenze.
  */
-private val CardBorderGreen = Color(0xFF3A7A44)
+private const val CardPaddingHorizontalDp = 4f
 
-/** Innenabstand der Karte je Seite; zugleich der Abzug für die Emoji-Breitenrechnung. */
-private const val CardPaddingHorizontalDp = 10f
+/** Abstand der beiden Karten in der Reihe, ebenfalls Breitenbudget der Emojis. */
+private const val CardGapDp = 8f
+
+/** Zuwachs der Emoji-Basisgröße, wenn die richtige Karte in die Mitte wächst. */
+private const val CelebrateBaseScaleGain = 0.6f
 
 @Composable
 private fun PictureCard(
     atomIds: List<String>,
     pack: ContentPack,
     highlight: Boolean,
+    celebrateProgress: Float,
     enabled: Boolean,
     opacity: Float,
+    shakeTick: Int,
     onTap: () -> Unit,
     testTag: String,
     modifier: Modifier = Modifier,
 ) {
     val emojis = atomIds.joinToString("") { pack.atoms[it]?.emoji.orEmpty() }
     val fontScale = LocalDensity.current.fontScale
+    // Ein Animatable statt animateFloatAsState: die Schüttelrunde muss bei jedem
+    // neuen Tick von vorn beginnen, auch wenn die vorige noch läuft.
+    val shake = remember { Animatable(0f) }
+    LaunchedEffect(shakeTick) {
+        // Erst zurücksetzen, dann der Frühausstieg — nicht zu „wenn 0, einfach
+        // return" vereinfachen: beim Rundenwechsel fällt shakeTick von 1 auf 0, der
+        // Effekt startet neu und bricht dabei ein noch laufendes animateTo ab, dessen
+        // abschließendes snapTo unten also nie mehr läuft. Die Chevrons wechseln die
+        // Runde ohne Verzögerung (SessionViewModel.goNextRound) und sind nach einem
+        // Fehltipp aktiv — falsche Karte tippen, innerhalb der 420ms den Chevron: die
+        // nächste Runde eröffnete sonst mit einer um bis zu 12dp verschobenen Karte,
+        // und die bliebe für alle folgenden Runden schief stehen.
+        shake.snapTo(0f)
+        if (shakeTick == 0) return@LaunchedEffect
+        shake.animateTo(1f, tween(durationMillis = SentencePictureCardShake.DurationMs))
+        shake.snapTo(0f)
+    }
     // Die Emoji-Größe hängt an der real gemessenen Kartenbreite, nicht an einer
     // festen Staffelung: sonst überläuft die Reihe auf schmalen Geräten (siehe
     // SentencePictureCardSizing). BoxWithConstraints außen, Padding innen, damit
     // maxWidth die volle Kartenbreite ist und der Abzug hier sichtbar bleibt.
     BoxWithConstraints(modifier = modifier) {
         val contentWidthDp = (maxWidth.value - 2 * CardPaddingHorizontalDp).coerceAtLeast(1f)
-        val emojiSp = SentencePictureCardSizing.emojiSp(atomIds.size, contentWidthDp, fontScale)
+        // baseScale statt graphicsLayer-Skalierung: eine hochgezogene Bitmap wäre
+        // bei einem Glyphen, der die halbe Bühne füllt und dort mehrere hundert
+        // Millisekunden steht, sichtbar weich. Über das Row-Gewicht wird die Karte
+        // echt breiter gemessen, und dieselbe Funktion rechnet die Emoji-Größe für
+        // die neue Breite — der Glyph wird in Endgröße gerastert.
+        //
+        // Die Verbreiterung allein reicht dafür nicht: auf der breiten Karte
+        // bindet weiter die Basisgröße, nicht der Deckel. Erst baseScale hebt sie.
+        val emojiSp = SentencePictureCardSizing.emojiSp(
+            atomCount = atomIds.size,
+            contentWidthDp = contentWidthDp,
+            fontScale = fontScale,
+            baseScale = 1f + CelebrateBaseScaleGain * celebrateProgress,
+        )
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = AbcDimens.kidTouch * 2)
+                // graphicsLayer statt offset: eine reine Zeichenoperation, die
+                // kein Neu-Layout der Reihe auslöst und die Nachbarkarte
+                // deshalb nicht mitverschiebt.
+                .graphicsLayer {
+                    translationX = SentencePictureCardShake.offsetDp(shake.value).dp.toPx()
+                }
                 .alpha(opacity)
-                .background(color = CreamElevated, shape = RoundedCornerShape(22.dp))
+                // Keine Füllfläche: CreamElevated auf Cream ist nur 1.24:1 — als
+                // Kartengrenze kaum sichtbar, aber genug, um die Emojis
+                // abzudunkeln. Die Grenze wandert auf den Rahmen, wo sie mit
+                // 3.70:1 tatsächlich zu sehen ist — gerechnet für die *gemalte*
+                // Farbe, also WarmMuted mit Alpha 0.9 über Cream (≈ #897C68), nicht
+                // für das deckende WarmMuted (das wären 4.45:1). Über der
+                // 3:1-Schwelle für UI-Komponenten und ein Vielfaches der Füllung,
+                // die er ersetzt; die Bilder stehen auf der hellsten Fläche der
+                // Übung.
+                //
+                // Damit fällt auch die Sonderfarbe weg, die es nur wegen der
+                // Füllung gab: LeafGreen erreichte auf CreamElevated bloß 2.87:1,
+                // auf Cream sind es 3.5:1 — die Rollenfarbe „richtig" aus §10
+                // gilt hier wieder direkt.
                 .border(
                     width = if (highlight) 4.dp else 3.dp,
-                    color = if (highlight) CardBorderGreen else WarmMuted.copy(alpha = 0.9f),
+                    color = if (highlight) LeafGreen else WarmMuted.copy(alpha = 0.9f),
                     shape = RoundedCornerShape(22.dp),
                 )
                 .clickable(enabled = enabled, onClick = onTap)
