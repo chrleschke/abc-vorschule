@@ -1,5 +1,7 @@
 package app.abcvorschule.ui.exercise
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -23,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -52,18 +55,30 @@ fun NumberPad(
     modifier: Modifier = Modifier,
     /** True once the typed number turned out to be the answer — the field confirms in green. */
     solved: Boolean = false,
+    /** False during the audio lock — field and submit button are non-interactive
+     * and dimmed, and focus/keyboard are deferred until this turns true. */
+    enabled: Boolean = true,
 ) {
     var value by remember(resetToken) { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val opacity by animateFloatAsState(
+        targetValue = if (enabled) 1f else 0.5f,
+        animationSpec = tween(durationMillis = 200),
+        label = "number_pad_lock_opacity",
+    )
 
     fun submit() {
         value.toIntOrNull()?.let(onSubmit)
     }
 
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-        keyboardController?.show()
+    LaunchedEffect(enabled) {
+        // Deferred rather than Unit-keyed: while locked the keyboard must not pop
+        // up before the child is allowed to type (design doc).
+        if (enabled) {
+            focusRequester.requestFocus()
+            keyboardController?.show()
+        }
     }
     LaunchedEffect(solved) {
         // Without closing the IME the green confirmation sits behind the keyboard —
@@ -72,7 +87,7 @@ fun NumberPad(
     }
 
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().alpha(opacity),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -85,6 +100,7 @@ fun NumberPad(
                 .testTag("number_input"),
             textStyle = MaterialTheme.typography.displayLarge.copy(textAlign = TextAlign.Center),
             singleLine = true,
+            enabled = enabled,
             readOnly = solved,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { submit() }),
@@ -99,6 +115,7 @@ fun NumberPad(
         Spacer(Modifier.width(16.dp))
         Surface(
             onClick = { submit() },
+            enabled = enabled,
             shape = RoundedCornerShape(20.dp),
             color = SunCoral,
             modifier = Modifier

@@ -1,5 +1,7 @@
 package app.abcvorschule.ui.exercise
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -42,11 +45,19 @@ fun VisualQuantityBoard(
     solved: Int? = null,
     missCount: Int = 0,
     locked: Boolean = false,
+    /** False during the audio lock — separate from [locked] ("already answered"):
+     * this one gates the initial listen-first window (design doc). */
+    interactionLocked: Boolean = false,
     onResolve: (() -> Unit)? = null,
     ttsAvailable: Boolean = false,
     speaking: Boolean = false,
     onSpeakPrompt: () -> Unit = {},
 ) {
+    val answerOpacity by animateFloatAsState(
+        targetValue = if (interactionLocked) 0.5f else 1f,
+        animationSpec = tween(durationMillis = 200),
+        label = "math_choice_lock_opacity",
+    )
     ExerciseStage(
         modifier = modifier,
         prompt = {
@@ -71,6 +82,7 @@ fun VisualQuantityBoard(
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.alpha(answerOpacity),
             ) {
                 choices.forEach { value ->
                     // The picked tile confirms itself in green, so the child sees *which*
@@ -83,7 +95,7 @@ fun VisualQuantityBoard(
                                 color = if (correct) LeafGreen else CreamElevated,
                                 shape = RoundedCornerShape(18.dp),
                             )
-                            .clickable { onChoose(value) }
+                            .clickable(enabled = !interactionLocked) { onChoose(value) }
                             .padding(horizontal = 16.dp, vertical = 12.dp)
                             .testTag("math_choice_$value"),
                         horizontalAlignment = Alignment.CenterHorizontally,
