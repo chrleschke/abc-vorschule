@@ -11,6 +11,9 @@ import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.Lesson
 import app.abcvorschule.content.PromptUnlock
 import app.abcvorschule.content.SentenceOrderRound
+import app.abcvorschule.content.SentencePictureRound
+import app.abcvorschule.content.SentencePictureSpec
+import app.abcvorschule.content.SentencePictureSpeech
 import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.SymbolHuntRound
@@ -317,6 +320,11 @@ class SessionViewModel(
                 pack.atoms[round.targetAtomId],
                 pack.atoms[round.wordAtomId],
             )
+            is SentencePictureRound -> SentencePictureSpeech.promptParts(
+                _ui.value.current?.spec as? SentencePictureSpec,
+                round,
+                _ui.value.roundIndex,
+            )
             else -> listOfNotNull(round.promptTts.takeIf { it.isNotBlank() })
         }
     }
@@ -514,6 +522,7 @@ class SessionViewModel(
     /** Miss feedback is spoken; content authors supply the didactic re-reading. */
     private fun missCueForCurrent(): String = when (val round = _ui.value.currentRound) {
         is SoundPositionRound -> round.missTts
+        is SentencePictureRound -> round.promptTts
         else -> "Probiere eine andere Antwort"
     }
 

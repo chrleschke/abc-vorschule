@@ -2,6 +2,7 @@ package app.abcvorschule.debug
 
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.LetterTraceRound
+import app.abcvorschule.content.SentencePictureSpec
 import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SoundPositionSpec
 import app.abcvorschule.content.SymbolHuntDerivation
@@ -43,12 +44,24 @@ fun ContentPack.ttsDebugEntries(): List<TtsDebugEntry> {
     }
 
     tasks.values.sortedBy { it.id }.forEach { task ->
+        // Task-Level-Strings: gesprochene Felder, die nicht an einer Runde hängen.
+        // IDs wie in tools/tts/ttskit/extract.py, damit Debug-Screen und Sprach-
+        // Pipeline denselben Schlüssel benutzen.
         if (task is SoundPositionSpec) {
             entries += TtsDebugEntry(
                 id = "task:${task.id}:phonemeTts",
                 group = TtsDebugGroup.Task,
                 label = "${task.id} · phonemeTts",
                 originalText = task.phonemeTts,
+                sourceFile = "tasks.json",
+            )
+        }
+        if (task is SentencePictureSpec) {
+            entries += TtsDebugEntry(
+                id = "task:${task.id}:instructionTts",
+                group = TtsDebugGroup.Task,
+                label = "${task.id} · instructionTts",
+                originalText = task.instructionTts,
                 sourceFile = "tasks.json",
             )
         }

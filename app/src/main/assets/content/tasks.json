@@ -4711,6 +4711,492 @@
           "operation": "subtract"
         }
       ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l01-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Zwei Ameisen sind zu Mama gekrabbelt.",
+          "correctAtomIds": ["ameise", "ameise", "mama"],
+          "wrongAtomIds": ["ameise", "mama"]
+        },
+        {
+          "promptTts": "Mama hat die Ameise gefunden.",
+          "correctAtomIds": ["mama", "ameise"],
+          "wrongAtomIds": ["oma", "ameise"]
+        },
+        {
+          "promptTts": "Mama malte am Morgen eine Sonne.",
+          "correctAtomIds": ["mama", "sonne"],
+          "wrongAtomIds": ["mama", "herz"]
+        },
+        {
+          "promptTts": "Oma hat Mama gerufen.",
+          "correctAtomIds": ["oma", "mama"],
+          "wrongAtomIds": ["opa", "mama"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l02-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Opa hat Oma einen Kuss gegeben.",
+          "correctAtomIds": ["opa", "oma"],
+          "wrongAtomIds": ["opa", "mama"]
+        },
+        {
+          "promptTts": "Mimi ist auf das Sofa gesprungen.",
+          "correctAtomIds": ["mimi", "sofa"],
+          "wrongAtomIds": ["hund", "sofa"]
+        },
+        {
+          "promptTts": "Zwei Omas saßen auf der Bank.",
+          "correctAtomIds": ["oma", "oma"],
+          "wrongAtomIds": ["oma"]
+        },
+        {
+          "promptTts": "Oma hat Mimi gesucht und gefunden.",
+          "correctAtomIds": ["oma", "mimi"],
+          "wrongAtomIds": ["opa", "mimi"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l03-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Tom hat Opa gerufen.",
+          "correctAtomIds": ["tom", "opa"],
+          "wrongAtomIds": ["tom", "oma"]
+        },
+        {
+          "promptTts": "Papa hat zwei Tomaten geschnitten.",
+          "correctAtomIds": ["papa", "tomate", "tomate"],
+          "wrongAtomIds": ["papa", "tomate"]
+        },
+        {
+          "promptTts": "Opa trug einen Topf voll Suppe.",
+          "correctAtomIds": ["opa", "suppe"],
+          "wrongAtomIds": ["opa", "tee"]
+        },
+        {
+          "promptTts": "Tom warf den Ball zu Papa.",
+          "correctAtomIds": ["tom", "ball", "papa"],
+          "wrongAtomIds": ["tom", "ball", "opa"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l04-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Das Lama hat laut Hallo gerufen.",
+          "correctAtomIds": ["lama", "hallo"],
+          "wrongAtomIds": ["pferd", "hallo"]
+        },
+        {
+          "promptTts": "Zwei Lamas liefen über die Wiese.",
+          "correctAtomIds": ["lama", "lama"],
+          "wrongAtomIds": ["lama"]
+        },
+        {
+          "promptTts": "Das Lama hat einen Hut gefressen.",
+          "correctAtomIds": ["lama", "hut"],
+          "wrongAtomIds": ["lama", "keks"]
+        },
+        {
+          "promptTts": "Oma hat dem Lama gewinkt.",
+          "correctAtomIds": ["oma", "hallo", "lama"],
+          "wrongAtomIds": ["oma", "hallo", "pferd"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l05-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Ein Ufo ist im Tal gelandet.",
+          "correctAtomIds": ["ufo", "tal"],
+          "wrongAtomIds": ["ufo", "haus"]
+        },
+        {
+          "promptTts": "Papa hat zwei Hüte gekauft.",
+          "correctAtomIds": ["papa", "hut", "hut"],
+          "wrongAtomIds": ["papa", "hut"]
+        },
+        {
+          "promptTts": "Der Wind trug Omas Hut davon.",
+          "correctAtomIds": ["oma", "hut"],
+          "wrongAtomIds": ["oma", "schuh"]
+        },
+        {
+          "promptTts": "Drei Ufos flogen am Himmel.",
+          "correctAtomIds": ["ufo", "ufo", "ufo"],
+          "wrongAtomIds": ["ufo", "ufo"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l06-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Tom hat den Ball ins Tor geworfen.",
+          "correctAtomIds": ["tom", "ball", "tor"],
+          "wrongAtomIds": ["tom", "ball", "nest"]
+        },
+        {
+          "promptTts": "Oma hat zwei Rosen bekommen.",
+          "correctAtomIds": ["oma", "rose", "rose"],
+          "wrongAtomIds": ["oma", "rose"]
+        },
+        {
+          "promptTts": "Der Clown hatte eine rote Nase.",
+          "correctAtomIds": ["clown", "nase", "rot"],
+          "wrongAtomIds": ["clown", "nase", "blau"]
+        },
+        {
+          "promptTts": "Ein Vogel saß auf dem Tor.",
+          "correctAtomIds": ["vogel", "tor"],
+          "wrongAtomIds": ["vogel", "baum"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l07-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Im Nest lag ein kleiner Vogel.",
+          "correctAtomIds": ["nest", "vogel"],
+          "wrongAtomIds": ["nest", "maus"]
+        },
+        {
+          "promptTts": "Die Sonne schien auf die Rosen.",
+          "correctAtomIds": ["sonne", "rose", "rose"],
+          "wrongAtomIds": ["wolke", "rose", "rose"]
+        },
+        {
+          "promptTts": "Tom hat im Sand ein Nest gefunden.",
+          "correctAtomIds": ["tom", "sand", "nest"],
+          "wrongAtomIds": ["tom", "sand", "ball"]
+        },
+        {
+          "promptTts": "Oma hat die Rosen gegossen.",
+          "correctAtomIds": ["oma", "rose", "rose"],
+          "wrongAtomIds": ["opa", "rose", "rose"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l08-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "In der Dose waren zwei Kekse.",
+          "correctAtomIds": ["dose", "keks", "keks"],
+          "wrongAtomIds": ["dose", "keks"]
+        },
+        {
+          "promptTts": "Der Hund hat einen Keks geklaut.",
+          "correctAtomIds": ["hund", "keks"],
+          "wrongAtomIds": ["katze", "keks"]
+        },
+        {
+          "promptTts": "Tom aß den letzten Keks.",
+          "correctAtomIds": ["tom", "keks"],
+          "wrongAtomIds": ["tom", "eis"]
+        },
+        {
+          "promptTts": "Die Dosen standen im Regal.",
+          "correctAtomIds": ["dose", "dose"],
+          "wrongAtomIds": ["dose"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l09-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Die Wolken zogen über das Haus.",
+          "correctAtomIds": ["wolke", "wolke", "haus"],
+          "wrongAtomIds": ["wolke", "haus"]
+        },
+        {
+          "promptTts": "Mama hat ein neues Kleid genäht.",
+          "correctAtomIds": ["mama", "kleid"],
+          "wrongAtomIds": ["mama", "jacke"]
+        },
+        {
+          "promptTts": "Das Eis ist in der Sonne geschmolzen.",
+          "correctAtomIds": ["eis", "sonne"],
+          "wrongAtomIds": ["eis", "wolke"]
+        },
+        {
+          "promptTts": "Tom hat zwei Eier gefunden.",
+          "correctAtomIds": ["tom", "eier"],
+          "wrongAtomIds": ["tom", "ei"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l10-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Die Giraffe hat aus dem Sack gefressen.",
+          "correctAtomIds": ["giraffe", "sack"],
+          "wrongAtomIds": ["pferd", "sack"]
+        },
+        {
+          "promptTts": "Auf dem Dach saßen zwei Tauben.",
+          "correctAtomIds": ["dach", "taube", "taube"],
+          "wrongAtomIds": ["dach", "taube"]
+        },
+        {
+          "promptTts": "Opa hat mir ein Buch geschenkt.",
+          "correctAtomIds": ["opa", "buch"],
+          "wrongAtomIds": ["opa", "paket"]
+        },
+        {
+          "promptTts": "Der Drache flog über den Weg.",
+          "correctAtomIds": ["drache", "weg"],
+          "wrongAtomIds": ["drache", "park"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l11-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Vor dem Haus standen zwei Bäume.",
+          "correctAtomIds": ["haus", "baeume"],
+          "wrongAtomIds": ["haus", "baum"]
+        },
+        {
+          "promptTts": "Der Bär hat im Haus geschlafen.",
+          "correctAtomIds": ["baer", "haus"],
+          "wrongAtomIds": ["baer", "baum"]
+        },
+        {
+          "promptTts": "Auf dem Baum saß eine Eule.",
+          "correctAtomIds": ["baum", "eule"],
+          "wrongAtomIds": ["baum", "vogel"]
+        },
+        {
+          "promptTts": "Aus dem Haus kamen zwei Mäuse.",
+          "correctAtomIds": ["haus", "maus", "maus"],
+          "wrongAtomIds": ["haus", "maus"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l12-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Hier stehen viele Häuser.",
+          "correctAtomIds": ["haeusser"],
+          "wrongAtomIds": ["haus"]
+        },
+        {
+          "promptTts": "Der Frosch hat zwei Rüben geerntet.",
+          "correctAtomIds": ["frosch", "ruebe", "ruebe"],
+          "wrongAtomIds": ["frosch", "ruebe"]
+        },
+        {
+          "promptTts": "Die Äpfel fielen vom Baum.",
+          "correctAtomIds": ["aepfel", "baum"],
+          "wrongAtomIds": ["apfel", "baum"]
+        },
+        {
+          "promptTts": "Die Mäuse aßen den Käse auf.",
+          "correctAtomIds": ["maus", "maus", "kaese"],
+          "wrongAtomIds": ["maus", "kaese"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l13-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Das Schaf hat neue Schuhe bekommen.",
+          "correctAtomIds": ["schaf", "schuh", "schuh"],
+          "wrongAtomIds": ["schaf", "hut"]
+        },
+        {
+          "promptTts": "Zwei Fische schwammen im Fluss.",
+          "correctAtomIds": ["fisch", "fisch"],
+          "wrongAtomIds": ["fisch"]
+        },
+        {
+          "promptTts": "Tom ist in die Schule gegangen.",
+          "correctAtomIds": ["tom", "schule"],
+          "wrongAtomIds": ["tom", "haus"]
+        },
+        {
+          "promptTts": "Oma hat einen Schuh verloren.",
+          "correctAtomIds": ["oma", "schuh"],
+          "wrongAtomIds": ["oma", "schuh", "schuh"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l14-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Das Zebra hat ein Jojo gefunden.",
+          "correctAtomIds": ["zebra", "jojo"],
+          "wrongAtomIds": ["zebra", "ball"]
+        },
+        {
+          "promptTts": "Zwei Eulen saßen auf dem Baum.",
+          "correctAtomIds": ["eule", "eule", "baum"],
+          "wrongAtomIds": ["eule", "baum"]
+        },
+        {
+          "promptTts": "Der Zug ist durch das Tal gefahren.",
+          "correctAtomIds": ["zug", "tal"],
+          "wrongAtomIds": ["auto", "tal"]
+        },
+        {
+          "promptTts": "Die Eule fing eine Maus.",
+          "correctAtomIds": ["eule", "maus"],
+          "wrongAtomIds": ["katze", "maus"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l15-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Der Vogel ist gegen die Vase geflogen.",
+          "correctAtomIds": ["vogel", "vase"],
+          "wrongAtomIds": ["vogel", "lampe"]
+        },
+        {
+          "promptTts": "Papa ist in die Vase getreten.",
+          "correctAtomIds": ["papa", "fuss", "vase"],
+          "wrongAtomIds": ["papa", "fuss", "ball"]
+        },
+        {
+          "promptTts": "In der Vase standen zwei Rosen.",
+          "correctAtomIds": ["vase", "rose", "rose"],
+          "wrongAtomIds": ["vase", "rose"]
+        },
+        {
+          "promptTts": "Zwei Vögel badeten im Sand.",
+          "correctAtomIds": ["vogel", "vogel", "sand"],
+          "wrongAtomIds": ["vogel", "sand"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l16-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Das Pferd hat zwei Äpfel gefressen.",
+          "correctAtomIds": ["pferd", "aepfel"],
+          "wrongAtomIds": ["pferd", "apfel"]
+        },
+        {
+          "promptTts": "Opa trug einen schweren Sack.",
+          "correctAtomIds": ["opa", "sack"],
+          "wrongAtomIds": ["opa", "paket"]
+        },
+        {
+          "promptTts": "Das Pferd ist über das Tor gesprungen.",
+          "correctAtomIds": ["pferd", "tor"],
+          "wrongAtomIds": ["pferd", "haus"]
+        },
+        {
+          "promptTts": "Die Äpfel lagen im Sack.",
+          "correctAtomIds": ["aepfel", "sack"],
+          "wrongAtomIds": ["aepfel", "eimer"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l17-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Die Spinne saß auf dem Spiegel.",
+          "correctAtomIds": ["spinne", "spiegel"],
+          "wrongAtomIds": ["spinne", "fenster"]
+        },
+        {
+          "promptTts": "Am Himmel standen viele Sterne.",
+          "correctAtomIds": ["stern", "stern", "stern"],
+          "wrongAtomIds": ["stern"]
+        },
+        {
+          "promptTts": "Tom ist über den Stuhl gestolpert.",
+          "correctAtomIds": ["tom", "stuhl"],
+          "wrongAtomIds": ["tom", "sofa"]
+        },
+        {
+          "promptTts": "Zwei Spinnen krabbelten langsam über die Straße.",
+          "correctAtomIds": ["spinne", "spinne", "strasse"],
+          "wrongAtomIds": ["spinne", "strasse"]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l18-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "promptTts": "Das Pony ist mit dem Taxi gefahren.",
+          "correctAtomIds": ["pony", "taxi"],
+          "wrongAtomIds": ["pony", "bus"]
+        },
+        {
+          "promptTts": "Zwei Quallen schwammen im Wasser.",
+          "correctAtomIds": ["qualle", "qualle"],
+          "wrongAtomIds": ["qualle"]
+        },
+        {
+          "promptTts": "Der Clown hat Xylofon gespielt.",
+          "correctAtomIds": ["clown", "xylofon"],
+          "wrongAtomIds": ["clown", "radio"]
+        },
+        {
+          "promptTts": "Das Taxi hielt an der Ampel.",
+          "correctAtomIds": ["taxi", "ampel"],
+          "wrongAtomIds": ["bus", "ampel"]
+        }
+      ]
     }
   ]
 }

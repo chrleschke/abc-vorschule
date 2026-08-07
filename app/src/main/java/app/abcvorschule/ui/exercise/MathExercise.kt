@@ -21,7 +21,7 @@ import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.theme.WarmInk
 
 /**
- * Trainer 6 — Rechnen. Pure quantity arithmetic: emoji groups and numerals only,
+ * Trainer 7 — Rechnen. Pure quantity arithmetic: emoji groups and numerals only,
  * never words to read or build. Singular/plural lives in the spoken prompt.
  */
 @Composable

@@ -13,6 +13,7 @@ object ContentValidator {
         TrainerKind.syllable_merge,
         TrainerKind.word_build,
         TrainerKind.sentence_order,
+        TrainerKind.sentence_picture,
         TrainerKind.count_add,
     )
 
@@ -37,6 +38,13 @@ object ContentValidator {
     private const val MaxFinalePictures = 4
     private const val MinFinaleWords = 4
     private const val MaxFinaleWords = 7
+
+    /** Redaktionsregeln Satz-Versteher, siehe Design-Spec 2026-08-07. */
+    private const val MinSentencePictureRounds = 3
+    private const val MaxSentencePictureRounds = 6
+    private const val MinSentencePictureWords = 4
+    private const val MaxSentencePictureWords = 8
+    private const val MaxSentencePictureCardAtoms = 3
 
     fun validate(pack: ContentPack): List<ValidationIssue> {
         val issues = mutableListOf<ValidationIssue>()
@@ -227,6 +235,56 @@ object ContentValidator {
                         issues += ValidationIssue(
                             "task $id tray holds $tray tiles; max is $MaxSentenceTrayTiles",
                         )
+                    }
+                }
+                is SentencePictureSpec -> {
+                    if (spec.instructionTts.isBlank()) {
+                        issues += ValidationIssue("task $id needs an instructionTts")
+                    }
+                    if (spec.rounds.size !in MinSentencePictureRounds..MaxSentencePictureRounds) {
+                        issues += ValidationIssue(
+                            "task $id holds ${spec.rounds.size} rounds; expected " +
+                                "$MinSentencePictureRounds..$MaxSentencePictureRounds",
+                        )
+                    }
+                    spec.rounds.forEach { round ->
+                        val words = round.promptTts.trim().split(Regex("\\s+")).count { it.isNotEmpty() }
+                        if (words !in MinSentencePictureWords..MaxSentencePictureWords) {
+                            issues += ValidationIssue(
+                                "task $id sentence holds $words words; expected " +
+                                    "$MinSentencePictureWords..$MaxSentencePictureWords",
+                            )
+                        }
+                        if ("Ordne" in round.promptTts) {
+                            issues += ValidationIssue(
+                                "task $id sentence must not repeat the 'Ordne' instruction",
+                            )
+                        }
+                        listOf("correct" to round.correctAtomIds, "wrong" to round.wrongAtomIds)
+                            .forEach { (label, ids) ->
+                                if (ids.size !in 1..MaxSentencePictureCardAtoms) {
+                                    issues += ValidationIssue(
+                                        "task $id $label card holds ${ids.size} atoms; " +
+                                            "expected 1..$MaxSentencePictureCardAtoms",
+                                    )
+                                }
+                                ids.forEach { atomId ->
+                                    requireAtom("task $id", atomId)
+                                    val atom = pack.atoms[atomId]
+                                    if (atom != null && atom.emoji.isBlank()) {
+                                        issues += ValidationIssue(
+                                            "task $id $label card atom $atomId carries no emoji",
+                                        )
+                                    }
+                                }
+                            }
+                        // Beide Karten müssen unterscheidbar sein, sonst kann die
+                        // Aufgabe nicht fehlschlagen (Prüffrage der Prinzipien).
+                        fun glyphs(ids: List<String>) =
+                            ids.joinToString("") { pack.atoms[it]?.emoji.orEmpty() }
+                        if (glyphs(round.correctAtomIds) == glyphs(round.wrongAtomIds)) {
+                            issues += ValidationIssue("task $id cards are indistinguishable")
+                        }
                     }
                 }
                 is CountAddSpec -> spec.rounds.forEach { round ->
