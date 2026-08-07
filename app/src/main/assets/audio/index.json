@@ -1,5 +1,10 @@
 {
   "clips": {
+    "...im Wort...": {
+      "file": "ui_6d42ce6fdfae.ogg",
+      "fingerprint": "4954739c4d7573cb",
+      "profile": "ui"
+    },
     "12 Dosen": {
       "file": "word_ee49e1b093e8.ogg",
       "fingerprint": "5ad8c277347b57b0",
@@ -290,6 +295,11 @@
       "fingerprint": "a3e837bfe15e946f",
       "profile": "word"
     },
+    "Am Himmel stehen viele Sterne.": {
+      "file": "sentence_50d90e55c9cb.ogg",
+      "fingerprint": "3f7418d648578427",
+      "profile": "sentence"
+    },
     "Ameise": {
       "file": "word_e89bbd48dc17.ogg",
       "fingerprint": "0ffb4835bf5ebbcf",
@@ -314,6 +324,21 @@
       "file": "reward_3baa94bb94fe.ogg",
       "fingerprint": "5f5b74085a119f38",
       "profile": "reward"
+    },
+    "Auf dem Dach sitzen zwei Tauben.": {
+      "file": "sentence_9723703803eb.ogg",
+      "fingerprint": "2783957375355826",
+      "profile": "sentence"
+    },
+    "Auf dem Tor saß ein kleiner Vogel.": {
+      "file": "sentence_30fea05d6bda.ogg",
+      "fingerprint": "a2efd6b3c4b2f0ba",
+      "profile": "sentence"
+    },
+    "Aus dem Haus kamen zwei Mäuse.": {
+      "file": "sentence_231525cd6a7f.ogg",
+      "fingerprint": "c123caa45c41acc3",
+      "profile": "sentence"
     },
     "Ausgezeichnet": {
       "file": "reward_29fde84fd167.ogg",
@@ -343,6 +368,11 @@
     "Ball": {
       "file": "word_ae5859eceacb.ogg",
       "fingerprint": "25634d9b6859f995",
+      "profile": "word"
+    },
+    "Banane": {
+      "file": "word_a2df25966b32.ogg",
+      "fingerprint": "f23ef4c8fc761835",
       "profile": "word"
     },
     "Baue das Wort Apfel.": {
@@ -585,6 +615,11 @@
       "fingerprint": "42634129fb06d24c",
       "profile": "word"
     },
+    "Bett": {
+      "file": "word_e65491290432.ogg",
+      "fingerprint": "3750e58fbc69985a",
+      "profile": "word"
+    },
     "Biene": {
       "file": "word_49530e11d87d.ogg",
       "fingerprint": "b97499fcef92ba17",
@@ -605,6 +640,11 @@
       "fingerprint": "a6543dc2682007e9",
       "profile": "reward"
     },
+    "Brokkoli": {
+      "file": "word_18c606952024.ogg",
+      "fingerprint": "b47d21a707269dbc",
+      "profile": "word"
+    },
     "Brot": {
       "file": "word_ef53751671e5.ogg",
       "fingerprint": "d0a29ffa80b27b45",
@@ -620,6 +660,11 @@
       "fingerprint": "39e3c7692c1d6b53",
       "profile": "word"
     },
+    "Busch": {
+      "file": "word_9c5fc5624cb2.ogg",
+      "fingerprint": "3426ad957f3058be",
+      "profile": "word"
+    },
     "Bär": {
       "file": "word_f00b1e56865e.ogg",
       "fingerprint": "fdc7ec2220ae3344",
@@ -629,6 +674,11 @@
       "file": "word_f5252953fc2d.ogg",
       "fingerprint": "a9a8a9f96c1f0175",
       "profile": "word"
+    },
+    "Bäääm! Volltreffer!": {
+      "file": "reward_1765ff147259.ogg",
+      "fingerprint": "e95d365883b08541",
+      "profile": "reward"
     },
     "C": {
       "file": "phoneme_6b23c0d5f35d.ogg",
@@ -680,15 +730,35 @@
       "fingerprint": "153a6a0a3d8dd025",
       "profile": "sentence"
     },
+    "Das Eis ist in der Sonne geschmolzen.": {
+      "file": "sentence_2cee5d335761.ogg",
+      "fingerprint": "4e522e31c6e638fd",
+      "profile": "sentence"
+    },
     "Das Herz ist rot.": {
       "file": "sentence_20074d0c7579.ogg",
       "fingerprint": "d58479867008b892",
+      "profile": "sentence"
+    },
+    "Das Lama hat einen Hut gefressen.": {
+      "file": "sentence_238458f63f04.ogg",
+      "fingerprint": "0d08a186dbe3dfd3",
       "profile": "sentence"
     },
     "Das Lama hat einen roten Hut!": {
       "file": "finale_c485debfc347.ogg",
       "fingerprint": "fabe85aa1180f100",
       "profile": "finale"
+    },
+    "Das Lama hat laut Hallo gerufen.": {
+      "file": "sentence_b0b65c1bc802.ogg",
+      "fingerprint": "0ebda1aa5171bbae",
+      "profile": "sentence"
+    },
+    "Das Pferd hat zwei Äpfel gefuttert.": {
+      "file": "sentence_15c731864d50.ogg",
+      "fingerprint": "201d0d6a2317ee9d",
+      "profile": "sentence"
     },
     "Das Pferd knackt den Sack!": {
       "file": "finale_707f64819467.ogg",
@@ -700,9 +770,24 @@
       "fingerprint": "528ecfb1cd594d1c",
       "profile": "sentence"
     },
+    "Das Pferd sprang über das Tor.": {
+      "file": "sentence_f7aca856104d.ogg",
+      "fingerprint": "0f12dc76f77231b4",
+      "profile": "sentence"
+    },
+    "Das Pony ist mit dem Taxi gefahren.": {
+      "file": "sentence_cff8e609c311.ogg",
+      "fingerprint": "655b388a14b98900",
+      "profile": "sentence"
+    },
     "Das Quadrat ist gelb.": {
       "file": "sentence_a2b1bcad9ae8.ogg",
       "fingerprint": "048d4daa9395dda7",
+      "profile": "sentence"
+    },
+    "Das Schaf hat neue Schuhe bekommen.": {
+      "file": "sentence_6c892ec908da.ogg",
+      "fingerprint": "1f3ff2e1c278b865",
       "profile": "sentence"
     },
     "Das Schaf steckt im Schuh!": {
@@ -710,9 +795,19 @@
       "fingerprint": "d3d66a340879baad",
       "profile": "finale"
     },
+    "Das Taxi hielt an der Ampel.": {
+      "file": "sentence_8cef79759fe2.ogg",
+      "fingerprint": "44d316d1332c5df7",
+      "profile": "sentence"
+    },
     "Das Taxi ist gelb.": {
       "file": "sentence_f4e12abcc256.ogg",
       "fingerprint": "1f006776040669d5",
+      "profile": "sentence"
+    },
+    "Das Zebra hat ein Jojo gefunden.": {
+      "file": "sentence_933b5863d8b8.ogg",
+      "fingerprint": "d30852fc471f18c5",
       "profile": "sentence"
     },
     "Das Zebra jongliert mit dem Jojo!": {
@@ -740,10 +835,20 @@
       "fingerprint": "00532d5d135df5ee",
       "profile": "sentence"
     },
+    "Das war spitze!": {
+      "file": "reward_e49ce94e10e5.ogg",
+      "fingerprint": "76fbae52eca08126",
+      "profile": "reward"
+    },
     "Das üben wir später.": {
       "file": "ui_8d0d96ca4976.ogg",
       "fingerprint": "38314d1a9105594f",
       "profile": "ui"
+    },
+    "Daumen hoch!": {
+      "file": "reward_ac9c83aa5b79.ogg",
+      "fingerprint": "eb614f05bd3366f6",
+      "profile": "reward"
     },
     "Deine Nase ist rot wie eine Rose.": {
       "file": "finale_349ab3496772.ogg",
@@ -755,9 +860,39 @@
       "fingerprint": "5661a6262cbeb6b0",
       "profile": "finale"
     },
+    "Der Bär hat im Bett geschlafen.": {
+      "file": "sentence_3df4bb8ae078.ogg",
+      "fingerprint": "10c754305e0199df",
+      "profile": "sentence"
+    },
+    "Der Clown hat Xylofon gespielt.": {
+      "file": "sentence_10fe7ba191e6.ogg",
+      "fingerprint": "fc270495675cc184",
+      "profile": "sentence"
+    },
+    "Der Dino hat den Kuchen gefressen.": {
+      "file": "sentence_bf43ffd0c632.ogg",
+      "fingerprint": "274f82100886bc0b",
+      "profile": "sentence"
+    },
+    "Der Drache flog über den Park.": {
+      "file": "sentence_918d36ae80a3.ogg",
+      "fingerprint": "58302758ab274152",
+      "profile": "sentence"
+    },
+    "Der Elefant hat große Füße.": {
+      "file": "sentence_5a4e84504740.ogg",
+      "fingerprint": "2d2944c3d0123bde",
+      "profile": "sentence"
+    },
     "Der Fisch schwimmt.": {
       "file": "sentence_2723db5e341b.ogg",
       "fingerprint": "18bd03adbdb5dac1",
+      "profile": "sentence"
+    },
+    "Der Frosch ist mit dem Fahrrad gefahren.": {
+      "file": "sentence_b8df3b338bb7.ogg",
+      "fingerprint": "3d8c8b677591c6bd",
       "profile": "sentence"
     },
     "Der Fuchs futtert den Kuchen!": {
@@ -800,14 +935,39 @@
       "fingerprint": "2341d8be9207d987",
       "profile": "finale"
     },
+    "Der Vogel setzt sich auf den Fuß.": {
+      "file": "sentence_549bfef15466.ogg",
+      "fingerprint": "c50efb9ce230f4e7",
+      "profile": "sentence"
+    },
     "Der Wal will mein Eis!": {
       "file": "finale_bd0296f21a30.ogg",
       "fingerprint": "6558a02003007065",
       "profile": "finale"
     },
+    "Der Wind trug Omas Hut davon.": {
+      "file": "sentence_2355776033b3.ogg",
+      "fingerprint": "7d82b2baf9723788",
+      "profile": "sentence"
+    },
+    "Der Zug fuhr durch das Tal.": {
+      "file": "sentence_6c79457e27c2.ogg",
+      "fingerprint": "d5ae240bdc75c4fd",
+      "profile": "sentence"
+    },
+    "Die Eule fing eine Maus.": {
+      "file": "sentence_12e277a45f58.ogg",
+      "fingerprint": "a47aa5a45b802cf1",
+      "profile": "sentence"
+    },
     "Die Eule fliegt.": {
       "file": "sentence_9d87d18b56ec.ogg",
       "fingerprint": "e242444638879bdb",
+      "profile": "sentence"
+    },
+    "Die Eule flog auf den Baum.": {
+      "file": "sentence_cbdbe9c0c34e.ogg",
+      "fingerprint": "06b85cacc24ed791",
       "profile": "sentence"
     },
     "Die Giraffe angelt auf dem Dach!": {
@@ -815,19 +975,64 @@
       "fingerprint": "c16c42310e6e3add",
       "profile": "finale"
     },
+    "Die Giraffe frisst aus dem Sack.": {
+      "file": "sentence_19048a388ae2.ogg",
+      "fingerprint": "821db128c5d2a248",
+      "profile": "sentence"
+    },
     "Die Katze klaut den Keks!": {
       "file": "finale_172373132f57.ogg",
       "fingerprint": "c2aff431c1cc9469",
       "profile": "finale"
+    },
+    "Die Mäuse haben den Käse geklaut.": {
+      "file": "sentence_646dfbb5549c.ogg",
+      "fingerprint": "d235d2e80834b55e",
+      "profile": "sentence"
     },
     "Die Qualle quetscht sich ins Taxi!": {
       "file": "finale_f7ea0a9a8437.ogg",
       "fingerprint": "39ad95855d84e268",
       "profile": "finale"
     },
+    "Die Rose steht in der Vase.": {
+      "file": "sentence_5d28d58d79c6.ogg",
+      "fingerprint": "7a9d2d5e86c2e96f",
+      "profile": "sentence"
+    },
+    "Die Rose wächst neben dem Tor.": {
+      "file": "sentence_c20bbc886c9b.ogg",
+      "fingerprint": "50a3d09d5d81fe46",
+      "profile": "sentence"
+    },
+    "Die Sonne scheint auf das Nest.": {
+      "file": "sentence_9a4f719d9be9.ogg",
+      "fingerprint": "db09c83720d26eee",
+      "profile": "sentence"
+    },
+    "Die Spinne hat sich im Spiegel gesehen.": {
+      "file": "sentence_6081bbc330c0.ogg",
+      "fingerprint": "a86d1977cdf0f071",
+      "profile": "sentence"
+    },
     "Die Spinne spielt.": {
       "file": "sentence_147f2a0d4995.ogg",
       "fingerprint": "3dc03f44a8de1cdb",
+      "profile": "sentence"
+    },
+    "Die Wolken zogen über das Haus.": {
+      "file": "sentence_9f1f1902b079.ogg",
+      "fingerprint": "ed2a5db5008593e9",
+      "profile": "sentence"
+    },
+    "Die Äpfel sind vom Baum gefallen.": {
+      "file": "sentence_eaa529d7a46a.ogg",
+      "fingerprint": "ca0d2efc1a6bc85b",
+      "profile": "sentence"
+    },
+    "Die Äpfel wurden aufgemampft.": {
+      "file": "sentence_1b97eb1db0ff.ogg",
+      "fingerprint": "61b4bcbc2325533e",
       "profile": "sentence"
     },
     "Dino": {
@@ -895,6 +1100,16 @@
       "fingerprint": "8c59120ad4cd4f5b",
       "profile": "prompt"
     },
+    "Du hast es drauf!": {
+      "file": "reward_bd22ab11f640.ogg",
+      "fingerprint": "19f8bbb2c1bec84e",
+      "profile": "reward"
+    },
+    "Du kleiner Einstein!": {
+      "file": "reward_67fc68c98c2f.ogg",
+      "fingerprint": "6a0631c166ee786d",
+      "profile": "reward"
+    },
     "E": {
       "file": "phoneme_a9f51566bd67.ogg",
       "fingerprint": "8c6fd00a17f77151",
@@ -935,10 +1150,30 @@
       "fingerprint": "32945f7bceb78c3c",
       "profile": "word"
     },
+    "Ein Ufo ist im Tal gelandet.": {
+      "file": "sentence_548ba90bb4a2.ogg",
+      "fingerprint": "cd80112240dcfb55",
+      "profile": "sentence"
+    },
     "Eine Spinne bewundert sich im Spiegel!": {
       "file": "finale_b65d1769e248.ogg",
       "fingerprint": "69bc1f2f077678d7",
       "profile": "finale"
+    },
+    "Einfach cool!": {
+      "file": "reward_0bb238d289d0.ogg",
+      "fingerprint": "3b00ea3b9e595c11",
+      "profile": "reward"
+    },
+    "Einfach weggemuckelt!": {
+      "file": "reward_b1219822f169.ogg",
+      "fingerprint": "0a7676747018f0ab",
+      "profile": "reward"
+    },
+    "Einhorn-Power pur!": {
+      "file": "reward_95763da124c8.ogg",
+      "fingerprint": "7e8ab76b6b4ad92e",
+      "profile": "reward"
     },
     "Einundzwanzig Frösche sitzen am Teich. Acht hüpfen weg. Wie viele Frösche bleiben.": {
       "file": "prompt_975e2eaeed5c.ogg",
@@ -995,6 +1230,11 @@
       "fingerprint": "8a5d8594dc98b988",
       "profile": "reward"
     },
+    "Fahrrad": {
+      "file": "word_6c966afb1bc2.ogg",
+      "fingerprint": "0b26052c308e81f7",
+      "profile": "word"
+    },
     "Fantastisch": {
       "file": "reward_aa551a457045.ogg",
       "fingerprint": "0efb6facad308e7e",
@@ -1048,6 +1288,11 @@
     "Fisch": {
       "file": "word_e5c286bb5e83.ogg",
       "fingerprint": "b7523f57af78b6d6",
+      "profile": "word"
+    },
+    "Flugzeug": {
+      "file": "word_b1cba0fae462.ogg",
+      "fingerprint": "bbd54a5bbe19e84d",
       "profile": "word"
     },
     "Frosch": {
@@ -1160,6 +1405,11 @@
       "fingerprint": "3956f01a6529ad31",
       "profile": "reward"
     },
+    "Gummibären-Siegertanz, jetzt!": {
+      "file": "reward_0c75cca6bb81.ogg",
+      "fingerprint": "fb58ad45473655bd",
+      "profile": "reward"
+    },
     "Gut gemacht": {
       "file": "reward_f5f4be6b7622.ogg",
       "fingerprint": "f3bb73024f133842",
@@ -1210,10 +1460,25 @@
       "fingerprint": "43c668b4013111c7",
       "profile": "word"
     },
+    "Hier hast du einen Keks!": {
+      "file": "reward_c0355e1c65c9.ogg",
+      "fingerprint": "92501fa72773c6a0",
+      "profile": "reward"
+    },
     "Hier sind Häuser.": {
       "file": "sentence_3dc7bd551f44.ogg",
       "fingerprint": "c52cc602cf997a6e",
       "profile": "sentence"
+    },
+    "Hier stehen viele Häuser.": {
+      "file": "sentence_7383bff16440.ogg",
+      "fingerprint": "0b0a20b119beabc2",
+      "profile": "sentence"
+    },
+    "High-Five mit Schallgeschwindigkeit!": {
+      "file": "reward_cd1f47cdc8f2.ogg",
+      "fingerprint": "1b21b3d31700b686",
+      "profile": "reward"
     },
     "Himmel": {
       "file": "word_cac219d63246.ogg",
@@ -1249,6 +1514,16 @@
       "file": "word_d09c3c3ea576.ogg",
       "fingerprint": "f73c4a732f75c007",
       "profile": "word"
+    },
+    "Im Nest lag ein kleiner Vogel.": {
+      "file": "sentence_343420116adb.ogg",
+      "fingerprint": "694d6e922ec43c11",
+      "profile": "sentence"
+    },
+    "In der Dose waren zwei Kekse.": {
+      "file": "sentence_f0717c3fe572.ogg",
+      "fingerprint": "68586d6798ee0faa",
+      "profile": "sentence"
     },
     "Insel": {
       "file": "word_82f1643a857d.ogg",
@@ -1295,6 +1570,11 @@
       "fingerprint": "25c8a9eeaf1b5978",
       "profile": "word"
     },
+    "Keks verdient!": {
+      "file": "reward_590c99a02d2c.ogg",
+      "fingerprint": "914a37eba411f1ea",
+      "profile": "reward"
+    },
     "Klasse": {
       "file": "reward_eebeec9dcb97.ogg",
       "fingerprint": "54b2d18b4c48eb92",
@@ -1314,6 +1594,11 @@
       "file": "word_b0034fdf5386.ogg",
       "fingerprint": "94d8f8603b8b6cdc",
       "profile": "word"
+    },
+    "Kopf-Gymnastik: Note 1!": {
+      "file": "reward_9d76c7cda5e8.ogg",
+      "fingerprint": "d7749aadef7af741",
+      "profile": "reward"
     },
     "Kreis": {
       "file": "word_6574ac40ddcf.ogg",
@@ -1365,6 +1650,11 @@
       "fingerprint": "bfdeb20d65d8cf88",
       "profile": "word"
     },
+    "Läuft bei dir!": {
+      "file": "reward_2683bdba4f29.ogg",
+      "fingerprint": "039b9ed70ac32bae",
+      "profile": "reward"
+    },
     "Löffel": {
       "file": "word_07015b4f5662.ogg",
       "fingerprint": "279f837e81876804",
@@ -1400,9 +1690,24 @@
       "fingerprint": "f1fa2a4513b95d9f",
       "profile": "finale"
     },
+    "Mama hat die Ameise gefunden.": {
+      "file": "sentence_d487b42d5216.ogg",
+      "fingerprint": "6b1a1abd94916dee",
+      "profile": "sentence"
+    },
+    "Mama hat ein schönes, neues Kleid.": {
+      "file": "sentence_7f93b57f91fd.ogg",
+      "fingerprint": "70b6032acf9edc68",
+      "profile": "sentence"
+    },
     "Mama ist im Haus.": {
       "file": "sentence_ea0d0f938a70.ogg",
       "fingerprint": "19c5548488ca7a6e",
+      "profile": "sentence"
+    },
+    "Mama malte am Morgen eine Sonne.": {
+      "file": "sentence_b6ee878578ef.ogg",
+      "fingerprint": "bfc86eb3fc999d55",
       "profile": "sentence"
     },
     "Mama.": {
@@ -1428,6 +1733,16 @@
     "Mimi": {
       "file": "word_15b73886c509.ogg",
       "fingerprint": "d72b34436f9eb672",
+      "profile": "word"
+    },
+    "Mimi ist auf das Sofa gesprungen.": {
+      "file": "sentence_403a5ed910a0.ogg",
+      "fingerprint": "6d1e47f725e3566d",
+      "profile": "sentence"
+    },
+    "Mond": {
+      "file": "word_d658cc20598b.ogg",
+      "fingerprint": "59a17e77c7727be8",
       "profile": "word"
     },
     "N": {
@@ -1520,9 +1835,34 @@
       "fingerprint": "6d7861b54e6bf618",
       "profile": "word"
     },
+    "Oma hat Mama gerufen.": {
+      "file": "sentence_c6b127018a11.ogg",
+      "fingerprint": "0c2a1496d6ccb342",
+      "profile": "sentence"
+    },
+    "Oma hat Mimi gesucht und gefunden.": {
+      "file": "sentence_9fcd6c7923ba.ogg",
+      "fingerprint": "b5aeebff34818044",
+      "profile": "sentence"
+    },
+    "Oma hat die Rosen gegossen.": {
+      "file": "sentence_27855427efd6.ogg",
+      "fingerprint": "595f594c83041da6",
+      "profile": "sentence"
+    },
     "Oma hat einen Hut.": {
       "file": "sentence_f8d91895467d.ogg",
       "fingerprint": "51f6879057d9b639",
+      "profile": "sentence"
+    },
+    "Oma hat einen Schuh verloren.": {
+      "file": "sentence_669665c82620.ogg",
+      "fingerprint": "3804e5309cd3f93a",
+      "profile": "sentence"
+    },
+    "Oma ist auf dem Lama geritten.": {
+      "file": "sentence_45160646f7b0.ogg",
+      "fingerprint": "c2d9f22197c11758",
       "profile": "sentence"
     },
     "Oma ist da.": {
@@ -1545,6 +1885,26 @@
       "fingerprint": "b07ac70b85ca48e9",
       "profile": "word"
     },
+    "Opa hat Oma einen Kuss gegeben.": {
+      "file": "sentence_8c030af95659.ogg",
+      "fingerprint": "0d5160454ec2dce1",
+      "profile": "sentence"
+    },
+    "Opa hat ein großes Paket bekommen.": {
+      "file": "sentence_7c198468f299.ogg",
+      "fingerprint": "6f52e25142582ff0",
+      "profile": "sentence"
+    },
+    "Opa hat mir ein Buch geschenkt.": {
+      "file": "sentence_d88e7efd2bf7.ogg",
+      "fingerprint": "c6cd88139c609c24",
+      "profile": "sentence"
+    },
+    "Opa trug einen Topf voll Suppe.": {
+      "file": "sentence_0ff1747ecbc0.ogg",
+      "fingerprint": "c754042961d15f99",
+      "profile": "sentence"
+    },
     "Ordne das Wort - Mama - dem Bild zu.": {
       "file": "prompt_1ac28f3a7750.ogg",
       "fingerprint": "759ab7a8259b4541",
@@ -1553,6 +1913,11 @@
     "Ordne das Wort - Oma - dem Bild zu.": {
       "file": "prompt_c4b5f9462116.ogg",
       "fingerprint": "10b716d017c4a1f8",
+      "profile": "prompt"
+    },
+    "Ordne das richtige Bild zu.": {
+      "file": "prompt_42562da70a14.ogg",
+      "fingerprint": "746897a274f73ab8",
       "profile": "prompt"
     },
     "P": {
@@ -1579,6 +1944,16 @@
       "file": "word_4959de6ed9b8.ogg",
       "fingerprint": "28bc0acfcd9e742c",
       "profile": "word"
+    },
+    "Papa hat zwei Hüte gekauft.": {
+      "file": "sentence_1d228a508663.ogg",
+      "fingerprint": "260e9026c581be65",
+      "profile": "sentence"
+    },
+    "Papa hat zwei Tomaten geschnitten.": {
+      "file": "sentence_186b4c5d85fa.ogg",
+      "fingerprint": "18edb56e2d57e865",
+      "profile": "sentence"
     },
     "Papa und Opa tanzen auf dem Tisch!": {
       "file": "finale_eb42f8849812.ogg",
@@ -1623,6 +1998,11 @@
     "Pinguin": {
       "file": "word_0bf83ff3617d.ogg",
       "fingerprint": "5d93498e86aa7b5f",
+      "profile": "word"
+    },
+    "Pirat": {
+      "file": "word_c654763c683e.ogg",
+      "fingerprint": "6fb89577a640ddf1",
       "profile": "word"
     },
     "Pizza": {
@@ -1699,6 +2079,11 @@
       "file": "word_2a7dfeb2f2b0.ogg",
       "fingerprint": "a621e47491132d0f",
       "profile": "word"
+    },
+    "Ratzfatz weggezaubert!": {
+      "file": "reward_1fb5c28b5203.ogg",
+      "fingerprint": "af1278251031f5f2",
+      "profile": "reward"
     },
     "Raupe": {
       "file": "word_d29eb8ca21d7.ogg",
@@ -1925,6 +2310,11 @@
       "fingerprint": "e5ffbd5151332263",
       "profile": "prompt"
     },
+    "Schlau-Schlumpf-Modus aktiviert!": {
+      "file": "reward_0fd1d90c9d97.ogg",
+      "fingerprint": "3947ef1bda0196c9",
+      "profile": "reward"
+    },
     "Schuh": {
       "file": "word_6bc75e1bf7ef.ogg",
       "fingerprint": "10afd21ec17df011",
@@ -2045,6 +2435,11 @@
       "fingerprint": "d1fcf44832f54191",
       "profile": "word"
     },
+    "Strand": {
+      "file": "word_770baae20e7b.ogg",
+      "fingerprint": "8bf452414ca74ab8",
+      "profile": "word"
+    },
     "Straße": {
       "file": "word_58a3778c18c4.ogg",
       "fingerprint": "6ca890200875aa34",
@@ -2125,9 +2520,54 @@
       "fingerprint": "db6111a567d8575a",
       "profile": "word"
     },
+    "Tom aß den letzten Keks.": {
+      "file": "sentence_574ac24e60c0.ogg",
+      "fingerprint": "e3d20e64f0280187",
+      "profile": "sentence"
+    },
+    "Tom hat Opa gerufen.": {
+      "file": "sentence_3a01ceb81b01.ogg",
+      "fingerprint": "7f0174311a614255",
+      "profile": "sentence"
+    },
+    "Tom hat den Ball ins Tor geworfen.": {
+      "file": "sentence_5b9bd91a9232.ogg",
+      "fingerprint": "e4fc2847351f850a",
+      "profile": "sentence"
+    },
+    "Tom hat sich die Nase geputzt.": {
+      "file": "sentence_7ed8f4d710a5.ogg",
+      "fingerprint": "501a3aaf062b5289",
+      "profile": "sentence"
+    },
+    "Tom hat zwei Eier versteckt.": {
+      "file": "sentence_eb431632569f.ogg",
+      "fingerprint": "8961b92aa965bb6f",
+      "profile": "sentence"
+    },
+    "Tom isst ein großes Eis.": {
+      "file": "sentence_48bbe3bc10a1.ogg",
+      "fingerprint": "f3059d3b73b34502",
+      "profile": "sentence"
+    },
+    "Tom ist in die Schule gegangen.": {
+      "file": "sentence_22b41035301f.ogg",
+      "fingerprint": "bad0527da341242a",
+      "profile": "sentence"
+    },
     "Tom ruft Opa.": {
       "file": "sentence_b76ede73be92.ogg",
       "fingerprint": "f2bb2dff3b909a3f",
+      "profile": "sentence"
+    },
+    "Tom springt auf dem Sofa.": {
+      "file": "sentence_098411f786d4.ogg",
+      "fingerprint": "6192f4f2c52e914f",
+      "profile": "sentence"
+    },
+    "Tom warf den Ball zu Papa.": {
+      "file": "sentence_0d80f7ba0e5c.ogg",
+      "fingerprint": "e9941193861df40f",
       "profile": "sentence"
     },
     "Tomate": {
@@ -2143,6 +2583,11 @@
     "Tram": {
       "file": "word_5a72462e41ab.ogg",
       "fingerprint": "a6377e9bbd9474f6",
+      "profile": "word"
+    },
+    "Tropfen": {
+      "file": "word_e1f7ce180233.ogg",
+      "fingerprint": "1189c73d251f82be",
       "profile": "word"
     },
     "Tür": {
@@ -2169,6 +2614,11 @@
       "file": "word_990fa93a142a.ogg",
       "fingerprint": "7f5fcaf92ac80e5e",
       "profile": "word"
+    },
+    "Und... Tadaaa!": {
+      "file": "reward_ea0277374838.ogg",
+      "fingerprint": "8e15394d26c4c351",
+      "profile": "reward"
     },
     "V": {
       "file": "phoneme_de5a6f78116e.ogg",
@@ -2235,6 +2685,16 @@
       "fingerprint": "cd213719d43c5507",
       "profile": "word"
     },
+    "Voll abgeräumt!": {
+      "file": "reward_13a2475466db.ogg",
+      "fingerprint": "42abb7c5adb8a5dd",
+      "profile": "reward"
+    },
+    "Vor dem Haus wachsen zwei Bäume.": {
+      "file": "sentence_41daff282283.ogg",
+      "fingerprint": "ec931c36a8673b4c",
+      "profile": "sentence"
+    },
     "W": {
       "file": "phoneme_fcb5f40df9be.ogg",
       "fingerprint": "30401de6e7c928bd",
@@ -2250,6 +2710,11 @@
       "fingerprint": "dd5a74b46d56787b",
       "profile": "word"
     },
+    "Wasser": {
+      "file": "word_f942c0f4855b.ogg",
+      "fingerprint": "4fc0d51b5f04dfb1",
+      "profile": "word"
+    },
     "Weg": {
       "file": "word_fe3a5d0b9c4e.ogg",
       "fingerprint": "724bc51fceadb84c",
@@ -2259,6 +2724,11 @@
       "file": "reward_16b8dc080113.ogg",
       "fingerprint": "22acb9efeaaaba92",
       "profile": "reward"
+    },
+    "Wer hat die Kekse aus der Dose geklaut...": {
+      "file": "sentence_0d6a3c9ba753.ogg",
+      "fingerprint": "32fc82b8b222fd3a",
+      "profile": "sentence"
     },
     "Wespe": {
       "file": "word_38ba6262a672.ogg",
@@ -2510,6 +2980,11 @@
       "fingerprint": "351519a9fbc5bda4",
       "profile": "reward"
     },
+    "Zack, Gehirn-Explosion!": {
+      "file": "reward_20fba53372b1.ogg",
+      "fingerprint": "866d42f7ca442fe4",
+      "profile": "reward"
+    },
     "Zahn": {
       "file": "word_02b4db5796e4.ogg",
       "fingerprint": "2fa22aaedc340224",
@@ -2730,10 +3205,55 @@
       "fingerprint": "af91a39a9a869688",
       "profile": "word"
     },
+    "Zwei Ameisen sind zu Mama gekrabbelt.": {
+      "file": "sentence_b30eb1c60821.ogg",
+      "fingerprint": "4889bc5b8dd6e9bf",
+      "profile": "sentence"
+    },
+    "Zwei Eulen sitzen auf dem Baum.": {
+      "file": "sentence_873c6007352d.ogg",
+      "fingerprint": "874e16c5979444e4",
+      "profile": "sentence"
+    },
+    "Zwei Fische schwimmen im Fluss.": {
+      "file": "sentence_c48c25a0d8df.ogg",
+      "fingerprint": "b6405c6e0d586ddf",
+      "profile": "sentence"
+    },
+    "Zwei Lamas liefen über die Wiese.": {
+      "file": "sentence_66e1a8e78069.ogg",
+      "fingerprint": "edf22506b898766c",
+      "profile": "sentence"
+    },
+    "Zwei Omas sitzen auf der Bank.": {
+      "file": "sentence_8cc5de9f561e.ogg",
+      "fingerprint": "b743965a6cd90d07",
+      "profile": "sentence"
+    },
+    "Zwei Quallen schwimmen im Meer.": {
+      "file": "sentence_bd0f036e5a32.ogg",
+      "fingerprint": "260c52e814da366a",
+      "profile": "sentence"
+    },
     "Zwei Reihen mit je vier Rosen blühen im Beet. Wie viele Rosen sind das.": {
       "file": "prompt_8c2b7c6c4b52.ogg",
       "fingerprint": "275c04a07454dcb1",
       "profile": "prompt"
+    },
+    "Zwei Spinnen krabbeln über die Straße.": {
+      "file": "sentence_cd68ea07b79e.ogg",
+      "fingerprint": "35d784e665e50ccf",
+      "profile": "sentence"
+    },
+    "Zwei Ufos fliegen am Himmel.": {
+      "file": "sentence_76f3b1626cc0.ogg",
+      "fingerprint": "d579c874d2e80eba",
+      "profile": "sentence"
+    },
+    "Zwei Vögel baden im Sand.": {
+      "file": "sentence_1ed32fdcd687.ogg",
+      "fingerprint": "8a7e77a9f2f52119",
+      "profile": "sentence"
     },
     "Zwölf Eis und neun Eis. Wie viele Eis sind das zusammen.": {
       "file": "prompt_26a3d65bcbcc.ogg",
@@ -2914,11 +3434,6 @@
       "file": "word_a898df22bfc7.ogg",
       "fingerprint": "667ebe55e371c304",
       "profile": "word"
-    },
-    "...im Wort...": {
-      "file": "ui_582967534d0f.ogg",
-      "fingerprint": "3d42da87e52e97cb",
-      "profile": "ui"
     },
     "ist": {
       "file": "word_1da8321dcc9a.ogg",

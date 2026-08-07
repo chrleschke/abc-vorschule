@@ -741,6 +741,10 @@
       "seed": 943388734,
       "sourceText": "Wo hörst du den Buchstaben - Ä? Am Anfang, in der Mitte oder am Ende."
     },
+    "prompt:42562da70a14": {
+      "seed": 548253115,
+      "sourceText": "Ordne das richtige Bild zu."
+    },
     "prompt:44d371ae00ce": {
       "seed": 485564181,
       "sourceText": "Baue das Wort Hut."
@@ -1401,6 +1405,22 @@
       "textOverride": "\"Sch\" wie Schaf.",
       "sourceText": "Sch - wie Schaf."
     },
+    "reward:0bb238d289d0": {
+      "seed": 1869530881,
+      "sourceText": "Einfach cool!"
+    },
+    "reward:0c75cca6bb81": {
+      "seed": 244251654,
+      "sourceText": "Gummibären-Siegertanz, jetzt!"
+    },
+    "reward:0fd1d90c9d97": {
+      "seed": 1904053378,
+      "sourceText": "Schlau-Schlumpf-Modus aktiviert!"
+    },
+    "reward:13a2475466db": {
+      "seed": 1869530881,
+      "sourceText": "Voll abgeräumt!"
+    },
     "reward:13de3d45009c": {
       "seed": 1771886242,
       "textOverride": "\"Scht\" wie Stern.",
@@ -1416,10 +1436,26 @@
       "textOverride": "Weiter so!",
       "sourceText": "Weiter so"
     },
+    "reward:1765ff147259": {
+      "seed": 1995171,
+      "sourceText": "Bäääm! Volltreffer!"
+    },
     "reward:1f4d61aef3b9": {
       "seed": 873012571,
       "textOverride": "\"O\" wie Oma.",
       "sourceText": "O - wie Oma."
+    },
+    "reward:1fb5c28b5203": {
+      "seed": 1869530881,
+      "sourceText": "Ratzfatz weggezaubert!"
+    },
+    "reward:20fba53372b1": {
+      "seed": 1179549907,
+      "sourceText": "Zack, Gehirn-Explosion!"
+    },
+    "reward:2683bdba4f29": {
+      "seed": 1869530881,
+      "sourceText": "Läuft bei dir!"
     },
     "reward:2732e9286b3a": {
       "seed": 1179549907,
@@ -1466,6 +1502,10 @@
       "textOverride": "\"Fau\" wie Vogel.",
       "sourceText": "V - wie Vogel."
     },
+    "reward:590c99a02d2c": {
+      "seed": 873012571,
+      "sourceText": "Keks verdient!"
+    },
     "reward:6010341413e0": {
       "seed": 1904053378,
       "textOverride": "Zett wie Zebra.",
@@ -1480,6 +1520,10 @@
       "seed": 1135500920,
       "textOverride": "\"Ü\" wie in Rübe.",
       "sourceText": "Ü - wie Rübe."
+    },
+    "reward:67fc68c98c2f": {
+      "seed": 873012571,
+      "sourceText": "Du kleiner Einstein!"
     },
     "reward:6f6d00e1b28e": {
       "seed": 1869530881,
@@ -1581,6 +1625,10 @@
       "textOverride": "...klasse gemacht",
       "sourceText": "Klasse gemacht"
     },
+    "reward:95763da124c8": {
+      "seed": 873012571,
+      "sourceText": "Einhorn-Power pur!"
+    },
     "reward:9aa77a522bb6": {
       "seed": 671864064,
       "textOverride": "\"Sch\" wie Schule.",
@@ -1590,6 +1638,10 @@
       "seed": 1084655494,
       "textOverride": "\"Em\" wie Mond.",
       "sourceText": "M - wie Mond."
+    },
+    "reward:9d76c7cda5e8": {
+      "seed": 1869530881,
+      "sourceText": "Kopf-Gymnastik: Note 1!"
     },
     "reward:9ebfd7ef79a2": {
       "seed": 244251654,
@@ -1620,6 +1672,14 @@
       "seed": 1087946411,
       "sourceText": "Fantastisch"
     },
+    "reward:ac9c83aa5b79": {
+      "seed": 1995171,
+      "sourceText": "Daumen hoch!"
+    },
+    "reward:b1219822f169": {
+      "seed": 1904053378,
+      "sourceText": "Einfach weggemuckelt!"
+    },
     "reward:b7f70cd2a8ea": {
       "seed": 244251654,
       "textOverride": "O wie Ohr.",
@@ -1630,10 +1690,18 @@
       "textOverride": "Ei wie Eis.",
       "sourceText": "Ei - wie Eis."
     },
+    "reward:bd22ab11f640": {
+      "seed": 893467947,
+      "sourceText": "Du hast es drauf!"
+    },
     "reward:bfebc184cbd9": {
       "seed": 807468455,
       "textOverride": "\"ÄM\" wie Maus.",
       "sourceText": "M - wie Maus."
+    },
+    "reward:c0355e1c65c9": {
+      "seed": 1179549907,
+      "sourceText": "Hier hast du einen Keks!"
     },
     "reward:c15c2f3980ee": {
       "seed": 873012571,
@@ -1649,6 +1717,10 @@
       "seed": 1771886242,
       "textOverride": "Genau richtig!",
       "sourceText": "Genau richtig"
+    },
+    "reward:cd1f47cdc8f2": {
+      "seed": 1179549907,
+      "sourceText": "High-Five mit Schallgeschwindigkeit!"
     },
     "reward:cec5ae37e973": {
       "seed": 1516666763,
@@ -1674,6 +1746,14 @@
       "seed": 1087946411,
       "textOverride": "\"Ef\" wie Fuchs.",
       "sourceText": "F - wie Fuchs."
+    },
+    "reward:e49ce94e10e5": {
+      "seed": 1771886242,
+      "sourceText": "Das war spitze!"
+    },
+    "reward:ea0277374838": {
+      "seed": 1771886242,
+      "sourceText": "Und... Tadaaa!"
     },
     "reward:eebeec9dcb97": {
       "seed": 1869530881,
@@ -1719,17 +1799,83 @@
       "seed": 447155165,
       "sourceText": "Wir gehen den Weg."
     },
+    "sentence:098411f786d4": {
+      "seed": 1502192888,
+      "sourceText": "Tom springt auf dem Sofa."
+    },
+    "sentence:0d6a3c9ba753": {
+      "seed": 58873926,
+      "sourceText": "Wer hat die Kekse aus der Dose geklaut..."
+    },
+    "sentence:0d80f7ba0e5c": {
+      "seed": 1601555549,
+      "sourceText": "Tom warf den Ball zu Papa."
+    },
     "sentence:0f7df5461bdf": {
       "seed": 1095904114,
       "sourceText": "Der Löwe ist da."
+    },
+    "sentence:0ff1747ecbc0": {
+      "seed": 1095904114,
+      "sourceText": "Opa trug einen Topf voll Suppe."
+    },
+    "sentence:10fe7ba191e6": {
+      "seed": 1125768222,
+      "sourceText": "Der Clown hat Xylofon gespielt."
+    },
+    "sentence:12e277a45f58": {
+      "seed": 1659905595,
+      "sourceText": "Die Eule fing eine Maus."
     },
     "sentence:147f2a0d4995": {
       "seed": 1711854709,
       "sourceText": "Die Spinne spielt."
     },
+    "sentence:15c731864d50": {
+      "seed": 312820997,
+      "sourceText": "Das Pferd hat zwei Äpfel gefuttert."
+    },
+    "sentence:186b4c5d85fa": {
+      "seed": 1624620892,
+      "sourceText": "Papa hat zwei Tomaten geschnitten."
+    },
+    "sentence:19048a388ae2": {
+      "seed": 312820997,
+      "sourceText": "Die Giraffe frisst aus dem Sack."
+    },
+    "sentence:1b97eb1db0ff": {
+      "seed": 1601555549,
+      "sourceText": "Die Äpfel wurden aufgemampft."
+    },
+    "sentence:1d228a508663": {
+      "seed": 1624620892,
+      "sourceText": "Papa hat zwei Hüte gekauft."
+    },
+    "sentence:1ed32fdcd687": {
+      "seed": 1095904114,
+      "sourceText": "Zwei Vögel baden im Sand."
+    },
     "sentence:20074d0c7579": {
       "seed": 1601555549,
       "sourceText": "Das Herz ist rot."
+    },
+    "sentence:22b41035301f": {
+      "seed": 439084397,
+      "textOverride": "Matheo ist in die Schule gegangen.",
+      "sourceText": "Tom ist in die Schule gegangen."
+    },
+    "sentence:231525cd6a7f": {
+      "seed": 1228004130,
+      "sourceText": "Aus dem Haus kamen zwei Mäuse."
+    },
+    "sentence:2355776033b3": {
+      "seed": 432945842,
+      "textOverride": "Der Wind trug Omas Hut davon. Das ist nicht gut.",
+      "sourceText": "Der Wind trug Omas Hut davon."
+    },
+    "sentence:238458f63f04": {
+      "seed": 1095904114,
+      "sourceText": "Das Lama hat einen Hut gefressen."
     },
     "sentence:25e52f9570c2": {
       "seed": 1776987163,
@@ -1739,33 +1885,187 @@
       "seed": 1502192888,
       "sourceText": "Der Fisch schwimmt."
     },
+    "sentence:27855427efd6": {
+      "seed": 1095904114,
+      "sourceText": "Oma hat die Rosen gegossen."
+    },
+    "sentence:2cee5d335761": {
+      "seed": 1273693101,
+      "sourceText": "Das Eis ist in der Sonne geschmolzen."
+    },
+    "sentence:30fea05d6bda": {
+      "seed": 1624620892,
+      "sourceText": "Auf dem Tor saß ein kleiner Vogel."
+    },
+    "sentence:343420116adb": {
+      "seed": 1585345271,
+      "sourceText": "Im Nest lag ein kleiner Vogel."
+    },
     "sentence:37aa13fdf05d": {
       "seed": 1273693101,
       "sourceText": "Das Dreieck ist rot."
+    },
+    "sentence:3a01ceb81b01": {
+      "seed": 432945842,
+      "sourceText": "Tom hat Opa gerufen."
     },
     "sentence:3dc7bd551f44": {
       "seed": 404743588,
       "sourceText": "Hier sind Häuser."
     },
+    "sentence:3df4bb8ae078": {
+      "seed": 1659905595,
+      "sourceText": "Der Bär hat im Bett geschlafen."
+    },
     "sentence:3ff48545b9c4": {
       "seed": 1624620892,
       "sourceText": "Hallo Lama!"
+    },
+    "sentence:403a5ed910a0": {
+      "seed": 1585345271,
+      "sourceText": "Mimi ist auf das Sofa gesprungen."
     },
     "sentence:410190d7c985": {
       "seed": 939057873,
       "sourceText": "Das Pferd läuft."
     },
+    "sentence:41daff282283": {
+      "seed": 1674724842,
+      "sourceText": "Vor dem Haus wachsen zwei Bäume."
+    },
+    "sentence:45160646f7b0": {
+      "seed": 1659905595,
+      "sourceText": "Oma ist auf dem Lama geritten."
+    },
+    "sentence:48bbe3bc10a1": {
+      "seed": 1273693101,
+      "textOverride": "Lenni isst ein großes Eis.",
+      "sourceText": "Tom isst ein großes Eis."
+    },
+    "sentence:50d90e55c9cb": {
+      "seed": 1624620892,
+      "sourceText": "Am Himmel stehen viele Sterne."
+    },
+    "sentence:548ba90bb4a2": {
+      "seed": 1624620892,
+      "sourceText": "Ein Ufo ist im Tal gelandet."
+    },
+    "sentence:549bfef15466": {
+      "seed": 439084397,
+      "sourceText": "Der Vogel setzt sich auf den Fuß."
+    },
+    "sentence:574ac24e60c0": {
+      "seed": 1502192888,
+      "sourceText": "Tom aß den letzten Keks."
+    },
+    "sentence:5a4e84504740": {
+      "seed": 312820997,
+      "sourceText": "Der Elefant hat große Füße."
+    },
+    "sentence:5b9bd91a9232": {
+      "seed": 1585345271,
+      "sourceText": "Tom hat den Ball ins Tor geworfen."
+    },
+    "sentence:5d28d58d79c6": {
+      "seed": 1502192888,
+      "sourceText": "Die Rose steht in der Vase."
+    },
     "sentence:5da5adfeaff0": {
       "seed": 432945842,
       "sourceText": "Der Fuß ist groß."
+    },
+    "sentence:6081bbc330c0": {
+      "seed": 1624620892,
+      "sourceText": "Die Spinne hat sich im Spiegel gesehen."
+    },
+    "sentence:646dfbb5549c": {
+      "seed": 1674724842,
+      "sourceText": "Die Mäuse haben den Käse geklaut."
+    },
+    "sentence:669665c82620": {
+      "seed": 1273693101,
+      "sourceText": "Oma hat einen Schuh verloren."
+    },
+    "sentence:66e1a8e78069": {
+      "seed": 1659905595,
+      "textOverride": "Zwei Lamas liefen um die Wette.",
+      "sourceText": "Zwei Lamas liefen über die Wiese."
     },
     "sentence:6c731de28695": {
       "seed": 1674724842,
       "sourceText": "Mama."
     },
+    "sentence:6c79457e27c2": {
+      "seed": 1601555549,
+      "sourceText": "Der Zug fuhr durch das Tal."
+    },
+    "sentence:6c892ec908da": {
+      "seed": 447155165,
+      "sourceText": "Das Schaf hat neue Schuhe bekommen."
+    },
+    "sentence:7383bff16440": {
+      "seed": 1585345271,
+      "sourceText": "Hier stehen viele Häuser."
+    },
+    "sentence:76f3b1626cc0": {
+      "seed": 312820997,
+      "sourceText": "Zwei Ufos fliegen am Himmel."
+    },
+    "sentence:7c198468f299": {
+      "seed": 1624620892,
+      "sourceText": "Opa hat ein großes Paket bekommen."
+    },
+    "sentence:7ed8f4d710a5": {
+      "seed": 1095904114,
+      "sourceText": "Tom hat sich die Nase geputzt."
+    },
+    "sentence:7f93b57f91fd": {
+      "seed": 1659905595,
+      "sourceText": "Mama hat ein schönes, neues Kleid."
+    },
+    "sentence:873c6007352d": {
+      "seed": 1228004130,
+      "sourceText": "Zwei Eulen sitzen auf dem Baum."
+    },
+    "sentence:8c030af95659": {
+      "seed": 1095904114,
+      "sourceText": "Opa hat Oma einen Kuss gegeben."
+    },
+    "sentence:8cc5de9f561e": {
+      "seed": 1659905595,
+      "sourceText": "Zwei Omas sitzen auf der Bank."
+    },
+    "sentence:8cef79759fe2": {
+      "seed": 1502192888,
+      "sourceText": "Das Taxi hielt an der Ampel."
+    },
+    "sentence:918d36ae80a3": {
+      "seed": 1095904114,
+      "sourceText": "Der Drache flog über den Park."
+    },
+    "sentence:933b5863d8b8": {
+      "seed": 939057873,
+      "sourceText": "Das Zebra hat ein Jojo gefunden."
+    },
+    "sentence:9723703803eb": {
+      "seed": 1624620892,
+      "sourceText": "Auf dem Dach sitzen zwei Tauben."
+    },
+    "sentence:9a4f719d9be9": {
+      "seed": 432945842,
+      "sourceText": "Die Sonne scheint auf das Nest."
+    },
     "sentence:9d87d18b56ec": {
       "seed": 1095904114,
       "sourceText": "Die Eule fliegt."
+    },
+    "sentence:9f1f1902b079": {
+      "seed": 1273693101,
+      "sourceText": "Die Wolken zogen über das Haus."
+    },
+    "sentence:9fcd6c7923ba": {
+      "seed": 432945842,
+      "sourceText": "Oma hat Mimi gesucht und gefunden."
     },
     "sentence:a2b1bcad9ae8": {
       "seed": 58873926,
@@ -1775,13 +2075,29 @@
       "seed": 1711854709,
       "sourceText": "Lama ist da."
     },
+    "sentence:b0b65c1bc802": {
+      "seed": 432945842,
+      "sourceText": "Das Lama hat laut Hallo gerufen."
+    },
     "sentence:b309c28c2c33": {
       "seed": 439084397,
       "sourceText": "Das ist mein Brot."
     },
+    "sentence:b30eb1c60821": {
+      "seed": 447155165,
+      "sourceText": "Zwei Ameisen sind zu Mama gekrabbelt."
+    },
+    "sentence:b6ee878578ef": {
+      "seed": 1273693101,
+      "sourceText": "Mama malte am Morgen eine Sonne."
+    },
     "sentence:b76ede73be92": {
       "seed": 1659905595,
       "sourceText": "Tom ruft Opa."
+    },
+    "sentence:b8df3b338bb7": {
+      "seed": 432945842,
+      "sourceText": "Der Frosch ist mit dem Fahrrad gefahren."
     },
     "sentence:ba35c984dbf8": {
       "seed": 1125768222,
@@ -1791,9 +2107,50 @@
       "seed": 312820997,
       "sourceText": "Der Kreis ist blau."
     },
+    "sentence:bd0f036e5a32": {
+      "seed": 439084397,
+      "sourceText": "Zwei Quallen schwimmen im Meer."
+    },
+    "sentence:bf43ffd0c632": {
+      "seed": 1095904114,
+      "sourceText": "Der Dino hat den Kuchen gefressen."
+    },
+    "sentence:c20bbc886c9b": {
+      "seed": 439084397,
+      "sourceText": "Die Rose wächst neben dem Tor."
+    },
+    "sentence:c48c25a0d8df": {
+      "seed": 1273693101,
+      "sourceText": "Zwei Fische schwimmen im Fluss."
+    },
+    "sentence:c6b127018a11": {
+      "seed": 1228004130,
+      "sourceText": "Oma hat Mama gerufen."
+    },
     "sentence:c74c8774dfc4": {
       "seed": 432945842,
       "sourceText": "Oma ist da."
+    },
+    "sentence:cbdbe9c0c34e": {
+      "seed": 1776987163,
+      "sourceText": "Die Eule flog auf den Baum."
+    },
+    "sentence:cd68ea07b79e": {
+      "seed": 404743588,
+      "sourceText": "Zwei Spinnen krabbeln über die Straße."
+    },
+    "sentence:cff8e609c311": {
+      "seed": 1095904114,
+      "sourceText": "Das Pony ist mit dem Taxi gefahren."
+    },
+    "sentence:d487b42d5216": {
+      "seed": 1776987163,
+      "textOverride": "Mama hat eine Ameise gefunden.",
+      "sourceText": "Mama hat die Ameise gefunden."
+    },
+    "sentence:d88e7efd2bf7": {
+      "seed": 58873926,
+      "sourceText": "Opa hat mir ein Buch geschenkt."
     },
     "sentence:dd996e27ce1b": {
       "seed": 1897889202,
@@ -1803,6 +2160,19 @@
       "seed": 1585345271,
       "sourceText": "Mama ist im Haus."
     },
+    "sentence:eaa529d7a46a": {
+      "seed": 404743588,
+      "sourceText": "Die Äpfel sind vom Baum gefallen."
+    },
+    "sentence:eb431632569f": {
+      "seed": 439084397,
+      "textOverride": "Mateo hat zwei Eier versteckt.",
+      "sourceText": "Tom hat zwei Eier versteckt."
+    },
+    "sentence:f0717c3fe572": {
+      "seed": 1273693101,
+      "sourceText": "In der Dose waren zwei Kekse."
+    },
     "sentence:f35268d13ff1": {
       "seed": 1228004130,
       "sourceText": "Der Hase ist im Sand."
@@ -1810,6 +2180,10 @@
     "sentence:f4e12abcc256": {
       "seed": 404743588,
       "sourceText": "Das Taxi ist gelb."
+    },
+    "sentence:f7aca856104d": {
+      "seed": 404743588,
+      "sourceText": "Das Pferd sprang über das Tor."
     },
     "sentence:f8d91895467d": {
       "seed": 1228004130,
@@ -1828,6 +2202,10 @@
       "seed": 173037020,
       "textOverride": "Probier's noch mal...",
       "sourceText": "Probiere eine andere Antwort"
+    },
+    "ui:6d42ce6fdfae": {
+      "seed": 393662429,
+      "sourceText": "...im Wort..."
     },
     "ui:8d0d96ca4976": {
       "seed": 173037020,
@@ -1903,6 +2281,10 @@
     "word:18847502691e": {
       "seed": 1765179368,
       "sourceText": "14 Vögel"
+    },
+    "word:18c606952024": {
+      "seed": 1229619544,
+      "sourceText": "Brokkoli"
     },
     "word:18e1dd392168": {
       "seed": 243544604,
@@ -2221,6 +2603,11 @@
       "seed": 1647504061,
       "sourceText": "Yacht"
     },
+    "word:6c966afb1bc2": {
+      "seed": 1389964126,
+      "textOverride": "Fahrrad.",
+      "sourceText": "Fahrrad"
+    },
     "word:6fb86a981cf3": {
       "seed": 1420845013,
       "sourceText": "Dino"
@@ -2236,6 +2623,11 @@
     "word:753692ec36ad": {
       "seed": 1956026513,
       "sourceText": "Hallo"
+    },
+    "word:770baae20e7b": {
+      "seed": 1229619544,
+      "textOverride": "Schtrand.",
+      "sourceText": "Strand"
     },
     "word:77562953d4c8": {
       "seed": 1389964126,
@@ -2433,6 +2825,11 @@
       "seed": 58331711,
       "sourceText": "Elefant"
     },
+    "word:9c5fc5624cb2": {
+      "seed": 1769364428,
+      "textOverride": "Busch.",
+      "sourceText": "Busch"
+    },
     "word:9f6ef157aa9c": {
       "seed": 1677023100,
       "sourceText": "15 Fische"
@@ -2458,6 +2855,11 @@
     "word:a252f7aeeb24": {
       "seed": 1860324308,
       "sourceText": "Ei"
+    },
+    "word:a2df25966b32": {
+      "seed": 1512252573,
+      "textOverride": "Banane.",
+      "sourceText": "Banane"
     },
     "word:a410d513bba1": {
       "seed": 244473108,
@@ -2511,6 +2913,10 @@
     "word:b0034fdf5386": {
       "seed": 2033479896,
       "sourceText": "Kleid"
+    },
+    "word:b1cba0fae462": {
+      "seed": 1677023100,
+      "sourceText": "Flugzeug"
     },
     "word:b4b7ccdb3223": {
       "seed": 1229619544,
@@ -2571,6 +2977,11 @@
     "word:c55dcf4319da": {
       "seed": 1977624608,
       "sourceText": "Apfel"
+    },
+    "word:c654763c683e": {
+      "seed": 1847009125,
+      "textOverride": "Piraatt.",
+      "sourceText": "Pirat"
     },
     "word:c67a98fb5c20": {
       "seed": 713263381,
@@ -2645,6 +3056,11 @@
       "seed": 158222434,
       "sourceText": "Opa"
     },
+    "word:d658cc20598b": {
+      "seed": 1164320468,
+      "textOverride": "...Mondt.",
+      "sourceText": "Mond"
+    },
     "word:d81e31f7f546": {
       "seed": 1512463413,
       "sourceText": "28 Fische"
@@ -2687,6 +3103,11 @@
       "textOverride": "Ro'se.",
       "sourceText": "Rose"
     },
+    "word:e1f7ce180233": {
+      "seed": 1229619544,
+      "textOverride": "Tropfen.",
+      "sourceText": "Tropfen"
+    },
     "word:e45e09e0dd89": {
       "seed": 1009374954,
       "sourceText": "Markt"
@@ -2707,6 +3128,11 @@
     "word:e5c286bb5e83": {
       "seed": 1854465165,
       "sourceText": "Fisch"
+    },
+    "word:e65491290432": {
+      "seed": 1512463413,
+      "textOverride": "Bett.",
+      "sourceText": "Bett"
     },
     "word:e6ae6e617178": {
       "seed": 1366345099,
@@ -2820,6 +3246,10 @@
       "seed": 1365805799,
       "textOverride": "Zugk.",
       "sourceText": "Zug"
+    },
+    "word:f942c0f4855b": {
+      "seed": 153000027,
+      "sourceText": "Wasser"
     },
     "word:f9eeb52c9bc4": {
       "seed": 928440568,
