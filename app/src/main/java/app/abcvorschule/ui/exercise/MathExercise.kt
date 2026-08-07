@@ -34,6 +34,7 @@ fun MathExercise(
     showSymbolPrompt: Boolean,
     ttsAvailable: Boolean,
     speaking: Boolean,
+    interactionLocked: Boolean = false,
     onSpeakPrompt: () -> Unit,
     onSpeak: (String) -> Unit,
     onResult: (distance: Int?, resolved: Boolean, correct: Boolean) -> Unit,
@@ -99,6 +100,7 @@ fun MathExercise(
                     onSubmit = { handleGuess(it) },
                     resetToken = NumberPadInput.resetToken(roundKey, misses),
                     solved = solved != null,
+                    enabled = !interactionLocked,
                 )
                 if (misses >= 2 && !locked) {
                     AbcResolveButton(onClick = ::resolve)
@@ -116,6 +118,7 @@ fun MathExercise(
             solved = solved,
             missCount = misses,
             locked = locked,
+            interactionLocked = interactionLocked,
             onResolve = ::resolve,
             ttsAvailable = ttsAvailable,
             speaking = speaking,
