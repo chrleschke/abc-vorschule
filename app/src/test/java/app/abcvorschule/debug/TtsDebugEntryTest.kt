@@ -1,6 +1,7 @@
 package app.abcvorschule.debug
 
 import app.abcvorschule.content.ContentRepository
+import app.abcvorschule.content.SentencePictureSpec
 import app.abcvorschule.content.SoundPositionSpec
 import app.abcvorschule.content.rounds
 import org.junit.Assert.assertEquals
@@ -44,6 +45,21 @@ class TtsDebugEntryTest {
 
         val missEntry = entries.first { it.id == "task:${spec.id}:round:0:missTts" }
         assertEquals(spec.rounds.first().missTts, missEntry.originalText)
+    }
+
+    @Test
+    fun sentencePictureSpecsExposeTheirInstructionTts() {
+        // Task-Level-Ansage wie SoundPositionSpec.phonemeTts — ohne Eintrag fehlt die
+        // einzige Aufgabenansage des Satz-Verstehers im TTS-Debug-Screen, obwohl
+        // tools/tts/ttskit/extract.py sie unter derselben ID mitnimmt.
+        val specs = pack.tasks.values.filterIsInstance<SentencePictureSpec>()
+        assertTrue("pack should ship sentence_picture tasks", specs.isNotEmpty())
+        specs.forEach { spec ->
+            val entry = entries.first { it.id == "task:${spec.id}:instructionTts" }
+            assertEquals(spec.instructionTts, entry.originalText)
+            assertEquals(TtsDebugGroup.Task, entry.group)
+            assertEquals("tasks.json", entry.sourceFile)
+        }
     }
 
     @Test
