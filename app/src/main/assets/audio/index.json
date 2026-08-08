@@ -55,14 +55,14 @@
       "fingerprint": "2b5b82249508aa65",
       "profile": "word"
     },
-    "15 Füße": {
-      "file": "word_491b9dfec5e6.ogg",
-      "fingerprint": "a292d7043ebb26f4",
-      "profile": "word"
-    },
     "15 Omas": {
       "file": "word_3ed7e3585bf7.ogg",
       "fingerprint": "0cf1031b5086918b",
+      "profile": "word"
+    },
+    "15 Rüben": {
+      "file": "word_bd9d5f862fab.ogg",
+      "fingerprint": "b9a161282b6f34c0",
       "profile": "word"
     },
     "16 Bücher": {
@@ -80,9 +80,9 @@
       "fingerprint": "fa415e97e98b548e",
       "profile": "word"
     },
-    "18 Spinnen": {
-      "file": "word_8cc3a3ea0583.ogg",
-      "fingerprint": "75659c8893d80629",
+    "18 Sterne": {
+      "file": "word_44474cda5d54.ogg",
+      "fingerprint": "facffbb4c889225d",
       "profile": "word"
     },
     "18 Vögel": {
@@ -170,14 +170,14 @@
       "fingerprint": "6e5f44bb2af81ae6",
       "profile": "word"
     },
-    "30 Füße": {
-      "file": "word_d3c2d1d49356.ogg",
-      "fingerprint": "2d63a90aa3632aff",
+    "30 Rüben": {
+      "file": "word_7253bc3fb39a.ogg",
+      "fingerprint": "4dde7b7492025803",
       "profile": "word"
     },
-    "30 Spinnen": {
-      "file": "word_37be568d02a0.ogg",
-      "fingerprint": "52aca792a5b8ab6a",
+    "30 Sterne": {
+      "file": "word_6432f69e8da7.ogg",
+      "fingerprint": "fcae15f094f3c4f9",
       "profile": "word"
     },
     "30 Taxis": {
@@ -330,9 +330,9 @@
       "fingerprint": "2783957375355826",
       "profile": "sentence"
     },
-    "Auf dem Tor saß ein kleiner Vogel.": {
-      "file": "sentence_30fea05d6bda.ogg",
-      "fingerprint": "a2efd6b3c4b2f0ba",
+    "Auf dem Tor sitzt ein kleiner Vogel.": {
+      "file": "sentence_b0ea092062f3.ogg",
+      "fingerprint": "f91d1b3ee20ce439",
       "profile": "sentence"
     },
     "Aus dem Haus kamen zwei Mäuse.": {
@@ -865,9 +865,9 @@
       "fingerprint": "10c754305e0199df",
       "profile": "sentence"
     },
-    "Der Clown hat Xylofon gespielt.": {
-      "file": "sentence_10fe7ba191e6.ogg",
-      "fingerprint": "fc270495675cc184",
+    "Der Clown hat Klavier gespielt.": {
+      "file": "sentence_69a524a305ff.ogg",
+      "fingerprint": "e0ee0c8e239f5750",
       "profile": "sentence"
     },
     "Der Dino hat den Kuchen gefressen.": {
@@ -930,6 +930,11 @@
       "fingerprint": "11d99fcf39864097",
       "profile": "finale"
     },
+    "Der Pirat hat die Kekse geklaut.": {
+      "file": "sentence_027d7fa9791a.ogg",
+      "fingerprint": "8cc263f19f43cfe3",
+      "profile": "sentence"
+    },
     "Der Vogel klaut die Vase!": {
       "file": "finale_f0c434302046.ogg",
       "fingerprint": "2341d8be9207d987",
@@ -948,6 +953,11 @@
     "Der Wind trug Omas Hut davon.": {
       "file": "sentence_2355776033b3.ogg",
       "fingerprint": "7d82b2baf9723788",
+      "profile": "sentence"
+    },
+    "Der Zucker steckt im Sack.": {
+      "file": "sentence_1a258b299718.ogg",
+      "fingerprint": "7251b4d191872463",
       "profile": "sentence"
     },
     "Der Zug fuhr durch das Tal.": {
@@ -1030,11 +1040,6 @@
       "fingerprint": "ca0d2efc1a6bc85b",
       "profile": "sentence"
     },
-    "Die Äpfel wurden aufgemampft.": {
-      "file": "sentence_1b97eb1db0ff.ogg",
-      "fingerprint": "61b4bcbc2325533e",
-      "profile": "sentence"
-    },
     "Dino": {
       "file": "word_6fb86a981cf3.ogg",
       "fingerprint": "acbed9ef5a00cbf6",
@@ -1090,9 +1095,9 @@
       "fingerprint": "387a2fc0ff480f64",
       "profile": "prompt"
     },
-    "Dreißig Füße stampfen. Fünfzehn hören auf. Wie viele Füße stampfen noch.": {
-      "file": "prompt_fb1ab15a1e92.ogg",
-      "fingerprint": "1a0128bc05468d01",
+    "Dreißig Rüben liegen im Beet. Opa zieht fünfzehn heraus. Wie viele Rüben bleiben.": {
+      "file": "prompt_8d5a8b235f63.ogg",
+      "fingerprint": "20b1e8f3162cdd30",
       "profile": "prompt"
     },
     "Dreißig Taxis warten am Bahnhof. Siebzehn fahren los. Wie viele Taxis bleiben.": {
@@ -1153,6 +1158,11 @@
     "Ein Ufo ist im Tal gelandet.": {
       "file": "sentence_548ba90bb4a2.ogg",
       "fingerprint": "cd80112240dcfb55",
+      "profile": "sentence"
+    },
+    "Ein kleiner Vogel liegt im Nest.": {
+      "file": "sentence_9e533d98b8eb.ogg",
+      "fingerprint": "6c019f87f6113345",
       "profile": "sentence"
     },
     "Eine Spinne bewundert sich im Spiegel!": {
@@ -1375,11 +1385,6 @@
       "fingerprint": "4e3c61ed0b8af847",
       "profile": "word"
     },
-    "Gans": {
-      "file": "word_f13321c94b40.ogg",
-      "fingerprint": "a72a59ce16dae12e",
-      "profile": "word"
-    },
     "Genau richtig": {
       "file": "reward_cb547321569e.ogg",
       "fingerprint": "4efeaacb22212df4",
@@ -1515,14 +1520,9 @@
       "fingerprint": "f73c4a732f75c007",
       "profile": "word"
     },
-    "Im Nest lag ein kleiner Vogel.": {
-      "file": "sentence_343420116adb.ogg",
-      "fingerprint": "694d6e922ec43c11",
-      "profile": "sentence"
-    },
-    "In der Dose waren zwei Kekse.": {
-      "file": "sentence_f0717c3fe572.ogg",
-      "fingerprint": "68586d6798ee0faa",
+    "In der Dose sind zwei Kekse.": {
+      "file": "sentence_c3f01ea1599d.ogg",
+      "fingerprint": "a29356d5e5e103c6",
       "profile": "sentence"
     },
     "Insel": {
@@ -1945,9 +1945,9 @@
       "fingerprint": "28bc0acfcd9e742c",
       "profile": "word"
     },
-    "Papa hat zwei Hüte gekauft.": {
-      "file": "sentence_1d228a508663.ogg",
-      "fingerprint": "260e9026c581be65",
+    "Papa hat einen Hut gekauft.": {
+      "file": "sentence_19d32f06186f.ogg",
+      "fingerprint": "c7329461b008a3e6",
       "profile": "sentence"
     },
     "Papa hat zwei Tomaten geschnitten.": {
@@ -2345,9 +2345,9 @@
       "fingerprint": "2f6f87220c353ad5",
       "profile": "prompt"
     },
-    "Sechzehn Spinnen und vierzehn Spinnen. Wie viele Spinnen sind das.": {
-      "file": "prompt_141d639bc4d4.ogg",
-      "fingerprint": "c56867c578aea1fd",
+    "Sechzehn Sterne und vierzehn Sterne. Wie viele Sterne sind das.": {
+      "file": "prompt_83e32e726f99.ogg",
+      "fingerprint": "8d12015ac18b89b4",
       "profile": "prompt"
     },
     "Sehr gut": {
@@ -2365,9 +2365,9 @@
       "fingerprint": "d783c8035ed1f6ab",
       "profile": "prompt"
     },
-    "Siebenundzwanzig Spinnen sitzen im Netz. Neun krabbeln weg. Wie viele Spinnen bleiben.": {
-      "file": "prompt_cb3dcc46101f.ogg",
-      "fingerprint": "7bd6c5e5981fc815",
+    "Siebenundzwanzig Sterne funkeln am Himmel. Neun verstecken sich hinter einer Wolke. Wie viele Sterne bleiben.": {
+      "file": "prompt_b07e68eea068.ogg",
+      "fingerprint": "e6dd0e73ad637b4f",
       "profile": "prompt"
     },
     "Siebzehn Ameisen und neun Ameisen. Wie viele Ameisen sind das.": {
@@ -2520,11 +2520,6 @@
       "fingerprint": "db6111a567d8575a",
       "profile": "word"
     },
-    "Tom aß den letzten Keks.": {
-      "file": "sentence_574ac24e60c0.ogg",
-      "fingerprint": "e3d20e64f0280187",
-      "profile": "sentence"
-    },
     "Tom hat Opa gerufen.": {
       "file": "sentence_3a01ceb81b01.ogg",
       "fingerprint": "7f0174311a614255",
@@ -2543,6 +2538,11 @@
     "Tom hat zwei Eier versteckt.": {
       "file": "sentence_eb431632569f.ogg",
       "fingerprint": "8961b92aa965bb6f",
+      "profile": "sentence"
+    },
+    "Tom isst den letzten Keks.": {
+      "file": "sentence_9adcabfb357d.ogg",
+      "fingerprint": "c8d305fa96ac28c8",
       "profile": "sentence"
     },
     "Tom isst ein großes Eis.": {
@@ -2665,9 +2665,9 @@
       "fingerprint": "e3b5570d371482b5",
       "profile": "prompt"
     },
-    "Vierundzwanzig Füße und sechs Füße. Wie viele Füße sind das.": {
-      "file": "prompt_fb145f731271.ogg",
-      "fingerprint": "c54ff3f0535e5bb0",
+    "Vierundzwanzig Rüben und sechs Rüben. Wie viele Rüben sind das.": {
+      "file": "prompt_7c04b37029b3.ogg",
+      "fingerprint": "74fd42e11a8028a3",
       "profile": "prompt"
     },
     "Vierzehn Häuser und neun Häuser. Wie viele Häuser sind das.": {
@@ -2724,11 +2724,6 @@
       "file": "reward_16b8dc080113.ogg",
       "fingerprint": "22acb9efeaaaba92",
       "profile": "reward"
-    },
-    "Wer hat die Kekse aus der Dose geklaut...": {
-      "file": "sentence_0d6a3c9ba753.ogg",
-      "fingerprint": "32fc82b8b222fd3a",
-      "profile": "sentence"
     },
     "Wespe": {
       "file": "word_38ba6262a672.ogg",
@@ -2945,9 +2940,9 @@
       "fingerprint": "1b71f9a9080cf0f2",
       "profile": "reward"
     },
-    "X - wie Xylophon.": {
-      "file": "reward_6f6d00e1b28e.ogg",
-      "fingerprint": "c164bdc62ccfd4a2",
+    "X - wie Xylofon.": {
+      "file": "reward_0515961d5b26.ogg",
+      "fingerprint": "3979343a1a7fcd8f",
       "profile": "reward"
     },
     "Xylofon": {
@@ -3310,6 +3305,66 @@
       "fingerprint": "901b9952d5f9479a",
       "profile": "word"
     },
+    "das Auto": {
+      "file": "article_word_b8460049fb0b.ogg",
+      "fingerprint": "353d5480080064f6",
+      "profile": "article_word"
+    },
+    "das Dach": {
+      "file": "article_word_17170661261a.ogg",
+      "fingerprint": "ba8d6a7e20fb46da",
+      "profile": "article_word"
+    },
+    "das Eis": {
+      "file": "article_word_92cd4c160870.ogg",
+      "fingerprint": "d91da987ad4d76f4",
+      "profile": "article_word"
+    },
+    "das Feuer": {
+      "file": "article_word_bc880df7c54d.ogg",
+      "fingerprint": "f50ceed325e7247e",
+      "profile": "article_word"
+    },
+    "das Kleid": {
+      "file": "article_word_c5acfae3ff25.ogg",
+      "fingerprint": "0b2073e28fc912d8",
+      "profile": "article_word"
+    },
+    "das Lama": {
+      "file": "article_word_3ebe749c9e3f.ogg",
+      "fingerprint": "2c559f5d2beb1c85",
+      "profile": "article_word"
+    },
+    "das Ohr": {
+      "file": "article_word_0a7b2badd352.ogg",
+      "fingerprint": "3ab375c16b25d449",
+      "profile": "article_word"
+    },
+    "das Pferd": {
+      "file": "article_word_672556b12c13.ogg",
+      "fingerprint": "8b58d58dd15636cc",
+      "profile": "article_word"
+    },
+    "das Pony": {
+      "file": "article_word_1028110d4368.ogg",
+      "fingerprint": "c3e8f88aba118f73",
+      "profile": "article_word"
+    },
+    "das Schaf": {
+      "file": "article_word_ba3338403adf.ogg",
+      "fingerprint": "3ffcfd8e8d1b4536",
+      "profile": "article_word"
+    },
+    "das Tor": {
+      "file": "article_word_302e90b4e5bd.ogg",
+      "fingerprint": "72b098d966733c7f",
+      "profile": "article_word"
+    },
+    "das Ufo": {
+      "file": "article_word_b2471f85d960.ogg",
+      "fingerprint": "a00f7e063c23e05c",
+      "profile": "article_word"
+    },
     "den": {
       "file": "word_8a8a1a9fe856.ogg",
       "fingerprint": "43e014627383ff7b",
@@ -3320,15 +3375,185 @@
       "fingerprint": "6a91e910cbba0264",
       "profile": "word"
     },
+    "der Elefant": {
+      "file": "article_word_31f8ba1ba172.ogg",
+      "fingerprint": "86735917d90e1730",
+      "profile": "article_word"
+    },
+    "der Fisch": {
+      "file": "article_word_31fa197389b5.ogg",
+      "fingerprint": "8405f848142bf3bb",
+      "profile": "article_word"
+    },
+    "der Fuß": {
+      "file": "article_word_af03a3f0d76e.ogg",
+      "fingerprint": "cebefa5c3240038c",
+      "profile": "article_word"
+    },
+    "der Hase": {
+      "file": "article_word_9e15162cf4ac.ogg",
+      "fingerprint": "1c0c10f1e591be80",
+      "profile": "article_word"
+    },
+    "der Himmel": {
+      "file": "article_word_8a5c3f8475db.ogg",
+      "fingerprint": "1a2250cd9a2938f1",
+      "profile": "article_word"
+    },
+    "der Igel": {
+      "file": "article_word_706f101a0731.ogg",
+      "fingerprint": "36b47e843946493a",
+      "profile": "article_word"
+    },
+    "der Käse": {
+      "file": "article_word_923a2b14be5c.ogg",
+      "fingerprint": "1c9ccccafa5c4cf7",
+      "profile": "article_word"
+    },
+    "der Löffel": {
+      "file": "article_word_bb8e7e13b424.ogg",
+      "fingerprint": "6fde3378058d799c",
+      "profile": "article_word"
+    },
+    "der Löwe": {
+      "file": "article_word_810f27f55ac5.ogg",
+      "fingerprint": "dc2b3f5d4f457220",
+      "profile": "article_word"
+    },
+    "der Stern": {
+      "file": "article_word_8ce357f18cfb.ogg",
+      "fingerprint": "bc046d6c0d0f9c99",
+      "profile": "article_word"
+    },
+    "der Tag": {
+      "file": "article_word_721adbe100b7.ogg",
+      "fingerprint": "f3c11c858e7cfa1f",
+      "profile": "article_word"
+    },
+    "der Tiger": {
+      "file": "article_word_2c67b999d70d.ogg",
+      "fingerprint": "fb90daf212b53f86",
+      "profile": "article_word"
+    },
+    "der Uhu": {
+      "file": "article_word_95cc29849c58.ogg",
+      "fingerprint": "9ba6e4df40950383",
+      "profile": "article_word"
+    },
+    "der Vogel": {
+      "file": "article_word_3327104c5600.ogg",
+      "fingerprint": "2014f4c83b09fd3c",
+      "profile": "article_word"
+    },
+    "der Wal": {
+      "file": "article_word_8485ddd26ace.ogg",
+      "fingerprint": "5a28226d8be169ae",
+      "profile": "article_word"
+    },
+    "der Weg": {
+      "file": "article_word_119080787e71.ogg",
+      "fingerprint": "d74b1b630f54bb15",
+      "profile": "article_word"
+    },
+    "der Zucker": {
+      "file": "article_word_506482a9a934.ogg",
+      "fingerprint": "552fb557081fb451",
+      "profile": "article_word"
+    },
     "die": {
       "file": "word_a8d79f40ddb7.ogg",
       "fingerprint": "5dd530eb74c12642",
       "profile": "word"
     },
+    "die Gabel": {
+      "file": "article_word_2070b9758446.ogg",
+      "fingerprint": "2689a3d32dfc1eb1",
+      "profile": "article_word"
+    },
+    "die Häuser": {
+      "file": "article_word_767dbc597a1d.ogg",
+      "fingerprint": "230cd9317ec7902d",
+      "profile": "article_word"
+    },
+    "die Katze": {
+      "file": "article_word_7bbdf7570db7.ogg",
+      "fingerprint": "b43c862f13d5b239",
+      "profile": "article_word"
+    },
+    "die Maus": {
+      "file": "article_word_08628824ece3.ogg",
+      "fingerprint": "b89078be7ad85254",
+      "profile": "article_word"
+    },
+    "die Nase": {
+      "file": "article_word_8c83baf28842.ogg",
+      "fingerprint": "7e1c15282bd03190",
+      "profile": "article_word"
+    },
+    "die Nuss": {
+      "file": "article_word_062a39c06faf.ogg",
+      "fingerprint": "c1d7394043b156ba",
+      "profile": "article_word"
+    },
+    "die Quelle": {
+      "file": "article_word_20660f53ab32.ogg",
+      "fingerprint": "58a476365b6b7d92",
+      "profile": "article_word"
+    },
+    "die Schule": {
+      "file": "article_word_b447fc074b23.ogg",
+      "fingerprint": "b256b8198f537bb7",
+      "profile": "article_word"
+    },
+    "die Sonne": {
+      "file": "article_word_0d10136da096.ogg",
+      "fingerprint": "146a439914c826d1",
+      "profile": "article_word"
+    },
+    "die Straße": {
+      "file": "article_word_0c05438d17a6.ogg",
+      "fingerprint": "985cc9e3f8524ad8",
+      "profile": "article_word"
+    },
+    "die Suppe": {
+      "file": "article_word_543242b7aa10.ogg",
+      "fingerprint": "d647accbcd6b6bee",
+      "profile": "article_word"
+    },
+    "die Vase": {
+      "file": "article_word_6161728ddab9.ogg",
+      "fingerprint": "866ef607855284ae",
+      "profile": "article_word"
+    },
+    "die Wolke": {
+      "file": "article_word_10b7b80aa218.ogg",
+      "fingerprint": "e34c2fc71cfe663b",
+      "profile": "article_word"
+    },
     "dough": {
       "file": "phoneme_cb9db87912c0.ogg",
       "fingerprint": "7172e4810cf41ed5",
       "profile": "phoneme"
+    },
+    "ein Opa": {
+      "file": "article_word_b966fb392d32.ogg",
+      "fingerprint": "3f99596f21730772",
+      "profile": "article_word"
+    },
+    "ein Papa": {
+      "file": "article_word_8e7f9651c57e.ogg",
+      "fingerprint": "35fa0a3f8aa853bb",
+      "profile": "article_word"
+    },
+    "eine Mama": {
+      "file": "article_word_4e0916367267.ogg",
+      "fingerprint": "d204865cba12907a",
+      "profile": "article_word"
+    },
+    "eine Oma": {
+      "file": "article_word_77cea8b274b2.ogg",
+      "fingerprint": "a2facc1b5fab471a",
+      "profile": "article_word"
     },
     "einen": {
       "file": "word_9227a87d17bb.ogg",

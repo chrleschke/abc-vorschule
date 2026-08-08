@@ -1,6 +1,208 @@
 {
   "version": 1,
   "locks": {
+    "article_word:062a39c06faf": {
+      "seed": 354671520,
+      "sourceText": "die Nuss"
+    },
+    "article_word:08628824ece3": {
+      "seed": 1123002408,
+      "sourceText": "die Maus"
+    },
+    "article_word:0a7b2badd352": {
+      "seed": 2053893539,
+      "sourceText": "das Ohr"
+    },
+    "article_word:0c05438d17a6": {
+      "seed": 354671520,
+      "sourceText": "die Straße"
+    },
+    "article_word:0d10136da096": {
+      "seed": 128216919,
+      "sourceText": "die Sonne"
+    },
+    "article_word:1028110d4368": {
+      "seed": 66028957,
+      "sourceText": "das Pony"
+    },
+    "article_word:10b7b80aa218": {
+      "seed": 1123002408,
+      "sourceText": "die Wolke"
+    },
+    "article_word:119080787e71": {
+      "seed": 427919886,
+      "sourceText": "der Weg"
+    },
+    "article_word:17170661261a": {
+      "seed": 2080298366,
+      "sourceText": "das Dach"
+    },
+    "article_word:175fda59cb18": {
+      "seed": 506043488,
+      "textOverride": "die Rübe.",
+      "sourceText": "die Rübe"
+    },
+    "article_word:20660f53ab32": {
+      "seed": 198819411,
+      "sourceText": "die Quelle"
+    },
+    "article_word:2070b9758446": {
+      "seed": 2053893539,
+      "sourceText": "die Gabel"
+    },
+    "article_word:2c67b999d70d": {
+      "seed": 579800338,
+      "sourceText": "der Tiger"
+    },
+    "article_word:302e90b4e5bd": {
+      "seed": 1236049303,
+      "sourceText": "das Tor"
+    },
+    "article_word:31f8ba1ba172": {
+      "seed": 427919886,
+      "sourceText": "der Elefant"
+    },
+    "article_word:31fa197389b5": {
+      "seed": 104478509,
+      "sourceText": "der Fisch"
+    },
+    "article_word:3327104c5600": {
+      "seed": 1958806341,
+      "sourceText": "der Vogel"
+    },
+    "article_word:3ebe749c9e3f": {
+      "seed": 943836457,
+      "sourceText": "das Lama"
+    },
+    "article_word:4e0916367267": {
+      "seed": 943836457,
+      "textOverride": "eine Mama.",
+      "sourceText": "eine Mama"
+    },
+    "article_word:506482a9a934": {
+      "seed": 822907700,
+      "sourceText": "der Zucker"
+    },
+    "article_word:543242b7aa10": {
+      "seed": 1047430012,
+      "sourceText": "die Suppe"
+    },
+    "article_word:6161728ddab9": {
+      "seed": 2053893539,
+      "sourceText": "die Vase"
+    },
+    "article_word:672556b12c13": {
+      "seed": 1527238604,
+      "sourceText": "das Pferd"
+    },
+    "article_word:706f101a0731": {
+      "seed": 2080298366,
+      "sourceText": "der Igel"
+    },
+    "article_word:721adbe100b7": {
+      "seed": 2053893539,
+      "textOverride": "der Tag.",
+      "sourceText": "der Tag"
+    },
+    "article_word:767dbc597a1d": {
+      "seed": 66028957,
+      "sourceText": "die Häuser"
+    },
+    "article_word:77cea8b274b2": {
+      "seed": 579800338,
+      "sourceText": "eine Oma"
+    },
+    "article_word:7bbdf7570db7": {
+      "seed": 1028299224,
+      "sourceText": "die Katze"
+    },
+    "article_word:810f27f55ac5": {
+      "seed": 579800338,
+      "sourceText": "der Löwe"
+    },
+    "article_word:8485ddd26ace": {
+      "seed": 1256047046,
+      "textOverride": "der Wal.",
+      "sourceText": "der Wal"
+    },
+    "article_word:8a5c3f8475db": {
+      "seed": 427919886,
+      "sourceText": "der Himmel"
+    },
+    "article_word:8c83baf28842": {
+      "seed": 1770486514,
+      "sourceText": "die Nase"
+    },
+    "article_word:8ce357f18cfb": {
+      "seed": 2053893539,
+      "sourceText": "der Stern"
+    },
+    "article_word:8d2ae4615aad": {
+      "seed": 506043488,
+      "textOverride": "der Sack.",
+      "sourceText": "der Sack"
+    },
+    "article_word:8e7f9651c57e": {
+      "seed": 2080298366,
+      "sourceText": "ein Papa"
+    },
+    "article_word:923a2b14be5c": {
+      "seed": 1123002408,
+      "sourceText": "der Käse"
+    },
+    "article_word:92cd4c160870": {
+      "seed": 1123002408,
+      "sourceText": "das Eis"
+    },
+    "article_word:95cc29849c58": {
+      "seed": 1958806341,
+      "sourceText": "der Uhu"
+    },
+    "article_word:9e15162cf4ac": {
+      "seed": 446502140,
+      "sourceText": "der Hase"
+    },
+    "article_word:af03a3f0d76e": {
+      "seed": 162359775,
+      "sourceText": "der Fuß"
+    },
+    "article_word:b2471f85d960": {
+      "seed": 752724038,
+      "sourceText": "das Ufo"
+    },
+    "article_word:b447fc074b23": {
+      "seed": 821599947,
+      "sourceText": "die Schule"
+    },
+    "article_word:b8460049fb0b": {
+      "seed": 1958806341,
+      "sourceText": "das Auto"
+    },
+    "article_word:b966fb392d32": {
+      "seed": 2080298366,
+      "sourceText": "ein Opa"
+    },
+    "article_word:ba3338403adf": {
+      "seed": 837861076,
+      "sourceText": "das Schaf"
+    },
+    "article_word:bb8e7e13b424": {
+      "seed": 354671520,
+      "sourceText": "der Löffel"
+    },
+    "article_word:bc880df7c54d": {
+      "seed": 302229236,
+      "sourceText": "das Feuer"
+    },
+    "article_word:c03821366506": {
+      "seed": 506043488,
+      "textOverride": "das Rad.",
+      "sourceText": "das Rad"
+    },
+    "article_word:c5acfae3ff25": {
+      "seed": 1238263247,
+      "sourceText": "das Kleid"
+    },
     "finale:0e8ee2e401d0": {
       "seed": 445173952,
       "sourceText": "Mama Maus mampft einen dicken Apfel!"
@@ -886,6 +1088,10 @@
       "seed": 1557796273,
       "sourceText": "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende."
     },
+    "prompt:7c04b37029b3": {
+      "seed": 634912039,
+      "sourceText": "Vierundzwanzig Rüben und sechs Rüben. Wie viele Rüben sind das."
+    },
     "prompt:7cc3b5a2d992": {
       "seed": 1816915274,
       "sourceText": "Drei Reihen mit je sechs Vögeln sitzen auf den Leitungen. Wie viele Vögel sind das."
@@ -901,6 +1107,10 @@
     "prompt:82b3474e488e": {
       "seed": 1943746528,
       "sourceText": "Baue das Wort Baum."
+    },
+    "prompt:83e32e726f99": {
+      "seed": 122602205,
+      "sourceText": "Sechzehn Sterne und vierzehn Sterne. Wie viele Sterne sind das."
     },
     "prompt:844dd6651f8c": {
       "seed": 28675494,
@@ -933,6 +1143,10 @@
     "prompt:8c2b7c6c4b52": {
       "seed": 1607038802,
       "sourceText": "Zwei Reihen mit je vier Rosen blühen im Beet. Wie viele Rosen sind das."
+    },
+    "prompt:8d5a8b235f63": {
+      "seed": 1521286730,
+      "sourceText": "Dreißig Rüben liegen im Beet. Opa zieht fünfzehn heraus. Wie viele Rüben bleiben."
     },
     "prompt:8f690f34b4df": {
       "seed": 1208583262,
@@ -1093,6 +1307,10 @@
     "prompt:b0622a492cdc": {
       "seed": 1467362234,
       "sourceText": "Baue das Wort Taxi."
+    },
+    "prompt:b07e68eea068": {
+      "seed": 634912039,
+      "sourceText": "Siebenundzwanzig Sterne funkeln am Himmel. Neun verstecken sich hinter einer Wolke. Wie viele Sterne bleiben."
     },
     "prompt:b0bdf8a04cdb": {
       "seed": 1936892529,
@@ -1389,6 +1607,10 @@
       "seed": 873012571,
       "textOverride": "L wie Lama.",
       "sourceText": "L - wie Lama."
+    },
+    "reward:0515961d5b26": {
+      "seed": 1995171,
+      "sourceText": "X - wie Xylofon."
     },
     "reward:06e12cfbe9b6": {
       "seed": 1135500920,
@@ -1795,6 +2017,11 @@
       "textOverride": "\"Zeh\" wie Clown.",
       "sourceText": "C - wie Clown."
     },
+    "sentence:027d7fa9791a": {
+      "seed": 439084397,
+      "textOverride": "Wer möchte Nudelauflauf?",
+      "sourceText": "Der Pirat hat die Kekse geklaut."
+    },
     "sentence:0620b64d3955": {
       "seed": 447155165,
       "sourceText": "Wir gehen den Weg."
@@ -1842,6 +2069,15 @@
     "sentence:19048a388ae2": {
       "seed": 312820997,
       "sourceText": "Die Giraffe frisst aus dem Sack."
+    },
+    "sentence:19d32f06186f": {
+      "seed": 1095904114,
+      "sourceText": "Papa hat einen Hut gekauft."
+    },
+    "sentence:1a258b299718": {
+      "seed": 1624620892,
+      "textOverride": "Ein Sack voll Zucker.",
+      "sourceText": "Der Zucker steckt im Sack."
     },
     "sentence:1b97eb1db0ff": {
       "seed": 1601555549,
@@ -1991,6 +2227,10 @@
       "textOverride": "Zwei Lamas liefen um die Wette.",
       "sourceText": "Zwei Lamas liefen über die Wiese."
     },
+    "sentence:69a524a305ff": {
+      "seed": 1624620892,
+      "sourceText": "Der Clown hat Klavier gespielt."
+    },
     "sentence:6c731de28695": {
       "seed": 1674724842,
       "sourceText": "Mama."
@@ -2055,9 +2295,17 @@
       "seed": 432945842,
       "sourceText": "Die Sonne scheint auf das Nest."
     },
+    "sentence:9adcabfb357d": {
+      "seed": 1095904114,
+      "sourceText": "Tom isst den letzten Keks."
+    },
     "sentence:9d87d18b56ec": {
       "seed": 1095904114,
       "sourceText": "Die Eule fliegt."
+    },
+    "sentence:9e533d98b8eb": {
+      "seed": 439084397,
+      "sourceText": "Ein kleiner Vogel liegt im Nest."
     },
     "sentence:9f1f1902b079": {
       "seed": 1273693101,
@@ -2078,6 +2326,10 @@
     "sentence:b0b65c1bc802": {
       "seed": 432945842,
       "sourceText": "Das Lama hat laut Hallo gerufen."
+    },
+    "sentence:b0ea092062f3": {
+      "seed": 312820997,
+      "sourceText": "Auf dem Tor sitzt ein kleiner Vogel."
     },
     "sentence:b309c28c2c33": {
       "seed": 439084397,
@@ -2118,6 +2370,10 @@
     "sentence:c20bbc886c9b": {
       "seed": 439084397,
       "sourceText": "Die Rose wächst neben dem Tor."
+    },
+    "sentence:c3f01ea1599d": {
+      "seed": 432945842,
+      "sourceText": "In der Dose sind zwei Kekse."
     },
     "sentence:c48c25a0d8df": {
       "seed": 1273693101,
@@ -2430,6 +2686,10 @@
       "seed": 1378116787,
       "sourceText": "Baum"
     },
+    "word:44474cda5d54": {
+      "seed": 1389964126,
+      "sourceText": "18 Sterne"
+    },
     "word:447d5f2a9d57": {
       "seed": 1765179368,
       "sourceText": "25 Taxis"
@@ -2568,6 +2828,10 @@
       "textOverride": "Affe.",
       "sourceText": "Affe"
     },
+    "word:6432f69e8da7": {
+      "seed": 1765179368,
+      "sourceText": "30 Sterne"
+    },
     "word:643aa97e949c": {
       "seed": 1221809993,
       "sourceText": "Sofa"
@@ -2619,6 +2883,11 @@
     "word:700f4dce8c0c": {
       "seed": 818295292,
       "sourceText": "Xylofon"
+    },
+    "word:7253bc3fb39a": {
+      "seed": 1512463413,
+      "textOverride": "Der Nudelauflauf ist fertig! H",
+      "sourceText": "30 Rüben"
     },
     "word:753692ec36ad": {
       "seed": 1956026513,
@@ -2943,6 +3212,10 @@
     "word:bb815bb06bef": {
       "seed": 877129697,
       "sourceText": "Klavier"
+    },
+    "word:bd9d5f862fab": {
+      "seed": 1229619544,
+      "sourceText": "15 Rüben"
     },
     "word:be39f4733f40": {
       "seed": 960095982,
