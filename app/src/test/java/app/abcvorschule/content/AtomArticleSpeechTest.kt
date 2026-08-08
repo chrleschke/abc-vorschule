@@ -53,6 +53,32 @@ class AtomArticleSpeechTest {
         assertEquals("die Häuser", AtomArticleSpeech.forAtom(haeuser))
     }
 
+    // Die folgenden drei Fälle spiegeln test_article_speech_mirrors_the_kotlin_rule in
+    // tools/tts/tests/test_extract.py wörtlich — Python pinnt dieselben Randfälle mit
+    // Verweis auf Kotlin-Verhalten. Beide Seiten müssen zusammen geändert werden.
+
+    @Test
+    fun `the override is passed through untrimmed`() {
+        // takeIf { it.isNotBlank() } filtert nur — es trimmt nicht.
+        val haeuser = atom("Häuser", Gender.n, NounClass.thing, override = " die Häuser ")
+        assertEquals(" die Häuser ", AtomArticleSpeech.forAtom(haeuser))
+    }
+
+    @Test
+    fun `a blank override is no override`() {
+        // Nur-Leerzeichen ist blank, also kein Override — Fallback auf die Ableitung.
+        val kind = atom("Kind", Gender.n, NounClass.person, override = "   ")
+        assertEquals("das Kind", AtomArticleSpeech.forAtom(kind))
+    }
+
+    @Test
+    fun `display is not trimmed in the composed speech`() {
+        // display selbst wird nicht getrimmt: Rand-Leerzeichen bleiben erhalten,
+        // daher das doppelte Leerzeichen zwischen Artikel und display.
+        val haus = atom(" Haus ", Gender.n, NounClass.thing)
+        assertEquals("das  Haus ", AtomArticleSpeech.forAtom(haus))
+    }
+
     @Test
     fun `an unclassified atom has no article speech`() {
         assertNull(AtomArticleSpeech.forAtom(atom("ist")))

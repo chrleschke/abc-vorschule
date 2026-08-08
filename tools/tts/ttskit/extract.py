@@ -174,7 +174,7 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
         if atom["id"] not in reachable:
             continue
         speech = article_speech(atom)
-        # Gleicher Text wie das Lemma (Namen) → kein zweiter Clip.
+        # Gleicher Text wie display (Namen) → kein zweiter Clip.
         if not speech or speech == atom.get("display"):
             continue
         add(f"atom:{atom['id']}:articleTts", speech, "articleTts", "atoms.json", None,

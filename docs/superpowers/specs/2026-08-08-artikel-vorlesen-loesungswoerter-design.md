@@ -166,8 +166,8 @@ dauerhaft als „fehlt" in `tts status` und würden echte Lücken verdecken.
 
 Nicht das bestehende `word`-Profil, aus zwei Gründen:
 
-- `word` ist auf `max_new_tokens: 25` (≈ 2,0 s Rohaudio) gedeckelt. „eine Erdbeere" läuft
-  dagegen und würde hart abgeschnitten.
+- `word` ist auf `max_new_tokens: 25` (≈ 2,0 s Rohaudio) gedeckelt. „die Erdbeere" — der
+  längste der 85 Artikel-Texte — läuft dagegen und würde hart abgeschnitten.
 - Die Instruktion muss ausdrücklich verlangen, Artikel und Nomen **als eine Einheit** zu
   sprechen. Ein Absetzen nach dem Artikel klingt wie zwei aneinandergehängte Clips — genau
   das Flickwerk, das vermieden werden soll.
@@ -206,8 +206,12 @@ Antippen, Prompts und die Wort-Detektiv-Sequenzen.
 ### Reihenfolge und Zwischenzustand
 
 Der Content- und Code-Teil ist ohne Audio auslieferbar: fehlt ein Clip, spricht Android-TTS
-„das Haus" (`ClipIndex.lookup` liefert `null`, `SpeechController` fällt zurück). Die
-Kuratierung der 85 Clips im TTS-Web-Interface ist ein eigener, nachgelagerter Schritt.
+„das Haus" (`ClipIndex.lookup` liefert `null`, `SpeechController` fällt zurück) — **sofern
+das Gerät eine deutsche TTS-Stimme hat** (`languageOk` in `SpeechController`). Ohne deutsche
+Stimme, aber mit committetem Clip-Index, greift `speechAvailable` zwar (Clips allein reichen
+für „verfügbar"), doch `enqueueTts` bricht mangels `languageOk` ab — das Erfolgs-Vorsprechen
+bleibt für diese 85 Wörter dann stumm, bis die Clips produziert sind. Die Kuratierung der 85
+Clips im TTS-Web-Interface ist ein eigener, nachgelagerter Schritt.
 
 ## 5. Tests
 

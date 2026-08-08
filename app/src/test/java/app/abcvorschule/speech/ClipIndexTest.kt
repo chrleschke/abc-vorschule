@@ -129,7 +129,7 @@ class ClipIndexTest {
         assertTrue("committed index.json darf nicht leer sein", index.size > 0)
 
         val fileNamePattern = Regex(
-            "^(word|phoneme|prompt|miss|reward|sentence|finale|ui)_[0-9a-f]{12}\\.ogg$",
+            "^(article_word|word|phoneme|prompt|miss|reward|sentence|finale|ui)_[0-9a-f]{12}\\.ogg$",
         )
         index.entries().forEach { entry ->
             assertTrue(
@@ -137,6 +137,10 @@ class ClipIndexTest {
                 fileNamePattern.matches(entry.file),
             )
         }
+        // article_word steht vor word in der Alternation: "das Haus" erzeugt
+        // article_word_e537e289a34f.ogg, dessen Präfix "article_" sonst am
+        // ^word-Anker vorbeiläuft. Pinnt den konkreten Fall, nicht nur "im Prinzip".
+        assertTrue(fileNamePattern.matches("article_word_e537e289a34f.ogg"))
 
         // Pinnt die Exporter→App-Naht an einen echten, aktuell gelockten Clip.
         // Falls dieser Text jemals entlockt wird, verschwindet der Eintrag aus

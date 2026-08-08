@@ -173,7 +173,9 @@
         "subtalker_top_p": 1,
         "max_new_tokens": 35
       },
-      "seedPool": []
+      "seedPool": [],
+      "trim": true,
+      "normalize": true
     },
     "phoneme": {
       "label": "Laut / Buchstabe",

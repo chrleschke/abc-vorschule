@@ -14,7 +14,8 @@ from ttskit.store import (
 def test_profiles_load_falls_back_to_defaults(tmp_path):
     profiles = Profiles.load(tmp_path / "missing.json")
     assert set(profiles.profiles) == {
-        "word", "phoneme", "prompt", "miss", "reward", "sentence", "finale", "ui",
+        "word", "article_word", "phoneme", "prompt", "miss", "reward", "sentence",
+        "finale", "ui",
     }
     assert profiles.pool_salt == "v1"
 
@@ -302,8 +303,8 @@ def test_param_to_dict_carries_everything_the_ui_needs():
 
 def test_default_profiles_carry_the_measured_duration_limits():
     # Abgeleitet aus den Dauern der validierten Aufnahmen, siehe Spec.
-    expected = {"phoneme": 25, "word": 38, "sentence": 50, "finale": 63,
-                "prompt": 125, "miss": 75, "reward": 63, "ui": 75}
+    expected = {"phoneme": 25, "word": 38, "article_word": 35, "sentence": 50,
+                "finale": 63, "prompt": 125, "miss": 75, "reward": 63, "ui": 75}
     actual = {name: profile["sampling"]["max_new_tokens"]
               for name, profile in DEFAULT_PROFILES["profiles"].items()}
     assert actual == expected

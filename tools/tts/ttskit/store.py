@@ -178,6 +178,13 @@ DEFAULT_PROFILES: dict[str, Any] = {
             "mit neutraler Betonung. Keine Übertreibung, keine Frage-Melodie.",
             38,  # 3,04 s
         ),
+        "article_word": _profile(
+            "Artikel + Wort",
+            "Sprich Artikel und Nomen als eine einzige Einheit, ohne Pause nach "
+            "dem Artikel. Klar und freundlich, in ruhigem Tempo. Keine "
+            "Frage-Melodie, keine Übertreibung.",
+            35,  # 2,80 s
+        ),
         "phoneme": _profile(
             "Laut / Buchstabe",
             "Sprich ausschließlich den Lautwert des Buchstabens, deutlich gedehnt "
