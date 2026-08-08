@@ -83,4 +83,87 @@ class PathFocusTest {
         // A path shorter than the viewport does not scroll at all.
         assertEquals(0, PathFocus.scrollTarget(nodeY = 400f, viewportHeight = 1000, maxScroll = 0))
     }
+
+    @Test
+    fun markerStartsOnTheFinishedLessonForAForwardHop() {
+        assertEquals(2, PathFocus.markerStartIndex(fromIndex = 2, headIndex = 3))
+        // Free order can also skip signs forwards; still a forward hop.
+        assertEquals(1, PathFocus.markerStartIndex(fromIndex = 1, headIndex = 4))
+    }
+
+    @Test
+    fun markerSkipsTheHopAfterAFreeOrderDetourAhead() {
+        // l4 was finished out of order while the highlight stayed on l1: hopping
+        // from 4 back to 1 would warm the whole trail on the first frame and walk
+        // the marker visibly backwards — progress being taken away. The marker
+        // starts directly on the head instead.
+        assertEquals(1, PathFocus.markerStartIndex(fromIndex = 4, headIndex = 1))
+    }
+
+    @Test
+    fun markerStartsOnTheHeadWithoutAUsableFromLesson() {
+        assertEquals(3, PathFocus.markerStartIndex(fromIndex = null, headIndex = 3))
+        assertEquals(3, PathFocus.markerStartIndex(fromIndex = 3, headIndex = 3))
+        // Untouched path: no head, nothing to hop to.
+        assertEquals(-1, PathFocus.markerStartIndex(fromIndex = 2, headIndex = -1))
+    }
+
+    // ---- entryScrollTarget ----
+    //
+    // All in dp-as-px (density 1). The hop headroom is a sign's full height plus
+    // the marker column above it, and the from-node sits one default spacing
+    // (168dp) above the head node — the geometry the finding was verified against.
+
+    private val hopHeadroom =
+        (PathSignDimens.TotalHeight + PathMarkerDimens.Headroom).value // 166dp
+    private val fromY = 1000f
+    private val headY = fromY + PathGeometry.DefaultSpacing // 1168
+
+    @Test
+    fun entryScrollShowsTheHopStartOnSmallViewports() {
+        // 470dp (a 640dp phone minus chrome) and 640dp: the plain head target
+        // would put the hop's start above the top edge — off screen entirely
+        // below ~690dp — so the entry target must pull back up.
+        for (viewport in listOf(470, 640)) {
+            val headTarget = PathFocus.scrollTarget(headY, viewport, maxScroll = 5000)
+            val entry = PathFocus.entryScrollTarget(fromY, headY, hopHeadroom, viewport, maxScroll = 5000)
+            val hopStartTop = fromY - hopHeadroom
+            assertTrue(
+                "plain target $headTarget must cut off the hop start at $hopStartTop (viewport $viewport)",
+                hopStartTop - headTarget < 0f,
+            )
+            assertTrue(
+                "hop start at ${hopStartTop - entry} must be on screen (viewport $viewport)",
+                hopStartTop - entry >= 0f,
+            )
+            assertTrue(
+                "head node at ${headY - entry} must stay inside the $viewport viewport",
+                headY - entry <= viewport,
+            )
+        }
+    }
+
+    @Test
+    fun entryScrollIsThePlainTargetOnceTheHopStartFitsAnyway() {
+        // At 800dp the anchor leaves enough room above the head for the whole
+        // hop; the entry target degenerates to the plain one and the follow-up
+        // animation is a no-op.
+        val viewport = 800
+        val headTarget = PathFocus.scrollTarget(headY, viewport, maxScroll = 5000)
+        val entry = PathFocus.entryScrollTarget(fromY, headY, hopHeadroom, viewport, maxScroll = 5000)
+        assertEquals(headTarget, entry)
+        assertTrue("hop start must be on screen", fromY - hopHeadroom - entry >= 0f)
+    }
+
+    @Test
+    fun entryScrollStaysInsideTheScrollableRange() {
+        // Hop start so close to the top that its headroom pokes past the content
+        // edge: clamps at 0 instead of scrolling to a negative offset.
+        assertEquals(
+            0,
+            PathFocus.entryScrollTarget(100f, 268f, hopHeadroom, 640, maxScroll = 5000),
+        )
+        // A path shorter than the viewport does not scroll at all.
+        assertEquals(0, PathFocus.entryScrollTarget(fromY, headY, hopHeadroom, 640, maxScroll = 0))
+    }
 }

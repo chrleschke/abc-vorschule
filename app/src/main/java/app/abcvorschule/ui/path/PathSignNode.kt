@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.R
 import app.abcvorschule.progress.LessonState
+import app.abcvorschule.ui.components.IconLock
 import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.theme.LeafGreenLight
 import app.abcvorschule.ui.theme.SkyBlueLight
@@ -62,6 +64,93 @@ object PathSignDimens {
 
 private val BoardShape = RoundedCornerShape(14.dp)
 private val RingWidth = 4.dp
+
+/**
+ * Effective text sizes on the sign's board.
+ *
+ * The board is a painted object in the landscape, fixed at 136×86dp — it does not
+ * grow with the system font scale the way a reading surface would (dp-stable
+ * lettering on a pictorial object is the sanctioned exception; the label is not
+ * something the child reads, TalkBack announces it). Left alone, titleLarge at
+ * font scale 2.0 renders "C y x qu" some 175dp wide — clipped mid-glyph by
+ * maxLines=1 — and stacks label plus emoji row ~90dp tall on the 86dp board.
+ *
+ * So both text roles are capped: the rendered size stops growing at
+ * [MaxBoardFontScale] (the vertical budget), and the label additionally shrinks
+ * until its estimated width fits [MaxLabelWidthDp]. Font scale 1.3 — the test
+ * device — sits below both caps for every authored label and renders exactly as
+ * before.
+ *
+ * Pure math (estimated glyph advances, no Compose), so it is JVM-unit-testable.
+ */
+internal object PathSignLabel {
+    /** titleLarge's authored size — the label never exceeds this in sp. */
+    const val BaseLabelSp = 22f
+
+    /** The emoji row's authored size. */
+    const val BaseEmojiSp = 16f
+
+    /** Board width (136dp) minus ring and rounded-corner breathing room. */
+    const val MaxLabelWidthDp = 120f
+
+    /**
+     * Rendered text stops growing past this scale: at 1.6 the label line plus the
+     * emoji row still fit the 86dp board with margin ([boardColumnHeightDp] ≈76dp,
+     * asserted in PathSignLabelTest); at 2.0 they overflow it.
+     */
+    const val MaxBoardFontScale = 1.6f
+
+    /**
+     * Line height ≈ 1.25× the font size — generous for the medium sans the label
+     * uses (~1.17×); neither Text sets an explicit lineHeight.
+     */
+    const val EstimatedLineHeightRatio = 1.25f
+
+    /** The emoji row's reserved minimum height, mirrored by its heightIn. */
+    const val MinEmojiRowDp = 22f
+
+    /**
+     * Estimated advance of [c] in em for the semi-bold label font. Slightly
+     * generous on purpose: over-estimating shrinks a label a touch early,
+     * under-estimating clips a glyph.
+     */
+    private fun advanceEm(c: Char): Float = when {
+        c == ' ' -> 0.30f
+        c in "iIjl" -> 0.34f
+        c in "ftr" -> 0.44f
+        c in "mw" -> 0.90f
+        c in "MW" -> 0.98f
+        c.isUpperCase() -> 0.75f
+        else -> 0.60f
+    }
+
+    fun widthEm(label: String): Float = label.sumOf { advanceEm(it).toDouble() }.toFloat()
+
+    /**
+     * Font size in sp that keeps [label] on one unclipped line of the board at
+     * [fontScale]. Up to [MaxBoardFontScale] and [MaxLabelWidthDp] this is
+     * [BaseLabelSp] unchanged; past either cap the *rendered* size is held, i.e.
+     * the sp value shrinks by exactly the factor the scale grows.
+     */
+    fun labelFontSp(label: String, fontScale: Float): Float {
+        if (fontScale <= 0f) return BaseLabelSp
+        val heightCappedDp = BaseLabelSp * minOf(fontScale, MaxBoardFontScale)
+        val em = widthEm(label)
+        val renderedDp = if (em > 0f) minOf(heightCappedDp, MaxLabelWidthDp / em) else heightCappedDp
+        return renderedDp / fontScale
+    }
+
+    /** Emoji size in sp: authored size until [MaxBoardFontScale], then held there. */
+    fun emojiFontSp(fontScale: Float): Float {
+        if (fontScale <= 0f) return BaseEmojiSp
+        return BaseEmojiSp * minOf(fontScale, MaxBoardFontScale) / fontScale
+    }
+
+    /** Estimated height in dp of the label line plus the emoji row at [fontScale]. */
+    fun boardColumnHeightDp(label: String, fontScale: Float): Float =
+        labelFontSp(label, fontScale) * fontScale * EstimatedLineHeightRatio +
+            maxOf(emojiFontSp(fontScale) * fontScale * EstimatedLineHeightRatio, MinEmojiRowDp)
+}
 
 /**
  * A lesson as a wooden signpost standing on the trail: the grapheme large, three
@@ -213,12 +302,14 @@ fun PathSignNode(
                 )
                 // The child cannot read, and WoodMid against WoodDark is only a
                 // 1.41:1 board difference, so "not yet" must not rest on the ring
-                // colour alone. Decorative for TalkBack — the sign's
-                // contentDescription already announces the locked state.
-                !playable -> Text(
-                    text = "🔒",
-                    fontSize = 16.sp,
-                    color = Color.Unspecified,
+                // colour alone. Vector lock, not the 🔒 emoji: the emoji renders
+                // vendor-gold and collides with the StarGold reward role right
+                // next to real stars (§10: UI chrome is vector/ASCII). Decorative
+                // for TalkBack — the sign's contentDescription already announces
+                // the locked state.
+                !playable -> IconLock(
+                    tint = SoftSand.copy(alpha = 0.55f),
+                    size = 16.dp,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(8.dp)
@@ -227,6 +318,7 @@ fun PathSignNode(
                 else -> Nail(shade, Modifier.align(Alignment.TopEnd).padding(10.dp))
             }
 
+            val fontScale = LocalDensity.current.fontScale
             Column(
                 modifier = Modifier.align(Alignment.Center),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -234,10 +326,13 @@ fun PathSignNode(
                 Text(
                     text = label,
                     style = MaterialTheme.typography.titleLarge,
-                    color = labelColor,
                     // Labels run up to 8 characters ("C y x qu", "Sch ch+"). At a
                     // large font scale a wrapped second line spills past the board's
-                    // rounded corner, which is not clipped.
+                    // rounded corner, which is not clipped — hence maxLines=1, and
+                    // hence the capped size: uncapped, font scale 2.0 clips the long
+                    // labels mid-glyph instead. See PathSignLabel.
+                    fontSize = PathSignLabel.labelFontSp(label, fontScale).sp,
+                    color = labelColor,
                     maxLines = 1,
                 )
                 // Reserved height even when empty, so authored and planned signs stay
@@ -245,10 +340,12 @@ fun PathSignNode(
                 // height: height() caps as well as floors, and 16sp emojis need
                 // ~21.5dp at font scale 1.15 and ~24.3dp at 1.3 — they would silently
                 // crop, and the three pictures are the whole sign for a child who
-                // cannot read the letter above them. The 86dp board absorbs it.
+                // cannot read the letter above them. The 86dp board absorbs it up to
+                // PathSignLabel.MaxBoardFontScale, where the emoji size is held so
+                // the row cannot push the column off the board.
                 Row(
                     modifier = Modifier
-                        .heightIn(min = 22.dp)
+                        .heightIn(min = PathSignLabel.MinEmojiRowDp.dp)
                         // Without this TalkBack reads "mouse tree ant" into the
                         // middle of the state announcement.
                         .clearAndSetSemantics {},
@@ -258,7 +355,7 @@ fun PathSignNode(
                     emojis.forEach { emoji ->
                         Text(
                             text = emoji,
-                            fontSize = 16.sp,
+                            fontSize = PathSignLabel.emojiFontSp(fontScale).sp,
                             color = Color.Unspecified,
                             modifier = Modifier.graphicsLayer {
                                 // 0.18 was set when the whole screen was a night
