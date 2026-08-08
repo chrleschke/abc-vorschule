@@ -62,6 +62,24 @@ object ContentValidator {
             if (atom.display.isBlank()) {
                 issues += ValidationIssue("atom ${atom.id} has a blank display")
             }
+            if (atom.nounClass != null && atom.nounClass != NounClass.properName && atom.gender == null) {
+                issues += ValidationIssue(
+                    "atom ${atom.id} has nounClass ${atom.nounClass} but no gender",
+                )
+            }
+            if (atom.gender != null && atom.nounClass == null) {
+                issues += ValidationIssue("atom ${atom.id} has a gender but no nounClass")
+            }
+            if (atom.nounClass == NounClass.properName && atom.gender != null) {
+                issues += ValidationIssue(
+                    "atom ${atom.id} is a name and must not carry a gender",
+                )
+            }
+            if (!atom.articleSpeechOverride.isNullOrBlank() && atom.nounClass == null) {
+                issues += ValidationIssue(
+                    "atom ${atom.id} has an articleSpeechOverride but no nounClass",
+                )
+            }
             atom.strokes.forEachIndexed { i, stroke ->
                 if (stroke.points.size < 2) {
                     issues += ValidationIssue("atom ${atom.id} stroke $i needs at least 2 points")
@@ -73,6 +91,25 @@ object ContentValidator {
                         issues += ValidationIssue("atom ${atom.id} stroke $i leaves the unit box")
                     }
                 }
+            }
+        }
+
+        // Plural-Atome ("Häuser") nehmen im Deutschen "die", unabhängig vom Genus des
+        // Singulars; die Ableitung kann das nicht wissen und braucht einen Override.
+        // Selbst-Plurale ("Eimer" → "Eimer") sind keine eigenen Plural-Atome.
+        val pluralDisplays: Set<String> = pack.atoms.values
+            .mapNotNull { singular ->
+                singular.pluralDisplay?.takeIf { it != singular.display }
+            }
+            .toSet()
+        pack.atoms.values.forEach { atom ->
+            if (atom.display in pluralDisplays &&
+                atom.nounClass != null &&
+                atom.articleSpeechOverride.isNullOrBlank()
+            ) {
+                issues += ValidationIssue(
+                    "atom ${atom.id} is a plural form and needs an articleSpeechOverride",
+                )
             }
         }
 

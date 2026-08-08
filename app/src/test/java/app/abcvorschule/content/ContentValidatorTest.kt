@@ -600,4 +600,94 @@ class ContentValidatorTest {
             .distinct()
         assertEquals(listOf("Ordne das richtige Bild zu."), instructions)
     }
+
+    // --- Genus-, Nomenklassen- und Plural-Konsistenz ---------------------------
+
+    private fun packWithAtom(atom: Atom) =
+        pack.copy(atoms = pack.atoms + (atom.id to atom))
+
+    private fun testAtom(
+        id: String = "test-atom",
+        display: String = "Testwort",
+        gender: Gender? = null,
+        nounClass: NounClass? = null,
+        override: String? = null,
+        pluralDisplay: String? = null,
+    ) = Atom(
+        id = id, lemma = display, display = display, emoji = "", kind = AtomKind.word,
+        pluralDisplay = pluralDisplay,
+        gender = gender, nounClass = nounClass, articleSpeechOverride = override,
+    )
+
+    @Test
+    fun `thing without gender is an issue`() {
+        val issues = ContentValidator.validate(packWithAtom(testAtom(nounClass = NounClass.thing)))
+        assertTrue(issues.any { "test-atom" in it.message && "gender" in it.message })
+    }
+
+    @Test
+    fun `person without gender is an issue`() {
+        val issues = ContentValidator.validate(packWithAtom(testAtom(nounClass = NounClass.person)))
+        assertTrue(issues.any { "test-atom" in it.message && "gender" in it.message })
+    }
+
+    @Test
+    fun `gender without noun class is an issue`() {
+        val issues = ContentValidator.validate(packWithAtom(testAtom(gender = Gender.f)))
+        assertTrue(issues.any { "test-atom" in it.message && "nounClass" in it.message })
+    }
+
+    @Test
+    fun `a name with a gender is an issue`() {
+        val issues = ContentValidator.validate(
+            packWithAtom(testAtom(gender = Gender.m, nounClass = NounClass.properName)),
+        )
+        assertTrue(issues.any { "test-atom" in it.message })
+    }
+
+    @Test
+    fun `a plural atom without an override is an issue`() {
+        val singular = testAtom(id = "test-sing", display = "Testding", pluralDisplay = "Testdinge",
+            gender = Gender.n, nounClass = NounClass.thing)
+        val plural = testAtom(id = "test-plur", display = "Testdinge",
+            gender = Gender.n, nounClass = NounClass.thing)
+        val mutated = pack.copy(
+            atoms = pack.atoms + (singular.id to singular) + (plural.id to plural),
+        )
+        val issues = ContentValidator.validate(mutated)
+        assertTrue(issues.any { "test-plur" in it.message && "articleSpeechOverride" in it.message })
+    }
+
+    @Test
+    fun `a self plural needs no override`() {
+        // "Eimer" ist sein eigener Plural — das ist kein Plural-Atom.
+        val selfPlural = testAtom(id = "test-self", display = "Testeimer",
+            pluralDisplay = "Testeimer", gender = Gender.m, nounClass = NounClass.thing)
+        val issues = ContentValidator.validate(packWithAtom(selfPlural))
+        assertTrue(issues.none { "test-self" in it.message })
+    }
+
+    @Test
+    fun `a plural atom with an override is fine`() {
+        val singular = testAtom(id = "test-sing", display = "Testding", pluralDisplay = "Testdinge",
+            gender = Gender.n, nounClass = NounClass.thing)
+        val plural = testAtom(id = "test-plur", display = "Testdinge", gender = Gender.n,
+            nounClass = NounClass.thing, override = "die Testdinge")
+        val mutated = pack.copy(
+            atoms = pack.atoms + (singular.id to singular) + (plural.id to plural),
+        )
+        val issues = ContentValidator.validate(mutated)
+        assertTrue(issues.none { "test-plur" in it.message })
+    }
+
+    @Test
+    fun `an override without a noun class is an issue`() {
+        // AtomArticleSpeech.forAtom prüft articleSpeechOverride vor nounClass — ein
+        // Override ohne nounClass würde sonst nie durch die Vollständigkeitsprüfung
+        // (Task 4) laufen und stumm einen Artikel-Sprechtext bekommen.
+        val issues = ContentValidator.validate(
+            packWithAtom(testAtom(override = "die Testdinge")),
+        )
+        assertTrue(issues.any { "test-atom" in it.message && "nounClass" in it.message })
+    }
 }
