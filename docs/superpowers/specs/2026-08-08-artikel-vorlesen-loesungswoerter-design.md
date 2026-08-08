@@ -32,8 +32,8 @@ enum class NounClass {
     thing,
     /** Personenbezeichnung (Oma, Opa, Clown, Pirat) — unbestimmter Artikel. */
     person,
-    /** Eigenname (Tom, Mimi) — kein Artikel. */
-    name,
+    /** Eigenname (Tom, Mimi) — kein Artikel. Kotlin: `properName` (JSON `"name"`). */
+    @SerialName("name") properName,
 }
 
 data class Atom(
@@ -57,7 +57,7 @@ forAtom(atom): String?
 |---|---|---|
 | `articleSpeechOverride` gesetzt | der Override, wörtlich | `die Häuser` |
 | `nounClass == null` | `null` — kein Substantiv, Aufrufer fällt auf sein bisheriges Verhalten zurück | `ist`, `rot`, `ma`, `M` |
-| `nounClass == name` | `display` | `Tom` |
+| `nounClass == properName` | `display` | `Tom` |
 | `nounClass == person`, `gender == m` | `ein $display` | `ein Opa` |
 | `nounClass == person`, `gender == f` | `eine $display` | `eine Oma` |
 | `nounClass == person`, `gender == n` | `das $display` | `das Kind` |
@@ -126,7 +126,7 @@ Neue Regeln in `ContentValidator.validate`, pro Atom:
 
 1. `nounClass` in `{thing, person}` → `gender` muss gesetzt sein.
 2. `gender` gesetzt → `nounClass` muss gesetzt sein (kein halbes Paar).
-3. `nounClass == name` → `gender` muss `null` sein (Namen tragen kein Artikel-Genus).
+3. `nounClass == properName` → `gender` muss `null` sein (Namen tragen kein Artikel-Genus).
 4. **Plural-Atome brauchen einen Override.** Ein Atom `p` braucht `articleSpeechOverride`,
    wenn es ein *anderes* Atom `s` gibt mit `s.pluralDisplay == p.display` und
    `s.display != p.display`. Die zweite Bedingung schließt Selbst-Plurale aus

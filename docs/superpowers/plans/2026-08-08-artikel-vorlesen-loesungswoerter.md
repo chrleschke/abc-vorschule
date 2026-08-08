@@ -50,7 +50,7 @@
 - Consumes: `Atom`, `AtomKind` aus `ContentModels.kt`
 - Produces:
   - `enum class Gender { m, f, n }`
-  - `enum class NounClass { thing, person, name }`
+  - `enum class NounClass { thing, person, properName }` (JSON-Wert bleibt `"name"` via `@SerialName`)
   - `Atom.gender: Gender?`, `Atom.nounClass: NounClass?`, `Atom.articleSpeechOverride: String?`
   - `object AtomArticleSpeech { fun forAtom(atom: Atom?): String? }`
 
@@ -105,7 +105,7 @@ class AtomArticleSpeechTest {
 
     @Test
     fun `a name is spoken bare`() {
-        assertEquals("Tom", AtomArticleSpeech.forAtom(atom("Tom", nounClass = NounClass.name)))
+        assertEquals("Tom", AtomArticleSpeech.forAtom(atom("Tom", nounClass = NounClass.properName)))
     }
 
     @Test
@@ -155,10 +155,19 @@ enum class NounClass {
     /** Personenbezeichnung (Oma, Opa, Clown) — unbestimmter Artikel, Neutrum ausgenommen. */
     person,
 
-    /** Eigenname (Tom, Mimi) — kein Artikel. */
-    name,
+    /**
+     * Eigenname (Tom, Mimi) — kein Artikel.
+     *
+     * Heißt in Kotlin `properName`, weil `name` mit `kotlin.Enum.name` kollidiert;
+     * der JSON-Wert bleibt `"name"`. Gleiches `@SerialName`-Muster wie bei
+     * `sentenceTts`/`promptTts` in `TaskSpecs.kt`.
+     */
+    @SerialName("name")
+    properName,
 }
 ```
+
+`@SerialName` braucht den Import `kotlinx.serialization.SerialName` — prüfe, ob `ContentModels.kt` ihn schon hat, und ergänze ihn sonst.
 
 In `data class Atom`, nach `pluralHighlight`, vor `strokes`:
 
@@ -194,7 +203,7 @@ object AtomArticleSpeech {
         atom.articleSpeechOverride?.takeIf { it.isNotBlank() }?.let { return it }
         val nounClass = atom.nounClass ?: return null
         val display = atom.display.takeIf { it.isNotBlank() } ?: return null
-        if (nounClass == NounClass.name) return display
+        if (nounClass == NounClass.properName) return display
         val gender = atom.gender ?: return null
         return "${article(nounClass, gender)} $display"
     }
@@ -475,7 +484,7 @@ und wie die Issues geprüft werden.
     @Test
     fun `a name with a gender is an issue`() {
         val issues = ContentValidator.validate(
-            packWithAtom(testAtom(gender = Gender.m, nounClass = NounClass.name)),
+            packWithAtom(testAtom(gender = Gender.m, nounClass = NounClass.properName)),
         )
         assertTrue(issues.any { "test-atom" in it.message })
     }
@@ -530,7 +539,7 @@ In `ContentValidator.validate`, im vorhandenen `pack.atoms.values.forEach { atom
 (nach der `display.isBlank()`-Prüfung, vor der Stroke-Schleife) ergänzen:
 
 ```kotlin
-            if (atom.nounClass != null && atom.nounClass != NounClass.name && atom.gender == null) {
+            if (atom.nounClass != null && atom.nounClass != NounClass.properName && atom.gender == null) {
                 issues += ValidationIssue(
                     "atom ${atom.id} has nounClass ${atom.nounClass} but no gender",
                 )
@@ -538,7 +547,7 @@ In `ContentValidator.validate`, im vorhandenen `pack.atoms.values.forEach { atom
             if (atom.gender != null && atom.nounClass == null) {
                 issues += ValidationIssue("atom ${atom.id} has a gender but no nounClass")
             }
-            if (atom.nounClass == NounClass.name && atom.gender != null) {
+            if (atom.nounClass == NounClass.properName && atom.gender != null) {
                 issues += ValidationIssue(
                     "atom ${atom.id} is a name and must not carry a gender",
                 )
