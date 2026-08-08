@@ -1,5 +1,6 @@
 package app.abcvorschule.session
 
+import app.abcvorschule.content.AtomArticleSpeech
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.LetterTraceRound
@@ -33,20 +34,25 @@ object SuccessSpeech {
         is SyllableMergeRound -> listOf(
             SyllableMergeSpeech.resultSpeech(round, pack.atoms[round.resultAtomId]),
         )
+        // §7: Die Antwort nennt bei Substantiven den Artikel ("das Haus"), die
+        // Aufgabe nicht ("Baue das Wort Haus"). Nicht-Substantive bleiben nackt.
         is WordBuildRound -> listOfNotNull(
-            pack.atoms[round.targetAtomId]?.display ?: round.promptTts.takeIf { it.isNotBlank() },
+            pack.atoms[round.targetAtomId]?.let { AtomArticleSpeech.forAtom(it) ?: it.display }
+                ?: round.promptTts.takeIf { it.isNotBlank() },
         )
         is SentenceOrderRound -> listOf(pack.sentence(round.sentenceId).tts)
         is SentencePictureRound -> listOfNotNull(round.promptTts.takeIf { it.isNotBlank() })
         is LetterTraceRound -> listOfNotNull(round.rewardTts.takeIf { it.isNotBlank() })
         is SoundPositionRound -> listOfNotNull(
-            pack.atoms[round.atomId]?.lemma ?: round.promptTts.takeIf { it.isNotBlank() },
+            pack.atoms[round.atomId]?.let { AtomArticleSpeech.forAtom(it) ?: it.lemma }
+                ?: round.promptTts.takeIf { it.isNotBlank() },
         )
         is SymbolHuntRound -> listOfNotNull(
             pack.atoms[round.targetAtomId]?.lemma ?: round.promptTts.takeIf { it.isNotBlank() },
         )
         is SymbolInWordRound -> listOfNotNull(
-            pack.atoms[round.wordAtomId]?.display ?: round.promptTts.takeIf { it.isNotBlank() },
+            pack.atoms[round.wordAtomId]?.let { AtomArticleSpeech.forAtom(it) ?: it.display }
+                ?: round.promptTts.takeIf { it.isNotBlank() },
         )
         else -> emptyList()
     }

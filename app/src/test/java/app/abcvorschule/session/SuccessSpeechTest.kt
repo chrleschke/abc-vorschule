@@ -6,7 +6,17 @@ import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.ContentRepository
 import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.CountAddSpec
+import app.abcvorschule.content.Gender
+import app.abcvorschule.content.NounClass
 import app.abcvorschule.content.SentencePictureRound
+import app.abcvorschule.content.SoundPositionRound
+import app.abcvorschule.content.SoundSlot
+import app.abcvorschule.content.SymbolHuntMode
+import app.abcvorschule.content.SymbolHuntRound
+import app.abcvorschule.content.SymbolInWordMode
+import app.abcvorschule.content.SymbolInWordRound
+import app.abcvorschule.content.WordBlock
+import app.abcvorschule.content.WordBuildRound
 import app.abcvorschule.ui.rewards.PraisePhrases
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -74,5 +84,86 @@ class SuccessSpeechTest {
             listOf("Tom hat Opa gerufen."),
             SuccessSpeech.partsForRound(round, pack, praise = false),
         )
+    }
+
+    /** Kontrolliertes Substantiv-Atom: Task 4 liefert Genus/NounClass erst später. */
+    private val haus = Atom(
+        id = "test-haus",
+        lemma = "Haus",
+        display = "Haus",
+        emoji = "🏠",
+        kind = AtomKind.word,
+        gender = Gender.n,
+        nounClass = NounClass.thing,
+    )
+
+    private fun packWithHaus(): ContentPack = pack.copy(
+        atoms = pack.atoms + (haus.id to haus),
+    )
+
+    @Test
+    fun wordBuildSuccessSpeaksArticleWithTargetWord() {
+        val round = WordBuildRound(
+            promptTts = "Baue das Wort Haus",
+            targetAtomId = haus.id,
+            blocks = listOf(WordBlock(atomId = haus.id, display = "Haus")),
+        )
+        assertEquals(
+            listOf("das Haus"),
+            SuccessSpeech.partsForRound(round, packWithHaus(), praise = false),
+        )
+    }
+
+    @Test
+    fun symbolInWordSuccessSpeaksArticleWithWord() {
+        val round = SymbolInWordRound(
+            promptTts = "Finde H",
+            wordAtomId = haus.id,
+            targetAtomId = "letter-h",
+            mode = SymbolInWordMode.letter,
+            segments = listOf("H", "a", "u", "s"),
+            targetIndices = listOf(0),
+        )
+        assertEquals(
+            listOf("das Haus"),
+            SuccessSpeech.partsForRound(round, packWithHaus(), praise = false),
+        )
+    }
+
+    @Test
+    fun soundPositionSuccessSpeaksArticleWithWord() {
+        val round = SoundPositionRound(
+            promptTts = "Wo hörst du H?",
+            atomId = haus.id,
+            slot = SoundSlot.start,
+            missTts = "Haus. Hörst du das - H - am Anfang.",
+        )
+        assertEquals(
+            listOf("das Haus"),
+            SuccessSpeech.partsForRound(round, packWithHaus(), praise = false),
+        )
+    }
+
+    @Test
+    fun wordBuildSuccessKeepsBareDisplayForUnclassifiedTarget() {
+        // "ich" trägt im ausgelieferten Pack keine NounClass — bleibt unverändert nackt.
+        val round = WordBuildRound(
+            promptTts = "Baue das Wort ich",
+            targetAtomId = "ich",
+            blocks = listOf(WordBlock(atomId = "ich", display = "ich")),
+        )
+        assertEquals(listOf("ich"), SuccessSpeech.partsForRound(round, pack, praise = false))
+    }
+
+    @Test
+    fun symbolHuntSuccessSpeaksBareGraphemeWithoutArticle() {
+        // §7: Trainer 2 spricht das Graphem, nie einen Artikel — dieser Zweig bleibt unangetastet.
+        val round = SymbolHuntRound(
+            promptTts = "Finde M",
+            targetAtomId = "letter-m",
+            mode = SymbolHuntMode.letter,
+            distractorPool = listOf("N", "W"),
+        )
+        assertEquals(listOf("M"), SuccessSpeech.partsForRound(round, pack, praise = false))
     }
 }
