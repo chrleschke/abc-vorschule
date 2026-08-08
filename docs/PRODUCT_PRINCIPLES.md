@@ -210,9 +210,10 @@ niemals mit einem stummen No-Op.
 
 ## 6. Hilfestufen
 
-- Parent-Gate (langer Druck auf ⋯) öffnet das Sheet „Eltern“ mit genau zwei Einstellungen:
-  Abschnitt „Hilfestufe“ (**Auto / Mit Hilfe / Ohne Hilfe**) und die Freigabe
-  „Reihenfolge frei wählbar“, die die Fortschrittssperre des Pfades aufhebt.
+- Parent-Gate (langer Druck auf ⋯) öffnet das Sheet „Eltern“ mit Hilfestufe
+  (**Auto / Mit Hilfe / Ohne Hilfe**) und der Freigabe „Reihenfolge frei wählbar“,
+  die die Fortschrittssperre des Pfades aufhebt. In Debug-Builds zusätzlich
+  „TTS Debug“ am Ende des Sheets (Entwickler-Werkzeug, nicht für Release).
 - Auto passt Gerüste sanft an; erzwungene Stufen frieren Auto-Streaks ein.
 - Gerüste pro Atom/Slot (Silhouette vs. Lücke), nicht global starr über die ganze Aufgabe.
 

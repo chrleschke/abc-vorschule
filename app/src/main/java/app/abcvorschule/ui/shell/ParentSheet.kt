@@ -1,5 +1,6 @@
 package app.abcvorschule.ui.shell
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,9 +21,11 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import app.abcvorschule.BuildConfig
 import app.abcvorschule.R
 import app.abcvorschule.progress.ParentMode
 import app.abcvorschule.ui.theme.WarmMuted
@@ -35,6 +38,7 @@ fun ParentSheet(
     onSelectMode: (ParentMode) -> Unit,
     onToggleUnlockAll: (Boolean) -> Unit,
     onDismiss: () -> Unit,
+    onOpenTtsDebug: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(
@@ -95,6 +99,23 @@ fun ParentSheet(
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
+            }
+            if (BuildConfig.DEBUG) {
+                HorizontalDivider()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 56.dp)
+                        .clickable(onClick = onOpenTtsDebug)
+                        .testTag("tts_debug_entry"),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.parent_tts_debug),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
             }
         }
     }

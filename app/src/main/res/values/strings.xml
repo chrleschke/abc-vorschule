@@ -8,6 +8,7 @@
     <string name="parent_gate_description">Eltern-Einstellungen, lange drücken zum Öffnen</string>
     <string name="parent_section_difficulty">Hilfestufe</string>
     <string name="parent_unlock_all">Reihenfolge frei wählbar</string>
+    <string name="parent_tts_debug">TTS Debug</string>
     <string name="mode_auto">Auto</string>
     <string name="mode_beginner">Mit Hilfe</string>
     <string name="mode_advanced">Ohne Hilfe</string>

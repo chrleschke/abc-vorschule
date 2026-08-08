@@ -85,5 +85,5 @@ Strichdaten fehlen oder Referenzen ins Leere zeigen.
 ## Product notes
 
 - Keine Werbung, keine Netz-Permission für die Kernpraxis.
-- Eltern-Hilfestufe: Auto / Mit Hilfe / Ohne Hilfe hinter Long-Press-Gate.
+- Eltern-Hilfestufe: Auto / Mit Hilfe / Ohne Hilfe hinter Long-Press-Gate; in Debug-Builds zusätzlich „TTS Debug“ im Eltern-Sheet.
 
