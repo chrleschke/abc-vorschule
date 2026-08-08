@@ -15,8 +15,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
@@ -40,6 +42,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
@@ -79,7 +82,6 @@ object MergeProgress {
     fun glow(fraction: Float): Float = (0.25f + 0.75f * fraction.coerceIn(0f, 1f))
 }
 
-private val FloeGap = 120.dp
 private val IdleNudge = 10.dp
 private const val IdleNudgeDelayMs = 3_500L
 private const val TrackWaveMs = 1_400
@@ -108,9 +110,6 @@ fun SyllableMergeTrainer(
 ) {
     val roundKey = "$roundIndex-${round.leftAtomId}-${round.rightAtomId}"
     val density = LocalDensity.current
-    // Each tile travels half the gap, so they meet in the middle; the dragged
-    // tile stays 1:1 under the finger while its partner mirrors the motion.
-    val tileTravelPx = with(density) { (FloeGap / 2).toPx() }
     val idleNudgePx = with(density) { IdleNudge.toPx() }
     val scope = rememberCoroutineScope()
     val fraction = remember(roundKey) { Animatable(0f) }
@@ -143,15 +142,26 @@ fun SyllableMergeTrainer(
         onResult(true, false, scoredIds)
     }
 
+    // Der Anzieh-Schnapp läuft rundengebunden statt in scope.launch: eine
+    // scope-Coroutine überlebte einen Chevron-Rundenwechsel während der Feder
+    // (einige hundert ms) und würde ihr onResult(true) der NEUEN Runde
+    // gutschreiben. Der Rundenwechsel cancelt diesen Effect stattdessen.
+    var attracting by remember(roundKey) { mutableStateOf(false) }
+    LaunchedEffect(roundKey, attracting) {
+        if (!attracting) return@LaunchedEffect
+        idleNudge.snapTo(0f)
+        fraction.animateTo(1f, spring(stiffness = Spring.StiffnessMedium))
+        commit()
+    }
+
     fun settle() {
         dragging = false
         interactions++
         if (merged) return
-        scope.launch {
-            if (MergeProgress.shouldAttract(fraction.value)) {
-                fraction.animateTo(1f, spring(stiffness = Spring.StiffnessMedium))
-                commit()
-            } else {
+        if (MergeProgress.shouldAttract(fraction.value)) {
+            attracting = true
+        } else {
+            scope.launch {
                 // No penalty: a short pull just glides back.
                 fraction.animateTo(
                     0f,
@@ -171,13 +181,12 @@ fun SyllableMergeTrainer(
         interactions++
         speakTile(fromRightTile)
         if (merged) return
-        scope.launch {
-            idleNudge.snapTo(0f)
-            val target = MergeProgress.stepped(fraction.value)
-            if (MergeProgress.shouldAttract(target)) {
-                fraction.animateTo(1f, spring(stiffness = Spring.StiffnessMedium))
-                commit()
-            } else {
+        val target = MergeProgress.stepped(fraction.value)
+        if (MergeProgress.shouldAttract(target)) {
+            attracting = true
+        } else {
+            scope.launch {
+                idleNudge.snapTo(0f)
                 fraction.animateTo(
                     target,
                     spring(dampingRatio = Spring.DampingRatioMediumBouncy),
@@ -186,8 +195,12 @@ fun SyllableMergeTrainer(
         }
     }
 
-    fun Modifier.mergeDrag(fromRightTile: Boolean, enabled: Boolean): Modifier =
-        if (!enabled) this else pointerInput(roundKey) {
+    // travelPx ist Parameter UND pointerInput-Key: die Reisedistanz kommt jetzt aus
+    // der gemessenen Bühnenbreite, und ein pointerInput fängt seine Captures beim
+    // Start ein — ohne den Key rechnete eine nach Breiten-/Skalenwechsel laufende
+    // Geste mit der alten Distanz weiter.
+    fun Modifier.mergeDrag(fromRightTile: Boolean, enabled: Boolean, travelPx: Float): Modifier =
+        if (!enabled) this else pointerInput(roundKey, travelPx) {
             detectDragGestures(
                 onDragStart = {
                     dragging = true
@@ -196,7 +209,7 @@ fun SyllableMergeTrainer(
                 },
                 onDrag = { change, amount ->
                     change.consume()
-                    val target = MergeProgress.applyDrag(fraction.value, amount.x, tileTravelPx, fromRightTile)
+                    val target = MergeProgress.applyDrag(fraction.value, amount.x, travelPx, fromRightTile)
                     scope.launch { fraction.snapTo(target) }
                     if (MergeProgress.isContact(target)) {
                         dragging = false
@@ -238,54 +251,96 @@ fun SyllableMergeTrainer(
                 speaking = speaking,
                 onSpeakPrompt = onSpeakPrompt,
             )
-            if (merged) {
-                Floe(
-                    label = round.resultDisplay,
-                    glow = 1f,
-                    frozen = true,
-                    onTap = { onSpeak(resultSpeech) },
-                    modifier = Modifier
-                        .graphicsLayer {
-                            scaleX = resultScale.value
-                            scaleY = resultScale.value
-                        }
-                        .testTag("merge_result"),
-                )
-            } else {
-                val inwardPx = fraction.value * tileTravelPx + idleNudge.value * idleNudgePx
-                Box(contentAlignment = Alignment.Center) {
-                    MergeTrack(
-                        progress = fraction.value,
-                        modifier = Modifier
-                            .width(FloeGap)
-                            .height(AbcDimens.letterFrame),
+            // Gemessen statt angenommen, wie der Wort-Detektiv: die alten festen
+            // Breiten (min. 108 + 120 + 108 = 336dp, mit „sch" 366dp) überliefen
+            // die ~296dp nutzbare Bühne eines 360dp-Geräts und beschnitten die
+            // rechte Kachel. Breiten, Lücke, Glyph und Spur-Versatz kommen aus
+            // EINER Rechnung (SyllableFrameSizing), damit die Spur-Mitte exakt
+            // der Treffpunkt der Kacheln ist (§3.3-Symmetrie).
+            BoxWithConstraints(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                val fontScale = LocalDensity.current.fontScale
+                if (merged) {
+                    val spec = SyllableFrameSizing.resultFloe(
+                        availableDp = maxWidth.value,
+                        label = round.resultDisplay,
+                        fontScale = fontScale,
                     )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Floe(
-                            label = round.leftDisplay,
-                            glow = glow,
-                            frozen = false,
-                            onTap = { nudgeTap(fromRightTile = false) },
-                            enabled = !interactionLocked,
-                            opacity = interactionOpacity,
+                    Floe(
+                        label = round.resultDisplay,
+                        widthDp = spec.widthDp,
+                        glyphSp = spec.glyphSp,
+                        glow = 1f,
+                        frozen = true,
+                        onTap = { onSpeak(resultSpeech) },
+                        modifier = Modifier
+                            .graphicsLayer {
+                                scaleX = resultScale.value
+                                scaleY = resultScale.value
+                            }
+                            .testTag("merge_result"),
+                    )
+                } else {
+                    val layout = SyllableFrameSizing.mergeLayout(
+                        availableDp = maxWidth.value,
+                        leftLabel = round.leftDisplay,
+                        rightLabel = round.rightDisplay,
+                        fontScale = fontScale,
+                    )
+                    // Each tile travels half the gap, so they meet in the middle;
+                    // the dragged tile stays 1:1 under the finger while its
+                    // partner mirrors the motion.
+                    val tileTravelPx = with(density) { (layout.gapDp / 2f).dp.toPx() }
+                    val inwardPx = fraction.value * tileTravelPx + idleNudge.value * idleNudgePx
+                    Box(contentAlignment = Alignment.Center) {
+                        MergeTrack(
+                            progress = fraction.value,
                             modifier = Modifier
-                                .offset { IntOffset(inwardPx.roundToInt(), 0) }
-                                .mergeDrag(fromRightTile = false, enabled = !interactionLocked)
-                                .testTag("merge_left"),
+                                .offset(x = layout.trackOffsetDp.dp)
+                                .width(layout.gapDp.dp)
+                                .height(AbcDimens.letterFrame),
                         )
-                        Spacer(Modifier.width(FloeGap))
-                        Floe(
-                            label = round.rightDisplay,
-                            glow = glow,
-                            frozen = false,
-                            onTap = { nudgeTap(fromRightTile = true) },
-                            enabled = !interactionLocked,
-                            opacity = interactionOpacity,
-                            modifier = Modifier
-                                .offset { IntOffset(-inwardPx.roundToInt(), 0) }
-                                .mergeDrag(fromRightTile = true, enabled = !interactionLocked)
-                                .testTag("merge_right"),
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Floe(
+                                label = round.leftDisplay,
+                                widthDp = layout.leftWidthDp,
+                                glyphSp = layout.glyphSp,
+                                glow = glow,
+                                frozen = false,
+                                onTap = { nudgeTap(fromRightTile = false) },
+                                enabled = !interactionLocked,
+                                opacity = interactionOpacity,
+                                modifier = Modifier
+                                    .offset { IntOffset(inwardPx.roundToInt(), 0) }
+                                    .mergeDrag(
+                                        fromRightTile = false,
+                                        enabled = !interactionLocked,
+                                        travelPx = tileTravelPx,
+                                    )
+                                    .testTag("merge_left"),
+                            )
+                            Spacer(Modifier.width(layout.gapDp.dp))
+                            Floe(
+                                label = round.rightDisplay,
+                                widthDp = layout.rightWidthDp,
+                                glyphSp = layout.glyphSp,
+                                glow = glow,
+                                frozen = false,
+                                onTap = { nudgeTap(fromRightTile = true) },
+                                enabled = !interactionLocked,
+                                opacity = interactionOpacity,
+                                modifier = Modifier
+                                    .offset { IntOffset(-inwardPx.roundToInt(), 0) }
+                                    .mergeDrag(
+                                        fromRightTile = true,
+                                        enabled = !interactionLocked,
+                                        travelPx = tileTravelPx,
+                                    )
+                                    .testTag("merge_right"),
+                            )
+                        }
                     }
                 }
             }
@@ -332,6 +387,10 @@ private fun MergeTrack(progress: Float, modifier: Modifier = Modifier) {
 @Composable
 private fun Floe(
     label: String,
+    /** Aus [SyllableFrameSizing] gelöst — Breite und Glyph kommen aus derselben
+     * Rechnung wie Lücke und Spur, sonst driftet die Zeile wieder auseinander. */
+    widthDp: Float,
+    glyphSp: Float,
     glow: Float,
     frozen: Boolean,
     onTap: () -> Unit,
@@ -341,7 +400,7 @@ private fun Floe(
 ) {
     Box(
         modifier = modifier
-            .width(SyllableFrameSizing.widthDp(label).dp)
+            .width(widthDp.dp)
             .height(AbcDimens.letterFrame)
             .alpha(opacity)
             .background(
@@ -358,7 +417,10 @@ private fun Floe(
     ) {
         Text(
             text = label,
-            fontSize = AbcDimens.letterSp,
+            // Effektiv auf AbcDimens.letterSp gedeckelt (SyllableFrameSizing teilt
+            // durch fontScale, Muster FinaleLayout.capEffectiveSize) und auf
+            // schmalen Bühnen darunter geschrumpft, damit die Zeile nie überläuft.
+            fontSize = glyphSp.sp,
             // Always WarmInk, even when frozen: LeafGreen text on the LeafGreen-tinted
             // wash below only reaches ~2.25:1 (and ~2.87:1 even against plain
             // CreamElevated) — short of the required 3:1 for large glyphs on Cream. The

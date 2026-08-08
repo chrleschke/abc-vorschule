@@ -63,18 +63,28 @@ class DragFieldState {
         selectedKey = key
     }
 
-    fun startDrag(key: String) {
+    /**
+     * @return true when this card now owns the drag. Ein zweiter Finger (bei
+     * Vorschulkindern der Normalfall: Handballen, zweite Hand) darf den laufenden
+     * Drag nicht übernehmen — sonst überschreibt er draggingKey/dragOffset, die
+     * erste Karte springt zurück und beide Finger addieren in denselben Offset.
+     */
+    fun startDrag(key: String): Boolean {
+        if (draggingKey != null && draggingKey != key) return false
         draggingKey = key
         selectedKey = key
         dragOffset = Offset.Zero
+        return true
     }
 
-    fun drag(delta: Offset) {
+    fun drag(key: String, delta: Offset) {
+        if (draggingKey != key) return
         dragOffset += delta
     }
 
     /** @return the zone the card landed on, or null when it should snap back. */
     fun endDrag(key: String): String? {
+        if (draggingKey != key) return null
         val travelled = dragOffset.getDistance()
         val bounds = cards[key]
         val hit = if (bounds != null && DragHitTest.shouldCommit(travelled)) {
@@ -85,6 +95,17 @@ class DragFieldState {
         draggingKey = null
         dragOffset = Offset.Zero
         return hit
+    }
+
+    /**
+     * Abgebrochene Geste (System-Gesture, Palm-Rejection): reiner Snap-back.
+     * Ein Cancel darf nie wie ein Loslassen committen — die Karte hängt sonst
+     * zufällig über einer falschen Zone und der nie beendete Zug wird gewertet.
+     */
+    fun cancelDrag(key: String) {
+        if (draggingKey != key) return
+        draggingKey = null
+        dragOffset = Offset.Zero
     }
 
     fun reset() {
@@ -122,7 +143,10 @@ fun DragCard(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val dragging = state.draggingKey == key
-    DisposableEffect(key) {
+    // Auch auf `state` gekeyt: liefert rememberDragFieldState nach einem
+    // Rundenwechsel eine neue Instanz bei gleichem Karten-Key, würde ein nur
+    // key-gekeyter Effect/Gesture-Block sonst im verwaisten Alt-State schreiben.
+    DisposableEffect(state, key) {
         onDispose { state.removeCard(key) }
     }
     Box(
@@ -145,15 +169,29 @@ fun DragCard(
             .onGloballyPositioned { state.putCard(key, it.boundsInRoot()) }
             .then(
                 if (enabled) {
-                    Modifier.pointerInput(key) {
+                    Modifier.pointerInput(state, key) {
+                        // Ob dieser Finger den Drag besitzt: ein zweiter Finger, den
+                        // startDrag abweist, darf beim Loslassen weder droppen noch
+                        // den laufenden Drag der ersten Karte beenden.
+                        var owns = false
                         detectDragGestures(
-                            onDragStart = { state.startDrag(key) },
+                            onDragStart = { owns = state.startDrag(key) },
                             onDrag = { change, amount ->
                                 change.consume()
-                                state.drag(amount)
+                                if (owns) state.drag(key, amount)
                             },
-                            onDragEnd = { onDropped(state.endDrag(key)) },
-                            onDragCancel = { onDropped(state.endDrag(key)) },
+                            onDragEnd = {
+                                if (owns) onDropped(state.endDrag(key))
+                                owns = false
+                            },
+                            onDragCancel = {
+                                // Snap-back ohne Zonen-Auflösung — ein Cancel ist kein Drop.
+                                if (owns) {
+                                    state.cancelDrag(key)
+                                    onDropped(null)
+                                }
+                                owns = false
+                            },
                         )
                     }
                 } else {
@@ -176,7 +214,7 @@ fun DropZone(
     enabled: Boolean = true,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    DisposableEffect(key) {
+    DisposableEffect(state, key) {
         onDispose { state.removeZone(key) }
     }
     Box(

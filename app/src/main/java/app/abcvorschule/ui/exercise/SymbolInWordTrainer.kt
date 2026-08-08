@@ -154,7 +154,7 @@ fun SymbolInWordTrainer(
     val target = pack.atoms[round.targetAtomId]
     val label = target?.let { SymbolInWordDerivation.targetLabel(it, round.mode) }
     val scaffold = scaffoldFor(round.targetAtomId)
-    val slotWidth = slotWidthDp(label)
+    val slotWidth = slotWidthDp(label, LocalDensity.current.fontScale)
 
     // Positions are captured in window space and differenced against the wrapping
     // Box, because a flight crosses ExerciseStage's two separate Columns and there
@@ -215,7 +215,11 @@ fun SymbolInWordTrainer(
                 flight = SymbolFlight(index, result.state.collected.size - 1)
             }
             SymbolInWordTapOutcome.RoundComplete -> {
-                haptics.tick()
+                // celebrate, nicht tick: alle Striche voll ist der Batterie-voll-Moment
+                // des Detektivs, und die Jagd feiert ihren mit celebrate — "both hunts
+                // must feel the same" (HuntCelebration in ResolveGate.kt); §10 reserviert
+                // celebrate genau für diese Batterie-Feier.
+                haptics.celebrate()
                 flight = SymbolFlight(index, result.state.collected.size - 1)
                 complete = true
             }
@@ -368,9 +372,15 @@ fun SymbolInWordTrainer(
  * WordFrameSizing uses, so a three-letter target like "Sch" gets a visibly wider
  * stroke than "e" — the stroke's width is what tells a child "Sch is one thing,
  * not three" (design doc §5).
+ *
+ * Mit [fontScale] multipliziert wie die Flight-Box oben und
+ * [WordFrameSizing.wordSegmentWidthDp]: der gelandete Glyph rendert in
+ * `syllableSp × fontScale`, also muss das dp-Budget des Strichs dieselbe
+ * Skalierung tragen — sonst ragt „Sch" bei font_scale 2.0 über seinen Strich
+ * hinaus und der Strich sagt nicht mehr „das ist EIN Ding".
  */
-private fun slotWidthDp(label: SymbolInWordDerivation.TargetLabel?): Dp =
-    (AbcDimens.syllableSp.value * WordFrameSizing.GlyphAspect * (label?.primary?.length ?: 1))
+private fun slotWidthDp(label: SymbolInWordDerivation.TargetLabel?, fontScale: Float): Dp =
+    (AbcDimens.syllableSp.value * fontScale * WordFrameSizing.GlyphAspect * (label?.primary?.length ?: 1))
         .coerceAtLeast(MinSlotWidthDp).dp
 
 /** The hunted symbol, as a case pair ("P / p") for letters and a single lowercase

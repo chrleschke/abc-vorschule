@@ -45,6 +45,7 @@ import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.SunCoral
+import app.abcvorschule.ui.theme.WarmMuted
 
 /**
  * Primary action aligned to the trailing edge.
@@ -86,11 +87,16 @@ fun AbcResolveButton(
     modifier: Modifier = Modifier,
     label: String = stringResource(R.string.resolve),
 ) {
+    // Ruhige Sekundäraktion in einer Rolle: WarmMuted (4.45:1 auf Cream) für Glyph
+    // und Label. Vorher erbte das Label primary (= LeafGreen, „richtig/erledigt")
+    // und das Icon secondary (= SkyBlue, „Fortschritt") — zwei Bedeutungsfarben
+    // auf einem Aufgeben-Weg, und Auflösen darf nicht grün sein (§8, §10).
     TextButton(
         onClick = onClick,
         modifier = modifier.defaultMinSize(minHeight = 56.dp),
+        colors = ButtonDefaults.textButtonColors(contentColor = WarmMuted),
     ) {
-        IconUnlock(tint = MaterialTheme.colorScheme.secondary, size = 22.dp)
+        IconUnlock(tint = WarmMuted, size = 22.dp)
         Spacer(Modifier.width(8.dp))
         Text(label, style = MaterialTheme.typography.titleLarge)
     }

@@ -81,7 +81,8 @@ private val SentenceExtraHorizontalPadding = 20.dp
  *   [excludedFromMeasurement]. Der Satztext richtet sich an den mitlesenden
  *   Erwachsenen — die einzige bewusste Ausnahme von „das Kind kann nicht lesen"
  *   (PRODUCT_PRINCIPLES.md Abschnitt 12), weil keine Handlung am Text hängt.
- * - [finale] null (Abbruch mit Punkten): nur Erfolgs-Header, derselbe Stern und
+ * - [finale] null (Defensivpfad: Finale nicht auflösbar — Abbrüche führen direkt
+ *   zum Pfad und erreichen diesen Screen nie, §5): nur Erfolgs-Header, derselbe Stern und
  *   Weiter. Ohne Bildreihe ist der Stern der einzige Inhalt des mittleren Blocks und
  *   sitzt darum exakt in dessen Zentrum — tiefer als beim Finale, wo der Stern hinter
  *   der Bildreihe sitzt, die selbst über der Mitte der (durch Satz und Speaker

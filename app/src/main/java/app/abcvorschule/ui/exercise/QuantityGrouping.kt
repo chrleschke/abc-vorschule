@@ -14,4 +14,22 @@ object QuantityGrouping {
             if (rem == 1) add(1)
         }
     }
+
+    /**
+     * Emoji size for a prompt that stacks pair rows vertically. A 9 needs five
+     * rows; at the base size that tower (~340dp at fontScale 1.3) starves the
+     * task block and runs over the answer row on small screens. Symbolic rounds
+     * (single icon + numeral) keep the base size — their cluster row count is
+     * meaningless. Mirrors [MultiplicationMatrix.emojiSizeSp], which shrinks by
+     * column count for the same reason.
+     */
+    fun promptEmojiSizeSp(base: Int, left: Int, right: Int): Int {
+        if (QuantityRepresentation.forceSymbolicFor(left, right)) return base
+        val rows = maxOf(clusters(left).size, clusters(right).size)
+        return when {
+            rows <= 3 -> base
+            rows == 4 -> base * 4 / 5
+            else -> base * 2 / 3
+        }
+    }
 }

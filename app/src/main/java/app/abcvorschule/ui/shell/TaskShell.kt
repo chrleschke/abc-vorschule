@@ -46,7 +46,7 @@ import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.SuccessBurst
 import app.abcvorschule.ui.rewards.playBlockedBlip
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
@@ -365,7 +365,7 @@ private fun RoundProgressDots(
                 modifier = Modifier
                     .size(RoundDotSize)
                     .background(
-                        color = if (filled) LeafGreen else WarmMuted.copy(alpha = 0.35f),
+                        color = if (filled) SkyBlue else WarmMuted.copy(alpha = 0.35f),
                         shape = CircleShape,
                     ),
             )

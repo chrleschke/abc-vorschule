@@ -25,8 +25,10 @@ object SuccessSpeech {
         random: Random = Random.Default,
     ): List<String> = when (round) {
         is CountAddRound -> {
+            // Praise first, answer last (§7): the quantity must be the last thing
+            // the child hears — "Ausgezeichnet! Zwei Ameisen", never the reverse.
             val answer = round.spokenAnswer(pack.atoms[round.iconAtomId])
-            if (praise) listOf(answer, PraisePhrases.pick(random)) else listOf(answer)
+            if (praise) listOf(PraisePhrases.pick(random), answer) else listOf(answer)
         }
         is SyllableMergeRound -> listOf(
             SyllableMergeSpeech.resultSpeech(round, pack.atoms[round.resultAtomId]),

@@ -264,6 +264,7 @@ class SessionViewModel(
                 )
             }
         }
+        persistNavigation()
     }
 
     fun goNextRound() {
@@ -285,6 +286,16 @@ class SessionViewModel(
                 )
             }
         }
+        persistNavigation()
+    }
+
+    /**
+     * Chevron-Navigation soll ein Resume genauso überleben wie eine Antwort —
+     * sonst kehrt das Kind nach Prozess-Tod an der letzten *beantworteten*
+     * Position zurück statt dort, wo es tatsächlich stand.
+     */
+    private fun persistNavigation() {
+        viewModelScope.launch { persistSnapshot() }
     }
 
     fun clearSpeakCue() {
@@ -354,6 +365,11 @@ class SessionViewModel(
 
     fun onSuccessBurstFinished() {
         viewModelScope.launch {
+            // Phase-Guard wie bei onRevealFinished: der Burst-Callback kann noch im
+            // selben Frame feuern, in dem Close/Back bereits zum Pfad gewechselt hat —
+            // ein ungeschütztes advance() liefe dann auf dem Path-State, löschte den
+            // Resume-Snapshot und zeigte einen leeren RewardSummary.
+            if (_ui.value.successPhase != SuccessPhase.ShowBurst) return@launch
             _ui.update { it.copy(successPhase = SuccessPhase.Idle, successSpeakParts = emptyList()) }
             advance()
         }
@@ -411,8 +427,9 @@ class SessionViewModel(
             false
         }
         AppScreen.RewardSummary -> {
-            // Backing out of the summary is still a mid-lesson exit unless the lesson
-            // actually finished, in which case advance() already cleared the snapshot.
+            // Der Summary ist nur über den echten Abschluss erreichbar, und advance()
+            // hat den Snapshot dort bereits gelöscht — clearSnapshot=false ist also
+            // ein No-Op-Schutz, kein zweiter Abbruchpfad.
             backToPath(clearSnapshot = false)
             false
         }
@@ -426,6 +443,7 @@ class SessionViewModel(
         viewModelScope.launch {
             if (_ui.value.successPhase != SuccessPhase.Idle) return@launch
             val taskId = _ui.value.current?.spec?.id ?: return@launch
+            val position = attemptPosition()
             val outcome = outcomeFor(correct, resolved)
             progress = progressRepository.update { current ->
                 var next = current
@@ -434,15 +452,17 @@ class SessionViewModel(
                 if (correct && !resolved) next = ProgressionEngine.awardPoints(next, POINTS_PER_CORRECT)
                 next
             }
+            if (!stillAt(position)) return@launch
             afterAttempt(correct && !resolved, resolved, !correct && !resolved)
         }
     }
 
-    fun submitMathResult(distance: Int?, resolved: Boolean, correct: Boolean) {
+    fun submitMathResult(distance: Int?, resolved: Boolean, correct: Boolean, guess: Int? = null) {
         viewModelScope.launch {
             if (_ui.value.successPhase != SuccessPhase.Idle) return@launch
             val trainer = _ui.value.current ?: return@launch
             val round = _ui.value.currentRound as? CountAddRound ?: return@launch
+            val position = attemptPosition()
             val key = ProgressionEngine.mathKey(round)
             val outcome = outcomeFor(correct, resolved)
             progress = progressRepository.update { current ->
@@ -451,11 +471,20 @@ class SessionViewModel(
                 if (correct && !resolved) next = ProgressionEngine.awardPoints(next, POINTS_PER_CORRECT)
                 next
             }
+            if (!stillAt(position)) return@launch
             afterAttempt(
                 correct = correct && !resolved,
                 resolved = resolved,
                 missHint = !correct && !resolved,
-                speakOverride = if (resolved || correct) null else MathHinting.missFeedback(distance),
+                // Der getippte Wert und der Hinweis als EINE Äußerung: zwei
+                // aufeinanderfolgende Primary-speaks würden sich gegenseitig
+                // flushen und die Zahl mitten im Wort abschneiden.
+                speakOverride = if (resolved || correct) {
+                    null
+                } else {
+                    listOfNotNull(guess?.let { "$it." }, MathHinting.missFeedback(distance))
+                        .joinToString(" ")
+                },
             )
         }
     }
@@ -464,6 +493,23 @@ class SessionViewModel(
         resolved -> AttemptOutcome.Resolve
         correct -> AttemptOutcome.Correct
         else -> AttemptOutcome.Miss
+    }
+
+    private fun attemptPosition(): Pair<Int, Int> =
+        _ui.value.trainerIndex to _ui.value.roundIndex
+
+    /**
+     * Der DataStore-Write in den submit-Methoden suspendiert 50–200 ms; in diesem
+     * Fenster ist die Phase noch Idle und Chevrons/Exit bleiben bedienbar. Läuft die
+     * Erfolgs-/Miss-Zeremonie danach ungeprüft weiter, spricht sie die Antwort der
+     * *verschobenen* Runde vor und advance() überspringt sie. Statistik und Punkte
+     * sind zu diesem Zeitpunkt bereits korrekt gebucht (Task-ID vor der Suspension
+     * gefangen) — nur die Zeremonie entfällt, wenn das Kind aktiv weiternavigiert hat.
+     */
+    private fun stillAt(position: Pair<Int, Int>): Boolean {
+        val state = _ui.value
+        return state.screen == AppScreen.Practice &&
+            state.trainerIndex to state.roundIndex == position
     }
 
     private suspend fun afterAttempt(
@@ -528,6 +574,10 @@ class SessionViewModel(
 
     private suspend fun advance() {
         val state = _ui.value
+        // Defensiv: advance() darf nur aus einer laufenden Übung heraus wirken —
+        // auf dem Path-State würde es den Resume-Snapshot löschen und einen leeren
+        // RewardSummary zeigen.
+        if (state.screen != AppScreen.Practice) return
         val step = SessionProgression.next(
             state.trainerIndex,
             state.roundIndex,

@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,6 +52,7 @@ import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 
@@ -184,12 +186,17 @@ fun SentenceOrderTrainer(
                     )
                 }
                 BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                    val pegWidth = WordFrameSizing.frameWidthDp(maxWidth.value, words.size)
+                    val fontScale = LocalDensity.current.fontScale
+                    val longest = words.maxOfOrNull { it.length } ?: 1
+                    val shareWidth = WordFrameSizing.frameWidthDp(maxWidth.value, words.size)
                     val gap = WordFrameSizing.gapDp(maxWidth.value, words.size)
-                    val glyphSp = WordFrameSizing.glyphSp(
-                        pegWidth,
-                        words.maxOfOrNull { it.length } ?: 1,
-                    )
+                    // Mit fontScale, sonst wächst der gerenderte Glyph aus dem festen
+                    // Peg (live: Einwort-Runde zeigte „Mam" statt „Mama" bei
+                    // font_scale 1.3); gewinnt trotzdem der MinGlyphSp-Floor, weitet
+                    // fittedFrameWidthDp den Peg, statt dass maxLines = 1 clippt.
+                    val glyphSp = WordFrameSizing.glyphSp(shareWidth, longest, fontScale)
+                    val pegWidth =
+                        WordFrameSizing.fittedFrameWidthDp(shareWidth, glyphSp, longest, fontScale)
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(gap.dp, Alignment.CenterHorizontally),
                         verticalAlignment = Alignment.Top,
@@ -208,7 +215,9 @@ fun SentenceOrderTrainer(
                                 opacity = interactionOpacity,
                                 onTap = {
                                     val selected = field.selectedKey
-                                    val card = cards.firstOrNull { cardKey(it) == selected }
+                                    val card = cards.withIndex()
+                                        .firstOrNull { (i, c) -> cardKey(i, c) == selected }
+                                        ?.value
                                     if (card != null) place(index, card)
                                     if (filled != null) onSpeak(filled)
                                 },
@@ -228,8 +237,8 @@ fun SentenceOrderTrainer(
                 modifier = Modifier.testTag("sentence_tray"),
             ) {
                 if (!resolved && !completed) {
-                    cards.forEach { card ->
-                        val key = cardKey(card)
+                    cards.forEachIndexed { cardIndex, card ->
+                        val key = cardKey(cardIndex, card)
                         DragCard(
                             state = field,
                             key = key,
@@ -245,7 +254,11 @@ fun SentenceOrderTrainer(
                                 .defaultMinSize(minHeight = AbcDimens.kidTouch - 8.dp)
                                 .alpha(interactionOpacity)
                                 .background(
-                                    color = if (field.selectedKey == key) LeafGreen else CreamElevated,
+                                    // SkyBlue, nicht LeafGreen: die Auswahl ist ein
+                                    // unvalidierter Aktiv-Zustand, kein "richtig" —
+                                    // Grün ist für gefüllte Pegs reserviert (§10:
+                                    // eine Bedeutung pro Farbe).
+                                    color = if (field.selectedKey == key) SkyBlue else CreamElevated,
                                     shape = RoundedCornerShape(18.dp),
                                 )
                                 .padding(horizontal = 16.dp, vertical = 12.dp)
@@ -254,7 +267,8 @@ fun SentenceOrderTrainer(
                             Text(
                                 text = card.display,
                                 style = MaterialTheme.typography.headlineSmall,
-                                // Cream on LeafGreen ~3.57:1 (large glyph, see Color.kt);
+                                // Cream on SkyBlue ~3.88:1 (large glyph; Herleitung wie
+                                // SymbolHuntTrainer's TilePalette, see Color.kt);
                                 // WarmInk on CreamElevated ~8.9:1.
                                 color = if (field.selectedKey == key) Cream else WarmInk,
                             )
@@ -274,7 +288,10 @@ fun SentenceOrderTrainer(
     )
 }
 
-private fun cardKey(card: WordBlock): String = "card-${card.atomId}-${card.display}"
+// Mit Tray-Index wie WordBuildTray.tileKey: zwei Karten mit gleichem Wort teilen
+// sich sonst selectedKey/draggingKey/Bounds — "dragging one moves both".
+private fun cardKey(index: Int, card: WordBlock): String =
+    "card-$index-${card.atomId}-${card.display}"
 
 /**
  * Filled-peg border colour, dedicated and darker than [LeafGreen] — same fix as
@@ -308,7 +325,10 @@ private fun Peg(
             .defaultMinSize(minHeight = 64.dp)
             .alpha(opacity)
             .background(
-                color = if (armed) LeafGreen.copy(alpha = 0.22f) else CreamElevated,
+                // SkyBlue-Wash wie die armierte Karte im Tray: "hier kann die
+                // gewählte Karte hin" ist ein Aktiv-Signal, kein "richtig" —
+                // LeafGreen bleibt dem gefüllten Peg (§10).
+                color = if (armed) SkyBlue.copy(alpha = 0.22f) else CreamElevated,
                 shape = RoundedCornerShape(16.dp),
             )
             .border(

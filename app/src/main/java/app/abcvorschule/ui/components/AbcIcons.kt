@@ -177,13 +177,72 @@ fun IconUnlock(
             cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.08f),
             style = stroke,
         )
+        // Offener Bügel: links im Korpus verankert, rechtes Ende angehoben — ein
+        // symmetrisch geschlossener Bügel läse sich als zugesperrtes Schloss und
+        // würde die Botschaft des Auflösen-Buttons invertieren.
+        drawLine(
+            color = tint,
+            start = Offset(w * 0.30f, w * 0.44f),
+            end = Offset(w * 0.30f, w * 0.28f),
+            strokeWidth = w * 0.1f,
+            cap = StrokeCap.Round,
+        )
+        drawArc(
+            color = tint,
+            startAngle = 180f,
+            sweepAngle = 140f,
+            useCenter = false,
+            topLeft = Offset(w * 0.30f, w * 0.10f),
+            size = androidx.compose.ui.geometry.Size(w * 0.36f, w * 0.36f),
+            style = stroke,
+        )
+    }
+}
+
+/**
+ * Geschlossenes Vorhängeschloss für gesperrte Pfad-Schilder. Vektor statt des
+ * 🔒-Emojis: Emojis rendern herstellerabhängig (meist goldgelb) und kollidieren
+ * damit farblich mit der StarGold-Belohnungsrolle direkt neben echten Sternen —
+ * und §10 verlangt für UI-Chrome ohnehin Vektor/ASCII.
+ */
+@Composable
+fun IconLock(
+    tint: Color,
+    modifier: Modifier = Modifier,
+    size: Dp = 22.dp,
+) {
+    Canvas(modifier.size(size)) {
+        val w = size.toPx()
+        val stroke = Stroke(width = w * 0.1f, cap = StrokeCap.Round)
+        drawRoundRect(
+            color = tint,
+            topLeft = Offset(w * 0.22f, w * 0.42f),
+            size = androidx.compose.ui.geometry.Size(w * 0.56f, w * 0.4f),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.08f),
+            style = stroke,
+        )
+        // Beide Bügel-Beine tauchen in den Korpus ein — eindeutig zugesperrt.
+        drawLine(
+            color = tint,
+            start = Offset(w * 0.32f, w * 0.44f),
+            end = Offset(w * 0.32f, w * 0.30f),
+            strokeWidth = w * 0.1f,
+            cap = StrokeCap.Round,
+        )
+        drawLine(
+            color = tint,
+            start = Offset(w * 0.68f, w * 0.44f),
+            end = Offset(w * 0.68f, w * 0.30f),
+            strokeWidth = w * 0.1f,
+            cap = StrokeCap.Round,
+        )
         drawArc(
             color = tint,
             startAngle = 180f,
             sweepAngle = 180f,
             useCenter = false,
-            topLeft = Offset(w * 0.3f, w * 0.12f),
-            size = androidx.compose.ui.geometry.Size(w * 0.4f, w * 0.4f),
+            topLeft = Offset(w * 0.32f, w * 0.12f),
+            size = androidx.compose.ui.geometry.Size(w * 0.36f, w * 0.36f),
             style = stroke,
         )
     }

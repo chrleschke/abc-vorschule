@@ -18,6 +18,7 @@ import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.session.ScheduledTrainer
 import app.abcvorschule.ui.components.AbcResolveButton
+import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.WarmInk
 
 /**
@@ -36,10 +37,10 @@ fun MathExercise(
     speaking: Boolean,
     interactionLocked: Boolean = false,
     onSpeakPrompt: () -> Unit,
-    onSpeak: (String) -> Unit,
-    onResult: (distance: Int?, resolved: Boolean, correct: Boolean) -> Unit,
+    onResult: (distance: Int?, resolved: Boolean, correct: Boolean, guess: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val haptics = LocalAbcHaptics.current
     val operation = MathOperation.fromWireName(round.operation) ?: MathOperation.Add
     val roundKey = "${trainer.spec.id}#$roundIndex-${round.operation}-${round.left}-${round.right}"
     var misses by remember(roundKey) { mutableIntStateOf(0) }
@@ -48,25 +49,33 @@ fun MathExercise(
     // light up the green confirmation meant for a correct answer.
     var solved by remember(roundKey) { mutableStateOf<Int?>(null) }
     val usePad = MathHinting.usesNumberPad(scaffold)
-    val choices = remember(roundKey) { MathHinting.threeChoices(round.answer).shuffled() }
+    // Seeded wie TrayOrder: die Kachel-Reihenfolge muss beim Rück-Chevron in eine
+    // besuchte Runde (und nach Recreation) dieselbe sein wie beim ersten Besuch.
+    val choices = remember(roundKey) {
+        MathHinting.threeChoices(round.answer).shuffled(kotlin.random.Random(roundKey.hashCode()))
+    }
 
     fun handleGuess(guess: Int) {
         if (locked) return
         if (guess == round.answer) {
             locked = true
             solved = guess
-            onResult(0, false, true)
+            onResult(0, false, true, guess)
         } else {
-            onSpeak(guess.toString())
+            // Kein lokales Echo mehr: ein zweiter Primary-speak (der Miss-Hinweis
+            // aus dem ViewModel) flusht die Engine und würde die Zahl mitten im
+            // Wort abschneiden. Der Tipp wandert stattdessen mit ins Cue —
+            // "Sieben. Du bist nah dran …" als eine Äußerung.
+            haptics.nudge()
             misses += 1
-            onResult(MathHinting.distance(round.answer, guess), false, false)
+            onResult(MathHinting.distance(round.answer, guess), false, false, guess)
         }
     }
 
     fun resolve() {
         if (locked) return
         locked = true
-        onResult(null, true, false)
+        onResult(null, true, false, null)
     }
 
     if (usePad) {

@@ -50,6 +50,25 @@ class MultiplicationMatrixTest {
     }
 
     @Test
+    fun theGutterHoldsOneDigitAtEverySystemFontScale() {
+        // The gutter is dp, the numeral is sp: the derivation must cover the
+        // largest scale Android offers, not just the 1.3 the old comment named.
+        listOf(1f, 1.3f, MultiplicationMatrix.MaxFontScale).forEach { scale ->
+            assertTrue(
+                "a digit at scale $scale must fit the ${MultiplicationMatrix.RowLabelGutterDp}dp gutter",
+                MultiplicationMatrix.rowLabelAdvanceDp(scale) <=
+                    MultiplicationMatrix.RowLabelGutterDp.toFloat(),
+            )
+        }
+    }
+
+    @Test
+    fun theGutterNeverShrinksBelowItsShippedWidth() {
+        // Every row starts at the same x as before unless the theme forces more.
+        assertTrue(MultiplicationMatrix.RowLabelGutterDp >= 24)
+    }
+
+    @Test
     fun equationLabelSpellsOutBothFactors() {
         assertEquals("3 × 4", MultiplicationMatrix.equationLabel(3, 4))
         assertEquals(

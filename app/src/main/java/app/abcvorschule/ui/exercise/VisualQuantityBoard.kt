@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.ui.components.AbcResolveButton
+import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
@@ -71,16 +73,23 @@ fun VisualQuantityBoard(
                 horizontalArrangement = Arrangement.spacedBy(20.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                MathQuantityPrompt(emoji, left, right, operation, emojiSizeSp = 44)
+                MathQuantityPrompt(
+                    emoji, left, right, operation,
+                    emojiSizeSp = QuantityGrouping.promptEmojiSizeSp(44, left, right),
+                )
             }
         },
         answers = {
-            // Solutions must match the prompt's representation: once either operand is
-            // symbolic, every answer tile shows a single icon too, never a mix of
-            // "one icon" and "nine icons" for the same round.
-            val forceSymbolic = QuantityRepresentation.forceSymbolicFor(left, right)
+            // Solutions must match the prompt's representation: once either operand or
+            // any choice is symbolic, every answer tile shows a single icon too, never
+            // a mix of "one icon" and "nine icons" for the same round.
+            val forceSymbolic = QuantityRepresentation.forceSymbolicForChoices(left, right, choices)
+            // §8: gleiche Dimensionen der Buttons. Shorter clusters pad up to the
+            // tallest choice with invisible ghost rows, so tile size never hints at
+            // the answer and the numerals share one baseline.
+            val equalRows = if (forceSymbolic) 0 else choices.maxOf { QuantityGrouping.clusters(it).size }
             FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.alpha(answerOpacity),
             ) {
@@ -96,10 +105,11 @@ fun VisualQuantityBoard(
                                 shape = RoundedCornerShape(18.dp),
                             )
                             .clickable(enabled = !interactionLocked) { onChoose(value) }
+                            .defaultMinSize(minWidth = AbcDimens.kidTouch, minHeight = AbcDimens.kidTouch)
                             .padding(horizontal = 16.dp, vertical = 12.dp)
                             .testTag("math_choice_$value"),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
                     ) {
                         QuantityCluster(
                             emoji = emoji,
@@ -108,6 +118,7 @@ fun VisualQuantityBoard(
                             showNumber = true,
                             numberColor = if (correct) Cream else WarmInk,
                             forceSymbolic = forceSymbolic,
+                            minClusterRows = equalRows,
                         )
                     }
                 }
@@ -130,6 +141,9 @@ fun QuantityCluster(
     /** Set when the other number in this round is already symbolic, so both
      * sides of the equation stay visually consistent. */
     forceSymbolic: Boolean = false,
+    /** Pad up to this many emoji rows with invisible pair rows, so sibling
+     * tiles keep equal height and width regardless of their count (§8). */
+    minClusterRows: Int = 0,
 ) {
     if (forceSymbolic || QuantityRepresentation.isSymbolic(count)) {
         Column(
@@ -153,6 +167,16 @@ fun QuantityCluster(
                 repeat(size) {
                     Text(text = emoji, fontSize = emojiSizeSp.sp)
                 }
+            }
+        }
+        // Ghost rows between the emojis and the numeral: sizes with fewer rows
+        // grow to match their tallest sibling, and all numerals line up.
+        repeat((minClusterRows - clusters.size).coerceAtLeast(0)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.alpha(0f),
+            ) {
+                repeat(2) { Text(text = emoji, fontSize = emojiSizeSp.sp) }
             }
         }
         if (showNumber) {

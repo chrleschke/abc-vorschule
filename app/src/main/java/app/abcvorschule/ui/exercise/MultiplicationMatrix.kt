@@ -1,5 +1,7 @@
 package app.abcvorschule.ui.exercise
 
+import kotlin.math.ceil
+
 /**
  * Layout rules for the multiplication matrix: "4 mal 5" is drawn as 4 rows of
  * 5 slots. Only the first row shows the real objects; every further row holds
@@ -29,8 +31,27 @@ object MultiplicationMatrix {
      */
     fun rowLabel(rowIndex: Int): String = (rowIndex + 1).toString()
 
-    /** Fixed gutter so every row starts at the same x — one digit at font scale 1.3 fits. */
-    const val RowLabelGutterDp = 24
+    /** Schriftgröße der Zeilennummern: `labelLarge` aus `ui/theme/Theme.kt` —
+     * dokumentierte Kopie nach dem Muster der M3-Basen in `FinaleLayout`. */
+    const val RowLabelSp = 16f
+
+    /** Größte System-Schriftskalierung, die Android anbietet und gegen die die
+     * Rinne ausgelegt sein muss. */
+    const val MaxFontScale = 2f
+
+    /** Gerenderter Vorschub einer Zeilennummer bei [fontScale] — eine Ziffer,
+     * [MaxRows] < 10 hält das test-gesichert so. Aspekt mit Headroom aus
+     * [WordFrameSizing.GlyphAspect]. */
+    fun rowLabelAdvanceDp(fontScale: Float): Float =
+        RowLabelSp * fontScale * WordFrameSizing.GlyphAspect
+
+    /**
+     * Fixed gutter so every row starts at the same x. Kein Literal mehr, sondern
+     * gegen [MaxFontScale] abgeleitet (16sp × 2.0 × 0.72 ≈ 23dp, aufgerundet und
+     * nie unter den gewohnten 24dp): eine Theme- oder Deckelanpassung verbreitert
+     * die Rinne dann von selbst, statt die Ziffer bei font_scale 2.0 zu clippen.
+     */
+    val RowLabelGutterDp: Int = maxOf(24, ceil(rowLabelAdvanceDp(MaxFontScale)).toInt())
 
     /**
      * The task itself, written above the grid: "3 × 4". Without it the picture
