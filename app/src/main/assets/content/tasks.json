@@ -3103,16 +3103,16 @@
       "id": "l17-t10",
       "rounds": [
         {
-          "promptTts": "Siebenundzwanzig Spinnen sitzen im Netz. Neun krabbeln weg. Wie viele Spinnen bleiben.",
-          "iconAtomId": "spinne",
+          "promptTts": "Siebenundzwanzig Sterne funkeln am Himmel. Neun verstecken sich hinter einer Wolke. Wie viele Sterne bleiben.",
+          "iconAtomId": "stern",
           "left": 27,
           "right": 9,
           "answer": 18,
           "operation": "subtract"
         },
         {
-          "promptTts": "Sechzehn Spinnen und vierzehn Spinnen. Wie viele Spinnen sind das.",
-          "iconAtomId": "spinne",
+          "promptTts": "Sechzehn Sterne und vierzehn Sterne. Wie viele Sterne sind das.",
+          "iconAtomId": "stern",
           "left": 16,
           "right": 14,
           "answer": 30
@@ -3197,7 +3197,7 @@
           "promptTts": "Zeichne den Buchstaben - X - nach und sammle dabei alle Sterne.",
           "atomId": "letter-x",
           "glyph": "X",
-          "rewardTts": "X - wie Xylophon.",
+          "rewardTts": "X - wie Xylofon.",
           "rewardEmoji": "🎵",
           "blocks": []
         }
@@ -4515,15 +4515,15 @@
       "id": "l25-t10",
       "rounds": [
         {
-          "promptTts": "Vierundzwanzig Füße und sechs Füße. Wie viele Füße sind das.",
-          "iconAtomId": "fuss",
+          "promptTts": "Vierundzwanzig Rüben und sechs Rüben. Wie viele Rüben sind das.",
+          "iconAtomId": "ruebe",
           "left": 24,
           "right": 6,
           "answer": 30
         },
         {
-          "promptTts": "Dreißig Füße stampfen. Fünfzehn hören auf. Wie viele Füße stampfen noch.",
-          "iconAtomId": "fuss",
+          "promptTts": "Dreißig Rüben liegen im Beet. Opa zieht fünfzehn heraus. Wie viele Rüben bleiben.",
+          "iconAtomId": "ruebe",
           "left": 30,
           "right": 15,
           "answer": 15,
@@ -4831,7 +4831,7 @@
           "wrongAtomIds": ["elefant", "haus"]
         },
         {
-          "sentenceTts": "Papa hat zwei Hüte gekauft.",
+          "sentenceTts": "Papa hat einen Hut gekauft.",
           "correctAtomIds": ["papa", "hut"],
           "wrongAtomIds": ["papa", "kleid"]
         },
@@ -4858,7 +4858,7 @@
           "wrongAtomIds": ["tom", "apfel", "nest"]
         },
         {
-          "sentenceTts": "Auf dem Tor saß ein kleiner Vogel.",
+          "sentenceTts": "Auf dem Tor sitzt ein kleiner Vogel.",
           "correctAtomIds": ["vogel", "tor"],
           "wrongAtomIds": ["vogel", "baum"]
         },
@@ -4880,7 +4880,7 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Im Nest lag ein kleiner Vogel.",
+          "sentenceTts": "Ein kleiner Vogel liegt im Nest.",
           "correctAtomIds": ["nest", "vogel"],
           "wrongAtomIds": ["nest", "maus"]
         },
@@ -4907,7 +4907,7 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "In der Dose waren zwei Kekse.",
+          "sentenceTts": "In der Dose sind zwei Kekse.",
           "correctAtomIds": ["dose", "keks", "keks"],
           "wrongAtomIds": ["dose", "eis"]
         },
@@ -4917,14 +4917,14 @@
           "wrongAtomIds": ["hund", "kuchen"]
         },
         {
-          "sentenceTts": "Tom aß den letzten Keks.",
+          "sentenceTts": "Tom isst den letzten Keks.",
           "correctAtomIds": ["tom", "keks"],
           "wrongAtomIds": ["tom", "brokkoli"]
         },
         {
-          "sentenceTts": "Wer hat die Kekse aus der Dose geklaut...",
-          "correctAtomIds": ["keks", "dose"],
-          "wrongAtomIds": ["keks", "pirat"]
+          "sentenceTts": "Der Pirat hat die Kekse geklaut.",
+          "correctAtomIds": ["pirat", "keks"],
+          "wrongAtomIds": ["hund", "keks"]
         }
       ]
     },
@@ -5138,9 +5138,9 @@
           "wrongAtomIds": ["dino", "tor"]
         },
         {
-          "sentenceTts": "Die Äpfel wurden aufgemampft.",
-          "correctAtomIds": ["aepfel"],
-          "wrongAtomIds": ["banane"]
+          "sentenceTts": "Der Zucker steckt im Sack.",
+          "correctAtomIds": ["zucker", "sack"],
+          "wrongAtomIds": ["zucker", "paket"]
         }
       ]
     },
@@ -5187,8 +5187,8 @@
           "wrongAtomIds": ["fisch", "fisch"]
         },
         {
-          "sentenceTts": "Der Clown hat Xylofon gespielt.",
-          "correctAtomIds": ["clown", "xylofon"],
+          "sentenceTts": "Der Clown hat Klavier gespielt.",
+          "correctAtomIds": ["clown", "klavier"],
           "wrongAtomIds": ["clown", "radio"]
         },
         {

@@ -91,6 +91,47 @@ class ContentValidatorTest {
     }
 
     @Test
+    fun derivedTrainerInAuthoredLessonIsAnIssueNotACrash() {
+        // symbol_hunt/symbol_in_word have no TrainerRank — before the fix,
+        // TrainerRank.getValue threw NoSuchElementException and validate() never
+        // returned any issues for such a pack.
+        val derived = SymbolInWordSpec(
+            id = "derived-siw",
+            rounds = listOf(
+                SymbolInWordRound(
+                    promptTts = "Finde den Buchstaben - M - im Wort - Mama.",
+                    wordAtomId = "mama",
+                    targetAtomId = "letter-m",
+                    mode = SymbolInWordMode.letter,
+                    segments = listOf("M", "a", "m", "a"),
+                    targetIndices = listOf(0, 2),
+                ),
+            ),
+        )
+        val lesson = pack.authoredLessons.first()
+        val issues = issuesOf { p ->
+            p.copy(
+                tasks = p.tasks + (derived.id to derived),
+                lessons = p.lessons.map {
+                    if (it.id == lesson.id) it.copy(taskIds = it.taskIds + derived.id) else it
+                },
+                // Break something unrelated too: the derived trainer must not stop
+                // the validator from collecting all remaining issues.
+                finales = p.finales + ("f-l01" to p.finale("f-l01").copy(tts = "")),
+            )
+        }
+        assertTrue(
+            issues.toString(),
+            issues.any { it.contains("authored lesson ${lesson.id} must not hold derived trainer symbol_in_word") },
+        )
+        assertTrue(
+            issues.toString(),
+            issues.any { it.contains("derived-siw") && it.contains("must not appear in authored content") },
+        )
+        assertTrue(issues.toString(), issues.any { it.contains("f-l01") && it.contains("tts") })
+    }
+
+    @Test
     fun plannedLessonWithTasksIsRejected() {
         // The shipped pack may have zero planned lessons at any given time (it does,
         // post-588cf1f) — mutate one authored lesson to planned-with-tasks instead of
@@ -255,6 +296,31 @@ class ContentValidatorTest {
         )
         val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
         assertTrue(issues.any { it.contains("tray holds") && it.contains("max is 5") })
+    }
+
+    @Test
+    fun sentenceOrderDistractorDuplicatingASentenceWordIsRejected() {
+        // Same rule word_build already has: a "wrong" tile that reads like a word
+        // of the sentence is indistinguishable from a right one.
+        val spec = pack.tasks.values.filterIsInstance<SentenceOrderSpec>().first()
+        val broken = spec.copy(
+            rounds = spec.rounds.map { round ->
+                val word = pack.sentenceWords(pack.sentence(round.sentenceId)).first()
+                round.copy(distractors = listOf(WordBlock("letter-m", word)))
+            },
+        )
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.toString(), issues.any { it.contains("duplicate sentence words") })
+    }
+
+    @Test
+    fun traceRoundWithBlankRewardTtsIsRejected() {
+        // One representative of the blank-field checks (missTts, rewardTts,
+        // rewardEmoji, stretchTts, Atom.display all follow the promptTts pattern).
+        val spec = pack.tasks.values.filterIsInstance<LetterTraceSpec>().first()
+        val broken = spec.copy(rounds = spec.rounds.map { it.copy(rewardTts = " ") })
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.toString(), issues.any { it.contains("rewardTts") })
     }
 
     @Test

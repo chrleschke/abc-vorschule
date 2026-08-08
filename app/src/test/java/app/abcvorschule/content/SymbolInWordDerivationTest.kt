@@ -289,6 +289,53 @@ class SymbolInWordDerivationTest {
     }
 
     @Test
+    fun aBlockWhoseDisplayDisagreesWithTheTargetAtomIsNotAHit() {
+        // Synthetic: the same syllable atom `mi` backs two blocks, one agreeing
+        // with the atom's display ("Mi") and one disagreeing beyond casing ("mim").
+        // Only the agreeing block may count as a hit of the announced target —
+        // before the fix, hits matched by atomId alone and the "mim" segment
+        // counted as a hit of the label "mi" the child was asked to find.
+        val word = Atom(
+            id = "synthetic-mimimi",
+            lemma = "Mimimi",
+            display = "Mimimi",
+            emoji = "🎻",
+        )
+        val wordBuild = WordBuildSpec(
+            id = "synthetic-agreement-build",
+            rounds = listOf(
+                // First word makes the derivation's next round the odd (syllable) one.
+                pack.tasks.values.filterIsInstance<WordBuildSpec>()
+                    .flatMap { it.rounds }
+                    .first { pack.atom(it.targetAtomId).display == "Mama" },
+                WordBuildRound(
+                    promptTts = "Baue das Wort Mimimi.",
+                    targetAtomId = word.id,
+                    blocks = listOf(
+                        WordBlock(atomId = "mi", display = "Mi"),
+                        WordBlock(atomId = "mi", display = "mim"),
+                        WordBlock(atomId = "letter-i", display = "i"),
+                    ),
+                ),
+            ),
+        )
+        val synthetic = pack.copy(
+            atoms = pack.atoms + (word.id to word),
+            tasks = pack.tasks + (wordBuild.id to wordBuild),
+        )
+        val base = pack.lesson("l01")
+        val lesson = base.copy(
+            taskIds = base.taskIds.filter { pack.tasks[it] is LetterTraceSpec } + wordBuild.id,
+        )
+        val round = SymbolInWordDerivation.buildRounds(synthetic, lesson)
+            .single { it.wordAtomId == word.id }
+        assertEquals(SymbolInWordMode.syllable, round.mode)
+        assertEquals("mi", round.targetAtomId)
+        assertEquals(listOf("Mi", "mim", "i"), round.segments)
+        assertEquals(listOf(0), round.targetIndices)
+    }
+
+    @Test
     fun aWordBuiltTwiceProducesOneRound() {
         // l05 authors "Hut" in two word_build tasks.
         assertEquals(1, rounds("l05").count { it.wordAtomId == "hut" })

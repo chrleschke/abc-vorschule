@@ -3976,14 +3976,6 @@
       "pluralDisplay": "Eimer"
     },
     {
-      "id": "gans",
-      "lemma": "Gans",
-      "display": "Gans",
-      "emoji": "🦢",
-      "kind": "other",
-      "pluralDisplay": "Gänse"
-    },
-    {
       "id": "buch",
       "lemma": "Buch",
       "display": "Buch",

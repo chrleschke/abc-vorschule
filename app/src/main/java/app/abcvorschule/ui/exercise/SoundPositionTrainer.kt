@@ -68,8 +68,9 @@ private val WagonSize = 96.dp
 
 /**
  * Trainer 1 — Auditiver Finder. The child hears a phoneme and a picture word and
- * drops the picture into the wagon matching the sound's position. Only the
- * picture is shown; the word itself is never written.
+ * drops the picture into the wagon matching the sound's position. Below the
+ * picture the word is rendered split into its grapheme groups, tinted in the
+ * three wagon colours ([colouredWord]) — a colour hint, not a reading task.
  */
 @Composable
 fun SoundPositionTrainer(
