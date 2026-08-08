@@ -69,6 +69,9 @@ Kernpunkte (Kurzfassung):
 - **Audio-First**: Kinder lesen nicht. Bilder, Icons, Layout, Sprache. Lesbare Labels nur wo nötig (Atom-Namen sind Aufgabe selbst).
 - **Drag & Drop**: Committet bei echtem Treffer, sonst Snap-back. Keine Strafen.
 - **Rechnen**: Icons (keine Wörter), 3 Optionen (visuell) oder System-Zahlentastatur; Erfolg vorgesprochen (kein sichtbarer Text), Miss gesprochenes Feedback. Ab 11 Mengen nur als Symbol + Ziffer; Progression Plus → Wegnehmen → gleiche Gruppen.
+- **Artikel im Erfolgs-Vorsprechen**: Substantiv-Lösungswörter werden mit Artikel
+  vorgesprochen („das Haus"), Aufgabenstellungen nicht. Genus und Nomenklasse stehen am
+  Atom, Regel in `AtomArticleSpeech`, Details in PRODUCT_PRINCIPLES §4/§7.
 
 
 

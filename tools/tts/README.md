@@ -154,6 +154,15 @@ Profil `phoneme` (Lautwert), alle anderen Lemmata im Profil `word`. Damit kollid
 Buchstaben wie `M` und Silben wie `ma` nicht doppelt mit `phonemeTts`/`stretchTts` —
 identischer Text im selben Profil wird zu einem Clip zusammengefasst.
 
+Das Profil `article_word` trägt die Lösungswörter **mit Artikel** („das Haus"), die das
+Erfolgs-Vorsprechen nennt. Es ist bewusst nicht `word`: dessen `max_new_tokens: 25` (≈ 2,0 s)
+schneidet „eine Erdbeere" ab, und die Instruktion muss ausdrücklich verlangen, Artikel und
+Nomen als eine Einheit zu sprechen — abgesetzt klingt es wie zwei aneinandergehängte Clips.
+Ein Artikel-Item entsteht nur für Atome, die `SuccessSpeech` erreichen kann
+(`word_build.targetAtomId` ∪ `sound_position.atomId`); die übrigen klassifizierten
+Substantive stünden sonst dauerhaft als „fehlt" in `tts status` und würden echte Lücken
+verdecken.
+
 Beim Export (`ttskit/export.py`) darf derselbe gesprochene Text trotzdem nur einmal
 im Index stehen. Gewinnt bei Kollisionen zuerst die pädagogisch passende Variante
 (kurzer Satz-Architekt-Text → `sentence`, Buchstaben-Laut → `phoneme`, …); danach
@@ -166,24 +175,26 @@ ohne Lock (typisch nach Batch-`render`): `tts wire-locks`, danach `tts export`.
 
 ## Umfang
 
-`tts extract` liest aktuell 893 Items — 891 Strings aus dem Content-Pack plus 2
-`ui:`-Einträge aus `extra-strings.json` — und bündelt sie zu 694 Clips (identischer
-Text im selben Profil kollabiert in einen Clip):
+`tts extract` liest aktuell 1174 Items — 1126 Strings aus dem Content-Pack plus 48
+Einträge aus `extra-strings.json` (davon 3 ohne eigenes `field`, die damit auf das
+Profil `ui` fallen) — und bündelt sie zu 926 Clips (identischer Text im selben Profil
+kollabiert in einen Clip):
 
 | Profil | Clips |
 | --- | --- |
-| word | 260 |
-| prompt | 223 |
+| word | 244 |
+| prompt | 231 |
+| sentence | 98 |
+| reward | 86 |
+| article_word | 85 |
 | miss | 81 |
-| reward | 47 |
-| phoneme | 37 |
-| sentence | 26 |
+| phoneme | 80 |
 | finale | 18 |
-| ui | 2 |
-| **gesamt** | **694** |
+| ui | 3 |
+| **gesamt** | **926** |
 
 Ein voller `render`-Lauf dauert ungefähr 25–40 Minuten — je nach Profilmix. Ein kurzer
-Satz braucht ~2,4 s, die 18 langen `finale`-Sätze im Schnitt ~3,2 s; die 260 einzelnen
+Satz braucht ~2,4 s, die 18 langen `finale`-Sätze im Schnitt ~3,2 s; die 244 einzelnen
 `word`-Clips sind deutlich schneller. Eine einzelne Zahl wäre hier irreführend.
 
 ## Seeds

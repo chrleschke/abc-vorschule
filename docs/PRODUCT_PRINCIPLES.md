@@ -148,6 +148,13 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
   Einzelbuchstaben (inkl. Ä/Ö/Ü) bleiben unverändert; die Breite kommt aus dem Lemma
   (Leerzeichen ignoriert, damit `S t` als Digraph zählt).
 - Orthografie: Silben eher klein; zusammengesetzte Wörter/Sätze korrekt großgeschrieben.
+- **Genus und Nomenklasse am Atom.** Jedes Substantiv-Atom trägt `gender` (`m`/`f`/`n`) und
+  `nounClass` (`thing` / `person` / `name`); `articleSpeechOverride` überschreibt den
+  abgeleiteten Sprechtext, wo die Regel nicht greift (Plural-Atome wie `Häuser` nehmen „die",
+  unabhängig vom Genus des Singulars). Nicht-Substantive — Funktionswörter, Verben,
+  Adjektive, Buchstaben, Silben — tragen die Felder nicht. `ContentValidator` erzwingt, dass
+  jedes vom Erfolgs-Vorsprechen erreichbare Atom klassifiziert ist oder ausdrücklich in
+  `ArticleFreeSpeechAtomIds` steht.
 - Rechnen nutzt die Bild-Ikonen derselben Lektion; Details zu Singular/Plural siehe Abschnitt 8.
 - Jede autorierte Lektion verweist über `finaleId` auf einen **Finale-Satz** in
   `finales.json` — den Belohnungssatz des End-Screens (Abschnitt 12). Wiederholungslektionen
@@ -215,6 +222,15 @@ niemals mit einem stummen No-Op.
 - System-TTS für Prompts; Speaker (Vektor-Icon) **im Aufgabenbereich**, mittig über dem Aufgabentitel.
 - Tippen auf Aufgaben-Items (Buchstaben, Silben, Wörter, Antwortkacheln) liest sie vor.
 - Bei Erfolg: Antwort vorsprechen → Stern im oberen Drittel → erst danach nächste Aufgabe (Audio abwarten).
+- **Die Antwort nennt den Artikel, die Aufgabe nicht.** Ist das Lösungswort ein Substantiv,
+  spricht das Erfolgs-Vorsprechen es mit Artikel („Baue das Wort Haus" → „das Haus") —
+  Gegenstände und Tiere mit dem bestimmten (der/die/das), Personenbezeichnungen mit dem
+  unbestimmten (ein/eine), Namen ohne. Neutrum-Personen bekommen „das": „ein Opa" und
+  „ein Kind" wären sonst nicht unterscheidbar. Betroffen sind Wort-Bauer, Wort-Detektiv und
+  Auditiver Finder (`SuccessSpeech`). **Nicht** betroffen: Prompts, das Antippen von Items,
+  `missTts`, Rechnen („zwei Ameisen" — vor einer Zahl steht kein Artikel) und ganze Sätze,
+  die ihre Artikel schon tragen. Abgeleitet wird in `AtomArticleSpeech`; `tools/tts` spiegelt
+  die Regel, damit vorproduzierte Clips denselben Text tragen.
 - Lob (**nur Rechnen, nur gesprochen**): ein zufälliges Wort oder ein kurzer Ausruf aus
   `PraisePhrases` steht vor der Antwort („Ausgezeichnet! zwei Ameisen"), damit die Menge das Letzte
   bleibt, was das Kind hört. Nie als Text anzeigen — das Kind kann nicht lesen. Auflösen
