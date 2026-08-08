@@ -1,5 +1,6 @@
 package app.abcvorschule.content
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -22,6 +23,30 @@ enum class AtomKind {
 
     /** Picture-only vocabulary used for listening/counting, never read or spelled. */
     other,
+}
+
+/** Grammatisches Genus eines Substantiv-Atoms. */
+@Serializable
+enum class Gender { m, f, n }
+
+/** Wie ein Substantiv beim Vorsprechen seinen Artikel bekommt. */
+@Serializable
+enum class NounClass {
+    /** Gegenstand, Tier, Pflanze, Abstraktum — bestimmter Artikel. */
+    thing,
+
+    /** Personenbezeichnung (Oma, Opa, Clown) — unbestimmter Artikel, Neutrum ausgenommen. */
+    person,
+
+    /**
+     * Eigenname (Tom, Mimi) — kein Artikel.
+     *
+     * Heißt in Kotlin `properName`, weil `name` mit `kotlin.Enum.name` kollidiert;
+     * der JSON-Wert bleibt `"name"`. Gleiches `@SerialName`-Muster wie bei
+     * `sentenceTts`/`promptTts` in `TaskSpecs.kt`.
+     */
+    @SerialName("name")
+    properName,
 }
 
 /** Where a phoneme sits inside a spoken word. */
@@ -48,6 +73,12 @@ data class Atom(
     val kind: AtomKind = AtomKind.word,
     val pluralDisplay: String? = null,
     val pluralHighlight: String? = null,
+    /** Genus; gesetzt für [NounClass.thing] und [NounClass.person], null bei Namen. */
+    val gender: Gender? = null,
+    /** Gesetzt an jedem Substantiv-Atom; null heißt „kein Substantiv". */
+    val nounClass: NounClass? = null,
+    /** Fertiger Artikel-Sprechtext, wenn die Ableitung nicht passt (Plural-Atome). */
+    val articleSpeechOverride: String? = null,
     /** Uppercase glyph strokes; required for atoms used by a letter_trace round. */
     val strokes: List<GlyphStroke> = emptyList(),
 )
