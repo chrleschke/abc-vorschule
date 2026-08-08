@@ -683,7 +683,12 @@ und passe sie an, falls sie anders heißen.
 ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest --tests '*ContentValidatorTest*'
 ```
 
-Erwartet: FAIL mit 85 Issues der Form `atom haus is spoken as a success answer but has no nounClass`.
+Erwartet: FAIL mit **87** Issues der Form `atom haus is spoken as a success answer but has no nounClass`.
+
+87, nicht 85: erreichbar sind 91 Atome, davon stehen 4 in `ArticleFreeSpeechAtomIds`. Die
+beiden Namen (`tom`, `mimi`) brauchen sehr wohl eine `nounClass` (`properName`) und werden
+deshalb mitgemeldet — sie erzeugen nur später keinen *Clip*, weil ihr Sprechtext dem
+`display` entspricht. 85 ist die Clip-Zahl in Task 5, nicht die Befundzahl hier.
 
 - [ ] **Step 4: Write the enrichment script**
 
@@ -785,10 +790,35 @@ if __name__ == "__main__":
 python3 <scratchpad>/enrich_atoms.py && git diff --stat app/src/main/assets/content/atoms.json
 ```
 
-Erwartet: `classified 152 atoms, 4 overrides`. Der Diff berührt **nur** hinzugefügte Zeilen —
-prüfe mit `git diff app/src/main/assets/content/atoms.json | grep '^-' | grep -v '^---'`,
-dass keine Zeile entfernt wurde. Ist dort Ausgabe, ist das Round-Trip-Format abgewichen:
-nicht committen, sondern melden.
+Erwartet: `classified 152 atoms, 4 overrides`.
+
+**Feldreihenfolge geht vor Diff-Reinheit.** `atoms.json` wird von Hand autoriert; die drei
+neuen Felder stehen deshalb bei **jedem** Atom an derselben Stelle — nach `pluralHighlight`,
+vor `strokes`, also in derselben Reihenfolge wie in der Kotlin-`Atom`-Klasse. Dass die bis
+dahin letzte Zeile eines Atoms dabei ein Komma bekommt und im Diff als geändert erscheint,
+ist erwartetes Rauschen und **kein** Grund, die Felder woanders einzufügen.
+
+Prüfe stattdessen, dass nur Kommas gewandert sind — jede entfernte Zeile muss sich in einer
+hinzugefügten Zeile plus Komma wiederfinden:
+
+```bash
+git diff app/src/main/assets/content/atoms.json | grep '^-' | grep -v '^---' | sed 's/^-//;s/,$//' | sort > /tmp/removed.txt
+git diff app/src/main/assets/content/atoms.json | grep '^+' | grep -v '^+++' | sed 's/^+//;s/,$//' | sort > /tmp/added.txt
+comm -23 /tmp/removed.txt /tmp/added.txt
+```
+
+Gibt `comm` etwas aus, ist echter Inhalt verlorengegangen: nicht committen, sondern melden.
+Zusätzlich muss ein Round-Trip byte-identisch sein:
+
+```bash
+python3 -c "
+import json
+p='app/src/main/assets/content/atoms.json'
+raw=open(p,encoding='utf-8').read()
+assert json.dumps(json.loads(raw),ensure_ascii=False,indent=2)+'\n'==raw, 'Format abgewichen'
+print('round-trip ok')
+"
+```
 
 - [ ] **Step 6: Run the validator test**
 
