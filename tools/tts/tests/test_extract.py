@@ -263,6 +263,53 @@ def test_article_speech_mirrors_the_kotlin_rule():
     assert article_speech({"display": "ist"}) is None
     assert article_speech({"display": "Haus", "nounClass": "thing"}) is None
 
+    # Kotlins takeIf { it.isNotBlank() } filtert nur — es trimmt nicht. Ein
+    # gültiger Override kommt unverändert zurück, auch mit Rand-Leerzeichen.
+    assert article_speech({"display": "Häuser", "gender": "n", "nounClass": "thing",
+                           "articleSpeechOverride": " die Häuser "}) == " die Häuser "
+    # Ein Nur-Leerzeichen-Override ist blank, also kein Override — Fallback auf
+    # die normale Ableitung.
+    assert article_speech({"display": "Kind", "gender": "n", "nounClass": "person",
+                           "articleSpeechOverride": "   "}) == "das Kind"
+    # Ein Nur-Leerzeichen-display ist ebenfalls blank, auch wenn nounClass und
+    # gender gesetzt sind.
+    assert article_speech({"display": "   ", "gender": "n", "nounClass": "thing"}) is None
+    # display selbst wird nicht getrimmt: Rand-Leerzeichen bleiben im
+    # zusammengesetzten Sprechtext erhalten.
+    assert article_speech({"display": " Haus ", "gender": "n",
+                           "nounClass": "thing"}) == "das  Haus "
+
+
+def test_article_override_beats_the_name_duplicate_check(tmp_path):
+    """Die Duplikat-Vermeidung vergleicht Text gegen Text, nicht nounClass gegen "name".
+
+    Ein Name mit Override, der vom display abweicht, ist kein Duplikat und muss
+    trotz nounClass == "name" einen eigenen Clip bekommen — sonst hätte die
+    Prüfung in extract_items klammheimlich zu einer hartkodierten
+    nounClass == "name"-Ausnahme verengt statt zum generischen Textvergleich.
+    """
+    import json
+
+    d = tmp_path / "content"
+    d.mkdir()
+    (d / "atoms.json").write_text(json.dumps({"atoms": [
+        {"id": "kapitaen", "lemma": "Kapitän", "display": "Kapitän", "emoji": "",
+         "kind": "word", "nounClass": "name", "articleSpeechOverride": "Herr Kapitän"},
+    ]}), encoding="utf-8")
+    (d / "tasks.json").write_text(json.dumps({"tasks": [
+        {"trainer": "sound_position", "id": "l01-t1", "rounds": [
+            {"promptTts": "Wo hörst du K?", "atomId": "kapitaen", "slot": "start",
+             "missTts": "Kapitän. Am Anfang.", "blocks": []},
+        ]},
+    ]}), encoding="utf-8")
+    for name, key in (("sentences.json", "sentences"), ("finales.json", "finales"),
+                      ("lessons.json", "lessons")):
+        (d / name).write_text(json.dumps({key: []}), encoding="utf-8")
+
+    by_id = {i.id: i for i in extract_items(d)}
+    item = by_id["atom:kapitaen:articleTts"]
+    assert item.text == "Herr Kapitän"
+
 
 def test_article_items_cover_only_reachable_atoms():
     items = extract_items(CONTENT_DIR)

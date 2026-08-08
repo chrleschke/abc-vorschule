@@ -98,14 +98,14 @@ def article_speech(atom: dict) -> str | None:
     Personen bekommen den unbestimmten Artikel — außer im Neutrum, wo nur "das"
     das Genus eindeutig trägt ("ein Opa" und "ein Kind" klingen sonst gleich).
     """
-    override = (atom.get("articleSpeechOverride") or "").strip()
-    if override:
+    override = atom.get("articleSpeechOverride") or ""
+    if override.strip():
         return override
     noun_class = atom.get("nounClass")
     if not noun_class:
         return None
-    display = (atom.get("display") or "").strip()
-    if not display:
+    display = atom.get("display") or ""
+    if not display.strip():
         return None
     if noun_class == "name":
         return display
