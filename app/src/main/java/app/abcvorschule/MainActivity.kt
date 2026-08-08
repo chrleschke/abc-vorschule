@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +29,8 @@ import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.rememberAbcHaptics
 import app.abcvorschule.ui.shell.TaskShell
 import app.abcvorschule.ui.theme.AbcTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,8 +61,15 @@ class MainActivity : ComponentActivity() {
 fun AbcApp(onFinish: () -> Unit = {}) {
     val context = LocalContext.current
     val app = context.applicationContext as AbcApplication
-    val speech = remember {
-        SpeechController(context, ClipIndex.load { path -> context.assets.open(path) })
+    val speech = remember { SpeechController(context) }
+    // Clip-Index (~110 KB JSON) abseits des Main-Threads laden: synchron im ersten
+    // Frame geparst hat er den App-Start blockiert. SpeechController startet leer
+    // und zieht Verfügbarkeit reaktiv nach, sobald der Index da ist.
+    LaunchedEffect(speech) {
+        val index = withContext(Dispatchers.IO) {
+            ClipIndex.load { path -> context.assets.open(path) }
+        }
+        speech.updateClipIndex(index)
     }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner, speech) {
