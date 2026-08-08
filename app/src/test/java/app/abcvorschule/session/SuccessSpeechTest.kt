@@ -33,11 +33,13 @@ class SuccessSpeechTest {
     )
 
     @Test
-    fun countAddSuccessSpeaksAnswerBeforePraise() {
+    fun countAddSuccessSpeaksPraiseBeforeAnswer() {
+        // §7: das Lob steht vor der Antwort, damit die Menge das Letzte ist,
+        // was das Kind hört ("Ausgezeichnet! 2 Ameisen").
         val parts = SuccessSpeech.partsForRound(countRound, packWithAmeise(), praise = true)
         assertEquals(2, parts.size)
-        assertEquals("2 Ameisen", parts[0])
-        assertTrue(parts[1] in PraisePhrases.All)
+        assertTrue(parts[0] in PraisePhrases.All)
+        assertEquals("2 Ameisen", parts[1])
     }
 
     @Test

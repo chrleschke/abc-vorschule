@@ -53,11 +53,40 @@ object WordFrameSizing {
         return perFrame.coerceIn(MinFrameDp, MaxFrameDp)
     }
 
-    fun glyphSp(frameWidthDp: Float, longestDisplayChars: Int): Float {
+    /**
+     * Beide Budgets sind dp, also teilt [fontScale] das Ergebnis wie bei
+     * [wordGlyphSp]: ohne die Division wächst der *gerenderte* Glyph (sp ×
+     * fontScale) mit der System-Schriftgröße aus dem festen Rahmen heraus —
+     * live belegt am Einwort-Satz-Architekten, dessen Silhouette „Mama" bei
+     * font_scale 1.3 als „Mam" endete. [MinGlyphSp] gewinnt weiterhin zuletzt
+     * (unlesbar ist schlimmer als übergelaufen, gleicher Trade wie
+     * [wordGlyphSp]); den Überlauf des Floors fängt [fittedFrameWidthDp].
+     */
+    fun glyphSp(frameWidthDp: Float, longestDisplayChars: Int, fontScale: Float = 1f): Float {
         val chars = longestDisplayChars.coerceAtLeast(1)
         val usable = (frameWidthDp - 2 * FramePaddingDp).coerceAtLeast(1f)
-        return (usable / (chars * GlyphAspect)).coerceIn(MinGlyphSp, MaxGlyphSp)
+        val budget = usable / (chars * GlyphAspect)
+        val scaled = if (fontScale > 1f) budget / fontScale else budget
+        return scaled.coerceIn(MinGlyphSp, MaxGlyphSp)
     }
+
+    /**
+     * Rahmenbreite, die [glyphSp] bei [fontScale] wirklich fasst: im Normalfall
+     * die gleichverteilte Breite, gegen die der Glyph gelöst wurde — breiter nur,
+     * wenn der [MinGlyphSp]-Floor gewonnen hat. Dann wird die Breite aus der
+     * gerenderten Glyphbreite abgeleitet (Muster [wordSegmentWidthDp]) statt den
+     * Text zu clippen: ein Rahmen, der über die Reihe hinausragt, ist besser als
+     * eine Silhouette, aus der der letzte Buchstabe fehlt.
+     */
+    fun fittedFrameWidthDp(
+        frameWidthDp: Float,
+        glyphSp: Float,
+        longestDisplayChars: Int,
+        fontScale: Float = 1f,
+    ): Float = maxOf(
+        frameWidthDp,
+        glyphSp * fontScale * GlyphAspect * longestDisplayChars.coerceAtLeast(1) + 2 * FramePaddingDp,
+    )
 
     /**
      * How many segments fit in one row at the touch-target floor. At least one, so

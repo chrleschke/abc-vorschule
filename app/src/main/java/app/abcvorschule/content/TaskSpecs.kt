@@ -66,7 +66,11 @@ data class SoundPositionRound(
     /** Picture-word the child sorts; rendered as emoji only, never as text. */
     val atomId: String,
     val slot: SoundSlot,
-    /** Segmented re-reading used on a miss, e.g. "A - Mmm - eise". */
+    /**
+     * Whole-word re-reading spoken on a miss, e.g. "Ameise. Hörst du das - M - in der Mitte.".
+     * The word is always spoken as one piece — never segmented/spelled out, which system TTS
+     * would read letter by letter (PRODUCT_PRINCIPLES §7).
+     */
     val missTts: String,
 ) : TrainerRound
 

@@ -32,17 +32,48 @@ class ContentRepository(
 
     private fun parsePack(): ContentPack {
         val manifest = json.decodeFromString<PackManifest>(read("content/pack.manifest.json"))
-        val atoms = json.decodeFromString<AtomsFile>(read("content/atoms.json")).atoms
-            .associateBy { it.id }
-        val sentences = json.decodeFromString<SentencesFile>(read("content/sentences.json")).sentences
-            .associateBy { it.id }
-        val tasks = json.decodeFromString<TasksFile>(read("content/tasks.json")).tasks
-            .associateBy { it.id }
-        val finales = json.decodeFromString<FinalesFile>(read("content/finales.json")).finales
-            .associateBy { it.id }
+        // `associateBy` is last-wins: a duplicated id would silently shadow its
+        // first definition and ContentValidator could never see it — so duplicates
+        // must fail right here, on the same exception path a validation issue takes
+        // (SessionViewModel.bootstrap catches it via runCatching).
+        val issues = mutableListOf<ValidationIssue>()
+        val atoms = associateByUniqueId(
+            "atoms",
+            json.decodeFromString<AtomsFile>(read("content/atoms.json")).atoms,
+            issues,
+        ) { it.id }
+        val sentences = associateByUniqueId(
+            "sentences",
+            json.decodeFromString<SentencesFile>(read("content/sentences.json")).sentences,
+            issues,
+        ) { it.id }
+        val tasks = associateByUniqueId(
+            "tasks",
+            json.decodeFromString<TasksFile>(read("content/tasks.json")).tasks,
+            issues,
+        ) { it.id }
+        val finales = associateByUniqueId(
+            "finales",
+            json.decodeFromString<FinalesFile>(read("content/finales.json")).finales,
+            issues,
+        ) { it.id }
+        // Lessons stay a list; ContentValidator reports duplicate lesson ids itself.
         val lessons = json.decodeFromString<LessonsFile>(read("content/lessons.json")).lessons
             .sortedBy { it.index }
+        if (issues.isNotEmpty()) throw ContentValidationException(issues)
         return ContentPack(manifest, atoms, sentences, tasks, finales, lessons)
+    }
+
+    private fun <T> associateByUniqueId(
+        what: String,
+        items: List<T>,
+        issues: MutableList<ValidationIssue>,
+        id: (T) -> String,
+    ): Map<String, T> {
+        items.groupingBy(id).eachCount().filterValues { it > 1 }.keys.forEach { duplicate ->
+            issues += ValidationIssue("$what holds duplicate id $duplicate")
+        }
+        return items.associateBy(id)
     }
 
     private fun read(path: String): String =

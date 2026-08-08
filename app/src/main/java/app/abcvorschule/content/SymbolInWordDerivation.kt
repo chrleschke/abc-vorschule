@@ -50,6 +50,10 @@ object SymbolInWordDerivation {
             .flatMap { it.rounds }
             .distinctBy { it.targetAtomId }
 
+        // Resolve the grapheme table once per lesson — it only depends on the
+        // lesson index, and rebuilding it per word walks the whole pack each time.
+        val graphemeTable = WordGraphemes.table(pack, lesson.index)
+
         val rounds = mutableListOf<SymbolInWordRound>()
         var focusCursor = 0
         words.forEach { word ->
@@ -62,7 +66,7 @@ object SymbolInWordDerivation {
             // zerlegt. Der Wort-Bauer darf eine Silbe weiterhin bauen; nur gejagt
             // wird darin nicht.
             if (wordAtom.kind == AtomKind.syllable) return@forEach
-            val graphemes = WordGraphemes.split(pack, lesson.index, wordAtom.display)
+            val graphemes = WordGraphemes.split(wordAtom.display, graphemeTable)
             if (graphemes.size < MinSegments) return@forEach
 
             // The index that drives alternation counts *produced* rounds, not words
@@ -166,10 +170,17 @@ object SymbolInWordDerivation {
             ?: syllableBlocks.first()
         val target = pack.atom(targetBlock.atomId)
         val segments = word.blocks.map { it.display }
-        // Match by atomId, not by display text: a repeated syllable can appear as
-        // two differently-cased blocks of the same atom ("Mi"/"mi" in "Mimi"), and
-        // atomId is the authoritative link from a block to its atom.
-        val hits = word.blocks.indices.filter { word.blocks[it].atomId == targetBlock.atomId }
+        // Match by atomId *plus* the same display agreement that qualified the
+        // target: a repeated syllable can appear as two differently-cased blocks of
+        // the same atom ("Mi"/"mi" in "Mimi"), so plain display equality would be
+        // too narrow — but a block whose text disagrees with the atom beyond casing
+        // (the l17 "Spin"/`spi` shape) does not read as the announced label and
+        // must not count as a hit of it either.
+        val hits = word.blocks.indices.filter { index ->
+            val block = word.blocks[index]
+            block.atomId == targetBlock.atomId &&
+                block.display.equals(target.display, ignoreCase = true)
+        }
         val template = if (hits.size > 1) PromptSyllableMany else PromptSyllableOne
         return Built(
             SymbolInWordRound(

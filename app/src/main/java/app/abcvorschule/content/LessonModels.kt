@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class LessonStatus {
-    /** Fully authored: six trainer types in non-decreasing rank, playable. */
+    /** Fully authored: seven trainer types in non-decreasing rank, playable. */
     authored,
 
     /** Declared in the Fibel order, content still to come. Shown locked on the path. */

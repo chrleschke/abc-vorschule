@@ -4,6 +4,8 @@
     <string name="continue_label">Weiter</string>
     <string name="reward_title">Super gemacht!</string>
     <string name="parent_title">Eltern</string>
+    <!-- TalkBack-Label des Parent-Gates: erklärt Erwachsenen die Long-Press-Geste. -->
+    <string name="parent_gate_description">Eltern-Einstellungen, lange drücken zum Öffnen</string>
     <string name="parent_section_difficulty">Hilfestufe</string>
     <string name="parent_unlock_all">Reihenfolge frei wählbar</string>
     <string name="mode_auto">Auto</string>

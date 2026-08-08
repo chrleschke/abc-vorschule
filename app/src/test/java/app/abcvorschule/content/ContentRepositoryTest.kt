@@ -1,5 +1,7 @@
 package app.abcvorschule.content
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -66,6 +68,34 @@ class ContentRepositoryTest {
                 assertTrue(pack.atom(round.iconAtomId).emoji.isNotBlank())
             }
         }
+    }
+
+    @Test
+    fun duplicateIdsFailParsingInsteadOfSilentlyKeepingTheLastOne() {
+        // `associateBy` is last-wins: without the parse-time check a duplicated id
+        // would shadow its first definition and the validator could never see it.
+        val json = Json { ignoreUnknownKeys = true }
+        val classLoader = Thread.currentThread().contextClassLoader!!
+        val shippedAtoms = json.decodeFromString<AtomsFile>(
+            classLoader.getResourceAsStream("content/atoms.json")!!
+                .bufferedReader().use { it.readText() },
+        ).atoms
+        val doubledId = shippedAtoms.first().id
+        val doubled = json.encodeToString(AtomsFile(shippedAtoms + shippedAtoms.first()))
+        val repository = ContentRepository { path ->
+            if (path == "content/atoms.json") {
+                doubled.byteInputStream()
+            } else {
+                classLoader.getResourceAsStream(path) ?: error("Missing classpath resource: $path")
+            }
+        }
+        val failure = runCatching { repository.load() }.exceptionOrNull()
+        assertTrue("expected ContentValidationException, got $failure", failure is ContentValidationException)
+        val messages = (failure as ContentValidationException).issues.map { it.message }
+        assertTrue(
+            messages.toString(),
+            messages.any { it.contains("duplicate id") && it.contains(doubledId) && it.contains("atoms") },
+        )
     }
 
     @Test

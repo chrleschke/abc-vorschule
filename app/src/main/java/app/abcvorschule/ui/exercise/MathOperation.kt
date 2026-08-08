@@ -31,4 +31,13 @@ object QuantityRepresentation {
      * round-wide mode; it is not a per-number check.
      */
     fun forceSymbolicFor(left: Int, right: Int): Boolean = isSymbolic(left) || isSymbolic(right)
+
+    /**
+     * Same rule for the answer tiles: if any of the three choices is symbolic,
+     * all three render symbolic. Otherwise a round like "5 + 5" (choices 9/10/11)
+     * would put a single icon + numeral next to two emoji clusters — unequal
+     * tiles that leak the answer's magnitude (§8: gleiche Dimensionen).
+     */
+    fun forceSymbolicForChoices(left: Int, right: Int, choices: List<Int>): Boolean =
+        forceSymbolicFor(left, right) || choices.any { isSymbolic(it) }
 }

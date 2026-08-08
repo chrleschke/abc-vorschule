@@ -82,6 +82,72 @@ class WordFrameSizingTest {
         assertEquals(WordFrameSizing.MaxGlyphSp, huge, 0.01f)
     }
 
+    // --- glyphs must fit their frame at every system font scale -----------------
+
+    /** Rendered advance of the longest block inside one frame, in dp. */
+    private fun renderedGlyphWidth(glyphSp: Float, chars: Int, scale: Float): Float =
+        glyphSp * scale * WordFrameSizing.GlyphAspect * chars
+
+    @Test
+    fun theRenderedGlyphFitsItsFittedFrameAtEveryFontScale() {
+        // The live regression this pins: the one-word Satz-Architekt rendered its
+        // "Mama" silhouette as "Mam" at font_scale 1.3, because glyphSp ignored the
+        // scale and the MinGlyphSp floor overflowed the fixed frame width.
+        // Shapes: 4-char one-word peg ("Mama"), 2-char Wort-Bauer block ("Hä"),
+        // 1-char block — each against every real device stage width.
+        val shapes = listOf(1 to 4, 5 to 2, 5 to 1, 2 to 3)
+        listOf(1f, 1.3f, 2f).forEach { scale ->
+            (deviceStageWidths + stageWidth).forEach { available ->
+                shapes.forEach { (frames, chars) ->
+                    val share = WordFrameSizing.frameWidthDp(available, frames)
+                    val glyph = WordFrameSizing.glyphSp(share, chars, scale)
+                    val fitted = WordFrameSizing.fittedFrameWidthDp(share, glyph, chars, scale)
+                    assertTrue(
+                        "$chars chars in $frames frames at scale $scale on ${available}dp: " +
+                            "${renderedGlyphWidth(glyph, chars, scale)}dp glyph in ${fitted}dp frame",
+                        renderedGlyphWidth(glyph, chars, scale) <=
+                            fitted - 2 * WordFrameSizing.FramePaddingDp + 0.01f,
+                    )
+                    assertTrue(
+                        "frame must stay hittable",
+                        fitted >= WordFrameSizing.MinFrameDp,
+                    )
+                    assertTrue("glyph must stay legible", glyph >= WordFrameSizing.MinGlyphSp)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun theFittedFrameOnlyWidensWhenTheLegibilityFloorWins() {
+        // Comfortable case: glyph was solved against the share, frame unchanged.
+        val share = WordFrameSizing.frameWidthDp(stageWidth, 2)
+        val glyph = WordFrameSizing.glyphSp(share, 1, 1f)
+        assertEquals(
+            share,
+            WordFrameSizing.fittedFrameWidthDp(share, glyph, 1, 1f),
+            0.01f,
+        )
+        // Floor case: "Mama" in one 84dp peg at scale 1.3 — 20sp floor renders
+        // ~75dp of glyph, so the frame must widen past the share instead of clipping.
+        val floored = WordFrameSizing.glyphSp(WordFrameSizing.MaxFrameDp, 4, 1.3f)
+        assertEquals(WordFrameSizing.MinGlyphSp, floored, 0.01f)
+        assertTrue(
+            WordFrameSizing.fittedFrameWidthDp(WordFrameSizing.MaxFrameDp, floored, 4, 1.3f) >
+                WordFrameSizing.MaxFrameDp,
+        )
+    }
+
+    @Test
+    fun glyphSpKeepsItsPreScaleValuesAtFontScaleOne() {
+        // fontScale defaults to 1f, so every existing call site keeps its numbers.
+        assertEquals(
+            WordFrameSizing.glyphSp(WordFrameSizing.MaxFrameDp, 2),
+            WordFrameSizing.glyphSp(WordFrameSizing.MaxFrameDp, 2, 1f),
+            0.001f,
+        )
+    }
+
     // --- row wrapping for long words ----------------------------------------
     // Reuses the `stageWidth` (396dp usable stage width) declared above.
 

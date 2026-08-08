@@ -59,6 +59,9 @@ object ContentValidator {
         }
 
         pack.atoms.values.forEach { atom ->
+            if (atom.display.isBlank()) {
+                issues += ValidationIssue("atom ${atom.id} has a blank display")
+            }
             atom.strokes.forEachIndexed { i, stroke ->
                 if (stroke.points.size < 2) {
                     issues += ValidationIssue("atom ${atom.id} stroke $i needs at least 2 points")
@@ -144,7 +147,12 @@ object ContentValidator {
                             "task $id needs at least $MinSoundPositionRounds rounds to be failable",
                         )
                     }
-                    spec.rounds.forEach { requireAtom("task $id", it.atomId) }
+                    spec.rounds.forEach { round ->
+                        requireAtom("task $id", round.atomId)
+                        if (round.missTts.isBlank()) {
+                            issues += ValidationIssue("task $id has a round without missTts")
+                        }
+                    }
                 }
                 is LetterTraceSpec -> spec.rounds.forEach { round ->
                     requireAtom("task $id", round.atomId)
@@ -155,11 +163,20 @@ object ContentValidator {
                     if (round.glyph.isBlank()) {
                         issues += ValidationIssue("task $id has a trace round without a glyph")
                     }
+                    if (round.rewardTts.isBlank()) {
+                        issues += ValidationIssue("task $id has a trace round without rewardTts")
+                    }
+                    if (round.rewardEmoji.isBlank()) {
+                        issues += ValidationIssue("task $id has a trace round without a rewardEmoji")
+                    }
                 }
                 is SyllableMergeSpec -> spec.rounds.forEach { round ->
                     requireAtom("task $id", round.leftAtomId)
                     requireAtom("task $id", round.rightAtomId)
                     requireAtom("task $id", round.resultAtomId)
+                    if (round.stretchTts.isBlank()) {
+                        issues += ValidationIssue("task $id has a merge round without stretchTts")
+                    }
                     val spelled = round.leftDisplay + round.rightDisplay
                     val expected = pack.atoms[round.resultAtomId]?.display
                     if (expected != null && !spelled.equals(expected, ignoreCase = true)) {
@@ -222,6 +239,18 @@ object ContentValidator {
                         if (sentence != null && holistic !in sentence.atomIds) {
                             issues += ValidationIssue(
                                 "task $id marks $holistic holistic but the sentence does not use it",
+                            )
+                        }
+                    }
+                    // Same rule as word_build: a distractor that reads like a word of
+                    // the sentence makes the "wrong" tile indistinguishable from a
+                    // right one.
+                    if (sentence != null) {
+                        val duplicate = round.distractors.map { it.display }
+                            .intersect(pack.sentenceWords(sentence).toSet())
+                        if (duplicate.isNotEmpty()) {
+                            issues += ValidationIssue(
+                                "task $id distractors duplicate sentence words $duplicate",
                             )
                         }
                     }
@@ -325,8 +354,17 @@ object ContentValidator {
                         )
                     }
                 }
-                is SymbolHuntSpec -> Unit // synthetic-only; never appears in authored content
-                is SymbolInWordSpec -> Unit // synthetic-only; never appears in authored content
+                // Derived trainers are synthesized at runtime (SymbolHuntInsertion,
+                // SymbolInWordInsertion) and must never be authored — a spec of
+                // either kind inside the pack is itself the defect.
+                is SymbolHuntSpec ->
+                    issues += ValidationIssue(
+                        "task $id is a derived trainer (${spec.kind}) and must not appear in authored content",
+                    )
+                is SymbolInWordSpec ->
+                    issues += ValidationIssue(
+                        "task $id is a derived trainer (${spec.kind}) and must not appear in authored content",
+                    )
             }
         }
 
@@ -343,10 +381,20 @@ object ContentValidator {
             when (lesson.status) {
                 LessonStatus.authored -> {
                     val kinds = lesson.taskIds.mapNotNull { pack.tasks[it]?.kind }
-                    val ranks = kinds.map { TrainerRank.getValue(it) }
+                    // Derived trainers (Jagd, Wort-Detektiv) exist only at runtime and
+                    // have no rank in TrainerOrder — report them as an issue instead of
+                    // crashing on getValue, and judge the sequence over the rest so all
+                    // remaining issues still get collected.
+                    val (authoredKinds, derivedKinds) = kinds.partition { it in TrainerRank }
+                    derivedKinds.distinct().forEach { kind ->
+                        issues += ValidationIssue(
+                            "authored lesson ${lesson.id} must not hold derived trainer $kind",
+                        )
+                    }
+                    val ranks = authoredKinds.map { TrainerRank.getValue(it) }
                     val monotonic = ranks.zipWithNext().all { (a, b) -> a <= b }
-                    val startsAndEndsRight = kinds.firstOrNull() == TrainerKind.sound_position &&
-                        kinds.lastOrNull() == TrainerKind.count_add
+                    val startsAndEndsRight = authoredKinds.firstOrNull() == TrainerKind.sound_position &&
+                        authoredKinds.lastOrNull() == TrainerKind.count_add
                     if (!monotonic || !startsAndEndsRight) {
                         issues += ValidationIssue(
                             "authored lesson ${lesson.id} must hold trainer kinds in " +

@@ -32,6 +32,11 @@ Bei Konflikten mit Implementierungsdetails oder älteren Planabschnitten gelten 
 Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede Lektion führt die sieben Trainer-**Typen** unten in fester Rangfolge durch — ein Typ kann sich wiederholen oder ganz fehlen (z. B. keine Satzrunde in einer Lektion), die Reihenfolge geht aber nie zurück; jede Lektion beginnt mit dem Auditiven Finder und endet mit Rechnen:
 
 1. **Auditiver Finder** — Laut im gesprochenen Wort verorten (Lok mit Anfang/Mitte/Ende-Waggon). Der gesuchte Laut steht groß über dem Zug; darunter zeigt das Bildwort seine Graphemgruppen in den drei Waggonfarben.
+   **Derzeit pausiert** (`PausedTrainerKinds` in `TaskSpecs.kt`): das Anfang/Mitte/Ende-Konzept
+   überforderte junge Tester, und das Scoring ist bei Wörtern mit wiederholtem Phonem mehrdeutig
+   („Erdbeere"). Content und Code bleiben unangetastet im Repo; eine Session überspringt den Typ
+   einfach und beginnt zur Laufzeit mit dem Spurensucher. Die Rangfolge unten beschreibt weiterhin
+   den autorierten Content.
 2. **Visueller Spurensucher** — Graphem nachzeichnen („Zeichne das große T nach …"), gelbe Sterne in
   Strichreihenfolge sammeln. Nur der aktive Balken zeigt leuchtende Sterne, kommende Balken blass;
   eingesammelte Sterne verschwinden. Der aktive Balken liegt zuoberst und alle Sterne liegen über
@@ -289,7 +294,7 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 
 ## 9. Layout-Grundform der Übungen
 
-- **Chrome oben:** Parent-Gate · Punkte · Speaker; darunter zentriert Zurück/Weiter-Chevrons; darunter Status-/Fortschrittsbalken.
+- **Chrome oben:** Parent-Gate · Punkte · Schließen; darunter zentriert Zurück/Weiter-Chevrons; darunter Status-/Fortschrittsbalken. Der Speaker sitzt nicht im Chrome, sondern gemäß §7 im Aufgabenbereich.
 - **Prompt/Aufgabe:** oberer Block, zentriert, mit Luft zu den Rändern (kein Kleben am Screenrand).
 - **Antworten:** unterer Block, zentriert (Kacheln, Mengenwahl, Ziffernblock).
 - Keine doppelte Aufgabe+Vorschau desselben Tokens.
@@ -326,6 +331,9 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
   `LeafGreenLight`/`SkyBlueLight` sind helle Ring-Varianten ausschließlich für Akzente AUF
   dunklen Flächen (Holzschilder auf dem Pfad) — nie als Fläche oder Akzent auf Cream.
   Eine Bedeutung pro Farbe — Sterne und Progress greifen nie auf `primary` zu.
+  Benannte Ausnahme: die **warm gelaufenen Trittspuren** des Pfades nutzen ein transparentes
+  StarGold (§5 verlangt „wärmer", und ein kaltes SkyBlue widerspräche dem) — das ist eine
+  Landschafts-Färbung, kein Präzedenzfall für „Gold = Fortschritt" im UI-Chrome.
 - Haptik-Vokabular `AbcHaptics` (tick/success/celebrate/nudge): tick = kleiner Sammel-Erfolg
   (Trace-Stern, Jagd-Treffer, Einrasten), success = Aufgabe richtig, celebrate = Lektions-/
   Batterie-Feier, nudge = sanfte Korrektur. Haptik ergänzt Ton, ersetzt ihn nie.

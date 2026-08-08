@@ -17,7 +17,7 @@ class DragFieldStateTest {
         state.putCard("card", Rect(0f, 0f, 50f, 50f))
         state.putZone("zoneA", zoneA)
         state.startDrag("card")
-        state.drag(Offset(40f, 0f))
+        state.drag("card", Offset(40f, 0f))
 
         assertEquals("zoneA", state.endDrag("card"))
     }
@@ -28,7 +28,7 @@ class DragFieldStateTest {
         state.putCard("card", Rect(0f, 0f, 50f, 50f))
         state.putZone("zoneB", zoneB)
         state.startDrag("card")
-        state.drag(Offset(40f, 0f))
+        state.drag("card", Offset(40f, 0f))
 
         assertNull(state.endDrag("card"))
     }
@@ -40,7 +40,7 @@ class DragFieldStateTest {
         state.putCard("card", Rect(0f, 0f, 50f, 50f))
         state.putZone("zoneA", zoneA)
         state.startDrag("card")
-        state.drag(Offset(DragHitTest.MinCommitPx, 0f))
+        state.drag("card", Offset(DragHitTest.MinCommitPx, 0f))
 
         assertNull(state.endDrag("card"))
     }
@@ -51,7 +51,7 @@ class DragFieldStateTest {
         state.putCard("card", Rect(0f, 0f, 50f, 50f))
         state.putZone("zoneA", zoneA)
         state.startDrag("card")
-        state.drag(Offset(40f, 0f))
+        state.drag("card", Offset(40f, 0f))
         state.endDrag("card")
 
         assertNull(state.draggingKey)
@@ -64,7 +64,7 @@ class DragFieldStateTest {
         state.putCard("card", Rect(0f, 0f, 50f, 50f))
         state.putZone("zoneB", zoneB)
         state.startDrag("card")
-        state.drag(Offset(40f, 0f))
+        state.drag("card", Offset(40f, 0f))
         state.endDrag("card")
 
         assertNull(state.draggingKey)
@@ -77,7 +77,7 @@ class DragFieldStateTest {
         state.putCard("card", Rect(0f, 0f, 50f, 50f))
         state.putZone("zoneA", zoneA)
         state.startDrag("card")
-        state.drag(Offset(1f, 0f))
+        state.drag("card", Offset(1f, 0f))
         state.endDrag("card")
 
         assertNull(state.draggingKey)
@@ -90,7 +90,7 @@ class DragFieldStateTest {
         state.putCard("card", Rect(0f, 0f, 50f, 50f))
         state.putZone("zoneB", zoneB)
         state.startDrag("card")
-        state.drag(Offset(40f, 0f))
+        state.drag("card", Offset(40f, 0f))
         state.endDrag("card") // misses, snaps back
 
         // A fresh gesture on the same card must start from a clean offset.
@@ -103,7 +103,7 @@ class DragFieldStateTest {
         val state = DragFieldState()
         state.putCard("card", Rect(0f, 0f, 50f, 50f))
         state.startDrag("card")
-        state.drag(Offset(15f, 15f))
+        state.drag("card", Offset(15f, 15f))
         assertTrue(state.dragOffset != Offset.Zero)
 
         state.startDrag("card")
@@ -131,7 +131,7 @@ class DragFieldStateTest {
         state.putZone("zoneA", zoneA)
         state.select("card")
         state.startDrag("card")
-        state.drag(Offset(40f, 0f))
+        state.drag("card", Offset(40f, 0f))
 
         state.reset()
 
@@ -143,7 +143,7 @@ class DragFieldStateTest {
         // zoneA now resolves to nothing because the zone is gone.
         state.putCard("card", Rect(0f, 0f, 50f, 50f))
         state.startDrag("card")
-        state.drag(Offset(40f, 0f))
+        state.drag("card", Offset(40f, 0f))
         assertNull(state.endDrag("card"))
     }
 
@@ -156,13 +156,13 @@ class DragFieldStateTest {
         state.putZone("zoneA", zoneA)
         state.putZone("zoneB", zoneB)
         state.startDrag("card")
-        state.drag(Offset(100f, 0f))
+        state.drag("card", Offset(100f, 0f))
         assertEquals("zoneB", state.endDrag("card"))
 
         state.removeZone("zoneB")
 
         state.startDrag("card")
-        state.drag(Offset(100f, 0f))
+        state.drag("card", Offset(100f, 0f))
         // Same bounds, but zoneB is gone: the drop must now resolve to zoneA, never zoneB.
         assertEquals("zoneA", state.endDrag("card"))
     }
@@ -173,7 +173,7 @@ class DragFieldStateTest {
         state.putCard("card", Rect(0f, 0f, 50f, 50f))
         state.putZone("zoneA", zoneA)
         state.startDrag("card")
-        state.drag(Offset(40f, 0f))
+        state.drag("card", Offset(40f, 0f))
 
         state.removeCard("card")
 

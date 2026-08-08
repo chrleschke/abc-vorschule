@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
@@ -91,11 +92,18 @@ fun NumberPad(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        // Breite aus der effektiven Textgröße statt fester 140dp: bei großer
+        // System-Schriftskalierung passte die Antwort sonst nicht mehr ins Feld
+        // (Rechnung in NumberPadInput.fieldWidthDp).
+        val fieldWidth = NumberPadInput.fieldWidthDp(
+            textSp = MaterialTheme.typography.displayLarge.fontSize.value,
+            fontScale = LocalDensity.current.fontScale,
+        )
         OutlinedTextField(
             value = value,
             onValueChange = { input -> value = NumberPadInput.sanitize(input) },
             modifier = Modifier
-                .width(140.dp)
+                .width(fieldWidth.dp)
                 .focusRequester(focusRequester)
                 .testTag("number_input"),
             textStyle = MaterialTheme.typography.displayLarge.copy(textAlign = TextAlign.Center),

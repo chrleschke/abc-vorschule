@@ -11,7 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onLongClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import app.abcvorschule.R
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
@@ -24,12 +31,25 @@ fun ParentGateButton(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalAbcHaptics.current
+    val gateDescription = stringResource(R.string.parent_gate_description)
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = MaterialTheme.shapes.medium,
         modifier = modifier
             .size(48.dp)
             .testTag("parent_gate")
+            // Der rohe pointerInput ist für TalkBack unsichtbar; die Semantik macht
+            // die einzige Einstellungstür (§6) als Button mit Long-Click-Aktion
+            // bedienbar, ohne die Kindersicherung (langer Druck) aufzuweichen.
+            .semantics {
+                role = Role.Button
+                contentDescription = gateDescription
+                onLongClick {
+                    haptics.tick()
+                    onUnlocked()
+                    true
+                }
+            }
             .pointerInput(onUnlocked) {
                 detectTapGestures(
                     onPress = {
@@ -39,8 +59,9 @@ fun ParentGateButton(
                             }
                         } catch (_: TimeoutCancellationException) {
                             // Long-press threshold reached: confirm the gesture landed
-                            // before the gate unlocks.
-                            haptics.nudge()
+                            // before the gate unlocks. tick = Einrasten (§10), keine
+                            // Korrektur — nudge wäre das falsche Vokabular.
+                            haptics.tick()
                             onUnlocked()
                             tryAwaitRelease()
                         }

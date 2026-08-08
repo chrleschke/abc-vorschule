@@ -94,8 +94,9 @@ data class SessionUiState(
     val sessionPoints: Int = 0,
     /**
      * Das Finale der abgeschlossenen Lektion — gesetzt **nur** beim echten Abschluss.
-     * Ein Abbruch mit Punkten zeigt dieselbe Route, aber ohne Satz: der Satz belohnt
-     * Durchhalten und nutzt sich sonst ab (PRODUCT_PRINCIPLES.md Abschnitt 5).
+     * Bleibt es null, greift die schlanke End-Screen-Variante — ein Defensivpfad für
+     * nicht auflösbare Finales; Abbrüche gehen direkt zum Pfad und erreichen den
+     * End-Screen nie (PRODUCT_PRINCIPLES.md Abschnitt 5).
      */
     val completedFinaleId: String? = null,
     val ready: Boolean = false,
@@ -122,7 +123,7 @@ data class SessionUiState(
     /** Spoken-only miss/hint text — never rendered as chrome. */
     val speakCue: String? = null,
     val successPhase: SuccessPhase = SuccessPhase.Idle,
-    /** Ordered success speech — answer first, praise second for Rechnen. */
+    /** Ordered success speech — praise first, answer last for Rechnen (§7: die Menge bleibt das Letzte). */
     val successSpeakParts: List<String> = emptyList(),
     val error: String? = null,
 ) {

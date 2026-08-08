@@ -33,12 +33,13 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.Atom
@@ -201,6 +202,14 @@ fun LetterTraceTrainer(
                                     done = true
                                 }
                             },
+                            onDragFinished = {
+                                // The bridge only spans samples of ONE drag. Without
+                                // this reset, lifting the finger and re-planting it
+                                // further along bridges the untraced gap and collects
+                                // the next star — exactly what the ahead-gate exists
+                                // to prevent.
+                                lastFinger = null
+                            },
                             modifier = Modifier
                                 .size(GlyphBox)
                                 .testTag("trace_canvas_${atom.id}"),
@@ -269,12 +278,12 @@ private data class TraceLayout(
     val stars: List<List<TracePoint>>,
 )
 
-private fun buildTraceLayout(atom: Atom, boxSize: Float): TraceLayout {
+private fun buildTraceLayout(atom: Atom, boxSize: Float, origin: TracePoint): TraceLayout {
     val fit = TraceProgress.fitFor(atom.lemma)
     val strokes = TraceGeometry.toPixels(
         strokes = atom.strokes,
         boxSize = boxSize,
-        origin = TracePoint(0f, 0f),
+        origin = origin,
         heightScale = fit.heightScale,
     )
     val stars = strokes.map {
@@ -295,14 +304,31 @@ private fun TraceCanvas(
         strokes: List<List<TracePoint>>,
         stars: List<List<TracePoint>>,
     ) -> Unit,
+    onDragFinished: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val density = LocalDensity.current
-    // The glyph box is a fixed dp size, so its pixel size is known up front —
-    // computed once and shared by both the gesture handler and the draw scope,
-    // instead of each recomputing strokes/stars from their own size source.
-    val boxSizePx = remember(density) { with(density) { GlyphBox.toPx() } }
-    val layout = remember(atom.id, atom.lemma, boxSizePx) { buildTraceLayout(atom, boxSizePx) }
+    // The glyph box *requests* GlyphBox dp, but narrow screens squeeze it (360dp
+    // device minus shell/stage padding leaves ~296dp). Geometry and hit-testing
+    // must follow the measured size, not the requested one — otherwise strokes
+    // near the right edge are drawn outside the canvas and their start points sit
+    // in a dead zone the pointerInput never sees (letter-ch/-sch/-y).
+    var measured by remember { mutableStateOf(IntSize.Zero) }
+    val boxSizePx = minOf(measured.width, measured.height).toFloat()
+    val layout = remember(atom.id, atom.lemma, boxSizePx, measured) {
+        if (boxSizePx <= 0f) {
+            null
+        } else {
+            buildTraceLayout(
+                atom = atom,
+                boxSize = boxSizePx,
+                // Center the (square) glyph box inside the possibly non-square canvas.
+                origin = TracePoint(
+                    (measured.width - boxSizePx) / 2f,
+                    (measured.height - boxSizePx) / 2f,
+                ),
+            )
+        }
+    }
 
     // One animation for the whole glyph instead of one per stroke: animating the
     // stroke *index* keeps the number of animation calls independent of how many
@@ -315,41 +341,50 @@ private fun TraceCanvas(
 
     Canvas(
         modifier = modifier
-            .pointerInput(atom.id) {
+            .onSizeChanged { measured = it }
+            // Keyed on the layout, not just the atom: a size/density change rebuilds
+            // the strokes, and a gesture block holding the old layout would hit-test
+            // against pixels the canvas no longer draws.
+            .pointerInput(atom.id, layout) {
                 detectDragGestures(
                     onDrag = { change, _ ->
                         change.consume()
+                        val current = layout ?: return@detectDragGestures
                         onFinger(
                             TracePoint(change.position.x, change.position.y),
-                            layout.boxSize,
-                            layout.corridorFraction,
-                            layout.strokes,
-                            layout.stars,
+                            current.boxSize,
+                            current.corridorFraction,
+                            current.strokes,
+                            current.stars,
                         )
                     },
+                    onDragEnd = { onDragFinished() },
+                    onDragCancel = { onDragFinished() },
                 )
             }
             // Tap alternative to the drag (R15): a child who taps instead of dragging
             // must still make progress. Each tap collects exactly the next expected
             // star, so repeated taps trace the glyph in stroke order. Keyed on `state`
             // so a fresh gesture recognizer always sees the current stroke/star index.
-            .pointerInput(atom.id, state) {
+            .pointerInput(atom.id, state, layout) {
                 detectTapGestures(
                     onTap = {
-                        val target = layout.stars.getOrNull(state.strokeIndex)
+                        val current = layout ?: return@detectTapGestures
+                        val target = current.stars.getOrNull(state.strokeIndex)
                             ?.getOrNull(state.starIndex)
                             ?: return@detectTapGestures
                         onFinger(
                             target,
-                            layout.boxSize,
-                            layout.corridorFraction,
-                            layout.strokes,
-                            layout.stars,
+                            current.boxSize,
+                            current.corridorFraction,
+                            current.strokes,
+                            current.stars,
                         )
                     },
                 )
             },
     ) {
+        val layout = layout ?: return@Canvas
         val corridor = layout.boxSize * layout.corridorFraction
         // Keep the red vehicle and stars in proportion to the (possibly thinner) road.
         val chromeScale = layout.corridorFraction / TraceProgress.CorridorFraction

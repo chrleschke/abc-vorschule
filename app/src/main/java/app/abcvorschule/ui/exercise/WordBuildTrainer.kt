@@ -20,17 +20,18 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,9 +51,9 @@ import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
-import kotlinx.coroutines.launch
 
 object WordBuildTray {
     /** Preschoolers must be able to scan the whole tray at a glance. */
@@ -120,7 +121,18 @@ fun WordBuildTrainer(
     }
     val tiles = WordBuildTray.tiles(round, placed.values.toList(), seed = round.targetAtomId.hashCode())
     val haptics = LocalAbcHaptics.current
-    val scope = rememberCoroutineScope()
+    // Der letzte Baustein spricht erst zu Ende, dann kommt der Erfolg. Das läuft
+    // in einem LaunchedEffect mit roundKey statt in scope.launch: ein Chevron-Tap
+    // während der Ansage wechselt die Runde, und eine scope-Coroutine überlebte
+    // das — SpeechController.stop() completet ihre Waiter, und das verspätete
+    // onResult(true) würde der NEUEN Runde gutgeschrieben.
+    var finalBlockSpeech by remember(roundKey) { mutableStateOf<String?>(null) }
+    LaunchedEffect(roundKey, finalBlockSpeech) {
+        val speech = finalBlockSpeech ?: return@LaunchedEffect
+        onSpeakAndAwait(speech)
+        completed = true
+        onResult(true, false, scoredIds)
+    }
     val interactionOpacity by animateFloatAsState(
         targetValue = if (interactionLocked) 0.5f else 1f,
         animationSpec = tween(durationMillis = 200),
@@ -144,11 +156,8 @@ fun WordBuildTrainer(
                 )
             ) {
                 WordBuildPlacementSpeech.BlockSpeechMode.Immediate -> onSpeak(blockSpeech)
-                WordBuildPlacementSpeech.BlockSpeechMode.AwaitBeforeSuccess -> scope.launch {
-                    onSpeakAndAwait(blockSpeech)
-                    completed = true
-                    onResult(true, false, scoredIds)
-                }
+                WordBuildPlacementSpeech.BlockSpeechMode.AwaitBeforeSuccess ->
+                    finalBlockSpeech = blockSpeech
             }
         } else {
             misses += 1
@@ -169,12 +178,17 @@ fun WordBuildTrainer(
             )
             Text(text = target.emoji, fontSize = 84.sp)
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                val frameWidth = WordFrameSizing.frameWidthDp(maxWidth.value, solution.size)
+                val fontScale = LocalDensity.current.fontScale
+                val longest = solution.maxOfOrNull { it.length } ?: 1
+                val shareWidth = WordFrameSizing.frameWidthDp(maxWidth.value, solution.size)
                 val gap = WordFrameSizing.gapDp(maxWidth.value, solution.size)
-                val glyphSp = WordFrameSizing.glyphSp(
-                    frameWidth,
-                    solution.maxOfOrNull { it.length } ?: 1,
-                )
+                // Mit fontScale, sonst wächst der gerenderte Glyph aus dem festen
+                // Rahmen (live: „Mam" statt „Mama" bei font_scale 1.3); gewinnt
+                // trotzdem der MinGlyphSp-Floor, weitet fittedFrameWidthDp den
+                // Rahmen, statt dass maxLines = 1 den Text clippt.
+                val glyphSp = WordFrameSizing.glyphSp(shareWidth, longest, fontScale)
+                val frameWidth =
+                    WordFrameSizing.fittedFrameWidthDp(shareWidth, glyphSp, longest, fontScale)
                 AnimatedContent(
                     targetState = completed,
                     transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(140)) },
@@ -243,7 +257,11 @@ fun WordBuildTrainer(
                                 )
                                 .alpha(interactionOpacity)
                                 .background(
-                                    color = if (field.selectedKey == key) LeafGreen else CreamElevated,
+                                    // SkyBlue, nicht LeafGreen: die Auswahl ist ein
+                                    // unvalidierter Aktiv-Zustand, kein "richtig" —
+                                    // Grün ist für erledigte Slots reserviert (§10:
+                                    // eine Bedeutung pro Farbe).
+                                    color = if (field.selectedKey == key) SkyBlue else CreamElevated,
                                     shape = RoundedCornerShape(22.dp),
                                 )
                                 .padding(horizontal = 18.dp, vertical = 12.dp)
@@ -252,7 +270,8 @@ fun WordBuildTrainer(
                             Text(
                                 text = block.display,
                                 fontSize = AbcDimens.syllableSp,
-                                // Cream on LeafGreen ~3.57:1 (large glyph, see Color.kt);
+                                // Cream on SkyBlue ~3.88:1 (large glyph; Herleitung wie
+                                // SymbolHuntTrainer's TilePalette, see Color.kt);
                                 // WarmInk on CreamElevated ~8.9:1.
                                 color = if (field.selectedKey == key) Cream else WarmInk,
                             )
@@ -306,7 +325,10 @@ private fun Frame(
             .defaultMinSize(minHeight = frameWidthDp.dp)
             .alpha(opacity)
             .background(
-                color = if (armed) LeafGreen.copy(alpha = 0.22f) else CreamElevated,
+                // SkyBlue-Wash wie die armierte Kachel im Tray: "hier kann die
+                // gewählte Kachel hin" ist ein Aktiv-Signal, kein "richtig" —
+                // LeafGreen bleibt dem gefüllten Slot (§10).
+                color = if (armed) SkyBlue.copy(alpha = 0.22f) else CreamElevated,
                 shape = RoundedCornerShape(22.dp),
             )
             .border(

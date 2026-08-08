@@ -54,6 +54,11 @@ import kotlinx.coroutines.delay
 // at 64dp — comfortably above the design spec's 56dp hit-box floor.
 private val TileSize = AbcDimens.kidTouch
 
+/** Obergrenze des Kachel-Glyphen — die bisherige feste Größe, jetzt nur noch der
+ * Deckel: einzelne Buchstaben auf jeder Kachel bleiben exakt wie gehabt, nur
+ * Mehrzeichen-Symbole („Sch") und große Schriftskalierungen schrumpfen darunter. */
+private const val MaxTileGlyphSp = 28f
+
 // Four, not five: the dark theme's fifth entry (SoftSand, near-white) worked against a
 // dark field but a near-Cream tile on the light field would vanish into the page. Also
 // swaps StarGold for StarGoldDeep — StarGold's own border-solid contrast against Cream
@@ -221,9 +226,19 @@ private fun SymbolHuntField(
                     .testTag("hunt_tile_${tile.instanceId}"),
                 contentAlignment = Alignment.Center,
             ) {
+                val glyph = pack.atoms[tile.atomId]?.display ?: tile.atomId
+                // Aus dem Kacheldurchmesser abgeleitet statt fest 28sp: der Kreis
+                // clippt (siehe .clip oben), also würde ein „Sch" auf der kleinsten
+                // 64dp-Kachel ab font_scale 1.3 angeschnitten (28sp × 1.3 × 0.72 × 3
+                // ≈ 79dp Vorschub). Gleiches dp-Budget-durch-fontScale-Muster wie
+                // WordFrameSizing.wordGlyphSp; GlyphAspect inklusive Headroom von dort.
+                val glyphSp = (
+                    tileDp.value /
+                        (glyph.length.coerceAtLeast(1) * WordFrameSizing.GlyphAspect * density.fontScale)
+                    ).coerceAtMost(MaxTileGlyphSp)
                 Text(
-                    text = pack.atoms[tile.atomId]?.display ?: tile.atomId,
-                    fontSize = 28.sp,
+                    text = glyph,
+                    fontSize = glyphSp.sp,
                     color = WarmInk,
                 )
             }

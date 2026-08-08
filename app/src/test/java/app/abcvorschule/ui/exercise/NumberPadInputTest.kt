@@ -2,6 +2,7 @@ package app.abcvorschule.ui.exercise
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class NumberPadInputTest {
@@ -39,6 +40,41 @@ class NumberPadInputTest {
         assertEquals(
             NumberPadInput.resetToken("r1", 2),
             NumberPadInput.resetToken("r1", 2),
+        )
+    }
+
+    // --- field width vs. system font scale -------------------------------------
+
+    /** displayLarge from ui/theme/Theme.kt — the style the field renders in. */
+    private val displayLargeSp = 40f
+
+    @Test
+    fun theFieldKeepsItsShippedWidthUpToTheTestDeviceScale() {
+        // Nothing may shift at 1.0 or on the font_scale-1.3 test device: the
+        // derived minimum only overtakes the 140dp floor once it actually must.
+        assertEquals(140f, NumberPadInput.fieldWidthDp(displayLargeSp, 1f), 0.01f)
+        assertEquals(140f, NumberPadInput.fieldWidthDp(displayLargeSp, 1.3f), 0.01f)
+    }
+
+    @Test
+    fun theFieldHoldsTheLongestAnswerAtEveryFontScale() {
+        // The regression this pins: the fixed 140dp field could not show two
+        // displayLarge digits at font_scale 2.0, let alone MaxDigits.
+        listOf(1f, 1.3f, 2f).forEach { scale ->
+            val width = NumberPadInput.fieldWidthDp(displayLargeSp, scale)
+            val digits = NumberPadInput.MaxDigits * displayLargeSp * scale * NumberPadInput.DigitAspect
+            assertTrue(
+                "at scale $scale ${digits}dp of digits must fit ${width}dp",
+                digits <= width - NumberPadInput.FieldPaddingDp + 0.01f,
+            )
+        }
+    }
+
+    @Test
+    fun theFieldWidthGrowsMonotonicallyWithTheScale() {
+        assertTrue(
+            NumberPadInput.fieldWidthDp(displayLargeSp, 2f) >
+                NumberPadInput.fieldWidthDp(displayLargeSp, 1.3f) - 0.01f,
         )
     }
 }

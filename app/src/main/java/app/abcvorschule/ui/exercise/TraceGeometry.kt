@@ -417,6 +417,12 @@ object TraceProgress {
     fun isShortStroke(strokeLength: Float, boxSize: Float): Boolean =
         boxSize > 0f && strokeLength < boxSize * ShortStrokeFraction
 
+    /** Arc distance on a closed loop of length [total] — the shorter way around. */
+    private fun circularDistance(a: Float, b: Float, total: Float): Float {
+        val direct = kotlin.math.abs(a - b)
+        return minOf(direct, total - direct)
+    }
+
     fun update(
         state: TraceState,
         finger: TracePoint,
@@ -438,7 +444,19 @@ object TraceProgress {
         val stroke = strokes[state.strokeIndex]
         val corridor = boxSize * corridorFraction
         if (TraceGeometry.distanceToPolyline(finger, stroke) > corridor) {
-            return TraceUpdate(state, collectedStar = false, offCorridor = true, glyphDone = false)
+            // A finger still resting on an already *finished* stroke is not "off the
+            // road" — after a bar hand-off without lifting (T, E, Ei) the finger sits
+            // at the old bar's end, which lies outside the new bar's corridor. That
+            // must behave like `ahead` (no nudge, no off-road count), or every
+            // continuous multi-bar trace collects a phantom correction per hand-off.
+            val onFinishedStroke = strokes.take(state.strokeIndex).any {
+                TraceGeometry.distanceToPolyline(finger, it) <= corridor
+            }
+            return if (onFinishedStroke) {
+                TraceUpdate(state, collectedStar = false, offCorridor = false, glyphDone = false, ahead = true)
+            } else {
+                TraceUpdate(state, collectedStar = false, offCorridor = true, glyphDone = false)
+            }
         }
         stars.getOrNull(state.strokeIndex)?.getOrNull(state.starIndex)
             ?: return TraceUpdate(state, collectedStar = false, offCorridor = false, glyphDone = false)
@@ -448,20 +466,42 @@ object TraceProgress {
         // of the stroke by construction in TraceGeometry.starPositions, which gives the
         // target's arc length without projecting a point that a closed stroke may share
         // with its own start.
-        val targetArc = TraceGeometry.polylineLength(stroke) *
+        val total = TraceGeometry.polylineLength(stroke)
+        val targetArc = total *
             (state.starIndex + 1).toFloat() / stars[state.strokeIndex].size
         val fingerArc = TraceGeometry.arcLengthAt(stroke, finger)
+        // Closed strokes (O, Ö, Qu-Bogen: first == last) make arcLengthAt bistable at
+        // the seam — a finger resting on the start point projects to arc ≈ 0 or ≈ total
+        // depending on 1–2 px of touch jitter. All arc comparisons must therefore be
+        // wrap-aware, or every jitter flip bridges nearly the whole loop and collects
+        // stars the child never traced.
+        val closed = stroke.size > 2 && stroke.first() == stroke.last() && total > 0f
         // Collect by along-path proximity, not Euclidean distance to the star centre.
         // The road is wider than the old point-hit radius, so a finger riding the outer
         // edge of the corridor (legal) used to miss stars that sit on the centreline.
-        val onStar = kotlin.math.abs(fingerArc - targetArc) <= starHit
+        val onStar = if (closed) {
+            circularDistance(fingerArc, targetArc, total) <= starHit
+        } else {
+            kotlin.math.abs(fingerArc - targetArc) <= starHit
+        }
         val crossedStar = previousFinger != null &&
             TraceGeometry.distanceToPolyline(previousFinger, stroke) <= corridor &&
             run {
                 val prevArc = TraceGeometry.arcLengthAt(stroke, previousFinger)
-                val lo = minOf(prevArc, fingerArc)
-                val hi = maxOf(prevArc, fingerArc)
-                lo <= targetArc + starHit && hi >= targetArc - starHit
+                if (closed) {
+                    // The bridge follows the *shorter* arc between the two samples.
+                    // A seam flip (prev ≈ 0, finger ≈ total) spans ~0 and covers
+                    // nothing; the legitimate final crossing (0.97·L → 0.02·L) spans
+                    // 0.05·L and still collects the last star. Same tolerance as the
+                    // open-stroke interval check, expressed circularly.
+                    val span = circularDistance(prevArc, fingerArc, total)
+                    circularDistance(prevArc, targetArc, total) +
+                        circularDistance(targetArc, fingerArc, total) <= span + 2 * starHit
+                } else {
+                    val lo = minOf(prevArc, fingerArc)
+                    val hi = maxOf(prevArc, fingerArc)
+                    lo <= targetArc + starHit && hi >= targetArc - starHit
+                }
             }
         val hit = onStar || crossedStar
         // Ahead of that star the finger marks no progress — the pick-up radius is the only

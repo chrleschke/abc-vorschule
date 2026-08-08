@@ -260,4 +260,65 @@ class TraceProgressTest {
             ).offCorridor,
         )
     }
+
+    // --- Geschlossene Striche (O/Ö/Qu): die Naht macht arcLengthAt bistabil -----
+
+    // Quadratische Schleife, erster Punkt == letzter Punkt, Umfang 400.
+    private val loop = listOf(
+        TracePoint(0f, 0f),
+        TracePoint(100f, 0f),
+        TracePoint(100f, 100f),
+        TracePoint(0f, 100f),
+        TracePoint(0f, 0f),
+    )
+    private val loopStars = listOf(TraceGeometry.starPositions(loop, 4))
+
+    @Test
+    fun seamJitterOnAClosedStrokeCollectsNothing() {
+        // Der Finger ruht am Startpunkt der Schleife; 1–2 px Touch-Jitter lassen
+        // die Projektion zwischen Arc ≈ 0 und Arc ≈ Umfang springen. Die Brücke
+        // folgt dem kürzeren Bogen, überspannt also fast nichts — vor dem Fix
+        // deckte sie die ganze Schleife ab und sammelte jeden Stern von selbst.
+        val onFirstSegment = TracePoint(1f, 0f) // Arc ≈ 1
+        val onLastSegment = TracePoint(0f, 1f) // Arc ≈ 399
+        val result = TraceProgress.update(
+            state = TraceState(),
+            finger = onLastSegment,
+            strokes = listOf(loop),
+            stars = loopStars,
+            boxSize = boxSize,
+            previousFinger = onFirstSegment,
+        )
+        assertFalse(result.collectedStar)
+        assertFalse(result.offCorridor)
+    }
+
+    @Test
+    fun crossingTheSeamAtTheEndOfAClosedStrokeStillCollectsTheLastStar() {
+        // Der letzte Stern sitzt bei Arc = Umfang, also genau auf der Naht. Ein
+        // Finger, der die Schleife zu Ende fährt und knapp über die Naht rutscht,
+        // muss ihn weiterhin einsammeln (kurzer Bogen von 388 nach 4 über 400).
+        val result = TraceProgress.update(
+            state = TraceState(0, 3),
+            finger = TracePoint(4f, 0f),
+            strokes = listOf(loop),
+            stars = loopStars,
+            boxSize = boxSize,
+            previousFinger = TracePoint(0f, 12f),
+        )
+        assertTrue(result.collectedStar)
+        assertTrue(result.glyphDone)
+    }
+
+    @Test
+    fun restingOnAFinishedStrokeAfterAHandOffIsNotOffRoad() {
+        // Nach dem letzten Stern des Querbalkens rückt der Stroke-Index mitten im
+        // Drag weiter; der Finger liegt noch am Ende des fertigen Balkens. Das ist
+        // keine Korrektur wert (kein Nudge, kein Off-Road-Zähler) — der Finger ist
+        // auf der Straße, nur auf der schon gebauten.
+        val result = update(TraceState(1, 0), TracePoint(100f, 0f))
+        assertFalse(result.offCorridor)
+        assertTrue(result.ahead)
+        assertFalse(result.collectedStar)
+    }
 }

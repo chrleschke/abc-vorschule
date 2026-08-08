@@ -173,16 +173,20 @@ fun PathScreen(
                     val headIndex = PathFocus.headIndex(lessons, states, highlightedLessonId)
                     // Starts on the sign the child came back from, so the very first
                     // frame after a finished lesson still shows the old position; the
-                    // effect below then walks it to the new one. Deliberately
-                    // key-less remember: leaving the path disposes this composable, so
-                    // the flag from the session state is the only thing that can carry
-                    // "where we came from" across that gap.
-                    val markerIndex = remember {
-                        Animatable(
-                            (PathFocus.indexOf(lessons, advanceFromLessonId) ?: headIndex)
-                                .coerceAtLeast(0).toFloat(),
-                        )
+                    // effect below then walks it to the new one. A from-lesson AHEAD
+                    // of the head (free-order detour) starts on the head instead —
+                    // see PathFocus.markerStartIndex — so the marker never hops
+                    // backwards. Deliberately key-less remember: leaving the path
+                    // disposes this composable, so the flag from the session state is
+                    // the only thing that can carry "where we came from" across that
+                    // gap.
+                    val markerStartIndex = remember {
+                        PathFocus.markerStartIndex(
+                            fromIndex = PathFocus.indexOf(lessons, advanceFromLessonId),
+                            headIndex = headIndex,
+                        ).coerceAtLeast(0)
                     }
+                    val markerIndex = remember { Animatable(markerStartIndex.toFloat()) }
                     LaunchedEffect(headIndex) {
                         if (headIndex < 0) return@LaunchedEffect
                         val target = headIndex.toFloat()
@@ -203,7 +207,7 @@ fun PathScreen(
                     LaunchedEffect(Unit) {
                         if (advanceFromLessonId != null) onAdvanceAnimated()
                     }
-                    AutoScrollToHead(scrollState, nodePoints, headIndex)
+                    AutoScrollToHead(scrollState, nodePoints, headIndex, markerStartIndex)
 
                     // Walked footprints are warm gold and nearly opaque, the ones
                     // still ahead are a faint warm grey — on a light landscape the
@@ -272,15 +276,27 @@ fun PathScreen(
  * screen for most of the Fibel — 26 signs are some 4400dp of trail — and both the
  * indicator and its hop would happen where nobody is looking.
  *
- * Only ever scrolls when the marker's node changes (or the layout itself did): a
- * child who scrolled ahead to look at the later signs must not be yanked back.
+ * Entering the path with a hop still pending ([hopStartIndex] != [headIndex]) is
+ * special: parking the NEW sign at the anchor puts the OLD sign — the hop's start
+ * — off screen on ordinary phone viewports (see [PathFocus.entryScrollTarget]),
+ * and the hop would show only its landing. So the entry jump lands where the hop's
+ * start is visible, and a second, animated scroll carries the view to the usual
+ * target in step with the hop. Both are the *entry* scroll — after it, this only
+ * ever scrolls when the marker's node changes (or the layout itself did): a child
+ * who scrolled ahead to look at the later signs must not be yanked back.
  */
 @Composable
 private fun AutoScrollToHead(
     scrollState: ScrollState,
     nodePoints: List<PathPoint>,
     headIndex: Int,
+    hopStartIndex: Int,
 ) {
+    // Everything that has to be on screen above the hop's start node: the sign
+    // standing on it plus the marker (with bob) above the sign.
+    val hopHeadroomPx = with(LocalDensity.current) {
+        (PathSignDimens.TotalHeight + PathMarkerDimens.Headroom).toPx()
+    }
     var lastScrolledHead by remember { mutableStateOf<Int?>(null) }
     LaunchedEffect(headIndex, nodePoints) {
         val nodeY = nodePoints.getOrNull(headIndex)?.y ?: return@LaunchedEffect
@@ -289,12 +305,40 @@ private fun AutoScrollToHead(
         // from a zero viewport would park the sign at the very top.
         val viewport = snapshotFlow { scrollState.viewportSize }.first { it > 0 }
         val target = PathFocus.scrollTarget(nodeY, viewport, scrollState.maxValue)
-        // Animated only for an actual move to a new sign, so it reads as following
-        // the hop. Entering the path (or re-laying it out) jumps straight there.
-        if (lastScrolledHead == null || lastScrolledHead == headIndex) {
-            scrollState.scrollTo(target)
-        } else {
-            scrollState.animateScrollTo(target)
+        val hopFromY = nodePoints.getOrNull(hopStartIndex)?.y
+        when {
+            // First scroll with a hop pending: show the hop's start, then follow
+            // the marker down to the new sign. Delay and duration mirror the hop
+            // animation in PathScreen, so pin and viewport travel together.
+            lastScrolledHead == null && hopStartIndex != headIndex && hopFromY != null -> {
+                val entry = PathFocus.entryScrollTarget(
+                    fromNodeY = hopFromY,
+                    headNodeY = nodeY,
+                    hopHeadroom = hopHeadroomPx,
+                    viewportHeight = viewport,
+                    maxScroll = scrollState.maxValue,
+                )
+                scrollState.scrollTo(entry)
+                if (entry != target) {
+                    delay(PathFocus.HopStartDelayMillis)
+                    scrollState.animateScrollTo(
+                        target,
+                        tween(
+                            durationMillis = PathFocus.hopMillis(
+                                hopStartIndex.toFloat(),
+                                headIndex.toFloat(),
+                            ),
+                            easing = FastOutSlowInEasing,
+                        ),
+                    )
+                }
+            }
+            // Animated only for an actual move to a new sign, so it reads as
+            // following the hop. Entering the path without a pending hop (or
+            // re-laying it out) jumps straight there.
+            lastScrolledHead == null || lastScrolledHead == headIndex ->
+                scrollState.scrollTo(target)
+            else -> scrollState.animateScrollTo(target)
         }
         lastScrolledHead = headIndex
     }
