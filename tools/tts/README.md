@@ -103,10 +103,11 @@ Browser lokal.
 gerenderte oder bestätigte Clips aus — nur auf künftige Generierungen. Details dazu und
 warum das Absicht ist: „Profil-Updates und bestätigter Content" unten.
 
-**Mit `phoneme` anfangen.** Das ist Absicht: mit 37 Clips ist es das kleinste Profil und
-zugleich das riskanteste — gefragt ist der *Lautwert*, nicht der Buchstabenname („mmmmm",
-nicht „Em"). Klappt das per Instruktion nicht, greift die Aussprache-Eingabe als
-Notausgang. Das weiß man dann nach ein paar Minuten und nicht nach 25–40 Minuten Rendern.
+**Mit `phoneme` anfangen.** Das ist Absicht: mit 80 Clips ist es überschaubar und
+zugleich das riskanteste Profil — gefragt ist der *Lautwert*, nicht der Buchstabenname
+(„mmmmm", nicht „Em"). Klappt das per Instruktion nicht, greift die Aussprache-Eingabe
+als Notausgang. Das weiß man dann nach ein paar Minuten und nicht nach 25–40 Minuten
+Rendern.
 
 ## Aussprache und Stimme
 
