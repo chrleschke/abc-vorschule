@@ -1,5 +1,10 @@
 from ttskit.extract import FIELD_TO_PROFILE, extract_items, profile_for_item
 from ttskit.models import Item
+from ttskit.paths import Paths
+
+#: Der echte Content-Pack der App — für Tests, die gegen die tatsächlich
+#: reichweitigen Atome prüfen, statt gegen die Mini-Fixture.
+CONTENT_DIR = Paths().content_dir
 
 
 def test_extracts_every_authored_string(content_dir):
@@ -241,3 +246,43 @@ def test_malformed_json_in_a_content_file_names_the_file(tmp_path):
     (d / "atoms.json").write_text("{ kaputt", encoding="utf-8")
     with pytest.raises(ValueError, match="atoms.json"):
         extract_items(d)
+
+
+def test_article_speech_mirrors_the_kotlin_rule():
+    from ttskit.extract import article_speech
+
+    assert article_speech({"display": "Haus", "gender": "n", "nounClass": "thing"}) == "das Haus"
+    assert article_speech({"display": "Maus", "gender": "f", "nounClass": "thing"}) == "die Maus"
+    assert article_speech({"display": "Baum", "gender": "m", "nounClass": "thing"}) == "der Baum"
+    assert article_speech({"display": "Oma", "gender": "f", "nounClass": "person"}) == "eine Oma"
+    assert article_speech({"display": "Opa", "gender": "m", "nounClass": "person"}) == "ein Opa"
+    assert article_speech({"display": "Kind", "gender": "n", "nounClass": "person"}) == "das Kind"
+    assert article_speech({"display": "Tom", "nounClass": "name"}) == "Tom"
+    assert article_speech({"display": "Häuser", "gender": "n", "nounClass": "thing",
+                           "articleSpeechOverride": "die Häuser"}) == "die Häuser"
+    assert article_speech({"display": "ist"}) is None
+    assert article_speech({"display": "Haus", "nounClass": "thing"}) is None
+
+
+def test_article_items_cover_only_reachable_atoms():
+    items = extract_items(CONTENT_DIR)
+    by_id = {i.id: i for i in items if i.field == "articleTts"}
+
+    # word_build-Ziel und sound_position-Wort → Clip
+    assert by_id["atom:haus:articleTts"].text == "das Haus"
+    assert by_id["atom:ameise:articleTts"].text == "die Ameise"
+    # klassifiziert, aber nie vorgesprochen → kein Clip
+    assert "atom:banane:articleTts" not in by_id
+    # Name: Sprechtext == display, wäre ein Duplikat des word-Clips
+    assert "atom:tom:articleTts" not in by_id
+    # kein Substantiv
+    assert "atom:ich:articleTts" not in by_id
+    assert len(by_id) == 85
+
+
+def test_article_items_use_the_article_word_profile():
+    from ttskit.extract import profile_for_item
+
+    items = [i for i in extract_items(CONTENT_DIR) if i.field == "articleTts"]
+    assert items
+    assert all(profile_for_item(i) == "article_word" for i in items)

@@ -38,7 +38,7 @@ from .plan import fingerprint, orphan_locks, status_of
 #: phoneme vor word, damit Buchstaben-/Silben-Laute nicht von Wort-Clips
 #: verdrängt werden. Die App kennt am Call-Site nur den Text — der Index
 #: muss eindeutig sein.
-PROFILE_PRIORITY = ("phoneme", "word", "prompt", "miss", "reward",
+PROFILE_PRIORITY = ("phoneme", "word", "article_word", "prompt", "miss", "reward",
                     "sentence", "finale", "ui")
 
 #: Substrings that mark an authored task prompt — not a bare sentence even

@@ -158,6 +158,23 @@
       "trim": true,
       "normalize": true
     },
+    "article_word": {
+      "label": "Artikel + Wort",
+      "speaker": "sohee",
+      "language": "german",
+      "instruct": "Sprich Artikel und Nomen als eine einzige Einheit, ohne Pause nach dem Artikel. Klar und freundlich, in ruhigem Tempo. Keine Frage-Melodie, keine Übertreibung, keine lange Betonung. Kein Stöhnen, kein Zischen. Kein Englisch, kein Koreanisch. Sprich mit tiefer Stimme.",
+      "sampling": {
+        "temperature": 0.55,
+        "top_k": 40,
+        "top_p": 0.8,
+        "repetition_penalty": 1.05,
+        "subtalker_temperature": 0.45,
+        "subtalker_top_k": 50,
+        "subtalker_top_p": 1,
+        "max_new_tokens": 35
+      },
+      "seedPool": []
+    },
     "phoneme": {
       "label": "Laut / Buchstabe",
       "speaker": "sohee",

@@ -24,6 +24,7 @@ FIELD_TO_PROFILE: dict[str, str] = {
     "finaleTts": "finale",
     "uiText": "ui",
     "spokenAnswerTts": "word",
+    "articleTts": "article_word",
 }
 
 # Order matters: it decides the order of items within a round.
@@ -87,6 +88,53 @@ def _spoken_answer(answer: int, icon: dict) -> str:
     return f"{answer} {noun}".strip()
 
 
+_DEFINITE = {"m": "der", "f": "die", "n": "das"}
+_INDEFINITE = {"m": "ein", "f": "eine"}
+
+
+def article_speech(atom: dict) -> str | None:
+    """Mirror AtomArticleSpeech.forAtom in AtomArticleSpeech.kt.
+
+    Personen bekommen den unbestimmten Artikel — außer im Neutrum, wo nur "das"
+    das Genus eindeutig trägt ("ein Opa" und "ein Kind" klingen sonst gleich).
+    """
+    override = (atom.get("articleSpeechOverride") or "").strip()
+    if override:
+        return override
+    noun_class = atom.get("nounClass")
+    if not noun_class:
+        return None
+    display = (atom.get("display") or "").strip()
+    if not display:
+        return None
+    if noun_class == "name":
+        return display
+    gender = atom.get("gender")
+    if not gender:
+        return None
+    if noun_class == "person" and gender in _INDEFINITE:
+        return f"{_INDEFINITE[gender]} {display}"
+    return f"{_DEFINITE[gender]} {display}"
+
+
+def _speech_reachable_atom_ids(tasks: list[dict]) -> set[str]:
+    """Atome, die SuccessSpeech je mit Artikel spricht.
+
+    Spiegelt SuccessSpeech.partsForRound: Wort-Bauer und Auditiver Finder.
+    Der Wort-Detektiv leitet sich zur Laufzeit aus den word_build-Wörtern ab
+    (SymbolInWordDerivation) und ist damit enthalten.
+    """
+    reachable: set[str] = set()
+    for task in tasks:
+        trainer = task.get("trainer")
+        for round_ in task.get("rounds", []):
+            if trainer == "word_build" and round_.get("targetAtomId"):
+                reachable.add(round_["targetAtomId"])
+            elif trainer == "sound_position" and round_.get("atomId"):
+                reachable.add(round_["atomId"])
+    return reachable
+
+
 def extract_items(content_dir: Path, extra_strings: dict | None = None,
                   blanks: list[str] | None = None) -> list[Item]:
     """Collect every authored TTS string from the content pack.
@@ -116,10 +164,21 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
         items.append(Item(id=item_id, text=text, field=field, source=source,
                           lesson=lesson, label=label, atom_kind=atom_kind))
 
+    reachable = _speech_reachable_atom_ids(tasks)
+
     for atom in sorted(atoms, key=lambda a: a["id"]):
         add(f"atom:{atom['id']}:lemma", atom.get("lemma", ""), "lemma",
             "atoms.json", None, f"{atom.get('display', atom['id'])} ({atom.get('kind', '?')})",
             atom_kind=atom.get("kind"))
+
+        if atom["id"] not in reachable:
+            continue
+        speech = article_speech(atom)
+        # Gleicher Text wie das Lemma (Namen) → kein zweiter Clip.
+        if not speech or speech == atom.get("display"):
+            continue
+        add(f"atom:{atom['id']}:articleTts", speech, "articleTts", "atoms.json", None,
+            f"{atom.get('display', atom['id'])} (Artikel)")
 
     for sentence in sorted(sentences, key=lambda s: s["id"]):
         add(f"sentence:{sentence['id']}:tts", sentence.get("tts", ""), "sentenceTts",
