@@ -46,6 +46,13 @@ object ContentValidator {
     private const val MaxSentencePictureWords = 8
     private const val MaxSentencePictureCardAtoms = 3
 
+    /**
+     * Erreichbare Atome, die bewusst ohne Artikel gesprochen werden: Interjektion,
+     * Pronomen, Adjektiv, Präposition. Alles andere Erreichbare muss eine
+     * [NounClass] tragen, sonst fiele es still auf die artikellose Form zurück.
+     */
+    val ArticleFreeSpeechAtomIds: Set<String> = setOf("hallo", "ich", "rot", "am")
+
     fun validate(pack: ContentPack): List<ValidationIssue> {
         val issues = mutableListOf<ValidationIssue>()
         val atomIds = pack.atoms.keys
@@ -109,6 +116,26 @@ object ContentValidator {
             ) {
                 issues += ValidationIssue(
                     "atom ${atom.id} is a plural form and needs an articleSpeechOverride",
+                )
+            }
+        }
+
+        // Reichweite des Erfolgs-Vorsprechens: nur diese Atome werden je mit Artikel
+        // gesprochen (Wort-Detektiv leitet sich aus word_build ab, ist also enthalten).
+        val speechReachable: Set<String> = pack.tasks.values.flatMap { spec ->
+            when (spec) {
+                is WordBuildSpec -> spec.rounds.map { it.targetAtomId }
+                is SoundPositionSpec -> spec.rounds.map { it.atomId }
+                else -> emptyList()
+            }
+        }.toSet()
+        speechReachable.forEach { id ->
+            if (id in ArticleFreeSpeechAtomIds) return@forEach
+            val atom = pack.atoms[id] ?: return@forEach
+            if (atom.nounClass == null) {
+                issues += ValidationIssue(
+                    "atom $id is spoken as a success answer but has no nounClass " +
+                        "(add gender + nounClass, or list it in ArticleFreeSpeechAtomIds)",
                 )
             }
         }

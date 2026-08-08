@@ -2938,6 +2938,8 @@
       "lemma": "Mama",
       "display": "Mama",
       "emoji": "👩",
+      "gender": "f",
+      "nounClass": "person",
       "kind": "word"
     },
     {
@@ -2954,6 +2956,8 @@
       "emoji": "👵",
       "kind": "word",
       "pluralDisplay": "Omas",
+      "gender": "f",
+      "nounClass": "person",
       "pluralHighlight": "s"
     },
     {
@@ -2968,6 +2972,7 @@
       "lemma": "Mimi",
       "display": "Mimi",
       "emoji": "🐱",
+      "nounClass": "name",
       "kind": "word"
     },
     {
@@ -2975,6 +2980,8 @@
       "lemma": "Papa",
       "display": "Papa",
       "emoji": "👨",
+      "gender": "m",
+      "nounClass": "person",
       "kind": "word"
     },
     {
@@ -2982,6 +2989,8 @@
       "lemma": "Opa",
       "display": "Opa",
       "emoji": "👴",
+      "gender": "m",
+      "nounClass": "person",
       "kind": "word"
     },
     {
@@ -2989,6 +2998,7 @@
       "lemma": "Tom",
       "display": "Tom",
       "emoji": "👦",
+      "nounClass": "name",
       "kind": "word"
     },
     {
@@ -2998,6 +3008,8 @@
       "emoji": "🦙",
       "kind": "word",
       "pluralDisplay": "Lamas",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "s"
     },
     {
@@ -3013,6 +3025,8 @@
       "display": "Tal",
       "emoji": "⛰️",
       "kind": "word",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Täler"
     },
     {
@@ -3029,6 +3043,8 @@
       "emoji": "🎩",
       "kind": "word",
       "pluralDisplay": "Hüte",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "Umlaut"
     },
     {
@@ -3038,6 +3054,8 @@
       "emoji": "🛸",
       "kind": "word",
       "pluralDisplay": "Ufos",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "s"
     },
     {
@@ -3061,6 +3079,8 @@
       "emoji": "🥅",
       "kind": "word",
       "pluralDisplay": "Tore",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -3084,6 +3104,8 @@
       "emoji": "👃",
       "kind": "word",
       "pluralDisplay": "Nasen",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralHighlight": "n"
     },
     {
@@ -3098,6 +3120,8 @@
       "lemma": "Sand",
       "display": "Sand",
       "emoji": "🏖️",
+      "gender": "m",
+      "nounClass": "thing",
       "kind": "word"
     },
     {
@@ -3107,6 +3131,8 @@
       "emoji": "🪺",
       "kind": "word",
       "pluralDisplay": "Nester",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "er"
     },
     {
@@ -3116,6 +3142,8 @@
       "emoji": "🌹",
       "kind": "word",
       "pluralDisplay": "Rosen",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralHighlight": "n"
     },
     {
@@ -3137,6 +3165,8 @@
       "lemma": "Tee",
       "display": "Tee",
       "emoji": "☕",
+      "gender": "m",
+      "nounClass": "thing",
       "kind": "word"
     },
     {
@@ -3146,6 +3176,8 @@
       "emoji": "🥫",
       "kind": "word",
       "pluralDisplay": "Dosen",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralHighlight": "n"
     },
     {
@@ -3169,6 +3201,8 @@
       "emoji": "🍪",
       "kind": "word",
       "pluralDisplay": "Kekse",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -3176,6 +3210,8 @@
       "lemma": "Eis",
       "display": "Eis",
       "emoji": "🍦",
+      "gender": "n",
+      "nounClass": "thing",
       "kind": "word"
     },
     {
@@ -3192,6 +3228,8 @@
       "emoji": "🛣️",
       "kind": "word",
       "pluralDisplay": "Wege",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -3200,6 +3238,8 @@
       "display": "Dach",
       "emoji": "🏠",
       "kind": "word",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Dächer"
     },
     {
@@ -3209,6 +3249,8 @@
       "emoji": "🏠",
       "kind": "word",
       "pluralDisplay": "Häuser",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "Umlaut"
     },
     {
@@ -3218,6 +3260,8 @@
       "emoji": "🐭",
       "kind": "word",
       "pluralDisplay": "Mäuse",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralHighlight": "Umlaut"
     },
     {
@@ -3227,6 +3271,8 @@
       "emoji": "🌳",
       "kind": "word",
       "pluralDisplay": "Bäume",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "Umlaut"
     },
     {
@@ -3241,6 +3287,9 @@
       "lemma": "Häuser",
       "display": "Häuser",
       "emoji": "🏘️",
+      "gender": "n",
+      "nounClass": "thing",
+      "articleSpeechOverride": "die Häuser",
       "kind": "word"
     },
     {
@@ -3248,6 +3297,9 @@
       "lemma": "Bäume",
       "display": "Bäume",
       "emoji": "🌳🌳",
+      "gender": "m",
+      "nounClass": "thing",
+      "articleSpeechOverride": "die Bäume",
       "kind": "word"
     },
     {
@@ -3255,6 +3307,9 @@
       "lemma": "Äpfel",
       "display": "Äpfel",
       "emoji": "🍎🍎",
+      "gender": "m",
+      "nounClass": "thing",
+      "articleSpeechOverride": "die Äpfel",
       "kind": "word"
     },
     {
@@ -3264,6 +3319,8 @@
       "emoji": "🍎",
       "kind": "word",
       "pluralDisplay": "Äpfel",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "Umlaut"
     },
     {
@@ -3273,6 +3330,8 @@
       "emoji": "",
       "kind": "word",
       "pluralDisplay": "Öfen",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "Umlaut"
     },
     {
@@ -3281,6 +3340,8 @@
       "display": "Tür",
       "emoji": "🚪",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Türen"
     },
     {
@@ -3290,6 +3351,8 @@
       "emoji": "👟",
       "kind": "word",
       "pluralDisplay": "Schuhe",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -3299,6 +3362,8 @@
       "emoji": "🐟",
       "kind": "word",
       "pluralDisplay": "Fische",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -3308,6 +3373,8 @@
       "emoji": "🐑",
       "kind": "word",
       "pluralDisplay": "Schafe",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -3317,6 +3384,8 @@
       "emoji": "🏫",
       "kind": "word",
       "pluralDisplay": "Schulen",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralHighlight": "n"
     },
     {
@@ -3326,6 +3395,8 @@
       "emoji": "🦓",
       "kind": "word",
       "pluralDisplay": "Zebras",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "s"
     },
     {
@@ -3335,6 +3406,8 @@
       "emoji": "🦉",
       "kind": "word",
       "pluralDisplay": "Eulen",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralHighlight": "n"
     },
     {
@@ -3343,6 +3416,8 @@
       "display": "Zug",
       "emoji": "🚂",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Züge"
     },
     {
@@ -3352,6 +3427,8 @@
       "emoji": "🦶",
       "kind": "word",
       "pluralDisplay": "Füße",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "Umlaut"
     },
     {
@@ -3361,6 +3438,8 @@
       "emoji": "🐦",
       "kind": "word",
       "pluralDisplay": "Vögel",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "Umlaut"
     },
     {
@@ -3369,6 +3448,8 @@
       "display": "Vase",
       "emoji": "🏺",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Vasen"
     },
     {
@@ -3377,6 +3458,8 @@
       "display": "Straße",
       "emoji": "🛣️",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Straßen"
     },
     {
@@ -3386,6 +3469,8 @@
       "emoji": "🛍️",
       "kind": "word",
       "pluralDisplay": "Säcke",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "Umlaut"
     },
     {
@@ -3395,6 +3480,8 @@
       "emoji": "🐎",
       "kind": "word",
       "pluralDisplay": "Pferde",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -3404,6 +3491,8 @@
       "emoji": "⭐",
       "kind": "word",
       "pluralDisplay": "Sterne",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "n"
     },
     {
@@ -3413,6 +3502,8 @@
       "emoji": "🕷️",
       "kind": "word",
       "pluralDisplay": "Spinnen",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralHighlight": "n"
     },
     {
@@ -3422,6 +3513,8 @@
       "emoji": "🪼",
       "kind": "word",
       "pluralDisplay": "Quallen",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralHighlight": "n"
     },
     {
@@ -3431,6 +3524,8 @@
       "emoji": "🚕",
       "kind": "word",
       "pluralDisplay": "Taxis",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "s"
     },
     {
@@ -3440,6 +3535,8 @@
       "emoji": "🐴",
       "kind": "word",
       "pluralDisplay": "Ponys",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "s"
     },
     {
@@ -3448,6 +3545,8 @@
       "display": "Ball",
       "emoji": "⚽",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Bälle"
     },
     {
@@ -3456,6 +3555,8 @@
       "display": "Auto",
       "emoji": "🚗",
       "kind": "word",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Autos"
     },
     {
@@ -3464,6 +3565,8 @@
       "display": "Tram",
       "emoji": "🚋",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Trams"
     },
     {
@@ -3472,6 +3575,8 @@
       "display": "Markt",
       "emoji": "",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Märkte"
     },
     {
@@ -3479,6 +3584,8 @@
       "lemma": "Polizei",
       "display": "Polizei",
       "emoji": "🚓",
+      "gender": "f",
+      "nounClass": "thing",
       "kind": "word"
     },
     {
@@ -3487,6 +3594,8 @@
       "display": "Park",
       "emoji": "🌳",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Parks"
     },
     {
@@ -3494,6 +3603,8 @@
       "lemma": "Milch",
       "display": "Milch",
       "emoji": "🥛",
+      "gender": "f",
+      "nounClass": "thing",
       "kind": "word"
     },
     {
@@ -3501,6 +3612,8 @@
       "lemma": "Salami",
       "display": "Salami",
       "emoji": "",
+      "gender": "f",
+      "nounClass": "thing",
       "kind": "word"
     },
     {
@@ -3508,6 +3621,8 @@
       "lemma": "Pizza",
       "display": "Pizza",
       "emoji": "🍕",
+      "gender": "f",
+      "nounClass": "thing",
       "kind": "word"
     },
     {
@@ -3516,6 +3631,8 @@
       "display": "Ampel",
       "emoji": "🚦",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Ampeln"
     },
     {
@@ -3524,6 +3641,8 @@
       "display": "Ameise",
       "emoji": "🐜",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Ameisen"
     },
     {
@@ -3532,6 +3651,8 @@
       "display": "Igel",
       "emoji": "🦔",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Igel"
     },
     {
@@ -3540,6 +3661,8 @@
       "display": "Insel",
       "emoji": "🏝️",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Inseln"
     },
     {
@@ -3548,6 +3671,8 @@
       "display": "Ohr",
       "emoji": "👂",
       "kind": "other",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Ohren"
     },
     {
@@ -3556,6 +3681,8 @@
       "display": "Radio",
       "emoji": "📻",
       "kind": "other",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Radios"
     },
     {
@@ -3564,6 +3691,8 @@
       "display": "Sonne",
       "emoji": "☀️",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Sonnen"
     },
     {
@@ -3572,6 +3701,8 @@
       "display": "Tomate",
       "emoji": "🍅",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Tomaten"
     },
     {
@@ -3580,6 +3711,8 @@
       "display": "Ente",
       "emoji": "🦆",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Enten"
     },
     {
@@ -3588,6 +3721,8 @@
       "display": "Paket",
       "emoji": "📦",
       "kind": "other",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Pakete"
     },
     {
@@ -3596,6 +3731,8 @@
       "display": "Kuchen",
       "emoji": "🍰",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Kuchen"
     },
     {
@@ -3604,6 +3741,8 @@
       "display": "Clown",
       "emoji": "🤡",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "person",
       "pluralDisplay": "Clowns"
     },
     {
@@ -3612,6 +3751,8 @@
       "display": "Drache",
       "emoji": "🐉",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Drachen"
     },
     {
@@ -3620,6 +3761,8 @@
       "display": "Frosch",
       "emoji": "🐸",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Frösche"
     },
     {
@@ -3628,6 +3771,8 @@
       "display": "Fuchs",
       "emoji": "🦊",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Füchse"
     },
     {
@@ -3636,6 +3781,8 @@
       "display": "Giraffe",
       "emoji": "🦒",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Giraffen"
     },
     {
@@ -3644,6 +3791,8 @@
       "display": "Gabel",
       "emoji": "🍴",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Gabeln"
     },
     {
@@ -3652,6 +3801,8 @@
       "display": "Hund",
       "emoji": "🐶",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Hunde"
     },
     {
@@ -3660,6 +3811,8 @@
       "display": "Jacke",
       "emoji": "🧥",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Jacken"
     },
     {
@@ -3668,6 +3821,8 @@
       "display": "Jojo",
       "emoji": "🪀",
       "kind": "word",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Jojos"
     },
     {
@@ -3676,6 +3831,8 @@
       "display": "Krokodil",
       "emoji": "🐊",
       "kind": "word",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Krokodile"
     },
     {
@@ -3684,6 +3841,8 @@
       "display": "Katze",
       "emoji": "🐱",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Katzen"
     },
     {
@@ -3692,6 +3851,8 @@
       "display": "Löwe",
       "emoji": "🦁",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Löwen"
     },
     {
@@ -3700,6 +3861,8 @@
       "display": "Nilpferd",
       "emoji": "🦛",
       "kind": "word",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Nilpferde"
     },
     {
@@ -3708,6 +3871,8 @@
       "display": "Pinguin",
       "emoji": "🐧",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Pinguine"
     },
     {
@@ -3715,6 +3880,8 @@
       "lemma": "Quark",
       "display": "Quark",
       "emoji": "",
+      "gender": "m",
+      "nounClass": "thing",
       "kind": "word"
     },
     {
@@ -3723,6 +3890,8 @@
       "display": "Raupe",
       "emoji": "🐛",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Raupen"
     },
     {
@@ -3731,6 +3900,8 @@
       "display": "Uhu",
       "emoji": "🦉",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Uhus"
     },
     {
@@ -3739,6 +3910,8 @@
       "display": "Wolke",
       "emoji": "☁️",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Wolken"
     },
     {
@@ -3747,6 +3920,8 @@
       "display": "Wal",
       "emoji": "🐳",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Wale"
     },
     {
@@ -3755,6 +3930,8 @@
       "display": "Xylofon",
       "emoji": "🎹",
       "kind": "word",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Xylofone"
     },
     {
@@ -3763,6 +3940,8 @@
       "display": "Yacht",
       "emoji": "⛵",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Yachten"
     },
     {
@@ -3771,6 +3950,8 @@
       "display": "Zitrone",
       "emoji": "🍋",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Zitronen"
     },
     {
@@ -3779,6 +3960,8 @@
       "display": "Spiegel",
       "emoji": "🪞",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Spiegel"
     },
     {
@@ -3885,6 +4068,8 @@
       "display": "Käse",
       "emoji": "🧀",
       "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Käse"
     },
     {
@@ -3893,6 +4078,8 @@
       "display": "Rübe",
       "emoji": "🫜",
       "kind": "word",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Rüben"
     },
     {
@@ -3901,6 +4088,8 @@
       "display": "Salat",
       "emoji": "🥗",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Salate"
     },
     {
@@ -3909,6 +4098,8 @@
       "display": "Tiger",
       "emoji": "🐯",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Tiger"
     },
     {
@@ -3917,6 +4108,8 @@
       "display": "Lampe",
       "emoji": "💡",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Lampen"
     },
     {
@@ -3925,6 +4118,8 @@
       "display": "Hase",
       "emoji": "🐰",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Hasen"
     },
     {
@@ -3933,6 +4128,8 @@
       "display": "Feder",
       "emoji": "🪶",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Federn"
     },
     {
@@ -3941,6 +4138,8 @@
       "display": "Nuss",
       "emoji": "🌰",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Nüsse"
     },
     {
@@ -3949,6 +4148,8 @@
       "display": "Sofa",
       "emoji": "🛋️",
       "kind": "other",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Sofas"
     },
     {
@@ -3957,6 +4158,8 @@
       "display": "Erdbeere",
       "emoji": "🍓",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Erdbeeren"
     },
     {
@@ -3965,6 +4168,8 @@
       "display": "Dino",
       "emoji": "🦕",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Dinos"
     },
     {
@@ -3973,6 +4178,8 @@
       "display": "Eimer",
       "emoji": "🪣",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Eimer"
     },
     {
@@ -3981,6 +4188,8 @@
       "display": "Buch",
       "emoji": "📖",
       "kind": "other",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Bücher"
     },
     {
@@ -3989,6 +4198,8 @@
       "display": "Biene",
       "emoji": "🐝",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Bienen"
     },
     {
@@ -3997,6 +4208,8 @@
       "display": "Bär",
       "emoji": "🐻",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Bären"
     },
     {
@@ -4005,6 +4218,8 @@
       "display": "Löffel",
       "emoji": "🥄",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Löffel"
     },
     {
@@ -4013,6 +4228,8 @@
       "display": "Zahn",
       "emoji": "🦷",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Zähne"
     },
     {
@@ -4021,6 +4238,8 @@
       "display": "Feuer",
       "emoji": "🔥",
       "kind": "other",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Feuer"
     },
     {
@@ -4029,6 +4248,8 @@
       "display": "Zucker",
       "emoji": "🍬",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Zucker"
     },
     {
@@ -4037,6 +4258,8 @@
       "display": "Stuhl",
       "emoji": "🪑",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Stühle"
     },
     {
@@ -4045,6 +4268,8 @@
       "display": "Hexe",
       "emoji": "🧙",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "person",
       "pluralDisplay": "Hexen"
     },
     {
@@ -4053,6 +4278,8 @@
       "display": "Quelle",
       "emoji": "💧",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Quellen"
     },
     {
@@ -4061,6 +4288,8 @@
       "display": "Suppe",
       "emoji": "🍲",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Suppen"
     },
     {
@@ -4068,6 +4297,8 @@
       "lemma": "Himmel",
       "display": "Himmel",
       "emoji": "🌌",
+      "gender": "m",
+      "nounClass": "thing",
       "kind": "other"
     },
     {
@@ -4076,6 +4307,8 @@
       "display": "Elefant",
       "emoji": "🐘",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Elefanten"
     },
     {
@@ -4083,6 +4316,8 @@
       "lemma": "Gras",
       "display": "Gras",
       "emoji": "🌱",
+      "gender": "n",
+      "nounClass": "thing",
       "kind": "other"
     },
     {
@@ -4091,6 +4326,8 @@
       "display": "Rad",
       "emoji": "🚲",
       "kind": "other",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Räder"
     },
     {
@@ -4099,6 +4336,8 @@
       "display": "Kleid",
       "emoji": "👗",
       "kind": "other",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Kleider"
     },
     {
@@ -4107,6 +4346,8 @@
       "display": "Tag",
       "emoji": "📅",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Tage"
     },
     {
@@ -4115,6 +4356,8 @@
       "display": "Taube",
       "emoji": "🕊️",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Tauben"
     },
     {
@@ -4123,6 +4366,8 @@
       "display": "Blitz",
       "emoji": "⚡",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Blitze"
     },
     {
@@ -4131,6 +4376,8 @@
       "display": "Klavier",
       "emoji": "🎹",
       "kind": "other",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Klaviere"
     },
     {
@@ -4138,6 +4385,8 @@
       "lemma": "Fenster",
       "display": "Fenster",
       "emoji": "🪟",
+      "gender": "n",
+      "nounClass": "thing",
       "kind": "other"
     },
     {
@@ -4146,6 +4395,8 @@
       "display": "Wespe",
       "emoji": "🐝",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Wespen"
     },
     {
@@ -4155,6 +4406,8 @@
       "emoji": "🥚",
       "kind": "word",
       "pluralDisplay": "Eier",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "er"
     },
     {
@@ -4162,6 +4415,9 @@
       "lemma": "Eier",
       "display": "Eier",
       "emoji": "🥚🥚",
+      "gender": "n",
+      "nounClass": "thing",
+      "articleSpeechOverride": "die Eier",
       "kind": "word"
     },
     {
@@ -4171,6 +4427,8 @@
       "emoji": "🍃",
       "kind": "word",
       "pluralDisplay": "Blätter",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "Umlaut"
     },
     {
@@ -4180,6 +4438,8 @@
       "emoji": "🌱",
       "kind": "word",
       "pluralDisplay": "Pflanzen",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralHighlight": "n"
     },
     {
@@ -4196,6 +4456,8 @@
       "emoji": "🐄",
       "kind": "word",
       "pluralDisplay": "Kühe",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralHighlight": "Umlaut"
     },
     {
@@ -4205,6 +4467,8 @@
       "emoji": "🐓",
       "kind": "word",
       "pluralDisplay": "Hähne",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "Umlaut"
     },
     {
@@ -4214,6 +4478,8 @@
       "emoji": "🍄",
       "kind": "word",
       "pluralDisplay": "Pilze",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -4223,6 +4489,8 @@
       "emoji": "🚌",
       "kind": "word",
       "pluralDisplay": "Busse",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "se"
     },
     {
@@ -4232,6 +4500,8 @@
       "emoji": "🐵",
       "kind": "word",
       "pluralDisplay": "Affen",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "n"
     },
     {
@@ -4241,6 +4511,8 @@
       "emoji": "🍞",
       "kind": "word",
       "pluralDisplay": "Brote",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -4250,6 +4522,8 @@
       "emoji": "",
       "kind": "word",
       "pluralDisplay": "Tische",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -4259,6 +4533,8 @@
       "emoji": "🚄",
       "kind": "word",
       "pluralDisplay": "Bahnen",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralHighlight": "en"
     },
     {
@@ -4380,6 +4656,8 @@
       "emoji": "🔵",
       "kind": "word",
       "pluralDisplay": "Kreise",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -4389,6 +4667,8 @@
       "emoji": "🟨",
       "kind": "word",
       "pluralDisplay": "Quadrate",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -4398,6 +4678,8 @@
       "emoji": "🔺",
       "kind": "word",
       "pluralDisplay": "Dreiecke",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "e"
     },
     {
@@ -4407,6 +4689,8 @@
       "emoji": "❤️",
       "kind": "word",
       "pluralDisplay": "Herzen",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralHighlight": "en"
     },
     {
@@ -4443,6 +4727,8 @@
       "display": "Banane",
       "emoji": "🍌",
       "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
       "pluralDisplay": "Bananen"
     },
     {
@@ -4451,6 +4737,8 @@
       "display": "Bett",
       "emoji": "🛏️",
       "kind": "other",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Betten"
     },
     {
@@ -4458,6 +4746,8 @@
       "lemma": "Brokkoli",
       "display": "Brokkoli",
       "emoji": "🥦",
+      "gender": "m",
+      "nounClass": "thing",
       "kind": "other"
     },
     {
@@ -4466,6 +4756,8 @@
       "display": "Busch",
       "emoji": "🌿",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Büsche"
     },
     {
@@ -4474,6 +4766,8 @@
       "display": "Fahrrad",
       "emoji": "🚲",
       "kind": "other",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Fahrräder"
     },
     {
@@ -4482,6 +4776,8 @@
       "display": "Flugzeug",
       "emoji": "✈️",
       "kind": "other",
+      "gender": "n",
+      "nounClass": "thing",
       "pluralDisplay": "Flugzeuge"
     },
     {
@@ -4489,6 +4785,8 @@
       "lemma": "Mond",
       "display": "Mond",
       "emoji": "🌙",
+      "gender": "m",
+      "nounClass": "thing",
       "kind": "other"
     },
     {
@@ -4497,6 +4795,8 @@
       "display": "Pirat",
       "emoji": "🏴‍☠️",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "person",
       "pluralDisplay": "Piraten"
     },
     {
@@ -4505,6 +4805,8 @@
       "display": "Strand",
       "emoji": "🏖️",
       "kind": "other",
+      "gender": "m",
+      "nounClass": "thing",
       "pluralDisplay": "Strände"
     },
     {
@@ -4512,6 +4814,8 @@
       "lemma": "Tropfen",
       "display": "Tropfen",
       "emoji": "💦",
+      "gender": "m",
+      "nounClass": "thing",
       "kind": "other"
     },
     {
@@ -4519,6 +4823,8 @@
       "lemma": "Wasser",
       "display": "Wasser",
       "emoji": "🌊",
+      "gender": "n",
+      "nounClass": "thing",
       "kind": "other"
     }
   ]

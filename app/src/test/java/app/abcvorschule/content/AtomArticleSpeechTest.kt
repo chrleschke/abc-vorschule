@@ -65,4 +65,23 @@ class AtomArticleSpeechTest {
         // darf daran trotzdem nicht abstürzen oder "null Haus" liefern.
         assertNull(AtomArticleSpeech.forAtom(atom("Haus", gender = null, nounClass = NounClass.thing)))
     }
+
+    @Test
+    fun `the shipped pack derives the expected article forms`() {
+        val pack = ContentRepository.fromClasspath().load()
+        fun speech(id: String) = AtomArticleSpeech.forAtom(pack.atoms[id])
+
+        assertEquals("das Haus", speech("haus"))
+        assertEquals("die Maus", speech("maus"))
+        assertEquals("der Baum", speech("baum"))
+        assertEquals("das Lama", speech("lama"))
+        assertEquals("das Pony", speech("pony"))
+        assertEquals("die Häuser", speech("haeusser"))
+        assertEquals("die Bäume", speech("baeume"))
+        assertEquals("eine Oma", speech("oma"))
+        assertEquals("ein Opa", speech("opa"))
+        assertEquals("Tom", speech("tom"))
+        assertNull(speech("ich"))
+        assertNull(speech("letter-m"))
+    }
 }
