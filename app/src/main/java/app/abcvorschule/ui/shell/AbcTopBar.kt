@@ -1,20 +1,16 @@
 package app.abcvorschule.ui.shell
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -36,16 +32,30 @@ import app.abcvorschule.ui.theme.WarmInk
  */
 val TopBarHeight: Dp = 64.dp
 
-/** Kantenlänge des schwebenden ⋯-Knopfs. */
+/** Kantenlänge des schwebenden Drei-Punkte-Knopfs (Elterntür, siehe `ParentGateButton`). */
 val TopBarFloatingActionSize: Dp = 48.dp
 
 /**
- * Platz, den der schwebende ⋯-Knopf im Titel-Slot freihalten muss: seine Breite,
- * sein Abstand zur Bildschirmkante und eine Handbreit Luft. Ausgerechnet statt
- * geschätzt — mit einer geratenen Zahl lag die Punktezahl hinter dem Knopf.
+ * Feste Handbreit über der Titelzeile. Im Vollbild ist der Status-Bar-Inset null;
+ * ohne sie klebte die Zeile an der physischen Kante.
  */
-val TopBarFloatingActionReserve: Dp =
-    TopBarFloatingActionSize + AbcDimens.screenHorizontal + 8.dp
+private val TopBarExtraTop: Dp = 10.dp
+
+/**
+ * Abstand des schwebenden Knopfs zur Oberkante des Top-Insets. Ausgerechnet statt
+ * geschätzt: so sitzt er auf derselben Mittelachse wie der Punktestand in der
+ * Leiste — mit einer geratenen Zahl (8 dp) stand er im Vollbild 10 dp zu hoch,
+ * der Stern links und die Punkte rechts lagen sichtbar nicht auf einer Linie.
+ */
+val TopBarFloatingActionTop: Dp =
+    TopBarExtraTop + (TopBarHeight - TopBarFloatingActionSize) / 2
+
+/**
+ * Startabstand des Titel-Slots einer M3-Top-App-Bar ohne Navigations-Icon
+ * (`TopAppBarTitleInset`, nicht öffentlich). Steht hier, damit der Punktestand
+ * auf dieselbe Randachse gesetzt werden kann wie der schwebende Eltern-Knopf.
+ */
+private val TopBarTitleInset: Dp = 16.dp
 
 /**
  * Die Kopfzeile der App: eine native M3-[TopAppBar], durchsichtig, damit
@@ -54,14 +64,13 @@ val TopBarFloatingActionReserve: Dp =
  * Kein Titel — weder auf dem Pfad noch in der Lektion. Ein Lektionslabel wäre
  * Elterntext an der Stelle, an der das Kind zuerst hinsieht.
  *
- * @param points Punktestand rechts im Titel-Slot. `null` in der Lektion: dort
- * steht der Stern mittig unter dem Fortschritt, auf der Achse, auf der am Ende
- * des Trainers auch der große Stern hochkommt.
+ * @param points Punktestand links am Anfang des Titel-Slots. `null` in der
+ * Lektion: dort steht der Stern mittig unter dem Fortschritt, auf der Achse, auf
+ * der am Ende des Trainers auch der große Stern hochkommt.
  * @param onBack Zurück zum Pfad. `null` auf dem Pfad selbst — dort gibt es
  * nichts, wohin zurück.
  * @param starOutline Kontur des Sterns. Default passt auf Cream; über dem
  * Pfad-Himmel muss der Aufrufer sie überschreiben (siehe `PathScreen`).
- * @param endReserve Freiraum am Titelende für einen schwebenden Knopf darüber.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +79,6 @@ fun AbcTopBar(
     points: Int? = null,
     onBack: (() -> Unit)? = null,
     starOutline: Color = StarGoldDeep,
-    endReserve: Dp = 0.dp,
 ) {
     TopAppBar(
         modifier = modifier,
@@ -81,7 +89,7 @@ fun AbcTopBar(
         // null, und ohne sie klebte die Titelzeile an der physischen Kante.
         windowInsets = WindowInsets.safeDrawing
             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
-            .add(WindowInsets(top = 10.dp)),
+            .add(WindowInsets(top = TopBarExtraTop)),
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,
             scrolledContainerColor = Color.Transparent,
@@ -105,15 +113,20 @@ fun AbcTopBar(
         },
         title = {
             if (points != null) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = endReserve),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Spacer(Modifier.weight(1f))
-                    AbcStarCount(points = points, outline = starOutline)
-                }
+                // Linksbündig in der Ecke, nicht rechts: rechtsbündig wanderte der
+                // Stern bei jeder zusätzlichen Ziffer nach links — der Punktestand
+                // verschob sich beim Zählen. Links bleibt der Stern stehen und nur
+                // die Zahl wächst nach rechts, weg vom schwebenden Eltern-Knopf.
+                AbcStarCount(
+                    points = points,
+                    outline = starOutline,
+                    // Setzt den Stern auf dieselbe Randachse wie den Eltern-Knopf
+                    // am anderen Ende der Leiste — der Titel-Slot beginnt 16 dp
+                    // von der Kante, der Knopf steht `screenHorizontal` davon weg.
+                    modifier = Modifier.padding(
+                        start = AbcDimens.screenHorizontal - TopBarTitleInset,
+                    ),
+                )
             }
         },
     )

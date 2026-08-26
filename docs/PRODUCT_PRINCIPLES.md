@@ -214,9 +214,11 @@ niemals mit einem stummen No-Op.
 
 ## 6. Hilfestufen
 
-- Parent-Gate (langer Druck auf ⋯) öffnet das Sheet „Eltern“. Der ⋯ ist ein **schwebender
-  runder Knopf oben rechts auf dem Pfad-Screen**, kein Bar-Element — und in der Lektion gibt es
-  ihn nicht: dort führt der Weg zu den Einstellungen über das Verlassen der Lektion. Das Sheet
+- Parent-Gate (langer Druck auf das Drei-Punkte-Menü) öffnet das Sheet „Eltern“. Es ist ein
+  **schwebender runder Knopf oben rechts auf dem Pfad-Screen**, kein Bar-Element, und trägt das
+  **native Overflow-Icon — drei senkrechte Punkte** (`Icons.Rounded.MoreVert`), keinen getippten
+  ⋯-Glyph: Erwachsene erkennen daran ohne Text, dass hier ein Menü liegt, und ein Vektor wächst
+  nicht mit der Schriftskalierung aus dem 48-dp-Knopf heraus. In der Lektion gibt es ihn nicht: dort führt der Weg zu den Einstellungen über das Verlassen der Lektion. Das Sheet
   bietet die Hilfestufe (**Auto / Mit Hilfe / Ohne Hilfe**) und die Freigabe „Reihenfolge frei
   wählbar“, die die Fortschrittssperre des Pfades aufhebt. In Debug-Builds zusätzlich
   „TTS Debug“ am Ende des Sheets (Entwickler-Werkzeug, nicht für Release).
@@ -328,7 +330,13 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - **Chrome oben (nativ):** eine durchsichtige M3-Top-App-Bar. In der Lektion trägt sie **nur**
   den Zurück-Pfeil (nach links, nicht X — die Lektion ist ein Ziel, das man verlässt, kein
   Dialog): kein Lektionstitel (Elterntext an der Stelle, an der das Kind zuerst hinsieht),
-  keine Punkte, kein Overflow-Menü. Auf dem Pfad trägt sie rechts Stern + Punkte.
+  keine Punkte, kein Overflow-Menü. Auf dem Pfad trägt sie **links in der Ecke** Stern +
+  Punkte — nicht rechts: rechtsbündig wanderte der Stern bei jeder zusätzlichen Ziffer nach
+  links, der Punktestand verschob sich beim Zählen. Links steht der Stern fest und nur die Zahl
+  wächst nach rechts, weg vom schwebenden Drei-Punkte-Knopf am anderen Ende derselben Zeile.
+  Beide sitzen auf der Mittelachse der Titelzeile und auf derselben Randachse
+  (`AbcDimens.screenHorizontal`); der Knopf-Versatz ist aus Leistenhöhe und Knopfgröße
+  gerechnet (`TopBarFloatingActionTop`), nicht geschätzt.
   Darunter **eine** Zeile: Rückfall-Chevrons an den Rändern, dazwischen die Fortschrittskette.
   Der Speaker sitzt nicht im Chrome, sondern gemäß §7 im Aufgabenbereich.
 - **Der Punktestand steht in der Lektion mittig unter dem Fortschritt** (`AbcStarCount`), auf
@@ -398,7 +406,7 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 ## 10. Design-System
 
 - Gemeinsame Komponenten unter `ui/components/` (`AbcContinueButton`, `AbcSpeakerButton`, `AbcNavChevron`, `AbcSegmentedProgress`, Vektor-Icons inkl. `IconStar`) und `ui/shell/AbcTopBar`.
-- Buttons: keine Emojis — nur ASCII oder Canvas/SVG-Vektoren. Punkte-/Erfolgs-Symbol ist der Vektor-Stern `IconStar`, kein Text-Asterisk.
+- Buttons: keine Emojis — nur ASCII oder Canvas/SVG-Vektoren. Punkte-/Erfolgs-Symbol ist der Vektor-Stern `IconStar`, kein Text-Asterisk. Icons zeichnet die App selbst (`ui/components/AbcIcons.kt`); die eine Ausnahme ist das **native Overflow-Icon** der Elterntür (`Icons.Rounded.MoreVert` aus `material-icons-core`, ausdrücklich im Version-Catalog deklariert) — an ihm sollen Erwachsene ein Menü erkennen, und das leistet nur das Systemzeichen.
 - Übungen nutzen `ExerciseStage` für klare Trennung Speaker-Kopfzeile / Aufgabenblock /
   Antwortblock. Der Speaker geht in den Slot `promptChrome`, nie in `prompt` — nur der
   Slot garantiert die feste Höhe aus §7.
