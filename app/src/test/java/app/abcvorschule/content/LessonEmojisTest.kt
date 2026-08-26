@@ -9,11 +9,25 @@ class LessonEmojisTest {
 
     @Test
     fun firstLessonShowsItsOwnPictureWords() {
-        // l01 (M & A) hunts the sound in ameise / maus / baum.
+        // Aus den Trainern, die das Kind in l01 wirklich spielt (M & A): Mama,
+        // Ameise, Maus. Der Auditive Finder derselben Lektion steht in
+        // PausedTrainerKinds und liefert nur noch Auffüllung — vorher stand er
+        // vorn und bestimmte das Schild allein.
         assertEquals(
-            listOf("🐜", "🐭", "🌳"),
+            listOf("👩", "🐜", "🐭"),
             LessonEmojis.forLesson(pack, pack.lesson("l01")),
         )
+    }
+
+    @Test
+    fun pausedTrainersOnlyFillUpWhatThePlayedOnesLeaveOpen() {
+        // Die eigentliche Zusage: kein Bild aus einem pausierten Trainer, solange
+        // die gespielten Trainer der Lektion selbst genug hergeben.
+        pack.authoredLessons.forEach { lesson ->
+            val played = LessonEmojis.forLesson(pack, lesson.copy(taskIds = pack.playableTasksOf(lesson).map { it.id }))
+            val shown = LessonEmojis.forLesson(pack, lesson)
+            assertEquals("lesson ${lesson.id}", played, shown.take(played.size))
+        }
     }
 
     @Test
