@@ -14,5 +14,4 @@ object AbcDimens {
     val progressBarHeight = 10.dp
     val letterSp = 54.sp
     val syllableSp = 46.sp
-    val answerTileSp = 38.sp
 }

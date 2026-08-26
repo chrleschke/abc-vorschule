@@ -26,10 +26,6 @@ class ContentRepository(
         return pack
     }
 
-    fun clearCache() {
-        cached = null
-    }
-
     private fun parsePack(): ContentPack {
         val manifest = json.decodeFromString<PackManifest>(read("content/pack.manifest.json"))
         // `associateBy` is last-wins: a duplicated id would silently shadow its

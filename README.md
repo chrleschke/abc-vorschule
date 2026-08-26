@@ -1,9 +1,13 @@
 # ABC-Vorschul App
 
 Kostenlose, werbefreie Android-Vorschul-App (ca. 4–7 Jahre) für Lesen und Rechnen auf Deutsch.
-Dunkles UI, offline nach Installation. Ein Fibel-Pfad aus 26 Lektionen; jede Lektion läuft
-sechs Trainer-Typen in fester didaktischer Reihenfolge über einen gemeinsamen Content-Graphen.
-Optional: Buchstaben-/Silben-Jagd als Übungselement zwischen den Trainern.
+Helles, warmes Cream-UI, offline nach Installation. Ein Fibel-Pfad aus 26 Lektionen; jede Lektion
+läuft sieben autorierte Trainer-Typen in fester didaktischer Reihenfolge über einen gemeinsamen
+Content-Graphen — ein Typ darf sich wiederholen oder fehlen, zurück geht die Reihenfolge nie.
+Der **Auditive Finder ist derzeit pausiert** (`PausedTrainerKinds` in `TaskSpecs.kt`); zur Laufzeit
+beginnt eine Lektion deshalb mit dem Spurensucher.
+Zur Laufzeit abgeleitet, nie autoriert: Buchstaben-/Silben-Jagd und Wort-Detektiv als
+Übungselemente zwischen den Trainern.
 
 ## Dokumentation
 
@@ -59,12 +63,22 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest
 die Bühnenkante — die Rechnung dahinter prüft `SentencePegSizingTest` in den
 Unit-Tests. `SymbolHuntTileBoundsTest` tut dasselbe für die Streukacheln der
 Buchstabenjagd, gegen `SymbolHuntLayoutTest` als Geometrie-Gegenstück.
-`SentenceOrderPegShotTest` und `SentenceOrderMorphShotTest` behaupten
-nichts, sie **rendern**: Layout in mehreren Breiten und Systemschriftgrößen, und
-einen Filmstreifen des Fill-Morphs bei angehaltener Testuhr. Die PNGs landen im
-`filesDir` der App, weil `externalCacheDir` auf einem frischen Emulator null ist.
-Abholen (Gradle deinstalliert die APK nach dem Lauf, also erst von Hand
-installieren und dann direkt instrumentieren):
+Die Shot-Tests behaupten nichts, sie **rendern**: Layout in mehreren Breiten und
+Systemschriftgrößen, und Filmstreifen der Morphs bei angehaltener Testuhr. Sie
+legen ihre PNGs an **zwei verschiedenen Orten** ab — welchen Weg man zum Abholen
+braucht, hängt also am Test:
+
+| Test | Zielordner | Abholweg |
+|------|-----------|----------|
+| `SentenceOrderPegShotTest` | `filesDir/pegshots` | `run-as` (A) |
+| `SentenceOrderMorphShotTest` | `filesDir/morphshots` | `run-as` (A) |
+| `WordBuildMorphShotTest` | `filesDir/wordbuildmorphshots` | `run-as` (A) |
+| `SymbolHuntMorphShotTest` | `additionalTestOutputDir/huntmorphshots` | Gradle (B) |
+| `SymbolHuntBatteryShotTest` | `additionalTestOutputDir/huntbatteryshots` | Gradle (B) |
+
+**Weg A — `filesDir` + `run-as`.** `filesDir` statt `externalCacheDir`, weil das auf
+einem frischen Emulator null ist. Gradle deinstalliert die APK nach dem Lauf, also
+erst von Hand installieren und dann direkt instrumentieren:
 
 ```bash
 adb install -r app/build/outputs/apk/debug/app-debug.apk && adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
@@ -77,6 +91,25 @@ adb shell am instrument -w -e class app.abcvorschule.ui.exercise.SentenceOrderPe
 ```bash
 for f in $(adb shell run-as app.abcvorschule ls files/pegshots | tr -d '\r'); do adb exec-out run-as app.abcvorschule cat "files/pegshots/$f" > "$f"; done
 ```
+
+`run-as` funktioniert nur auf debuggable Builds und **nicht auf einem nicht gerooteten
+Gerät** — dort ist es gesperrt. Deshalb Weg B für die Jagd-Shots.
+
+**Weg B — `additionalTestOutputDir`, von Gradle abgeholt.** Diese Tests lesen den
+Ordner aus den Instrumentation-Argumenten; AGP setzt ihn selbst und zieht die Dateien
+nach dem Lauf herunter. Kein `run-as`, kein manuelles Installieren:
+
+```bash
+ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=app.abcvorschule.ui.exercise.SymbolHuntBatteryShotTest
+```
+
+Die PNGs liegen danach lokal unter
+`app/build/outputs/connected_android_test_additional_output/…/huntbatteryshots/` — AGP legt
+darunter noch je einen Ordner pro Variante und Gerät an.
+Kommt der Lauf ohne das AGP-Argument (etwa per `adb shell am instrument`), fallen beide
+Tests auf `getExternalFilesDir(null)` zurück — den sieht die adb-Shell wegen Scoped
+Storage aber nicht zuverlässig, also besser über Gradle laufen lassen.
 
 ## Content-Pack (Schema v2)
 
@@ -95,9 +128,17 @@ Autoriert: alle 26 Lektionen (Phase 1–7), inklusive der Wiederholungs-Tracks. 
 Lektion auf `planned`; der Status bleibt im Schema erhalten, damit künftige Lektionen als gesperrte
 Pfad-Knoten angelegt werden können, ohne Code zu ändern.
 
-Der Validator lehnt ein Pack ab, wenn eine autorierte Lektion nicht genau die sechs Trainer in
-Reihenfolge enthält, Kachelfolgen das Zielwort nicht buchstabieren, eine Summe nicht stimmt,
-Strichdaten fehlen oder Referenzen ins Leere zeigen.
+Die sieben autorierten Trainer-Typen in Rangfolge (`ContentValidator.TrainerOrder`):
+`sound_position` · `letter_trace` · `syllable_merge` · `word_build` · `sentence_order` ·
+`sentence_picture` · `count_add`. `symbol_hunt` und `symbol_in_word` stehen nie im Content —
+sie entstehen erst zur Laufzeit (`SessionTrainers`).
+
+Der Validator prüft die Reihenfolge über den **Rang**, nicht über Vollständigkeit: eine autorierte
+Lektion muss mit `sound_position` beginnen, mit `count_add` enden und dazwischen nicht-fallend
+bleiben. Wiederholte Typen (l01 hat zwei `sound_position`, zwei `letter_trace`, zwei `count_add`)
+und ausgelassene Typen sind erlaubt, ein Rücksprung nicht. Abgelehnt wird ein Pack außerdem, wenn
+eine autorierte Lektion einen abgeleiteten Trainer enthält, Kachelfolgen das Zielwort nicht
+buchstabieren, eine Summe nicht stimmt, Strichdaten fehlen oder Referenzen ins Leere zeigen.
 
 ## Offline-Smoke-Skript (manuell)
 
@@ -106,10 +147,15 @@ Strichdaten fehlen oder Referenzen ins Leere zeigen.
    und trägt den wippenden „Du bist hier“-Marker; Lektionen 2–26 sind gesperrt (entsperren sich nach Mastery).
 3. Gesperrten Knoten antippen → gesprochener Hinweis, kein stummes No-Op.
 4. Lektion 1 öffnen und die Trainer der Reihenfolge nach durchspielen:
-   Auditiver Finder (Waggon-Zuordnung) · Visueller Spurensucher (Buchstaben nachspuren) ·
+   Visueller Spurensucher (Buchstaben nachspuren, zweimal) ·
    optional Buchstaben-Jagd (Batterie voll → Feier, automatisch weiter, kein Weiter-Button) ·
    Silben-Verschmelzer · optional Silben-Jagd ·
-   Wort-Bauer (Mama bauen) · Satz-Architekt (Wortschild aufhängen) · zwei Rechenaufgaben.
+   Wort-Bauer (Mama bauen) · Wort-Detektiv (Buchstabe im Wort antippen) ·
+   Satz-Architekt (Wortschild aufhängen) · Satz-Versteher (Satz hören, Bildkarte tippen) ·
+   zwei Rechenaufgaben.
+   **Der Auditive Finder (Waggon-Zuordnung) taucht nicht auf** — er steht in
+   `PausedTrainerKinds` und wird beim Zusammenstellen der Session herausgefiltert
+   (`ContentPack.playableTasksOf`). Das ist kein Fehler; der Content dazu liegt weiter im Pack.
    Bei Wort-Bauer und Satz-Architekt beide Bedienwege prüfen: eine Kachel per Ziehen platzieren
    (die gezogene Kachel liegt sichtbar über den Zielfeldern, nie darunter) und eine per Tippen
    (Tap-Alternative: Kachel antippen, dann Zielfeld antippen).

@@ -72,6 +72,12 @@ data class Atom(
     val emoji: String,
     val kind: AtomKind = AtomKind.word,
     val pluralDisplay: String? = null,
+    /**
+     * Der Plural-Endungsteil ("Rosen" → "n"), an 46 Atomen kuratiert, aber derzeit
+     * **ohne Leser**: Rechnen zeigt bewusst keine Wörter, und kein anderer Trainer
+     * hebt die Endung hervor. Bleibt stehen, weil Löschen die 46 kuratierten Werte
+     * in atoms.json entwerten würde — nicht, weil es jemand benutzt.
+     */
     val pluralHighlight: String? = null,
     /** Genus; gesetzt für [NounClass.thing] und [NounClass.person], null bei Namen. */
     val gender: Gender? = null,
