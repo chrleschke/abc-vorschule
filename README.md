@@ -33,6 +33,33 @@ Install:
 ./gradlew :app:installDebug
 ```
 
+### Instrumentierte Tests und Layout-Screenshots
+
+```bash
+./gradlew :app:connectedDebugAndroidTest
+```
+
+`SentenceOrderPegBoundsTest` misst die gerenderten Pegs des Satz-Architekten gegen
+die Bühnenkante — die Rechnung dahinter prüft `SentencePegSizingTest` in den
+Unit-Tests. `SentenceOrderPegShotTest` und `SentenceOrderMorphShotTest` behaupten
+nichts, sie **rendern**: Layout in mehreren Breiten und Systemschriftgrößen, und
+einen Filmstreifen des Fill-Morphs bei angehaltener Testuhr. Die PNGs landen im
+`filesDir` der App, weil `externalCacheDir` auf einem frischen Emulator null ist.
+Abholen (Gradle deinstalliert die APK nach dem Lauf, also erst von Hand
+installieren und dann direkt instrumentieren):
+
+```bash
+adb install -r app/build/outputs/apk/debug/app-debug.apk && adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+```
+
+```bash
+adb shell am instrument -w -e class app.abcvorschule.ui.exercise.SentenceOrderPegShotTest app.abcvorschule.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+```bash
+for f in $(adb shell run-as app.abcvorschule ls files/pegshots | tr -d '\r'); do adb exec-out run-as app.abcvorschule cat "files/pegshots/$f" > "$f"; done
+```
+
 ## Content-Pack (Schema v2)
 
 `app/src/main/assets/content/`
