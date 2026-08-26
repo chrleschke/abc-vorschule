@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      android:forceDarkAllowed gibt es erst ab API 29. In values/ war es ein
+      Lint-Fehler (NewApi); hier ist es nach API-Level abgegrenzt, statt die
+      Prüfung stummzuschalten. Unter 29 fehlt das Attribut damit — dort gibt es
+      auch kein Force Dark, das es abschalten müsste.
+
+      Abgeschaltet, weil das Cream der App keine helle Variante eines dunklen
+      Themes ist: die automatische Invertierung würde Landschaft, Schilder und
+      Karten umfärben, und die Kontraste, die überall gegen Cream gerechnet sind,
+      gelten dann nicht mehr.
+    -->
+    <style name="Theme.AbcVorschule" parent="Base.Theme.AbcVorschule">
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>
