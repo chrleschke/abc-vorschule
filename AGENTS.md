@@ -95,6 +95,55 @@ Kernpunkte (Kurzfassung):
 
 
 
+## Geteilter Emulator
+
+An diesem Repo laufen regelmäßig **mehrere Claude-Sessions parallel**, jede in einem
+eigenen Worktree unter `.claude/worktrees/`, und alle teilen sich den einen
+`uxreview`-Emulator. Ein `installDebug` oder `connectedDebugAndroidTest` aus einer
+fremden Session ersetzt das Paket mitten im eigenen Lauf; Android killt den laufenden
+Testprozess dann mit `killDueToPackageUpdate`, und der eigene Lauf endet ohne eine
+einzige Assertion als **„Process crashed"**. Das ist kein eigener Bug — wer das für
+einen hält, debuggt stundenlang fremde Installationen.
+
+**Vor** `connectedDebugAndroidTest`, `installDebug` oder einer Sichtprüfung am
+Emulator also erst nachsehen, wer sonst noch dran ist:
+
+```bash
+git worktree list && ps ax -o pid,command | grep "[c]onnectedDebugAndroidTest"
+```
+
+```bash
+adb -s emulator-5554 logcat -d | grep "TestRunner: started" | tail -5
+```
+
+Testklassen, die es im eigenen Worktree nicht gibt, oder ein `lastUpdateTime`
+(`adb -s emulator-5554 shell dumpsys package app.abcvorschule | grep lastUpdateTime`),
+das ohne eigenes Zutun weiterspringt, heißen: da arbeitet jemand anders.
+
+**Maßnahmen, in dieser Reihenfolge:**
+
+1. **Lock nehmen**, damit die Sessions sich nicht gegenseitig aus dem Lauf werfen —
+   `mkdir` ist atomar, `flock(1)` gibt es auf macOS nicht:
+
+   ```bash
+   LOCK=/tmp/abc-emulator.lock; mkdir "$LOCK" 2>/dev/null && basename "$PWD" > "$LOCK/owner" && echo frei || echo "belegt von $(cat $LOCK/owner)"
+   ```
+
+   Nach dem Lauf **immer** `rm -rf /tmp/abc-emulator.lock`. Steht ein Lock, dessen
+   Besitzer-Worktree gar nichts mehr laufen hat (`ps`-Prüfung oben), ist er abgestanden
+   und darf weg.
+2. **Gerät festnageln:** `ANDROID_SERIAL=emulator-5554` vor den Gradle-Aufruf. Ohne das
+   fächert `connectedDebugAndroidTest` über *alle* angeschlossenen Geräte auf — und ein
+   Telefon, das gleichzeitig per USB und per WLAN hängt, blockiert sich mit
+   `INSTALL_FAILED_DUPLICATE_PACKAGE` selbst.
+3. **Nur die eigene Klasse laufen lassen**, nicht das ganze Paket — kürzeres Fenster,
+   kleinere Kollisionsfläche:
+   `-Pandroid.testInstrumentationRunnerArguments.class=<voll.qualifizierte.Klasse>`.
+4. **Bei „Process crashed" ohne Assertion:** Logcat auf `killDueToPackageUpdate` prüfen,
+   und wenn es das war, den Lauf schlicht wiederholen, statt am eigenen Test zu suchen.
+
+Details zum SDK-Setup in den Worktrees: siehe `README.md`.
+
 ## Definition of Done (Agent)
 
 - Verhalten entspricht den Produktprinzipien

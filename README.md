@@ -27,6 +27,15 @@ Optional: Buchstaben-/Silben-Jagd als Übungselement zwischen den Trainern.
 ./gradlew :app:testDebugUnitTest
 ```
 
+Die Agent-Worktrees unter `.claude/worktrees/` tragen **keine** `local.properties`,
+Gradle findet das SDK dort also nicht. Dort jedem Aufruf das SDK voranstellen, statt
+eine `local.properties` anzulegen (die gehört nicht ins Repo, und die Worktrees werden
+neu erzeugt):
+
+```bash
+ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest
+```
+
 Install:
 
 ```bash
@@ -35,13 +44,22 @@ Install:
 
 ### Instrumentierte Tests und Layout-Screenshots
 
+> **Erst prüfen, wer sonst auf dem Emulator ist.** Mehrere Claude-Sessions arbeiten
+> parallel in eigenen Worktrees und teilen sich den einen `uxreview`-Emulator; eine
+> fremde Installation killt den eigenen Testprozess mitten im Lauf
+> (`killDueToPackageUpdate` → „Process crashed" ohne Assertion). Prüfschritte, Lock und
+> die restlichen Gegenmaßnahmen stehen in
+> [`AGENTS.md` → Geteilter Emulator](AGENTS.md#geteilter-emulator).
+
 ```bash
-./gradlew :app:connectedDebugAndroidTest
+ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest
 ```
 
 `SentenceOrderPegBoundsTest` misst die gerenderten Pegs des Satz-Architekten gegen
 die Bühnenkante — die Rechnung dahinter prüft `SentencePegSizingTest` in den
-Unit-Tests. `SentenceOrderPegShotTest` und `SentenceOrderMorphShotTest` behaupten
+Unit-Tests. `SymbolHuntTileBoundsTest` tut dasselbe für die Streukacheln der
+Buchstabenjagd, gegen `SymbolHuntLayoutTest` als Geometrie-Gegenstück.
+`SentenceOrderPegShotTest` und `SentenceOrderMorphShotTest` behaupten
 nichts, sie **rendern**: Layout in mehreren Breiten und Systemschriftgrößen, und
 einen Filmstreifen des Fill-Morphs bei angehaltener Testuhr. Die PNGs landen im
 `filesDir` der App, weil `externalCacheDir` auf einem frischen Emulator null ist.
