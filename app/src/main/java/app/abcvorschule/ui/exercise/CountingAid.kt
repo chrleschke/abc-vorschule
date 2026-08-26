@@ -64,9 +64,11 @@ fun CountingAid(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(CountingField.RowGapDp.dp * 2),
     ) {
-        // Plus stapelt seine zwei Gruppen übereinander statt nebeneinander: fünf
-        // Spalten je Gruppe wären nebeneinander zehn, und zehn Objekte quer passen
-        // bei font_scale 1.3 auf kein Telefon.
+        // Plus stapelt seine zwei Gruppen übereinander statt nebeneinander: nebeneinander
+        // stünden zwei volle Zeilen quer, also bis zu zwanzig Objekte, und das Emoji
+        // müsste auf die Hälfte schrumpfen. Gestapelt liest sich außerdem der
+        // durchlaufende Zähler von oben nach unten, statt über das Operatorzeichen
+        // zu springen.
         var offset = 0
         CountingField.groupSizes(operation, left, right).forEachIndexed { groupIndex, size ->
             if (groupIndex > 0) {
