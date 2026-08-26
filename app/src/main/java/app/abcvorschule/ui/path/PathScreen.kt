@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -39,6 +40,7 @@ import app.abcvorschule.progress.LessonState
 import app.abcvorschule.ui.shell.AbcTopBar
 import app.abcvorschule.ui.shell.ParentGateButton
 import app.abcvorschule.ui.shell.TopBarFloatingActionReserve
+import app.abcvorschule.ui.shell.TopBarHeight
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.WarmInk
@@ -76,42 +78,38 @@ fun PathScreen(
     Box(modifier.fillMaxSize()) {
         PathBackground(scrollOffset = { scrollState.value })
 
-        Column(Modifier.fillMaxSize()) {
-            // Sterne rechts in der Kopfzeile, mit Platz für den schwebenden ⋯
-            // darüber. Der Stern bekommt hier als einziger Ort der App eine
-            // WarmInk-Kontur: er steht über dem Himmel, nicht über Cream, und
-            // StarGoldDeep fällt dort auf 2.07:1 — WarmInk gibt ihm 6.97:1, die
-            // Tinte, in der auch die Zahl daneben steht.
-            AbcTopBar(
-                points = points,
-                starOutline = WarmInk,
-                endReserve = TopBarFloatingActionReserve,
-            )
+        val density = LocalDensity.current
+        val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+        val navigationBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        // Die Schilder laufen unter der durchsichtigen Kopfzeile durch und werden
+        // erst an der physischen Bildschirmkante beschnitten — deshalb füllt der
+        // Scroll-Bereich den ganzen Screen, statt unter der Leiste anzufangen.
+        // Stand er in einer Column unter ihr, schnitt seine Oberkante die Schilder
+        // mitten im Bild ab, an einer Linie, die der Hintergrund nicht erklärt.
+        // Den Platz, den die Leiste einnimmt, hält der Inhalt selbst frei.
+        val contentTop = statusBarTop + TopBarHeight
+        val contentTopPx = with(density) { contentTop.toPx() }
+        val spacingPx = with(density) { PathGeometry.DefaultSpacing.dp.toPx() }
+        val marginPx = with(density) { PathGeometry.DefaultMargin.dp.toPx() }
+        val horizontalMarginPx = with(density) { PathGeometry.DefaultHorizontalMargin.dp.toPx() }
+        val dotSpacingPx = with(density) { PathTrail.DefaultDotSpacing.dp.toPx() }
+        val dotRadiusPx = with(density) { PathTrail.DefaultDotRadius.dp.toPx() }
 
-            val density = LocalDensity.current
-            val navigationBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-            val spacingPx = with(density) { PathGeometry.DefaultSpacing.dp.toPx() }
-            val marginPx = with(density) { PathGeometry.DefaultMargin.dp.toPx() }
-            val horizontalMarginPx = with(density) { PathGeometry.DefaultHorizontalMargin.dp.toPx() }
-            val dotSpacingPx = with(density) { PathTrail.DefaultDotSpacing.dp.toPx() }
-            val dotRadiusPx = with(density) { PathTrail.DefaultDotRadius.dp.toPx() }
-
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(scrollState)
-                    .testTag("path_scroll"),
-            ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .testTag("path_scroll"),
+        ) {
+            Column(Modifier.fillMaxWidth()) {
+                Spacer(Modifier.height(contentTop))
                 BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth()
-                        // Plus Nav-Bar-Inset: die Landschaft läuft unter der
-                        // durchsichtigen Leiste durch, aber das letzte Schild muss
-                        // sich darüber schieben lassen.
                         .height(
                             with(density) {
                                 PathGeometry.contentHeight(lessons.size, spacingPx, marginPx).toDp()
-                            } + navigationBarBottom,
+                            },
                         ),
                 ) {
                     val widthPx = with(density) { maxWidth.toPx() }
@@ -187,7 +185,7 @@ fun PathScreen(
                     LaunchedEffect(Unit) {
                         if (advanceFromLessonId != null) onAdvanceAnimated()
                     }
-                    AutoScrollToHead(scrollState, nodePoints, headIndex, markerStartIndex)
+                    AutoScrollToHead(scrollState, nodePoints, contentTopPx, headIndex, markerStartIndex)
 
                     // Walked footprints are warm gold and nearly opaque, the ones
                     // still ahead are a faint warm grey — on a light landscape the
@@ -227,8 +225,24 @@ fun PathScreen(
                         PathHereMarker(nodePoints = nodePoints, index = { markerIndex.value })
                     }
                 }
+                // Das letzte Schild muss sich über die Nav-Bar schieben lassen;
+                // die Landschaft läuft darunter weiter durch.
+                Spacer(Modifier.height(navigationBarBottom))
             }
         }
+
+        // Über dem Scroll-Inhalt, nicht darüber gestapelt: die Leiste ist
+        // durchsichtig, die Schilder wandern unter ihr hindurch.
+        AbcTopBar(
+            // Der Stern bekommt hier als einziger Ort der App eine WarmInk-Kontur:
+            // er steht über dem Himmel, nicht über Cream, und StarGoldDeep fällt
+            // dort auf 2.07:1 — WarmInk gibt ihm 6.97:1, die Tinte, in der auch die
+            // Zahl daneben steht.
+            points = points,
+            starOutline = WarmInk,
+            endReserve = TopBarFloatingActionReserve,
+            modifier = Modifier.align(Alignment.TopStart),
+        )
 
         // Schwebt über der Kopfzeile statt in ihr: der ⋯ ist kein Bar-Element,
         // sondern die Elterntür — 8 dp unter dem Status-Bar-Inset sitzt er auf
@@ -261,6 +275,7 @@ fun PathScreen(
 private fun AutoScrollToHead(
     scrollState: ScrollState,
     nodePoints: List<PathPoint>,
+    contentTopPx: Float,
     headIndex: Int,
     hopStartIndex: Int,
 ) {
@@ -270,14 +285,17 @@ private fun AutoScrollToHead(
         (PathSignDimens.TotalHeight + PathMarkerDimens.Headroom).toPx()
     }
     var lastScrolledHead by remember { mutableStateOf<Int?>(null) }
-    LaunchedEffect(headIndex, nodePoints) {
-        val nodeY = nodePoints.getOrNull(headIndex)?.y ?: return@LaunchedEffect
+    LaunchedEffect(headIndex, nodePoints, contentTopPx) {
+        // Knoten-y ist Pfad-Koordinate; der Scroll-Inhalt beginnt aber erst unter
+        // dem Platz, den die Kopfzeile freihält. Ohne diesen Versatz parkt jedes
+        // Ziel um Status-Bar plus Leiste zu hoch.
+        val nodeY = nodePoints.getOrNull(headIndex)?.y?.plus(contentTopPx) ?: return@LaunchedEffect
         // The scroll container does not know its size (nor its maxValue) until the
         // first layout pass, and this effect can run before it — a target computed
         // from a zero viewport would park the sign at the very top.
         val viewport = snapshotFlow { scrollState.viewportSize }.first { it > 0 }
         val target = PathFocus.scrollTarget(nodeY, viewport, scrollState.maxValue)
-        val hopFromY = nodePoints.getOrNull(hopStartIndex)?.y
+        val hopFromY = nodePoints.getOrNull(hopStartIndex)?.y?.plus(contentTopPx)
         when {
             // First scroll with a hop pending: show the hop's start, then follow
             // the marker down to the new sign. Delay and duration mirror the hop
