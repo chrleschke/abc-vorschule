@@ -381,6 +381,15 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - **Speaker-Kopfzeile:** ganz oben in der Bühne, feste Höhe über alle Trainer (§7).
 - **Prompt/Aufgabe:** Block darunter, zentriert, mit Luft zu den Rändern (kein Kleben am Screenrand).
 - **Antworten:** unterer Block, zentriert (Kacheln, Mengenwahl, Ziffernblock).
+- **Der Aufgabenblock steht still, während die Runde läuft.** Er ist in dem
+  zentriert, was der Antwortblock übrig lässt, also verschiebt ihn jede
+  Höhenänderung unten — im Wort-Bauer wanderte das Wort dadurch durch drei
+  senkrechte Positionen: Tray voll, Tray leer (alle Bausteine sitzen), Rahmen zu
+  fertigem Wort. Wer einen Block im Lauf einer Runde leer laufen oder schrumpfen
+  lässt, hält dessen größte Höhe fest (`holdTallest` in `WordBuildTrainer`,
+  gemessen statt gerechnet — Zeilenumbruch des Trays, Zeilenhöhe und
+  Systemschriftgröße kennt die Geometrie nicht). Das Kind soll die Lösung im Blick
+  behalten, nicht dem Wort nachsehen.
 - Keine doppelte Aufgabe+Vorschau desselben Tokens.
 - Ausnahme Buchstaben-/Silben-Jagd: Kacheln verstreuen sich über den gesamten Aufgabenbereich statt in einer geordneten Antwortliste; die Batterie bleibt im Antwortbereich unten.
 - Ausnahme Wort-Detektiv: der Antwortbereich trägt **Quittungs-Striche statt Wahloptionen**.
@@ -444,10 +453,15 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - Erfolgsmomente: SuccessBurst (Gold-Stern + Funken, ohne Haptik), Gold-Puls an der
   Segmentgrenze je Trainer, Konfetti auf dem End-Screen.
 - **Shape-Morph beim Einrasten (Squish-Settle).** Rastet ein Wort in einen Peg des
-  Satz-Architekten, quetscht der Peg horizontal und federt in Form zurück: `scaleX`
-  0,91 → über 1,0 → 1,0, `scaleY` gegenläufig 1,05 → 1,0, Eckradius 24 → 16dp, eine
+  Satz-Architekten **oder ein Baustein in einen Rahmen des Wort-Bauers**, quetscht
+  das Bauteil horizontal und federt in Form zurück: `scaleX`
+  0,91 → über 1,0 → 1,0, `scaleY` gegenläufig 1,05 → 1,0, Eckradius +8dp über den
+  Ruheradius des Bauteils (Peg 16dp, Rahmen 22dp) und zurück, eine
   Feder mit `dampingRatio = 0.42` und `Spring.StiffnessMediumLow`, synchron zur
-  `tick`-Haptik. Das ist die Material-3-Expressive-Idee „Form folgt Zustand" mit
+  `tick`-Haptik. Dieselbe Tat bekommt dieselbe Antwort, darum liegen Werte und
+  Feder **einmal** in `SlotFillMorph`/`rememberSlotFillSettle` und nicht als Kopie
+  je Trainer; Filmstreifen zum Beurteilen in `SentenceOrderMorphShotTest` und
+  `WordBuildMorphShotTest`. Das ist die Material-3-Expressive-Idee „Form folgt Zustand" mit
   Bordmitteln — **kein** `androidx.graphics.shapes`-Polygon-Morph, weil eine blobbige
   Zielform das Wort im Peg beschneiden würde. Gegenläufiges Y ist Pflicht, sonst
   liest die Bewegung als Zoom statt als Quetschung. Nur die eigene Tat federt: nach
@@ -455,6 +469,15 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
   das das Kind nicht geschafft hat. Gelesen wird die Feder in der **Zeichenphase**
   (`graphicsLayer` / `drawBehind`), damit 300ms Bewegung nicht 300ms rekomponieren
   und die registrierten Drop-Zonen nicht unter dem Finger wandern.
+- **Ein Trainer, der geladen wird, animiert nichts** — er ist einfach da. Bewegung
+  ist Antwort auf eine Tat des Kindes; eine Bühne, die sich beim Laden selbst
+  aufbaut, liest als Fehler. Praktische Falle dabei: `AnimatedContent` merkt sich
+  seinen Zustand in einem ungekeyten `remember`, und der Aufrufort überlebt den
+  Rundenwechsel, solange zwei Trainer desselben Typs aufeinander folgen (Wort-Bauer
+  36× im Pack). Der Rundenschlüssel muss deshalb auch die Transition keyen
+  (`key(roundKey)` in `WordBuildTrainer`), sonst spielt die neue Runde den Eintritt
+  ihrer leeren Platzhalter ab. Gegen die Rückkehr steht
+  `WordBuildRoundSwitchTest`.
 - **Druck-Morph der Jagd-Kacheln (Aufblähen, Plopp, Wegploppen).** Eine Kachel der
   Buchstaben-/Silben-Jagd ist eine weiche Kugel: Schattierung im Kreis (heller Kern oben
   links, satter Rand, Glanzpunkt, Innenschatten am Rand) statt flacher Fläche. Unter dem
