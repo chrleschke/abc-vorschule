@@ -241,7 +241,11 @@ brechen.
   überlappende Positionen, Größen (Streuung z. B. 0.8×–1.3× Basisgröße) und
   Farbindizes. **Constraints:** Hit-Box ≥ 56 dp, Mindestabstand zwischen
   Kachelmitten so, dass Finger-Misses unwahrscheinlich sind; Layouts unter dem
-  Threshold werden verworfen und neu geseedet.
+  Threshold werden verworfen und neu geseedet. Der Rand, den eine Kachel zum
+  Feldrand hält, folgt **ihrem eigenen Radius** (Grundgröße × ihrer Skala ÷ 2,
+  plus etwas Luft) — die zurückgegebenen Punkte sind Kachel*mittelpunkte*, ein
+  fester prozentualer Rand ist auf Handybreite schmaler als der Radius der
+  größten Kachel und schneidet sie am Bildschirmrand ab.
 - Farben ausschließlich aus der bestehenden Palette
   (`SoftMint`, `SoftCoral`, `SoftSky`, `SoftGold`, `SoftSand`), rotierend nach
   Kachelindex — bereits für den dunklen Hintergrund kontraststark validiert,
