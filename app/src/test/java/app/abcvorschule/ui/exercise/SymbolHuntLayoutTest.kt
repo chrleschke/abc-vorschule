@@ -67,7 +67,9 @@ class SymbolHuntLayoutTest {
                 tileSizePx = tileSizePx,
             )
             positions.forEachIndexed { index, tile ->
-                val radius = tileSizePx * tile.scale / 2f
+                // Der aufgeblähte Radius, nicht der Ruheradius: gedrückt wächst die
+                // Kachel um HuntTileMorph.MaxInflate und muss trotzdem drinbleiben.
+                val radius = tileSizePx * tile.scale / 2f * (1f + HuntTileMorph.MaxInflate)
                 assertTrue("tile $index (seed $seed) juts out left: ${tile.x - radius}", tile.x - radius >= 0f)
                 assertTrue("tile $index (seed $seed) juts out right: ${tile.x + radius}", tile.x + radius <= 336f)
                 assertTrue("tile $index (seed $seed) juts out top: ${tile.y - radius}", tile.y - radius >= 0f)

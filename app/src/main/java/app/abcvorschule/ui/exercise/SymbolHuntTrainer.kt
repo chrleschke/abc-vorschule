@@ -1,15 +1,22 @@
 package app.abcvorschule.ui.exercise
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -31,6 +38,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -43,6 +55,7 @@ import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.SoftSand
 import app.abcvorschule.ui.theme.StarGoldDeep
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
@@ -94,8 +107,10 @@ fun SymbolHuntTrainer(
     }
     // Captured once, before any tap can shrink state.tiles — the scatter layout
     // must stay keyed on the round's original tile count, not the shrinking list,
-    // so surviving tiles keep their position/color across a correct tap.
-    val initialTileCount = remember(roundKey) { state.tiles.size }
+    // so surviving tiles keep their position/color across a correct tap. Das Feld
+    // komponiert außerdem über diese Liste (nicht über state.tiles), damit eine
+    // eingesammelte Kachel noch wegploppen kann statt zu verschwinden.
+    val initialTiles = remember(roundKey) { state.tiles }
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var batteryFull by remember(roundKey) { mutableStateOf(false) }
     val haptics = LocalAbcHaptics.current
@@ -161,7 +176,7 @@ fun SymbolHuntTrainer(
             if (!resolved) {
                 SymbolHuntField(
                     state = state,
-                    initialTileCount = initialTileCount,
+                    initialTiles = initialTiles,
                     pack = pack,
                     enabled = !batteryFull && !interactionLocked,
                     onTap = ::handleTap,
@@ -187,7 +202,7 @@ fun SymbolHuntTrainer(
 @Composable
 private fun SymbolHuntField(
     state: SymbolHuntState,
-    initialTileCount: Int,
+    initialTiles: List<SymbolHuntTile>,
     pack: ContentPack,
     enabled: Boolean = true,
     onTap: (Int) -> Unit,
@@ -202,50 +217,218 @@ private fun SymbolHuntField(
         // state.seed — cannot reshuffle the surviving tiles. A wrong tap DOES
         // bump state.seed, which is the intended "mix the field" reshuffle.
         val tileSizePx = with(density) { TileSize.toPx() }
-        val positions = remember(state.seed, initialTileCount, widthPx, heightPx, tileSizePx) {
-            SymbolHuntLayout.scatter(state.seed, initialTileCount, widthPx, heightPx, tileSizePx)
+        val positions = remember(state.seed, initialTiles.size, widthPx, heightPx, tileSizePx) {
+            SymbolHuntLayout.scatter(state.seed, initialTiles.size, widthPx, heightPx, tileSizePx)
         }
-        state.tiles.forEach { tile ->
+        // Gelaufen wird über die *ursprüngliche* Kachelliste, nicht über
+        // state.tiles: eine eingesammelte Kachel muss noch ein paar Frames
+        // komponiert bleiben, sonst gibt es kein Wegploppen (HuntTileMorph
+        // Phase 4) — sie wäre schlicht weg. Wer noch im Feld liegt, sagt
+        // `present`; wer fertig weggeploppt ist, komponiert sich selbst heraus.
+        val presentIds = remember(state.tiles) { state.tiles.mapTo(HashSet()) { it.instanceId } }
+        initialTiles.forEach { tile ->
             // Indexed by the tile's stable instanceId (its index in the original,
             // pre-shrink tile list) rather than its position in the current
             // (shrinking) list, so a surviving tile keeps the same slot/color.
             val position = positions.getOrNull(tile.instanceId) ?: return@forEach
-            val tileDp = TileSize * position.scale
-            val offsetX = with(density) { position.x.toDp() } - tileDp / 2
-            val offsetY = with(density) { position.y.toDp() } - tileDp / 2
-            val color = TilePalette[tile.instanceId % TilePalette.size]
-            Box(
-                modifier = Modifier
-                    .offset(x = offsetX, y = offsetY)
-                    .size(tileDp)
-                    // Without this clip, the tile's click/ripple bounds default to the
-                    // Box's full square size instead of the CircleShape drawn below —
-                    // the touch feedback flashes as a square and, where scattered tiles
-                    // sit close together, can spill visibly into a neighbouring tile.
-                    .clip(CircleShape)
-                    .background(color = color.copy(alpha = 0.22f), shape = CircleShape)
-                    .border(width = 3.dp, color = color, shape = CircleShape)
-                    .clickable(enabled = enabled) { onTap(tile.instanceId) }
-                    .testTag("hunt_tile_${tile.instanceId}"),
-                contentAlignment = Alignment.Center,
-            ) {
-                val glyph = pack.atoms[tile.atomId]?.display ?: tile.atomId
-                // Aus dem Kacheldurchmesser abgeleitet statt fest 28sp: der Kreis
-                // clippt (siehe .clip oben), also würde ein „Sch" auf der kleinsten
-                // 64dp-Kachel ab font_scale 1.3 angeschnitten (28sp × 1.3 × 0.72 × 3
-                // ≈ 79dp Vorschub). Gleiches dp-Budget-durch-fontScale-Muster wie
-                // WordFrameSizing.wordGlyphSp; GlyphAspect inklusive Headroom von dort.
-                val glyphSp = (
-                    tileDp.value /
-                        (glyph.length.coerceAtLeast(1) * WordFrameSizing.GlyphAspect * density.fontScale)
-                    ).coerceAtMost(MaxTileGlyphSp)
-                Text(
-                    text = glyph,
-                    fontSize = glyphSp.sp,
-                    color = WarmInk,
+            HuntTile(
+                glyph = pack.atoms[tile.atomId]?.display ?: tile.atomId,
+                position = position,
+                color = TilePalette[tile.instanceId % TilePalette.size],
+                present = tile.instanceId in presentIds,
+                enabled = enabled,
+                onTap = { onTap(tile.instanceId) },
+                modifier = Modifier.testTag("hunt_tile_${tile.instanceId}"),
+            )
+        }
+    }
+}
+
+/** Merker „diese Kachel war schon einmal unter dem Finger". Bewusst kein
+ * `mutableStateOf`: er wird nur im Druck-Effekt gelesen und geschrieben, eine
+ * Recomposition dafür wäre umsonst. Ohne ihn liefe der Loslassen-Zweig schon
+ * beim ersten Komponieren mit und das ganze Feld wackelte beim Rundenstart. */
+private class HuntPressLatch { var touched = false }
+
+/**
+ * Eine Kachel im Streufeld, samt Druck-Morph — Kurven, Grenzen und Begründung
+ * stehen in [HuntTileMorph].
+ *
+ * Beide Federwerte werden ausschließlich in der **Zeichenphase** gelesen
+ * (`graphicsLayer` / `drawBehind`), nie in der Komposition: 1,5 Sekunden Halten
+ * dürfen nicht 1,5 Sekunden lang rekomponieren, und die Streuposition darf
+ * dabei nicht unter dem Finger wandern (gleiche Begründung wie beim Peg-Morph
+ * des Satz-Architekten). Rekomponiert wird nur beim Kippen von `pressed` und
+ * einmal am Ende des Wegploppens.
+ */
+@Composable
+private fun HuntTile(
+    glyph: String,
+    position: HuntTilePosition,
+    color: Color,
+    present: Boolean,
+    enabled: Boolean,
+    onTap: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val inflate = remember { Animatable(0f) }
+    val exit = remember { Animatable(0f) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
+    val latch = remember { HuntPressLatch() }
+    var poppedAway by remember { mutableStateOf(false) }
+
+    LaunchedEffect(pressed) {
+        if (pressed) {
+            latch.touched = true
+            // Anfassen: kurze Feder auf +6 %, mit leichtem Nachwippen.
+            inflate.animateTo(
+                targetValue = HuntTileMorph.PressPuff,
+                animationSpec = spring(dampingRatio = 0.55f, stiffness = Spring.StiffnessMedium),
+            )
+            // Halten: verzögert weiter bis zum Deckel +10 % und dort stillstehen.
+            inflate.animateTo(
+                targetValue = HuntTileMorph.MaxInflate,
+                animationSpec = tween(
+                    durationMillis = HuntTileMorph.HoldMs,
+                    easing = LinearOutSlowInEasing,
+                ),
+            )
+        } else if (latch.touched) {
+            // Loslassen: schneller Kollaps unter den Ruhedurchmesser …
+            inflate.animateTo(
+                targetValue = -HuntTileMorph.CollapseUndershoot,
+                animationSpec = tween(
+                    durationMillis = HuntTileMorph.CollapseMs,
+                    easing = FastOutLinearInEasing,
+                ),
+            )
+            // … dann das Plopp zurück in Form.
+            inflate.animateTo(
+                targetValue = 0f,
+                animationSpec = spring(dampingRatio = 0.38f, stiffness = Spring.StiffnessHigh),
+            )
+        }
+    }
+
+    // Eigener Effekt auf einem eigenen Animatable: beim Treffer laufen Kollaps
+    // (Finger geht hoch) und Wegploppen (Kachel verlässt das Feld) im selben
+    // Frame los und dürfen sich nicht gegenseitig abbrechen — eine geteilte
+    // Feder würde genau das tun.
+    LaunchedEffect(present) {
+        if (present) {
+            exit.snapTo(0f)
+            poppedAway = false
+        } else {
+            exit.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(
+                    durationMillis = HuntTileMorph.PopAwayMs,
+                    easing = FastOutLinearInEasing,
+                ),
+            )
+            poppedAway = true
+        }
+    }
+
+    // Nach dem Ploppen wirklich raus aus dem Baum: eine auf Deckkraft 0
+    // stehengelassene Kachel bliebe mit ihrem Glyphen in der Semantik und
+    // TalkBack läse eingesammelte Buchstaben weiter vor.
+    if (poppedAway) return
+
+    val density = LocalDensity.current
+    val tileDp = TileSize * position.scale
+    val offsetX = with(density) { position.x.toDp() } - tileDp / 2
+    val offsetY = with(density) { position.y.toDp() } - tileDp / 2
+    Box(
+        modifier = modifier
+            .offset(x = offsetX, y = offsetY)
+            .size(tileDp)
+            .graphicsLayer {
+                val factor = HuntTileMorph.scale(inflate.value, exit.value)
+                scaleX = factor
+                scaleY = factor
+                alpha = HuntTileMorph.alpha(exit.value)
+            }
+            // Der Clip hält die Verläufe im Kreis — der Glanzpunkt sitzt
+            // außermittig und ragte sonst an der Kante heraus — und deckelt
+            // weiter den Glyphen (siehe Größenrechnung unten).
+            .clip(CircleShape)
+            .drawBehind {
+                val press = HuntTileMorph.pressProgress(inflate.value)
+                val radius = size.minDimension / 2f
+                val center = Offset(size.width / 2f, size.height / 2f)
+                val lightCenter = Offset(
+                    x = size.width * HuntTileMorph.GlossCenterX,
+                    y = size.height * HuntTileMorph.GlossCenterY,
+                )
+                // Grundwäsche mit Tiefe statt flacher Fläche: heller Kern oben
+                // links, satter Rand. Im Mittel die bisherigen 0,22 Deckkraft.
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            color.copy(alpha = HuntTileMorph.coreAlpha(press)),
+                            color.copy(alpha = HuntTileMorph.rimAlpha(press)),
+                        ),
+                        center = lightCenter,
+                        radius = radius * HuntTileMorph.WashRadiusFactor,
+                    ),
+                    radius = radius,
+                    center = center,
+                )
+                // Innenschatten am Rand, der mit dem Druck zunimmt: die Kachel
+                // liest als weiche Kugel, die man eindrückt, nicht als Zoom.
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        HuntTileMorph.ShadeInnerStop to Color.Transparent,
+                        1f to color.copy(alpha = HuntTileMorph.shadeAlpha(press)),
+                        center = center,
+                        radius = radius,
+                    ),
+                    radius = radius,
+                    center = center,
+                )
+                // Glanzpunkt: wird beim Drücken schwächer und zieht sich zusammen.
+                val glossRadius = radius * HuntTileMorph.glossRadiusFactor(press)
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            SoftSand.copy(alpha = HuntTileMorph.glossAlpha(press)),
+                            SoftSand.copy(alpha = 0f),
+                        ),
+                        center = lightCenter,
+                        radius = glossRadius,
+                    ),
+                    radius = glossRadius,
+                    center = lightCenter,
                 )
             }
-        }
+            .border(width = 3.dp, color = color, shape = CircleShape)
+            .clickable(
+                interactionSource = interactionSource,
+                // Keine Ripple mehr: der Morph *ist* die Druckantwort, zwei
+                // gleichzeitige Druck-Rückmeldungen im selben Kreis lesen als
+                // Doppelbild.
+                indication = null,
+                enabled = enabled && present,
+                onClick = onTap,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        // Aus dem Kacheldurchmesser abgeleitet statt fest 28sp: der Kreis
+        // clippt (siehe .clip oben), also würde ein „Sch" auf der kleinsten
+        // 64dp-Kachel ab font_scale 1.3 angeschnitten (28sp × 1.3 × 0.72 × 3
+        // ≈ 79dp Vorschub). Gleiches dp-Budget-durch-fontScale-Muster wie
+        // WordFrameSizing.wordGlyphSp; GlyphAspect inklusive Headroom von dort.
+        val glyphSp = (
+            tileDp.value /
+                (glyph.length.coerceAtLeast(1) * WordFrameSizing.GlyphAspect * density.fontScale)
+            ).coerceAtMost(MaxTileGlyphSp)
+        Text(
+            text = glyph,
+            fontSize = glyphSp.sp,
+            color = WarmInk,
+        )
     }
 }
 

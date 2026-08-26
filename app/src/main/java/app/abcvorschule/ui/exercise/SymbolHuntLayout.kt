@@ -100,8 +100,12 @@ object SymbolHuntLayout {
     ): HuntTilePosition {
         // Skala zuerst: der Rand, den diese Kachel braucht, hängt an ihrem eigenen
         // Radius — eine 1,3er-Kachel muss weiter von der Kante weg als eine 0,8er.
+        // Gerechnet wird mit dem *aufgeblähten* Radius: unter dem Finger wächst die
+        // Kachel um bis zu HuntTileMorph.MaxInflate, und auch gedrückt darf sie
+        // nicht über die Feldkante ragen.
         val scale = MinScale + random.nextFloat() * ScaleSpan
-        val inset = tileSizePx * (scale / 2f + EdgePaddingFraction)
+        val pressedRadius = tileSizePx * scale / 2f * (1f + HuntTileMorph.MaxInflate)
+        val inset = pressedRadius + tileSizePx * EdgePaddingFraction
         return HuntTilePosition(
             x = axisPosition(random, boundsWidth, inset),
             y = axisPosition(random, boundsHeight, inset),
