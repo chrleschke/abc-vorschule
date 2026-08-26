@@ -3,6 +3,7 @@ package app.abcvorschule.ui.shell
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,6 +26,14 @@ import kotlinx.coroutines.withTimeout
 
 private const val ParentGateMs = 1500L
 
+/**
+ * Die einzige Einstellungstür (§6), als schwebender Knopf über dem Inhalt — er
+ * gehört keiner Bar an und wird deshalb rund gezeichnet, mit einem Schatten, der
+ * ihn von der Landschaft dahinter abhebt.
+ *
+ * Nur auf dem Pfad-Screen. In der Lektion gibt es ihn nicht: dort führt der Weg
+ * zu den Eltern-Einstellungen über das Verlassen der Lektion.
+ */
 @Composable
 fun ParentGateButton(
     onUnlocked: () -> Unit,
@@ -34,9 +43,10 @@ fun ParentGateButton(
     val gateDescription = stringResource(R.string.parent_gate_description)
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = MaterialTheme.shapes.medium,
+        shape = CircleShape,
+        shadowElevation = 4.dp,
         modifier = modifier
-            .size(48.dp)
+            .size(TopBarFloatingActionSize)
             .testTag("parent_gate")
             // Der rohe pointerInput ist für TalkBack unsichtbar; die Semantik macht
             // die einzige Einstellungstür (§6) als Button mit Long-Click-Aktion

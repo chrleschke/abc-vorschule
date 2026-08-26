@@ -210,9 +210,11 @@ niemals mit einem stummen No-Op.
 
 ## 6. Hilfestufen
 
-- Parent-Gate (langer Druck auf ⋯) öffnet das Sheet „Eltern“ mit Hilfestufe
-  (**Auto / Mit Hilfe / Ohne Hilfe**) und der Freigabe „Reihenfolge frei wählbar“,
-  die die Fortschrittssperre des Pfades aufhebt. In Debug-Builds zusätzlich
+- Parent-Gate (langer Druck auf ⋯) öffnet das Sheet „Eltern“. Der ⋯ ist ein **schwebender
+  runder Knopf oben rechts auf dem Pfad-Screen**, kein Bar-Element — und in der Lektion gibt es
+  ihn nicht: dort führt der Weg zu den Einstellungen über das Verlassen der Lektion. Das Sheet
+  bietet die Hilfestufe (**Auto / Mit Hilfe / Ohne Hilfe**) und die Freigabe „Reihenfolge frei
+  wählbar“, die die Fortschrittssperre des Pfades aufhebt. In Debug-Builds zusätzlich
   „TTS Debug“ am Ende des Sheets (Entwickler-Werkzeug, nicht für Release).
 - Auto passt Gerüste sanft an; erzwungene Stufen frieren Auto-Streaks ein.
 - Gerüste pro Atom/Slot (Silhouette vs. Lücke), nicht global starr über die ganze Aufgabe.
@@ -313,7 +315,19 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 
 ## 9. Layout-Grundform der Übungen
 
-- **Chrome oben:** Parent-Gate · Punkte · Schließen; darunter zentriert Zurück/Weiter-Chevrons; darunter Status-/Fortschrittsbalken. Der Speaker sitzt nicht im Chrome, sondern gemäß §7 im Aufgabenbereich.
+- **Chrome oben (nativ):** eine durchsichtige M3-Top-App-Bar. Links das Schließen-X, im Titel-Slot
+  der elternseitige Lektionstitel und rechts Stern + Punkte. Kein Overflow-Menü in der Lektion.
+  Darunter **eine** Zeile: Rückfall-Chevrons an den Rändern, dazwischen die Fortschrittskette.
+  Der Speaker sitzt nicht im Chrome, sondern gemäß §7 im Aufgabenbereich.
+- **Fortschritt ist eine Segmentkette** (`AbcSegmentedProgress`): ein Segment je Trainer, das
+  laufende füllt sich nach Runden-Anteil. Sie ersetzt Balken, Textlabel „3/8" und Runden-Punkte —
+  das Kind liest das Label ohnehin nicht.
+- **Vor/Zurück ist ein Rückfallweg, kein Angebot**: die Chevrons haben kein Button-Gehäuse mehr,
+  nur den gedämpften Glyph (Trefferfläche bleibt 48 dp). Vorwärts kommt das Kind durch Lösen.
+- **Schutzbereiche sind durchsichtig:** kein globales `safeDrawing`-Padding auf der Wurzel —
+  Hintergrund und Pfad-Landschaft laufen unter Status- und Nav-Bar durch, jedes Element
+  konsumiert seinen Inset selbst. Die Unterkante des Aufgabenbereichs nutzt `safeDrawing`
+  (nicht nur `navigationBars`), damit die System-Zahlentastatur den Block weiter hochschiebt.
 - **Prompt/Aufgabe:** oberer Block, zentriert, mit Luft zu den Rändern (kein Kleben am Screenrand).
 - **Antworten:** unterer Block, zentriert (Kacheln, Mengenwahl, Ziffernblock).
 - Keine doppelte Aufgabe+Vorschau desselben Tokens.
@@ -338,7 +352,7 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 
 ## 10. Design-System
 
-- Gemeinsame Komponenten unter `ui/components/` (`AbcContinueButton`, `AbcSpeakerButton`, `AbcNavChevron`, `AbcProgressBar`, Vektor-Icons inkl. `IconStar`).
+- Gemeinsame Komponenten unter `ui/components/` (`AbcContinueButton`, `AbcSpeakerButton`, `AbcNavChevron`, `AbcSegmentedProgress`, Vektor-Icons inkl. `IconStar`) und `ui/shell/AbcTopBar`.
 - Buttons: keine Emojis — nur ASCII oder Canvas/SVG-Vektoren. Punkte-/Erfolgs-Symbol ist der Vektor-Stern `IconStar`, kein Text-Asterisk.
 - Übungen nutzen `ExerciseStage` für klare Trennung Aufgabenblock / Antwortblock.
   Der Parameter `answerAnchor` ist mit `Bottom` vorbelegt; `BelowCenter` ist die
@@ -356,7 +370,7 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - Haptik-Vokabular `AbcHaptics` (tick/success/celebrate/nudge): tick = kleiner Sammel-Erfolg
   (Trace-Stern, Jagd-Treffer, Einrasten), success = Aufgabe richtig, celebrate = Lektions-/
   Batterie-Feier, nudge = sanfte Korrektur. Haptik ergänzt Ton, ersetzt ihn nie.
-- Erfolgsmomente: SuccessBurst (Gold-Stern + Funken), Gold-Puls der Progress-Bar je Trainer,
+- Erfolgsmomente: SuccessBurst (Gold-Stern + Funken), Gold-Puls an der Segmentgrenze je Trainer,
   Konfetti auf dem End-Screen.
 
 

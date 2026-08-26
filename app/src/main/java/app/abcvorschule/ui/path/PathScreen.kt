@@ -5,23 +5,21 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,8 +36,9 @@ import androidx.compose.ui.unit.dp
 import app.abcvorschule.content.Lesson
 import app.abcvorschule.progress.LessonGating
 import app.abcvorschule.progress.LessonState
-import app.abcvorschule.ui.components.IconStar
+import app.abcvorschule.ui.shell.AbcTopBar
 import app.abcvorschule.ui.shell.ParentGateButton
+import app.abcvorschule.ui.shell.TopBarFloatingActionReserve
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.WarmInk
@@ -78,38 +77,19 @@ fun PathScreen(
         PathBackground(scrollOffset = { scrollState.value })
 
         Column(Modifier.fillMaxSize()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = AbcDimens.screenHorizontal, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                ParentGateButton(onUnlocked = onParentGateUnlocked)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Not colorScheme.primary: primary is LeafGreen, the "correct"
-                    // colour, and a green star reads as a checkmark. The score is
-                    // gold.
-                    //
-                    // The outline is overridden because this is the one place in the
-                    // app where a star is not on Cream. IconStar's StarGoldDeep is
-                    // tuned to Cream (3.26:1) and drops to 2.07:1 on DaySkyTop, the
-                    // sky directly behind this row — and the StarGold fill itself is
-                    // 1.17:1 there, so without a working outline the glyph would be
-                    // a gold smudge on blue. WarmInk gives it 6.97:1, the same ink
-                    // the number beside it is drawn in.
-                    IconStar(tint = StarGold, outline = WarmInk, size = 22.dp)
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text = "$points",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = WarmInk,
-                    )
-                }
-                Spacer(Modifier.size(48.dp))
-            }
+            // Sterne rechts in der Kopfzeile, mit Platz für den schwebenden ⋯
+            // darüber. Der Stern bekommt hier als einziger Ort der App eine
+            // WarmInk-Kontur: er steht über dem Himmel, nicht über Cream, und
+            // StarGoldDeep fällt dort auf 2.07:1 — WarmInk gibt ihm 6.97:1, die
+            // Tinte, in der auch die Zahl daneben steht.
+            AbcTopBar(
+                points = points,
+                starOutline = WarmInk,
+                endReserve = TopBarFloatingActionReserve,
+            )
 
             val density = LocalDensity.current
+            val navigationBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
             val spacingPx = with(density) { PathGeometry.DefaultSpacing.dp.toPx() }
             val marginPx = with(density) { PathGeometry.DefaultMargin.dp.toPx() }
             val horizontalMarginPx = with(density) { PathGeometry.DefaultHorizontalMargin.dp.toPx() }
@@ -125,10 +105,13 @@ fun PathScreen(
                 BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth()
+                        // Plus Nav-Bar-Inset: die Landschaft läuft unter der
+                        // durchsichtigen Leiste durch, aber das letzte Schild muss
+                        // sich darüber schieben lassen.
                         .height(
                             with(density) {
                                 PathGeometry.contentHeight(lessons.size, spacingPx, marginPx).toDp()
-                            },
+                            } + navigationBarBottom,
                         ),
                 ) {
                     val widthPx = with(density) { maxWidth.toPx() }
@@ -246,6 +229,17 @@ fun PathScreen(
                 }
             }
         }
+
+        // Schwebt über der Kopfzeile statt in ihr: der ⋯ ist kein Bar-Element,
+        // sondern die Elterntür — 8 dp unter dem Status-Bar-Inset sitzt er auf
+        // der Mittelachse der 64 dp hohen Leiste.
+        ParentGateButton(
+            onUnlocked = onParentGateUnlocked,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(top = 8.dp, end = AbcDimens.screenHorizontal),
+        )
     }
 }
 

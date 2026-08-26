@@ -1,19 +1,14 @@
 package app.abcvorschule.ui.components
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -24,16 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -41,9 +28,6 @@ import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.Cream
-import app.abcvorschule.ui.theme.CreamElevated
-import app.abcvorschule.ui.theme.SkyBlue
-import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmMuted
 
@@ -140,21 +124,17 @@ fun AbcNavChevron(
     contentDescription: String,
     modifier: Modifier = Modifier,
 ) {
-    FilledTonalIconButton(
-        onClick = onClick,
-        enabled = enabled,
+    // Ohne Gehäuse: Vor/Zurück ist ein Rückfallweg für Erwachsene, kein Angebot
+    // ans Kind — vorwärts kommt es durch Lösen. Die Trefferfläche bleibt trotzdem
+    // bei 48 dp, sonst wäre der Rückfallweg auf dem Gerät nicht bedienbar.
+    Box(
         modifier = modifier
-            .defaultMinSize(minWidth = 52.dp, minHeight = 52.dp)
+            .size(48.dp)
+            .clickable(enabled = enabled, onClick = onClick)
             .semantics { this.contentDescription = contentDescription },
-        colors = IconButtonDefaults.filledTonalIconButtonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
+        contentAlignment = Alignment.Center,
     ) {
-        val tint = if (enabled) {
-            MaterialTheme.colorScheme.onSurface
-        } else {
-            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f)
-        }
+        val tint = WarmMuted.copy(alpha = if (enabled) 0.55f else 0.2f)
         if (forward) {
             IconChevronRight(tint = tint)
         } else {
@@ -179,60 +159,5 @@ fun AbcCloseButton(
         ),
     ) {
         IconClose(tint = MaterialTheme.colorScheme.onSurface, size = 22.dp)
-    }
-}
-
-@Composable
-fun AbcProgressBar(
-    index: Int,
-    total: Int,
-    modifier: Modifier = Modifier,
-) {
-    val fraction = if (total <= 0) 0f else ((index + 1).toFloat() / total.toFloat()).coerceIn(0f, 1f)
-    val animatedFraction by animateFloatAsState(
-        targetValue = fraction,
-        animationSpec = tween(450),
-        label = "progress-fraction",
-    )
-    // Kurzer Gold-Puls an der Füllkante — Puls markiert das Ereignis „Trainer
-    // geschafft", nicht den Zustand. Der Merker startet nur auf dem zuletzt
-    // gesehenen Index (kein Puls bei Erstkomposition) und pulst nur, wenn der
-    // neue Index tatsächlich größer ist — ein Rücksprung per Zurück-Chevron
-    // (index sinkt) pulst also ebenfalls nicht.
-    val pulse = remember { Animatable(0f) }
-    var previousIndex by remember { mutableIntStateOf(index) }
-    LaunchedEffect(index) {
-        if (index > previousIndex) {
-            pulse.snapTo(1f)
-            pulse.animateTo(0f, animationSpec = tween(500))
-        }
-        previousIndex = index
-    }
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(AbcDimens.progressBarHeight)
-            .padding(horizontal = 4.dp),
-    ) {
-        Canvas(Modifier.fillMaxSize()) {
-            drawRoundRect(
-                color = CreamElevated,
-                cornerRadius = CornerRadius(size.height),
-            )
-            val fillWidth = size.width * animatedFraction
-            drawRoundRect(
-                color = SkyBlue,
-                size = Size(fillWidth, size.height),
-                cornerRadius = CornerRadius(size.height),
-            )
-            val pulseValue = pulse.value
-            if (pulseValue > 0f) {
-                drawCircle(
-                    color = StarGold.copy(alpha = 0.6f * pulseValue),
-                    radius = size.height * (0.8f + 0.6f * (1f - pulseValue)),
-                    center = Offset(fillWidth, size.height / 2f),
-                )
-            }
-        }
     }
 }

@@ -35,7 +35,9 @@ Angebot ans Kind.
 
 - Top App Bar: `statusBars` (M3 `TopAppBar` macht das über seine `windowInsets`
   von allein).
-- Content-Unterkante: `navigationBars` + `AbcDimens.screenBottomExtra`.
+- Content-Unterkante: `safeDrawing.only(Bottom)` + `AbcDimens.screenBottomExtra` —
+  `safeDrawing` statt `navigationBars`, weil dort auch die System-Zahlentastatur
+  hochkommt (§8) und den Aufgabenblock weiter hochschieben muss.
 - Pfad: `PathBackground` zeichnet bis an die Kanten; der Scroll-Inhalt bekommt
   oben und unten Content-Padding, damit nichts unter den Bars klebt, die
   Landschaft aber durchläuft.
@@ -51,8 +53,8 @@ Neu: `ui/shell/AbcTopBar.kt`, ein Wrapper um M3 `TopAppBar` mit
 
 | Screen | Navigations-Icon | Titel-Slot |
 | --- | --- | --- |
-| Pfad | keins | Stern + Punktezahl, rechtsbündig, 56 dp Reserve am Ende für den schwebenden ⋯ |
-| Lektion | X (`AbcCloseButton`-Glyph), verlässt die Lektion direkt zum Pfad | Lektionstitel links, Stern + Punkte rechts |
+| Pfad | keins | Stern + Punktezahl, rechtsbündig, mit `TopBarFloatingActionReserve` am Ende für den schwebenden ⋯ (Knopfbreite + Randabstand + Luft, nicht geschätzt) |
+| Lektion | X als nackter `IconButton` (kein gefüllter Kreis — er wäre der einzige Knopfkasten in einer durchsichtigen Leiste), verlässt die Lektion direkt zum Pfad | Lektionstitel links, Stern + Punkte rechts |
 
 Der Stern behält auf dem Pfad seinen `WarmInk`-Outline: dort steht er über dem
 Himmel, nicht über Cream (Begründung steht am Aufrufort in `PathScreen`).
@@ -95,16 +97,17 @@ Ersetzt ersatzlos: `AbcProgressBar`, das Textlabel `trainerProgressLabel` und
 `RoundProgressDots`. Das Label liest das Kind nicht, und die Segmentzahl sagt
 dasselbe.
 
-Die Füll-Mathematik (Segment-Index → Füllanteil) lebt als reine Funktion neben
-der Composable und bekommt einen JVM-Test: Rundenanteil im laufenden Segment,
-Verhalten bei einem einzigen Trainer, bei Runden-Zahl 0, und dass ein
-Rücksprung per Chevron keinen Puls auslöst.
+Die Füll-Mathematik (Segment-Index → Füllanteil) lebt als reine Funktion
+`SegmentedProgress.fillOf` neben der Composable und bekommt einen JVM-Test:
+Rundenanteil im laufenden Segment, ein einziger Trainer, Runden-Zahl 0, und ein
+Rundenindex jenseits der Rundenzahl. Der Puls selbst bleibt ungetestet — er
+hängt an Compose-Animationsstate, den ein reiner JVM-Test nicht erreicht.
 
 ## 5. Betroffene Dateien
 
 | Datei | Änderung |
 | --- | --- |
-| `ui/shell/AbcTopBar.kt` | neu |
+| `ui/shell/AbcTopBar.kt` | neu; Navigations-Icon als nackter `IconButton`, `TopBarFloatingActionReserve` aus der Knopfbreite gerechnet |
 | `ui/components/AbcSegmentedProgress.kt` | neu, inkl. reiner Füll-Mathematik |
 | `ui/shell/ParentGate.kt` | rund, schwebend |
 | `ui/components/AbcButtons.kt` | `AbcNavChevron` gehäuselos, `AbcProgressBar` entfällt |
