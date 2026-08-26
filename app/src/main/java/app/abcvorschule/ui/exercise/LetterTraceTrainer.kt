@@ -363,18 +363,27 @@ private fun TraceCanvas(
                 )
             }
             // Tap alternative to the drag (R15): a child who taps instead of dragging
-            // must still make progress. Each tap collects exactly the next expected
-            // star, so repeated taps trace the glyph in stroke order. Keyed on `state`
-            // so a fresh gesture recognizer always sees the current stroke/star index.
+            // must still make progress. A tap *on the next star* collects it, so
+            // repeated taps trace the glyph in stroke order — but only there: a tap
+            // elsewhere is reported where it landed and runs through the same corridor
+            // and ahead gates as a drag sample. Keyed on `state` so a fresh gesture
+            // recognizer always sees the current stroke/star index.
             .pointerInput(atom.id, state, layout) {
                 detectTapGestures(
-                    onTap = {
+                    onTap = { tap ->
                         val current = layout ?: return@detectTapGestures
                         val target = current.stars.getOrNull(state.strokeIndex)
                             ?.getOrNull(state.starIndex)
                             ?: return@detectTapGestures
+                        // Every tap is a gesture of its own: drop the bridge first, or two
+                        // taps could "cross" a star along a stretch nobody ever traced.
+                        onDragFinished()
                         onFinger(
-                            target,
+                            TraceProgress.tapSample(
+                                tap = TracePoint(tap.x, tap.y),
+                                target = target,
+                                boxSize = current.boxSize,
+                            ),
                             current.boxSize,
                             current.corridorFraction,
                             current.strokes,
