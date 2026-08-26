@@ -33,14 +33,35 @@ object SymbolHuntLayout {
      */
     private const val MaxAttemptsPerTile = 40
 
-    fun scatter(seed: Long, tileCount: Int, boundsWidth: Float, boundsHeight: Float): List<HuntTilePosition> {
+    /** Kleiner Atemabstand zwischen Kachelrand und Feldrand, als Anteil der
+     * Kachel-Grundgröße — bei 80dp Kacheln also 4dp. */
+    private const val EdgePaddingFraction = 0.05f
+
+    /** Skalenband der Kacheln (visuelle Abwechslung, siehe [randomTile]). */
+    private const val MinScale = 0.8f
+    private const val ScaleSpan = 0.5f
+
+    /**
+     * [tileSizePx] ist der Grunddurchmesser einer Kachel vor [HuntTilePosition.scale];
+     * die Streuung braucht ihn, weil die zurückgegebenen Punkte Kachel*mittelpunkte*
+     * sind. Ohne ihn lag der Rand bei festen 10 % der Feldbreite — schmaler als der
+     * Radius der größten Kachel (80dp × 1,3 ÷ 2 = 52dp) auf einem handybreiten Feld,
+     * und die äußeren Kacheln wurden am linken/rechten Bildschirmrand abgeschnitten.
+     */
+    fun scatter(
+        seed: Long,
+        tileCount: Int,
+        boundsWidth: Float,
+        boundsHeight: Float,
+        tileSizePx: Float,
+    ): List<HuntTilePosition> {
         if (tileCount <= 0 || boundsWidth <= 0f || boundsHeight <= 0f) return emptyList()
         val minDistance = minOf(boundsWidth, boundsHeight) * MinCenterDistanceFraction
         var attempt = 0
-        var candidate = place(seed, tileCount, boundsWidth, boundsHeight, minDistance)
+        var candidate = place(seed, tileCount, boundsWidth, boundsHeight, minDistance, tileSizePx)
         while (attempt < MaxAttempts && !isWellSpaced(candidate, minDistance)) {
             attempt += 1
-            candidate = place(seed + attempt, tileCount, boundsWidth, boundsHeight, minDistance)
+            candidate = place(seed + attempt, tileCount, boundsWidth, boundsHeight, minDistance, tileSizePx)
         }
         return candidate
     }
@@ -51,17 +72,18 @@ object SymbolHuntLayout {
         boundsWidth: Float,
         boundsHeight: Float,
         minDistance: Float,
+        tileSizePx: Float,
     ): List<HuntTilePosition> {
         val random = Random(seed)
         val placed = ArrayList<HuntTilePosition>(tileCount)
         for (index in 0 until tileCount) {
-            var candidate = randomTile(random, boundsWidth, boundsHeight, index)
+            var candidate = randomTile(random, boundsWidth, boundsHeight, tileSizePx, index)
             var attempts = 1
             while (
                 attempts < MaxAttemptsPerTile &&
                 placed.any { hypot(it.x - candidate.x, it.y - candidate.y) < minDistance }
             ) {
-                candidate = randomTile(random, boundsWidth, boundsHeight, index)
+                candidate = randomTile(random, boundsWidth, boundsHeight, tileSizePx, index)
                 attempts += 1
             }
             placed.add(candidate)
@@ -69,12 +91,36 @@ object SymbolHuntLayout {
         return placed
     }
 
-    private fun randomTile(random: Random, boundsWidth: Float, boundsHeight: Float, index: Int) = HuntTilePosition(
-        x = (0.1f + random.nextFloat() * 0.8f) * boundsWidth,
-        y = (0.1f + random.nextFloat() * 0.8f) * boundsHeight,
-        scale = 0.8f + random.nextFloat() * 0.5f,
-        colorIndex = index,
-    )
+    private fun randomTile(
+        random: Random,
+        boundsWidth: Float,
+        boundsHeight: Float,
+        tileSizePx: Float,
+        index: Int,
+    ): HuntTilePosition {
+        // Skala zuerst: der Rand, den diese Kachel braucht, hängt an ihrem eigenen
+        // Radius — eine 1,3er-Kachel muss weiter von der Kante weg als eine 0,8er.
+        val scale = MinScale + random.nextFloat() * ScaleSpan
+        val inset = tileSizePx * (scale / 2f + EdgePaddingFraction)
+        return HuntTilePosition(
+            x = axisPosition(random, boundsWidth, inset),
+            y = axisPosition(random, boundsHeight, inset),
+            scale = scale,
+            colorIndex = index,
+        )
+    }
+
+    /**
+     * Mittelpunkt auf einer Achse, so gezogen, dass die ganze Kachel im Feld bleibt.
+     * Der Zufallswert wird auch dann verbraucht, wenn kein Spielraum bleibt (Kachel
+     * breiter als das Feld → mittig), damit die Zufallsfolge — und damit die
+     * Reproduzierbarkeit über den Seed — unabhängig von den Feldmaßen ist.
+     */
+    private fun axisPosition(random: Random, extent: Float, inset: Float): Float {
+        val span = extent - 2f * inset
+        val roll = random.nextFloat()
+        return if (span <= 0f) extent / 2f else inset + roll * span
+    }
 
     private fun isWellSpaced(tiles: List<HuntTilePosition>, minDistance: Float): Boolean {
         for (i in tiles.indices) {
