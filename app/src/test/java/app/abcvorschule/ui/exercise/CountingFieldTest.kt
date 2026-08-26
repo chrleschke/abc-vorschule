@@ -6,25 +6,54 @@ import org.junit.Test
 
 class CountingFieldTest {
     @Test
-    fun quantitiesBreakIntoRowsOfFive() {
-        assertEquals(emptyList<Int>(), CountingField.rows(0))
-        assertEquals(listOf(3), CountingField.rows(3))
-        assertEquals(listOf(5), CountingField.rows(5))
-        assertEquals(listOf(5, 1), CountingField.rows(6))
-        assertEquals(listOf(5, 5, 5, 5, 5, 5), CountingField.rows(30))
+    fun smallQuantitiesBreakIntoRowsOfFive() {
+        assertEquals(emptyList<Int>(), CountingField.rows(0, CountingField.RowSize))
+        assertEquals(listOf(3), CountingField.rows(3, CountingField.RowSize))
+        assertEquals(listOf(5), CountingField.rows(5, CountingField.RowSize))
+        assertEquals(listOf(5, 1), CountingField.rows(6, CountingField.RowSize))
+    }
+
+    @Test
+    fun largeQuantitiesSwitchToRowsOfTenSoTheFieldDoesNotTowerUp() {
+        // Fünferzeilen überall türmen den echten Content unbrauchbar hoch:
+        // "30 − 17" wären zehn Zeilen und das Emoji müsste auf 14sp schrumpfen.
+        assertEquals(CountingField.RowSize, CountingField.rowSize(MathOperation.Add, 3, 4))
+        assertEquals(CountingField.WideRowSize, CountingField.rowSize(MathOperation.Subtract, 30, 17))
+        assertEquals(listOf(10, 10, 10), CountingField.rows(30, CountingField.WideRowSize))
+    }
+
+    @Test
+    fun theRowWidthIsDecidedForTheWholeRoundNotPerGroup() {
+        // Sonst stünde bei "15 + 4" eine Zehnerzeile über einer Fünferzeile und die
+        // beiden Gruppen wären nicht mehr vergleichbar.
+        assertEquals(CountingField.WideRowSize, CountingField.rowSize(MathOperation.Add, 15, 4))
+    }
+
+    @Test
+    fun aWideRowStillReadsAsTwoFivesForSubitizing() {
+        assertEquals(listOf(5, 5), CountingField.fiveChunks(10))
+        assertEquals(listOf(5, 2), CountingField.fiveChunks(7))
+        assertEquals(listOf(3), CountingField.fiveChunks(3))
     }
 
     @Test
     fun everyQuantityUpToThirtyKeepsItsTotalAcrossTheRows() {
-        (0..30).forEach { count ->
-            assertEquals("count $count", count, CountingField.rows(count).sum())
+        listOf(CountingField.RowSize, CountingField.WideRowSize).forEach { rowSize ->
+            (0..30).forEach { count ->
+                assertEquals("count $count / $rowSize", count, CountingField.rows(count, rowSize).sum())
+            }
         }
     }
 
     @Test
-    fun noRowIsEverWiderThanFive() {
-        (0..30).forEach { count ->
-            assertTrue("count $count", CountingField.rows(count).all { it <= CountingField.RowSize })
+    fun noRowIsEverWiderThanItsRowSize() {
+        listOf(CountingField.RowSize, CountingField.WideRowSize).forEach { rowSize ->
+            (0..30).forEach { count ->
+                assertTrue(
+                    "count $count / $rowSize",
+                    CountingField.rows(count, rowSize).all { it <= rowSize },
+                )
+            }
         }
     }
 
@@ -33,7 +62,7 @@ class CountingFieldTest {
         assertEquals(listOf(7, 8), CountingField.groupSizes(MathOperation.Add, 7, 8))
         // Minus zeigt nur die Ausgangsmenge; die weggenommenen wandern in die Weg-Zone.
         assertEquals(listOf(15), CountingField.groupSizes(MathOperation.Subtract, 15, 6))
-        // Malnehmen rendert die Matrix, nicht Fünferzeilen — eine Gruppe aus allen Zellen.
+        // Malnehmen rendert die Matrix, nicht Zeilen dieser Breite — eine Gruppe.
         assertEquals(listOf(20), CountingField.groupSizes(MathOperation.Multiply, 4, 5))
     }
 
@@ -52,42 +81,48 @@ class CountingFieldTest {
     }
 
     @Test
-    fun emojiShrinkAsTheFieldGrowsTaller() {
-        // 3 + 4: eine Zeile je Gruppe — volle Größe.
-        val small = CountingField.emojiSizeSp(MathOperation.Add, 3, 4)
-        // 16 + 11: vier plus drei Zeilen — der Turm muss schrumpfen, sonst läuft er
-        // bei font_scale 1.3 aus dem Aufgabenblock.
-        val large = CountingField.emojiSizeSp(MathOperation.Add, 16, 11)
-        assertTrue("small=$small large=$large", small > large)
-        assertEquals(CountingField.MaxEmojiSp, small)
+    fun theCommonCaseKeepsFullSizedEmojiAndOnlyTheCrowdedOnesShrink() {
+        // "7 + 8" ist die typische Runde über zehn — sie darf nichts einbüßen.
+        assertEquals(CountingField.MaxEmojiSp, CountingField.emojiSizeSp(MathOperation.Add, 7, 8))
+        assertTrue(
+            CountingField.emojiSizeSp(MathOperation.Subtract, 30, 17) < CountingField.MaxEmojiSp,
+        )
     }
 
     @Test
     fun everyRoundTheCurriculumCanProduceFitsTheTaskBlockAndStaysReadable() {
-        // Stichproben reichen hier nicht: der höchste Fall ist "26 − 26" (zwölf
-        // Zeilen), und der entsteht nur, wenn ein fortgeschrittenes Scaffold die
-        // Zahlen-Eingabe auch bei kleinem Ergebnis anschaltet. Deshalb über alle
-        // Operandenpaare, die der Validator zulässt (MaxMathQuantity = 30).
-        val fontScale = CountingField.LayoutFontScale
-        var worst = 0f
+        // Stichproben reichen hier nicht: der echte Content enthält "30 − 17", und
+        // der höchste denkbare Fall ist "30 − 30". Deshalb über alle Operandenpaare,
+        // die der Validator zulässt (MaxMathQuantity = 30).
+        var worstHeight = 0f
+        var worstWidth = 0f
+        var worstRows = 0
         forEveryValidRound { operation, left, right ->
             val size = CountingField.emojiSizeSp(operation, left, right)
-            val rows = CountingField.totalRows(operation, left, right)
-            val height = rows * (size * fontScale + CountingField.RowGapDp)
-            worst = maxOf(worst, height)
-            assertTrue(
-                "$operation $left/$right -> ${height}dp",
-                height <= CountingField.TaskBlockDp,
-            )
             assertTrue(
                 "$operation $left/$right -> ${size}sp is too small to tap or read",
                 size >= CountingField.MinEmojiSp,
             )
+            if (operation == MathOperation.Multiply) return@forEveryValidRound
+            val rows = CountingField.totalRows(operation, left, right)
+            val height = CountingField.fieldHeightDp(rows, size)
+            val width = CountingField.rowWidthDp(
+                CountingField.rowSize(operation, left, right),
+                size,
+            )
+            worstHeight = maxOf(worstHeight, height)
+            worstWidth = maxOf(worstWidth, width)
+            worstRows = maxOf(worstRows, rows)
+            assertTrue("$operation $left/$right -> ${height}dp high", height <= CountingField.TaskBlockDp)
+            assertTrue("$operation $left/$right -> ${width}dp wide", width <= CountingField.FieldWidthDp)
         }
-        // Beweist, dass der Test überhaupt nah an die Schranke kommt — sonst wäre er
-        // ein Test, der nichts prüft. Der höchste Fall ist "26 − 26" mit zwölf
-        // Zeilen und landet rechnerisch bei ~297.6dp.
-        assertTrue("worst case only reached ${worst}dp", worst > CountingField.TaskBlockDp * 0.9f)
+        // Es bindet die *Breite*, nicht die Höhe: der Zehnerzeilen-Umbruch deckelt
+        // die Zeilenzahl bei sechs, und sechs Zeilen passen mühelos. Deshalb prüft
+        // die Gegenprobe hier die Breite — sonst wäre der Test einer, der nichts
+        // prüft, weil beide Schranken mit Luft eingehalten würden.
+        assertTrue("worst width only reached ${worstWidth}dp", worstWidth > CountingField.FieldWidthDp * 0.9f)
+        assertTrue("worst case needs $worstRows rows", worstRows <= 6)
+        assertTrue("height has headroom, was ${worstHeight}dp", worstHeight < CountingField.TaskBlockDp * 0.9f)
     }
 
     @Test

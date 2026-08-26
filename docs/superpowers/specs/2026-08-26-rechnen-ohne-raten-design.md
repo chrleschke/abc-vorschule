@@ -67,7 +67,9 @@ Grundregeln:
 - Der Zähler ist eine mitlaufende Ziffer im Haus-Stil (Zahl unter der
   Mengengruppe, §8).
 - Der Zählerwert wird in das Antwortfeld gespiegelt — **erst ab dem ersten
-  Tipp**. Vorher bleibt das Feld leer: bei Plus stünde sonst sofort eine 0 im
+  Tipp**. Einen zweiten, eigenen Zähler-Text zeigt die Zähl-Hilfe **nicht**:
+  dieselbe Zahl zweimal im selben Bild ist genau das, was §9 verbietet, und der
+  Platz fehlt dem Feld. Vorher bleibt das Feld leer: bei Plus stünde sonst sofort eine 0 im
   Feld, bei Minus sofort der linke Operand. Technisch heißt das
   `countedValue: Int?` = `null`, solange nichts angetippt wurde.
 - Das Kind kann den Wert von Hand überschreiben; Absenden ist jederzeit
@@ -116,14 +118,20 @@ Operand ≥ 11 ist, kippt die ganze Runde in diesen Modus
 zum Antippen.
 
 In der Zähl-Hilfe wird die Menge deshalb **aufgeklappt**: 18 echte Objekte in
-**Fünferreihen**. Das bricht PRODUCT_PRINCIPLES §8 („ab 11 nur Symbol + Ziffer")
-bewusst auf — aber ausschließlich in der Zähl-Hilfe nach zwei Fehlversuchen,
-**nie** im Aufgaben-Prompt. Der Prompt-Grund für §8 (keine Emoji-Wand als
-Aufgabe) gilt dort weiter; hier ist die Menge nicht Aufgabe, sondern Werkzeug.
+Zeilen. Das bricht PRODUCT_PRINCIPLES §8 („ab 11 nur Symbol + Ziffer") bewusst
+auf — aber ausschließlich in der Zähl-Hilfe nach zwei Fehlversuchen, **nie** im
+Aufgaben-Prompt. Der Prompt-Grund für §8 (keine Emoji-Wand als Aufgabe) gilt
+dort weiter; hier ist die Menge nicht Aufgabe, sondern Werkzeug.
 
-Fünferreihen statt der sonstigen Paar-Bündelung (`QuantityGrouping.clusters`),
-weil die Fünferbündelung die Struktur ist, die das Kind für den Zahlenraum 20/30
-ohnehin braucht.
+Gebündelt wird in **Fünfern**, nicht in Paaren (`QuantityGrouping.clusters`) —
+die Fünferbündelung ist die Struktur, die das Kind für den Zahlenraum 20/30
+ohnehin braucht. Ab einer Gruppengröße von 11 laufen die Zeilen auf **zehn**
+Objekte, gezeichnet als zwei Fünfer mit breiterer Lücke, wie an einem
+Rechenrahmen. Fünferzeilen überall wären konsequenter, türmen den authorierten
+Content aber unbrauchbar hoch: „30 − 17" steht so im Pack und wäre zehn Zeilen,
+mit einem Emoji, das auf 14sp schrumpfen müsste. Die Zeilenbreite gilt
+rundenweit, nicht je Gruppe, sonst stünde bei „15 + 4" eine Zehnerzeile über
+einer Fünferzeile.
 
 ### Audio
 

@@ -45,6 +45,7 @@ fun CountingAid(
     modifier: Modifier = Modifier,
 ) {
     val sizeSp = CountingField.emojiSizeSp(operation, left, right)
+    val rowSize = CountingField.rowSize(operation, left, right)
 
     if (operation == MathOperation.Multiply) {
         MultiplicationMatrixGrid(
@@ -80,6 +81,7 @@ fun CountingAid(
                 size = size,
                 indexOffset = offset,
                 sizeSp = sizeSp,
+                rowSize = rowSize,
                 state = state,
                 onTap = onTap,
             )
@@ -92,15 +94,13 @@ fun CountingAid(
                 slots = state.removeSlots,
                 filled = state.tapped.size,
                 sizeSp = sizeSp,
+                rowSize = rowSize,
             )
         }
 
-        Text(
-            text = state.counted?.toString() ?: "",
-            style = MaterialTheme.typography.displayLarge,
-            color = WarmInk,
-            modifier = Modifier.testTag("counting_total"),
-        )
+        // Kein eigener Zähler-Text: der Zählerstand steht bereits live und groß im
+        // Antwortfeld. Zweimal dieselbe Zahl im selben Bild ist genau das, was §9
+        // verbietet — und der Platz fehlt dem Feld.
     }
 }
 
@@ -112,6 +112,7 @@ private fun CountingGroup(
     size: Int,
     indexOffset: Int,
     sizeSp: Int,
+    rowSize: Int,
     state: CountingState,
     onTap: (Int) -> Unit,
 ) {
@@ -120,22 +121,30 @@ private fun CountingGroup(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(CountingField.RowGapDp.dp),
     ) {
-        CountingField.rows(size).forEach { rowSize ->
-            Row(horizontalArrangement = Arrangement.spacedBy(CountingField.RowGapDp.dp)) {
-                repeat(rowSize) {
-                    val objectIndex = index++
-                    // Minus startet mit allen Objekten angehakt und nimmt weg; Plus und
-                    // Malnehmen starten leer und sammeln ein. "Angetippt" heißt also je
-                    // nach Rechenart das Gegenteil — verblasst ist es in beiden Fällen.
-                    val used = state.isTapped(objectIndex)
-                    Text(
-                        text = emoji,
-                        fontSize = sizeSp.sp,
-                        modifier = Modifier
-                            .alpha(if (used) CountedAlpha else 1f)
-                            .clickable { onTap(objectIndex) }
-                            .testTag("counting_object_$objectIndex"),
-                    )
+        CountingField.rows(size, rowSize).forEach { rowLength ->
+            // Eine Zehnerzeile wird als zwei Fünfer mit breiterer Lücke gezeichnet:
+            // ohne den Bruch zerfällt die lange Zeile in etwas, das ein Vorschulkind
+            // nicht mehr auf einen Blick erfassen kann.
+            Row(horizontalArrangement = Arrangement.spacedBy(CountingField.FiveGapDp.dp)) {
+                CountingField.fiveChunks(rowLength).forEach { chunk ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(CountingField.RowGapDp.dp)) {
+                        repeat(chunk) {
+                            val objectIndex = index++
+                            // Minus startet mit allen Objekten angehakt und nimmt weg;
+                            // Plus und Malnehmen starten leer und sammeln ein.
+                            // "Angetippt" heißt je nach Rechenart das Gegenteil —
+                            // verblasst ist es in beiden Fällen.
+                            val used = state.isTapped(objectIndex)
+                            Text(
+                                text = emoji,
+                                fontSize = sizeSp.sp,
+                                modifier = Modifier
+                                    .alpha(if (used) CountedAlpha else 1f)
+                                    .clickable { onTap(objectIndex) }
+                                    .testTag("counting_object_$objectIndex"),
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -149,7 +158,7 @@ private fun CountingGroup(
  * fünf Spalten breit bleibt.
  */
 @Composable
-private fun TakeAwayZone(emoji: String, slots: Int, filled: Int, sizeSp: Int) {
+private fun TakeAwayZone(emoji: String, slots: Int, filled: Int, sizeSp: Int, rowSize: Int) {
     val slotSize = (sizeSp * LocalDensity.current.fontScale).dp + 8.dp
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -157,18 +166,22 @@ private fun TakeAwayZone(emoji: String, slots: Int, filled: Int, sizeSp: Int) {
         modifier = Modifier.testTag("take_away_zone"),
     ) {
         var placed = 0
-        CountingField.rows(slots).forEach { rowSize ->
-            Row(horizontalArrangement = Arrangement.spacedBy(CountingField.RowGapDp.dp)) {
-                repeat(rowSize) {
-                    val occupied = placed++ < filled
-                    Box(
-                        modifier = Modifier
-                            .size(slotSize)
-                            .background(CreamElevated, RoundedCornerShape(10.dp))
-                            .border(2.dp, WarmMuted, RoundedCornerShape(10.dp)),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        if (occupied) Text(text = emoji, fontSize = sizeSp.sp)
+        CountingField.rows(slots, rowSize).forEach { rowLength ->
+            Row(horizontalArrangement = Arrangement.spacedBy(CountingField.FiveGapDp.dp)) {
+                CountingField.fiveChunks(rowLength).forEach { chunk ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(CountingField.RowGapDp.dp)) {
+                        repeat(chunk) {
+                            val occupied = placed++ < filled
+                            Box(
+                                modifier = Modifier
+                                    .size(slotSize)
+                                    .background(CreamElevated, RoundedCornerShape(10.dp))
+                                    .border(2.dp, WarmMuted, RoundedCornerShape(10.dp)),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                if (occupied) Text(text = emoji, fontSize = sizeSp.sp)
+                            }
+                        }
                     }
                 }
             }
