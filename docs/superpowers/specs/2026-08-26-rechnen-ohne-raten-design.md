@@ -169,11 +169,17 @@ pro Runde beim Scheduling, damit ein Moduswechsel ab der nächsten Runde greift.
 
 ### Reine, testbare Regeln
 
-- `MathHinting.usesNumberPad(scaffold, parentMode, answer): Boolean` — die
-  Entscheidung aus Abschnitt 1. Compose-frei, erweitert `MathHintingTest`.
+- `MathHinting.inputFor(scaffold, parentMode, answer): MathInputMode` — die
+  Entscheidung aus Abschnitt 1. Compose-frei, erweitert `MathHintingTest`,
+  ersetzt das heutige `usesNumberPad(scaffold)`. Gibt direkt den Modus zurück
+  statt eines Boolean, damit die Regel und der Map-Wert in
+  `ScheduledTrainer.mathInputs` denselben Typ sprechen.
   Konstante `TypedAnswerFrom = 11` mit eigener Bedeutung (nicht
   `QuantityRepresentation.SymbolicFrom` mitbenutzen, auch wenn der Wert
   zufällig gleich ist).
+- Die Miss-Schwellen der Eskalationsleiter werden ebenfalls Konstanten in
+  `MathHinting` (`CountingAidFromMisses = 2`, `ResolveFromMissesTyped = 4`),
+  damit die Leiter an einer Stelle steht und testbar bleibt.
 - Neu `CountingField.kt` — reine Layout- und Zustandslogik, unit-getestet:
   - Fünferreihen-Aufteilung einer Menge bis 30
   - Emoji-Größe nach Gesamtmenge (Muster: `MultiplicationMatrix.emojiSizeSp`,
@@ -211,13 +217,23 @@ Unit (JVM):
   Zähler nach n Tipps; Deckel bei `right`; Rücknahme durch zweiten Tipp;
   Endwert entspricht `MathOperation.answer` für alle drei Operationen.
 
-Instrumentiert / Compose:
+Das Projekt hat **keinen `androidTest`-Source-Set** — die Testkultur sind reine
+JVM-Unit-Tests auf Compose-freier Logik (`app/src/test/...`). Dieses Design hält
+sich daran: alles Prüfbare lebt in `MathHinting`, `CountingField` und
+`CountingState`, die Compose-Schicht bleibt eine dünne Darstellung ohne eigenen
+Fachzustand. Ein Instrumentierungs-Source-Set nur für dieses Feature
+aufzumachen, wäre eine Projektentscheidung, die hier nicht hingehört.
 
-- Ergebnis > 10 in `ParentMode.Auto` zeigt `number_input`, keine Kacheln.
-- Zwei Fehlversuche klappen die Zähl-Hilfe auf; „Auflösen" erst nach vier.
-- Minus: alle Objekte angehakt beim Start, Weg-Zone hat `right` Plätze,
-  siebter Tipp ändert den Zähler nicht.
-- Der Zählerwert erscheint im Antwortfeld.
+Manueller Smoke-Test (`./gradlew :app:installDebug`, Gerät auf font_scale 1.3):
+
+1. Lektion mit Ergebnis > 10 im Default-Modus `Auto` → Zahlenfeld, keine Kacheln.
+2. Zwei falsche Eingaben → Zähl-Hilfe klappt auf, Tastatur klappt ein,
+   „Auflösen" ist noch **nicht** da; nach zwei weiteren erst.
+3. Minus: alle Objekte angehakt, Weg-Zone zeigt `right` leere Plätze, ein Tipp
+   über den Deckel hinaus ändert den Zähler nicht.
+4. Malnehmen: Geisterreihen sind echt und antippbar.
+5. Eltern-Sheet auf „Mit Hilfe" → dieselbe Aufgabe zeigt wieder drei Kacheln.
+6. Größter Fall (Ergebnis 30) läuft nicht aus dem Aufgabenblock.
 
 ## Doku-Folgeänderungen (verbindlich, siehe AGENTS.md Schritt 7)
 
