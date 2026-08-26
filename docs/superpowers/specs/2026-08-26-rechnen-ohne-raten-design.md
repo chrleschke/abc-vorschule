@@ -206,11 +206,28 @@ verdecken. Beim Aufklappen der Zähl-Hilfe wird die Tastatur deshalb
 
 ## Entscheidung 3 — Die Eskalationsleiter
 
-| Fehlversuche | Was passiert |
-| ------------ | ------------ |
-| 0–1 | Nur gesprochenes Feedback (`MathHinting.missFeedback`), wie heute |
-| 2 | Zähl-Hilfe klappt auf |
-| 4 | „Auflösen"-Knopf erscheint |
+| Fehlversuche | Was passiert | Was gesprochen wird |
+| ------------ | ------------ | ------------------- |
+| 0–1 | — | Getippte Zahl als Wort + Hinweis (`MathHinting.missFeedback`) |
+| 2 | Zähl-Hilfe klappt auf | **Nur die Zählanweisung** |
+| 3 | — | Wieder Zahl + Hinweis |
+| 4 | „Auflösen"-Knopf erscheint | Wieder Zahl + Hinweis |
+
+Der Fehlversuch, der die Zähl-Hilfe aufklappt, sagt die **Zählanweisung und
+sonst nichts**. „Probier es noch mal" ist in genau diesem Moment die falsche
+Auskunft: die Aufgabe hat sich gerade in etwas anderes verwandelt, und das muss
+zuerst gesagt werden, bevor irgendetwas anderes um Aufmerksamkeit ringt. Regel
+in `MathHinting.missSpeech`.
+
+### Kein Lob für eine erarbeitete Antwort
+
+Wer die Zähl-Hilfe benutzt hat, bekommt die Antwort **bestätigt, aber nicht
+gelobt** (`MathHinting.praises`, `SuccessSpeech.partsForRound(praise = false)`) —
+dieselbe Unterscheidung, die das Auflösen längst trifft. Erarbeitet ist nicht
+gewusst, und ein Lobsatz für beides brächte dem Kind bei, dass es dasselbe sei.
+
+**Punkte bleiben davon unberührt.** Sie wegzunehmen wäre eine Strafe, und
+Strafen kennt die App nicht (§8). Der Unterschied liegt im Lob, nicht im Konto.
 
 Heute erscheint „Auflösen" bereits bei 2 Fehlversuchen. Er rückt nach hinten,
 damit die Hilfe nicht übersprungen werden kann — ein echter Ausweg bleibt aber

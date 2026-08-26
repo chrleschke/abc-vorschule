@@ -2,6 +2,7 @@ package app.abcvorschule.ui.exercise
 
 import app.abcvorschule.progress.ParentMode
 import app.abcvorschule.progress.ScaffoldLevel
+import app.abcvorschule.speech.GermanNumberWord
 
 object MathHinting {
     const val NearDistanceMax = 2
@@ -87,6 +88,37 @@ object MathHinting {
         // Geste benennen, die tatsächlich verlangt ist.
         MathOperation.Multiply -> CountingAidCueRows
         MathOperation.Add -> CountingAidCueCollect
+    }
+
+    /**
+     * Lobt die Erfolgs-Zeremonie diesen Versuch? Mit der Zähl-Hilfe gelöst heißt
+     * **erarbeitet, nicht gewusst** — ein Lobsatz dafür wäre hohl und brächte dem
+     * Kind bei, dass beides dasselbe ist. Dieselbe Unterscheidung, die das
+     * Auflösen schon trifft. Punkte bleiben davon unberührt: sie wegzunehmen wäre
+     * eine Strafe, und Strafen kennt die App nicht (§8).
+     */
+    fun praises(attempt: MathAttempt): Boolean =
+        attempt.correct && !attempt.resolved && !attempt.aided
+
+    /**
+     * Was nach einem Fehlversuch gesprochen wird.
+     *
+     * Der Versuch, der die Zähl-Hilfe aufklappt, sagt die **Zählanweisung** — und
+     * nur sie. „Probier es noch mal" wäre in genau diesem Moment die falsche
+     * Auskunft: die Aufgabe hat sich gerade in etwas anderes verwandelt, und das
+     * muss zuerst gesagt werden, bevor irgendetwas anderes um Aufmerksamkeit ringt.
+     *
+     * Sonst der getippte Wert und der Hinweis als **eine** Äußerung — zwei
+     * aufeinanderfolgende Primary-speaks würden sich gegenseitig flushen und die
+     * Zahl mitten im Wort abschneiden. Die Zahl als Wort und mit Komma statt Punkt:
+     * „7." ist im Deutschen die Ordinalzahl ([GermanNumberWord]).
+     */
+    fun missSpeech(attempt: MathAttempt, operation: MathOperation): String {
+        if (attempt.opensAid) return countingAidCue(operation)
+        return listOfNotNull(
+            attempt.guess?.let { "${GermanNumberWord.of(it)}," },
+            missFeedback(attempt.distance),
+        ).joinToString(" ")
     }
 
     fun inputFor(scaffold: ScaffoldLevel, parentMode: ParentMode, answer: Int): MathInputMode {

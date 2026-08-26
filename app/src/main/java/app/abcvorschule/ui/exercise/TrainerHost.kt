@@ -23,7 +23,7 @@ import app.abcvorschule.session.ScheduledTrainer
 /** Callbacks every trainer reports through, so the ViewModel owns all sequencing. */
 data class TrainerCallbacks(
     val onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
-    val onMathResult: (distance: Int?, resolved: Boolean, correct: Boolean, guess: Int?) -> Unit,
+    val onMathResult: (MathAttempt) -> Unit,
     val onSpeak: (String) -> Unit,
     /** Wie [onSpeak], aber auf einem eigenen Audio-Kanal — für Tap-Echos, die eine
      * noch laufende Rundenansage nicht abwürgen dürfen (Wort-Detektiv, design doc). */

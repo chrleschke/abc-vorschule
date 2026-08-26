@@ -40,7 +40,7 @@ fun MathExercise(
     onSpeakPrompt: () -> Unit,
     onSpeakFeedback: (String) -> Unit,
     onSpeakCounting: (String) -> Unit,
-    onResult: (distance: Int?, resolved: Boolean, correct: Boolean, guess: Int?) -> Unit,
+    onResult: (MathAttempt) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalAbcHaptics.current
@@ -60,12 +60,10 @@ fun MathExercise(
     // Optionen.
     val countingOpen = usePad && misses >= MathHinting.CountingAidFromMisses
 
-    // Kinder lesen nicht: dass sich der Aufgabenbereich gerade in etwas
-    // Antippbares verwandelt hat, muss gesagt werden. Feedback-Kanal, damit ein
-    // noch laufender Miss-Hinweis nicht abgewürgt wird.
-    LaunchedEffect(countingOpen) {
-        if (countingOpen) onSpeakFeedback(MathHinting.countingAidCue(operation))
-    }
+    // Die Zählanweisung spricht das ViewModel als Miss-Feedback des zweiten
+    // Fehlversuchs (MathAttempt.opensAid) — sie *ersetzt* dort den allgemeinen
+    // Hinweis, statt hinterherzulaufen. Hier noch einmal zu sprechen hieße, sie
+    // doppelt zu sagen.
     // Seeded wie TrayOrder: die Kachel-Reihenfolge muss beim Rück-Chevron in eine
     // besuchte Runde (und nach Recreation) dieselbe sein wie beim ersten Besuch.
     val choices = remember(roundKey) {
@@ -77,7 +75,16 @@ fun MathExercise(
         if (guess == round.answer) {
             locked = true
             solved = guess
-            onResult(0, false, true, guess)
+            onResult(
+                MathAttempt(
+                    distance = 0,
+                    resolved = false,
+                    correct = true,
+                    guess = guess,
+                    aided = countingOpen,
+                    opensAid = false,
+                ),
+            )
         } else {
             // Kein lokales Echo mehr: ein zweiter Primary-speak (der Miss-Hinweis
             // aus dem ViewModel) flusht die Engine und würde die Zahl mitten im
@@ -85,14 +92,34 @@ fun MathExercise(
             // "Sieben. Du bist nah dran …" als eine Äußerung.
             haptics.nudge()
             misses += 1
-            onResult(MathHinting.distance(round.answer, guess), false, false, guess)
+            onResult(
+                MathAttempt(
+                    distance = MathHinting.distance(round.answer, guess),
+                    resolved = false,
+                    correct = false,
+                    guess = guess,
+                    aided = countingOpen,
+                    // Genau dieser Fehlversuch klappt die Hilfe auf: `countingOpen`
+                    // ist oben noch der Wert *vor* der Erhöhung.
+                    opensAid = usePad && misses == MathHinting.CountingAidFromMisses,
+                ),
+            )
         }
     }
 
     fun resolve() {
         if (locked) return
         locked = true
-        onResult(null, true, false, null)
+        onResult(
+            MathAttempt(
+                distance = null,
+                resolved = true,
+                correct = false,
+                guess = null,
+                aided = countingOpen,
+                opensAid = false,
+            ),
+        )
     }
 
     if (usePad) {
