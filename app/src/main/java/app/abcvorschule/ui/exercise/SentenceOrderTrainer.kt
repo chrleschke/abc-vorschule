@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -171,79 +172,90 @@ fun SentenceOrderTrainer(
             if (!illustrationEmoji.isNullOrBlank()) {
                 Text(text = illustrationEmoji, fontSize = 84.sp)
             }
-            AnimatedContent(
-                targetState = completed,
-                transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(140)) },
-                label = "sentence_complete",
-            ) { isComplete ->
-                // Die Bühne wird gemessen, nicht geraten: die Peg-Reihe bricht nie um
-                // (Produktentscheidung), also ist die gemessene Breite die einzige
-                // Größe, gegen die Glyph und Peg-Breiten gelöst werden dürfen.
-                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                    val fontScale = LocalDensity.current.fontScale
-                    if (isComplete) {
-                        // Auch der fertige Satz wird gelöst statt in headlineSmall
-                        // gesetzt: „Oma hat einen Hut" braucht dort bei font_scale
-                        // 1.3 rund 382dp von 296dp.
-                        val glyphDp =
-                            SentencePegSizing.completedGlyphDp(maxWidth.value, words)
-                        Text(
-                            text = words.joinToString(" "),
-                            style = MaterialTheme.typography.headlineSmall.copy(
-                                fontSize = SentencePegSizing.glyphSp(glyphDp, fontScale).sp,
-                            ),
-                            color = WarmInk,
-                            maxLines = 1,
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .testTag("completed_sentence"),
-                        )
-                    } else {
-                        // Eine Glyphgröße für den ganzen Satz (gemischte Größen lesen
-                        // sich nicht als Satz), aber eine eigene Breite je Peg — die
-                        // Silhouette des Wortes, und der Grund, warum die Reihe
-                        // überhaupt in eine Zeile passt. Herleitung und der alte
-                        // Überlauf stehen in SentencePegSizing.
-                        val row = SentencePegSizing.solve(maxWidth.value, words)
-                        val glyphSp = SentencePegSizing.glyphSp(row.glyphDp, fontScale)
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(
-                                row.gapDp.dp,
-                                Alignment.CenterHorizontally,
-                            ),
-                            verticalAlignment = Alignment.Top,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            words.forEachIndexed { index, expected ->
-                                val filled = if (resolved) expected else placed[index]
-                                val atomId = atomIds.getOrElse(index) { expected }
-                                Peg(
-                                    index = index,
-                                    expected = expected,
-                                    filled = filled,
-                                    showGhost = scaffoldFor(atomId) == ScaffoldLevel.Beginner,
-                                    armed = field.selectedKey != null && filled == null,
-                                    enabled = !interactionLocked,
-                                    opacity = interactionOpacity,
-                                    // Nur die eigene Tat federt. Nach „Auflösen"
-                                    // fallen alle Pegs gleichzeitig — fünf Wackler
-                                    // im Chor wären eine Feier für etwas, das das
-                                    // Kind nicht geschafft hat.
-                                    morphOnFill = !resolved,
-                                    onTap = {
-                                        val selected = field.selectedKey
-                                        val card = cards.withIndex()
-                                            .firstOrNull { (i, c) -> cardKey(i, c) == selected }
-                                            ?.value
-                                        if (card != null) place(index, card)
-                                        if (filled != null) onSpeak(filled)
-                                    },
-                                    registerWith = field,
-                                    pegWidthDp = row.pegWidthsDp.getOrElse(index) {
-                                        SentencePegSizing.MinPegWidthDp
-                                    },
-                                    glyphSp = glyphSp,
-                                )
+            // `key(roundKey)` bindet die Transition an die Runde. Ohne Schlüssel
+            // merkt sich AnimatedContent seinen Zustand in einem ungekeyten
+            // `remember`, und der Aufrufort überlebt einen Rundenwechsel: folgen
+            // zwei Satz-Architekten aufeinander, stünde die Transition beim Laden
+            // noch auf "fertig", während der neue Rundenzustand schon "leer" ist —
+            // die Bühne spielte dann den Eintritt der leeren Pegs ab, und das sieht
+            // nach einem Fehler aus. Im ausgelieferten Pack liegen heute nie zwei
+            // sentence_order-Tasks hintereinander, im Wort-Bauer schon: die
+            // ausführliche Herleitung steht dort in WordBuildTrainer.kt.
+            key(roundKey) {
+                AnimatedContent(
+                    targetState = completed,
+                    transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(140)) },
+                    label = "sentence_complete",
+                ) { isComplete ->
+                    // Die Bühne wird gemessen, nicht geraten: die Peg-Reihe bricht nie um
+                    // (Produktentscheidung), also ist die gemessene Breite die einzige
+                    // Größe, gegen die Glyph und Peg-Breiten gelöst werden dürfen.
+                    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                        val fontScale = LocalDensity.current.fontScale
+                        if (isComplete) {
+                            // Auch der fertige Satz wird gelöst statt in headlineSmall
+                            // gesetzt: „Oma hat einen Hut" braucht dort bei font_scale
+                            // 1.3 rund 382dp von 296dp.
+                            val glyphDp =
+                                SentencePegSizing.completedGlyphDp(maxWidth.value, words)
+                            Text(
+                                text = words.joinToString(" "),
+                                style = MaterialTheme.typography.headlineSmall.copy(
+                                    fontSize = SentencePegSizing.glyphSp(glyphDp, fontScale).sp,
+                                ),
+                                color = WarmInk,
+                                maxLines = 1,
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .testTag("completed_sentence"),
+                            )
+                        } else {
+                            // Eine Glyphgröße für den ganzen Satz (gemischte Größen lesen
+                            // sich nicht als Satz), aber eine eigene Breite je Peg — die
+                            // Silhouette des Wortes, und der Grund, warum die Reihe
+                            // überhaupt in eine Zeile passt. Herleitung und der alte
+                            // Überlauf stehen in SentencePegSizing.
+                            val row = SentencePegSizing.solve(maxWidth.value, words)
+                            val glyphSp = SentencePegSizing.glyphSp(row.glyphDp, fontScale)
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    row.gapDp.dp,
+                                    Alignment.CenterHorizontally,
+                                ),
+                                verticalAlignment = Alignment.Top,
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                words.forEachIndexed { index, expected ->
+                                    val filled = if (resolved) expected else placed[index]
+                                    val atomId = atomIds.getOrElse(index) { expected }
+                                    Peg(
+                                        index = index,
+                                        expected = expected,
+                                        filled = filled,
+                                        showGhost = scaffoldFor(atomId) == ScaffoldLevel.Beginner,
+                                        armed = field.selectedKey != null && filled == null,
+                                        enabled = !interactionLocked,
+                                        opacity = interactionOpacity,
+                                        // Nur die eigene Tat federt. Nach „Auflösen"
+                                        // fallen alle Pegs gleichzeitig — fünf Wackler
+                                        // im Chor wären eine Feier für etwas, das das
+                                        // Kind nicht geschafft hat.
+                                        morphOnFill = !resolved,
+                                        onTap = {
+                                            val selected = field.selectedKey
+                                            val card = cards.withIndex()
+                                                .firstOrNull { (i, c) -> cardKey(i, c) == selected }
+                                                ?.value
+                                            if (card != null) place(index, card)
+                                            if (filled != null) onSpeak(filled)
+                                        },
+                                        registerWith = field,
+                                        pegWidthDp = row.pegWidthsDp.getOrElse(index) {
+                                            SentencePegSizing.MinPegWidthDp
+                                        },
+                                        glyphSp = glyphSp,
+                                    )
+                                }
                             }
                         }
                     }
