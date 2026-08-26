@@ -169,13 +169,15 @@ fun WordBuildTrainer(
 
     ExerciseStage(
         modifier = modifier,
-        prompt = {
+        promptChrome = {
             TaskPromptChrome(
                 title = null,
                 ttsAvailable = ttsAvailable,
                 speaking = speaking,
                 onSpeakPrompt = onSpeakPrompt,
             )
+        },
+        prompt = {
             Text(text = target.emoji, fontSize = 84.sp)
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                 val fontScale = LocalDensity.current.fontScale

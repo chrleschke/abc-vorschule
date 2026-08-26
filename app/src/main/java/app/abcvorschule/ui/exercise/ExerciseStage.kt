@@ -54,8 +54,9 @@ enum class AnswerAnchor {
 private const val PromptHeightFraction = 0.52f
 
 /**
- * Bühne einer Übung: Aufgabenblock oben, Antwortblock darunter, beide auf 420dp
- * Breite gedeckelt, damit nichts am Bildschirmrand klebt.
+ * Bühne einer Übung: Speaker-Kopfzeile ganz oben, darunter der Aufgabenblock,
+ * darunter der Antwortblock, alle drei auf 420dp Breite gedeckelt, damit nichts
+ * am Bildschirmrand klebt.
  *
  * [AnswerAnchor.Bottom] (Vorbelegung, die Grundform aus PRODUCT_PRINCIPLES §9):
  * der Antwortblock sitzt am unteren Rand mit 8dp Luft darunter, der Aufgabenblock
@@ -65,11 +66,20 @@ private const val PromptHeightFraction = 0.52f
  * zusätzlich [PromptHeightFraction] der Bühnenhöhe als Untergrenze — seine
  * Oberkante liegt damit knapp unter der Bildschirmmitte, solange sein Inhalt in
  * den Rest passt.
+ *
+ * @param promptChrome Kopf des Aufgabenbereichs — in allen Trainern der Speaker
+ * ([TaskPromptChrome]). Eigener Slot **über** dem Aufgabenblock statt dessen
+ * erstes Kind: der Aufgabenblock ist zentriert, also wanderte der Speaker mit
+ * der Höhe des jeweiligen Trainerinhalts mit (gemessen: 203dp in der Jagd,
+ * 305dp im Spurensucher, 425dp im Silben-Verschmelzer). Als ungewichtetes
+ * erstes Kind der Bühne sitzt er in jedem Trainer auf derselben Höhe, direkt
+ * unter Fortschritt und Punktestand.
  */
 @Composable
 fun ExerciseStage(
     modifier: Modifier = Modifier,
     answerAnchor: AnswerAnchor = AnswerAnchor.Bottom,
+    promptChrome: @Composable ColumnScope.() -> Unit = {},
     prompt: @Composable ColumnScope.() -> Unit,
     answers: @Composable ColumnScope.() -> Unit,
 ) {
@@ -88,6 +98,15 @@ fun ExerciseStage(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Column(
+                modifier = Modifier
+                    .widthIn(max = 420.dp)
+                    .fillMaxWidth()
+                    .padding(start = 12.dp, top = 8.dp, end = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                content = promptChrome,
+            )
             Box(
                 modifier = Modifier
                     .weight(1f)

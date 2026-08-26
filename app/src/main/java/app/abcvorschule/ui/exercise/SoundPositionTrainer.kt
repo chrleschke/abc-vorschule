@@ -118,13 +118,15 @@ fun SoundPositionTrainer(
 
     ExerciseStage(
         modifier = modifier,
-        prompt = {
+        promptChrome = {
             TaskPromptChrome(
                 title = null,
                 ttsAvailable = ttsAvailable,
                 speaking = speaking,
                 onSpeakPrompt = onSpeakPrompt,
             )
+        },
+        prompt = {
             Text(
                 text = targetPhoneme,
                 fontSize = 42.sp,

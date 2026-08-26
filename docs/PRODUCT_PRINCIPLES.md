@@ -147,6 +147,10 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
   vertikal zur Mitte gestaucht (Di-/Trigraph-Höhenfaktor) und mit dünnerem Straßenkorridor.
   Einzelbuchstaben (inkl. Ä/Ö/Ü) bleiben unverändert; die Breite kommt aus dem Lemma
   (Leerzeichen ignoriert, damit `S t` als Digraph zählt).
+- **Der gezeichnete Glyph ist größer als sein Kasten:** die Straße ist ein Band um die Bahn
+  und steht an jeder Kante um den Korridor über die 1×1-Box hinaus. Der Kasten wird deshalb
+  so gedeckelt, dass Kasten **plus** Band in den gemessenen Platz passt — sonst lag das Band
+  im Speaker darüber (Compose beschneidet ein Canvas nicht auf seine eigene Größe).
 - Orthografie: Silben eher klein; zusammengesetzte Wörter/Sätze korrekt großgeschrieben.
 - **Genus und Nomenklasse am Atom.** Jedes Substantiv-Atom trägt `gender` (`m`/`f`/`n`) und
   `nounClass` (`thing` / `person` / `name`); `articleSpeechOverride` überschreibt den
@@ -222,7 +226,13 @@ niemals mit einem stummen No-Op.
 ## 7. Sprache & Audio
 
 - App und Inhalte deutsch. Sprache ist bei jedem TTS Aufruf eindeutet angegeben. 
-- System-TTS für Prompts; Speaker (Vektor-Icon) **im Aufgabenbereich**, mittig über dem Aufgabentitel.
+- System-TTS für Prompts; Speaker (Vektor-Icon) **im Aufgabenbereich**, mittig am Kopf der
+  Bühne (`ExerciseStage(promptChrome = …)`) und damit in **jedem** Trainer auf derselben
+  Höhe, direkt unter Fortschritt und Punktestand — nicht als erstes Kind des zentrierten
+  Aufgabenblocks, denn dort wanderte er mit dessen Inhaltshöhe (gemessen: 203dp in der
+  Jagd, 305dp im Spurensucher, 425dp im Silben-Verschmelzer). Ein Aufgabentitel steht
+  weiterhin unter ihm. Ausgenommen ist der End-Screen, der seinen eigenen Speaker beim
+  Finale-Satz trägt (Abschnitt 12).
 - Tippen auf Aufgaben-Items (Buchstaben, Silben, Wörter, Antwortkacheln) liest sie vor.
 - Bei Erfolg: Antwort vorsprechen → Stern im oberen Drittel → erst danach nächste Aufgabe (Audio abwarten).
 - **Die Antwort nennt den Artikel, die Aufgabe nicht.** Ist das Lösungswort ein Substantiv,
@@ -347,7 +357,8 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
   den ganzen Screen und hält oben nur so viel Platz frei, wie Status-Bar plus Leiste hoch sind.
   Stünde er als eigene Zeile unter der Leiste, schnitte seine Oberkante die Schilder mitten im
   Bild ab — eine Kante, die der durchgehende Hintergrund nicht erklärt.
-- **Prompt/Aufgabe:** oberer Block, zentriert, mit Luft zu den Rändern (kein Kleben am Screenrand).
+- **Speaker-Kopfzeile:** ganz oben in der Bühne, feste Höhe über alle Trainer (§7).
+- **Prompt/Aufgabe:** Block darunter, zentriert, mit Luft zu den Rändern (kein Kleben am Screenrand).
 - **Antworten:** unterer Block, zentriert (Kacheln, Mengenwahl, Ziffernblock).
 - Keine doppelte Aufgabe+Vorschau desselben Tokens.
 - Ausnahme Buchstaben-/Silben-Jagd: Kacheln verstreuen sich über den gesamten Aufgabenbereich statt in einer geordneten Antwortliste; die Batterie bleibt im Antwortbereich unten.
@@ -356,7 +367,8 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
   Wort im Aufgabenblock. Damit sind sie von den Schablonen des Wort-Bauers unterscheidbar.
 - Ausnahme Satz-Versteher: der Antwortblock beginnt bei **52 % der Bühnenhöhe**
   statt am unteren Rand (`ExerciseStage(answerAnchor = AnswerAnchor.BelowCenter)`).
-  Sein Aufgabenblock trägt nur den Speaker — kein Titel, keine Kacheln, kein Wort
+  Sein Aufgabenblock ist leer — kein Titel, keine Kacheln, kein Wort; der Speaker
+  steht wie überall in der Kopfzeile darüber
   (**Ausnahme:** ohne deutsches TTS steht dort der Satz als Text, damit ein
   Erwachsener vorlesen kann — der visuelle Fallback aus §7; er darf nicht als
   Verstoß gegen „kein Wort" gelöscht werden) — und am unteren Rand verdeckt die
@@ -373,7 +385,9 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 
 - Gemeinsame Komponenten unter `ui/components/` (`AbcContinueButton`, `AbcSpeakerButton`, `AbcNavChevron`, `AbcSegmentedProgress`, Vektor-Icons inkl. `IconStar`) und `ui/shell/AbcTopBar`.
 - Buttons: keine Emojis — nur ASCII oder Canvas/SVG-Vektoren. Punkte-/Erfolgs-Symbol ist der Vektor-Stern `IconStar`, kein Text-Asterisk.
-- Übungen nutzen `ExerciseStage` für klare Trennung Aufgabenblock / Antwortblock.
+- Übungen nutzen `ExerciseStage` für klare Trennung Speaker-Kopfzeile / Aufgabenblock /
+  Antwortblock. Der Speaker geht in den Slot `promptChrome`, nie in `prompt` — nur der
+  Slot garantiert die feste Höhe aus §7.
   Der Parameter `answerAnchor` ist mit `Bottom` vorbelegt; `BelowCenter` ist die
   eine benannte Ausnahme (§9, Satz-Versteher).
 - Farbrollen (verbindlich): `StarGold` = Sterne/Punkte/Belohnung (`StarGoldDeep` als Kontur-/

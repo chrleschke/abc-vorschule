@@ -125,13 +125,15 @@ fun MathExercise(
     if (usePad) {
         ExerciseStage(
             modifier = modifier.fillMaxSize(),
-            prompt = {
+            promptChrome = {
                 TaskPromptChrome(
                     title = null,
                     ttsAvailable = ttsAvailable,
                     speaking = speaking,
                     onSpeakPrompt = onSpeakPrompt,
                 )
+            },
+            prompt = {
                 // The multiplication matrix writes "3 × 4" above itself, and the
                 // counting aid writes its own equation line — a second symbolic line
                 // here would show the same task twice (Layout §9).
