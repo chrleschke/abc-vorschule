@@ -36,7 +36,7 @@ class CountingStateTest {
     @Test
     fun minusCountsDownFromTheStartingQuantity() {
         val start = CountingState.forRound(MathOperation.Subtract, 15, 6)
-        assertEquals(14, start.tap(start.framedFrom!!).counted)
+        assertEquals(14, start.tap(start.unitCount - 1).counted)
         assertEquals(9, tapAlong(start, 6).counted)
     }
 
@@ -69,11 +69,29 @@ class CountingStateTest {
         val plus = CountingState.forRound(MathOperation.Add, 7, 8)
         assertEquals(0, plus.nextIndex)
         assertEquals(1, plus.tap(0).nextIndex)
-        // Bei Minus startet der Puls auf dem ersten gerahmten Objekt, nicht auf dem
-        // ersten überhaupt — dort ist ja nichts zu tun.
+        assertNull(tapAlong(plus, 15).nextIndex)
+    }
+
+    @Test
+    fun minusPulsesFromTheEndBecauseItCountsBackwards() {
+        // Weggenommen wird vom Ende der Menge, und der Zähler zählt rückwärts. Ein
+        // Puls, der vorne anfinge, liefe der Zahl entgegen.
         val minus = CountingState.forRound(MathOperation.Subtract, 15, 6)
-        assertEquals(9, minus.nextIndex)
+        assertEquals(14, minus.nextIndex)
+        assertEquals(13, minus.tap(14).nextIndex)
         assertNull(tapAlong(minus, 6).nextIndex)
+    }
+
+    @Test
+    fun multiplicationCountsInRowStepsInsteadOfSingleObjects() {
+        // "4 mal 5": vier antippbare Reihen, jede zählt fünf.
+        val mal = CountingState.forRound(MathOperation.Multiply, 4, 5)
+        assertEquals(4, mal.unitCount)
+        assertEquals(5, mal.stepSize)
+        assertEquals(5, mal.tap(0).counted)
+        assertEquals(10, tapAlong(mal, 2).counted)
+        assertEquals(20, tapAlong(mal, 4).counted)
+        assertTrue(tapAlong(mal, 4).complete)
     }
 
     @Test
@@ -107,7 +125,7 @@ class CountingStateTest {
             Triple(MathOperation.Multiply, 5, 6),
         ).forEach { (operation, left, right) ->
             val start = CountingState.forRound(operation, left, right)
-            val taps = if (operation == MathOperation.Subtract) right else start.objectCount
+            val taps = if (operation == MathOperation.Subtract) right else start.unitCount
             val done = tapAlong(start, taps)
             assertTrue("$operation $left/$right not complete", done.complete)
             assertEquals("$operation $left/$right", operation.answer(left, right), done.counted)

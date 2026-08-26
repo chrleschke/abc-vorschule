@@ -28,6 +28,9 @@ data class TrainerCallbacks(
     /** Wie [onSpeak], aber auf einem eigenen Audio-Kanal — für Tap-Echos, die eine
      * noch laufende Rundenansage nicht abwürgen dürfen (Wort-Detektiv, design doc). */
     val onSpeakFeedback: (String) -> Unit,
+    /** Eigener Kanal für die mitgezählte Zahl der Zähl-Hilfe — sie darf eine
+     * laufende Ansage überlagern, statt sie abzuwürgen (design doc). */
+    val onSpeakCounting: (String) -> Unit,
     val onSpeakAndAwait: suspend (String) -> Unit,
     val onSpeakPrompt: () -> Unit,
 )
@@ -145,6 +148,7 @@ fun TrainerHost(
             interactionLocked = interactionLocked,
             onSpeakPrompt = callbacks.onSpeakPrompt,
             onSpeakFeedback = callbacks.onSpeakFeedback,
+            onSpeakCounting = callbacks.onSpeakCounting,
             onResult = callbacks.onMathResult,
             modifier = modifier.fillMaxSize(),
         )

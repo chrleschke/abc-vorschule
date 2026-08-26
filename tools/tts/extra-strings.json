@@ -295,6 +295,161 @@
       "id": "countingAidCueTakeAway",
       "text": "Tippe auf die Bilder, um sie wegzunehmen.",
       "note": "MathHinting.CountingAidCueTakeAway — Zähl-Hilfe Minus"
+    },
+    {
+      "id": "countingAidCueRows",
+      "text": "Tippe auf jede Reihe, um sie zu zählen.",
+      "note": "MathHinting.CountingAidCueRows — Zähl-Hilfe Malnehmen"
+    },
+    {
+      "id": "countingNumber01",
+      "text": "1.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber02",
+      "text": "2.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber03",
+      "text": "3.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber04",
+      "text": "4.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber05",
+      "text": "5.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber06",
+      "text": "6.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber07",
+      "text": "7.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber08",
+      "text": "8.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber09",
+      "text": "9.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber10",
+      "text": "10.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber11",
+      "text": "11.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber12",
+      "text": "12.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber13",
+      "text": "13.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber14",
+      "text": "14.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber15",
+      "text": "15.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber16",
+      "text": "16.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber17",
+      "text": "17.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber18",
+      "text": "18.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber19",
+      "text": "19.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber20",
+      "text": "20.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber21",
+      "text": "21.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber22",
+      "text": "22.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber23",
+      "text": "23.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber24",
+      "text": "24.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber25",
+      "text": "25.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber26",
+      "text": "26.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber27",
+      "text": "27.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber28",
+      "text": "28.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber29",
+      "text": "29.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+    },
+    {
+      "id": "countingNumber30",
+      "text": "30.",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
     }
   ],
   "templates": []

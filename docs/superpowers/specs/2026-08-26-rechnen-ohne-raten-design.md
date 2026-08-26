@@ -115,10 +115,24 @@ brauchte eine eigene Ziffer, die sich mit allen anderen Zahlen im Bild stapelte,
 und sie verdoppelte die Zeilenzahl des Feldes.
 
 **Malnehmen („4 × 5")** — Raster füllen.
-Dieselbe Matrix wie im Prompt, aber die Geisterreihen
-(`MultiplicationMatrix.GhostAlpha`) werden **echt** und alle Zellen antippbar.
-Der Zähler läuft zeilenweise 1…20. Das ist genau der Schritt, den das Kind
-vorher im Kopf nicht geschafft hat.
+Dieselbe Matrix wie im Prompt, aber **die Reihe ist die Einheit**, nicht die
+Zelle: ein Tipp macht eine ganze Geisterreihe echt, und der Zähler springt in
+Schritten — 5, 10, 15, 20.
+
+Zwanzig Objekte einzeln anzutippen trainiert Zählen in *Einerschritten*, also
+genau das, was Multiplikation nicht ist; reihenweise ist es Zählen in Schritten,
+und das ist die Sache selbst. Nebenbei fällt damit die Tipp-Flut weg, die 30
+Einzelzellen bedeuten würden.
+
+Anders als bei Plus und Minus wird eine Einheit hier beim Antippen **echt**,
+statt zu verblassen: Malnehmen ist Auffüllen, und die Geisterreihen aus §8 sind
+genau das, was das Kind vervollständigen soll. Die Zeilennummern behalten dabei
+volle Deckkraft — sie sind die Zählhilfe, kein Teil des Platzhalters (§8).
+
+Die Matrix wird in der Zähl-Hilfe **deutlich größer** als im Prompt
+(`CountingField.matrixEmojiSizeSp` statt `MultiplicationMatrix.emojiSizeSp`):
+dort teilt sie sich den Platz mit dem Antwortbereich, hier hat sie den
+Aufgabenblock für sich, und jede Reihe muss mit dem Finger zu treffen sein.
 
 ### Mengen ab 11 materialisieren sich
 
@@ -149,21 +163,34 @@ Prompt verklungen ist — dort steht ja kein zweiter Mengenblock mehr. Dieselbe
 Begründung, aus der die Multiplikationsmatrix ihre Gleichung längst selbst
 schreibt (§8).
 
-Das **nächste offene Objekt pulsiert** sanft in der Deckkraft und führt so durch
+Die **nächste offene Einheit pulsiert** sanft in der Deckkraft und führt so durch
 die Aufgabe. Der Puls, nicht der Ton, ist die eigentliche Anleitung: eine
 Ansage, die nur bei vorhandener TTS-Stimme oder gerendertem Clip ankommt, wäre
 keine.
+
+Bei Minus läuft der Puls **von hinten nach vorne**: weggenommen wird vom Ende
+der Menge, und der Zähler zählt rückwärts. Ein Puls, der vorne anfinge, liefe
+der Zahl entgegen.
+
+Eine **erledigte** gerahmte Zelle bekommt einen deutlich helleren Rahmen. Bliebe
+er gleich dunkel, sähe ein schon abgezähltes Objekt genauso „dran" aus wie ein
+offenes, und der Rahmen verlöre genau die Information, für die er da ist.
 
 ### Audio
 
 - **Beim Aufklappen:** ein gesprochener Cue als Verstärkung — „Tippe auf die
   Bilder, um sie zu zählen." bzw. „… um sie wegzunehmen.". Kinder lesen nicht
   (§Audio-First).
-- **Pro Tipp:** nur Haptik, **kein** Sprechen. Schnell aufeinanderfolgende
-  Äußerungen würgen sich in `SpeechController` gegenseitig ab — auch auf
-  `SpeechChannel.Feedback`, das vor dem Enqueue `stopOutput(channel)` ruft.
-- **Beim letzten Tipp:** einmal die Gesamtzahl sprechen („Neun!"). Eine einzelne
-  Äußerung, unkritisch, und der Payoff-Moment.
+- **Pro Tipp:** die erreichte Zahl wird mitgesprochen — Mitzählen ist der Kern
+  der Übung, und ohne Stimme zählt das Kind stumm. Dafür bekommt die Zähl-Hilfe
+  einen **eigenen Kanal** `SpeechChannel.Counting` mit eigenem Clip-Player: die
+  Zahl darf eine laufende Ansage **überlagern**, statt sie abzuwürgen oder von
+  ihr abgewürgt zu werden. Auf `Feedback` ginge das nicht — `speak` ruft dort
+  `stopOutput(channel)` vor dem Enqueue, und bei jedem Tipp eine Zahl heißt, dass
+  sich die Zahlen gegenseitig zerschnitten.
+- Die Zahlen 1…30 stehen als `"n."` in `extra-strings.json` und teilen sich die
+  Clips mit dem Miss-Echo in `SessionViewModel`, das dieselbe Form spricht.
+- Zusätzlich **Haptik** pro Tipp, damit die Rückmeldung auch ohne Ton ankommt.
 
 ### Tastatur
 

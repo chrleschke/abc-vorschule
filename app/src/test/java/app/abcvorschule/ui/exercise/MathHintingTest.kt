@@ -62,7 +62,9 @@ class MathHintingTest {
     fun theCountingCueMatchesTheGestureTheOperationAsks() {
         assertEquals(MathHinting.CountingAidCueTakeAway, MathHinting.countingAidCue(MathOperation.Subtract))
         assertEquals(MathHinting.CountingAidCueCollect, MathHinting.countingAidCue(MathOperation.Add))
-        assertEquals(MathHinting.CountingAidCueCollect, MathHinting.countingAidCue(MathOperation.Multiply))
+        // Malnehmen zählt reihenweise — der Cue muss die Geste benennen, die
+        // tatsächlich verlangt ist, nicht "jedes Bild".
+        assertEquals(MathHinting.CountingAidCueRows, MathHinting.countingAidCue(MathOperation.Multiply))
     }
 
     @Test

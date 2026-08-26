@@ -33,9 +33,40 @@ class CountingFieldTest {
     fun bothOperandsShareOneFieldSoTheTowerStaysLow() {
         // Zwei getrennte Blöcke kosteten bis zu sieben Zeilen und drückten das Emoji
         // auf 20sp; gemeinsam sind es höchstens sechs.
-        assertEquals(15, CountingField.objectCount(MathOperation.Add, 7, 8))
-        assertEquals(15, CountingField.objectCount(MathOperation.Subtract, 15, 6))
-        assertEquals(20, CountingField.objectCount(MathOperation.Multiply, 4, 5))
+        assertEquals(15, CountingField.unitCount(MathOperation.Add, 7, 8))
+        assertEquals(15, CountingField.unitCount(MathOperation.Subtract, 15, 6))
+    }
+
+    @Test
+    fun multiplicationCountsRowsNotObjects() {
+        // 20 Objekte einzeln anzutippen trainiert Zählen in Einerschritten, also
+        // genau das, was Multiplikation nicht ist. Vier Reihen à fünf: 5, 10, 15, 20.
+        assertEquals(4, CountingField.unitCount(MathOperation.Multiply, 4, 5))
+        assertEquals(5, CountingField.stepSize(MathOperation.Multiply, 5))
+        assertEquals(1, CountingField.stepSize(MathOperation.Add, 5))
+        assertEquals(1, CountingField.stepSize(MathOperation.Subtract, 5))
+    }
+
+    @Test
+    fun theMatrixGrowsInTheCountingAidBecauseItHasTheBlockToItself() {
+        // Im Aufgaben-Prompt teilt sich die Matrix den Platz mit dem Antwortbereich;
+        // in der Zähl-Hilfe muss jede Reihe mit dem Finger zu treffen sein.
+        val inPrompt = MultiplicationMatrix.emojiSizeSp(6)
+        val inAid = CountingField.matrixEmojiSizeSp(5, 6)
+        assertTrue("prompt=$inPrompt aid=$inAid", inAid > inPrompt)
+        // Und sie bleibt im Aufgabenblock: fünf Reihen sind der Deckel.
+        (1..MultiplicationMatrix.MaxRows).forEach { rows ->
+            (1..MultiplicationMatrix.MaxColumns).forEach { columns ->
+                val size = CountingField.matrixEmojiSizeSp(rows, columns)
+                val height = rows * (size * CountingField.LayoutFontScale + CountingField.MatrixGapDp) +
+                    CountingField.LabelLineSp * CountingField.LayoutFontScale
+                val width = MultiplicationMatrix.RowLabelGutterDp +
+                    columns * size * CountingField.LayoutFontScale +
+                    CountingField.MatrixGapDp * (columns - 1)
+                assertTrue("$rows x $columns -> ${height}dp high", height <= CountingField.TaskBlockDp)
+                assertTrue("$rows x $columns -> ${width}dp wide", width <= CountingField.FieldWidthDp)
+            }
+        }
     }
 
     @Test
@@ -95,9 +126,9 @@ class CountingFieldTest {
     }
 
     @Test
-    fun multiplicationDefersItsSizeToTheMatrixItReuses() {
+    fun multiplicationUsesTheCountingAidsOwnMatrixSize() {
         assertEquals(
-            MultiplicationMatrix.emojiSizeSp(6),
+            CountingField.matrixEmojiSizeSp(5, 6),
             CountingField.emojiSizeSp(MathOperation.Multiply, 5, 6),
         )
     }

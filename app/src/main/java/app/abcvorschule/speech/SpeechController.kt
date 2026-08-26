@@ -16,7 +16,14 @@ import java.util.concurrent.ConcurrentHashMap
  * abwürgen dürfen (Wort-Detektiv, siehe design doc). Getrennte ClipPlayer-Instanzen,
  * damit ein Aufruf auf dem einen Kanal den anderen nicht flusht — die TTS-Engine
  * bleibt geteilt, siehe design doc "Nicht im Scope". */
-enum class SpeechChannel { Primary, Feedback }
+/**
+ * Getrennte Ausgabewege. [Primary] trägt die Rundenansage und flusht, [Feedback]
+ * die Tap-Echos. [Counting] ist der Zählkanal der Zähl-Hilfe: er hat einen
+ * eigenen Clip-Player, damit die mitgezählte Zahl eine laufende Ansage
+ * **überlagert**, statt sie abzuwürgen oder von ihr abgewürgt zu werden — bei
+ * jedem Tipp eine Zahl, und das Kind tippt schnell.
+ */
+enum class SpeechChannel { Primary, Feedback, Counting }
 
 /**
  * Sprechen ist verfügbar, sobald irgendein Ausgabeweg existiert: kuratierte Clips
@@ -37,6 +44,7 @@ class SpeechController(
     private val clipPlayers: Map<SpeechChannel, ClipPlayer> = mapOf(
         SpeechChannel.Primary to ClipPlayer(appContext),
         SpeechChannel.Feedback to ClipPlayer(appContext),
+        SpeechChannel.Counting to ClipPlayer(appContext),
     )
 
     /** Text→Clip-Index. Startet typischerweise leer und wird asynchron nachgereicht

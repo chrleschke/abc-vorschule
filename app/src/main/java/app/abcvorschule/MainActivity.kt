@@ -116,6 +116,7 @@ fun AbcApp(onFinish: () -> Unit = {}) {
             speaking = speaking,
             onSpeak = speech::speak,
             onSpeakFeedback = { text -> speech.speak(text, channel = SpeechChannel.Feedback) },
+            onSpeakCounting = { text -> speech.speak(text, channel = SpeechChannel.Counting) },
             onSpeakAndAwait = speech::speakAndAwait,
             onSpeakPromptSequence = speech::speakAndAwaitSequence,
             onSpeakIntroSequence = { texts, onPartComplete ->

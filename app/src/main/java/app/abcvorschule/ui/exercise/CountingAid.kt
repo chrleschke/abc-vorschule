@@ -94,7 +94,7 @@ fun CountingAid(
                 .padding(bottom = 4.dp)
                 .testTag("counting_equation"),
         )
-        CountingField.rows(state.objectCount).forEach { rowLength ->
+        CountingField.rows(state.unitCount).forEach { rowLength ->
             Row(horizontalArrangement = Arrangement.spacedBy(CountingField.RowGapDp.dp)) {
                 repeat(rowLength) {
                     CountingCell(
@@ -140,9 +140,20 @@ private fun CountingCell(
         modifier = Modifier
             .then(
                 if (framed) {
+                    // Erledigte Zellen bekommen einen deutlich helleren Rahmen. Bliebe
+                    // er gleich dunkel, sähe ein schon abgezähltes Objekt genauso
+                    // "dran" aus wie ein offenes, und der Rahmen verlöre genau die
+                    // Information, für die er da ist.
                     Modifier
-                        .background(CreamElevated, RoundedCornerShape(8.dp))
-                        .border(2.dp, WarmMuted, RoundedCornerShape(8.dp))
+                        .background(
+                            CreamElevated.copy(alpha = if (used) 0.4f else 1f),
+                            RoundedCornerShape(8.dp),
+                        )
+                        .border(
+                            2.dp,
+                            WarmMuted.copy(alpha = if (used) 0.25f else 1f),
+                            RoundedCornerShape(8.dp),
+                        )
                 } else {
                     Modifier
                 },

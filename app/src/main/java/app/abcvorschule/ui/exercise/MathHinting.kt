@@ -79,9 +79,15 @@ object MathHinting {
      */
     const val CountingAidCueCollect = "Tippe auf die Bilder, um sie zu zählen."
     const val CountingAidCueTakeAway = "Tippe auf die Bilder, um sie wegzunehmen."
+    const val CountingAidCueRows = "Tippe auf jede Reihe, um sie zu zählen."
 
-    fun countingAidCue(operation: MathOperation): String =
-        if (operation == MathOperation.Subtract) CountingAidCueTakeAway else CountingAidCueCollect
+    fun countingAidCue(operation: MathOperation): String = when (operation) {
+        MathOperation.Subtract -> CountingAidCueTakeAway
+        // Malnehmen zählt reihenweise, nicht Bild für Bild — der Cue muss die
+        // Geste benennen, die tatsächlich verlangt ist.
+        MathOperation.Multiply -> CountingAidCueRows
+        MathOperation.Add -> CountingAidCueCollect
+    }
 
     fun inputFor(scaffold: ScaffoldLevel, parentMode: ParentMode, answer: Int): MathInputMode {
         val typed = scaffold == ScaffoldLevel.Advanced ||

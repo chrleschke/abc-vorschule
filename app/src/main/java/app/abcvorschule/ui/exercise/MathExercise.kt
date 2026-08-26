@@ -38,6 +38,7 @@ fun MathExercise(
     interactionLocked: Boolean = false,
     onSpeakPrompt: () -> Unit,
     onSpeakFeedback: (String) -> Unit,
+    onSpeakCounting: (String) -> Unit,
     onResult: (distance: Int?, resolved: Boolean, correct: Boolean, guess: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -130,13 +131,11 @@ fun MathExercise(
                             } else {
                                 haptics.tick()
                                 counting = next
-                                // Beim letzten Objekt einmal die Gesamtzahl — eine
-                                // einzelne Äußerung, das ist der Payoff-Moment. Pro
-                                // Tipp zu sprechen würgt sich gegenseitig ab
-                                // (SpeechController.stopOutput vor jedem Enqueue).
-                                if (next.complete) {
-                                    next.counted?.let { onSpeakFeedback("$it.") }
-                                }
+                                // Mitzählen bei jedem Tipp — auf dem eigenen
+                                // Zählkanal, damit die Zahl eine laufende Ansage
+                                // überlagert, statt sie abzuwürgen oder von ihr
+                                // abgewürgt zu werden.
+                                next.counted?.let { onSpeakCounting("$it.") }
                             }
                         },
                     )

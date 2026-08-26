@@ -28,6 +28,10 @@ object CountingField {
     /** Abstand zwischen zwei Zellen, in dp. */
     const val RowGapDp = 4f
 
+    /** Abstand zwischen zwei Matrixzellen, in dp — muss zu
+     * [MultiplicationMatrixGrid] passen. */
+    const val MatrixGapDp = 2f
+
     /** Innenabstand einer Zelle, in dp. Jede Zelle trägt ihn, nicht nur die
      * gerahmten — sonst säßen gerahmte und ungerahmte Objekte auf verschiedenen
      * Rastern und die Fünferzeile verliefe krumm. */
@@ -77,13 +81,23 @@ object CountingField {
         }
     }
 
-    /** Wie viele Objekte insgesamt antippbar auf dem Schirm stehen. */
-    fun objectCount(operation: MathOperation, left: Int, right: Int): Int =
+    /**
+     * Antippbare **Einheiten**. Bei Plus und Minus ist das ein Objekt, bei
+     * Malnehmen eine ganze **Reihe**: 24 Objekte einzeln anzutippen trainiert
+     * Zählen in Einerschritten, also genau das, was Multiplikation nicht ist.
+     * Reihenweise ist es Zählen in Schritten — die Sache selbst.
+     */
+    fun unitCount(operation: MathOperation, left: Int, right: Int): Int =
         when (operation) {
             MathOperation.Add -> left + right
             MathOperation.Subtract -> left
-            MathOperation.Multiply -> left * right
+            MathOperation.Multiply -> left
         }
+
+    /** Wie viel eine Einheit zählt: ein Objekt zählt eins, eine Matrixreihe so
+     * viel, wie sie Spalten hat. */
+    fun stepSize(operation: MathOperation, right: Int): Int =
+        if (operation == MathOperation.Multiply) right else 1
 
     /**
      * Ab welchem Index der zweite Operand beginnt — die gerahmten Objekte.
@@ -95,11 +109,11 @@ object CountingField {
      * sie ist antippbar), bei Plus kommt sie dazu.
      */
     fun framedFrom(operation: MathOperation, left: Int, right: Int): Int? =
-        if (operation == MathOperation.Multiply) null else objectCount(operation, left, right) - right
+        if (operation == MathOperation.Multiply) null else unitCount(operation, left, right) - right
 
     /** Gerenderte Zeilen. Malnehmen behält sein Raster, sonst Fünferzeilen. */
     fun totalRows(operation: MathOperation, left: Int, right: Int): Int =
-        if (operation == MathOperation.Multiply) left else rows(objectCount(operation, left, right)).size
+        if (operation == MathOperation.Multiply) left else rows(unitCount(operation, left, right)).size
 
     /** Kantenlänge einer Zelle in dp bei gegebener Emoji-Größe. */
     fun cellSizeDp(emojiSizeSp: Int): Float = emojiSizeSp * LayoutFontScale + 2 * CellPadDp
@@ -120,12 +134,28 @@ object CountingField {
      * per Konstruktion, für jede Runde, die der Validator zulässt.
      */
     fun emojiSizeSp(operation: MathOperation, left: Int, right: Int): Int {
-        if (operation == MathOperation.Multiply) return MultiplicationMatrix.emojiSizeSp(right)
+        if (operation == MathOperation.Multiply) return matrixEmojiSizeSp(left, right)
         val rows = totalRows(operation, left, right)
         if (rows <= 0) return MaxEmojiSp
         val byWidth = ((FieldWidthDp - RowGapDp * (RowSize - 1)) / RowSize - 2 * CellPadDp) / LayoutFontScale
         val available = TaskBlockDp - SafetyDp - LabelLineSp * LayoutFontScale
         val byHeight = (available / rows - RowGapDp - 2 * CellPadDp) / LayoutFontScale
+        return minOf(byWidth, byHeight).toInt().coerceIn(MinEmojiSp, MaxEmojiSp)
+    }
+
+    /**
+     * Emoji-Größe der Matrix **in der Zähl-Hilfe** — deutlich größer als
+     * [MultiplicationMatrix.emojiSizeSp], das für den Aufgaben-Prompt gilt. Dort
+     * teilt sich die Matrix den Platz mit dem Antwortbereich; hier hat sie den
+     * Aufgabenblock für sich, und die Zellen müssen mit dem Finger zu treffen
+     * sein. Aus demselben Budget hergeleitet wie die Fünferzeilen.
+     */
+    fun matrixEmojiSizeSp(rows: Int, columns: Int): Int {
+        if (rows <= 0 || columns <= 0) return MaxEmojiSp
+        val usable = FieldWidthDp - MultiplicationMatrix.RowLabelGutterDp - MatrixGapDp * (columns - 1)
+        val byWidth = usable / columns / LayoutFontScale
+        val available = TaskBlockDp - SafetyDp - LabelLineSp * LayoutFontScale
+        val byHeight = (available / rows - MatrixGapDp) / LayoutFontScale
         return minOf(byWidth, byHeight).toInt().coerceIn(MinEmojiSp, MaxEmojiSp)
     }
 }
