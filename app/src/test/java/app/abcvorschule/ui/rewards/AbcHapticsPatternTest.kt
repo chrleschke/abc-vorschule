@@ -12,9 +12,9 @@ class AbcHapticsPatternTest {
     }
 
     @Test
-    fun `success ist ein doppelpuls`() {
-        // waveform: [puls, pause, puls]
-        assertEquals(3, HapticPatterns.timingsFor(HapticVerb.Success).size)
+    fun `success ist ein einzelner kurzer puls`() {
+        assertEquals(1, HapticPatterns.timingsFor(HapticVerb.Success).size)
+        assertTrue(HapticPatterns.timingsFor(HapticVerb.Success).first() in 30L..60L)
     }
 
     @Test

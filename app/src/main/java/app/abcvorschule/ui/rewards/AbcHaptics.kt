@@ -33,14 +33,14 @@ enum class HapticVerb { Tick, Success, Celebrate, Nudge }
 object HapticPatterns {
     fun timingsFor(verb: HapticVerb): LongArray = when (verb) {
         HapticVerb.Tick -> longArrayOf(25)
-        HapticVerb.Success -> longArrayOf(35, 70, 55)
+        HapticVerb.Success -> longArrayOf(45)
         HapticVerb.Celebrate -> longArrayOf(45, 90, 45, 90, 90)
         HapticVerb.Nudge -> longArrayOf(20)
     }
 
     fun amplitudesFor(verb: HapticVerb): IntArray = when (verb) {
         HapticVerb.Tick -> intArrayOf(180)
-        HapticVerb.Success -> intArrayOf(160, 0, 220)
+        HapticVerb.Success -> intArrayOf(220)
         HapticVerb.Celebrate -> intArrayOf(150, 0, 190, 0, 255)
         HapticVerb.Nudge -> intArrayOf(90)
     }
