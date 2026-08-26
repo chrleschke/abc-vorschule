@@ -1,6 +1,7 @@
 package app.abcvorschule
 
 import android.graphics.Color as AndroidColor
+import android.media.AudioManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -38,6 +39,10 @@ import kotlinx.coroutines.withContext
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Alles, was die App hörbar macht — Sprachclips, TTS und die synthetisierten
+        // Blips — liegt auf der Medienspur. Ohne das regeln die Lautstärketasten die
+        // Klingeltonspur, und der Erwachsene dreht am falschen Regler.
+        volumeControlStream = AudioManager.STREAM_MUSIC
         enableEdgeToEdge(
             // Status bar: API 26 has windowLightStatusBar, so a fully transparent
             // darkScrim fallback never actually gets used — safe to leave transparent.

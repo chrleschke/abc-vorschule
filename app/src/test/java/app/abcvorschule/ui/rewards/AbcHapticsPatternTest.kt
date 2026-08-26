@@ -34,6 +34,32 @@ class AbcHapticsPatternTest {
         }
     }
 
+    /**
+     * Der Fallback ohne Amplitudensteuerung lief über
+     * `createOneShot(timings.sum(), …)` und zählte damit die PAUSEN als
+     * Vibrationszeit mit: aus dem Dreifachpuls wurde ein 360-ms-Dauerbrummen.
+     * Die Waveform-Form hält An und Aus getrennt.
+     */
+    @Test
+    fun `waveform-timings trennen puls und pause statt sie zu summieren`() {
+        val w = HapticPatterns.waveformTimingsFor(HapticVerb.Celebrate)
+        assertEquals(6, w.size) // fuehrende 0 (Delay-first) + puls,pause,puls,pause,puls
+        assertEquals(0L, w.first())
+        // Nur die Puls-Zellen vibrieren: 45+45+90, nicht die Summe aller 360.
+        val vibrating = w.filterIndexed { i, _ -> i % 2 == 1 }.sum()
+        assertEquals(180L, vibrating)
+        assertEquals(360L, HapticPatterns.timingsFor(HapticVerb.Celebrate).sum())
+    }
+
+    @Test
+    fun `waveform-timings sind fuer jedes verb delay-first`() {
+        HapticVerb.entries.forEach { v ->
+            val w = HapticPatterns.waveformTimingsFor(v)
+            assertEquals(0L, w.first())
+            assertEquals(HapticPatterns.timingsFor(v).size + 1, w.size)
+        }
+    }
+
     @Test
     fun `nudge ist schwaecher als tick`() {
         assertTrue(

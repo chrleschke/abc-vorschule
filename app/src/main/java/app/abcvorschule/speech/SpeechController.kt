@@ -11,6 +11,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicLong
 
 /** Primary trägt die Rundenansage; Feedback trägt Tap-Echos, die die Ansage nicht
  * abwürgen dürfen (Wort-Detektiv, siehe design doc). Getrennte ClipPlayer-Instanzen,
@@ -34,6 +35,48 @@ enum class SpeechChannel { Primary, Feedback, Counting }
  */
 internal fun speechAvailable(languageOk: Boolean, clipCount: Int): Boolean =
     languageOk || clipCount > 0
+
+/**
+ * Drosselung des Zählkanals. Für Zahlwörter existiert kein einziger Clip
+ * (`assets/audio/index.json` kennt keins), jede getippte Zahl geht also als
+ * TTS-Utterance in die geteilte Engine-Queue. `QUEUE_FLUSH` ist auf diesem
+ * Kanal verboten — es würde die laufende Primary-Ansage abwürgen, genau das,
+ * was die getrennten Kanäle verhindern sollen. Gedrosselt wird deshalb an der
+ * Quelle: höchstens eine Zahl liegt in der Engine, und was währenddessen
+ * getippt wird, ersetzt einander — danach kommt nur die ZULETZT getippte Zahl.
+ * Ohne das staut sich in der Zähl-Hilfe bei schnellem Finger eine Kette, die
+ * der Hand sekundenlang hinterherzählt.
+ */
+internal class CountingSpeechQueue {
+    private var inFlightId: String? = null
+    private var pendingText: String? = null
+
+    /** true = jetzt sprechen; false = gemerkt, kommt frühestens nach der laufenden Zahl. */
+    @Synchronized
+    fun offer(text: String, utteranceId: String): Boolean {
+        if (inFlightId != null) {
+            pendingText = text
+            return false
+        }
+        inFlightId = utteranceId
+        return true
+    }
+
+    /** Laufende Zahl ist zu Ende — liefert die zuletzt getippte wartende Zahl, falls es eine gibt. */
+    @Synchronized
+    fun onUtteranceFinished(utteranceId: String?): String? {
+        if (utteranceId == null || utteranceId != inFlightId) return null
+        inFlightId = null
+        return pendingText?.also { pendingText = null }
+    }
+
+    /** Die Engine-Queue wurde geflusht — nichts Wartendes darf danach noch nachklingen. */
+    @Synchronized
+    fun reset() {
+        inFlightId = null
+        pendingText = null
+    }
+}
 
 class SpeechController(
     context: Context,
@@ -73,6 +116,20 @@ class SpeechController(
      * Utterances würden sonst den Primary-Kanal-Zustand verfälschen. */
     @Volatile
     private var primaryUtteranceId: String? = null
+
+    /**
+     * Generation des Primary-Kanals. Jeder neue Primary-Start löst die laufende
+     * Sequenz ab — bisher lief die alte trotzdem weiter, weil `stopOutput` ihr
+     * ausstehendes `onComplete` feuert und sie damit zum nächsten Teil
+     * weiterwandert: die Ansage zerfiel in Fragmente und `onPartComplete`
+     * entsperrte die Runde, bevor sie gesprochen war. Das Token liegt hier und
+     * nicht als Job-Handle im Aufrufer, weil sonst jeder Aufrufort (Speaker-Tipp,
+     * Rundenansage, Erfolgs-Vorsprechen) seinen eigenen Sonderfall bräuchte —
+     * und die beiden ohnehin nicht voneinander wüssten.
+     */
+    private val primaryGeneration = AtomicLong(0)
+
+    private val countingQueue = CountingSpeechQueue()
 
     /** While true, speak calls are ignored — set when the activity stops (background). */
     @Volatile
@@ -162,22 +219,38 @@ class SpeechController(
         channel: SpeechChannel = SpeechChannel.Primary,
         timeoutMs: Long = 10_000L,
     ) {
-        if (text.isBlank() || blockedForBackground) return
+        awaitSpeak(text, channel, timeoutMs)
+    }
+
+    /**
+     * Wie [speakAndAwait], liefert aber das Primary-Token, unter dem gesprochen
+     * wurde: nur damit erkennt [speakAndAwaitSequence] nach dem Warten, dass ein
+     * neuer Primary-Start sie abgelöst hat, und hört auf, statt weiterzustottern.
+     */
+    private suspend fun awaitSpeak(
+        text: String,
+        channel: SpeechChannel,
+        timeoutMs: Long,
+    ): Long {
+        if (text.isBlank() || blockedForBackground) return primaryGeneration.get()
         if (channel == SpeechChannel.Primary) clearWaiters()
         stopOutput(channel)
+        // Nach dem stopOutput lesen: dessen Hochzählen gehört zu DIESEM Aufruf.
+        val generation = primaryGeneration.get()
         val deferred = CompletableDeferred<Unit>()
         if (playClip(text, channel, onComplete = { deferred.complete(Unit) })) {
             withTimeoutOrNull(timeoutMs) { deferred.await() }
-            return
+            return generation
         }
         val id = UUID.randomUUID().toString()
         utteranceWaiters[id] = deferred
         if (!enqueueTts(text, channel, id)) {
             utteranceWaiters.remove(id)
-            return
+            return generation
         }
         withTimeoutOrNull(timeoutMs) { deferred.await() }
         utteranceWaiters.remove(id)
+        return generation
     }
 
     /**
@@ -190,15 +263,25 @@ class SpeechController(
      * QUEUE_ADD ein: die TTS-Engine ist geteilt, ein FLUSH auf dem
      * Feedback-Kanal würde eine gerade laufende Primary-Ansage abwürgen —
      * genau das, was die getrennten Kanäle verhindern sollen (design doc).
+     * Counting reiht ebenfalls ein, aber gedrosselt über [CountingSpeechQueue]:
+     * dort ersetzt die zuletzt getippte Zahl die noch nicht gesprochene, statt
+     * dass sich eine Kette hinter dem Finger aufstaut.
      */
     private fun enqueueTts(text: String, channel: SpeechChannel, id: String): Boolean {
         val engine = tts ?: return false
         if (!languageOk) return false
-        if (channel == SpeechChannel.Primary) {
-            primaryUtteranceId = id
-            engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)
-        } else {
-            engine.speak(text, TextToSpeech.QUEUE_ADD, null, id)
+        when (channel) {
+            SpeechChannel.Primary -> {
+                primaryUtteranceId = id
+                engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, id)
+            }
+            SpeechChannel.Counting -> {
+                // Zurückgehalten heißt gemerkt, nicht gescheitert: true, damit der
+                // Aufrufer nicht auf einen anderen Ausgabeweg ausweicht.
+                if (!countingQueue.offer(text, id)) return true
+                engine.speak(text, TextToSpeech.QUEUE_ADD, null, id)
+            }
+            SpeechChannel.Feedback -> engine.speak(text, TextToSpeech.QUEUE_ADD, null, id)
         }
         return true
     }
@@ -215,7 +298,13 @@ class SpeechController(
         onPartComplete: ((index: Int) -> Unit)? = null,
     ) {
         texts.withIndex().filter { it.value.isNotBlank() }.forEach { (index, text) ->
-            speakAndAwait(text, timeoutMs = timeoutMs)
+            val generation = awaitSpeak(text, SpeechChannel.Primary, timeoutMs)
+            // Ein neuer Primary-Start (zweiter Speaker-Tipp, nächste Runde) hat
+            // diese Sequenz abgelöst — er hat unser Clip-onComplete gefeuert, wir
+            // sind also nicht zu Ende gesprochen, sondern abgeschnitten. Weder
+            // weitersprechen noch entsperren: sonst zerhackt sich die Ansage in
+            // Fragmente und die Runde entsperrt vor der Ansage.
+            if (primaryGeneration.get() != generation) return
             onPartComplete?.invoke(index)
         }
     }
@@ -255,6 +344,13 @@ class SpeechController(
         clipPlayers.getValue(channel).stop()
         if (channel == SpeechChannel.Primary) {
             primaryUtteranceId = null
+            primaryGeneration.incrementAndGet()
+            // `tts.stop()` flusht die ganze Engine-Queue, also auch eine wartende
+            // Zahl des Zählkanals — die darf danach nicht doch noch nachklingen.
+            // Ein stopOutput(Counting) leert die Queue bewusst NICHT: jeder Tipp
+            // geht durch `speak` und damit durch stopOutput, das Leeren dort
+            // hieße, die Drosselung bei jedem Tipp wieder aufzuheben.
+            countingQueue.reset()
             tts?.stop()
             _speaking.value = false
         }
@@ -267,6 +363,9 @@ class SpeechController(
         if (utteranceId != null && utteranceId == primaryUtteranceId) {
             primaryUtteranceId = null
             _speaking.value = false
+        }
+        countingQueue.onUtteranceFinished(utteranceId)?.let { next ->
+            enqueueTts(next, SpeechChannel.Counting, UUID.randomUUID().toString())
         }
         completeWaiter(utteranceId)
     }

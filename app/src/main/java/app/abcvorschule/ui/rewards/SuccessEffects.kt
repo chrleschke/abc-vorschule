@@ -144,7 +144,13 @@ private fun playTone(freqsHz: List<Double>, noteMs: Int, gapMs: Int = 15) {
         val track = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                    // USAGE_MEDIA wie der ClipPlayer, nicht ASSISTANCE_SONIFICATION:
+                    // das landete auf STREAM_SYSTEM und war im Vibrations-/Stummmodus
+                    // lautlos, während die Sprachclips weiterliefen. Der
+                    // Blocked-Blip ist aber gerade die Zusage „ein Tipp ist nie ein
+                    // stummes No-Op" — er muss auf derselben Spur liegen wie die
+                    // Sprache, die das Kind ohnehin hört.
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build(),
             )
@@ -158,15 +164,20 @@ private fun playTone(freqsHz: List<Double>, noteMs: Int, gapMs: Int = 15) {
             .setBufferSizeInBytes(samples.size * 2)
             .setTransferMode(AudioTrack.MODE_STATIC)
             .build()
-        track.write(samples, 0, samples.size)
-        track.setNotificationMarkerPosition(samples.size)
-        track.setPlaybackPositionUpdateListener(object : AudioTrack.OnPlaybackPositionUpdateListener {
-            override fun onMarkerReached(t: AudioTrack?) {
-                runCatching { track.release() }
-            }
-            override fun onPeriodicNotification(t: AudioTrack?) = Unit
-        })
-        track.play()
+        // Ab hier hängt ein nativer Track dran: wirft write/play, verschluckt das
+        // äußere runCatching die Exception und der Track bliebe für immer
+        // alloziert — der Marker-Callback, der sonst freigibt, kommt dann nie.
+        runCatching {
+            track.write(samples, 0, samples.size)
+            track.setNotificationMarkerPosition(samples.size)
+            track.setPlaybackPositionUpdateListener(object : AudioTrack.OnPlaybackPositionUpdateListener {
+                override fun onMarkerReached(t: AudioTrack?) {
+                    runCatching { track.release() }
+                }
+                override fun onPeriodicNotification(t: AudioTrack?) = Unit
+            })
+            track.play()
+        }.onFailure { runCatching { track.release() } }
     }
 }
 

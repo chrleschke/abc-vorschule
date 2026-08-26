@@ -24,6 +24,14 @@ class ClipPlayer(context: Context) {
      * Aufruf, der intern über [stop] geht). Liefert false, wenn sie gar nicht
      * erst startet — dann wurde [onComplete] nicht aufgerufen und der
      * Aufrufer übernimmt (Fallback auf Android-TTS).
+     *
+     * Vorbereitet wird asynchron: `prepare()` dekodiert synchron auf dem
+     * Main-Thread, und dieser Weg läuft auch beim Tap-Echo, während das Kind
+     * schnell tippt — der Ruckler landete mitten in den laufenden
+     * Kachel-Animationen. „Gestartet" heißt hier deshalb „übernommen": ein
+     * Fehler beim Vorbereiten kommt über den OnErrorListener und feuert
+     * [onComplete] wie ein Abbruch, statt den Aufrufer zurück auf TTS zu
+     * schicken, das der Clip schon ersetzt hat.
      */
     fun play(file: String, onComplete: () -> Unit): Boolean {
         stop()
@@ -48,9 +56,13 @@ class ClipPlayer(context: Context) {
                 finish()
                 true
             }
+            mp.setOnPreparedListener { prepared ->
+                // Zwischenzeitliches stop()/play() hat den Player abgelöst — ein
+                // nachlaufendes onPrepared darf dann nichts mehr anwerfen.
+                if (player === prepared) prepared.start()
+            }
             pendingOnComplete = onComplete
-            mp.prepare()
-            mp.start()
+            mp.prepareAsync()
             true
         } catch (_: Exception) {
             pendingOnComplete = null

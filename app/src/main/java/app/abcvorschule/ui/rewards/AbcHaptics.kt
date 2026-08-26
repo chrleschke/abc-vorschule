@@ -44,6 +44,16 @@ object HapticPatterns {
         HapticVerb.Celebrate -> intArrayOf(150, 0, 190, 0, 255)
         HapticVerb.Nudge -> intArrayOf(90)
     }
+
+    /**
+     * Delay-first-Form für `createWaveform`: führende 0, danach unsere
+     * Puls/Pause-Paare. Auch der Fallback ohne Amplitudensteuerung läuft
+     * hierüber — `createOneShot(timings.sum(), …)` hätte dort die Pausen als
+     * Vibrationszeit mitgezählt und aus dem Dreifachpuls von `celebrate` ein
+     * durchgehendes 360-ms-Brummen gemacht.
+     */
+    fun waveformTimingsFor(verb: HapticVerb): LongArray =
+        longArrayOf(0, *timingsFor(verb))
 }
 
 private class VibratorAbcHaptics(private val vibrator: Vibrator) : AbcHaptics {
@@ -69,9 +79,13 @@ private class VibratorAbcHaptics(private val vibrator: Vibrator) : AbcHaptics {
                     )
                 }
             } else {
-                VibrationEffect.createOneShot(
-                    timings.sum(),
-                    VibrationEffect.DEFAULT_AMPLITUDE,
+                // Ohne Amplitudensteuerung bleibt wenigstens der Rhythmus: die
+                // Waveform-Form trennt Puls und Pause. Summiert man sie zu einem
+                // OneShot, wird aus `celebrate` ein Dauerbrummen — und damit ein
+                // anderes Haptik-Vokabel als das, das die Stelle meint.
+                VibrationEffect.createWaveform(
+                    HapticPatterns.waveformTimingsFor(verb),
+                    -1,
                 )
             }
             vibrator.vibrate(effect)
