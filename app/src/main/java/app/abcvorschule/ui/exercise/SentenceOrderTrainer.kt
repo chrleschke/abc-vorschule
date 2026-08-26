@@ -1,10 +1,7 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -24,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -322,35 +318,11 @@ private fun cardKey(index: Int, card: WordBlock): String =
 private val PegBorderGreen = Color(0xFF3A7A44)
 
 /**
- * Squish-Settle beim Einrasten — der Shape-Morph, den Material 3 Expressive für
- * Zustandswechsel vorsieht, mit Bordmitteln statt mit `androidx.graphics.shapes`:
- * eine Feder, drei abgeleitete Eigenschaften. Kein `RoundedPolygon`-Morph, weil
- * eine blobbige Zielform das Wort im Peg beschneiden würde, und das Wort ist die
- * Aufgabe.
- *
- * Die Feder läuft von 0 nach [PegAtRest]; `settle - PegAtRest` ist damit ein
- * gedämpfter Wackler, der bei −1 startet, über 0 hinausschwingt und auf 0
- * ausläuft. Daraus:
- *
- * - **scaleX** startet bei 0,91 und federt über 1,0 hinaus — das horizontale
- *   Wabbeln.
- * - **scaleY** läuft gegenläufig (1,05 → 1,0), damit es als *Quetschung* liest und
- *   nicht als Zoom; das Wort behält seine scheinbare Masse.
- * - **Eckradius** morpht 24dp → 16dp, weicher im Moment des Einrastens, wieder
- *   ruhig im Sitzen.
- *
- * Alles drei wird in der **Zeichenphase** gelesen (`graphicsLayer` / `drawBehind`),
- * nicht in der Komposition — gleiche Begründung wie in `PathHereMarker`: eine
- * Federphase darf keine 300ms lang rekomponieren, und Layout-Bounds dürfen dabei
- * nicht zittern, sonst wandert die registrierte Drop-Zone unter dem Finger weg.
+ * Ruheradius der Peg-Ecke. Werte und Begründung des Morphs selbst stehen in
+ * [SlotFillMorph] — geteilt mit den Rahmen des Wort-Bauers, weil dort dieselbe
+ * Tat dieselbe Antwort bekommt.
  */
-private const val PegAtRest = 1f
-private const val PegMorphSquishX = 0.09f
-private const val PegMorphStretchY = 0.05f
-private const val PegMorphDamping = 0.42f
 private val PegCornerRadius = 16.dp
-private val PegMorphCornerGain = 8.dp
-private val PegMinCornerRadius = 12.dp
 private val PegBorderWidth = 3.dp
 
 @Composable
@@ -370,21 +342,7 @@ private fun Peg(
 ) {
     // Bewusst nicht `by`: der Wert wird ausschließlich in graphicsLayer und
     // drawBehind gelesen, also in der Zeichenphase.
-    val settle = remember { Animatable(PegAtRest) }
-    LaunchedEffect(filled, morphOnFill) {
-        if (filled != null && morphOnFill) {
-            settle.snapTo(0f)
-            settle.animateTo(
-                targetValue = PegAtRest,
-                animationSpec = spring(
-                    dampingRatio = PegMorphDamping,
-                    stiffness = Spring.StiffnessMediumLow,
-                ),
-            )
-        } else {
-            settle.snapTo(PegAtRest)
-        }
-    }
+    val settle = rememberSlotFillSettle(filled = filled != null, morphOnFill = morphOnFill)
 
     // SkyBlue-Wash wie die armierte Karte im Tray: "hier kann die gewählte Karte
     // hin" ist ein Aktiv-Signal, kein "richtig" — LeafGreen bleibt dem gefüllten
@@ -408,15 +366,17 @@ private fun Peg(
             .width(pegWidthDp.dp)
             .defaultMinSize(minHeight = 64.dp)
             .graphicsLayer {
-                val wobble = settle.value - PegAtRest
-                scaleX = 1f + PegMorphSquishX * wobble
-                scaleY = 1f - PegMorphStretchY * wobble
+                scaleX = SlotFillMorph.scaleX(settle.value)
+                scaleY = SlotFillMorph.scaleY(settle.value)
                 alpha = opacity
             }
             .drawBehind {
-                val wobble = settle.value - PegAtRest
-                val radius = (PegCornerRadius.toPx() - PegMorphCornerGain.toPx() * wobble)
-                    .coerceAtLeast(PegMinCornerRadius.toPx())
+                val radius = SlotFillMorph.cornerRadius(
+                    settle = settle.value,
+                    resting = PegCornerRadius.toPx(),
+                    gain = SlotFillMorph.CornerGainDp.dp.toPx(),
+                    min = SlotFillMorph.MinCornerRadiusDp.dp.toPx(),
+                )
                 drawRoundRect(color = fill, cornerRadius = CornerRadius(radius))
                 // Der Rand wird um seine halbe Breite eingerückt gezeichnet, damit er
                 // wie Modifier.border innen sitzt und nicht halb über die Kante malt.
