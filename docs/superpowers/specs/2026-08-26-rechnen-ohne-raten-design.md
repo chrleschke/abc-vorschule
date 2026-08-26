@@ -188,8 +188,13 @@ offenes, und der Rahmen verlöre genau die Information, für die er da ist.
   ihr abgewürgt zu werden. Auf `Feedback` ginge das nicht — `speak` ruft dort
   `stopOutput(channel)` vor dem Enqueue, und bei jedem Tipp eine Zahl heißt, dass
   sich die Zahlen gegenseitig zerschnitten.
-- Die Zahlen 1…30 stehen als `"n."` in `extra-strings.json` und teilen sich die
-  Clips mit dem Miss-Echo in `SessionViewModel`, das dieselbe Form spricht.
+- Die Zahlen stehen **als Wort** (`GermanNumberWord`), nicht als Ziffer mit
+  Punkt: „8." ist im Deutschen die Schreibweise der Ordinalzahl, und jede
+  TTS-Engine liest sie folgerichtig „achte". Das bestehende Miss-Echo in
+  `SessionViewModel` sprach `"$guess."` und sagte damit seit jeher „siebte, du
+  bist nah dran" — mitkorrigiert, dort trennt jetzt ein Komma statt eines
+  Punktes. Daraus die allgemeine Regel: **nach einer Ziffer nie ein Punkt** in
+  gesprochenem Text.
 - Zusätzlich **Haptik** pro Tipp, damit die Rückmeldung auch ohne Ton ankommt.
 
 ### Tastatur

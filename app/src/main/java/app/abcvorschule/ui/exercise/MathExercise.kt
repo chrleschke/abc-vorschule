@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.session.ScheduledTrainer
+import app.abcvorschule.speech.GermanNumberWord
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.WarmInk
@@ -134,8 +135,10 @@ fun MathExercise(
                                 // Mitzählen bei jedem Tipp — auf dem eigenen
                                 // Zählkanal, damit die Zahl eine laufende Ansage
                                 // überlagert, statt sie abzuwürgen oder von ihr
-                                // abgewürgt zu werden.
-                                next.counted?.let { onSpeakCounting("$it.") }
+                                // abgewürgt zu werden. Als Wort, nicht als Ziffer:
+                                // "8." ist im Deutschen die Ordinalzahl und würde
+                                // "achte" gelesen (GermanNumberWord).
+                                next.counted?.let { onSpeakCounting(GermanNumberWord.of(it)) }
                             }
                         },
                     )

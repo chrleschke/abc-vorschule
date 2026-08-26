@@ -302,154 +302,159 @@
       "note": "MathHinting.CountingAidCueRows — Zähl-Hilfe Malnehmen"
     },
     {
+      "id": "countingNumber00",
+      "text": "null",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
       "id": "countingNumber01",
-      "text": "1.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "eins",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber02",
-      "text": "2.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "zwei",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber03",
-      "text": "3.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "drei",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber04",
-      "text": "4.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "vier",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber05",
-      "text": "5.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "fünf",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber06",
-      "text": "6.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "sechs",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber07",
-      "text": "7.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "sieben",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber08",
-      "text": "8.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "acht",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber09",
-      "text": "9.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "neun",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber10",
-      "text": "10.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "zehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber11",
-      "text": "11.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "elf",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber12",
-      "text": "12.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "zwölf",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber13",
-      "text": "13.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "dreizehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber14",
-      "text": "14.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "vierzehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber15",
-      "text": "15.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "fünfzehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber16",
-      "text": "16.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "sechzehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber17",
-      "text": "17.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "siebzehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber18",
-      "text": "18.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "achtzehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber19",
-      "text": "19.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "neunzehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber20",
-      "text": "20.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "zwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber21",
-      "text": "21.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "einundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber22",
-      "text": "22.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "zweiundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber23",
-      "text": "23.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "dreiundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber24",
-      "text": "24.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "vierundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber25",
-      "text": "25.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "fünfundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber26",
-      "text": "26.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "sechsundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber27",
-      "text": "27.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "siebenundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber28",
-      "text": "28.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "achtundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber29",
-      "text": "29.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "neunundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     },
     {
       "id": "countingNumber30",
-      "text": "30.",
-      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting) — dient zugleich dem Miss-Echo in SessionViewModel"
+      "text": "dreißig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     }
   ],
   "templates": []

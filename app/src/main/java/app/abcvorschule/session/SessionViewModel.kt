@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import app.abcvorschule.speech.GermanNumberWord
 
 class SessionViewModel(
     private val contentRepository: ContentRepository,
@@ -483,11 +484,17 @@ class SessionViewModel(
                 // Der getippte Wert und der Hinweis als EINE Äußerung: zwei
                 // aufeinanderfolgende Primary-speaks würden sich gegenseitig
                 // flushen und die Zahl mitten im Wort abschneiden.
+                //
+                // Die Zahl als Wort und mit Komma statt Punkt getrennt: "7." ist im
+                // Deutschen die Ordinalzahl, das Echo sagte also bisher "siebte, du
+                // bist nah dran" (GermanNumberWord).
                 speakOverride = if (resolved || correct) {
                     null
                 } else {
-                    listOfNotNull(guess?.let { "$it." }, MathHinting.missFeedback(distance))
-                        .joinToString(" ")
+                    listOfNotNull(
+                        guess?.let { "${GermanNumberWord.of(it)}," },
+                        MathHinting.missFeedback(distance),
+                    ).joinToString(" ")
                 },
             )
         }
