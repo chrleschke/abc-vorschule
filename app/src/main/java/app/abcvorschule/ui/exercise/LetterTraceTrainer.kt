@@ -89,6 +89,9 @@ fun LetterTraceTrainer(
     var vehicle by remember(roundKey) { mutableStateOf<TracePoint?>(null) }
     var starsCollected by remember(roundKey) { mutableIntStateOf(0) }
     var offRoadCount by remember(roundKey) { mutableIntStateOf(0) }
+    // Taps that collected nothing — the signal that this child is tapping instead of
+    // drawing, and needs the resolve button rather than another silent tap.
+    var tapsWithoutTrace by remember(roundKey) { mutableIntStateOf(0) }
     var wasOffCorridor by remember(roundKey) { mutableStateOf(false) }
     var done by remember(roundKey) { mutableStateOf(false) }
     var reward by remember(roundKey) { mutableStateOf(false) }
@@ -184,6 +187,9 @@ fun LetterTraceTrainer(
                                     // like the long buzz that means "off the road".
                                     haptics.tick()
                                     starsCollected += 1
+                                    // The child is tracing after all — the tap tally
+                                    // must not carry over into the rest of the glyph.
+                                    tapsWithoutTrace = 0
                                     state = update.state
                                     // A finished bar hands the vehicle over to the next one, so the
                                     // child can see where the next stroke starts instead of hunting
@@ -210,6 +216,14 @@ fun LetterTraceTrainer(
                                 // to prevent.
                                 lastFinger = null
                             },
+                            onTapWithoutTrace = { strokeStart ->
+                                if (!done && !resolved) {
+                                    tapsWithoutTrace += 1
+                                    // Park the start dot where the stroke begins: the
+                                    // tap gets an answer ("start here"), just not a star.
+                                    strokeStart?.let { vehicle = it }
+                                }
+                            },
                             modifier = Modifier
                                 .size(GlyphBox)
                                 .testTag("trace_canvas_${atom.id}"),
@@ -222,8 +236,9 @@ fun LetterTraceTrainer(
             }
         },
         answers = {
-            // Repeated off-road nudges make the resolve available, matching R10.
-            if (offRoadCount >= 6 && !done && !resolved) {
+            // Repeated off-road nudges make the resolve available (R10) — and so do
+            // repeated fruitless taps, which is how a child who cannot drag gets on (R15).
+            if (TraceProgress.resolveAvailable(offRoadCount, tapsWithoutTrace) && !done && !resolved) {
                 AbcResolveButton(
                     onClick = {
                         resolved = true
@@ -305,6 +320,8 @@ private fun TraceCanvas(
         stars: List<List<TracePoint>>,
     ) -> Unit,
     onDragFinished: () -> Unit,
+    /** A tap made no progress; [strokeStart] is where the child should start instead. */
+    onTapWithoutTrace: (strokeStart: TracePoint?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // The glyph box *requests* GlyphBox dp, but narrow screens squeeze it (360dp
@@ -362,33 +379,21 @@ private fun TraceCanvas(
                     onDragCancel = { onDragFinished() },
                 )
             }
-            // Tap alternative to the drag (R15): a child who taps instead of dragging
-            // must still make progress. A tap *on the next star* collects it, so
-            // repeated taps trace the glyph in stroke order — but only there: a tap
-            // elsewhere is reported where it landed and runs through the same corridor
-            // and ahead gates as a drag sample. Keyed on `state` so a fresh gesture
-            // recognizer always sees the current stroke/star index.
+            // A tap collects nothing — this trainer practices the writing movement, and
+            // a tap has none. Letting a tap stand in for a touch on the star meant the
+            // whole glyph could be tapped star to star without ever drawing. A tap is
+            // answered with guidance instead: the start dot jumps to the beginning of
+            // the current stroke, and after a few fruitless taps the resolve button
+            // appears, which is the non-drag way on that R15 asks for.
+            // Keyed on `state` so a fresh recognizer always sees the current stroke.
             .pointerInput(atom.id, state, layout) {
                 detectTapGestures(
-                    onTap = { tap ->
+                    onTap = {
                         val current = layout ?: return@detectTapGestures
-                        val target = current.stars.getOrNull(state.strokeIndex)
-                            ?.getOrNull(state.starIndex)
-                            ?: return@detectTapGestures
-                        // Every tap is a gesture of its own: drop the bridge first, or two
-                        // taps could "cross" a star along a stretch nobody ever traced.
+                        // Every tap ends any gesture: never bridge from a tap into a
+                        // later stretch of road nobody traced.
                         onDragFinished()
-                        onFinger(
-                            TraceProgress.tapSample(
-                                tap = TracePoint(tap.x, tap.y),
-                                target = target,
-                                boxSize = current.boxSize,
-                            ),
-                            current.boxSize,
-                            current.corridorFraction,
-                            current.strokes,
-                            current.stars,
-                        )
+                        onTapWithoutTrace(TraceProgress.tapGuidance(state, current.strokes))
                     },
                 )
             },

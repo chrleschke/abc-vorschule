@@ -8,6 +8,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.math.abs
 import kotlin.math.hypot
 
 /**
@@ -115,6 +116,29 @@ class GlyphLetterformTest {
         }
         assertTrue(strokesOf("letter-pf")[1].size >= 10)
         assertTrue(strokesOf("letter-sp")[2].size >= 10)
+    }
+
+    @Test
+    fun thePRAndDBowlsAreRoundNotFlatSided() {
+        // P/R/D carried the same six-vertex bowl as the old B: the right-hand side ran
+        // dead straight between two corners, so the arc read as a box, not a bow. They
+        // are authored as dense half-ellipses like B's bowls now.
+        listOf("letter-p" to 1, "letter-r" to 1, "letter-d" to 1).forEach { (id, index) ->
+            val bowl = strokesOf(id)[index]
+            assertTrue("$id bowl has only ${bowl.size} points", bowl.size >= 12)
+
+            // No three consecutive points on the outer arc may be collinear: that is the
+            // flat side. Sample from the widest point outwards in both directions.
+            val widest = bowl.indices.maxByOrNull { bowl[it].x }!!
+            listOf(widest - 1, widest, widest + 1).forEach { i ->
+                val a = bowl[i - 1]
+                val b = bowl[i]
+                val c = bowl[i + 1]
+                val cross = (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x)
+                val bend = abs(cross) / (hypot(b.x - a.x, b.y - a.y) * hypot(c.x - b.x, c.y - b.y))
+                assertTrue("$id bowl is flat at index $i (bend $bend)", bend > 0.1f)
+            }
+        }
     }
 
     @Test

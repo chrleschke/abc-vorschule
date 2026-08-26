@@ -2,6 +2,7 @@ package app.abcvorschule.ui.exercise
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.hypot
@@ -71,9 +72,9 @@ class TraceProgressTest {
     }
 
     @Test
-    fun tappingTheNextStarIsNeverTreatedAsRunningAhead() {
-        // The tap shortcut (R15) feeds the star position itself as the finger, on every
-        // stroke and star index — the gate must let all of those through.
+    fun aSampleOnTheNextStarIsNeverTreatedAsRunningAhead() {
+        // A drag sample landing exactly on the star, on every stroke and star index —
+        // the ahead-gate must let all of those through.
         strokes.indices.forEach { strokeIndex ->
             stars[strokeIndex].indices.forEach { starIndex ->
                 val state = TraceState(strokeIndex, starIndex)
@@ -323,35 +324,40 @@ class TraceProgressTest {
     }
 
     @Test
-    fun aTapOnTheNextStarCountsAsTouchingIt() {
-        // Die Tap-Alternative (R15) darf den Stern treffen: ein Tap im Aufnahmeradius
-        // wird auf die Sternposition gerundet und sammelt ihn.
-        val star = stars[0][0]
-        val nearby = TracePoint(star.x + boxSize * TraceProgress.StarHitFraction * 0.5f, star.y)
-        val sample = TraceProgress.tapSample(nearby, star, boxSize)
-        assertEquals(star, sample)
-        assertTrue(update(TraceState(), sample).collectedStar)
+    fun aTapAnswersWithTheStartOfTheStrokeNotWithAStar() {
+        // Der erste Fix hat nur Taps *neben* dem Stern entwertet — ein Tap auf den Stern
+        // sammelte ihn weiter, also war der ganze Buchstabe von Stern zu Stern tippbar,
+        // ohne einmal zu ziehen. Ein Tap trägt jetzt gar keinen Fortschritt: er zeigt
+        // nur, wo der aktuelle Strich anfängt.
+        assertEquals(strokes[0].first(), TraceProgress.tapGuidance(TraceState(), strokes))
+        assertEquals(strokes[1].first(), TraceProgress.tapGuidance(TraceState(1, 0), strokes))
+        assertEquals(strokes[1].first(), TraceProgress.tapGuidance(TraceState(1, 1), strokes))
+        // Fertiger Glyph: kein Strich mehr, auf den gezeigt werden könnte.
+        assertNull(TraceProgress.tapGuidance(TraceState(strokes.size, 0), strokes))
     }
 
     @Test
-    fun aTapAwayFromTheNextStarCollectsNothing() {
-        // Der Bug: der Handler hat die Tap-Position verworfen und immer die Position des
-        // nächsten Sterns gemeldet — damit sammelte jeder Tap irgendwo im Glyphen-Feld
-        // den nächsten Stern ein. Ein Tap daneben muss dort gemeldet werden, wo er landet.
-        val star = stars[0][0]
-        val elsewhere = TracePoint(boxSize, boxSize)
-        val sample = TraceProgress.tapSample(elsewhere, star, boxSize)
-        assertEquals(elsewhere, sample)
-        val result = update(TraceState(), sample)
-        assertFalse(result.collectedStar)
-        assertTrue(result.offCorridor)
-        assertEquals(TraceState(), result.state)
-    }
-
-    @Test
-    fun aTapJustOutsideThePickUpRadiusIsNotSnapped() {
-        val star = stars[0][0]
-        val justOutside = TracePoint(star.x, star.y + boxSize * TraceProgress.StarHitFraction * 1.1f)
-        assertEquals(justOutside, TraceProgress.tapSample(justOutside, star, boxSize))
+    fun theResolveButtonIsOfferedToTheOffRoadChildAndToTheTappingOne() {
+        // Ohne Tap-Fortschritt braucht das Kind, das nur tippt, einen Weg weiter (R15):
+        // seine Taps liegen auf der Straße, lösen also nie die Off-Road-Schwelle aus.
+        assertFalse(TraceProgress.resolveAvailable(offRoadCount = 0, tapsWithoutTrace = 0))
+        assertFalse(
+            TraceProgress.resolveAvailable(
+                offRoadCount = TraceProgress.OffRoadNudgesBeforeResolve - 1,
+                tapsWithoutTrace = TraceProgress.TapsBeforeResolve - 1,
+            ),
+        )
+        assertTrue(
+            TraceProgress.resolveAvailable(
+                offRoadCount = TraceProgress.OffRoadNudgesBeforeResolve,
+                tapsWithoutTrace = 0,
+            ),
+        )
+        assertTrue(
+            TraceProgress.resolveAvailable(
+                offRoadCount = 0,
+                tapsWithoutTrace = TraceProgress.TapsBeforeResolve,
+            ),
+        )
     }
 }

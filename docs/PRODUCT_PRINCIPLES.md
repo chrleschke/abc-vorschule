@@ -315,10 +315,15 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 
 ## 9. Layout-Grundform der Übungen
 
-- **Chrome oben (nativ):** eine durchsichtige M3-Top-App-Bar. Links das Schließen-X, im Titel-Slot
-  der elternseitige Lektionstitel und rechts Stern + Punkte. Kein Overflow-Menü in der Lektion.
+- **Chrome oben (nativ):** eine durchsichtige M3-Top-App-Bar. In der Lektion trägt sie **nur**
+  den Zurück-Pfeil (nach links, nicht X — die Lektion ist ein Ziel, das man verlässt, kein
+  Dialog): kein Lektionstitel (Elterntext an der Stelle, an der das Kind zuerst hinsieht),
+  keine Punkte, kein Overflow-Menü. Auf dem Pfad trägt sie rechts Stern + Punkte.
   Darunter **eine** Zeile: Rückfall-Chevrons an den Rändern, dazwischen die Fortschrittskette.
   Der Speaker sitzt nicht im Chrome, sondern gemäß §7 im Aufgabenbereich.
+- **Der Punktestand steht in der Lektion mittig unter dem Fortschritt** (`AbcStarCount`), auf
+  derselben Achse, auf der am Ende des Trainers der große Stern hochkommt (`SuccessBurst`) —
+  die Punkte wachsen dort, wo der Stern landet, statt in einer Ecke der Leiste.
 - **Fortschritt ist eine Segmentkette** (`AbcSegmentedProgress`): ein Segment je Trainer, das
   laufende füllt sich nach Runden-Anteil. Sie ersetzt Balken, Textlabel „3/8" und Runden-Punkte —
   das Kind liest das Label ohnehin nicht.
@@ -328,6 +333,10 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
   Hintergrund und Pfad-Landschaft laufen unter Status- und Nav-Bar durch, jedes Element
   konsumiert seinen Inset selbst. Die Unterkante des Aufgabenbereichs nutzt `safeDrawing`
   (nicht nur `navigationBars`), damit die System-Zahlentastatur den Block weiter hochschiebt.
+- **Der Pfad scrollt unter der Leiste durch, nicht unter ihr entlang:** der Scroll-Bereich füllt
+  den ganzen Screen und hält oben nur so viel Platz frei, wie Status-Bar plus Leiste hoch sind.
+  Stünde er als eigene Zeile unter der Leiste, schnitte seine Oberkante die Schilder mitten im
+  Bild ab — eine Kante, die der durchgehende Hintergrund nicht erklärt.
 - **Prompt/Aufgabe:** oberer Block, zentriert, mit Luft zu den Rändern (kein Kleben am Screenrand).
 - **Antworten:** unterer Block, zentriert (Kacheln, Mengenwahl, Ziffernblock).
 - Keine doppelte Aufgabe+Vorschau desselben Tokens.

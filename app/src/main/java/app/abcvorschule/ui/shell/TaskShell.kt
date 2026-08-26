@@ -37,6 +37,7 @@ import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.session.SuccessPhase
 import app.abcvorschule.ui.components.AbcNavChevron
 import app.abcvorschule.ui.components.AbcSegmentedProgress
+import app.abcvorschule.ui.components.AbcStarCount
 import app.abcvorschule.ui.exercise.TrainerCallbacks
 import app.abcvorschule.ui.exercise.TrainerHost
 import app.abcvorschule.ui.path.PathScreen
@@ -258,14 +259,11 @@ private fun PracticeBody(
         viewModel.onRevealFinished()
     }
 
-    val lessonTitle = state.lessonId?.let { id -> pack.lessons.firstOrNull { it.id == id }?.title }
-
     Column(modifier = Modifier.fillMaxSize()) {
-        AbcTopBar(
-            points = state.points,
-            title = lessonTitle,
-            onClose = viewModel::exitLesson,
-        )
+        // Nur der Zurück-Pfeil: kein Lektionstitel (Elterntext an der Stelle, an
+        // der das Kind zuerst hinsieht) und keine Punkte — die stehen unten,
+        // mittig unter dem Fortschritt.
+        AbcTopBar(onBack = viewModel::exitLesson)
 
         // Fortschritt und die beiden Rückfall-Chevrons teilen sich eine Zeile
         // direkt unter der Kopfzeile: die Chevrons an den Rändern, gedämpft und
@@ -298,6 +296,16 @@ private fun PracticeBody(
                 contentDescription = stringResource(R.string.nav_forward),
             )
         }
+
+        // Der Punktestand mittig unter dem Fortschritt, auf derselben Achse, auf
+        // der am Ende des Trainers der große Stern hochkommt (`SuccessBurst`) —
+        // die Punkte wachsen dort, wo der Stern landet, statt in einer Ecke.
+        AbcStarCount(
+            points = state.points,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 6.dp),
+        )
 
         Spacer(Modifier.height(AbcDimens.chromeGap))
 
