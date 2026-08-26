@@ -20,10 +20,20 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AbcVorschule">
+        <!-- adjustResize, weil das Fenster sonst pant: ohne diese Zeile steht der
+             Soft-Input-Modus auf UNSPECIFIED, und dann wählt das System selbst.
+             Auf einem Motorola edge 60 pro (Android 16) wählt es Pan und schiebt
+             beim Aufklappen der Zahlentastatur (Rechnen ab Ergebnis 11, §8) das
+             ganze Fenster nach oben, bis Kopfzeile, Punktestand und
+             Fortschrittszeile aus dem Bild wandern. Auf dem Emulator (Android 17)
+             fiel das nicht auf — dort blieb das Fenster von sich aus stehen.
+             Mit adjustResize kommt die Tastatur nur noch als Inset an, und den
+             verbraucht die Übungsfläche in TaskShell selbst. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.AbcVorschule">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

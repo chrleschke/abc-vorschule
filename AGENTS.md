@@ -144,6 +144,16 @@ das ohne eigenes Zutun weiterspringt, heißen: da arbeitet jemand anders.
 
 Details zum SDK-Setup in den Worktrees: siehe `README.md`.
 
+**Der Emulator ersetzt das Gerät nicht.** Er läuft auf Android 17, das Testgerät (Motorola
+edge 60 pro) auf Android 16 — bei Fenster-Insets und Tastatur weichen die beiden auseinander.
+Der Pan-Bug der Kopfzeile (`windowSoftInputMode`, PRODUCT_PRINCIPLES §10) war auf dem Emulator
+mit **keiner** Einstellung zu sehen, auf dem Gerät sofort. Wer einen Bug beim Aufklappen der
+Tastatur, an Display-Ausschnitten oder an den Systemleisten sucht, prüft am Gerät:
+`ANDROID_SERIAL=<phone-serial> ./gradlew :app:installDebug` und danach Screenshots plus
+`adb -s <serial> exec-out uiautomator dump /dev/tty` — die Bounds aus dem Dump beweisen eine
+Verschiebung, die auf einem Screenshot noch nach Absicht aussehen kann. Das Gerät gehört dem
+Nutzer: vorher fragen, wenn er es nicht selbst angeboten hat.
+
 ## Definition of Done (Agent)
 
 - Verhalten entspricht den Produktprinzipien

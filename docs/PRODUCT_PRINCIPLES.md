@@ -367,6 +367,13 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
   (nicht nur `navigationBars`), damit die System-Zahlentastatur den Block weiter hochschiebt.
   Die Kopfzeile nimmt aus demselben Grund `safeDrawing` statt der M3-Vorgabe `systemBars`: im
   Vollbild ist der Status-Bar-Inset null, ein Display-Ausschnitt bleibt aber bestehen.
+  **Voraussetzung dafür ist `android:windowSoftInputMode="adjustResize"` im Manifest.** Ohne die
+  Zeile steht der Modus auf `UNSPECIFIED` und Android wählt selbst — auf dem Motorola-Testgerät
+  (Android 16) wählt es Pan und schiebt beim Aufklappen der Zahlentastatur das **ganze Fenster**
+  hoch, bis Kopfzeile, Punktestand und Fortschrittszeile aus dem Bild wandern. Die Kopfzeile
+  bleibt nur stehen, wenn die Tastatur ausschließlich als Inset ankommt. Auf dem Emulator
+  (Android 17) fällt das nicht auf — dort blieb das Fenster von sich aus stehen, der Bug war
+  **nur auf dem Gerät** zu sehen.
 - **Der Pfad scrollt unter der Leiste durch, nicht unter ihr entlang:** der Scroll-Bereich füllt
   den ganzen Screen und hält oben nur so viel Platz frei, wie Status-Bar plus Leiste hoch sind.
   Stünde er als eigene Zeile unter der Leiste, schnitte seine Oberkante die Schilder mitten im
