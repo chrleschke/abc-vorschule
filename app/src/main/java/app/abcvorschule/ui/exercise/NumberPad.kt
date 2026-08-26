@@ -59,6 +59,12 @@ fun NumberPad(
     /** False during the audio lock — field and submit button are non-interactive
      * and dimmed, and focus/keyboard are deferred until this turns true. */
     enabled: Boolean = true,
+    /** Von der Zähl-Hilfe hochgezählter Wert; `null` heißt „noch nichts angetippt"
+     * und lässt das Feld in Ruhe. */
+    countedValue: Int? = null,
+    /** True, solange die Zähl-Hilfe offen ist: die System-Tastatur würde das
+     * Zählfeld verdecken, also bleibt sie zu, bis das Kind das Feld antippt. */
+    hideKeyboard: Boolean = false,
 ) {
     var value by remember(resetToken) { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
@@ -73,18 +79,29 @@ fun NumberPad(
         value.toIntOrNull()?.let(onSubmit)
     }
 
-    LaunchedEffect(enabled) {
+    LaunchedEffect(enabled, hideKeyboard) {
         // Deferred rather than Unit-keyed: while locked the keyboard must not pop
-        // up before the child is allowed to type (design doc).
-        if (enabled) {
-            focusRequester.requestFocus()
-            keyboardController?.show()
+        // up before the child is allowed to type (design doc). Und solange die
+        // Zähl-Hilfe offen ist, verdeckt die Tastatur genau das Feld, auf dem das
+        // Kind zählen soll — ein Tipp ins Eingabefeld holt sie zurück.
+        if (!enabled) return@LaunchedEffect
+        if (hideKeyboard) {
+            keyboardController?.hide()
+            return@LaunchedEffect
         }
+        focusRequester.requestFocus()
+        keyboardController?.show()
     }
     LaunchedEffect(solved) {
         // Without closing the IME the green confirmation sits behind the keyboard —
         // exactly the thing it is supposed to show.
         if (solved) keyboardController?.hide()
+    }
+    LaunchedEffect(countedValue, resetToken) {
+        // Auch auf resetToken gekeyed: der Token wechselt bei jedem Fehlversuch und
+        // leert das Feld. Ohne dieses Re-Spiegeln stünde das Feld nach einem Miss
+        // leer da, während die Haken in der Zähl-Hilfe noch gesetzt sind.
+        countedValue?.let { value = it.toString() }
     }
 
     Row(
