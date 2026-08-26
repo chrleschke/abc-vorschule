@@ -285,6 +285,16 @@
       "text": "Voll abgeräumt!",
       "field": "rewardTts",
       "note": "PraisePhrases"
+    },
+    {
+      "id": "countingAidCueCollect",
+      "text": "Zähl mit! Tippe jedes Bild an.",
+      "note": "MathHinting.CountingAidCueCollect — Zähl-Hilfe Plus/Malnehmen"
+    },
+    {
+      "id": "countingAidCueTakeAway",
+      "text": "Nimm sie weg! Tippe an, was weggeht.",
+      "note": "MathHinting.CountingAidCueTakeAway — Zähl-Hilfe Minus"
     }
   ],
   "templates": []
