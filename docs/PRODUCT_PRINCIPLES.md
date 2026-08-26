@@ -214,9 +214,11 @@ niemals mit einem stummen No-Op.
 
 ## 6. Hilfestufen
 
-- Parent-Gate (langer Druck auf ⋯) öffnet das Sheet „Eltern“. Der ⋯ ist ein **schwebender
-  runder Knopf oben rechts auf dem Pfad-Screen**, kein Bar-Element — und in der Lektion gibt es
-  ihn nicht: dort führt der Weg zu den Einstellungen über das Verlassen der Lektion. Das Sheet
+- Parent-Gate (langer Druck auf das Drei-Punkte-Menü) öffnet das Sheet „Eltern“. Es ist ein
+  **schwebender runder Knopf oben rechts auf dem Pfad-Screen**, kein Bar-Element, und trägt das
+  **native Overflow-Icon — drei senkrechte Punkte** (`Icons.Rounded.MoreVert`), keinen getippten
+  ⋯-Glyph: Erwachsene erkennen daran ohne Text, dass hier ein Menü liegt, und ein Vektor wächst
+  nicht mit der Schriftskalierung aus dem 48-dp-Knopf heraus. In der Lektion gibt es ihn nicht: dort führt der Weg zu den Einstellungen über das Verlassen der Lektion. Das Sheet
   bietet die Hilfestufe (**Auto / Mit Hilfe / Ohne Hilfe**) und die Freigabe „Reihenfolge frei
   wählbar“, die die Fortschrittssperre des Pfades aufhebt. In Debug-Builds zusätzlich
   „TTS Debug“ am Ende des Sheets (Entwickler-Werkzeug, nicht für Release).
@@ -228,7 +230,7 @@ niemals mit einem stummen No-Op.
 - App und Inhalte deutsch. Sprache ist bei jedem TTS Aufruf eindeutet angegeben. 
 - System-TTS für Prompts; Speaker (Vektor-Icon) **im Aufgabenbereich**, mittig am Kopf der
   Bühne (`ExerciseStage(promptChrome = …)`) und damit in **jedem** Trainer auf derselben
-  Höhe, direkt unter Fortschritt und Punktestand — nicht als erstes Kind des zentrierten
+  Höhe, direkt unter der Fortschrittszeile — nicht als erstes Kind des zentrierten
   Aufgabenblocks, denn dort wanderte er mit dessen Inhaltshöhe (gemessen: 203dp in der
   Jagd, 305dp im Spurensucher, 425dp im Silben-Verschmelzer). Ein Aufgabentitel steht
   weiterhin unter ihm. Ausgenommen ist der End-Screen, der seinen eigenen Speaker beim
@@ -325,15 +327,27 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 
 ## 9. Layout-Grundform der Übungen
 
-- **Chrome oben (nativ):** eine durchsichtige M3-Top-App-Bar. In der Lektion trägt sie **nur**
-  den Zurück-Pfeil (nach links, nicht X — die Lektion ist ein Ziel, das man verlässt, kein
-  Dialog): kein Lektionstitel (Elterntext an der Stelle, an der das Kind zuerst hinsieht),
-  keine Punkte, kein Overflow-Menü. Auf dem Pfad trägt sie rechts Stern + Punkte.
+- **Chrome oben (nativ):** eine durchsichtige M3-Top-App-Bar. In der Lektion trägt sie den
+  Zurück-Pfeil (nach links, nicht X — die Lektion ist ein Ziel, das man verlässt, kein
+  Dialog) und mittig den Punktestand: kein Lektionstitel (Elterntext an der Stelle, an der
+  das Kind zuerst hinsieht), kein Overflow-Menü. Auf dem Pfad trägt sie **links in der Ecke**
+  Stern + Punkte — nicht rechts: rechtsbündig wanderte der Stern bei jeder zusätzlichen Ziffer
+  nach links, der Punktestand verschob sich beim Zählen. Links steht der Stern fest und nur die
+  Zahl wächst nach rechts, weg vom schwebenden Drei-Punkte-Knopf am anderen Ende derselben
+  Zeile. Beide sitzen auf der Mittelachse der Titelzeile und auf derselben Randachse
+  (`AbcDimens.screenHorizontal`); der Knopf-Versatz ist aus Leistenhöhe und Knopfgröße
+  gerechnet (`TopBarFloatingActionTop`), nicht geschätzt.
   Darunter **eine** Zeile: Rückfall-Chevrons an den Rändern, dazwischen die Fortschrittskette.
   Der Speaker sitzt nicht im Chrome, sondern gemäß §7 im Aufgabenbereich.
-- **Der Punktestand steht in der Lektion mittig unter dem Fortschritt** (`AbcStarCount`), auf
+- **Der Punktestand steht in der Lektion mittig in der Kopfzeile** (`AbcStarCount`), auf
   derselben Achse, auf der am Ende des Trainers der große Stern hochkommt (`SuccessBurst`) —
-  die Punkte wachsen dort, wo der Stern landet, statt in einer Ecke der Leiste.
+  die Punkte wachsen dort, wo der Stern landet, statt in einer Ecke der Leiste. Mittig heißt
+  hier auf der **Bildschirmmitte**, nicht mittig im Titel-Slot: der beginnt erst hinter dem
+  Zurück-Pfeil. Dass er dafür als eigene Lage über der Leiste liegt statt im Titel-Slot, ist
+  der Preis; die gemeinsame Achse mit dem Stern ist ihn wert.
+- **Was der Punktestand unter dem Fortschritt freigegeben hat, bekommt die Bühne nur zu
+  zwei Dritteln** (`SpeakerFollowFraction` in `TaskShell`): rückte der Speaker die volle
+  Höhe nach, klebte er an der Fortschrittszeile.
 - **Fortschritt ist eine Segmentkette** (`AbcSegmentedProgress`): ein Segment je Trainer, das
   laufende füllt sich nach Runden-Anteil. Sie ersetzt Balken, Textlabel „3/8" und Runden-Punkte —
   das Kind liest das Label ohnehin nicht.
@@ -398,7 +412,7 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 ## 10. Design-System
 
 - Gemeinsame Komponenten unter `ui/components/` (`AbcContinueButton`, `AbcSpeakerButton`, `AbcNavChevron`, `AbcSegmentedProgress`, Vektor-Icons inkl. `IconStar`) und `ui/shell/AbcTopBar`.
-- Buttons: keine Emojis — nur ASCII oder Canvas/SVG-Vektoren. Punkte-/Erfolgs-Symbol ist der Vektor-Stern `IconStar`, kein Text-Asterisk.
+- Buttons: keine Emojis — nur ASCII oder Canvas/SVG-Vektoren. Punkte-/Erfolgs-Symbol ist der Vektor-Stern `IconStar`, kein Text-Asterisk. Icons zeichnet die App selbst (`ui/components/AbcIcons.kt`); die eine Ausnahme ist das **native Overflow-Icon** der Elterntür (`Icons.Rounded.MoreVert` aus `material-icons-core`, ausdrücklich im Version-Catalog deklariert) — an ihm sollen Erwachsene ein Menü erkennen, und das leistet nur das Systemzeichen.
 - Übungen nutzen `ExerciseStage` für klare Trennung Speaker-Kopfzeile / Aufgabenblock /
   Antwortblock. Der Speaker geht in den Slot `promptChrome`, nie in `prompt` — nur der
   Slot garantiert die feste Höhe aus §7.
@@ -417,8 +431,11 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - Haptik-Vokabular `AbcHaptics` (tick/success/celebrate/nudge): tick = kleiner Sammel-Erfolg
   (Trace-Stern, Jagd-Treffer, Einrasten), success = Aufgabe richtig, celebrate = Lektions-/
   Batterie-Feier, nudge = sanfte Korrektur. Haptik ergänzt Ton, ersetzt ihn nie.
-- Erfolgsmomente: SuccessBurst (Gold-Stern + Funken), Gold-Puls an der Segmentgrenze je Trainer,
-  Konfetti auf dem End-Screen.
+  Der `SuccessBurst` am Trainer-Ende vibriert **nicht**: er folgt oft direkt auf den
+  Trainer-eigenen Puls, und zwei Vibrationen hintereinander sind zu viel — dort trägt
+  der Chime allein.
+- Erfolgsmomente: SuccessBurst (Gold-Stern + Funken, ohne Haptik), Gold-Puls an der
+  Segmentgrenze je Trainer, Konfetti auf dem End-Screen.
 - **Shape-Morph beim Einrasten (Squish-Settle).** Rastet ein Wort in einen Peg des
   Satz-Architekten, quetscht der Peg horizontal und federt in Form zurück: `scaleX`
   0,91 → über 1,0 → 1,0, `scaleY` gegenläufig 1,05 → 1,0, Eckradius 24 → 16dp, eine

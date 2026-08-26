@@ -70,6 +70,11 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    // Nur für das native Overflow-Icon (drei senkrechte Punkte) der Elterntür.
+    // Kommt transitiv schon über material3 herein — ausdrücklich deklariert,
+    // damit ein Versionssprung, der die Transitive fallen lässt, den Build
+    // bricht statt still das Icon zu verlieren.
+    implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
