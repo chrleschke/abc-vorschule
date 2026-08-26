@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -169,6 +170,7 @@ fun SymbolHuntTrainer(
         prompt = {
             if (!resolved) {
                 SymbolHuntField(
+                    roundKey = roundKey,
                     state = state,
                     initialTiles = initialTiles,
                     pack = pack,
@@ -200,6 +202,8 @@ fun SymbolHuntTrainer(
 
 @Composable
 private fun SymbolHuntField(
+    /** Keyt die Kacheln (siehe unten) — ein SymbolHuntSpec trägt mehrere Runden. */
+    roundKey: String,
     state: SymbolHuntState,
     initialTiles: List<SymbolHuntTile>,
     pack: ContentPack,
@@ -230,15 +234,24 @@ private fun SymbolHuntField(
             // pre-shrink tile list) rather than its position in the current
             // (shrinking) list, so a surviving tile keeps the same slot/color.
             val position = positions.getOrNull(tile.instanceId) ?: return@forEach
-            HuntTile(
-                glyph = pack.atoms[tile.atomId]?.display ?: tile.atomId,
-                position = position,
-                color = TilePalette[tile.instanceId % TilePalette.size],
-                present = tile.instanceId in presentIds,
-                enabled = enabled,
-                onTap = { onTap(tile.instanceId) },
-                modifier = Modifier.testTag("hunt_tile_${tile.instanceId}"),
-            )
+            // `key(roundKey, …)` ist Pflicht: ohne Schlüssel hängt die Identität
+            // einer Kachel an ihrer Position in dieser Schleife, und ein
+            // SymbolHuntSpec trägt mehrere Runden hintereinander. Slot i der neuen
+            // Runde erbte dann `poppedAway = true` von der Treffer-Kachel der
+            // Vorrunde und fehlte einen Frame lang, bis der present-Effect ihn
+            // zurücksetzt — dieselbe Falle wie beim ungekeyten AnimatedContent des
+            // Wort-Bauers (§10).
+            key(roundKey, tile.instanceId) {
+                HuntTile(
+                    glyph = pack.atoms[tile.atomId]?.display ?: tile.atomId,
+                    position = position,
+                    color = TilePalette[tile.instanceId % TilePalette.size],
+                    present = tile.instanceId in presentIds,
+                    enabled = enabled,
+                    onTap = { onTap(tile.instanceId) },
+                    modifier = Modifier.testTag("hunt_tile_${tile.instanceId}"),
+                )
+            }
         }
     }
 }

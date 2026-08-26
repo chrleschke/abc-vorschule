@@ -17,10 +17,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,7 +60,12 @@ fun CountingAid(
 ) {
     // Der Puls läuft dem nächsten offenen Objekt hinterher und zeigt dem Kind
     // durchgehend, wo es weitergeht.
-    val pulse by rememberInfiniteTransition(label = "counting_pulse").animateFloat(
+    //
+    // Bewusst ohne `by`: der State wird durchgereicht und erst in der
+    // Zeichenphase gelesen (§10, wie SlotFillMorph und die Jagd-Kacheln). Als
+    // Float gelesen rekomponierten hier bis zu 30 Zellen mit jedem
+    // Animationsframe — und die Zähl-Hilfe bleibt bis Rundenende offen.
+    val pulse = rememberInfiniteTransition(label = "counting_pulse").animateFloat(
         initialValue = 1f,
         targetValue = PulseLowAlpha,
         animationSpec = infiniteRepeatable(tween(PulseMillis), RepeatMode.Reverse),
@@ -123,7 +129,7 @@ private fun CountingCell(
     index: Int,
     sizeSp: Int,
     state: CountingState,
-    pulse: Float,
+    pulse: State<Float>,
     onTap: (Int) -> Unit,
 ) {
     val used = state.isTapped(index)
@@ -131,11 +137,8 @@ private fun CountingCell(
     // Minus startet mit allen Objekten stehend und nimmt weg; Plus sammelt ein.
     // "Angetippt" heißt je nach Rechenart das Gegenteil — verblasst ist es in
     // beiden Fällen, weil beide Male "damit bin ich durch" gemeint ist.
-    val alpha = when {
-        used -> CountedAlpha
-        state.nextIndex == index -> pulse
-        else -> 1f
-    }
+    val pulsing = state.nextIndex == index
+    val restingAlpha = if (used) CountedAlpha else 1f
     Box(
         modifier = Modifier
             .then(
@@ -163,6 +166,16 @@ private fun CountingCell(
             .testTag("counting_object_$index"),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = emoji, fontSize = sizeSp.sp, modifier = Modifier.alpha(alpha))
+        // Der Puls wird im Layer-Block gelesen, nicht in der Komposition —
+        // `Modifier.alpha(…)` ist genau derselbe Layer, nur mit dem Wert schon
+        // zur Kompositionszeit eingesetzt.
+        Text(
+            text = emoji,
+            fontSize = sizeSp.sp,
+            modifier = Modifier.graphicsLayer {
+                alpha = if (pulsing) pulse.value else restingAlpha
+                compositingStrategy = CompositingStrategy.ModulateAlpha
+            },
+        )
     }
 }

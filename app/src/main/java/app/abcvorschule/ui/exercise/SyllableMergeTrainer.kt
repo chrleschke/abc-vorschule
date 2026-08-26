@@ -10,8 +10,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -22,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,7 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -117,10 +118,6 @@ fun SyllableMergeTrainer(
     var merged by remember(roundKey) { mutableStateOf(false) }
     var dragging by remember(roundKey) { mutableStateOf(false) }
     var interactions by remember(roundKey) { mutableIntStateOf(0) }
-    val glow by animateFloatAsState(
-        targetValue = if (merged) 1f else MergeProgress.glow(fraction.value),
-        label = "merge_glow",
-    )
     val scoredIds = remember(roundKey) {
         listOf(round.leftAtomId, round.rightAtomId, round.resultAtomId).distinct()
     }
@@ -145,12 +142,22 @@ fun SyllableMergeTrainer(
     // scope-Coroutine überlebte einen Chevron-Rundenwechsel während der Feder
     // (einige hundert ms) und würde ihr onResult(true) der NEUEN Runde
     // gutschreiben. Der Rundenwechsel cancelt diesen Effect stattdessen.
-    var attracting by remember(roundKey) { mutableStateOf(false) }
-    LaunchedEffect(roundKey, attracting) {
-        if (!attracting) return@LaunchedEffect
+    //
+    // Ein Zähler, kein Bool: legt das Kind während des Schnapps den Finger
+    // wieder auf und zieht, präemptiert das `fraction.snapTo` aus `onDrag` die
+    // laufende `animateTo`-Mutation (MutatorMutex), dieser Effect wird gecancelt
+    // und `commit()` läuft nie. Ein Bool bliebe danach für den Rest der Runde
+    // auf true — derselbe Wert startet den Effect nicht neu, und damit wären
+    // Magnet-Pfad UND Zwei-Tipp-Pfad tot. Der Trainer hat kein „Zeig mir", das
+    // Kind säße fest. Jede neue Anzieh-Bitte ist deshalb ein neuer Wert.
+    var attractRequest by remember(roundKey) { mutableIntStateOf(0) }
+    LaunchedEffect(roundKey, attractRequest) {
+        if (attractRequest == 0) return@LaunchedEffect
         idleNudge.snapTo(0f)
         fraction.animateTo(1f, spring(stiffness = Spring.StiffnessMedium))
-        commit()
+        // Nur verbuchen, wenn die Feder wirklich durchgelaufen ist: ein
+        // abgebrochener Schnapp ist keine verschmolzene Runde.
+        if (MergeProgress.isContact(fraction.value)) commit()
     }
 
     fun settle() {
@@ -158,7 +165,7 @@ fun SyllableMergeTrainer(
         interactions++
         if (merged) return
         if (MergeProgress.shouldAttract(fraction.value)) {
-            attracting = true
+            attractRequest++
         } else {
             scope.launch {
                 // No penalty: a short pull just glides back.
@@ -182,7 +189,7 @@ fun SyllableMergeTrainer(
         if (merged) return
         val target = MergeProgress.stepped(fraction.value)
         if (MergeProgress.shouldAttract(target)) {
-            attracting = true
+            attractRequest++
         } else {
             scope.launch {
                 idleNudge.snapTo(0f)
@@ -203,6 +210,11 @@ fun SyllableMergeTrainer(
             detectDragGestures(
                 onDragStart = {
                     dragging = true
+                    // Der Finger übernimmt: ein laufender Anzieh-Schnapp gibt ab
+                    // (sein snapTo unten cancelt ihn ohnehin), und die Bitte wird
+                    // zurückgesetzt, damit das nächste Loslassen wieder als NEUER
+                    // Wert ankommt und den Effect startet.
+                    attractRequest = 0
                     scope.launch { idleNudge.snapTo(0f) }
                     speakTile(fromRightTile)
                 },
@@ -273,7 +285,7 @@ fun SyllableMergeTrainer(
                         label = round.resultDisplay,
                         widthDp = spec.widthDp,
                         glyphSp = spec.glyphSp,
-                        glow = 1f,
+                        glow = { 1f },
                         frozen = true,
                         onTap = { onSpeak(resultSpeech) },
                         modifier = Modifier
@@ -294,10 +306,17 @@ fun SyllableMergeTrainer(
                     // the dragged tile stays 1:1 under the finger while its
                     // partner mirrors the motion.
                     val tileTravelPx = with(density) { (layout.gapDp / 2f).dp.toPx() }
-                    val inwardPx = fraction.value * tileTravelPx + idleNudge.value * idleNudgePx
+                    // Feder-Werte NUR in Lambdas, nie hier in der Komposition:
+                    // ein `fraction.value` an dieser Stelle rekomponierte den
+                    // ganzen Trainer pro Zieh-Frame und bei jedem Idle-Atemzug
+                    // (der Loop läuft alle 3,5s endlos). Dieselbe Pflicht wie
+                    // beim Peg-Morph des Satz-Architekten (§10, SlotFillMorph).
+                    val inwardPx = {
+                        fraction.value * tileTravelPx + idleNudge.value * idleNudgePx
+                    }
                     Box(contentAlignment = Alignment.Center) {
                         MergeTrack(
-                            progress = fraction.value,
+                            progress = { fraction.value },
                             modifier = Modifier
                                 .offset(x = layout.trackOffsetDp.dp)
                                 .width(layout.gapDp.dp)
@@ -308,13 +327,13 @@ fun SyllableMergeTrainer(
                                 label = round.leftDisplay,
                                 widthDp = layout.leftWidthDp,
                                 glyphSp = layout.glyphSp,
-                                glow = glow,
+                                glow = { MergeProgress.glow(fraction.value) },
                                 frozen = false,
                                 onTap = { nudgeTap(fromRightTile = false) },
                                 enabled = !interactionLocked,
                                 opacity = interactionOpacity,
                                 modifier = Modifier
-                                    .offset { IntOffset(inwardPx.roundToInt(), 0) }
+                                    .offset { IntOffset(inwardPx().roundToInt(), 0) }
                                     .mergeDrag(
                                         fromRightTile = false,
                                         enabled = !interactionLocked,
@@ -327,13 +346,13 @@ fun SyllableMergeTrainer(
                                 label = round.rightDisplay,
                                 widthDp = layout.rightWidthDp,
                                 glyphSp = layout.glyphSp,
-                                glow = glow,
+                                glow = { MergeProgress.glow(fraction.value) },
                                 frozen = false,
                                 onTap = { nudgeTap(fromRightTile = true) },
                                 enabled = !interactionLocked,
                                 opacity = interactionOpacity,
                                 modifier = Modifier
-                                    .offset { IntOffset(-inwardPx.roundToInt(), 0) }
+                                    .offset { IntOffset(-inwardPx().roundToInt(), 0) }
                                     .mergeDrag(
                                         fromRightTile = true,
                                         enabled = !interactionLocked,
@@ -356,8 +375,11 @@ fun SyllableMergeTrainer(
  * and the whole track fades out as the tiles approach each other.
  */
 @Composable
-private fun MergeTrack(progress: Float, modifier: Modifier = Modifier) {
-    val phase by rememberInfiniteTransition(label = "merge_track")
+private fun MergeTrack(progress: () -> Float, modifier: Modifier = Modifier) {
+    // Bewusst ohne `by`: Welle und Fortschritt werden erst im Canvas gelesen,
+    // also in der Zeichenphase. Mit `by` rekomponierte die endlose Welle diese
+    // Funktion Frame für Frame, solange die Runde läuft.
+    val phase = rememberInfiniteTransition(label = "merge_track")
         .animateFloat(
             initialValue = 0f,
             targetValue = 1f,
@@ -365,7 +387,7 @@ private fun MergeTrack(progress: Float, modifier: Modifier = Modifier) {
             label = "merge_track_phase",
         )
     Canvas(modifier) {
-        val fade = (1f - progress).coerceIn(0f, 1f)
+        val fade = (1f - progress()).coerceIn(0f, 1f)
         if (fade <= 0f) return@Canvas
         val dotRadius = 3.dp.toPx()
         val dotCount = 7
@@ -375,7 +397,7 @@ private fun MergeTrack(progress: Float, modifier: Modifier = Modifier) {
             val x = stepX * i
             // 0 at the edges, 1 in the middle — the wave chases this value.
             val toMiddle = 1f - abs(x - size.width / 2f) / (size.width / 2f)
-            val highlight = (1f - abs(toMiddle - phase) * 3f).coerceIn(0f, 1f)
+            val highlight = (1f - abs(toMiddle - phase.value) * 3f).coerceIn(0f, 1f)
             drawCircle(
                 color = SkyBlue.copy(alpha = fade * (0.30f + 0.55f * highlight)),
                 radius = dotRadius * (0.8f + 0.4f * highlight),
@@ -385,6 +407,11 @@ private fun MergeTrack(progress: Float, modifier: Modifier = Modifier) {
     }
 }
 
+/** Ruheradius der Kachelecke — unverändert der bisherige Wert. */
+private val FloeCornerRadius = 26.dp
+
+private val FloeBorderWidth = 4.dp
+
 @Composable
 private fun Floe(
     label: String,
@@ -392,27 +419,41 @@ private fun Floe(
      * Rechnung wie Lücke und Spur, sonst driftet die Zeile wieder auseinander. */
     widthDp: Float,
     glyphSp: Float,
-    glow: Float,
+    /** Als Lambda, nicht als Wert: der Glühwert hängt am Zieh-Fortschritt und
+     * wird ausschließlich in der Zeichenphase gelesen (§10) — als Parameter
+     * rekomponierte er den ganzen Trainer pro Zieh-Frame. Der frühere
+     * `animateFloatAsState`-Nachlauf entfällt damit: `fraction` ist beim Ziehen
+     * ohnehin fingergenau und läuft sonst auf einer eigenen Feder. */
+    glow: () -> Float,
     frozen: Boolean,
     onTap: () -> Unit,
     enabled: Boolean = true,
     opacity: Float = 1f,
     modifier: Modifier = Modifier,
 ) {
+    val fill = if (frozen) LeafGreen.copy(alpha = 0.25f) else CreamElevated
+    val borderColor = if (frozen) LeafGreen else SkyBlue
     Box(
         modifier = modifier
             .width(widthDp.dp)
             .height(AbcDimens.letterFrame)
             .alpha(opacity)
-            .background(
-                color = if (frozen) LeafGreen.copy(alpha = 0.25f) else CreamElevated,
-                shape = RoundedCornerShape(26.dp),
-            )
-            .border(
-                width = 4.dp,
-                color = (if (frozen) LeafGreen else SkyBlue).copy(alpha = glow),
-                shape = RoundedCornerShape(26.dp),
-            )
+            // Fläche und Rand selbst gezeichnet statt background()/border(): nur
+            // so lässt sich der Glühwert in der Zeichenphase lesen. Der Rand
+            // sitzt um seine halbe Breite eingerückt und damit innen, genau wie
+            // Modifier.border — dieselbe Rechnung wie am Rahmen des Wort-Bauers.
+            .drawBehind {
+                val radius = FloeCornerRadius.toPx()
+                drawRoundRect(color = fill, cornerRadius = CornerRadius(radius))
+                val stroke = FloeBorderWidth.toPx()
+                drawRoundRect(
+                    color = borderColor.copy(alpha = glow().coerceIn(0f, 1f)),
+                    topLeft = Offset(stroke / 2f, stroke / 2f),
+                    size = Size(size.width - stroke, size.height - stroke),
+                    cornerRadius = CornerRadius((radius - stroke / 2f).coerceAtLeast(0f)),
+                    style = Stroke(width = stroke),
+                )
+            }
             .clickable(enabled = enabled, onClick = onTap),
         contentAlignment = Alignment.Center,
     ) {

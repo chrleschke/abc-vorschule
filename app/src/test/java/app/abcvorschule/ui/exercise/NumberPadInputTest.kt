@@ -43,6 +43,23 @@ class NumberPadInputTest {
         )
     }
 
+    // --- Spiegelung der Zähl-Hilfe ---------------------------------------------
+
+    @Test
+    fun theCountedValueIsMirroredIntoTheField() {
+        assertEquals("7", NumberPadInput.mirroredValue(7))
+        assertEquals("0", NumberPadInput.mirroredValue(0))
+    }
+
+    @Test
+    fun takingEveryTapBackClearsTheField() {
+        // Der Fehler, den das festnagelt: der Spiegel-Effect schrieb nur bei
+        // Nicht-Null, also blieb die zuletzt gezählte Zahl im Antwortfeld stehen,
+        // nachdem das Kind alle Tipps in der Zähl-Hilfe zurückgenommen hatte —
+        // absendbar, ohne dass sie noch irgendetwas zählte.
+        assertEquals("", NumberPadInput.mirroredValue(null))
+    }
+
     // --- field width vs. system font scale -------------------------------------
 
     /** displayLarge from ui/theme/Theme.kt — the style the field renders in. */

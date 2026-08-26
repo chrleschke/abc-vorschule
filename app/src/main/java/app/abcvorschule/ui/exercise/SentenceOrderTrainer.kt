@@ -166,7 +166,10 @@ fun SentenceOrderTrainer(
         },
         prompt = {
             if (!illustrationEmoji.isNullOrBlank()) {
-                Text(text = illustrationEmoji, fontSize = 84.sp)
+                Text(
+                    text = illustrationEmoji,
+                    fontSize = TaskPromptSizing.pictureSp(LocalDensity.current.fontScale).sp,
+                )
             }
             // `key(roundKey)` bindet die Transition an die Runde. Ohne Schlüssel
             // merkt sich AnimatedContent seinen Zustand in einem ungekeyten
@@ -304,7 +307,10 @@ fun SentenceOrderTrainer(
                     }
                 }
             }
-            if (misses >= 2 && !resolved) {
+            // `!completed` wie überall sonst: nach dem gelösten Satz bliebe der
+            // Knopf sichtbar, und ein Tipp darauf verbuchte die eben richtig
+            // gelöste Runde nachträglich als aufgelöst.
+            if (misses >= 2 && !resolved && !completed) {
                 AbcResolveButton(
                     onClick = {
                         resolved = true

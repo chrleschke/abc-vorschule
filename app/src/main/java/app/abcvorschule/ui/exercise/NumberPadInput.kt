@@ -34,6 +34,14 @@ object NumberPadInput {
         (MaxDigits * textSp * fontScale * DigitAspect + FieldPaddingDp)
             .coerceAtLeast(BaseFieldWidthDp)
 
+    /**
+     * Was die Zähl-Hilfe ins Antwortfeld spiegelt. `null` heißt „nichts (mehr)
+     * angetippt" und wird zum **leeren** Feld: nimmt das Kind alle Tipps zurück,
+     * bliebe sonst die zuletzt gespiegelte Zahl stehen — eine Antwort, die
+     * niemand mehr gezählt hat, absendbar mit einem Tipp auf den Pfeil.
+     */
+    fun mirroredValue(counted: Int?): String = counted?.toString() ?: ""
+
     fun sanitize(raw: String): String = raw.filter(Char::isDigit).take(MaxDigits)
 
     fun resetToken(roundKey: String, misses: Int): String = "$roundKey#$misses"

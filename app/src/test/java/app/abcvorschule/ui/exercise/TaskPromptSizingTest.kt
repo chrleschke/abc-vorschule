@@ -36,6 +36,24 @@ class TaskPromptSizingTest {
     }
 
     @Test
+    fun theTaskPictureKeepsItsShippedSize() {
+        assertEquals(84, TaskPromptSizing.pictureSp(1f))
+        assertEquals(TaskPromptSizing.PictureSp, TaskPromptSizing.pictureSp(1f))
+    }
+
+    @Test
+    fun theTaskPictureNeverOutgrowsItsBaseSize() {
+        // Die Regression: 84sp ungedeckelt rendern bei font_scale 2.0 als ~168dp
+        // und schieben den Aufgabenblock (der weder scrollt noch clippt) auf.
+        listOf(1f, 1.3f, 2f).forEach { scale ->
+            assertTrue(
+                "picture at scale $scale",
+                TaskPromptSizing.pictureSp(scale) * scale <= TaskPromptSizing.PictureSp + 0.01f,
+            )
+        }
+    }
+
+    @Test
     fun aSmallerSystemScaleIsLeftAlone() {
         // Below 1.0 the system asked for smaller text — capping is not zooming.
         assertEquals(34, TaskPromptSizing.titleSp(muted = false, fontScale = 0.85f))

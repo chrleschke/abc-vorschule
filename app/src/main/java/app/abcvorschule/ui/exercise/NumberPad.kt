@@ -59,12 +59,13 @@ fun NumberPad(
     /** False during the audio lock — field and submit button are non-interactive
      * and dimmed, and focus/keyboard are deferred until this turns true. */
     enabled: Boolean = true,
-    /** Von der Zähl-Hilfe hochgezählter Wert; `null` heißt „noch nichts angetippt"
-     * und lässt das Feld in Ruhe. */
+    /** Von der Zähl-Hilfe hochgezählter Wert; `null` heißt „nichts (mehr)
+     * angetippt". Wirkt nur bei [countingOpen]. */
     countedValue: Int? = null,
-    /** True, solange die Zähl-Hilfe offen ist: die System-Tastatur würde das
-     * Zählfeld verdecken, also bleibt sie zu, bis das Kind das Feld antippt. */
-    hideKeyboard: Boolean = false,
+    /** True, solange die Zähl-Hilfe offen ist. Zwei Folgen, eine Wahrheit: die
+     * System-Tastatur würde das Zählfeld verdecken, bleibt also zu, bis das Kind
+     * das Feld antippt — und das Feld spiegelt, was die Hilfe zählt. */
+    countingOpen: Boolean = false,
 ) {
     var value by remember(resetToken) { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
@@ -79,13 +80,13 @@ fun NumberPad(
         value.toIntOrNull()?.let(onSubmit)
     }
 
-    LaunchedEffect(enabled, hideKeyboard) {
+    LaunchedEffect(enabled, countingOpen) {
         // Deferred rather than Unit-keyed: while locked the keyboard must not pop
         // up before the child is allowed to type (design doc). Und solange die
         // Zähl-Hilfe offen ist, verdeckt die Tastatur genau das Feld, auf dem das
         // Kind zählen soll — ein Tipp ins Eingabefeld holt sie zurück.
         if (!enabled) return@LaunchedEffect
-        if (hideKeyboard) {
+        if (countingOpen) {
             keyboardController?.hide()
             return@LaunchedEffect
         }
@@ -97,11 +98,18 @@ fun NumberPad(
         // exactly the thing it is supposed to show.
         if (solved) keyboardController?.hide()
     }
-    LaunchedEffect(countedValue, resetToken) {
+    LaunchedEffect(countedValue, resetToken, countingOpen) {
         // Auch auf resetToken gekeyed: der Token wechselt bei jedem Fehlversuch und
         // leert das Feld. Ohne dieses Re-Spiegeln stünde das Feld nach einem Miss
         // leer da, während die Haken in der Zähl-Hilfe noch gesetzt sind.
-        countedValue?.let { value = it.toString() }
+        //
+        // Gespiegelt wird auch der LEERE Stand: nimmt das Kind alle Tipps wieder
+        // zurück, steht die Hilfe wieder bei null, und die zuletzt gespiegelte
+        // Zahl im Feld wäre eine Antwort, die niemand mehr gezählt hat — samt der
+        // Möglichkeit, sie abzusenden. Nur solange die Hilfe offen ist: sonst
+        // löschte dieser Effect die von Hand getippte Zahl.
+        if (!countingOpen) return@LaunchedEffect
+        value = NumberPadInput.mirroredValue(countedValue)
     }
 
     Row(

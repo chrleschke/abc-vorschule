@@ -16,11 +16,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -242,8 +245,12 @@ fun MultiplicationMatrixGrid(
      * Kind vorher im Kopf nicht geschafft hat. */
     counting: CountingState? = null,
     onTapCell: (Int) -> Unit = {},
-    /** Deckkraft des Puls-Hinweises auf der nächsten offenen Zelle. */
-    pulseAlpha: Float = 1f,
+    /** Deckkraft des Puls-Hinweises auf der nächsten offenen Reihe. Als State
+     * durchgereicht statt als Float: gelesen wird er unten in der Zeichenphase,
+     * sonst rekomponierte der endlose Puls die ganze Matrix Frame für Frame
+     * (§10, gleiche Pflicht wie bei SlotFillMorph). `null` heißt „kein Puls" —
+     * die Matrix steht dann im Aufgabenblock statt in der Zähl-Hilfe. */
+    pulseAlpha: State<Float>? = null,
 ) {
     // In der Zähl-Hilfe hat die Matrix den Aufgabenblock für sich und darf deutlich
     // größer werden — im Prompt teilt sie ihn mit dem Antwortbereich.
@@ -274,11 +281,11 @@ fun MultiplicationMatrixGrid(
             // Anders als bei Plus und Minus wird eine Reihe beim Antippen **echt**,
             // statt zu verblassen: Malnehmen ist Auffüllen, und die Geisterreihen
             // aus §8 sind genau das, was das Kind vervollständigen soll.
-            val rowAlpha = when {
+            val pulsing = counting != null && counting.nextIndex == row
+            val restingRowAlpha = when {
                 counting == null ->
                     if (MultiplicationMatrix.isConcreteRow(row)) 1f else MultiplicationMatrix.GhostAlpha
                 counting.isTapped(row) -> 1f
-                counting.nextIndex == row -> pulseAlpha
                 else -> MultiplicationMatrix.GhostAlpha
             }
             Row(
@@ -308,7 +315,12 @@ fun MultiplicationMatrixGrid(
                     Text(
                         text = emoji,
                         fontSize = sizeSp.sp,
-                        modifier = Modifier.alpha(rowAlpha),
+                        // Derselbe Layer, den `Modifier.alpha(…)` aufmacht — nur
+                        // wird der Puls hier in der Zeichenphase gelesen.
+                        modifier = Modifier.graphicsLayer {
+                            alpha = if (pulsing) pulseAlpha?.value ?: 1f else restingRowAlpha
+                            compositingStrategy = CompositingStrategy.ModulateAlpha
+                        },
                     )
                 }
             }

@@ -35,6 +35,20 @@ object TaskPromptSizing {
      * wie `FinaleLayout.sentenceLineHeightSp`. */
     const val TitleLineHeightSp = 34
 
+    /** Das Aufgabenbild über Wort bzw. Satz — die bisherige feste Größe im
+     * Wort-Bauer und im Satz-Architekten. */
+    const val PictureSp = 84
+
+    /**
+     * Größe des Aufgabenbildes, mit demselben Deckel wie der Titel: ein Emoji ist
+     * ein Bild, keine Prosa (Muster `SentencePictureCardSizing.emojiSp` und
+     * `WordFrameSizing.targetLabelSp`), und ungedeckelt rendern die 84sp bei
+     * font_scale 2.0 als ~168dp — der Aufgabenblock von [ExerciseStage] scrollt
+     * nicht und clippt nicht, das Bild schöbe also Wort und Rahmen aus dem Bild.
+     * Bei font_scale 1.0 kommt unverändert [PictureSp] heraus.
+     */
+    fun pictureSp(fontScale: Float): Int = capEffectiveSize(PictureSp, fontScale)
+
     fun titleSp(muted: Boolean, fontScale: Float): Int =
         capEffectiveSize(if (muted) MutedTitleSp else TitleSp, fontScale)
 

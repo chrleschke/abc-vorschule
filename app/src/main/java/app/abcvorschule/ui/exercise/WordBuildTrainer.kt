@@ -198,7 +198,7 @@ fun WordBuildTrainer(
         prompt = {
             Text(
                 text = target.emoji,
-                fontSize = 84.sp,
+                fontSize = TaskPromptSizing.pictureSp(LocalDensity.current.fontScale).sp,
                 modifier = Modifier.testTag("word_picture"),
             )
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
@@ -349,7 +349,15 @@ fun WordBuildTrainer(
                     }
                 }
             }
-            if (misses >= 2 && !resolved) {
+            // „Zeig mir" verschwindet, sobald die Lösung steht — nicht erst, wenn
+            // `completed` nach dem Vorsprechen des fertigen Wortes gesetzt wird.
+            // Dazwischen liegt das Timeout von `onSpeakAndAwait` (bis zu 10s), und
+            // ein Tipp in diesem Fenster verbucht die RICHTIG gelöste Runde als
+            // aufgelöst: keine Punkte, Scaffold-Abwertung, Auflösen-Zeremonie.
+            // Alle anderen Trainer nehmen ihren Erfolgszustand genauso in die
+            // Bedingung auf (SymbolInWordTrainer, SymbolHuntTrainer, …).
+            val solutionStands = completed || OrderedPlacement.isSolved(placed.toMap(), solution)
+            if (misses >= 2 && !resolved && !solutionStands) {
                 AbcResolveButton(
                     onClick = {
                         resolved = true

@@ -186,8 +186,8 @@ fun MathExercise(
                     resetToken = NumberPadInput.resetToken(roundKey, misses),
                     solved = solved != null,
                     enabled = !interactionLocked,
-                    countedValue = counting.counted.takeIf { countingOpen },
-                    hideKeyboard = countingOpen,
+                    countedValue = counting.counted,
+                    countingOpen = countingOpen,
                 )
                 if (misses >= MathHinting.ResolveFromMissesTyped && !locked) {
                     AbcResolveButton(onClick = ::resolve)
