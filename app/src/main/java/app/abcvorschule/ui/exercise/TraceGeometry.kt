@@ -418,17 +418,31 @@ object TraceProgress {
         boxSize > 0f && strokeLength < boxSize * ShortStrokeFraction
 
     /**
-     * Which finger position a tap reports. The tap alternative (R15) may only stand in
-     * for a touch on the star when the tap actually lands on that star — inside the same
-     * pick-up radius a dragging finger needs. Everywhere else the raw tap position is
-     * reported, so the corridor and ahead gates in [update] judge a tap exactly like a
-     * drag sample: reporting [target] unconditionally made *any* tap in the glyph box
-     * collect the next star, and repeated taps on empty canvas finished the whole letter.
+     * A tap is not a trace. This trainer practices the writing *movement*, so a star can
+     * only be collected by a finger that travels along the road — never by a discrete
+     * tap, not even a tap that lands exactly on the star. Letting a tap stand in for a
+     * touch collected the whole glyph by tapping star to star, which is the exercise
+     * skipped rather than done.
+     *
+     * What a tap does instead: it points the child at the beginning of the stroke they
+     * are on, so tapping is answered with guidance rather than with progress.
      */
-    fun tapSample(tap: TracePoint, target: TracePoint, boxSize: Float): TracePoint {
-        val hit = kotlin.math.hypot(tap.x - target.x, tap.y - target.y)
-        return if (hit <= boxSize * StarHitFraction) target else tap
-    }
+    fun tapGuidance(state: TraceState, strokes: List<List<TracePoint>>): TracePoint? =
+        strokes.getOrNull(state.strokeIndex)?.firstOrNull()
+
+    /** Off-road nudges after which the round may be resolved (R10). */
+    const val OffRoadNudgesBeforeResolve = 6
+
+    /**
+     * Fruitless taps after which the round may be resolved. A child who cannot drag at
+     * all taps instead; since taps no longer collect stars, this is their way on (R15).
+     * Their taps land *on* the road, so they never trip [OffRoadNudgesBeforeResolve].
+     */
+    const val TapsBeforeResolve = 4
+
+    /** Whether the resolve button is offered — for the off-road child and for the tapping one. */
+    fun resolveAvailable(offRoadCount: Int, tapsWithoutTrace: Int): Boolean =
+        offRoadCount >= OffRoadNudgesBeforeResolve || tapsWithoutTrace >= TapsBeforeResolve
 
     /** Arc distance on a closed loop of length [total] — the shorter way around. */
     private fun circularDistance(a: Float, b: Float, total: Float): Float {
