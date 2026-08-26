@@ -425,8 +425,11 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - Haptik-Vokabular `AbcHaptics` (tick/success/celebrate/nudge): tick = kleiner Sammel-Erfolg
   (Trace-Stern, Jagd-Treffer, Einrasten), success = Aufgabe richtig, celebrate = Lektions-/
   Batterie-Feier, nudge = sanfte Korrektur. Haptik ergänzt Ton, ersetzt ihn nie.
-- Erfolgsmomente: SuccessBurst (Gold-Stern + Funken), Gold-Puls an der Segmentgrenze je Trainer,
-  Konfetti auf dem End-Screen.
+  Der `SuccessBurst` am Trainer-Ende vibriert **nicht**: er folgt oft direkt auf den
+  Trainer-eigenen Puls, und zwei Vibrationen hintereinander sind zu viel — dort trägt
+  der Chime allein.
+- Erfolgsmomente: SuccessBurst (Gold-Stern + Funken, ohne Haptik), Gold-Puls an der
+  Segmentgrenze je Trainer, Konfetti auf dem End-Screen.
 - **Shape-Morph beim Einrasten (Squish-Settle).** Rastet ein Wort in einen Peg des
   Satz-Architekten, quetscht der Peg horizontal und federt in Form zurück: `scaleX`
   0,91 → über 1,0 → 1,0, `scaleY` gegenläufig 1,05 → 1,0, Eckradius 24 → 16dp, eine
