@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Ohne diese Zeile wirft jedes vibrate() eine SecurityException, die das
+         runCatching in AbcHaptics schluckt: die Haptik ist dann lautlos tot,
+         ohne dass irgendetwas darauf hinweist. Normale Berechtigung, sie wird
+         beim Installieren erteilt und nichts muss zur Laufzeit gefragt werden. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.TTS_SERVICE" />
