@@ -240,6 +240,8 @@ fun MultiplicationMatrixGrid(
      * Kind vorher im Kopf nicht geschafft hat. */
     counting: CountingState? = null,
     onTapCell: (Int) -> Unit = {},
+    /** Deckkraft des Puls-Hinweises auf der nächsten offenen Zelle. */
+    pulseAlpha: Float = 1f,
 ) {
     val sizeSp = MultiplicationMatrix.emojiSizeSp(columns)
     Column(
@@ -286,6 +288,7 @@ fun MultiplicationMatrixGrid(
                                 when {
                                     ghost -> MultiplicationMatrix.GhostAlpha
                                     done -> CountedAlpha
+                                    counting?.nextIndex == index -> pulseAlpha
                                     else -> 1f
                                 },
                             )

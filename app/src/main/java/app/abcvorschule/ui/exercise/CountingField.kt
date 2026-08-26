@@ -5,7 +5,7 @@ package app.abcvorschule.ui.exercise
  * Fehlversuchen an die Stelle der Aufgabenvisualisierung tritt (design doc
  * 2026-08-26-rechnen-ohne-raten).
  *
- * Zwei Dinge unterscheiden sie vom Aufgaben-Prompt:
+ * Drei Dinge unterscheiden sie vom Aufgaben-Prompt:
  *
  * 1. Mengen ab 11 werden hier **ausgeschrieben** statt als Symbol + Ziffer
  *    ([QuantityRepresentation]). §8 verbietet die Emoji-Wand als *Aufgabe*;
@@ -13,30 +13,25 @@ package app.abcvorschule.ui.exercise
  * 2. Gebündelt wird in **Fünfern**, nicht in Paaren wie [QuantityGrouping].
  *    Die Fünferbündelung ist die Struktur, die das Kind für den Zahlenraum
  *    20/30 ohnehin braucht.
+ * 3. Beide Operanden liegen in **einem** Feld, statt als zwei Blöcke unter- oder
+ *    nebeneinander. Der zweite Operand ist stattdessen gerahmt. Zwei getrennte
+ *    Blöcke kosteten bis zu sieben Zeilen und drückten das Emoji auf 20sp; im
+ *    gemeinsamen Feld sind es höchstens sechs und mindestens 24sp. Der Rahmen
+ *    trägt die Gruppierung dabei genauso gut wie ein Zeilenumbruch.
  *
  * Compose-frei, damit die Rechnungen als JVM-Test prüfbar bleiben.
  */
 object CountingField {
-    /** Objekte pro Zeile bei kleinen Mengen. */
+    /** Objekte pro Zeile. */
     const val RowSize = 5
 
-    /**
-     * Ab dieser Gruppengröße läuft die Zeile auf zehn Objekte — gerendert als
-     * zwei Fünfer mit breiterer Lücke, wie an einem Rechenrahmen. Fünferzeilen
-     * überall wären konsequenter, türmen den echten Content aber unbrauchbar hoch:
-     * "30 − 17" wären zehn Zeilen und das Emoji müsste auf 14sp schrumpfen. Die
-     * Zehnerbündelung ist für den Zahlenraum 20/30 ohnehin die Struktur, die das
-     * Kind braucht.
-     */
-    const val WideRowFrom = 11
-    const val WideRowSize = 10
-
-    /** Abstand zwischen zwei Objekten einer Fünfergruppe, in dp. */
+    /** Abstand zwischen zwei Zellen, in dp. */
     const val RowGapDp = 4f
 
-    /** Breitere Lücke zwischen den beiden Fünfern einer Zehnerzeile, in dp — sie
-     * erhält das Subitizing, das die lange Zeile sonst zerstört. */
-    const val FiveGapDp = 12f
+    /** Innenabstand einer Zelle, in dp. Jede Zelle trägt ihn, nicht nur die
+     * gerahmten — sonst säßen gerahmte und ungerahmte Objekte auf verschiedenen
+     * Rastern und die Fünferzeile verliefe krumm. */
+    const val CellPadDp = 3f
 
     /** Schriftskalierung, gegen die ausgelegt wird: das Testgerät steht auf 1.3,
      * und gegen 1.0 gerechnete Größen laufen dort über. */
@@ -46,8 +41,8 @@ object CountingField {
     const val MaxEmojiSp = 34
 
     /** Untergrenze: kleiner wird ein Emoji weder erkennbar noch sicher treffbar.
-     * Der höchste Fall ("30 − 30", sechs Zehnerzeilen) landet bei 21sp. */
-    const val MinEmojiSp = 18
+     * Der höchste Fall (sechs Zeilen) landet bei 24sp, bleibt also darüber. */
+    const val MinEmojiSp = 20
 
     /**
      * Reserve auf die Höhenschranke: die Rechnung zählt einen Zeilenabstand zu
@@ -57,10 +52,9 @@ object CountingField {
     const val SafetyDp = 2f
 
     /**
-     * Zeilenhöhe des einen Beschriftungstexts im Feld: das Operatorzeichen bei
-     * Plus, die Ziffer unter der Weg-Zone bei Minus. `headlineMedium.lineHeight`
-     * aus `ui/theme/Theme.kt` — dokumentierte Kopie nach dem Muster von
-     * [MultiplicationMatrix.RowLabelSp].
+     * Zeilenhöhe der Ziffernzeile über dem Feld („15 − 6 = ?").
+     * `headlineMedium.lineHeight` aus `ui/theme/Theme.kt` — dokumentierte Kopie
+     * nach dem Muster von [MultiplicationMatrix.RowLabelSp].
      */
     const val LabelLineSp = 34f
 
@@ -72,99 +66,66 @@ object CountingField {
     const val TaskBlockDp = 300f
     const val FieldWidthDp = 320f
 
-    /**
-     * Zeilenbreite der Runde. Rundenweit entschieden, nicht je Gruppe — sonst
-     * stünde bei "15 + 4" eine Zehnerzeile über einer Fünferzeile und die beiden
-     * Gruppen wären unvergleichbar. Gleiches Muster wie
-     * [QuantityRepresentation.forceSymbolicFor].
-     */
-    fun rowSize(operation: MathOperation, left: Int, right: Int): Int =
-        if (groupSizes(operation, left, right).max() >= WideRowFrom) WideRowSize else RowSize
-
-    /** Zeilen einer Menge zu je [rowSize]; die letzte Zeile ist kürzer. */
-    fun rows(count: Int, rowSize: Int): List<Int> {
+    /** Fünferzeilen einer Menge; die letzte Zeile ist kürzer. */
+    fun rows(count: Int): List<Int> {
         if (count <= 0) return emptyList()
-        val full = count / rowSize
-        val rest = count % rowSize
+        val full = count / RowSize
+        val rest = count % RowSize
         return buildList {
-            repeat(full) { add(rowSize) }
+            repeat(full) { add(RowSize) }
             if (rest > 0) add(rest)
         }
     }
 
-    /** Eine Zeile in ihre Fünferblöcke — das Subitizing der langen Zeile. */
-    fun fiveChunks(rowLength: Int): List<Int> = rows(rowLength, RowSize)
-
-    /**
-     * Die Objektgruppen in Anzeigereihenfolge.
-     *
-     * Plus behält seine zwei Gruppen — der Zähler läuft über beide durch, und die
-     * Aufgabe bleibt als Bild erkennbar. Minus zeigt nur die Ausgangsmenge; die
-     * weggenommenen Objekte wandern in die Weg-Zone, statt Teil dieses Feldes zu
-     * sein. Malnehmen liefert alle Matrixzellen als eine Gruppe — gerendert wird
-     * es ohnehin als Raster, nicht in Zeilen dieser Breite.
-     */
-    fun groupSizes(operation: MathOperation, left: Int, right: Int): List<Int> =
-        when (operation) {
-            MathOperation.Add -> listOf(left, right)
-            MathOperation.Subtract -> listOf(left)
-            MathOperation.Multiply -> listOf(left * right)
-        }
-
     /** Wie viele Objekte insgesamt antippbar auf dem Schirm stehen. */
     fun objectCount(operation: MathOperation, left: Int, right: Int): Int =
-        groupSizes(operation, left, right).sum()
+        when (operation) {
+            MathOperation.Add -> left + right
+            MathOperation.Subtract -> left
+            MathOperation.Multiply -> left * right
+        }
 
     /**
-     * Leere Plätze der Weg-Zone. Nur Minus hat eine: sie ist der Grund, warum das
-     * Kind nicht mitzählen muss, wie viele es schon weggenommen hat — die Struktur
-     * trägt die Zahl, und volle Zone heißt fertig.
+     * Ab welchem Index der zweite Operand beginnt — die gerahmten Objekte.
+     * `null` bei Malnehmen: die Matrix trägt ihre Struktur bereits in Reihen und
+     * Spalten, ein Rahmen darin wäre eine zweite, widersprüchliche Gruppierung.
+     *
+     * Der Rahmen bedeutet überall dasselbe: *das ist die zweite Zahl*. Was mit
+     * ihr passiert, entscheidet die Rechenart — bei Minus geht sie weg (und nur
+     * sie ist antippbar), bei Plus kommt sie dazu.
      */
-    fun removeSlots(operation: MathOperation, right: Int): Int =
-        if (operation == MathOperation.Subtract) right else 0
+    fun framedFrom(operation: MathOperation, left: Int, right: Int): Int? =
+        if (operation == MathOperation.Multiply) null else objectCount(operation, left, right) - right
 
-    /**
-     * Gerenderte Zeilen insgesamt. Bei Minus zählt die Weg-Zone mit — sie steht
-     * unter dem Hauptfeld, damit alles gleich breit bleibt statt daneben in die
-     * Breite zu laufen.
-     */
-    fun totalRows(operation: MathOperation, left: Int, right: Int): Int {
-        if (operation == MathOperation.Multiply) return left
-        val rowSize = rowSize(operation, left, right)
-        return rows(left, rowSize).size + rows(right, rowSize).size
-    }
+    /** Gerenderte Zeilen. Malnehmen behält sein Raster, sonst Fünferzeilen. */
+    fun totalRows(operation: MathOperation, left: Int, right: Int): Int =
+        if (operation == MathOperation.Multiply) left else rows(objectCount(operation, left, right)).size
 
-    /** Breite einer vollen Zeile in dp bei gegebener Emoji-Größe. */
-    fun rowWidthDp(rowSize: Int, emojiSizeSp: Int): Float {
-        val gaps = RowGapDp * (rowSize - 1) +
-            if (rowSize > RowSize) FiveGapDp - RowGapDp else 0f
-        return rowSize * emojiSizeSp * LayoutFontScale + gaps
-    }
+    /** Kantenlänge einer Zelle in dp bei gegebener Emoji-Größe. */
+    fun cellSizeDp(emojiSizeSp: Int): Float = emojiSizeSp * LayoutFontScale + 2 * CellPadDp
 
-    /** Höhe des Feldes in dp bei gegebener Emoji-Größe, inklusive Beschriftung. */
+    /** Breite einer vollen Fünferzeile in dp. */
+    fun rowWidthDp(emojiSizeSp: Int): Float =
+        RowSize * cellSizeDp(emojiSizeSp) + RowGapDp * (RowSize - 1)
+
+    /** Höhe des Feldes in dp, inklusive der Ziffernzeile darüber. */
     fun fieldHeightDp(rows: Int, emojiSizeSp: Int): Float =
-        rows * (emojiSizeSp * LayoutFontScale + RowGapDp) + LabelLineSp * LayoutFontScale
+        rows * (cellSizeDp(emojiSizeSp) + RowGapDp) + LabelLineSp * LayoutFontScale
 
     /**
      * Emoji-Größe in sp. Malnehmen erbt die Größe der Matrix, die es ohnehin
      * wiederverwendet; sonst wird die Größe aus dem verfügbaren Platz
      * *hergeleitet* statt gestuft. Eine Stufentabelle deckt den echten Content
-     * nicht ab — "30 − 17" steht so im Pack. Hergeleitet gelten beide Schranken
+     * nicht ab — „30 − 17" steht so im Pack. Hergeleitet gelten beide Schranken
      * per Konstruktion, für jede Runde, die der Validator zulässt.
-     *
-     * Beide Richtungen binden: die Zehnerzeile ist breitengetrieben, der hohe
-     * Minus-Fall höhengetrieben.
      */
     fun emojiSizeSp(operation: MathOperation, left: Int, right: Int): Int {
         if (operation == MathOperation.Multiply) return MultiplicationMatrix.emojiSizeSp(right)
         val rows = totalRows(operation, left, right)
         if (rows <= 0) return MaxEmojiSp
-        val rowSize = rowSize(operation, left, right)
-        val gaps = RowGapDp * (rowSize - 1) +
-            if (rowSize > RowSize) FiveGapDp - RowGapDp else 0f
-        val byWidth = (FieldWidthDp - gaps) / rowSize / LayoutFontScale
+        val byWidth = ((FieldWidthDp - RowGapDp * (RowSize - 1)) / RowSize - 2 * CellPadDp) / LayoutFontScale
         val available = TaskBlockDp - SafetyDp - LabelLineSp * LayoutFontScale
-        val byHeight = (available / rows - RowGapDp) / LayoutFontScale
+        val byHeight = (available / rows - RowGapDp - 2 * CellPadDp) / LayoutFontScale
         return minOf(byWidth, byHeight).toInt().coerceIn(MinEmojiSp, MaxEmojiSp)
     }
 }

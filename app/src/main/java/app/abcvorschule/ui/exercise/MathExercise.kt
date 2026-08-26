@@ -103,9 +103,10 @@ fun MathExercise(
                     speaking = speaking,
                     onSpeakPrompt = onSpeakPrompt,
                 )
-                // The multiplication matrix writes "3 × 4" above itself, so a second
-                // symbolic line here would show the same task twice (Layout §9).
-                if (showSymbolPrompt && operation != MathOperation.Multiply) {
+                // The multiplication matrix writes "3 × 4" above itself, and the
+                // counting aid writes its own equation line — a second symbolic line
+                // here would show the same task twice (Layout §9).
+                if (showSymbolPrompt && !countingOpen && operation != MathOperation.Multiply) {
                     Text(
                         text = "${round.left} ${operation.symbol} ${round.right} = ?",
                         style = MaterialTheme.typography.displayLarge,

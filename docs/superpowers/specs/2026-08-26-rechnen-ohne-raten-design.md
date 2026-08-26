@@ -81,28 +81,38 @@ Die Geste **ist** die Rechenart — die drei Operationen fühlen sich bewusst
 unterschiedlich an:
 
 **Plus („7 + 8")** — einsammeln.
-Beide Gruppen bleiben stehen und werden antippbar. Der Zähler startet bei 0 und
-läuft über beide Gruppen durch: 1…7 links, weiter 8…15 rechts.
+Ein Feld mit 15 Objekten, alle antippbar. Die letzten 8 sind gerahmt — das sind
+die, die dazukommen. Der Zähler startet bei 0 und läuft durch: 1…15.
+
+Der Rahmen bedeutet überall dasselbe: *das ist die zweite Zahl*. Was mit ihr
+passiert, entscheidet die Rechenart — bei Minus geht sie weg (und nur sie ist
+antippbar), bei Plus kommt sie dazu (und alles ist antippbar).
 
 **Minus („15 − 6")** — wegnehmen.
-Das Bild wechselt bewusst gegenüber dem Prompt: **ein** Feld mit 15 Objekten,
-alle angehakt, Zähler startet bei 15. Daneben eine **Weg-Zone mit genau `right`
-leeren Plätzen** (hier 6), unter ihr die Ziffer 6.
+**Ein** Feld mit 15 Objekten, Zähler startet bei 15. Die **letzten 6 sind
+gerahmt** — das sind die, die weggehen — und **nur sie sind antippbar**.
 
-- Tipp auf ein Objekt → es wandert in die Weg-Zone, Haken weg, Zähler 15 → 14 → …
-- Sind alle 6 Plätze belegt, nimmt ein weiterer Tipp nichts mehr weg
-  (kurzes Haptik-Nein, kein Fehler, keine Meldung).
-- Nach 6 Tipps steht der Zähler auf 9, die 9 steht im Feld.
+- Tipp auf ein gerahmtes Objekt → es verblasst, Zähler 15 → 14 → …
+- Ein Tipp auf ein bleibendes Objekt tut nichts. Kein Fehler, keine Meldung:
+  es ist schlicht nicht Teil der Aufgabe.
+- Nach 6 Tipps steht der Zähler auf 9, die 9 steht im Feld. Was ungerahmt und
+  voll deckend stehen bleibt, ist die Antwort — auf einen Blick abzählbar.
 
-Die leeren Plätze sind der Kern dieser Variante: das Kind muss *nicht*
-mitzählen, wie viele es schon weggenommen hat — die Struktur trägt die Zahl.
-Ohne sie müsste das Kind zwei Zahlen gleichzeitig verfolgen („wie viele weg"
-und „wie viele übrig"), und das ist im Vorschulalter zu viel.
+Der Rahmen ist der Kern dieser Variante: das Kind muss *nicht* mitzählen, wie
+viele es schon weggenommen hat — die Struktur trägt die Zahl, und es kann gar
+nicht zu viel wegnehmen. Ohne sie müsste es zwei Zahlen gleichzeitig verfolgen
+(„wie viele weg" und „wie viele übrig"), und das ist im Vorschulalter zu viel.
 
-Verworfene Alternative: *Rest zählen* — die App streicht die 6 durch, das Kind
+Verworfene Alternative 1: *Rest zählen* — die App streicht die 6 durch, das Kind
 zählt die verbliebenen 9 aufwärts. Abgelehnt, weil dann die App die Subtraktion
 ausführt und das Kind nur noch abzählt. Rückwärtszählen ist zudem selbst eine
 Vorschul-Fähigkeit, die hier trainiert werden soll.
+
+Verworfene Alternative 2: *Weg-Zone* — die weggenommenen Objekte wandern in eine
+eigene Zone mit `right` leeren Plätzen. Gebaut, am Gerät verworfen: die Bewegung
+in eine zweite Zone ist für ein Vorschulkind zu viel auf einmal, die Zone
+brauchte eine eigene Ziffer, die sich mit allen anderen Zahlen im Bild stapelte,
+und sie verdoppelte die Zeilenzahl des Feldes.
 
 **Malnehmen („4 × 5")** — Raster füllen.
 Dieselbe Matrix wie im Prompt, aber die Geisterreihen
@@ -125,18 +135,30 @@ dort weiter; hier ist die Menge nicht Aufgabe, sondern Werkzeug.
 
 Gebündelt wird in **Fünfern**, nicht in Paaren (`QuantityGrouping.clusters`) —
 die Fünferbündelung ist die Struktur, die das Kind für den Zahlenraum 20/30
-ohnehin braucht. Ab einer Gruppengröße von 11 laufen die Zeilen auf **zehn**
-Objekte, gezeichnet als zwei Fünfer mit breiterer Lücke, wie an einem
-Rechenrahmen. Fünferzeilen überall wären konsequenter, türmen den authorierten
-Content aber unbrauchbar hoch: „30 − 17" steht so im Pack und wäre zehn Zeilen,
-mit einem Emoji, das auf 14sp schrumpfen müsste. Die Zeilenbreite gilt
-rundenweit, nicht je Gruppe, sonst stünde bei „15 + 4" eine Zehnerzeile über
-einer Fünferzeile.
+ohnehin braucht. Beide Operanden teilen sich **ein** Feld; zwei getrennte Blöcke
+kosteten bis zu sieben Zeilen und drückten das Emoji auf 20sp, gemeinsam sind es
+höchstens sechs und mindestens 24sp. Der Rahmen trägt die Gruppierung dabei
+genauso gut wie ein Zeilenumbruch.
+
+### Aufgabe und Anleitung
+
+Über dem Feld steht die Aufgabe als **Ziffernzeile** („15 − 6 = ?"), solange die
+Zähl-Hilfe offen ist; die symbolische Zeile von `MathExercise` schweigt dann.
+Ohne sie verlöre besonders Minus seine Aufgabe ganz, sobald der gesprochene
+Prompt verklungen ist — dort steht ja kein zweiter Mengenblock mehr. Dieselbe
+Begründung, aus der die Multiplikationsmatrix ihre Gleichung längst selbst
+schreibt (§8).
+
+Das **nächste offene Objekt pulsiert** sanft in der Deckkraft und führt so durch
+die Aufgabe. Der Puls, nicht der Ton, ist die eigentliche Anleitung: eine
+Ansage, die nur bei vorhandener TTS-Stimme oder gerendertem Clip ankommt, wäre
+keine.
 
 ### Audio
 
-- **Beim Aufklappen:** ein gesprochener Cue („Zähl mit — tippe jedes … an" bzw.
-  „Nimm sechs … weg"). Kinder lesen nicht (§Audio-First).
+- **Beim Aufklappen:** ein gesprochener Cue als Verstärkung — „Tippe auf die
+  Bilder, um sie zu zählen." bzw. „… um sie wegzunehmen.". Kinder lesen nicht
+  (§Audio-First).
 - **Pro Tipp:** nur Haptik, **kein** Sprechen. Schnell aufeinanderfolgende
   Äußerungen würgen sich in `SpeechController` gegenseitig ab — auch auf
   `SpeechChannel.Feedback`, das vor dem Enqueue `stopOutput(channel)` ruft.

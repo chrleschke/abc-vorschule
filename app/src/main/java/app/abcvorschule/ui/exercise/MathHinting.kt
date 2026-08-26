@@ -72,9 +72,13 @@ object MathHinting {
      * Gesprochene Cues der Zähl-Hilfe. Feste Strings ohne Interpolation, sonst
      * findet die Clip-Suche nie einen kuratierten Clip (`ClipIndex.lookup`) und es
      * bliebe bei der TTS-Stimme. Gepflegt in `tools/tts/extra-strings.json`.
+     *
+     * Der Cue ist die *Verstärkung* der Anleitung, nicht die Anleitung selbst —
+     * die trägt der Puls-Hinweis auf dem nächsten offenen Objekt. Eine Ansage,
+     * die nur bei vorhandener Stimme ankommt, wäre keine Anleitung.
      */
-    const val CountingAidCueCollect = "Zähl mit! Tippe jedes Bild an."
-    const val CountingAidCueTakeAway = "Nimm sie weg! Tippe an, was weggeht."
+    const val CountingAidCueCollect = "Tippe auf die Bilder, um sie zu zählen."
+    const val CountingAidCueTakeAway = "Tippe auf die Bilder, um sie wegzunehmen."
 
     fun countingAidCue(operation: MathOperation): String =
         if (operation == MathOperation.Subtract) CountingAidCueTakeAway else CountingAidCueCollect

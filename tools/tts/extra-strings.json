@@ -288,12 +288,12 @@
     },
     {
       "id": "countingAidCueCollect",
-      "text": "Zähl mit! Tippe jedes Bild an.",
+      "text": "Tippe auf die Bilder, um sie zu zählen.",
       "note": "MathHinting.CountingAidCueCollect — Zähl-Hilfe Plus/Malnehmen"
     },
     {
       "id": "countingAidCueTakeAway",
-      "text": "Nimm sie weg! Tippe an, was weggeht.",
+      "text": "Tippe auf die Bilder, um sie wegzunehmen.",
       "note": "MathHinting.CountingAidCueTakeAway — Zähl-Hilfe Minus"
     }
   ],

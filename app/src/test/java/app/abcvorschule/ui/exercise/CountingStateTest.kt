@@ -7,8 +7,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CountingStateTest {
-    private fun tapAll(start: CountingState, count: Int): CountingState =
-        (0 until count).fold(start) { state, index -> state.tap(index) }
+    /** Tippt die ersten [count] antippbaren Objekte der Reihe nach an — also genau
+     * das, was der Puls-Hinweis dem Kind vorschlägt. */
+    private fun tapAlong(start: CountingState, count: Int): CountingState =
+        (0 until count).fold(start) { state, _ ->
+            state.nextIndex?.let(state::tap) ?: state
+        }
 
     @Test
     fun nothingIsMirroredIntoTheAnswerFieldBeforeTheFirstTap() {
@@ -20,11 +24,11 @@ class CountingStateTest {
     }
 
     @Test
-    fun plusCountsUpAcrossBothGroups() {
+    fun plusCountsUpAcrossBothOperands() {
         val start = CountingState.forRound(MathOperation.Add, 7, 8)
         assertEquals(1, start.tap(0).counted)
-        assertEquals(7, tapAll(start, 7).counted)
-        val done = tapAll(start, 15)
+        assertEquals(7, tapAlong(start, 7).counted)
+        val done = tapAlong(start, 15)
         assertEquals(15, done.counted)
         assertTrue(done.complete)
     }
@@ -32,19 +36,44 @@ class CountingStateTest {
     @Test
     fun minusCountsDownFromTheStartingQuantity() {
         val start = CountingState.forRound(MathOperation.Subtract, 15, 6)
-        assertEquals(14, start.tap(0).counted)
-        assertEquals(9, tapAll(start, 6).counted)
+        assertEquals(14, start.tap(start.framedFrom!!).counted)
+        assertEquals(9, tapAlong(start, 6).counted)
     }
 
     @Test
-    fun minusStopsAtTheTakeAwayTargetSoTheChildCannotOvershoot() {
+    fun minusOnlyLetsTheChildTouchWhatIsSupposedToGoAway() {
+        // Der Deckel ist keine Regel mehr, sondern die Struktur: es gibt schlicht nur
+        // sechs antippbare Objekte, also kann das Kind nicht zu viel wegnehmen.
         val start = CountingState.forRound(MathOperation.Subtract, 15, 6)
-        val full = tapAll(start, 6)
-        assertTrue(full.complete)
-        // Der siebte Tipp auf ein noch stehendes Objekt ändert nichts.
-        val overshoot = full.tap(6)
-        assertEquals(9, overshoot.counted)
-        assertEquals(full.tapped, overshoot.tapped)
+        assertEquals(9, start.framedFrom)
+        (0 until 9).forEach { assertFalse("index $it", start.isTappable(it)) }
+        (9 until 15).forEach { assertTrue("index $it", start.isTappable(it)) }
+
+        // Ein Tipp auf ein bleibendes Objekt tut nichts — kein Fehler, keine Meldung.
+        assertEquals(start, start.tap(0))
+        assertTrue(tapAlong(start, 6).complete)
+    }
+
+    @Test
+    fun plusFramesTheSecondOperandButLetsTheChildTapEverything() {
+        val start = CountingState.forRound(MathOperation.Add, 7, 8)
+        assertEquals(7, start.framedFrom)
+        assertFalse(start.isFramed(6))
+        assertTrue(start.isFramed(7))
+        // Anders als bei Minus ist hier alles antippbar: eingesammelt wird beides.
+        (0 until 15).forEach { assertTrue("index $it", start.isTappable(it)) }
+    }
+
+    @Test
+    fun thePulseFollowsTheNextOpenObject() {
+        val plus = CountingState.forRound(MathOperation.Add, 7, 8)
+        assertEquals(0, plus.nextIndex)
+        assertEquals(1, plus.tap(0).nextIndex)
+        // Bei Minus startet der Puls auf dem ersten gerahmten Objekt, nicht auf dem
+        // ersten überhaupt — dort ist ja nichts zu tun.
+        val minus = CountingState.forRound(MathOperation.Subtract, 15, 6)
+        assertEquals(9, minus.nextIndex)
+        assertNull(tapAlong(minus, 6).nextIndex)
     }
 
     @Test
@@ -54,10 +83,10 @@ class CountingStateTest {
         assertEquals(1, plus.tap(1).counted)
         assertFalse(plus.tap(1).isTapped(1))
 
-        // Auch am Deckel: sonst wäre eine Fehltipp-Serie bei Minus eine Sackgasse.
-        val minus = tapAll(CountingState.forRound(MathOperation.Subtract, 15, 6), 6)
-        assertEquals(10, minus.tap(5).counted)
-        assertFalse(minus.tap(5).complete)
+        // Auch wenn schon alles weg ist: sonst wäre ein Fehltipp eine Sackgasse.
+        val minus = tapAlong(CountingState.forRound(MathOperation.Subtract, 15, 6), 6)
+        assertEquals(10, minus.tap(14).counted)
+        assertFalse(minus.tap(14).complete)
     }
 
     @Test
@@ -79,7 +108,7 @@ class CountingStateTest {
         ).forEach { (operation, left, right) ->
             val start = CountingState.forRound(operation, left, right)
             val taps = if (operation == MathOperation.Subtract) right else start.objectCount
-            val done = tapAll(start, taps)
+            val done = tapAlong(start, taps)
             assertTrue("$operation $left/$right not complete", done.complete)
             assertEquals("$operation $left/$right", operation.answer(left, right), done.counted)
         }

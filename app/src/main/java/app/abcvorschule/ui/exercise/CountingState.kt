@@ -10,12 +10,32 @@ package app.abcvorschule.ui.exercise
  */
 data class CountingState(
     val operation: MathOperation,
-    /** Antippbare Objekte im Hauptfeld. */
+    /** Objekte im Feld — beide Operanden zusammen. */
     val objectCount: Int,
-    /** Plätze der Weg-Zone; nur Minus hat welche, sonst 0. */
-    val removeSlots: Int,
+    /** Ab hier beginnt der zweite Operand: die gerahmten Objekte. `null` bei
+     * Malnehmen, dessen Matrix ihre Struktur selbst trägt. */
+    val framedFrom: Int?,
     val tapped: Set<Int> = emptySet(),
 ) {
+    /** Gehört dieses Objekt zum zweiten Operanden? */
+    fun isFramed(index: Int): Boolean = framedFrom != null && index >= framedFrom
+
+    /**
+     * Bei Minus sind **nur** die gerahmten Objekte antippbar — sie sind die, die
+     * weggehen. Damit kann sich das Kind nicht verzählen, wie viele es schon
+     * weggenommen hat: es kann gar nicht zu viele wegnehmen. Bei Plus und
+     * Malnehmen wird alles eingesammelt, der Rahmen zeigt dort nur, wo die zweite
+     * Zahl anfängt.
+     */
+    fun isTappable(index: Int): Boolean {
+        if (index !in 0 until objectCount) return false
+        return operation != MathOperation.Subtract || isFramed(index)
+    }
+
+    /** Das nächste offene Objekt — der Puls-Hinweis läuft darauf mit. */
+    val nextIndex: Int?
+        get() = (0 until objectCount).firstOrNull { isTappable(it) && it !in tapped }
+
     /**
      * Der Wert, der ins Antwortfeld gespiegelt wird — `null`, solange nichts
      * angetippt ist. Ohne dieses `null` stünde bei Plus sofort eine 0 im Feld und
@@ -29,22 +49,21 @@ data class CountingState(
             else -> tapped.size
         }
 
-    /** Alles eingesammelt bzw. die Weg-Zone voll. */
+    /** Alles eingesammelt bzw. alles Gerahmte weggenommen. */
     val complete: Boolean
-        get() = tapped.size == if (operation == MathOperation.Subtract) removeSlots else objectCount
+        get() = nextIndex == null
 
     fun isTapped(index: Int): Boolean = index in tapped
 
     /**
      * Ein Tipp. Ein zweiter Tipp auf dasselbe Objekt nimmt ihn zurück — ein
      * Verzähler bleibt korrigierbar, und keine Fehltipp-Serie wird zur Sackgasse.
-     * Am Deckel der Weg-Zone tut ein neuer Tipp nichts: die sechs Plätze sind die
-     * ganze Information, die das Kind über „wie viele weg" braucht.
+     * Ein Tipp auf ein nicht antippbares Objekt tut nichts: bei Minus sind die
+     * bleibenden Objekte kein Fehler, sie sind schlicht nicht Teil der Aufgabe.
      */
     fun tap(index: Int): CountingState {
-        if (index !in 0 until objectCount) return this
         if (isTapped(index)) return copy(tapped = tapped - index)
-        if (complete) return this
+        if (!isTappable(index)) return this
         return copy(tapped = tapped + index)
     }
 
@@ -53,7 +72,7 @@ data class CountingState(
             CountingState(
                 operation = operation,
                 objectCount = CountingField.objectCount(operation, left, right),
-                removeSlots = CountingField.removeSlots(operation, right),
+                framedFrom = CountingField.framedFrom(operation, left, right),
             )
     }
 }

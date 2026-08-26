@@ -1,34 +1,32 @@
 # Zähl-Hilfe: Tippfläche bei großen Mengen
 
-**Datum:** 2026-08-26 · **Status:** offen, am Gerät zu entscheiden
+**Datum:** 2026-08-26 · **Status:** erledigt am 2026-08-26
 **Betrifft:** `ui/exercise/CountingField.emojiSizeSp`
 
-## Befund
+## Befund (ursprünglich)
 
-In den dichtesten Runden des authorierten Packs („30 − 17", „27 − 18") deckelt
+In den dichtesten Runden des authorierten Packs („30 − 17", „27 − 18") deckelte
 die Feldbreite das Emoji auf **21sp**, bei font_scale 1.3 also rund **27dp**
 Tippfläche — deutlich unter den 48dp, die Android als Minimum empfiehlt. 21 der
-37 Tipp-Runden im Pack landen dort.
+37 Tipp-Runden im Pack landeten dort.
 
-Gemildert dadurch, dass ein Fehltipp folgenlos ist: ein zweiter Tipp nimmt ihn
-zurück, es gibt keine Strafe und keinen Zeitdruck. Die
-Multiplikationsmatrix versendet mit `MultiplicationMatrix.emojiSizeSp` bereits
-26sp (34dp) und wurde so akzeptiert.
+Ursache waren zwei Dinge, die die Zeilenzahl aufblähten und damit die Größe
+drückten: die separate **Weg-Zone** bei Minus (verdoppelte die Zeilen) und die
+**zwei getrennten Operanden-Blöcke** bei Plus (bis zu sieben Zeilen).
 
-## Warum nicht direkt behoben
+## Erledigt durch
 
-Gemessen über die 28 echten Plus/Minus-Tipp-Runden ergibt eine Zeilenbreite von
-**8** die beste Untergrenze (24sp ≈ 31dp) gegenüber **10** (21sp ≈ 27dp) — ein
-Gewinn von 4dp. Der Preis wäre die 5+5-Struktur: Achterzeilen zerlegen sich in
-5+3 und verlieren die Zehnerbündelung, die PRODUCT_PRINCIPLES §8 für den
-Zahlenraum 20/30 ausdrücklich als Lernstruktur führt. 4dp sind das nicht wert,
-solange nicht am Gerät belegt ist, dass 27dp tatsächlich zu klein sind.
+Beides ist aus anderen Gründen weggefallen — am Gerät war die Weg-Zone
+„overwhelming" und stapelte zu viele Zahlen. Seitdem teilen sich beide Operanden
+**ein** Fünfer-Feld und der zweite Operand ist nur noch gerahmt statt räumlich
+getrennt. Damit sinkt die Zeilenzahl auf höchstens sechs.
 
-Die Höhe bindet nicht (237dp von 300dp im schlimmsten Fall) — der Engpass ist
-allein die Breite.
+Gemessen über alle 930 Runden, die der Validator zulässt: kleinste Emoji-Größe
+**24sp**, mit dem Zellpolster eine Tippfläche von **~37dp** statt 27dp. Der
+Testfall `everyRoundTheCurriculumCanProduceFitsTheTaskBlockAndStaysReadable`
+prüft das jetzt als Zusicherung, nicht als Schätzung.
 
-## Zu prüfen
-
-Am Testgerät (font_scale 1.3) eine Runde mit Ergebnis über 20 bis zur Zähl-Hilfe
-spielen und ein Kind zählen lassen. Trifft es die Objekte zuverlässig, ist der
-Befund erledigt. Sonst ist Zeilenbreite 8 die belegte Alternative.
+Die 48dp werden weiterhin nicht erreicht — 30 abzählbare Objekte auf einem
+Telefon geben das nicht her. Gemildert bleibt es dadurch, dass ein Fehltipp
+folgenlos ist (zweiter Tipp nimmt ihn zurück, keine Strafe, kein Zeitdruck) und
+dass der Puls-Hinweis auf das nächste Objekt zeigt.
