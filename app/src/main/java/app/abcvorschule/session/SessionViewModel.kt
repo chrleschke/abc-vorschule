@@ -268,6 +268,12 @@ class SessionViewModel(
                     speakCue = null,
                     successPhase = SuccessPhase.Idle,
                     successSpeakParts = emptyList(),
+                    // Der Punkt der eben beantworteten Runde ist schon gebucht und
+                    // persistiert; nur gespiegelt wurde er noch nicht, wenn das Kind
+                    // im Schreibfenster weiterblättert (`stillAt` bricht dann vor
+                    // `afterAttempt` ab). Ohne das zeigte die Kopfzeile den alten
+                    // Sternstand bis zur nächsten richtigen Antwort.
+                    points = progress.points,
                 )
             }
         }
@@ -290,6 +296,12 @@ class SessionViewModel(
                     speakCue = null,
                     successPhase = SuccessPhase.Idle,
                     successSpeakParts = emptyList(),
+                    // Der Punkt der eben beantworteten Runde ist schon gebucht und
+                    // persistiert; nur gespiegelt wurde er noch nicht, wenn das Kind
+                    // im Schreibfenster weiterblättert (`stillAt` bricht dann vor
+                    // `afterAttempt` ab). Ohne das zeigte die Kopfzeile den alten
+                    // Sternstand bis zur nächsten richtigen Antwort.
+                    points = progress.points,
                 )
             }
         }
@@ -307,22 +319,6 @@ class SessionViewModel(
 
     fun clearSpeakCue() {
         _ui.update { it.copy(speakCue = null) }
-    }
-
-    fun currentPromptText(ttsAvailable: Boolean): String {
-        val state = _ui.value
-        val round = state.currentRound ?: return ""
-        if (ttsAvailable) return currentPromptParts().joinToString(" ")
-        // No German voice: Rechnen falls back to a numeral prompt, others keep the text.
-        return if (round is CountAddRound) {
-            val symbol = app.abcvorschule.ui.exercise.MathOperation.fromWireName(round.operation)?.symbol ?: "+"
-            "${round.left} $symbol ${round.right} = ?"
-        } else if (round is SymbolHuntRound) {
-            val target = pack.atoms[round.targetAtomId]
-            "${round.promptTts} ${target?.display.orEmpty()}".trim()
-        } else {
-            round.promptTts
-        }
     }
 
     /** Ordered speech for the current round — hunt uses prompt clip + grapheme lemma. */
@@ -598,18 +594,32 @@ class SessionViewModel(
             state.trainers.map { it.spec.rounds.size },
         )
         if (step == null) {
-            progressRepository.saveSession(null)
             val finaleId = state.lessonId?.let { pack.finaleIdOf(it) }
+            // Zustandswechsel VOR dem Speichern und im Update noch einmal geprüft:
+            // `saveSession` suspendiert, und in genau diesem Fenster ist die Übung
+            // wieder bedienbar (`successPhase` steht bereits auf Idle, der
+            // Schließen-Pfeil hat ohnehin keinen Guard). Wer dort die Lektion
+            // verlässt, bekam den Pfad hin und den RewardSummary gleich wieder
+            // darüber gelegt; wer stattdessen zurückblätterte, schrieb hinter dem
+            // `saveSession(null)` einen neuen Snapshot — eine Leiche, in die der
+            // nächste App-Start zurücksprang.
+            var entered = false
             _ui.update {
-                it.copy(
-                    screen = AppScreen.RewardSummary,
-                    completedFinaleId = finaleId,
-                    speakCue = null,
-                    successPhase = SuccessPhase.Idle,
-                    successSpeakParts = emptyList(),
-                    points = progress.points,
-                )
+                if (it.screen != AppScreen.Practice || it.lessonId != state.lessonId) {
+                    it
+                } else {
+                    entered = true
+                    it.copy(
+                        screen = AppScreen.RewardSummary,
+                        completedFinaleId = finaleId,
+                        speakCue = null,
+                        successPhase = SuccessPhase.Idle,
+                        successSpeakParts = emptyList(),
+                        points = progress.points,
+                    )
+                }
             }
+            if (entered) progressRepository.saveSession(null)
             return
         }
         _ui.update {
@@ -630,6 +640,13 @@ class SessionViewModel(
 
     private suspend fun persistSnapshot() {
         val state = _ui.value
+        // Nur eine laufende Übung hat einen Wiedereinstiegspunkt. Die Prüfung
+        // gehört hierher und nicht an die Aufrufer: `persistNavigation` läuft
+        // nebenläufig, und der Zustand kann zwischen Auslösen und Schreiben auf
+        // den RewardSummary gewechselt sein — dann schriebe der Chevron-Tipp
+        // hinter dem `saveSession(null)` von advance() einen Snapshot für eine
+        // bereits beendete Lektion zurück, in die der nächste Start zurücksprang.
+        if (state.screen != AppScreen.Practice) return
         val lessonId = state.lessonId ?: return
         progressRepository.saveSession(
             SessionSnapshot(

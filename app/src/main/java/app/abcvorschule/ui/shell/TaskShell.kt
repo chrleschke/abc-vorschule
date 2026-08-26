@@ -66,6 +66,13 @@ fun TaskShell(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalAbcHaptics.current
+    // Wer die Lektion verlässt, verlässt auch ihre Stimme. Die Sprech-Effekte
+    // hängen an der Übungs-Composition und werden beim Wechsel zwar gecancelt,
+    // der bereits laufende Clip lief aber weiter — die Antwort der verlassenen
+    // Runde wurde über dem Lernpfad zu Ende gesprochen.
+    LaunchedEffect(state.screen) {
+        if (state.screen != AppScreen.Practice) onStopSpeak()
+    }
     // Bewusst OHNE globales safeDrawing-Padding: sonst liegt über und unter dem
     // Inhalt ein Cream-Band statt der Landschaft. Die Schutzbereiche sind
     // durchsichtig, jedes Element konsumiert seinen Inset selbst.

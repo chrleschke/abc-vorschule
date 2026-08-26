@@ -49,13 +49,25 @@ class ProgressRepository(
 
     suspend fun current(): LearnerProgress = progressFlow.first()
 
+    /**
+     * Schreibfehler beenden die Lektion nicht. Jeder Aufrufer im ViewModel startet
+     * seinen Schreibvorgang in `viewModelScope.launch { … }` ohne eigenen Fang —
+     * eine IOException (Speicher voll, Datei gesperrt) lief von dort ungefangen in
+     * den Default-Handler und beendete den Prozess mitten in der Übung. Der
+     * Punkt ist dann verloren, die Runde nicht.
+     *
+     * Zurückgegeben wird trotzdem der gerechnete Stand: die Sitzung läuft mit dem
+     * weiter, was das Kind gerade getan hat, auch wenn es nicht auf die Platte kam.
+     */
     suspend fun update(transform: (LearnerProgress) -> LearnerProgress): LearnerProgress {
-        var result = LearnerProgress()
-        dataStore.edit { prefs ->
-            result = transform(currentFrom(prefs))
-            prefs[key] = json.encodeToString(result)
+        var result: LearnerProgress? = null
+        runCatching {
+            dataStore.edit { prefs ->
+                result = transform(currentFrom(prefs))
+                prefs[key] = json.encodeToString(result)
+            }
         }
-        return result
+        return result ?: runCatching { transform(current()) }.getOrElse { LearnerProgress() }
     }
 
     suspend fun setParentMode(mode: ParentMode): LearnerProgress =
