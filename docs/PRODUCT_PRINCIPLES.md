@@ -431,6 +431,22 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
   das das Kind nicht geschafft hat. Gelesen wird die Feder in der **Zeichenphase**
   (`graphicsLayer` / `drawBehind`), damit 300ms Bewegung nicht 300ms rekomponieren
   und die registrierten Drop-Zonen nicht unter dem Finger wandern.
+- **Druck-Morph der Jagd-Kacheln (Aufblähen, Plopp, Wegploppen).** Eine Kachel der
+  Buchstaben-/Silben-Jagd ist eine weiche Kugel: Schattierung im Kreis (heller Kern oben
+  links, satter Rand, Glanzpunkt, Innenschatten am Rand) statt flacher Fläche. Unter dem
+  Finger bläht sie sich auf — Feder auf +6 %, dann verzögert weiter bis zum harten Deckel
+  **+10 %**, wo sie stillsteht. Länger Drücken wächst also immer langsamer und nie weiter:
+  unbegrenztes Wachsen verdeckt die Nachbarkacheln (der Streuabstand ist nur 0,22 der
+  kurzen Feldseite) und belohnt Draufhalten statt Suchen. Beim Loslassen kollabiert der
+  Kreis in 90ms unter seinen Ruhedurchmesser und ploppt federnd in Form zurück; die
+  **eingesammelte** Kachel kollabiert genauso, verlässt das Feld aber ploppend (170ms auf
+  Maßstab und Deckkraft null) statt schlagartig zu verschwinden. Der Innenschatten nimmt
+  mit dem Druck zu — dadurch liest die Bewegung als eingedrückte Kugel und nicht als Zoom
+  (gleiche Pflicht wie das gegenläufige `scaleY` oben). Unangetastet bleiben der Rand
+  (3dp volldeckend, er trägt die 3:1-Grenze für UI-Bauteile) und die mittlere Deckkraft
+  der Wäsche (0,22, wie vorher die flache Fläche). Die Ripple auf der Kachel entfällt: der
+  Morph *ist* die Druckantwort. Werte und Begründung in `HuntTileMorph`, Filmstreifen zum
+  Beurteilen in `SymbolHuntMorphShotTest`.
 
 
 
