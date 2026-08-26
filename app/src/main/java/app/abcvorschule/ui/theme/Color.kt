@@ -77,7 +77,7 @@ val SkyBlueLight = Color(0xFF8FB8D9)
  * UI-Komponenten. Die Balken werden im Verlauf nur nach oben aufgehellt, nie
  * abgedunkelt, damit diese Werte die untere Grenze bleiben. Nachbarschritte
  * liegen bei 1.25:1 bis 1.36:1 (fünf Balken) bzw. 1.59:1 bis 1.81:1 (drei) —
- * jede Stufe sichtbar, erster gegen letzten Balken 2.99:1.
+ * jede Stufe sichtbar, erster gegen letzten Balken 2.88:1.
  *
  * ChargeHigh ist zugleich der Vollzustand: dann tragen alle Balken diesen einen
  * Ton, und der Blitz darauf liegt bei 9.24:1 (WarmInk).

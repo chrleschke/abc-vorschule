@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.theme.ChargeHigh
 import app.abcvorschule.ui.theme.CloudWhite
+import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
@@ -56,9 +57,15 @@ fun SymbolHuntBattery(
 ) {
     // Der Puls existiert nur während der Feier am Rundenende — sonst liefe eine
     // Endlos-Animation die ganze Runde über ohne sichtbare Wirkung.
-    val glow = if (celebrate) {
+    //
+    // Bewusst als State weitergereicht und **nicht** per `by` ausgepackt: gelesen
+    // wird er erst in der Canvas-Lambda, also in der Zeichenphase. Ausgepackt
+    // würde jeder Animationsschritt dieses Composable rekomponieren — 500ms
+    // Puls, 500ms Rekomposition, genau das, was PRODUCT_PRINCIPLES §10 für die
+    // Einrast-Feder untersagt.
+    val glow: State<Float>? = if (celebrate) {
         val infiniteTransition = rememberInfiniteTransition(label = "battery_glow")
-        val animatedGlow by infiniteTransition.animateFloat(
+        infiniteTransition.animateFloat(
             initialValue = 0.35f,
             targetValue = 1f,
             animationSpec = infiniteRepeatable(
@@ -67,9 +74,8 @@ fun SymbolHuntBattery(
             ),
             label = "battery_glow_value",
         )
-        animatedGlow
     } else {
-        0f
+        null
     }
     Box(
         modifier = modifier.fillMaxWidth().testTag("hunt_battery"),
@@ -85,7 +91,12 @@ fun SymbolHuntBattery(
             // Der Halo-Rand liegt außen herum, damit der leuchtende Ring beim
             // Vollzustand Platz hat, ohne dass das Gehäuse dafür wandert.
             translate(left = halo, top = halo) {
-                drawBattery(collected = collected, total = total, celebrate = celebrate, glow = glow)
+                drawBattery(
+                    collected = collected,
+                    total = total,
+                    celebrate = celebrate,
+                    glow = glow?.value ?: 0f,
+                )
             }
         }
     }
@@ -195,12 +206,17 @@ private fun DrawScope.drawCells(collected: Int, total: Int, celebrate: Boolean, 
                 size = size,
                 cornerRadius = corner,
             )
+            // Der Rand ist die eigentliche Ansage „hier fehlt noch einer": die
+            // Vertiefung allein liegt nur 1.19:1 über der Wanne und verschwindet
+            // darin. CreamElevated bei α 0.5 ergibt 3.85:1 gegen die Vertiefung
+            // und 3.22:1 gegen die Wanne ringsum — beide über der 3:1-Grenze für
+            // UI-Bauteile, dieselbe Grenze, die auch der Jagd-Kachelrand trägt.
             drawRoundRect(
-                color = CloudWhite.copy(alpha = 0.10f),
+                color = CreamElevated.copy(alpha = 0.5f),
                 topLeft = topLeft,
                 size = size,
                 cornerRadius = corner,
-                style = Stroke(width = 1.dp.toPx()),
+                style = Stroke(width = HuntBatteryDesign.EmptyCellStroke.toPx()),
             )
             return@repeat
         }
@@ -249,7 +265,7 @@ private fun DrawScope.drawGloss(body: Rect, cornerRadius: CornerRadius) {
     }
 }
 
-/** Blitz in der Mitte, wenn die Batterie voll ist. WarmInk auf ChargeHigh ≈ 7.96:1. */
+/** Blitz in der Mitte, wenn die Batterie voll ist. WarmInk auf ChargeHigh ≈ 9.24:1. */
 private fun DrawScope.drawBolt(bodyWidth: Float, bodyHeight: Float) {
     val height = (bodyHeight - HuntBatteryDesign.Rim.toPx() * 2f) * 0.82f
     val width = height * 0.55f

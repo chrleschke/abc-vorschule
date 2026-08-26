@@ -39,8 +39,15 @@ object HuntBatteryDesign {
     val NubHeight: Dp = 16.dp
     val NubCorner: Dp = 3.dp
 
-    /** Wie weit ein gefüllter Balken in die Wanne hinein leuchtet. */
+    /**
+     * Wie weit ein gefüllter Balken in die Wanne hinein leuchtet. Darf
+     * [WellPadding] nie überschreiten, sonst leuchtet Grün auf das Gehäuse statt
+     * in die Wanne — [HuntBatteryDesignTest] hält das fest.
+     */
     val GlowBleed: Dp = 3.dp
+
+    /** Rand eines leeren Platzes; er trägt die 3:1-Grenze (siehe [SymbolHuntBattery]). */
+    val EmptyCellStroke: Dp = 2.dp
 
     /** Ring um das Gehäuse, wenn die Batterie voll ist. */
     val HaloWidth: Dp = 7.dp

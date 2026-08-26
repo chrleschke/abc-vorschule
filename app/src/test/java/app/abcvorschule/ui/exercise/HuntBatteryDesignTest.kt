@@ -1,8 +1,11 @@
 package app.abcvorschule.ui.exercise
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import app.abcvorschule.ui.theme.ChargeHigh
 import app.abcvorschule.ui.theme.ChargeLow
+import app.abcvorschule.ui.theme.WarmInk
+import kotlin.math.pow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -50,10 +53,62 @@ class HuntBatteryDesignTest {
     }
 
     @Test
-    fun boltIsAClosedShapeInsideItsBox() {
+    fun boltStaysInsideItsBox() {
+        // Der Blitz wird in eine Box der Größe (Breite × Höhe) skaliert; Punkte
+        // außerhalb 0..1 ragen aus ihr heraus und damit über die Balken hinaus.
         assertTrue(HuntBatteryDesign.BoltPath.size >= 5)
         HuntBatteryDesign.BoltPath.forEach { (x, y) ->
             assertTrue(x in 0f..1f && y in 0f..1f)
         }
+    }
+
+    @Test
+    fun everyBarClearsThreeToOneAgainstTheWell() {
+        // Die Zahl, auf der die ganze Farbwahl steht (Color.kt, ChargeLow/Mid/High):
+        // ein Balken muss sich von der Wanne abheben, sonst ist der Ladestand nicht
+        // ablesbar. Als Test statt nur als Kommentar, damit ein späterer Farbdreh
+        // hier auffliegt und nicht erst am Kind.
+        for (total in listOf(3, 5)) {
+            for (i in 0 until total) {
+                val shade = HuntBatteryDesign.shadeFor(i, total)
+                val ratio = contrast(shade, WarmInk)
+                assertTrue("Balken $i von $total: $ratio:1 gegen die Wanne", ratio >= 3.0)
+                // Der Verlauf hellt nur auf — die flache Farbe bleibt die Untergrenze.
+                assertTrue(contrast(HuntBatteryDesign.cellHighlight(shade), WarmInk) > ratio)
+            }
+        }
+        // Blitz auf dem Vollzustand: dunkles Zeichen auf hellem Grün.
+        assertTrue(contrast(WarmInk, ChargeHigh) >= 4.5)
+    }
+
+    @Test
+    fun theGlowStaysInsideTheWell() {
+        // Der Lichtsaum wird um jeden Balken herum gezeichnet. Wird er breiter als
+        // die Luft zwischen Balkenfeld und Wannenrand, leuchtet Grün auf das
+        // Gehäuse und die Batterie verliert ihre Kante.
+        assertTrue(HuntBatteryDesign.GlowBleed <= HuntBatteryDesign.WellPadding)
+        assertEquals(HuntBatteryDesign.CasingThickness + HuntBatteryDesign.WellPadding, HuntBatteryDesign.Rim)
+        // Das Balkenfeld muss in das Gehäuse passen, das die Batterie dafür aufspannt.
+        for (total in listOf(3, 5)) {
+            val field = HuntBatteryDesign.CellWidth * total +
+                HuntBatteryDesign.CellGap * (total - 1)
+            assertTrue(field < HuntBatteryDesign.bodyWidth(total))
+            assertTrue(HuntBatteryDesign.totalWidth(total) > HuntBatteryDesign.bodyWidth(total))
+        }
+    }
+
+    /** WCAG-2.x-Kontrast; die Werte in Color.kt sind mit derselben Formel gerechnet. */
+    private fun contrast(a: Color, b: Color): Double {
+        val la = relativeLuminance(a)
+        val lb = relativeLuminance(b)
+        return (maxOf(la, lb) + 0.05) / (minOf(la, lb) + 0.05)
+    }
+
+    private fun relativeLuminance(color: Color): Double {
+        fun channel(value: Float): Double {
+            val c = value.toDouble()
+            return if (c <= 0.04045) c / 12.92 else ((c + 0.055) / 1.055).pow(2.4)
+        }
+        return 0.2126 * channel(color.red) + 0.7152 * channel(color.green) + 0.0722 * channel(color.blue)
     }
 }

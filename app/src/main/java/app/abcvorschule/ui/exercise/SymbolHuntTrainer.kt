@@ -7,17 +7,13 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -104,6 +100,12 @@ fun SymbolHuntTrainer(
     // eingesammelte Kachel noch wegploppen kann statt zu verschwinden.
     val initialTiles = remember(roundKey) { state.tiles }
     var resolved by remember(roundKey) { mutableStateOf(false) }
+    // Ladestand, den das Kind selbst geschafft hat. `resolve()` füllt die Batterie
+    // in der Logik auf (die Runde ist damit abgeschlossen), aber angezeigt bleibt
+    // der echte Stand: eine volle Batterie nach „Zeig mir" wäre eine Feier für
+    // etwas, das das Kind nicht geschafft hat — dieselbe Regel, nach der die Pegs
+    // des Satz-Architekten nach dem Auflösen still fallen (PRODUCT_PRINCIPLES §10).
+    var earnedBeforeResolve by remember(roundKey) { mutableStateOf<Int?>(null) }
     var batteryFull by remember(roundKey) { mutableStateOf(false) }
     val haptics = LocalAbcHaptics.current
 
@@ -177,10 +179,15 @@ fun SymbolHuntTrainer(
             }
         },
         answers = {
-            SymbolHuntBattery(collected = state.collected, total = state.targetHitCount, celebrate = batteryFull)
+            SymbolHuntBattery(
+                collected = earnedBeforeResolve ?: state.collected,
+                total = state.targetHitCount,
+                celebrate = batteryFull,
+            )
             if (SymbolHuntProgress.resolveAvailable(state) && !resolved && !batteryFull) {
                 AbcResolveButton(
                     onClick = {
+                        earnedBeforeResolve = state.collected
                         resolved = true
                         state = SymbolHuntProgress.resolve(state)
                         onResult(false, true, listOf(round.targetAtomId))
