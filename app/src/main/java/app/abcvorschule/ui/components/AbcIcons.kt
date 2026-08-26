@@ -48,6 +48,33 @@ fun IconChevronRight(
     }
 }
 
+/**
+ * Zurück-Pfeil im Material-Stil: Schaft plus Spitze, nicht der nackte Chevron —
+ * das Navigations-Icon einer Top App Bar ist ein Pfeil, der Chevron gehört an
+ * die Rundennavigation.
+ */
+@Composable
+fun IconArrowBack(
+    tint: Color,
+    modifier: Modifier = Modifier,
+    size: Dp = 28.dp,
+) {
+    Canvas(modifier.size(size)) {
+        val stroke = Stroke(width = size.toPx() * 0.11f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        val shaft = Path().apply {
+            moveTo(size.toPx() * 0.82f, size.toPx() * 0.5f)
+            lineTo(size.toPx() * 0.2f, size.toPx() * 0.5f)
+        }
+        val head = Path().apply {
+            moveTo(size.toPx() * 0.45f, size.toPx() * 0.24f)
+            lineTo(size.toPx() * 0.19f, size.toPx() * 0.5f)
+            lineTo(size.toPx() * 0.45f, size.toPx() * 0.76f)
+        }
+        drawPath(shaft, color = tint, style = stroke)
+        drawPath(head, color = tint, style = stroke)
+    }
+}
+
 @Composable
 fun IconClose(
     tint: Color,
