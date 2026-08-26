@@ -2,14 +2,9 @@ package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -26,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,14 +46,12 @@ import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.SoftSand
 import app.abcvorschule.ui.theme.StarGoldDeep
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
-import app.abcvorschule.ui.theme.WarmMuted
 import kotlinx.coroutines.delay
 
 // Matches AbcDimens.kidTouch (the app-wide minimum touch target for 4-6-year-olds)
@@ -429,76 +421,5 @@ private fun HuntTile(
             fontSize = glyphSp.sp,
             color = WarmInk,
         )
-    }
-}
-
-@Composable
-private fun SymbolHuntBattery(
-    collected: Int,
-    total: Int,
-    celebrate: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    // The infinite pulse transition is only ever visible while celebrating (the
-    // very end of a round), so it's only created/started then — otherwise it
-    // would tick continuously for the entire round's lifetime for no visible
-    // effect, wasting battery/CPU.
-    val glow = if (celebrate) {
-        val infiniteTransition = rememberInfiniteTransition(label = "battery_glow")
-        val animatedGlow by infiniteTransition.animateFloat(
-            initialValue = 0.5f,
-            targetValue = 1f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 500, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse,
-            ),
-            label = "battery_glow_value",
-        )
-        animatedGlow
-    } else {
-        1f
-    }
-    Row(
-        modifier = modifier.fillMaxWidth().testTag("hunt_battery"),
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        repeat(total) { i ->
-            val filled = i < collected
-            val empty = !celebrate && !filled
-            Box(
-                modifier = Modifier
-                    .size(width = 28.dp, height = 44.dp)
-                    .alpha(if (celebrate) glow else 1f)
-                    .background(
-                        color = when {
-                            // Deviates from the literal StarGold mapping for the same
-                            // reason as TilePalette above: StarGold alone is only ~1.85:1
-                            // against Cream, well under the 3:1 floor for this filled
-                            // rectangle. StarGoldDeep clears it (~3.29:1).
-                            celebrate -> StarGoldDeep
-                            filled -> LeafGreen
-                            else -> CreamElevated
-                        },
-                        shape = RoundedCornerShape(6.dp),
-                    )
-                    .let {
-                        // CreamElevated on Cream is only ~1.24:1 — an empty cell would be
-                        // nearly invisible against the page without an outline. WarmMuted
-                        // at alpha 0.9f clears 3:1 against both CreamElevated (3.11:1, the
-                        // fill it borders) and Cream (3.86:1, the page around it), same
-                        // value as the empty slot/peg borders above. Filled/celebrating
-                        // cells carry enough of their own contrast and stay bare.
-                        if (empty) {
-                            it.border(
-                                width = 3.dp,
-                                color = WarmMuted.copy(alpha = 0.9f),
-                                shape = RoundedCornerShape(6.dp),
-                            )
-                        } else {
-                            it
-                        }
-                    },
-            )
-        }
     }
 }

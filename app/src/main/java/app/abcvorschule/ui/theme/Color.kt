@@ -60,6 +60,32 @@ val SkyBlue = Color(0xFF3F7FB5)
 val LeafGreenLight = Color(0xFF7EC8A3)
 val SkyBlueLight = Color(0xFF8FB8D9)
 
+/**
+ * Ladebalken der Jagd-Batterie (`HuntBatteryDesign`, PRODUCT_PRINCIPLES §10).
+ * Ein Verlauf statt einer Farbe: Balken 1 trägt den tiefsten, der letzte den
+ * hellsten Ton, Zwischenbalken werden interpoliert — die Batterie wird beim
+ * Laden sichtbar heller, nicht nur voller.
+ *
+ * Bewusst durchgehend Grün und ohne den früheren Gold-/Ockerton: Gold gehört in
+ * dieser App zur Sternbelohnung, und der volle Zustand ist hier ein Ladezustand
+ * („aufgeladen"), kein Preis. Grün ist außerdem app-weit die Farbe für richtig
+ * (LeafGreen), und die Batterie ist genau das: die Summe richtiger Treffer.
+ *
+ * Gemessen gegen [WarmInk], die Innenfläche der Batterie, in der die Balken
+ * liegen (nicht gegen Cream — auf die Seite sehen sie nie): ChargeLow 3.21:1,
+ * ChargeMid 5.83:1, ChargeHigh 9.24:1, alle über der 3:1-Schwelle für
+ * UI-Komponenten. Die Balken werden im Verlauf nur nach oben aufgehellt, nie
+ * abgedunkelt, damit diese Werte die untere Grenze bleiben. Nachbarschritte
+ * liegen bei 1.25:1 bis 1.36:1 (fünf Balken) bzw. 1.59:1 bis 1.81:1 (drei) —
+ * jede Stufe sichtbar, erster gegen letzten Balken 2.99:1.
+ *
+ * ChargeHigh ist zugleich der Vollzustand: dann tragen alle Balken diesen einen
+ * Ton, und der Blitz darauf liegt bei 9.24:1 (WarmInk).
+ */
+val ChargeLow = Color(0xFF389451)
+val ChargeMid = Color(0xFF5BC96D)
+val ChargeHigh = Color(0xFFA6F2A8)
+
 /** Cream on SunCoral ≈ 3.6:1 (large text / icons / UI components). */
 val SunCoral = Color(0xFFD25B2D)
 

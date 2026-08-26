@@ -495,6 +495,18 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
   Morph *ist* die Druckantwort. Werte und Begründung in `HuntTileMorph`, Filmstreifen zum
   Beurteilen in `SymbolHuntMorphShotTest`.
 
+- **Die Jagd-Batterie ist ein Gegenstand, keine Balkenreihe.** Gehäuse mit Pluspol,
+  Lichtkante und Glasglanz, darin eine dunkle Wanne mit drei bzw. fünf Ladebalken; leere
+  Plätze sind Vertiefungen in der Wanne, keine hellen Kästchen. Jeder gefüllte Balken hat
+  seinen **eigenen Grünton**, von links tief nach rechts hell (`ChargeLow` → `ChargeMid` →
+  `ChargeHigh`), plus Lichtsaum in die Wanne — Laden liest sich damit über Helligkeit und
+  nicht nur über Anzahl. **Voll ist grün, nicht gold**: alle Balken springen auf
+  `ChargeHigh`, ein Blitz erscheint in der Mitte und ein pulsierender Lichtsaum umgibt das
+  Gehäuse. Gold bleibt der Sternbelohnung vorbehalten (Farbrollen oben) — die Batterie
+  zeigt einen Ladezustand, keinen Preis, und Grün ist app-weit „richtig". Maße, Töne und
+  Blitzform in `HuntBatteryDesign`, Zustandsbild zum Beurteilen in
+  `SymbolHuntBatteryShotTest`.
+
 
 
 ## 11. Was bewusst nicht in v1 gehört
