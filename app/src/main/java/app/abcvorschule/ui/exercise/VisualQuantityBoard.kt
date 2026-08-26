@@ -33,6 +33,11 @@ import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 
+/** Deckkraft eines bereits gezählten Objekts. Deutlich sichtbarer als ein
+ * Geister-Platzhalter ([MultiplicationMatrix.GhostAlpha]) — „schon gezählt" darf
+ * nicht wie „gar nicht da" aussehen. */
+const val CountedAlpha = 0.45f
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VisualQuantityBoard(
@@ -230,6 +235,11 @@ fun MultiplicationMatrixGrid(
     rows: Int,
     columns: Int,
     modifier: Modifier = Modifier,
+    /** Gesetzt, sobald die Zähl-Hilfe offen ist: dann sind alle Zellen echt und
+     * antippbar — auch die sonst geisterhaften Reihen. Genau der Schritt, den das
+     * Kind vorher im Kopf nicht geschafft hat. */
+    counting: CountingState? = null,
+    onTapCell: (Int) -> Unit = {},
 ) {
     val sizeSp = MultiplicationMatrix.emojiSizeSp(columns)
     Column(
@@ -261,15 +271,32 @@ fun MultiplicationMatrixGrid(
                         .width(MultiplicationMatrix.RowLabelGutterDp.dp)
                         .testTag("multiplication_row_label_${MultiplicationMatrix.rowLabel(row)}"),
                 )
-                repeat(columns) {
+                repeat(columns) { column ->
+                    val index = row * columns + column
+                    // Ohne Zähl-Hilfe bleibt es beim Bild aus §8: nur die erste Reihe
+                    // ist echt, der Rest ist Platzhalter. Mit Zähl-Hilfe sind alle
+                    // Zellen echt — sonst gäbe es in den Geisterreihen nichts zu zählen.
+                    val ghost = counting == null && !MultiplicationMatrix.isConcreteRow(row)
+                    val done = counting?.isTapped(index) == true
                     Text(
                         text = emoji,
                         fontSize = sizeSp.sp,
-                        modifier = if (MultiplicationMatrix.isConcreteRow(row)) {
-                            Modifier
-                        } else {
-                            Modifier.alpha(MultiplicationMatrix.GhostAlpha)
-                        },
+                        modifier = Modifier
+                            .alpha(
+                                when {
+                                    ghost -> MultiplicationMatrix.GhostAlpha
+                                    done -> CountedAlpha
+                                    else -> 1f
+                                },
+                            )
+                            .then(
+                                if (counting == null) {
+                                    Modifier
+                                } else {
+                                    Modifier.clickable { onTapCell(index) }
+                                },
+                            )
+                            .testTag("counting_cell_$index"),
                     )
                 }
             }
