@@ -196,6 +196,15 @@ niemals mit einem stummen No-Op.
   Fibel-Reihenfolge noch nicht erreicht **und** hier noch nichts getan. Der Marker folgt trotzdem
   weiter der Fibel-Reihenfolge (erste nicht gemeisterte Lektion) und springt nicht zum Ausflug
   voraus.
+- **Freischalten heißt durchgespielt, nicht fehlerfrei.** Die nächste Lektion öffnet, sobald in
+  der vorherigen jeder spielbare Trainer zu Ende gebracht wurde — allein gelöst **oder** über
+  „Zeig mir" aufgelöst (`LessonGating.isCompleted`). Der Stern am Schild (`Mastered`) verlangt
+  weiterhin, dass jeder Trainer allein gelöst wurde, hält den Pfad aber nicht mehr auf. Grund:
+  183 der 226 spielbaren Trainer haben genau eine Runde — ein einziges „Zeig mir" sperrte dort
+  die Folgelektion dauerhaft, obwohl die Lektion samt Feier zu Ende gespielt war. Das traf
+  genau das Kind, das die Hilfe gebraucht hat, war für es nicht erkennbar und ist damit eine
+  Strafe (§8). Eine autorierte Lektion, deren Trainer alle pausiert sind, reicht den Stand
+  ihres Vorgängers durch, statt die Kette zu kappen.
 - Tippen auf ein freigeschaltetes Schild startet die Trainer-Session dieser Lektion — die
   sieben autorierten Typen (Abschnitt 3), ergänzt um etwaige abgeleitete Zusatz-Trainer
   (Jagd, Wort-Detektiv).

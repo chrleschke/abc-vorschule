@@ -192,4 +192,43 @@ class LessonGatingTest {
         val states = LessonGating.states(pack, LearnerProgress())
         assertEquals(pack.lessons.size, states.size)
     }
+
+    @Test
+    fun aResolvedTrainerStillOpensTheNextLesson() {
+        // Der Fall, der den Pfad früher stillgelegt hat: 183 der 226 spielbaren
+        // Trainer haben genau eine Runde, ein „Zeig mir" dort ließ `correct` für
+        // immer auf 0 — die Lektion lief samt Feier zu Ende, die nächste blieb zu.
+        val lesson = pack.lesson(first.id)
+        val playable = pack.playableTasksOf(lesson).map { it.id }
+        val progress = LearnerProgress(
+            taskStats = playable.mapIndexed { i, id ->
+                id to if (i == 0) {
+                    SkillStats(attempts = 1, resolves = 1)
+                } else {
+                    SkillStats(attempts = 1, correct = 1)
+                }
+            }.toMap(),
+        )
+        val second = pack.authoredLessons[1]
+        assertEquals(LessonState.Available, LessonGating.stateOf(pack, progress, second.id))
+        // Sichtbar bleibt der Unterschied trotzdem: allein gelöst ist etwas anderes.
+        assertEquals(LessonState.InProgress, LessonGating.stateOf(pack, progress, first.id))
+        assertTrue(LessonGating.isCompleted(pack, lesson, progress))
+        assertFalse(LessonGating.isMastered(pack, lesson, progress))
+    }
+
+    @Test
+    fun anUnfinishedTrainerStillLocksTheNextLesson() {
+        // Die Gegenprobe: nur angefasst, aber weder gelöst noch aufgelöst, hält die
+        // Kette weiterhin auf — sonst wäre „durchgespielt" bedeutungslos.
+        val lesson = pack.lesson(first.id)
+        val playable = pack.playableTasksOf(lesson).map { it.id }
+        val progress = LearnerProgress(
+            taskStats = playable.mapIndexed { i, id ->
+                id to if (i == 0) SkillStats(attempts = 3) else SkillStats(attempts = 1, correct = 1)
+            }.toMap(),
+        )
+        val second = pack.authoredLessons[1]
+        assertEquals(LessonState.Locked, LessonGating.stateOf(pack, progress, second.id))
+    }
 }
