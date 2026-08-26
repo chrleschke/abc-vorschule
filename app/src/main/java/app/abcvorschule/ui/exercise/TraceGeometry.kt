@@ -417,6 +417,19 @@ object TraceProgress {
     fun isShortStroke(strokeLength: Float, boxSize: Float): Boolean =
         boxSize > 0f && strokeLength < boxSize * ShortStrokeFraction
 
+    /**
+     * Which finger position a tap reports. The tap alternative (R15) may only stand in
+     * for a touch on the star when the tap actually lands on that star — inside the same
+     * pick-up radius a dragging finger needs. Everywhere else the raw tap position is
+     * reported, so the corridor and ahead gates in [update] judge a tap exactly like a
+     * drag sample: reporting [target] unconditionally made *any* tap in the glyph box
+     * collect the next star, and repeated taps on empty canvas finished the whole letter.
+     */
+    fun tapSample(tap: TracePoint, target: TracePoint, boxSize: Float): TracePoint {
+        val hit = kotlin.math.hypot(tap.x - target.x, tap.y - target.y)
+        return if (hit <= boxSize * StarHitFraction) target else tap
+    }
+
     /** Arc distance on a closed loop of length [total] — the shorter way around. */
     private fun circularDistance(a: Float, b: Float, total: Float): Float {
         val direct = kotlin.math.abs(a - b)

@@ -321,4 +321,37 @@ class TraceProgressTest {
         assertTrue(result.ahead)
         assertFalse(result.collectedStar)
     }
+
+    @Test
+    fun aTapOnTheNextStarCountsAsTouchingIt() {
+        // Die Tap-Alternative (R15) darf den Stern treffen: ein Tap im Aufnahmeradius
+        // wird auf die Sternposition gerundet und sammelt ihn.
+        val star = stars[0][0]
+        val nearby = TracePoint(star.x + boxSize * TraceProgress.StarHitFraction * 0.5f, star.y)
+        val sample = TraceProgress.tapSample(nearby, star, boxSize)
+        assertEquals(star, sample)
+        assertTrue(update(TraceState(), sample).collectedStar)
+    }
+
+    @Test
+    fun aTapAwayFromTheNextStarCollectsNothing() {
+        // Der Bug: der Handler hat die Tap-Position verworfen und immer die Position des
+        // nächsten Sterns gemeldet — damit sammelte jeder Tap irgendwo im Glyphen-Feld
+        // den nächsten Stern ein. Ein Tap daneben muss dort gemeldet werden, wo er landet.
+        val star = stars[0][0]
+        val elsewhere = TracePoint(boxSize, boxSize)
+        val sample = TraceProgress.tapSample(elsewhere, star, boxSize)
+        assertEquals(elsewhere, sample)
+        val result = update(TraceState(), sample)
+        assertFalse(result.collectedStar)
+        assertTrue(result.offCorridor)
+        assertEquals(TraceState(), result.state)
+    }
+
+    @Test
+    fun aTapJustOutsideThePickUpRadiusIsNotSnapped() {
+        val star = stars[0][0]
+        val justOutside = TracePoint(star.x, star.y + boxSize * TraceProgress.StarHitFraction * 1.1f)
+        assertEquals(justOutside, TraceProgress.tapSample(justOutside, star, boxSize))
+    }
 }
