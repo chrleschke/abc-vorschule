@@ -216,8 +216,9 @@ private fun SymbolHuntField(
         // which shrinks on every hit) so a correct tap — which does not touch
         // state.seed — cannot reshuffle the surviving tiles. A wrong tap DOES
         // bump state.seed, which is the intended "mix the field" reshuffle.
-        val positions = remember(state.seed, initialTiles.size, widthPx, heightPx) {
-            SymbolHuntLayout.scatter(state.seed, initialTiles.size, widthPx, heightPx)
+        val tileSizePx = with(density) { TileSize.toPx() }
+        val positions = remember(state.seed, initialTiles.size, widthPx, heightPx, tileSizePx) {
+            SymbolHuntLayout.scatter(state.seed, initialTiles.size, widthPx, heightPx, tileSizePx)
         }
         // Gelaufen wird über die *ursprüngliche* Kachelliste, nicht über
         // state.tiles: eine eingesammelte Kachel muss noch ein paar Frames
