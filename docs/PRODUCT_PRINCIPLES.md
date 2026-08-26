@@ -329,10 +329,20 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
   das Kind liest das Label ohnehin nicht.
 - **Vor/Zurück ist ein Rückfallweg, kein Angebot**: die Chevrons haben kein Button-Gehäuse mehr,
   nur den gedämpften Glyph (Trefferfläche bleibt 48 dp). Vorwärts kommt das Kind durch Lösen.
+- **Vollbild, und die Wischgesten gehören der App:** Status- und Navigationsleiste sind
+  versteckt (Sticky Immersive, `MainActivity.hideSystemBars`) — ein Randwisch holt sie kurz
+  zurück, statt sofort Zurück oder Home auszulösen; ein Kind darf sich nicht aus der Lektion
+  wischen. Darauf setzt `systemGestureExclusion()` über die **ganze Übungsfläche** auf: ein
+  Ziehen, das nah am Rand beginnt (der Silben-Verschmelzer verlangt genau das), bleibt bei der
+  App. Beides gehört zusammen — ohne Vollbild deckelt Android den Ausschluss bei 200 dp je
+  Bildschirmkante und die Fläche wäre nur zum Teil geschützt. Der Weg für Eltern nach draußen
+  bleibt: Leisten hervorwischen, dann normal navigieren.
 - **Schutzbereiche sind durchsichtig:** kein globales `safeDrawing`-Padding auf der Wurzel —
   Hintergrund und Pfad-Landschaft laufen unter Status- und Nav-Bar durch, jedes Element
   konsumiert seinen Inset selbst. Die Unterkante des Aufgabenbereichs nutzt `safeDrawing`
   (nicht nur `navigationBars`), damit die System-Zahlentastatur den Block weiter hochschiebt.
+  Die Kopfzeile nimmt aus demselben Grund `safeDrawing` statt der M3-Vorgabe `systemBars`: im
+  Vollbild ist der Status-Bar-Inset null, ein Display-Ausschnitt bleibt aber bestehen.
 - **Der Pfad scrollt unter der Leiste durch, nicht unter ihr entlang:** der Scroll-Bereich füllt
   den ganzen Screen und hält oben nur so viel Platz frei, wie Status-Bar plus Leiste hoch sind.
   Stünde er als eigene Zeile unter der Leiste, schnitte seine Oberkante die Schilder mitten im
