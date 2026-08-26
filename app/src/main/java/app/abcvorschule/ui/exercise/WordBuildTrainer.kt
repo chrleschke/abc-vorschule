@@ -164,7 +164,7 @@ fun WordBuildTrainer(
             val placedBefore = placed.toMap()
             placed[index] = block.display
             haptics.tick()
-            val blockSpeech = SpeechClipText.forAtomId(pack, block.atomId, block.display)
+            val blockSpeech = SpeechClipText.forWordBlock(pack, block.atomId, block.display)
             when (
                 WordBuildPlacementSpeech.blockSpeechMode(
                     placedBefore,
@@ -276,7 +276,7 @@ fun WordBuildTrainer(
                                                 ?.let { (_, block) -> place(index, block) }
                                             if (filled != null) {
                                                 onSpeak(
-                                                    SpeechClipText.forAtomId(
+                                                    SpeechClipText.forWordBlock(
                                                         pack,
                                                         round.blocks[index].atomId,
                                                         filled,
@@ -315,7 +315,7 @@ fun WordBuildTrainer(
                             enabled = !interactionLocked,
                             onTap = {
                                 field.select(key)
-                                onSpeak(SpeechClipText.forAtomId(pack, block.atomId, block.display))
+                                onSpeak(SpeechClipText.forWordBlock(pack, block.atomId, block.display))
                             },
                             onDropped = { zoneKey ->
                                 WordBuildTray.frameIndex(zoneKey ?: "")?.let { place(it, block) }
