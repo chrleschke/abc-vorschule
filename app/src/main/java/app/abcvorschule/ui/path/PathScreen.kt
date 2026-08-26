@@ -16,7 +16,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
@@ -39,7 +42,7 @@ import app.abcvorschule.progress.LessonGating
 import app.abcvorschule.progress.LessonState
 import app.abcvorschule.ui.shell.AbcTopBar
 import app.abcvorschule.ui.shell.ParentGateButton
-import app.abcvorschule.ui.shell.TopBarFloatingActionReserve
+import app.abcvorschule.ui.shell.TopBarFloatingActionTop
 import app.abcvorschule.ui.shell.TopBarHeight
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.StarGold
@@ -240,19 +243,23 @@ fun PathScreen(
             // Zahl daneben steht.
             points = points,
             starOutline = WarmInk,
-            endReserve = TopBarFloatingActionReserve,
             modifier = Modifier.align(Alignment.TopStart),
         )
 
-        // Schwebt über der Kopfzeile statt in ihr: der ⋯ ist kein Bar-Element,
-        // sondern die Elterntür — 8 dp unter dem Status-Bar-Inset sitzt er auf
-        // der Mittelachse der 64 dp hohen Leiste.
+        // Schwebt über der Kopfzeile statt in ihr: die drei Punkte sind kein
+        // Bar-Element, sondern die Elterntür. Sie sitzen auf der Mittelachse der
+        // Titelzeile — am anderen Ende derselben Zeile wie der Punktestand — und
+        // hängen an demselben Inset wie die Leiste (safeDrawing, nicht statusBars:
+        // im Vollbild ist der Status-Bar-Inset null, ein Display-Ausschnitt nicht,
+        // und die Leiste daneben rutscht dann unter ihm weg).
         ParentGateButton(
             onUnlocked = onParentGateUnlocked,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .padding(top = 8.dp, end = AbcDimens.screenHorizontal),
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
+                )
+                .padding(top = TopBarFloatingActionTop, end = AbcDimens.screenHorizontal),
         )
     }
 }

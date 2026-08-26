@@ -39,14 +39,15 @@ fun SuccessBurst(
     modifier: Modifier = Modifier,
 ) {
     if (!trigger) return
-    val haptics = LocalAbcHaptics.current
     val scale = remember(trigger) { Animatable(0.4f) }
     val alpha = remember(trigger) { Animatable(0f) }
     val burst = remember(trigger) { Animatable(0f) }
 
     LaunchedEffect(trigger) {
+        // Bewusst ohne Haptik: der große Stern am Trainer-Ende kommt oft direkt
+        // nach einem Trainer-eigenen Puls (celebrate/success) — zwei Vibrationen
+        // hintereinander waren zu viel. Der Chime trägt den Moment allein.
         playSuccessChime()
-        haptics.success()
         // Fire-and-forget, purely decorative: NOT inside the coroutineScope below —
         // that scope suspends until every launched child completes, so awaiting a
         // 600ms burst there would stretch the whole entry phase to 600ms and push

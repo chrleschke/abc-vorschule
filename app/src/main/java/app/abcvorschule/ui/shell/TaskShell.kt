@@ -37,7 +37,7 @@ import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.session.SuccessPhase
 import app.abcvorschule.ui.components.AbcNavChevron
 import app.abcvorschule.ui.components.AbcSegmentedProgress
-import app.abcvorschule.ui.components.AbcStarCount
+import app.abcvorschule.ui.components.abcStarCountHeight
 import app.abcvorschule.ui.exercise.TrainerCallbacks
 import app.abcvorschule.ui.exercise.TrainerHost
 import app.abcvorschule.ui.path.PathScreen
@@ -172,6 +172,14 @@ fun TaskShell(
     }
 }
 
+/**
+ * Anteil der Höhe, die der Punktestand unter dem Fortschritt freigegeben hat
+ * (er steht jetzt in der Kopfzeile), um den Speaker und mit ihm die ganze Bühne
+ * nach oben rückt. Bewusst nicht 1: die Aufgabe soll höher stehen, aber nicht
+ * an der Fortschrittszeile kleben.
+ */
+private const val SpeakerFollowFraction = 0.66f
+
 @Composable
 private fun PracticeBody(
     state: SessionUiState,
@@ -260,10 +268,16 @@ private fun PracticeBody(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Nur der Zurück-Pfeil: kein Lektionstitel (Elterntext an der Stelle, an
-        // der das Kind zuerst hinsieht) und keine Punkte — die stehen unten,
-        // mittig unter dem Fortschritt.
-        AbcTopBar(onBack = viewModel::exitLesson)
+        // Zurück-Pfeil links, Punktestand mittig — kein Lektionstitel
+        // (Elterntext an der Stelle, an der das Kind zuerst hinsieht). Der Stern
+        // steht mittig statt am Titelende, also weiter auf der Achse, auf der am
+        // Ende des Trainers der große Stern hochkommt (`SuccessBurst`), nur eine
+        // Etage höher: in der Kopfzeile statt unter dem Fortschritt.
+        AbcTopBar(
+            points = state.points,
+            centerPoints = true,
+            onBack = viewModel::exitLesson,
+        )
 
         // Fortschritt und die beiden Rückfall-Chevrons teilen sich eine Zeile
         // direkt unter der Kopfzeile: die Chevrons an den Rändern, gedämpft und
@@ -297,17 +311,16 @@ private fun PracticeBody(
             )
         }
 
-        // Der Punktestand mittig unter dem Fortschritt, auf derselben Achse, auf
-        // der am Ende des Trainers der große Stern hochkommt (`SuccessBurst`) —
-        // die Punkte wachsen dort, wo der Stern landet, statt in einer Ecke.
-        AbcStarCount(
-            points = state.points,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 6.dp),
+        // Der Punktestand stand früher hier, zwischen Fortschritt und Bühne. Was
+        // er freigegeben hat, bekommt die Bühne nur zu [SpeakerFollowFraction]:
+        // rückte der Speaker die volle Höhe nach, klebte er an der
+        // Fortschrittszeile. Der Rest bleibt als Luft stehen.
+        val freedByPointsInTopBar = abcStarCountHeight() + 6.dp
+        Spacer(
+            Modifier.height(
+                AbcDimens.chromeGap + freedByPointsInTopBar * (1f - SpeakerFollowFraction),
+            ),
         )
-
-        Spacer(Modifier.height(AbcDimens.chromeGap))
 
         if (task != null && round != null) {
             Box(

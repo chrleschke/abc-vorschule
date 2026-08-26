@@ -134,10 +134,9 @@ fun SyllableMergeTrainer(
     fun commit() {
         if (merged) return
         merged = true
-        // Small collect-moment for the snap itself; the round's SuccessBurst (fired
-        // from onResult below) already plays haptics.success() once, so this only
-        // needs the lighter tick — otherwise the single "correct" event would double
-        // up on two success buzzes.
+        // Small collect-moment for the snap itself: der Schnapp ist ein
+        // Sammel-Erfolg, kein eigener Trainer-Abschluss — der große Stern am Ende
+        // kommt bewusst ohne Haptik dazu.
         haptics.tick()
         onResult(true, false, scoredIds)
     }
