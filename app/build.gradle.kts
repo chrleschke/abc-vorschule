@@ -79,6 +79,12 @@ dependencies {
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.junit)
+    // Espresso ausdrücklich und aktuell, obwohl kein Test es direkt benutzt: es
+    // kommt transitiv über androidx.test.ext:junit herein (3.5.0), und sobald es im
+    // Klassenpfad liegt, ruft ComposeTestRule.waitForIdle() Espresso.onIdle() auf.
+    // Bis 3.6.x sucht dessen InputManagerEventInjectionStrategy
+    // android.hardware.input.InputManager.getInstance, die es ab API 36 nicht mehr
+    // gibt — jeder Compose-Test stirbt dann beim ersten waitForIdle.
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)

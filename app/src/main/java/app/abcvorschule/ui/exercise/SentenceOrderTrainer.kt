@@ -1,7 +1,15 @@
 package app.abcvorschule.ui.exercise
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -15,13 +23,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -31,7 +34,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -164,51 +173,80 @@ fun SentenceOrderTrainer(
                 targetState = completed,
                 transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(140)) },
                 label = "sentence_complete",
-            ) { isComplete -> if (isComplete) {
-                Text(words.joinToString(" "), style = MaterialTheme.typography.headlineSmall, color = WarmInk, modifier = Modifier.testTag("completed_sentence"))
-            } else BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                val fontScale = LocalDensity.current.fontScale
-                val longest = words.maxOfOrNull { it.length } ?: 1
-                val shareWidth = WordFrameSizing.frameWidthDp(maxWidth.value, words.size)
-                val gap = WordFrameSizing.gapDp(maxWidth.value, words.size)
-                // Mit fontScale, sonst wächst der gerenderte Glyph aus dem festen
-                // Peg (live: Einwort-Runde zeigte „Mam" statt „Mama" bei
-                // font_scale 1.3); gewinnt trotzdem der MinGlyphSp-Floor, weitet
-                // fittedFrameWidthDp den Peg, statt dass maxLines = 1 clippt.
-                val glyphSp = WordFrameSizing.glyphSp(shareWidth, longest, fontScale)
-                val pegWidth =
-                    WordFrameSizing.fittedFrameWidthDp(shareWidth, glyphSp, longest, fontScale)
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(gap.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.Top,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    words.forEachIndexed { index, expected ->
-                        val filled = if (resolved) expected else placed[index]
-                        val atomId = atomIds.getOrElse(index) { expected }
-                        Peg(
-                            index = index,
-                            expected = expected,
-                            filled = filled,
-                            showGhost = scaffoldFor(atomId) == ScaffoldLevel.Beginner,
-                            armed = field.selectedKey != null && filled == null,
-                            enabled = !interactionLocked,
-                            opacity = interactionOpacity,
-                            onTap = {
-                                val selected = field.selectedKey
-                                val card = cards.withIndex()
-                                    .firstOrNull { (i, c) -> cardKey(i, c) == selected }
-                                    ?.value
-                                if (card != null) place(index, card)
-                                if (filled != null) onSpeak(filled)
-                            },
-                            registerWith = field,
-                            pegWidthDp = pegWidth,
-                            glyphSp = glyphSp,
+            ) { isComplete ->
+                // Die Bühne wird gemessen, nicht geraten: die Peg-Reihe bricht nie um
+                // (Produktentscheidung), also ist die gemessene Breite die einzige
+                // Größe, gegen die Glyph und Peg-Breiten gelöst werden dürfen.
+                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                    val fontScale = LocalDensity.current.fontScale
+                    if (isComplete) {
+                        // Auch der fertige Satz wird gelöst statt in headlineSmall
+                        // gesetzt: „Oma hat einen Hut" braucht dort bei font_scale
+                        // 1.3 rund 382dp von 296dp.
+                        val glyphDp =
+                            SentencePegSizing.completedGlyphDp(maxWidth.value, words)
+                        Text(
+                            text = words.joinToString(" "),
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                fontSize = SentencePegSizing.glyphSp(glyphDp, fontScale).sp,
+                            ),
+                            color = WarmInk,
+                            maxLines = 1,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .testTag("completed_sentence"),
                         )
+                    } else {
+                        // Eine Glyphgröße für den ganzen Satz (gemischte Größen lesen
+                        // sich nicht als Satz), aber eine eigene Breite je Peg — die
+                        // Silhouette des Wortes, und der Grund, warum die Reihe
+                        // überhaupt in eine Zeile passt. Herleitung und der alte
+                        // Überlauf stehen in SentencePegSizing.
+                        val row = SentencePegSizing.solve(maxWidth.value, words)
+                        val glyphSp = SentencePegSizing.glyphSp(row.glyphDp, fontScale)
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(
+                                row.gapDp.dp,
+                                Alignment.CenterHorizontally,
+                            ),
+                            verticalAlignment = Alignment.Top,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            words.forEachIndexed { index, expected ->
+                                val filled = if (resolved) expected else placed[index]
+                                val atomId = atomIds.getOrElse(index) { expected }
+                                Peg(
+                                    index = index,
+                                    expected = expected,
+                                    filled = filled,
+                                    showGhost = scaffoldFor(atomId) == ScaffoldLevel.Beginner,
+                                    armed = field.selectedKey != null && filled == null,
+                                    enabled = !interactionLocked,
+                                    opacity = interactionOpacity,
+                                    // Nur die eigene Tat federt. Nach „Auflösen"
+                                    // fallen alle Pegs gleichzeitig — fünf Wackler
+                                    // im Chor wären eine Feier für etwas, das das
+                                    // Kind nicht geschafft hat.
+                                    morphOnFill = !resolved,
+                                    onTap = {
+                                        val selected = field.selectedKey
+                                        val card = cards.withIndex()
+                                            .firstOrNull { (i, c) -> cardKey(i, c) == selected }
+                                            ?.value
+                                        if (card != null) place(index, card)
+                                        if (filled != null) onSpeak(filled)
+                                    },
+                                    registerWith = field,
+                                    pegWidthDp = row.pegWidthsDp.getOrElse(index) {
+                                        SentencePegSizing.MinPegWidthDp
+                                    },
+                                    glyphSp = glyphSp,
+                                )
+                            }
+                        }
                     }
                 }
-            }}
+            }
         },
         answers = {
             FlowRow(
@@ -281,6 +319,38 @@ private fun cardKey(index: Int, card: WordBlock): String =
  */
 private val PegBorderGreen = Color(0xFF3A7A44)
 
+/**
+ * Squish-Settle beim Einrasten — der Shape-Morph, den Material 3 Expressive für
+ * Zustandswechsel vorsieht, mit Bordmitteln statt mit `androidx.graphics.shapes`:
+ * eine Feder, drei abgeleitete Eigenschaften. Kein `RoundedPolygon`-Morph, weil
+ * eine blobbige Zielform das Wort im Peg beschneiden würde, und das Wort ist die
+ * Aufgabe.
+ *
+ * Die Feder läuft von 0 nach [PegAtRest]; `settle - PegAtRest` ist damit ein
+ * gedämpfter Wackler, der bei −1 startet, über 0 hinausschwingt und auf 0
+ * ausläuft. Daraus:
+ *
+ * - **scaleX** startet bei 0,91 und federt über 1,0 hinaus — das horizontale
+ *   Wabbeln.
+ * - **scaleY** läuft gegenläufig (1,05 → 1,0), damit es als *Quetschung* liest und
+ *   nicht als Zoom; das Wort behält seine scheinbare Masse.
+ * - **Eckradius** morpht 24dp → 16dp, weicher im Moment des Einrastens, wieder
+ *   ruhig im Sitzen.
+ *
+ * Alles drei wird in der **Zeichenphase** gelesen (`graphicsLayer` / `drawBehind`),
+ * nicht in der Komposition — gleiche Begründung wie in `PathHereMarker`: eine
+ * Federphase darf keine 300ms lang rekomponieren, und Layout-Bounds dürfen dabei
+ * nicht zittern, sonst wandert die registrierte Drop-Zone unter dem Finger weg.
+ */
+private const val PegAtRest = 1f
+private const val PegMorphSquishX = 0.09f
+private const val PegMorphStretchY = 0.05f
+private const val PegMorphDamping = 0.42f
+private val PegCornerRadius = 16.dp
+private val PegMorphCornerGain = 8.dp
+private val PegMinCornerRadius = 12.dp
+private val PegBorderWidth = 3.dp
+
 @Composable
 private fun Peg(
     index: Int,
@@ -290,11 +360,43 @@ private fun Peg(
     armed: Boolean,
     enabled: Boolean,
     opacity: Float,
+    morphOnFill: Boolean,
     onTap: () -> Unit,
     registerWith: app.abcvorschule.ui.exercise.drag.DragFieldState,
     pegWidthDp: Float,
     glyphSp: Float,
 ) {
+    // Bewusst nicht `by`: der Wert wird ausschließlich in graphicsLayer und
+    // drawBehind gelesen, also in der Zeichenphase.
+    val settle = remember { Animatable(PegAtRest) }
+    LaunchedEffect(filled, morphOnFill) {
+        if (filled != null && morphOnFill) {
+            settle.snapTo(0f)
+            settle.animateTo(
+                targetValue = PegAtRest,
+                animationSpec = spring(
+                    dampingRatio = PegMorphDamping,
+                    stiffness = Spring.StiffnessMediumLow,
+                ),
+            )
+        } else {
+            settle.snapTo(PegAtRest)
+        }
+    }
+
+    // SkyBlue-Wash wie die armierte Karte im Tray: "hier kann die gewählte Karte
+    // hin" ist ein Aktiv-Signal, kein "richtig" — LeafGreen bleibt dem gefüllten
+    // Peg (§10).
+    val fill = if (armed) SkyBlue.copy(alpha = 0.22f) else CreamElevated
+    // Same deviation as WordBuildTrainer's Frame() border (identical pattern, "wie
+    // WordBuild-Slots" per the brief): the literal LeafGreen.copy(0.7f) /
+    // WarmMuted.copy(0.32f) fail the 3:1 UI-component floor once composited over
+    // CreamElevated. WarmMuted at alpha 0.9f clears 3:1 against CreamElevated
+    // itself (3.11:1). LeafGreen at full opacity still only reaches 2.87:1 against
+    // CreamElevated — PegBorderGreen is the dedicated darker fix for that case
+    // (3.79:1).
+    val borderColor = if (filled != null) PegBorderGreen else WarmMuted.copy(alpha = 0.9f)
+
     DropZone(
         state = registerWith,
         key = SentenceOrderTray.pegKey(index),
@@ -303,29 +405,31 @@ private fun Peg(
         modifier = Modifier
             .width(pegWidthDp.dp)
             .defaultMinSize(minHeight = 64.dp)
-            .alpha(opacity)
-            .background(
-                // SkyBlue-Wash wie die armierte Karte im Tray: "hier kann die
-                // gewählte Karte hin" ist ein Aktiv-Signal, kein "richtig" —
-                // LeafGreen bleibt dem gefüllten Peg (§10).
-                color = if (armed) SkyBlue.copy(alpha = 0.22f) else CreamElevated,
-                shape = RoundedCornerShape(16.dp),
-            )
-            .border(
-                width = 3.dp,
-                // Same deviation as WordBuildTrainer's Frame() border (identical pattern,
-                // "wie WordBuild-Slots" per the brief): the literal LeafGreen.copy(0.7f) /
-                // WarmMuted.copy(0.32f) fail the 3:1 UI-component floor once composited
-                // over CreamElevated. WarmMuted at alpha 0.9f clears 3:1 against
-                // CreamElevated itself (3.11:1). LeafGreen at full opacity still only
-                // reaches 2.87:1 against CreamElevated — PegBorderGreen is the dedicated
-                // darker fix for that case (3.79:1).
-                color = if (filled != null) PegBorderGreen else WarmMuted.copy(alpha = 0.9f),
-                shape = RoundedCornerShape(16.dp),
-            )
+            .graphicsLayer {
+                val wobble = settle.value - PegAtRest
+                scaleX = 1f + PegMorphSquishX * wobble
+                scaleY = 1f - PegMorphStretchY * wobble
+                alpha = opacity
+            }
+            .drawBehind {
+                val wobble = settle.value - PegAtRest
+                val radius = (PegCornerRadius.toPx() - PegMorphCornerGain.toPx() * wobble)
+                    .coerceAtLeast(PegMinCornerRadius.toPx())
+                drawRoundRect(color = fill, cornerRadius = CornerRadius(radius))
+                // Der Rand wird um seine halbe Breite eingerückt gezeichnet, damit er
+                // wie Modifier.border innen sitzt und nicht halb über die Kante malt.
+                val stroke = PegBorderWidth.toPx()
+                drawRoundRect(
+                    color = borderColor,
+                    topLeft = Offset(stroke / 2f, stroke / 2f),
+                    size = Size(size.width - stroke, size.height - stroke),
+                    cornerRadius = CornerRadius((radius - stroke / 2f).coerceAtLeast(0f)),
+                    style = Stroke(width = stroke),
+                )
+            }
             .padding(
-                horizontal = WordFrameSizing.FramePaddingDp.dp,
-                vertical = WordFrameSizing.FramePaddingDp.dp,
+                horizontal = SentencePegSizing.PegPaddingDp.dp,
+                vertical = SentencePegSizing.PegPaddingDp.dp,
             )
             .testTag("peg_$index"),
     ) {

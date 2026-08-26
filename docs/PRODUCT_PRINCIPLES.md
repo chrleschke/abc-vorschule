@@ -335,6 +335,20 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 - Ausnahme Wort-Detektiv: der Antwortbereich trägt **Quittungs-Striche statt Wahloptionen**.
   Sie sind bloße Grundstriche ohne Rahmen und ohne Tray — die einzige Symbolquelle ist das
   Wort im Aufgabenblock. Damit sind sie von den Schablonen des Wort-Bauers unterscheidbar.
+- **Satz-Architekt: die Peg-Reihe bricht nie um.** Ein Satz steht immer in *einer*
+  Zeile. Damit das auf jeder Breite und bei jeder Systemschriftgröße gilt, ist die
+  Rangfolge in `SentencePegSizing` verbindlich: (1) die Reihe passt, (2) jeder Peg
+  bleibt tippbar (56dp), (3) jeder Peg ist so breit wie **sein eigenes** Wort, nicht
+  wie das längste der Runde, (4) der Glyph nimmt, was übrig ist. Punkt 3 gibt der
+  leeren Lücke die **Silhouette** ihres Wortes — Längen-Matching ist erwünscht, eine
+  Vorlese-Vorstufe. Punkt 4 heißt: **kein Glyph-Floor**; auf schmalen Geräten fällt
+  die Schrift unter die 20sp aus §10, weil ein unerreichbarer Peg eine kaputte
+  Aufgabe ist und eine kleine Schrift nur eine unschöne. Autorierungs-Grenze
+  (`SentencePegSizing.ReadableGlyphDp`, 18dp auf 348dp Referenzbreite) wird von
+  `SentencePegSizingTest` gegen den Pack geprüft — ein zu langer neuer Satz bricht
+  den Test, nicht den Bildschirm. Einzige Stelle, an der der 56dp-Boden nachgibt:
+  fünf Pegs passen auf einem 320dp-Gerät physikalisch nicht in eine Zeile, dann
+  schrumpft die ganze Reihe gleichmäßig auf rund 48dp je Peg.
 - Ausnahme Satz-Versteher: der Antwortblock beginnt bei **52 % der Bühnenhöhe**
   statt am unteren Rand (`ExerciseStage(answerAnchor = AnswerAnchor.BelowCenter)`).
   Sein Aufgabenblock trägt nur den Speaker — kein Titel, keine Kacheln, kein Wort
@@ -372,6 +386,18 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
   Batterie-Feier, nudge = sanfte Korrektur. Haptik ergänzt Ton, ersetzt ihn nie.
 - Erfolgsmomente: SuccessBurst (Gold-Stern + Funken), Gold-Puls an der Segmentgrenze je Trainer,
   Konfetti auf dem End-Screen.
+- **Shape-Morph beim Einrasten (Squish-Settle).** Rastet ein Wort in einen Peg des
+  Satz-Architekten, quetscht der Peg horizontal und federt in Form zurück: `scaleX`
+  0,91 → über 1,0 → 1,0, `scaleY` gegenläufig 1,05 → 1,0, Eckradius 24 → 16dp, eine
+  Feder mit `dampingRatio = 0.42` und `Spring.StiffnessMediumLow`, synchron zur
+  `tick`-Haptik. Das ist die Material-3-Expressive-Idee „Form folgt Zustand" mit
+  Bordmitteln — **kein** `androidx.graphics.shapes`-Polygon-Morph, weil eine blobbige
+  Zielform das Wort im Peg beschneiden würde. Gegenläufiges Y ist Pflicht, sonst
+  liest die Bewegung als Zoom statt als Quetschung. Nur die eigene Tat federt: nach
+  „Auflösen" fallen alle Pegs still, ein Chor aus Wacklern wäre eine Feier für etwas,
+  das das Kind nicht geschafft hat. Gelesen wird die Feder in der **Zeichenphase**
+  (`graphicsLayer` / `drawBehind`), damit 300ms Bewegung nicht 300ms rekomponieren
+  und die registrierten Drop-Zonen nicht unter dem Finger wandern.
 
 
 
