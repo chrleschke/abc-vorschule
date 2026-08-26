@@ -12,6 +12,8 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import app.abcvorschule.ui.exercise.MathHinting
+import app.abcvorschule.ui.exercise.MathInputMode
 
 class LessonSessionTest {
     private val pack = ContentRepository.fromClasspath().load()
@@ -92,13 +94,13 @@ class LessonSessionTest {
     }
 
     @Test
-    fun mathScaffoldsAreIndependentPerFactAcrossACountAddTrainer() {
+    fun mathInputsAreIndependentPerFactAcrossACountAddTrainer() {
         // A lesson's count_add rounds carry several arithmetic facts (lesson 1 has
         // 1+1 and 2+1, split across two count_add tasks in the expanded pack); each
-        // fact must carry its own scaffold instead of sharing a single one computed
-        // from the first round. Flattened across every count_add task in the
-        // lesson rather than just the first, since ProgressionEngine.scaffoldForMath
-        // is a pure function over rounds regardless of which task they came from.
+        // fact must carry its own input mode instead of sharing a single one computed
+        // from the first round. Flattened across every count_add task in the lesson
+        // rather than just the first, since the decision is a pure function over
+        // rounds regardless of which task they came from.
         val rounds = pack.tasksOf(pack.authoredLessons.first())
             .filterIsInstance<CountAddSpec>()
             .flatMap { it.rounds }
@@ -110,12 +112,22 @@ class LessonSessionTest {
         val progress = LearnerProgress(
             mathStats = mapOf(secondKey to SkillStats(autoScaffold = ScaffoldLevel.Advanced)),
         )
-        val mathScaffolds = rounds.associate { round ->
+        val mathInputs = rounds.associate { round ->
             val key = ProgressionEngine.mathKey(round)
-            key to ProgressionEngine.scaffoldForMath(progress, key)
+            key to MathHinting.inputFor(
+                scaffold = ProgressionEngine.scaffoldForMath(progress, key),
+                parentMode = progress.parentMode,
+                answer = round.answer,
+            )
         }
-        assertEquals(ScaffoldLevel.Beginner, mathScaffolds.getValue(firstKey))
-        assertEquals(ScaffoldLevel.Advanced, mathScaffolds.getValue(secondKey))
+        // Lektion 1 rechnet im Zahlenraum bis 5 — hier entscheidet also allein das
+        // Scaffold, und die Ergebnis-Regel darf nichts daran verändern.
+        assertTrue(
+            "lesson 1 answers must stay below the typed threshold",
+            rounds.all { it.answer < MathHinting.TypedAnswerFrom },
+        )
+        assertEquals(MathInputMode.Tiles, mathInputs.getValue(firstKey))
+        assertEquals(MathInputMode.Typed, mathInputs.getValue(secondKey))
     }
 
     @Test

@@ -137,8 +137,8 @@ fun TrainerHost(
             round = round,
             roundIndex = roundIndex,
             icon = pack.atom(round.iconAtomId).emoji,
-            scaffold = trainer.mathScaffolds[ProgressionEngine.mathKey(round)]
-                ?: ScaffoldLevel.Beginner,
+            input = trainer.mathInputs[ProgressionEngine.mathKey(round)]
+                ?: MathInputMode.Tiles,
             showSymbolPrompt = !ttsAvailable,
             ttsAvailable = ttsAvailable,
             speaking = speaking,

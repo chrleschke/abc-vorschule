@@ -1,5 +1,6 @@
 package app.abcvorschule.ui.exercise
 
+import app.abcvorschule.progress.ParentMode
 import app.abcvorschule.progress.ScaffoldLevel
 
 object MathHinting {
@@ -39,6 +40,40 @@ object MathHinting {
         else -> "Schau noch einmal genau hin"
     }
 
-    /** Advanced = type the result; Beginner = pick from three labeled quantities. */
-    fun usesNumberPad(scaffold: ScaffoldLevel): Boolean = scaffold == ScaffoldLevel.Advanced
+    /**
+     * Ab diesem Ergebnis wird getippt statt gewählt — das Band `hard`
+     * (ProgressionEngine.bandFor) beginnt bei 11. Eigene Konstante, obwohl
+     * [QuantityRepresentation.SymbolicFrom] denselben Wert trägt: die eine Regel
+     * entscheidet über die Eingabeart, die andere über die Darstellung einer Menge.
+     * Sie dürfen sich unabhängig voneinander bewegen.
+     */
+    const val TypedAnswerFrom = 11
+
+    /** Fehlversuche, nach denen die Zähl-Hilfe aufklappt. */
+    const val CountingAidFromMisses = 2
+
+    /**
+     * Fehlversuche, nach denen im Tipp-Modus der Auflösen-Knopf erscheint — später
+     * als im Kachel-Modus (dort weiterhin 2), damit die Zähl-Hilfe nicht
+     * übersprungen werden kann. Ein echter Ausweg bleibt sie trotzdem.
+     */
+    const val ResolveFromMissesTyped = 4
+
+    /**
+     * Getippt wird bei fortgeschrittenem Scaffold — oder sobald das Ergebnis über
+     * zehn liegt. Die zweite Hälfte prüft den *Eltern-Modus*, nicht das abgeleitete
+     * Scaffold: der Default ist [ParentMode.Auto], und dort startet ein frisches Kind
+     * auf [ScaffoldLevel.Beginner]. Gegen das Scaffold geprüft würde die Regel beim
+     * Normalnutzer also nie greifen. Nur ein ausdrücklich gesetztes
+     * [ParentMode.Beginner] behält überall die Kacheln — Elternentscheidung schlägt
+     * Aufgabenschwere.
+     */
+    fun inputFor(scaffold: ScaffoldLevel, parentMode: ParentMode, answer: Int): MathInputMode {
+        val typed = scaffold == ScaffoldLevel.Advanced ||
+            (parentMode != ParentMode.Beginner && answer >= TypedAnswerFrom)
+        return if (typed) MathInputMode.Typed else MathInputMode.Tiles
+    }
 }
+
+/** Wie die Antwort einer Rechenrunde eingegeben wird. */
+enum class MathInputMode { Tiles, Typed }

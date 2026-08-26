@@ -235,9 +235,13 @@ class SessionViewModel(
         return ScheduledTrainer(
             spec = spec,
             scaffolds = atomIds.associateWith { ProgressionEngine.scaffoldForAtom(progress, it) },
-            mathScaffolds = spec.rounds.filterIsInstance<CountAddRound>().associate { round ->
+            mathInputs = spec.rounds.filterIsInstance<CountAddRound>().associate { round ->
                 val key = ProgressionEngine.mathKey(round)
-                key to ProgressionEngine.scaffoldForMath(progress, key)
+                key to MathHinting.inputFor(
+                    scaffold = ProgressionEngine.scaffoldForMath(progress, key),
+                    parentMode = progress.parentMode,
+                    answer = round.answer,
+                )
             },
         )
     }

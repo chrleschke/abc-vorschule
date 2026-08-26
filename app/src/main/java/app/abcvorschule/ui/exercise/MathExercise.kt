@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.content.CountAddRound
-import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.session.ScheduledTrainer
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
@@ -31,7 +30,7 @@ fun MathExercise(
     round: CountAddRound,
     roundIndex: Int,
     icon: String,
-    scaffold: ScaffoldLevel,
+    input: MathInputMode,
     showSymbolPrompt: Boolean,
     ttsAvailable: Boolean,
     speaking: Boolean,
@@ -48,7 +47,7 @@ fun MathExercise(
     // Tracked apart from `locked`, which a resolve also sets: giving up must not
     // light up the green confirmation meant for a correct answer.
     var solved by remember(roundKey) { mutableStateOf<Int?>(null) }
-    val usePad = MathHinting.usesNumberPad(scaffold)
+    val usePad = input == MathInputMode.Typed
     // Seeded wie TrayOrder: die Kachel-Reihenfolge muss beim Rück-Chevron in eine
     // besuchte Runde (und nach Recreation) dieselbe sein wie beim ersten Besuch.
     val choices = remember(roundKey) {
