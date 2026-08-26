@@ -228,7 +228,7 @@ niemals mit einem stummen No-Op.
 - App und Inhalte deutsch. Sprache ist bei jedem TTS Aufruf eindeutet angegeben. 
 - System-TTS für Prompts; Speaker (Vektor-Icon) **im Aufgabenbereich**, mittig am Kopf der
   Bühne (`ExerciseStage(promptChrome = …)`) und damit in **jedem** Trainer auf derselben
-  Höhe, direkt unter Fortschritt und Punktestand — nicht als erstes Kind des zentrierten
+  Höhe, direkt unter der Fortschrittszeile — nicht als erstes Kind des zentrierten
   Aufgabenblocks, denn dort wanderte er mit dessen Inhaltshöhe (gemessen: 203dp in der
   Jagd, 305dp im Spurensucher, 425dp im Silben-Verschmelzer). Ein Aufgabentitel steht
   weiterhin unter ihm. Ausgenommen ist der End-Screen, der seinen eigenen Speaker beim
@@ -325,15 +325,21 @@ nicht zwingend — Kinder erkennen die Icons ohnehin)
 
 ## 9. Layout-Grundform der Übungen
 
-- **Chrome oben (nativ):** eine durchsichtige M3-Top-App-Bar. In der Lektion trägt sie **nur**
-  den Zurück-Pfeil (nach links, nicht X — die Lektion ist ein Ziel, das man verlässt, kein
-  Dialog): kein Lektionstitel (Elterntext an der Stelle, an der das Kind zuerst hinsieht),
-  keine Punkte, kein Overflow-Menü. Auf dem Pfad trägt sie rechts Stern + Punkte.
+- **Chrome oben (nativ):** eine durchsichtige M3-Top-App-Bar. In der Lektion trägt sie den
+  Zurück-Pfeil (nach links, nicht X — die Lektion ist ein Ziel, das man verlässt, kein
+  Dialog) und mittig den Punktestand: kein Lektionstitel (Elterntext an der Stelle, an der
+  das Kind zuerst hinsieht), kein Overflow-Menü. Auf dem Pfad trägt sie rechts Stern + Punkte.
   Darunter **eine** Zeile: Rückfall-Chevrons an den Rändern, dazwischen die Fortschrittskette.
   Der Speaker sitzt nicht im Chrome, sondern gemäß §7 im Aufgabenbereich.
-- **Der Punktestand steht in der Lektion mittig unter dem Fortschritt** (`AbcStarCount`), auf
+- **Der Punktestand steht in der Lektion mittig in der Kopfzeile** (`AbcStarCount`), auf
   derselben Achse, auf der am Ende des Trainers der große Stern hochkommt (`SuccessBurst`) —
-  die Punkte wachsen dort, wo der Stern landet, statt in einer Ecke der Leiste.
+  die Punkte wachsen dort, wo der Stern landet, statt in einer Ecke der Leiste. Mittig heißt
+  hier auf der **Bildschirmmitte**, nicht mittig im Titel-Slot: der beginnt erst hinter dem
+  Zurück-Pfeil. Dass er dafür als eigene Lage über der Leiste liegt statt im Titel-Slot, ist
+  der Preis; die gemeinsame Achse mit dem Stern ist ihn wert.
+- **Was der Punktestand unter dem Fortschritt freigegeben hat, bekommt die Bühne nur zu
+  zwei Dritteln** (`SpeakerFollowFraction` in `TaskShell`): rückte der Speaker die volle
+  Höhe nach, klebte er an der Fortschrittszeile.
 - **Fortschritt ist eine Segmentkette** (`AbcSegmentedProgress`): ein Segment je Trainer, das
   laufende füllt sich nach Runden-Anteil. Sie ersetzt Balken, Textlabel „3/8" und Runden-Punkte —
   das Kind liest das Label ohnehin nicht.
