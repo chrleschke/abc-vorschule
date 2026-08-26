@@ -6,6 +6,7 @@ import app.abcvorschule.content.round
 import app.abcvorschule.content.rounds
 import app.abcvorschule.progress.ParentMode
 import app.abcvorschule.progress.ScaffoldLevel
+import app.abcvorschule.ui.exercise.MathInputMode
 
 sealed interface AppScreen {
     /** Fibel path — the app's entry screen. */
@@ -81,7 +82,7 @@ data class ScheduledTrainer(
      * takes effect from the very next round on — even within the same
      * trainer, not only once the next trainer starts (F7).
      */
-    val mathScaffolds: Map<String, ScaffoldLevel> = emptyMap(),
+    val mathInputs: Map<String, MathInputMode> = emptyMap(),
 )
 
 data class SessionUiState(

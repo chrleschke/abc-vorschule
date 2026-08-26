@@ -33,6 +33,11 @@ import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 
+/** Deckkraft eines bereits gezählten Objekts. Deutlich sichtbarer als ein
+ * Geister-Platzhalter ([MultiplicationMatrix.GhostAlpha]) — „schon gezählt" darf
+ * nicht wie „gar nicht da" aussehen. */
+const val CountedAlpha = 0.45f
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VisualQuantityBoard(
@@ -230,8 +235,21 @@ fun MultiplicationMatrixGrid(
     rows: Int,
     columns: Int,
     modifier: Modifier = Modifier,
+    /** Gesetzt, sobald die Zähl-Hilfe offen ist: dann sind alle Zellen echt und
+     * antippbar — auch die sonst geisterhaften Reihen. Genau der Schritt, den das
+     * Kind vorher im Kopf nicht geschafft hat. */
+    counting: CountingState? = null,
+    onTapCell: (Int) -> Unit = {},
+    /** Deckkraft des Puls-Hinweises auf der nächsten offenen Zelle. */
+    pulseAlpha: Float = 1f,
 ) {
-    val sizeSp = MultiplicationMatrix.emojiSizeSp(columns)
+    // In der Zähl-Hilfe hat die Matrix den Aufgabenblock für sich und darf deutlich
+    // größer werden — im Prompt teilt sie ihn mit dem Antwortbereich.
+    val sizeSp = if (counting == null) {
+        MultiplicationMatrix.emojiSizeSp(columns)
+    } else {
+        CountingField.matrixEmojiSizeSp(rows, columns)
+    }
     Column(
         modifier = modifier.testTag("multiplication_matrix"),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -246,9 +264,29 @@ fun MultiplicationMatrixGrid(
                 .testTag("multiplication_equation"),
         )
         repeat(rows) { row ->
+            // In der Zähl-Hilfe ist die **Reihe** die Einheit, nicht die Zelle:
+            // zwanzig Objekte einzeln anzutippen trainiert Zählen in Einerschritten,
+            // also genau das, was Multiplikation nicht ist. Reihenweise ist es
+            // Zählen in Schritten — "je vier: vier, acht, zwölf".
+            //
+            // Anders als bei Plus und Minus wird eine Reihe beim Antippen **echt**,
+            // statt zu verblassen: Malnehmen ist Auffüllen, und die Geisterreihen
+            // aus §8 sind genau das, was das Kind vervollständigen soll.
+            val rowAlpha = when {
+                counting == null ->
+                    if (MultiplicationMatrix.isConcreteRow(row)) 1f else MultiplicationMatrix.GhostAlpha
+                counting.isTapped(row) -> 1f
+                counting.nextIndex == row -> pulseAlpha
+                else -> MultiplicationMatrix.GhostAlpha
+            }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                 verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .then(
+                        if (counting == null) Modifier else Modifier.clickable { onTapCell(row) },
+                    )
+                    .testTag("counting_row_$row"),
             ) {
                 // Full opacity even beside a ghost row: the numerals are the
                 // counting aid, so they must not fade along with the placeholders.
@@ -261,15 +299,14 @@ fun MultiplicationMatrixGrid(
                         .width(MultiplicationMatrix.RowLabelGutterDp.dp)
                         .testTag("multiplication_row_label_${MultiplicationMatrix.rowLabel(row)}"),
                 )
+                // Die Deckkraft sitzt auf den Bildern, nicht auf der ganzen Zeile:
+                // die Zeilennummer behält volle Deckkraft, auch neben einer
+                // Geisterreihe — sie ist die Zählhilfe, kein Teil des Platzhalters (§8).
                 repeat(columns) {
                     Text(
                         text = emoji,
                         fontSize = sizeSp.sp,
-                        modifier = if (MultiplicationMatrix.isConcreteRow(row)) {
-                            Modifier
-                        } else {
-                            Modifier.alpha(MultiplicationMatrix.GhostAlpha)
-                        },
+                        modifier = Modifier.alpha(rowAlpha),
                     )
                 }
             }

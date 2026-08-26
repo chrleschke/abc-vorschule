@@ -41,6 +41,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import app.abcvorschule.speech.GermanNumberWord
+import app.abcvorschule.ui.exercise.MathAttempt
+import app.abcvorschule.ui.exercise.MathOperation
 
 class SessionViewModel(
     private val contentRepository: ContentRepository,
@@ -235,9 +238,13 @@ class SessionViewModel(
         return ScheduledTrainer(
             spec = spec,
             scaffolds = atomIds.associateWith { ProgressionEngine.scaffoldForAtom(progress, it) },
-            mathScaffolds = spec.rounds.filterIsInstance<CountAddRound>().associate { round ->
+            mathInputs = spec.rounds.filterIsInstance<CountAddRound>().associate { round ->
                 val key = ProgressionEngine.mathKey(round)
-                key to ProgressionEngine.scaffoldForMath(progress, key)
+                key to MathHinting.inputFor(
+                    scaffold = ProgressionEngine.scaffoldForMath(progress, key),
+                    parentMode = progress.parentMode,
+                    answer = round.answer,
+                )
             },
         )
     }
@@ -457,13 +464,14 @@ class SessionViewModel(
         }
     }
 
-    fun submitMathResult(distance: Int?, resolved: Boolean, correct: Boolean, guess: Int? = null) {
+    fun submitMathResult(attempt: MathAttempt) {
         viewModelScope.launch {
             if (_ui.value.successPhase != SuccessPhase.Idle) return@launch
             val trainer = _ui.value.current ?: return@launch
             val round = _ui.value.currentRound as? CountAddRound ?: return@launch
             val position = attemptPosition()
             val key = ProgressionEngine.mathKey(round)
+            val (_, resolved, correct) = attempt
             val outcome = outcomeFor(correct, resolved)
             progress = progressRepository.update { current ->
                 var next = ProgressionEngine.recordMathAttempt(current, key, outcome)
@@ -476,14 +484,17 @@ class SessionViewModel(
                 correct = correct && !resolved,
                 resolved = resolved,
                 missHint = !correct && !resolved,
-                // Der getippte Wert und der Hinweis als EINE Äußerung: zwei
-                // aufeinanderfolgende Primary-speaks würden sich gegenseitig
-                // flushen und die Zahl mitten im Wort abschneiden.
+                // Mit der Zähl-Hilfe gelöst heißt erarbeitet, nicht gewusst — dafür
+                // gibt es kein Lob. Dieselbe Unterscheidung, die das Auflösen schon
+                // trifft. Punkte bleiben: sie wegzunehmen wäre eine Strafe (§8).
+                praise = MathHinting.praises(attempt),
                 speakOverride = if (resolved || correct) {
                     null
                 } else {
-                    listOfNotNull(guess?.let { "$it." }, MathHinting.missFeedback(distance))
-                        .joinToString(" ")
+                    MathHinting.missSpeech(
+                        attempt,
+                        MathOperation.fromWireName(round.operation) ?: MathOperation.Add,
+                    )
                 },
             )
         }
@@ -517,9 +528,12 @@ class SessionViewModel(
         resolved: Boolean,
         missHint: Boolean,
         speakOverride: String? = null,
+        /** False, wenn die Antwort mit Hilfe zustande kam — dann bestätigt die
+         * Zeremonie sie, lobt sie aber nicht. */
+        praise: Boolean = true,
     ) {
         if (correct) {
-            val parts = successSpeakPartsForCurrent(praise = true)
+            val parts = successSpeakPartsForCurrent(praise = praise)
             _ui.update {
                 it.copy(
                     points = progress.points,

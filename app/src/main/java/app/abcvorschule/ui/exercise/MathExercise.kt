@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -15,8 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.content.CountAddRound
-import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.session.ScheduledTrainer
+import app.abcvorschule.speech.GermanNumberWord
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.WarmInk
@@ -31,13 +32,15 @@ fun MathExercise(
     round: CountAddRound,
     roundIndex: Int,
     icon: String,
-    scaffold: ScaffoldLevel,
+    input: MathInputMode,
     showSymbolPrompt: Boolean,
     ttsAvailable: Boolean,
     speaking: Boolean,
     interactionLocked: Boolean = false,
     onSpeakPrompt: () -> Unit,
-    onResult: (distance: Int?, resolved: Boolean, correct: Boolean, guess: Int?) -> Unit,
+    onSpeakFeedback: (String) -> Unit,
+    onSpeakCounting: (String) -> Unit,
+    onResult: (MathAttempt) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalAbcHaptics.current
@@ -48,7 +51,19 @@ fun MathExercise(
     // Tracked apart from `locked`, which a resolve also sets: giving up must not
     // light up the green confirmation meant for a correct answer.
     var solved by remember(roundKey) { mutableStateOf<Int?>(null) }
-    val usePad = MathHinting.usesNumberPad(scaffold)
+    val usePad = input == MathInputMode.Typed
+    var counting by remember(roundKey) {
+        mutableStateOf(CountingState.forRound(operation, round.left, round.right))
+    }
+    // Die Hilfe klappt bei der Schwelle auf und bleibt danach offen: sie wieder
+    // zuzuziehen, während das Kind mittendrin zählt, wäre die schlechteste aller
+    // Optionen.
+    val countingOpen = usePad && misses >= MathHinting.CountingAidFromMisses
+
+    // Die Zählanweisung spricht das ViewModel als Miss-Feedback des zweiten
+    // Fehlversuchs (MathAttempt.opensAid) — sie *ersetzt* dort den allgemeinen
+    // Hinweis, statt hinterherzulaufen. Hier noch einmal zu sprechen hieße, sie
+    // doppelt zu sagen.
     // Seeded wie TrayOrder: die Kachel-Reihenfolge muss beim Rück-Chevron in eine
     // besuchte Runde (und nach Recreation) dieselbe sein wie beim ersten Besuch.
     val choices = remember(roundKey) {
@@ -60,7 +75,16 @@ fun MathExercise(
         if (guess == round.answer) {
             locked = true
             solved = guess
-            onResult(0, false, true, guess)
+            onResult(
+                MathAttempt(
+                    distance = 0,
+                    resolved = false,
+                    correct = true,
+                    guess = guess,
+                    aided = countingOpen,
+                    opensAid = false,
+                ),
+            )
         } else {
             // Kein lokales Echo mehr: ein zweiter Primary-speak (der Miss-Hinweis
             // aus dem ViewModel) flusht die Engine und würde die Zahl mitten im
@@ -68,14 +92,34 @@ fun MathExercise(
             // "Sieben. Du bist nah dran …" als eine Äußerung.
             haptics.nudge()
             misses += 1
-            onResult(MathHinting.distance(round.answer, guess), false, false, guess)
+            onResult(
+                MathAttempt(
+                    distance = MathHinting.distance(round.answer, guess),
+                    resolved = false,
+                    correct = false,
+                    guess = guess,
+                    aided = countingOpen,
+                    // Genau dieser Fehlversuch klappt die Hilfe auf: `countingOpen`
+                    // ist oben noch der Wert *vor* der Erhöhung.
+                    opensAid = usePad && misses == MathHinting.CountingAidFromMisses,
+                ),
+            )
         }
     }
 
     fun resolve() {
         if (locked) return
         locked = true
-        onResult(null, true, false, null)
+        onResult(
+            MathAttempt(
+                distance = null,
+                resolved = true,
+                correct = false,
+                guess = null,
+                aided = countingOpen,
+                opensAid = false,
+            ),
+        )
     }
 
     if (usePad) {
@@ -88,20 +132,50 @@ fun MathExercise(
                     speaking = speaking,
                     onSpeakPrompt = onSpeakPrompt,
                 )
-                // The multiplication matrix writes "3 × 4" above itself, so a second
-                // symbolic line here would show the same task twice (Layout §9).
-                if (showSymbolPrompt && operation != MathOperation.Multiply) {
+                // The multiplication matrix writes "3 × 4" above itself, and the
+                // counting aid writes its own equation line — a second symbolic line
+                // here would show the same task twice (Layout §9).
+                if (showSymbolPrompt && !countingOpen && operation != MathOperation.Multiply) {
                     Text(
                         text = "${round.left} ${operation.symbol} ${round.right} = ?",
                         style = MaterialTheme.typography.displayLarge,
                         color = WarmInk,
                     )
                 }
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    MathQuantityPrompt(icon, round.left, round.right, operation, emojiSizeSp = 40)
+                if (countingOpen) {
+                    CountingAid(
+                        emoji = icon,
+                        left = round.left,
+                        right = round.right,
+                        operation = operation,
+                        state = counting,
+                        onTap = { index ->
+                            if (locked) return@CountingAid
+                            val next = counting.tap(index)
+                            if (next == counting) {
+                                // Deckel der Weg-Zone erreicht: kein Fehler, keine
+                                // Meldung, nur ein spürbares "das war's".
+                                haptics.nudge()
+                            } else {
+                                haptics.tick()
+                                counting = next
+                                // Mitzählen bei jedem Tipp — auf dem eigenen
+                                // Zählkanal, damit die Zahl eine laufende Ansage
+                                // überlagert, statt sie abzuwürgen oder von ihr
+                                // abgewürgt zu werden. Als Wort, nicht als Ziffer:
+                                // "8." ist im Deutschen die Ordinalzahl und würde
+                                // "achte" gelesen (GermanNumberWord).
+                                next.counted?.let { onSpeakCounting(GermanNumberWord.of(it)) }
+                            }
+                        },
+                    )
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        MathQuantityPrompt(icon, round.left, round.right, operation, emojiSizeSp = 40)
+                    }
                 }
             },
             answers = {
@@ -110,8 +184,10 @@ fun MathExercise(
                     resetToken = NumberPadInput.resetToken(roundKey, misses),
                     solved = solved != null,
                     enabled = !interactionLocked,
+                    countedValue = counting.counted.takeIf { countingOpen },
+                    hideKeyboard = countingOpen,
                 )
-                if (misses >= 2 && !locked) {
+                if (misses >= MathHinting.ResolveFromMissesTyped && !locked) {
                     AbcResolveButton(onClick = ::resolve)
                 }
             },

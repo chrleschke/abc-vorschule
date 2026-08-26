@@ -285,6 +285,176 @@
       "text": "Voll abgeräumt!",
       "field": "rewardTts",
       "note": "PraisePhrases"
+    },
+    {
+      "id": "countingAidCueCollect",
+      "text": "Tippe auf die Bilder, um sie zu zählen.",
+      "note": "MathHinting.CountingAidCueCollect — Zähl-Hilfe Plus/Malnehmen"
+    },
+    {
+      "id": "countingAidCueTakeAway",
+      "text": "Tippe auf die Bilder, um sie wegzunehmen.",
+      "note": "MathHinting.CountingAidCueTakeAway — Zähl-Hilfe Minus"
+    },
+    {
+      "id": "countingAidCueRows",
+      "text": "Tippe auf jede Reihe, um sie zu zählen.",
+      "note": "MathHinting.CountingAidCueRows — Zähl-Hilfe Malnehmen"
+    },
+    {
+      "id": "countingNumber00",
+      "text": "null",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber01",
+      "text": "eins",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber02",
+      "text": "zwei",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber03",
+      "text": "drei",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber04",
+      "text": "vier",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber05",
+      "text": "fünf",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber06",
+      "text": "sechs",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber07",
+      "text": "sieben",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber08",
+      "text": "acht",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber09",
+      "text": "neun",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber10",
+      "text": "zehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber11",
+      "text": "elf",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber12",
+      "text": "zwölf",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber13",
+      "text": "dreizehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber14",
+      "text": "vierzehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber15",
+      "text": "fünfzehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber16",
+      "text": "sechzehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber17",
+      "text": "siebzehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber18",
+      "text": "achtzehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber19",
+      "text": "neunzehn",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber20",
+      "text": "zwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber21",
+      "text": "einundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber22",
+      "text": "zweiundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber23",
+      "text": "dreiundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber24",
+      "text": "vierundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber25",
+      "text": "fünfundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber26",
+      "text": "sechsundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber27",
+      "text": "siebenundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber28",
+      "text": "achtundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber29",
+      "text": "neunundzwanzig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "countingNumber30",
+      "text": "dreißig",
+      "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
     }
   ],
   "templates": []

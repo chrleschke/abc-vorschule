@@ -68,7 +68,7 @@ Kernpunkte (Kurzfassung):
 - **Session-Modell**: Pfad-Screen → freigeschaltete Knoten starten Trainer-Sequenz → Fortschritt persistent, Vor/Zurück immer möglich.
 - **Audio-First**: Kinder lesen nicht. Bilder, Icons, Layout, Sprache. Lesbare Labels nur wo nötig (Atom-Namen sind Aufgabe selbst).
 - **Drag & Drop**: Committet bei echtem Treffer, sonst Snap-back. Keine Strafen.
-- **Rechnen**: Icons (keine Wörter), 3 Optionen (visuell) oder System-Zahlentastatur; Erfolg vorgesprochen (kein sichtbarer Text), Miss gesprochenes Feedback. Ab 11 Mengen nur als Symbol + Ziffer; Progression Plus → Wegnehmen → gleiche Gruppen.
+- **Rechnen**: Icons (keine Wörter). 3 Optionen (visuell) **oder** System-Zahlentastatur — getippt wird ab Ergebnis 11, außer im ausdrücklichen Eltern-Modus „Mit Hilfe“ (`MathHinting.inputFor`). Im Tipp-Modus nach 2 Fehlversuchen die **Zähl-Hilfe**: ein Fünfer-Feld mit beiden Operanden, der zweite gerahmt, Aufgabe als Ziffernzeile darüber, die nächste offene Einheit pulsiert und jeder Tipp zählt hörbar mit. Malnehmen zählt reihenweise, nicht Bild für Bild. Das Kind führt die Rechnung mit dem Finger aus, „Auflösen“ erst nach 4. Erfolg vorgesprochen (kein sichtbarer Text), Miss gesprochenes Feedback. Ab 11 Mengen nur als Symbol + Ziffer — **außer** in der Zähl-Hilfe, die sie ausschreibt. Progression Plus → Wegnehmen → gleiche Gruppen.
 - **Artikel im Erfolgs-Vorsprechen**: Substantiv-Lösungswörter werden mit Artikel
   vorgesprochen („das Haus"), Aufgabenstellungen nicht. Genus und Nomenklasse stehen am
   Atom, Regel in `AtomArticleSpeech`, Details in PRODUCT_PRINCIPLES §4/§7.

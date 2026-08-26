@@ -23,11 +23,14 @@ import app.abcvorschule.session.ScheduledTrainer
 /** Callbacks every trainer reports through, so the ViewModel owns all sequencing. */
 data class TrainerCallbacks(
     val onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
-    val onMathResult: (distance: Int?, resolved: Boolean, correct: Boolean, guess: Int?) -> Unit,
+    val onMathResult: (MathAttempt) -> Unit,
     val onSpeak: (String) -> Unit,
     /** Wie [onSpeak], aber auf einem eigenen Audio-Kanal — für Tap-Echos, die eine
      * noch laufende Rundenansage nicht abwürgen dürfen (Wort-Detektiv, design doc). */
     val onSpeakFeedback: (String) -> Unit,
+    /** Eigener Kanal für die mitgezählte Zahl der Zähl-Hilfe — sie darf eine
+     * laufende Ansage überlagern, statt sie abzuwürgen (design doc). */
+    val onSpeakCounting: (String) -> Unit,
     val onSpeakAndAwait: suspend (String) -> Unit,
     val onSpeakPrompt: () -> Unit,
 )
@@ -137,13 +140,15 @@ fun TrainerHost(
             round = round,
             roundIndex = roundIndex,
             icon = pack.atom(round.iconAtomId).emoji,
-            scaffold = trainer.mathScaffolds[ProgressionEngine.mathKey(round)]
-                ?: ScaffoldLevel.Beginner,
+            input = trainer.mathInputs[ProgressionEngine.mathKey(round)]
+                ?: MathInputMode.Tiles,
             showSymbolPrompt = !ttsAvailable,
             ttsAvailable = ttsAvailable,
             speaking = speaking,
             interactionLocked = interactionLocked,
             onSpeakPrompt = callbacks.onSpeakPrompt,
+            onSpeakFeedback = callbacks.onSpeakFeedback,
+            onSpeakCounting = callbacks.onSpeakCounting,
             onResult = callbacks.onMathResult,
             modifier = modifier.fillMaxSize(),
         )
