@@ -132,11 +132,7 @@ data class SessionUiState(
     val currentRound: TrainerRound? = current?.spec?.round(roundIndex)
     private val roundCounts: List<Int> = trainers.map { it.spec.rounds.size }
 
-    /** "3/8" — which scheduled trainer the child is on, out of however many this lesson has. */
-    val trainerProgressLabel: String =
-        if (trainers.isEmpty()) "" else "${trainerIndex + 1}/${trainers.size}"
-
-    /** Rounds inside the current trainer, for the sub-progress dots. */
+    /** Rounds inside the current trainer; füllt das laufende Segment der Fortschrittskette. */
     val roundCount: Int = roundCounts.getOrElse(trainerIndex) { 0 }
 
     val canGoPrevious: Boolean =

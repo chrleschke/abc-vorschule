@@ -11,11 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,10 +34,8 @@ import app.abcvorschule.session.AppScreen
 import app.abcvorschule.session.SessionUiState
 import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.session.SuccessPhase
-import app.abcvorschule.ui.components.AbcCloseButton
 import app.abcvorschule.ui.components.AbcNavChevron
-import app.abcvorschule.ui.components.AbcProgressBar
-import app.abcvorschule.ui.components.IconStar
+import app.abcvorschule.ui.components.AbcSegmentedProgress
 import app.abcvorschule.ui.exercise.TrainerCallbacks
 import app.abcvorschule.ui.exercise.TrainerHost
 import app.abcvorschule.ui.path.PathScreen
@@ -46,10 +43,6 @@ import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.SuccessBurst
 import app.abcvorschule.ui.rewards.playBlockedBlip
 import app.abcvorschule.ui.theme.AbcDimens
-import app.abcvorschule.ui.theme.SkyBlue
-import app.abcvorschule.ui.theme.StarGold
-import app.abcvorschule.ui.theme.WarmInk
-import app.abcvorschule.ui.theme.WarmMuted
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -71,18 +64,20 @@ fun TaskShell(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalAbcHaptics.current
+    // Bewusst OHNE globales safeDrawing-Padding: sonst liegt über und unter dem
+    // Inhalt ein Cream-Band statt der Landschaft. Die Schutzbereiche sind
+    // durchsichtig, jedes Element konsumiert seinen Inset selbst.
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .windowInsetsPadding(WindowInsets.safeDrawing)
-            .padding(bottom = AbcDimens.screenBottomExtra),
+            .background(MaterialTheme.colorScheme.background),
     ) {
         when {
             state.error != null -> {
                 Column(
                     Modifier
                         .fillMaxSize()
+                        .windowInsetsPadding(WindowInsets.safeDrawing)
                         .padding(24.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -92,7 +87,9 @@ fun TaskShell(
             }
             !state.ready || pack == null -> {
                 Column(
-                    Modifier.fillMaxSize(),
+                    Modifier
+                        .fillMaxSize()
+                        .windowInsetsPadding(WindowInsets.safeDrawing),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -109,6 +106,10 @@ fun TaskShell(
                     speaking = speaking,
                     onSpeak = onSpeak,
                     onContinue = viewModel::continueAfterSummary,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .windowInsetsPadding(WindowInsets.safeDrawing)
+                        .padding(bottom = AbcDimens.screenBottomExtra),
                 )
             }
             state.screen == AppScreen.Path -> {
@@ -256,36 +257,23 @@ private fun PracticeBody(
         viewModel.onRevealFinished()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = AbcDimens.screenHorizontal)
-            .padding(top = 8.dp),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            ParentGateButton(onUnlocked = viewModel::openDifficultySheet)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconStar(tint = StarGold, size = 22.dp)
-                Spacer(Modifier.width(6.dp))
-                Text(
-                    text = "${state.points}",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = WarmInk,
-                )
-            }
-            AbcCloseButton(onClick = viewModel::exitLesson)
-        }
+    val lessonTitle = state.lessonId?.let { id -> pack.lessons.firstOrNull { it.id == id }?.title }
 
-        Spacer(Modifier.height(8.dp))
+    Column(modifier = Modifier.fillMaxSize()) {
+        AbcTopBar(
+            points = state.points,
+            title = lessonTitle,
+            onClose = viewModel::exitLesson,
+        )
 
+        // Fortschritt und die beiden Rückfall-Chevrons teilen sich eine Zeile
+        // direkt unter der Kopfzeile: die Chevrons an den Rändern, gedämpft und
+        // ohne Gehäuse, die Segmentkette dazwischen.
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
         ) {
             AbcNavChevron(
                 forward = false,
@@ -293,7 +281,15 @@ private fun PracticeBody(
                 onClick = viewModel::goPreviousRound,
                 contentDescription = stringResource(R.string.nav_back),
             )
-            Spacer(Modifier.width(36.dp))
+            AbcSegmentedProgress(
+                index = state.trainerIndex,
+                total = state.trainers.size,
+                roundIndex = state.roundIndex,
+                roundCount = state.roundCount,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
+            )
             AbcNavChevron(
                 forward = true,
                 enabled = state.canGoNext && state.successPhase == SuccessPhase.Idle,
@@ -302,28 +298,21 @@ private fun PracticeBody(
             )
         }
 
-        Spacer(Modifier.height(8.dp))
-        AbcProgressBar(index = state.trainerIndex, total = state.trainers.size)
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = state.trainerProgressLabel,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-        )
-        if (state.roundCount > 1) {
-            Spacer(Modifier.height(6.dp))
-            RoundProgressDots(
-                roundCount = state.roundCount,
-                roundIndex = state.roundIndex,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-            )
-        }
-
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(AbcDimens.chromeGap))
 
         if (task != null && round != null) {
-            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = AbcDimens.screenHorizontal)
+                    // Nur die Unterkante: oben hat die Kopfzeile den Status-Bar-Inset
+                    // schon verbraucht. safeDrawing statt navigationBars, weil hier
+                    // auch die System-Zahlentastatur hochkommt (§8) — sie muss den
+                    // Aufgabenbereich weiterhin nach oben schieben.
+                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom))
+                    .padding(bottom = AbcDimens.screenBottomExtra),
+            ) {
                 TrainerHost(
                     trainer = task,
                     round = round,
@@ -345,37 +334,6 @@ private fun PracticeBody(
                     modifier = Modifier.fillMaxSize(),
                 )
             }
-        }
-    }
-}
-
-private val RoundDotSize = 8.dp
-
-/**
- * Sub-progress within the current trainer: one dot per round, filled up to and
- * including the current one. Shapes only — no text, no emoji.
- */
-@Composable
-private fun RoundProgressDots(
-    roundCount: Int,
-    roundIndex: Int,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        repeat(roundCount) { i ->
-            val filled = i <= roundIndex
-            Box(
-                modifier = Modifier
-                    .size(RoundDotSize)
-                    .background(
-                        color = if (filled) SkyBlue else WarmMuted.copy(alpha = 0.35f),
-                        shape = CircleShape,
-                    ),
-            )
         }
     }
 }
