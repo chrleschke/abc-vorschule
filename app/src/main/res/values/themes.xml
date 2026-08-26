@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.AbcVorschule" parent="android:Theme.Material.Light.NoActionBar">
+    <!--
+      Basis-Theme: alles, was auf jedem unterstützten API-Level (min 26) gilt.
+      Die API-spezifischen Aufsätze in values-vNN erben davon, statt es zu
+      ersetzen — ein gleichnamiger Style in values-vNN überschreibt den aus
+      values komplett, Item für Item wird nichts gemischt. Ohne diese Basis
+      müsste jeder Aufsatz die ganze Liste wiederholen.
+    -->
+    <style name="Base.Theme.AbcVorschule" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">#FFFBF3E4</item>
         <item name="android:navigationBarColor">#FFFBF3E4</item>
         <item name="android:windowBackground">#FFFBF3E4</item>
-        <item name="android:forceDarkAllowed">false</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
+
+    <style name="Theme.AbcVorschule" parent="Base.Theme.AbcVorschule" />
 </resources>
