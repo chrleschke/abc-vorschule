@@ -244,13 +244,15 @@ fun SyllableMergeTrainer(
 
     ExerciseStage(
         modifier = modifier,
-        prompt = {
+        promptChrome = {
             TaskPromptChrome(
                 title = null,
                 ttsAvailable = ttsAvailable,
                 speaking = speaking,
                 onSpeakPrompt = onSpeakPrompt,
             )
+        },
+        prompt = {
             // Gemessen statt angenommen, wie der Wort-Detektiv: die alten festen
             // Breiten (min. 108 + 120 + 108 = 336dp, mit „sch" 366dp) überliefen
             // die ~296dp nutzbare Bühne eines 360dp-Geräts und beschnitten die

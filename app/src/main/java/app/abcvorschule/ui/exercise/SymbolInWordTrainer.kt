@@ -249,13 +249,15 @@ fun SymbolInWordTrainer(
 
     Box(modifier = modifier.onGloballyPositioned { rootOffset = it.positionInWindow() }) {
         ExerciseStage(
-            prompt = {
+            promptChrome = {
                 TaskPromptChrome(
                     title = null,
                     ttsAvailable = ttsAvailable,
                     speaking = speaking,
                     onSpeakPrompt = onSpeakPrompt,
                 )
+            },
+            prompt = {
                 // A non-null label implies a non-null target — it is derived from it —
                 // which is why `target.display` needs no second null check here.
                 if (label != null) {
@@ -271,8 +273,9 @@ fun SymbolInWordTrainer(
                 // Luft zwischen Frage und Arbeit. ExerciseStage setzt AbcDimens.blockGap
                 // (22dp) zwischen *je zwei* Kinder, also auch links und rechts von diesem
                 // Spacer: aus 22dp Abstand Label→Wort werden damit 58dp. Weil der
-                // Aufgabenblock als Ganzes zentriert liegt, hebt das den Speaker und das
-                // gesuchte Symbol an, statt nur das Wort nach unten zu schieben.
+                // Aufgabenblock als Ganzes zentriert liegt, hebt das das gesuchte Symbol
+                // an, statt nur das Wort nach unten zu schieben. Der Speaker bleibt davon
+                // unberührt — er sitzt in der Kopfzeile der Bühne, nicht im Block.
                 Spacer(modifier = Modifier.height(TargetToWordExtraGap))
                 WordSegments(
                     round = round,

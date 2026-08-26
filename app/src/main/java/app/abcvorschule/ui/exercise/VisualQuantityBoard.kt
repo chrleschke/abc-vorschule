@@ -67,13 +67,15 @@ fun VisualQuantityBoard(
     )
     ExerciseStage(
         modifier = modifier,
-        prompt = {
+        promptChrome = {
             TaskPromptChrome(
                 title = null,
                 ttsAvailable = ttsAvailable,
                 speaking = speaking,
                 onSpeakPrompt = onSpeakPrompt,
             )
+        },
+        prompt = {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(20.dp),
                 verticalAlignment = Alignment.CenterVertically,

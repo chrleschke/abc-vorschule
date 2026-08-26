@@ -159,13 +159,15 @@ fun SentenceOrderTrainer(
 
     ExerciseStage(
         modifier = modifier,
-        prompt = {
+        promptChrome = {
             TaskPromptChrome(
                 title = null,
                 ttsAvailable = ttsAvailable,
                 speaking = speaking,
                 onSpeakPrompt = onSpeakPrompt,
             )
+        },
+        prompt = {
             if (!illustrationEmoji.isNullOrBlank()) {
                 Text(text = illustrationEmoji, fontSize = 84.sp)
             }

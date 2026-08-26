@@ -102,13 +102,15 @@ fun SentencePictureTrainer(
         // verdeckt die tippende Hand sonst genau die Bildkarten, die die
         // ganze Aufgabe sind.
         answerAnchor = AnswerAnchor.BelowCenter,
-        prompt = {
+        promptChrome = {
             TaskPromptChrome(
                 title = null,
                 ttsAvailable = ttsAvailable,
                 speaking = speaking,
                 onSpeakPrompt = onSpeakPrompt,
             )
+        },
+        prompt = {
             if (!ttsAvailable) {
                 // Ohne deutsches TTS liest ein Erwachsener vor — die eine
                 // Situation, in der der Satz als Text erscheinen muss.

@@ -9,7 +9,10 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isFinite
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.Atom
 import app.abcvorschule.content.LetterTraceRound
@@ -58,7 +62,9 @@ import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 import kotlinx.coroutines.delay
 
-private val GlyphBox = 350.dp
+/** Obergrenze für den Glyph-Kasten; enger wird er, wenn Kasten plus Straßenband
+ * (siehe `bandOverhang` unten) sonst nicht in den gemessenen Platz passen. */
+private val GlyphBoxMax = 350.dp
 
 /**
  * How long the finished glyph stays on screen before the reward page replaces it.
@@ -119,119 +125,143 @@ fun LetterTraceTrainer(
 
     ExerciseStage(
         modifier = modifier,
-        prompt = {
+        promptChrome = {
             TaskPromptChrome(
                 title = null,
                 ttsAvailable = ttsAvailable,
                 speaking = speaking,
                 onSpeakPrompt = onSpeakPrompt,
             )
-            Box(
-                modifier = Modifier.size(GlyphBox),
+        },
+        prompt = {
+            // Der gezeichnete Glyph ist größer als sein Kasten: die Straße ist ein
+            // Band von `corridorFraction × boxSize` Halbbreite um die Bahn, und die
+            // Bahn selbst reicht bis an die Kanten des Einheitsquadrats (y ab 0.02).
+            // Gemessen wird aber nur der Kasten — mit den vollen 350dp stand das Band
+            // 49dp über dessen Oberkante und lag damit im Speaker (live gesehen).
+            // Der Kasten wird deshalb so gedeckelt, dass Kasten *plus* Band in den
+            // gemessenen Platz passt; Compose beschneidet ein Canvas nicht auf seine
+            // eigene Größe, ein Überstand fiele also weiterhin niemandem auf, bevor
+            // er in einem Nachbarn landet.
+            BoxWithConstraints(
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center,
             ) {
-                if (morph < 1f) {
-                    // Keyed per round so a new glyph starts its fill animation from scratch
-                    // instead of animating the previous round's bars back to empty.
-                    key(roundKey) {
-                        TraceCanvas(
-                            atom = atom,
-                            state = state,
-                            vehicle = vehicle,
-                            onFinger = { finger, boxSize, corridorFraction, strokes, stars ->
-                                if (done || resolved) return@TraceCanvas
-                                val update = TraceProgress.update(
-                                    state = state,
-                                    finger = finger,
-                                    strokes = strokes,
-                                    stars = stars,
-                                    boxSize = boxSize,
-                                    previousFinger = lastFinger,
-                                    corridorFraction = corridorFraction,
-                                )
-                                if (update.offCorridor) {
-                                    // Edge-triggered: one short nudge per excursion, never one per
-                                    // pointer sample. Otherwise the device buzzes continuously and a
-                                    // single stray drag exhausts the resolve threshold at once.
-                                    if (!wasOffCorridor) {
-                                        wasOffCorridor = true
-                                        offRoadCount += 1
-                                        haptics.nudge()
-                                    }
-                                    // Drop the bridge so an off-road hop cannot "tunnel" through
-                                    // a star when the finger comes back onto a later stretch.
-                                    lastFinger = null
-                                    return@TraceCanvas
-                                }
-                                wasOffCorridor = false
-                                // On the road but past the next star: the vehicle stays
-                                // where it is, so the start dot of a fresh bar keeps
-                                // marking that bar's beginning instead of following the
-                                // finger to wherever it entered the road.
-                                if (update.ahead) {
-                                    lastFinger = finger
-                                    return@TraceCanvas
-                                }
-                                vehicle = finger
-                                lastFinger = finger
-                                if (update.collectedStar) {
-                                    // Read before the state write below, which is visible immediately.
-                                    val barFinished = update.state.strokeIndex != state.strokeIndex
-                                    stars.getOrNull(state.strokeIndex)?.getOrNull(state.starIndex)
-                                        ?.let { collectedAt ->
-                                            sparkSeq += 1
-                                            spark = collectedAt to sparkSeq
+                val bandOverhang = 1f + 2f * TraceProgress.fitFor(atom.lemma).corridorFraction
+                val glyphSide = minOf(
+                    GlyphBoxMax,
+                    maxWidth / bandOverhang,
+                    // Unbeschränkt (kein aktueller Fall, siehe ExerciseStage) bliebe
+                    // nur der Deckel GlyphBoxMax übrig.
+                    if (maxHeight.isFinite) maxHeight / bandOverhang else GlyphBoxMax,
+                )
+                Box(
+                    modifier = Modifier.size(glyphSide),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (morph < 1f) {
+                        // Keyed per round so a new glyph starts its fill animation from scratch
+                        // instead of animating the previous round's bars back to empty.
+                        key(roundKey) {
+                            TraceCanvas(
+                                atom = atom,
+                                state = state,
+                                vehicle = vehicle,
+                                onFinger = { finger, boxSize, corridorFraction, strokes, stars ->
+                                    if (done || resolved) return@TraceCanvas
+                                    val update = TraceProgress.update(
+                                        state = state,
+                                        finger = finger,
+                                        strokes = strokes,
+                                        stars = stars,
+                                        boxSize = boxSize,
+                                        previousFinger = lastFinger,
+                                        corridorFraction = corridorFraction,
+                                    )
+                                    if (update.offCorridor) {
+                                        // Edge-triggered: one short nudge per excursion, never one per
+                                        // pointer sample. Otherwise the device buzzes continuously and a
+                                        // single stray drag exhausts the resolve threshold at once.
+                                        if (!wasOffCorridor) {
+                                            wasOffCorridor = true
+                                            offRoadCount += 1
+                                            haptics.nudge()
                                         }
-                                    playStarBlip(starsCollected)
-                                    // A distinct short tick per star: the reward must not feel
-                                    // like the long buzz that means "off the road".
-                                    haptics.tick()
-                                    starsCollected += 1
-                                    // The child is tracing after all — the tap tally
-                                    // must not carry over into the rest of the glyph.
-                                    tapsWithoutTrace = 0
-                                    state = update.state
-                                    // A finished bar hands the vehicle over to the next one, so the
-                                    // child can see where the next stroke starts instead of hunting
-                                    // for it with the dot left behind at the previous bar's end.
-                                    if (barFinished) {
-                                        strokes.getOrNull(update.state.strokeIndex)?.firstOrNull()
-                                            ?.let {
-                                                vehicle = it
-                                                // Fresh bar: do not bridge from the previous
-                                                // stroke's end into this one's star window.
-                                                lastFinger = it
-                                            }
+                                        // Drop the bridge so an off-road hop cannot "tunnel" through
+                                        // a star when the finger comes back onto a later stretch.
+                                        lastFinger = null
+                                        return@TraceCanvas
                                     }
-                                }
-                                if (update.glyphDone) {
-                                    done = true
-                                }
-                            },
-                            onDragFinished = {
-                                // The bridge only spans samples of ONE drag. Without
-                                // this reset, lifting the finger and re-planting it
-                                // further along bridges the untraced gap and collects
-                                // the next star — exactly what the ahead-gate exists
-                                // to prevent.
-                                lastFinger = null
-                            },
-                            onTapWithoutTrace = { strokeStart ->
-                                if (!done && !resolved) {
-                                    tapsWithoutTrace += 1
-                                    // Park the start dot where the stroke begins: the
-                                    // tap gets an answer ("start here"), just not a star.
-                                    strokeStart?.let { vehicle = it }
-                                }
-                            },
-                            modifier = Modifier
-                                .size(GlyphBox)
-                                .testTag("trace_canvas_${atom.id}"),
-                        )
+                                    wasOffCorridor = false
+                                    // On the road but past the next star: the vehicle stays
+                                    // where it is, so the start dot of a fresh bar keeps
+                                    // marking that bar's beginning instead of following the
+                                    // finger to wherever it entered the road.
+                                    if (update.ahead) {
+                                        lastFinger = finger
+                                        return@TraceCanvas
+                                    }
+                                    vehicle = finger
+                                    lastFinger = finger
+                                    if (update.collectedStar) {
+                                        // Read before the state write below, which is visible immediately.
+                                        val barFinished = update.state.strokeIndex != state.strokeIndex
+                                        stars.getOrNull(state.strokeIndex)?.getOrNull(state.starIndex)
+                                            ?.let { collectedAt ->
+                                                sparkSeq += 1
+                                                spark = collectedAt to sparkSeq
+                                            }
+                                        playStarBlip(starsCollected)
+                                        // A distinct short tick per star: the reward must not feel
+                                        // like the long buzz that means "off the road".
+                                        haptics.tick()
+                                        starsCollected += 1
+                                        // The child is tracing after all — the tap tally
+                                        // must not carry over into the rest of the glyph.
+                                        tapsWithoutTrace = 0
+                                        state = update.state
+                                        // A finished bar hands the vehicle over to the next one, so the
+                                        // child can see where the next stroke starts instead of hunting
+                                        // for it with the dot left behind at the previous bar's end.
+                                        if (barFinished) {
+                                            strokes.getOrNull(update.state.strokeIndex)?.firstOrNull()
+                                                ?.let {
+                                                    vehicle = it
+                                                    // Fresh bar: do not bridge from the previous
+                                                    // stroke's end into this one's star window.
+                                                    lastFinger = it
+                                                }
+                                        }
+                                    }
+                                    if (update.glyphDone) {
+                                        done = true
+                                    }
+                                },
+                                onDragFinished = {
+                                    // The bridge only spans samples of ONE drag. Without
+                                    // this reset, lifting the finger and re-planting it
+                                    // further along bridges the untraced gap and collects
+                                    // the next star — exactly what the ahead-gate exists
+                                    // to prevent.
+                                    lastFinger = null
+                                },
+                                onTapWithoutTrace = { strokeStart ->
+                                    if (!done && !resolved) {
+                                        tapsWithoutTrace += 1
+                                        // Park the start dot where the stroke begins: the
+                                        // tap gets an answer ("start here"), just not a star.
+                                        strokeStart?.let { vehicle = it }
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .testTag("trace_canvas_${atom.id}"),
+                            )
+                        }
+                        TraceStarSpark(spark = spark)
+                    } else {
+                        TraceRewardCard(round = round)
                     }
-                    TraceStarSpark(spark = spark)
-                } else {
-                    TraceRewardCard(round = round)
                 }
             }
         },
@@ -324,8 +354,8 @@ private fun TraceCanvas(
     onTapWithoutTrace: (strokeStart: TracePoint?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // The glyph box *requests* GlyphBox dp, but narrow screens squeeze it (360dp
-    // device minus shell/stage padding leaves ~296dp). Geometry and hit-testing
+    // The glyph box *requests* up to GlyphBoxMax dp, but narrow screens squeeze it
+    // (360dp device minus shell/stage padding leaves ~296dp). Geometry and hit-testing
     // must follow the measured size, not the requested one — otherwise strokes
     // near the right edge are drawn outside the canvas and their start points sit
     // in a dead zone the pointerInput never sees (letter-ch/-sch/-y).
@@ -507,7 +537,9 @@ private fun TraceStarSpark(
         progress.animateTo(1f, tween(400))
     }
     val point = spark?.first ?: return
-    Canvas(modifier = modifier.size(GlyphBox)) {
+    // Dieselbe Fläche wie das TraceCanvas daneben — der Funkenpunkt kommt aus dessen
+    // Pixelkoordinaten, ein eigener Kasten anderer Größe verschöbe ihn.
+    Canvas(modifier = modifier.fillMaxSize()) {
         val offsets = BurstGeometry.sparkOffsets(
             count = 5,
             progress = progress.value,
