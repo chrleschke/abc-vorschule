@@ -16,6 +16,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.abcvorschule.speech.observeBackgroundSpeechStop
@@ -47,6 +50,7 @@ class MainActivity : ComponentActivity() {
             // don't need the fallback.
             navigationBarStyle = SystemBarStyle.light(AndroidColor.TRANSPARENT, 0x66000000),
         )
+        hideSystemBars()
         setContent {
             AbcTheme {
                 CompositionLocalProvider(LocalAbcHaptics provides rememberAbcHaptics()) {
@@ -54,6 +58,32 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    // Zurück in den Vollbildmodus, sobald das Fenster den Fokus zurückbekommt —
+    // etwa nachdem die System-Zahlentastatur zu war oder das Eltern-Sheet den
+    // Fokus hatte. Ohne das blieben die Leisten nach solchen Zwischenspielen
+    // stehen, und mit ihnen die Rutschbahn für eine versehentliche Zurück-Geste.
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) hideSystemBars()
+    }
+
+    /**
+     * Kinder-App im Vollbild: Status- und Navigationsleiste sind versteckt, ein
+     * Randwisch holt sie nur kurz zurück (BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE)
+     * statt sofort Zurück oder Home auszulösen.
+     *
+     * Das ist außerdem die Voraussetzung für den Gesten-Ausschluss über die ganze
+     * Übungsfläche: Android deckelt `systemGestureExclusion` sonst bei 200 dp je
+     * Bildschirmkante — der Deckel entfällt nur, solange die Navigationsleiste
+     * dauerhaft versteckt ist.
+     */
+    private fun hideSystemBars() {
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        controller.hide(WindowInsetsCompat.Type.systemBars())
     }
 }
 

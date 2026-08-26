@@ -1,6 +1,7 @@
 package app.abcvorschule.ui.shell
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -306,6 +307,13 @@ private fun PracticeBody(
                     .weight(1f)
                     .fillMaxWidth()
                     .padding(horizontal = AbcDimens.screenHorizontal)
+                    // Die ganze Übungsfläche gehört der App: ein Ziehen, das nah am
+                    // Bildschirmrand beginnt — der Silben-Verschmelzer verlangt genau
+                    // das — darf nicht als System-Zurück-Geste enden und die Lektion
+                    // abbrechen. Ohne den Vollbildmodus aus MainActivity griffe hier
+                    // Androids 200-dp-Deckel je Kante und die Fläche bliebe nur zum
+                    // Teil geschützt.
+                    .systemGestureExclusion()
                     // Nur die Unterkante: oben hat die Kopfzeile den Status-Bar-Inset
                     // schon verbraucht. safeDrawing statt navigationBars, weil hier
                     // auch die System-Zahlentastatur hochkommt (§8) — sie muss den

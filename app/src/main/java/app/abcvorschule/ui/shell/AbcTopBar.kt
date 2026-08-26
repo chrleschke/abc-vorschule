@@ -1,6 +1,11 @@
 package app.abcvorschule.ui.shell
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.add
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -66,6 +71,14 @@ fun AbcTopBar(
 ) {
     TopAppBar(
         modifier = modifier,
+        // safeDrawing statt der Vorgabe (systemBars): im Vollbild ist der
+        // Status-Bar-Inset null, ein Display-Ausschnitt bleibt aber bestehen —
+        // und darunter darf der Titel nicht liegen.
+        // Plus eine feste Handbreit oben: im Vollbild ist der Status-Bar-Inset
+        // null, und ohne sie klebte die Titelzeile an der physischen Kante.
+        windowInsets = WindowInsets.safeDrawing
+            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+            .add(WindowInsets(top = 10.dp)),
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,
             scrolledContainerColor = Color.Transparent,
