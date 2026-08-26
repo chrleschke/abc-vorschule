@@ -59,6 +59,13 @@ class MathHintingTest {
     }
 
     @Test
+    fun theCountingCueMatchesTheGestureTheOperationAsks() {
+        assertEquals(MathHinting.CountingAidCueTakeAway, MathHinting.countingAidCue(MathOperation.Subtract))
+        assertEquals(MathHinting.CountingAidCueCollect, MathHinting.countingAidCue(MathOperation.Add))
+        assertEquals(MathHinting.CountingAidCueCollect, MathHinting.countingAidCue(MathOperation.Multiply))
+    }
+
+    @Test
     fun threeChoicesAlwaysExactlyThreeIncludingAnswer() {
         val choices = MathHinting.threeChoices(4)
         assertEquals(3, choices.size)

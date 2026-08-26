@@ -68,6 +68,17 @@ object MathHinting {
      * [ParentMode.Beginner] behält überall die Kacheln — Elternentscheidung schlägt
      * Aufgabenschwere.
      */
+    /**
+     * Gesprochene Cues der Zähl-Hilfe. Feste Strings ohne Interpolation, sonst
+     * findet die Clip-Suche nie einen kuratierten Clip (`ClipIndex.lookup`) und es
+     * bliebe bei der TTS-Stimme. Gepflegt in `tools/tts/extra-strings.json`.
+     */
+    const val CountingAidCueCollect = "Zähl mit! Tippe jedes Bild an."
+    const val CountingAidCueTakeAway = "Nimm sie weg! Tippe an, was weggeht."
+
+    fun countingAidCue(operation: MathOperation): String =
+        if (operation == MathOperation.Subtract) CountingAidCueTakeAway else CountingAidCueCollect
+
     fun inputFor(scaffold: ScaffoldLevel, parentMode: ParentMode, answer: Int): MathInputMode {
         val typed = scaffold == ScaffoldLevel.Advanced ||
             (parentMode != ParentMode.Beginner && answer >= TypedAnswerFrom)

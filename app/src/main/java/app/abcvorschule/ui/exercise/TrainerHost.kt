@@ -144,6 +144,7 @@ fun TrainerHost(
             speaking = speaking,
             interactionLocked = interactionLocked,
             onSpeakPrompt = callbacks.onSpeakPrompt,
+            onSpeakFeedback = callbacks.onSpeakFeedback,
             onResult = callbacks.onMathResult,
             modifier = modifier.fillMaxSize(),
         )
