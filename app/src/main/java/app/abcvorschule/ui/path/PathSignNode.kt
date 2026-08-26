@@ -90,8 +90,35 @@ internal object PathSignLabel {
     /** The emoji row's authored size. */
     const val BaseEmojiSp = 16f
 
-    /** Board width (136dp) minus ring and rounded-corner breathing room. */
-    const val MaxLabelWidthDp = 120f
+    /**
+     * The corner glyph's column, measured from the board's edge: 8dp of padding
+     * plus a 16dp star or lock ([PathSignNode]'s TopEnd slot). The nail that stands
+     * in for both on an ordinary sign is smaller (10dp padding, 6dp head = 16dp), so
+     * this is the widest of the three — and it has to be, because one gutter has to
+     * serve every state: a label that resized as the sign went Locked -> Available
+     * -> Mastered would change size under the child as it progressed.
+     */
+    const val CornerGlyphGutterDp = 24f
+
+    /**
+     * Usable label width: the 136dp board minus [CornerGlyphGutterDp] on *both*
+     * sides, because the label column is centred on the board — what it may not
+     * enter on the right it must give up on the left as well.
+     *
+     * Was 120dp, which only subtracted the ring and the rounded corners and ignored
+     * the corner glyph entirely. 120dp centred spans x = 8..128, and the glyph's box
+     * is x = 112..128: at font scale 1.3 "C y x qu" renders ~116dp wide and reaches
+     * x ≈ 126, at [MaxBoardFontScale] it fills the full 120dp and runs under the
+     * star or the lock. 88dp keeps the label's line box clear of that column at
+     * every scale (its right edge lands exactly on x = 112). The ring and the corner
+     * radius are covered on the way — 8dp of padding is more than the 4dp ring.
+     *
+     * The price is that the two longest authored labels ("C y x qu", "Sch ch+", both
+     * ~4.05em) now shrink slightly even at font scale 1.0: 88 / 4.05 = 21.7dp
+     * instead of the authored 22dp, ~1%. Past 1.0 they hold that rendered size
+     * instead of growing. Short labels are untouched at every scale.
+     */
+    const val MaxLabelWidthDp = 136f - 2f * CornerGlyphGutterDp
 
     /**
      * Rendered text stops growing past this scale: at 1.6 the label line plus the

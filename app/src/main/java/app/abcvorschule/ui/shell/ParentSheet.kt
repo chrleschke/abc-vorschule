@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import app.abcvorschule.BuildConfig
 import app.abcvorschule.R
 import app.abcvorschule.progress.ParentMode
-import app.abcvorschule.ui.theme.WarmMuted
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,10 +55,17 @@ fun ParentSheet(
                 text = stringResource(R.string.parent_title),
                 style = MaterialTheme.typography.headlineMedium,
             )
+            // onSurface (WarmInk) statt WarmMuted: titleMedium ist in dieser App
+            // nicht überschrieben, bleibt also bei Material3s 16sp/Medium — Kleintext
+            // im Sinne von WCAG, und der Abschnitt ist reiner Erwachsenentext. Auf
+            // der Fläche des Sheets (CreamPanel) kam WarmMuted nur auf 4.04:1 und
+            // verfehlte die 4.5:1; WarmInk liegt dort bei 10.07:1. Die Rangfolge
+            // gegenüber den Optionen darunter trägt weiterhin die Größe (16sp gegen
+            // titleLarge 22sp), nicht die Farbe.
             Text(
                 text = stringResource(R.string.parent_section_difficulty),
                 style = MaterialTheme.typography.titleMedium,
-                color = WarmMuted,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Column(modifier = Modifier.selectableGroup()) {
                 ModeOption(

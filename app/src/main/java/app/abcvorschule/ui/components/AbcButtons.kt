@@ -52,7 +52,13 @@ fun AbcContinueButton(
             enabled = enabled,
             shape = RoundedCornerShape(18.dp),
             contentPadding = PaddingValues(horizontal = 22.dp, vertical = 14.dp),
-            modifier = Modifier.defaultMinSize(minHeight = AbcDimens.kidTouch - 8.dp),
+            // Voller kidTouch statt kidTouch - 8dp: das Kind tippt diesen Knopf, und
+            // 72dp waren eine Ausnahme ohne Begründung — §9 nimmt nur die Chevrons
+            // (48dp) aus. Der einzige Aufrufer ist der End-Screen, dessen mittlerer
+            // Block `weight(1f)` trägt: die 8dp gehen dort von einem Block ab, der
+            // bei font_scale 1.3 selbst im ungünstigsten Fall (360×640dp, vier
+            // Bilder, vierzeiliger Satz) über 100dp Luft behält.
+            modifier = Modifier.defaultMinSize(minHeight = AbcDimens.kidTouch),
             colors = ButtonDefaults.buttonColors(
                 containerColor = SunCoral,
                 contentColor = Cream,
@@ -75,6 +81,15 @@ fun AbcResolveButton(
     // und Label. Vorher erbte das Label primary (= LeafGreen, „richtig/erledigt")
     // und das Icon secondary (= SkyBlue, „Fortschritt") — zwei Bedeutungsfarben
     // auf einem Aufgeben-Weg, und Auflösen darf nicht grün sein (§8, §10).
+    //
+    // 56dp und nicht AbcDimens.kidTouch: 56dp ist der Hitbox-Boden des Design-Systems
+    // (WordFrameSizing.MinFrameDp, SentencePegSizing.MinPegWidthDp, §9 „jeder Peg
+    // bleibt tippbar (56dp)"), kidTouch der bequeme Zielwert dort, wo Platz ist. Hier
+    // ist keiner: der Knopf erscheint nach zwei Fehlversuchen *zusätzlich* im
+    // Antwortblock von acht Trainern, und der steht in einer Bühne, die weder scrollt
+    // noch beschneidet (ExerciseStage). Genau dieser Knopf wurde dort schon einmal
+    // auf wenige dp zusammengedrückt (siehe ExerciseStage-Kommentar zu
+    // PromptHeightFraction); 24dp mehr je Trainer wären derselbe Fehler noch einmal.
     TextButton(
         onClick = onClick,
         modifier = modifier.defaultMinSize(minHeight = 56.dp),
@@ -134,7 +149,16 @@ fun AbcNavChevron(
             .semantics { this.contentDescription = contentDescription },
         contentAlignment = Alignment.Center,
     ) {
-        val tint = WarmMuted.copy(alpha = if (enabled) 0.55f else 0.2f)
+        // Der Glyph trägt die 3:1-Grenze für UI-Bauteile allein: ohne Gehäuse gibt
+        // es keine zweite Fläche, an der man den Knopf erkennen könnte. 0.55 lag
+        // über Cream bei #B5AA98 = 2.08:1 — zu wenig für den einzigen Weg zurück in
+        // eine Runde. 0.8 komponiert zu #958976 = 3.11:1 und bleibt sichtbar unter
+        // den 4.45:1 des vollen WarmMuted: gedämpft wie in §9 gewollt, nur eben
+        // nicht unsichtbar.
+        // Der Aus-Zustand bleibt bei 0.2 (#E2D9C8, 1.27:1): deaktivierte Bauteile
+        // nimmt WCAG 1.4.11 ausdrücklich aus, und ein Rückfallweg, der gerade
+        // nirgendwohin führt, soll auch nicht danach aussehen.
+        val tint = WarmMuted.copy(alpha = if (enabled) 0.8f else 0.2f)
         if (forward) {
             IconChevronRight(tint = tint)
         } else {

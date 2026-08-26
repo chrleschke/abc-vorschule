@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -43,6 +42,7 @@ import app.abcvorschule.progress.LessonState
 import app.abcvorschule.ui.shell.AbcTopBar
 import app.abcvorschule.ui.shell.ParentGateButton
 import app.abcvorschule.ui.shell.TopBarFloatingActionTop
+import app.abcvorschule.ui.shell.TopBarExtraTop
 import app.abcvorschule.ui.shell.TopBarHeight
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.StarGold
@@ -82,15 +82,23 @@ fun PathScreen(
         PathBackground(scrollOffset = { scrollState.value })
 
         val density = LocalDensity.current
-        val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+        val safeDrawingTop = WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding()
         val navigationBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         // Die Schilder laufen unter der durchsichtigen Kopfzeile durch und werden
         // erst an der physischen Bildschirmkante beschnitten — deshalb füllt der
         // Scroll-Bereich den ganzen Screen, statt unter der Leiste anzufangen.
         // Stand er in einer Column unter ihr, schnitt seine Oberkante die Schilder
         // mitten im Bild ab, an einer Linie, die der Hintergrund nicht erklärt.
-        // Den Platz, den die Leiste einnimmt, hält der Inhalt selbst frei.
-        val contentTop = statusBarTop + TopBarHeight
+        // Den Platz, den die Leiste einnimmt, hält der Inhalt selbst frei — und zwar
+        // genau den, den sie wirklich einnimmt: `safeDrawing` (nicht `statusBars`)
+        // plus die feste Handbreit über der Titelzeile plus die Leistenhöhe. Die
+        // Leiste rechnet in AbcTopBar mit demselben Inset, und im Sticky-Immersive-
+        // Vollbild ist der Status-Bar-Inset null, während der Display-Ausschnitt
+        // bleibt. Mit `statusBars` fehlte hier deshalb immer mindestens die
+        // Handbreit, und der „Du bist hier"-Pin über dem ersten Schild rutschte ins
+        // Leistenband.
+        //
+        val contentTop = safeDrawingTop + TopBarExtraTop + TopBarHeight
         val contentTopPx = with(density) { contentTop.toPx() }
         val spacingPx = with(density) { PathGeometry.DefaultSpacing.dp.toPx() }
         val marginPx = with(density) { PathGeometry.DefaultMargin.dp.toPx() }

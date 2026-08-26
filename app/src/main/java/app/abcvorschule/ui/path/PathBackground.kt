@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -205,6 +206,17 @@ private fun HillBand(
     scrollOffset: () -> Int,
     trees: Boolean = false,
 ) {
+    // Zwei wiederverwendete Path-Objekte statt sieben neuer je Scroll-Frame (drei
+    // Bänder, dazu vier Kronen im vordersten): der Parallax-Wert wird bewusst erst
+    // in der Zeichenphase gelesen, damit Scrollen nur neu zeichnet — dann darf die
+    // Zeichenphase auch nicht in jedem Frame Objekte anlegen, die der GC danach
+    // wieder wegräumen muss.
+    //
+    // Eine Krone für alle vier Bäume reicht: `drawPath` gibt den Pfad sofort an den
+    // Canvas weiter, danach ist er wieder frei. `rewind()` statt `reset()`, weil
+    // rewind den bereits belegten Speicher behält — genau das ist der Zweck hier.
+    val hill = remember { Path() }
+    val crown = remember { Path() }
     Box(
         Modifier
             .fillMaxSize()
@@ -223,7 +235,8 @@ private fun HillBand(
                 // Path until the app dies, and both divisions by size.width are gone
                 // with it. A draw pass at zero width is reachable through a
                 // freeform/split-screen resize.
-                val hill = Path().apply {
+                hill.rewind()
+                hill.apply {
                     moveTo(0f, size.height)
                     lineTo(0f, base)
                     for (i in 0..HillSegments) {
@@ -257,12 +270,11 @@ private fun HillBand(
                             topLeft = Offset(tx - trunkHalfWidth, trunkTop),
                             size = Size(trunkHalfWidth * 2f, ty + skirt + trunkDepth - trunkTop),
                         )
-                        val crown = Path().apply {
-                            moveTo(tx, ty - apex)
-                            lineTo(tx - halfWidth, ty + skirt)
-                            lineTo(tx + halfWidth, ty + skirt)
-                            close()
-                        }
+                        crown.rewind()
+                        crown.moveTo(tx, ty - apex)
+                        crown.lineTo(tx - halfWidth, ty + skirt)
+                        crown.lineTo(tx + halfWidth, ty + skirt)
+                        crown.close()
                         drawPath(crown, color = TreeCrown)
                     }
                 }

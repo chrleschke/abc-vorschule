@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,23 +20,25 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.R
@@ -46,6 +49,7 @@ import app.abcvorschule.ui.components.AbcSpeakerButton
 import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.rewards.ConfettiGeometry
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
@@ -69,6 +73,25 @@ private const val BackgroundStarAlpha = 0.15f
 // ohne zu einem schmalen Textband zu werden. Reine Optik, keine Font-Scale-Entscheidung,
 // bleibt darum hier statt in FinaleLayout.
 private val SentenceExtraHorizontalPadding = 20.dp
+
+/**
+ * Mindest-Trefferfläche eines antippbaren Finale-Bildes. Vorher war die Fläche die
+ * Glyphenbox selbst — effektiv 64dp bei zwei oder drei Bildern, 52dp bei vier
+ * ([FinaleLayout.pictureSizeSp] deckelt die gerenderte Größe, sie ist also auf dem
+ * Testgerät bei font_scale 1.3 dieselbe wie bei 1.0). Beides liegt unter
+ * [AbcDimens.kidTouch], und getippt wird hier vom Kind (§7: antippbare Items werden
+ * vorgelesen).
+ *
+ * Die vollen 80dp bekommen nur zwei oder drei Bilder. Vier bräuchten
+ * 4×80 + 3×[FinaleLayout.PictureRowGapDp] = 368dp, die schmalste unterstützte
+ * Inhaltsbreite ist aber 272dp (320dp-Gerät minus 24dp Spaltenpolster je Seite,
+ * festgehalten in FinaleLayoutTest). Für vier Bilder ist der Boden deshalb genau das,
+ * was dort noch in *eine* Reihe passt — (272 − 3×16) / 4 = 56dp —, und das ist der
+ * Hitbox-Boden, auf den §9 auch die Satz-Pegs stellt, wenn kidTouch physikalisch nicht
+ * passt. Drei Bilder gehen mit 3×80 + 2×16 = 272dp genau auf.
+ */
+private fun pictureTouchSize(count: Int): Dp =
+    if (count >= 4) 56.dp else AbcDimens.kidTouch
 
 /**
  * Der End-Screen einer Lektion, in zwei Varianten:
@@ -122,7 +145,12 @@ fun RewardSummaryScreen(
         popped = true
         haptics.celebrate()
     }
-    val starScale by animateFloatAsState(
+    // Absichtlich nicht `by`: der Wert wird erst im graphicsLayer-Block von
+    // [BackgroundStar] gelesen, also in der Zeichenphase. Hier oben gelesen hätte
+    // er den ganzen End-Screen — Header, Bildreihe, Satz, Speaker, Weiter-Knopf —
+    // 500ms lang jeden Frame rekomponiert. Dieselbe Regel wie bei den Pfad-
+    // Animationen (PathSignNode, PathHereMarker, PathScreen).
+    val starScale = animateFloatAsState(
         targetValue = if (popped) 1f else 0.7f,
         animationSpec = tween(500),
         label = "reward-scale",
@@ -209,12 +237,24 @@ private const val ConfettiCount = 40
 private const val ConfettiSeed = 42L
 private const val ConfettiDurationMillis = 2200
 
+/**
+ * Einmal alloziert statt je Rekomposition: die vier Rollenfarben sind konstant,
+ * und die Liste wurde vorher in jedem Frame der 2200ms neu gebaut.
+ */
+private val ConfettiColors = listOf(StarGold, SunCoral, SkyBlue, LeafGreen)
+
 @Composable
 private fun ConfettiOverlay(modifier: Modifier = Modifier) {
     val pieces = remember { ConfettiGeometry.pieces(count = ConfettiCount, seed = ConfettiSeed) }
-    val colors = listOf(StarGold, SunCoral, SkyBlue, LeafGreen)
     var progress by remember { mutableStateOf(0f) }
-    val animatedProgress by animateFloatAsState(
+    // Absichtlich nicht `by`, und das `if (animatedProgress < 1f)` ist bewusst in
+    // die Zeichenphase gewandert: als Bedingung um das Canvas herum war der
+    // Fortschritt ein Kompositions-Lesezugriff und rekomponierte diese Composable
+    // — und mit ihr den ganzen End-Screen — 2200ms lang in jedem Frame. Jetzt
+    // bleibt das Canvas stehen und zeichnet nach dem Lauf schlicht nichts mehr;
+    // die Zusage aus dem Kommentar oben („zeichnet danach nichts mehr") gilt
+    // unverändert.
+    val animatedProgress = animateFloatAsState(
         targetValue = progress,
         animationSpec = tween(ConfettiDurationMillis, easing = LinearEasing),
         label = "confetti-progress",
@@ -223,35 +263,40 @@ private fun ConfettiOverlay(modifier: Modifier = Modifier) {
         progress = 1f
     }
 
-    if (animatedProgress < 1f) {
-        Canvas(modifier = modifier) {
-            val width = size.width
-            val height = size.height
-            pieces.forEach { piece ->
-                val y = ConfettiGeometry.yFraction(piece, animatedProgress)
-                if (y in -0.1f..1.1f) {
-                    val x = (piece.xFraction + piece.drift * animatedProgress).coerceIn(0f, 1f) * width
-                    val pieceSize = (10f * piece.sizeFraction)
-                    withTransform({
-                        translate(left = x, top = y * height)
-                        rotate(degrees = piece.drift * 360f * animatedProgress, pivot = Offset.Zero)
-                    }) {
-                        drawRoundRect(
-                            color = colors[piece.colorIndex],
-                            topLeft = Offset(-pieceSize / 2f, -pieceSize / 2f),
-                            size = Size(pieceSize, pieceSize),
-                            cornerRadius = CornerRadius(pieceSize * 0.3f),
-                        )
-                    }
+    Canvas(modifier = modifier) {
+        val fallen = animatedProgress.value
+        if (fallen >= 1f) return@Canvas
+        val width = size.width
+        val height = size.height
+        pieces.forEach { piece ->
+            val y = ConfettiGeometry.yFraction(piece, fallen)
+            if (y in -0.1f..1.1f) {
+                val x = (piece.xFraction + piece.drift * fallen).coerceIn(0f, 1f) * width
+                val pieceSize = (10f * piece.sizeFraction)
+                withTransform({
+                    translate(left = x, top = y * height)
+                    rotate(degrees = piece.drift * 360f * fallen, pivot = Offset.Zero)
+                }) {
+                    drawRoundRect(
+                        color = ConfettiColors[piece.colorIndex],
+                        topLeft = Offset(-pieceSize / 2f, -pieceSize / 2f),
+                        size = Size(pieceSize, pieceSize),
+                        cornerRadius = CornerRadius(pieceSize * 0.3f),
+                    )
                 }
             }
         }
     }
 }
 
-/** Der gedämpfte Erfolgsstern: gleiche Instanz für die echte und die schlanke Variante. */
+/**
+ * Der gedämpfte Erfolgsstern: gleiche Instanz für die echte und die schlanke
+ * Variante. [scale] kommt als `State` herein und wird im graphicsLayer-Block
+ * gelesen, also in der Zeichenphase — ein Skalierungsframe zeichnet den Stern neu,
+ * ohne irgendetwas zu rekomponieren.
+ */
 @Composable
-private fun BackgroundStar(scale: Float, modifier: Modifier = Modifier) {
+private fun BackgroundStar(scale: State<Float>, modifier: Modifier = Modifier) {
     IconStar(
         tint = StarGold.copy(alpha = BackgroundStarAlpha),
         // Ohne Override würde die neue Standard-Kontur (StarGoldDeep, siehe AbcIcons.kt)
@@ -261,7 +306,11 @@ private fun BackgroundStar(scale: Float, modifier: Modifier = Modifier) {
         // dieser Stern rein dekorativ ist, kein bedienbares Glyph.
         outline = StarGoldDeep.copy(alpha = BackgroundStarAlpha),
         size = BackgroundStarSize,
-        modifier = modifier.scale(scale),
+        modifier = modifier.graphicsLayer {
+            val factor = scale.value
+            scaleX = factor
+            scaleY = factor
+        },
     )
 }
 
@@ -306,10 +355,11 @@ private fun FinaleBody(
     speaking: Boolean,
     onSpeak: (String) -> Unit,
     fontScale: Float,
-    starScale: Float,
+    starScale: State<Float>,
 ) {
     val pictures = FinaleLayout.picturesOf(pack, finale)
     val pictureSp = FinaleLayout.pictureSizeSp(pictures.size, fontScale).sp
+    val pictureTouch = pictureTouchSize(pictures.size)
     val sentenceSp = FinaleLayout.sentenceSizeSp(fontScale)
     val sentenceLineHeightSp = FinaleLayout.sentenceLineHeightSp(fontScale)
 
@@ -347,14 +397,23 @@ private fun FinaleBody(
                         visible = shown,
                         enter = fadeIn(tween(260)) + scaleIn(tween(260), initialScale = 0.6f),
                     ) {
-                        Text(
-                            text = picture.emoji,
-                            fontSize = pictureSp,
-                            // Tippen liest das Wort vor (Prinzip 7).
-                            modifier = Modifier.clickable(enabled = ttsAvailable) {
-                                onSpeak(picture.lemma)
-                            },
-                        )
+                        // Die Trefferfläche ist die Box, nicht das Glyph: ein Emoji
+                        // ist kleiner als der Finger, der es trifft. Siehe
+                        // [pictureTouchSize].
+                        Box(
+                            modifier = Modifier
+                                .defaultMinSize(
+                                    minWidth = pictureTouch,
+                                    minHeight = pictureTouch,
+                                )
+                                // Tippen liest das Wort vor (Prinzip 7).
+                                .clickable(enabled = ttsAvailable) {
+                                    onSpeak(picture.lemma)
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(text = picture.emoji, fontSize = pictureSp)
+                        }
                     }
                 }
             }

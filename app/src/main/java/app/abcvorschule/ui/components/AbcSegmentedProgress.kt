@@ -101,8 +101,18 @@ fun AbcSegmentedProgress(
         val stride = segmentWidth + gap
         repeat(total) { segment ->
             val left = segment * stride
+            // Die Kante gefüllt/ungefüllt IST hier die Information — sie sagt, wie
+            // weit die Lektion ist —, also gilt für sie die 3:1-Grenze für
+            // UI-Bauteile. Bei 0.35 komponierte die Spur über Cream zu #CFC5B4 und
+            // SkyBlue kam darauf nur auf 2.50:1. 0.18 ergibt #E4DBCB: SkyBlue
+            // dagegen 3.11:1. Die Füllfarbe konnte nicht wandern — SkyBlue ist die
+            // Rolle „Fortschritt/aktiv" (§10) —, also musste die Spur heller werden.
+            // Sie bleibt dabei sichtbar: 1.25:1 gegen Cream ist dieselbe Stufe, mit
+            // der sich die Hügelbänder der Pfad-Landschaft voneinander trennen
+            // (Color.kt: 1.24:1 und 1.33:1), und die gefüllte Strecke selbst steht
+            // mit 3.88:1 auf Cream ohnehin für sich.
             drawRoundRect(
-                color = WarmMuted.copy(alpha = 0.35f),
+                color = WarmMuted.copy(alpha = 0.18f),
                 topLeft = Offset(left, 0f),
                 size = Size(segmentWidth, size.height),
                 cornerRadius = corner,

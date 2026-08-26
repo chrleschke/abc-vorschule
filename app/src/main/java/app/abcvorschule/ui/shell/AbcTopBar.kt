@@ -42,8 +42,12 @@ val TopBarFloatingActionSize: Dp = 48.dp
 /**
  * Feste Handbreit über der Titelzeile. Im Vollbild ist der Status-Bar-Inset null;
  * ohne sie klebte die Zeile an der physischen Kante.
+ *
+ * Öffentlich, weil der Pfad denselben Platz freihalten muss, den die Leiste
+ * einnimmt (`PathScreen.contentTop`) — mit einer zweiten Kopie der Zahl driftet
+ * die Reserve, und dann rutscht der „Du bist hier"-Pin ins Leistenband.
  */
-private val TopBarExtraTop: Dp = 10.dp
+val TopBarExtraTop: Dp = 10.dp
 
 /**
  * Abstand des schwebenden Knopfs zur Oberkante des Top-Insets. Ausgerechnet statt
