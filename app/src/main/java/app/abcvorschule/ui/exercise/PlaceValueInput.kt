@@ -39,10 +39,16 @@ object PlaceValueInput {
      */
     fun lastDigit(raw: String): String = raw.filter(Char::isDigit).takeLast(1)
 
-    /** Beide Felder zusammen als Zahl; `null`, solange etwas fehlt. */
-    fun combine(tens: String, ones: String): Int? {
-        if (ones.isEmpty()) return null
-        return "${tens}$ones".toIntOrNull()
+    /**
+     * Beide Felder zusammen als Zahl; `null`, solange die Eingabe nach
+     * [isComplete] nicht vollständig ist. Die Feldzahl gehört mit hinein, sonst
+     * beantworten [combine] und [isComplete] dieselbe Frage verschieden: bei
+     * einem einzigen Feld ist ein Rest im Zehnerfeld kein Zehner, sondern Müll
+     * aus einer früheren Runde.
+     */
+    fun combine(tens: String, ones: String, fieldCount: Int): Int? {
+        if (!isComplete(tens, ones, fieldCount)) return null
+        return (if (fieldCount == 1) ones else "$tens$ones").toIntOrNull()
     }
 
     fun isComplete(tens: String, ones: String, fieldCount: Int): Boolean =
