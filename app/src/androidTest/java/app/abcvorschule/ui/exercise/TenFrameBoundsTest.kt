@@ -66,33 +66,51 @@ class TenFrameBoundsTest {
 
     @Test
     fun onlyTheNextPlaceholderReactsAndTheFrameGrowsToTwenty() {
-        // `state` selbst ist die Quelle der Wahrheit für das, was ein Tipp bewirkt
-        // — `latest` ist nur ihr Fenster nach außen. Der Schreibzugriff im
-        // onTap-Callback läuft synchron im selben Snapshot wie der anschließende
-        // Lesezugriff hier, also ist kein Recompose zwischen Tipp und Prüfung
-        // nötig; `waitForIdle()` bleibt trotzdem als Netz für die Gesten-Erkennung
-        // von `clickable`, die intern eine Coroutine startet.
-        var latest: TenFrameState? = null
-        stage(left = 16, right = 8) { latest = it }
+        // Alle Callback-Aufrufe sammeln statt nur den letzten Zustand zu halten:
+        // ein Callback, der nie aufgerufen wird, sähe sonst genauso aus wie einer,
+        // der korrekt mit unverändertem Zustand aufgerufen wird — die Liste macht
+        // "nichts passiert" von "nichts wurde geprüft" unterscheidbar.
+        val taps = mutableListOf<TenFrameState>()
+        stage(left = 16, right = 8) { taps.add(it) }
+
         // Ein Tipp auf ein gesetztes Objekt tut nichts. Die Zelle trägt dafür gar
         // keinen Klick-Handler (siehe TenFrameBoard.TenFrameCell) — `performClick`
         // simuliert einen echten Tipp auf die Bildschirmmitte dieser Zelle und
-        // findet dort niemanden, der reagiert.
+        // findet dort niemanden, der reagiert. Das prüft nur die Widerrufs-Regel
+        // (§ TenFrameState: "kein Widerruf"), nicht die Reihenfolge.
         rule.onNodeWithTag("ten_frame_cell_0").performClick()
         rule.waitForIdle()
-        assertTrue(latest == null || latest!!.filled == 0)
-        // Vier Tipps auf den jeweils nächsten Platzhalter machen den Zehner voll.
-        // Dass die Trefferfläche der aktiven Zelle über ihre Nachbarn hinausragt
-        // (TenFrame.hitTargetDp), ändert daran nichts: `performClick` trifft die
-        // Mitte genau der per Test-Tag gefundenen Zelle, und zu jedem Zeitpunkt
-        // trägt nur diese eine Zelle überhaupt einen Klick-Handler — Nachbarn
-        // haben in der Überlappung keinen, mit dem sie konkurrieren könnten.
-        (16..19).forEach { index ->
+        assertTrue("taps=$taps", taps.isEmpty())
+
+        // Der Fall, um den es bei "nur der nächste Platzhalter reagiert" eigentlich
+        // geht: Zelle 20 ist ein Platzhalter (noch nicht real), aber nicht der
+        // nächste — nextIndex ist 16, in der zweiten Zeile, Zelle 20 liegt bereits
+        // in der dritten. Eine kaputte Reihenfolge-Prüfung (z. B. "irgendein noch
+        // offener Platzhalter reagiert") würde genau hier zuschlagen; der Test auf
+        // Zelle 0 oben kann das nicht zeigen, weil der dort schon aus einem
+        // anderen Grund (kein Handler) nichts tut.
+        rule.onNodeWithTag("ten_frame_cell_20").performClick()
+        rule.waitForIdle()
+        assertTrue("taps=$taps", taps.isEmpty())
+
+        // Positive Kontrolle: erst dieser Tipp beweist, dass der Callback in
+        // dieser Anordnung überhaupt feuern kann. Ohne ihn wären die beiden
+        // leeren Erwartungen oben tautologisch — sie würden genauso aussehen,
+        // wenn `onTap` nie verdrahtet worden wäre.
+        rule.onNodeWithTag("ten_frame_cell_16").performClick()
+        rule.waitForIdle()
+        assertTrue("taps=$taps", taps.size == 1)
+        assertTrue("filled=${taps.single().filled}", taps.single().filled == 1)
+
+        // Drei weitere Tipps auf den jeweils nächsten Platzhalter machen den
+        // zweiten Zehner voll.
+        (17..19).forEach { index ->
             rule.onNodeWithTag("ten_frame_cell_$index").performClick()
             rule.waitForIdle()
         }
         rule.onNodeWithTag("ten_frame_total").assertExists()
-        assertTrue("filled=${latest?.filled}", latest?.filled == 4)
-        assertTrue("tens=${latest?.fullTens}", latest?.fullTens == 20)
+        val last = taps.last()
+        assertTrue("filled=${last.filled}", last.filled == 4)
+        assertTrue("tens=${last.fullTens}", last.fullTens == 20)
     }
 }
