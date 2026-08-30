@@ -41,8 +41,6 @@ from pathlib import Path
 TOOL_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(TOOL_ROOT))
 
-from ttskit.audio import postprocess, write_wav  # noqa: E402
-
 CUSTOM_VOICE = "Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice"
 VOICE_DESIGN = "Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign"
 
@@ -123,7 +121,13 @@ def _load(checkpoint: str):
 
 def _render(fn, path: Path, seed: int, **kwargs) -> float:
     """Eine Generierung, seed-reproduzierbar und nachbearbeitet wie in der Pipeline."""
+    # Erst hier importiert, damit `index` die Seite auch dort neu schreiben
+    # kann, wo torch und soundfile nicht installiert sind. Die Aufnahmen
+    # anzusehen soll nicht am Generierungs-Stack haengen — der war waehrend
+    # dieser Arbeit schon einmal weg.
     import torch
+
+    from ttskit.audio import postprocess, write_wav
 
     torch.manual_seed(seed)
     started = time.time()
@@ -284,9 +288,19 @@ def main() -> int:
     ueber den Pfad zusammengefuehrt, damit die Seite alles zeigt.
     """
     which = sys.argv[1] if len(sys.argv) > 1 else "both"
-    if which not in ("both", "reference", "voicedesign"):
-        print(f"unbekannt: {which!r} — erlaubt: both, reference, voicedesign")
+    if which not in ("both", "reference", "voicedesign", "index"):
+        print(f"unbekannt: {which!r} — erlaubt: both, reference, voicedesign, index")
         return 2
+
+    # `index` schreibt nur die Seite neu, ohne eine einzige Aufnahme zu
+    # erzeugen. Ohne diesen Weg blieb die Seite auf dem Stand des letzten
+    # Laufs stehen, waehrend rows.json laengst mehr kannte — genau so fehlte
+    # Block A auf der Seite, obwohl alle 24 WAVs auf der Platte lagen.
+    if which == "index":
+        rows = json.loads((OUT / "rows.json").read_text(encoding="utf-8"))
+        index = write_index(rows)
+        print(f"{len(rows)} Aufnahmen auf der Seite\nAnhoeren: open {index}")
+        return 0
 
     OUT.mkdir(parents=True, exist_ok=True)
     rows: list[dict] = []
