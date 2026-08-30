@@ -26,7 +26,7 @@ data class Lesson(
     val focusAtomIds: List<String> = emptyList(),
     /** Trainer kinds in non-decreasing ContentValidator.TrainerOrder rank when
      * authored — a kind may repeat or be skipped, but the sequence never goes
-     * backward, always starts with sound_position, and always ends with count_add. */
+     * backward, always starts with letter_trace, and always ends with count_add. */
     val taskIds: List<String> = emptyList(),
     /**
      * Belohnungssatz beim Abschluss (`finales.json`). Ein Verweis statt eines

@@ -19,7 +19,6 @@ class ContentValidatorTest {
     fun sentencePictureRanksBetweenSentenceOrderAndCountAdd() {
         assertEquals(
             listOf(
-                TrainerKind.sound_position,
                 TrainerKind.letter_trace,
                 TrainerKind.syllable_merge,
                 TrainerKind.word_build,
@@ -38,7 +37,7 @@ class ContentValidatorTest {
             val kinds = pack.tasksOf(lesson).map { it.kind }
             val ranks = kinds.map { rank.getValue(it) }
             assertTrue("lesson ${lesson.id} kinds $kinds must be non-decreasing rank", ranks.zipWithNext().all { (a, b) -> a <= b })
-            assertEquals("lesson ${lesson.id} must start with sound_position", TrainerKind.sound_position, kinds.first())
+            assertEquals("lesson ${lesson.id} must start with letter_trace", TrainerKind.letter_trace, kinds.first())
             assertEquals("lesson ${lesson.id} must end with count_add", TrainerKind.count_add, kinds.last())
         }
     }
@@ -63,9 +62,9 @@ class ContentValidatorTest {
     fun monotonicOrderAcceptsRepeatedAndSkippedKinds() {
         val lesson = pack.authoredLessons.first()
         val repeatedAndSkipped = listOf(
-            TrainerKind.sound_position,
-            TrainerKind.sound_position,
             TrainerKind.letter_trace,
+            TrainerKind.letter_trace,
+            TrainerKind.syllable_merge,
             TrainerKind.word_build,
             TrainerKind.count_add,
         )
@@ -75,15 +74,15 @@ class ContentValidatorTest {
 
     @Test
     fun backwardJumpInTrainerKindsIsRejected() {
-        // Correct start (sound_position) and correct end (count_add) so this test
-        // isolates the monotonic-rank check: rank 3 (word_build) -> rank 1
-        // (letter_trace) is a genuine mid-sequence backward jump, not a start/end
+        // Correct start (letter_trace) and correct end (count_add) so this test
+        // isolates the monotonic-rank check: rank 2 (word_build) -> rank 1
+        // (syllable_merge) is a genuine mid-sequence backward jump, not a start/end
         // violation. If the monotonic check were dropped, this would slip through.
         val lesson = pack.authoredLessons.first()
         val dipsBackwardInTheMiddle = listOf(
-            TrainerKind.sound_position,
-            TrainerKind.word_build,
             TrainerKind.letter_trace,
+            TrainerKind.word_build,
+            TrainerKind.syllable_merge,
             TrainerKind.count_add,
         )
         val issues = ContentValidator.validate(packWithLessonKinds(lesson, dipsBackwardInTheMiddle)).map { it.message }

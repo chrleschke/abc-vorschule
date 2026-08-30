@@ -44,9 +44,8 @@ import app.abcvorschule.ui.theme.WarmMuted
 
 /**
  * Trainer 6 — Satz-Versteher. Ein Satz mit schwieriger Grammatik wird
- * vorgelesen; das Kind tippt eine von zwei Bildkarten. Tippen ist die Antwort
- * (wie beim Auditiven Finder) — die Karten tragen keine Wörter, also gibt es
- * kein Vorlese-Echo. Ein Miss liest den Satz erneut (missCueForCurrent).
+ * vorgelesen; das Kind tippt eine von zwei Bildkarten. Tippen ist die Antwort —
+ * die Karten tragen keine Wörter, also gibt es kein Vorlese-Echo. Ein Miss liest den Satz erneut (missCueForCurrent).
  */
 @Composable
 fun SentencePictureTrainer(

@@ -1140,11 +1140,6 @@
       "fingerprint": "9115865eb8e10d25",
       "profile": "reward"
     },
-    "Ei.": {
-      "file": "miss_1bdb9dfabccf.ogg",
-      "fingerprint": "c8bbb49e1acfcd15",
-      "profile": "miss"
-    },
     "Eier": {
       "file": "word_c67a98fb5c20.ogg",
       "fingerprint": "9f0307d78a6ad832",
@@ -2735,191 +2730,6 @@
       "fingerprint": "ae3495655c451016",
       "profile": "sentence"
     },
-    "Wo hörst du den Buchstaben - A? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_7b188b50820e.ogg",
-      "fingerprint": "2ede90417860b984",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - B? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_a9f62754c733.ogg",
-      "fingerprint": "ca0b8ab60be3954a",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - D? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_d3a4513f8c9a.ogg",
-      "fingerprint": "eac25f8ef6bb23e6",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - E? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_9f29d23ec573.ogg",
-      "fingerprint": "cab37c146ef05d25",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - F? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_9705f375d308.ogg",
-      "fingerprint": "d1e038568af66f8b",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - G? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_96d68f8451f7.ogg",
-      "fingerprint": "9a191fc49a857400",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - H? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_900b49a17a1e.ogg",
-      "fingerprint": "69f8256f91a09efa",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_0845c380bb11.ogg",
-      "fingerprint": "7e732b0759b15525",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - K? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_a9abb07205aa.ogg",
-      "fingerprint": "7705a0cffee5d62f",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - L? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_11bc85fc22b6.ogg",
-      "fingerprint": "d54510eeda2a5bf1",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_2eab93180bfb.ogg",
-      "fingerprint": "0c703eb9624baf14",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - N? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_e2c1b8ed3722.ogg",
-      "fingerprint": "3b7c45ff7f4d49a1",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - O? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_a1300d8ff0ec.ogg",
-      "fingerprint": "ec2bad0319992197",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - P? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_71e2030ff4d8.ogg",
-      "fingerprint": "98786130363116ad",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - R? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_b289a5260972.ogg",
-      "fingerprint": "937e6053d84b84f1",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - S? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_1ec405c1df3a.ogg",
-      "fingerprint": "057e1ae5a0a56ba2",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_16551c2f4d33.ogg",
-      "fingerprint": "66303b91da36e6c2",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - U? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_3961ac453bda.ogg",
-      "fingerprint": "224ed55a58739dd9",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - V? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_321cf8512c93.ogg",
-      "fingerprint": "e4df25cf0067921f",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - W? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_fa6fd5c04915.ogg",
-      "fingerprint": "b8e192249596bdbd",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - X? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_b49820c08813.ogg",
-      "fingerprint": "b2ced895363d9b7a",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - Z? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_e4de6e1c5a0c.ogg",
-      "fingerprint": "a34a13f919372948",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - Ä? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_4108ef0c0324.ogg",
-      "fingerprint": "db3181f7892e4e8c",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - Ö? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_84ec3e8f06ab.ogg",
-      "fingerprint": "2c9bc27639083b16",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - Ü? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_844dd6651f8c.ogg",
-      "fingerprint": "b77b189338fad0ce",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Buchstaben - ß? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_dc9b335d2595.ogg",
-      "fingerprint": "9c0c4a049b29c6a8",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Laut - Au? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_d37d945d637f.ogg",
-      "fingerprint": "51b9bc9fa7bca534",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_7b33412b12da.ogg",
-      "fingerprint": "b0f0262e092d1c8f",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Laut - Ei? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_e00281474263.ogg",
-      "fingerprint": "726297834e0d8847",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Laut - Eu? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_923ee5c167b9.ogg",
-      "fingerprint": "87a1fc8db93a623a",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Laut - Pf? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_1a6f6b9c07a9.ogg",
-      "fingerprint": "9b13ad26a94079ff",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Laut - Qu? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_042f5f070491.ogg",
-      "fingerprint": "f29e510ef3c8b73d",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Laut - Sch? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_3773ebc27e85.ogg",
-      "fingerprint": "3490fe29bce7685a",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Laut - Sp? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_538c49ab6354.ogg",
-      "fingerprint": "2732ffaa81b028bf",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Laut - St? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_de433e65a6b3.ogg",
-      "fingerprint": "3ce65c0876c22cb8",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Laut - ck? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_71c013a32788.ogg",
-      "fingerprint": "82fc9e50c7f3eea9",
-      "profile": "prompt"
-    },
-    "Wo hörst du den Laut - ks? Am Anfang, in der Mitte oder am Ende.": {
-      "file": "prompt_dcfc83effbf7.ogg",
-      "fingerprint": "3574f0f61b3d4960",
-      "profile": "prompt"
-    },
     "Wolke": {
       "file": "word_3a1338ef215e.ogg",
       "fingerprint": "302e52941f282802",
@@ -3305,11 +3115,6 @@
       "fingerprint": "901b9952d5f9479a",
       "profile": "word"
     },
-    "das Auto": {
-      "file": "article_word_b8460049fb0b.ogg",
-      "fingerprint": "353d5480080064f6",
-      "profile": "article_word"
-    },
     "das Dach": {
       "file": "article_word_17170661261a.ogg",
       "fingerprint": "ba8d6a7e20fb46da",
@@ -3325,11 +3130,6 @@
       "fingerprint": "4c66733e5f8e84cc",
       "profile": "article_word"
     },
-    "das Feuer": {
-      "file": "article_word_bc880df7c54d.ogg",
-      "fingerprint": "f50ceed325e7247e",
-      "profile": "article_word"
-    },
     "das Kleid": {
       "file": "article_word_c5acfae3ff25.ogg",
       "fingerprint": "0b2073e28fc912d8",
@@ -3343,11 +3143,6 @@
     "das Nest": {
       "file": "article_word_edef7161a78e.ogg",
       "fingerprint": "471aa1e879756d72",
-      "profile": "article_word"
-    },
-    "das Ohr": {
-      "file": "article_word_0a7b2badd352.ogg",
-      "fingerprint": "3ab375c16b25d449",
       "profile": "article_word"
     },
     "das Pferd": {
@@ -3385,11 +3180,6 @@
       "fingerprint": "6a91e910cbba0264",
       "profile": "word"
     },
-    "der Elefant": {
-      "file": "article_word_31f8ba1ba172.ogg",
-      "fingerprint": "86735917d90e1730",
-      "profile": "article_word"
-    },
     "der Fisch": {
       "file": "article_word_31fa197389b5.ogg",
       "fingerprint": "8405f848142bf3bb",
@@ -3398,31 +3188,6 @@
     "der Fuß": {
       "file": "article_word_af03a3f0d76e.ogg",
       "fingerprint": "cebefa5c3240038c",
-      "profile": "article_word"
-    },
-    "der Hase": {
-      "file": "article_word_9e15162cf4ac.ogg",
-      "fingerprint": "1c0c10f1e591be80",
-      "profile": "article_word"
-    },
-    "der Himmel": {
-      "file": "article_word_8a5c3f8475db.ogg",
-      "fingerprint": "1a2250cd9a2938f1",
-      "profile": "article_word"
-    },
-    "der Igel": {
-      "file": "article_word_706f101a0731.ogg",
-      "fingerprint": "36b47e843946493a",
-      "profile": "article_word"
-    },
-    "der Käse": {
-      "file": "article_word_923a2b14be5c.ogg",
-      "fingerprint": "1c9ccccafa5c4cf7",
-      "profile": "article_word"
-    },
-    "der Löffel": {
-      "file": "article_word_bb8e7e13b424.ogg",
-      "fingerprint": "6fde3378058d799c",
       "profile": "article_word"
     },
     "der Löwe": {
@@ -3435,39 +3200,14 @@
       "fingerprint": "bc046d6c0d0f9c99",
       "profile": "article_word"
     },
-    "der Tag": {
-      "file": "article_word_721adbe100b7.ogg",
-      "fingerprint": "f3c11c858e7cfa1f",
-      "profile": "article_word"
-    },
-    "der Tiger": {
-      "file": "article_word_2c67b999d70d.ogg",
-      "fingerprint": "fb90daf212b53f86",
-      "profile": "article_word"
-    },
-    "der Uhu": {
-      "file": "article_word_95cc29849c58.ogg",
-      "fingerprint": "9ba6e4df40950383",
-      "profile": "article_word"
-    },
     "der Vogel": {
       "file": "article_word_3327104c5600.ogg",
       "fingerprint": "2014f4c83b09fd3c",
       "profile": "article_word"
     },
-    "der Wal": {
-      "file": "article_word_8485ddd26ace.ogg",
-      "fingerprint": "5a28226d8be169ae",
-      "profile": "article_word"
-    },
     "der Weg": {
       "file": "article_word_119080787e71.ogg",
       "fingerprint": "d74b1b630f54bb15",
-      "profile": "article_word"
-    },
-    "der Zucker": {
-      "file": "article_word_506482a9a934.ogg",
-      "fingerprint": "552fb557081fb451",
       "profile": "article_word"
     },
     "die": {
@@ -3480,11 +3220,6 @@
       "fingerprint": "5568d3a1140556fe",
       "profile": "article_word"
     },
-    "die Gabel": {
-      "file": "article_word_2070b9758446.ogg",
-      "fingerprint": "2689a3d32dfc1eb1",
-      "profile": "article_word"
-    },
     "die Häuser": {
       "file": "article_word_767dbc597a1d.ogg",
       "fingerprint": "230cd9317ec7902d",
@@ -3495,54 +3230,14 @@
       "fingerprint": "ed80a3d5d8d81cd9",
       "profile": "article_word"
     },
-    "die Katze": {
-      "file": "article_word_7bbdf7570db7.ogg",
-      "fingerprint": "b43c862f13d5b239",
-      "profile": "article_word"
-    },
-    "die Maus": {
-      "file": "article_word_08628824ece3.ogg",
-      "fingerprint": "b89078be7ad85254",
-      "profile": "article_word"
-    },
-    "die Nase": {
-      "file": "article_word_8c83baf28842.ogg",
-      "fingerprint": "7e1c15282bd03190",
-      "profile": "article_word"
-    },
-    "die Nuss": {
-      "file": "article_word_062a39c06faf.ogg",
-      "fingerprint": "c1d7394043b156ba",
-      "profile": "article_word"
-    },
-    "die Quelle": {
-      "file": "article_word_20660f53ab32.ogg",
-      "fingerprint": "58a476365b6b7d92",
-      "profile": "article_word"
-    },
     "die Schule": {
       "file": "article_word_b447fc074b23.ogg",
       "fingerprint": "b256b8198f537bb7",
       "profile": "article_word"
     },
-    "die Sonne": {
-      "file": "article_word_0d10136da096.ogg",
-      "fingerprint": "146a439914c826d1",
-      "profile": "article_word"
-    },
     "die Spinne": {
       "file": "article_word_35da0bb87b07.ogg",
       "fingerprint": "9e2defcbd836c79b",
-      "profile": "article_word"
-    },
-    "die Straße": {
-      "file": "article_word_0c05438d17a6.ogg",
-      "fingerprint": "985cc9e3f8524ad8",
-      "profile": "article_word"
-    },
-    "die Suppe": {
-      "file": "article_word_543242b7aa10.ogg",
-      "fingerprint": "d647accbcd6b6bee",
       "profile": "article_word"
     },
     "die Vase": {
@@ -3698,11 +3393,6 @@
     "kei": {
       "file": "phoneme_368848dc82d1.ogg",
       "fingerprint": "82f9c7566dff7103",
-      "profile": "phoneme"
-    },
-    "ks": {
-      "file": "phoneme_59548661e252.ogg",
-      "fingerprint": "72f7a97dc8c0969e",
       "profile": "phoneme"
     },
     "la": {

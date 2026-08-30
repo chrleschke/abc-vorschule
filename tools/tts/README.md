@@ -183,11 +183,11 @@ identischer Text im selben Profil wird zu einem Clip zusammengefasst.
 
 Das Profil `article_word` trägt die Lösungswörter **mit Artikel** („das Haus"), die das
 Erfolgs-Vorsprechen nennt. Es ist bewusst nicht `word`: dessen `max_new_tokens: 25` (≈ 2,0 s)
-schneidet „die Erdbeere" — der längste der 85 Artikel-Texte — ab, und die Instruktion muss
+schneidet „die Erdbeere" — der längste der Artikel-Texte — ab, und die Instruktion muss
 ausdrücklich verlangen, Artikel und Nomen als eine Einheit zu sprechen — abgesetzt klingt es
 wie zwei aneinandergehängte Clips.
 Ein Artikel-Item entsteht nur für Atome, die `SuccessSpeech` erreichen kann
-(`word_build.targetAtomId` ∪ `sound_position.atomId`); die übrigen klassifizierten
+(`word_build.targetAtomId`); die übrigen klassifizierten
 Substantive stünden sonst dauerhaft als „fehlt" in `tts status` und würden echte Lücken
 verdecken.
 

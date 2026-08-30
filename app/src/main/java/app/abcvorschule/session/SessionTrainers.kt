@@ -30,7 +30,7 @@ object SessionTrainers {
         lesson: Lesson,
         schedule: (TaskSpec) -> ScheduledTrainer,
     ): List<ScheduledTrainer> {
-        val authored = pack.playableTasksOf(lesson).map { ScheduledTrainer(spec = it) }
+        val authored = pack.tasksOf(lesson).map { ScheduledTrainer(spec = it) }
         val withHunts = SymbolHuntInsertion.insertSymbolHunts(authored, pack, lesson.id, lesson.index)
         val withDetective = SymbolInWordInsertion.insertSymbolInWord(withHunts, pack, lesson)
         return withDetective.map { schedule(it.spec) }

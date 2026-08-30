@@ -145,12 +145,9 @@ class ClipIndexTest {
         // Pinnt die Exporter→App-Naht an einen echten, aktuell gelockten Clip.
         // Falls dieser Text jemals entlockt wird, verschwindet der Eintrag aus
         // dem committeten index.json — dann muss dieser Test aktualisiert werden.
-        // Pinnt die Exporter→App-Naht an einen echten, aktuell gelockten Clip.
         assertEquals(
-            "prompt_0845c380bb11.ogg",
-            index.lookup(
-                "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.",
-            )?.file,
+            "prompt_82b3474e488e.ogg",
+            index.lookup("Baue das Wort Baum.")?.file,
         )
         // Verschmelzer: display "ro" maps to phoneme lemma clip "roh"; "na" is keyed directly.
         assertEquals("phoneme_57fbb5e0d270.ogg", index.lookup("roh")?.file)

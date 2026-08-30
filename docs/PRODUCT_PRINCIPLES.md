@@ -29,14 +29,10 @@ Bei Konflikten mit Implementierungsdetails oder älteren Planabschnitten gelten 
 
 ## 3. Lernprogression (Fibel-Lernpfad)
 
-Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede Lektion führt die sieben Trainer-**Typen** unten in fester Rangfolge durch — ein Typ kann sich wiederholen oder ganz fehlen (z. B. keine Satzrunde in einer Lektion), die Reihenfolge geht aber nie zurück; jede Lektion beginnt mit dem Auditiven Finder und endet mit Rechnen:
+Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede Lektion führt die sechs Trainer-**Typen** unten in fester Rangfolge durch — ein Typ kann sich wiederholen oder ganz fehlen (z. B. keine Satzrunde in einer Lektion), die Reihenfolge geht aber nie zurück; jede Lektion beginnt mit dem Visuellen Spurensucher und endet mit Rechnen.
+Die Nummerierung beginnt bei 2, weil Trainer 1 (Auditiver Finder, Anfang/Mitte/Ende) entfernt wurde;
+die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
 
-1. **Auditiver Finder** — Laut im gesprochenen Wort verorten (Lok mit Anfang/Mitte/Ende-Waggon). Der gesuchte Laut steht groß über dem Zug; darunter zeigt das Bildwort seine Graphemgruppen in den drei Waggonfarben.
-   **Derzeit pausiert** (`PausedTrainerKinds` in `TaskSpecs.kt`): das Anfang/Mitte/Ende-Konzept
-   überforderte junge Tester, und das Scoring ist bei Wörtern mit wiederholtem Phonem mehrdeutig
-   („Erdbeere"). Content und Code bleiben unangetastet im Repo; eine Session überspringt den Typ
-   einfach und beginnt zur Laufzeit mit dem Spurensucher. Die Rangfolge unten beschreibt weiterhin
-   den autorierten Content.
 2. **Visueller Spurensucher** — Graphem nachzeichnen („Zeichne das große T nach …"), gelbe Sterne in
   Strichreihenfolge sammeln. Nur der aktive Balken zeigt leuchtende Sterne, kommende Balken blass;
   eingesammelte Sterne verschwinden. Der aktive Balken liegt zuoberst und alle Sterne liegen über
@@ -126,10 +122,12 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
 
 ## 4. Content-Graph
 
-- Atome (Buchstabe / Silbe / Wort + Emoji) sind wiederverwendbar über alle sieben Trainer-Typen einer Lektion.
-- Atom-Emojis werden auch außerhalb der Trainer verwendet: die Pfad-Schilder zeigen drei
-  Emojis je Lektion, abgeleitet aus sound_position → word_build → count_add → sentence_order
-  (deterministisch, über den Emoji-Glyph dedupliziert). `letter_trace.rewardEmoji` bleibt
+- Atome (Buchstabe / Silbe / Wort + Emoji) sind wiederverwendbar über alle sechs Trainer-Typen einer Lektion.
+- Atom-Emojis werden auch außerhalb der Trainer verwendet: die Pfad-Schilder zeigen bis zu drei
+  Emojis je Lektion, abgeleitet aus word_build → count_add → sentence_order → sentence_picture
+  (deterministisch, über den Emoji-Glyph dedupliziert). Der Satz-Versteher steht bewusst am Ende:
+  seine Bildkarten sind Antwortmaterial und füllen nur auf, was die übrigen Trainer offenlassen.
+  Lektionen ohne Satz-Versteher (l19–l26) kommen mit zwei Bildern aus. `letter_trace.rewardEmoji` bleibt
   bewusst außen vor — er ist die Belohnung des Trainers und wird nicht vorweggenommen.
 - Tasks referenzieren Atom-IDs; Validierung verhindert tote Referenzen.
 - **Glyphen-Strichenden treffen sich exakt oder deutlich nicht.** Ein Querstrich, der den Stamm
@@ -206,7 +204,7 @@ niemals mit einem stummen No-Op.
   Strafe (§8). Eine autorierte Lektion, deren Trainer alle pausiert sind, reicht den Stand
   ihres Vorgängers durch, statt die Kette zu kappen.
 - Tippen auf ein freigeschaltetes Schild startet die Trainer-Session dieser Lektion — die
-  sieben autorierten Typen (Abschnitt 3), ergänzt um etwaige abgeleitete Zusatz-Trainer
+  sechs autorierten Typen (Abschnitt 3), ergänzt um etwaige abgeleitete Zusatz-Trainer
   (Jagd, Wort-Detektiv).
 - Kein Domänen-Mix, keine Zufallsrotation: die Trainer-Reihenfolge ist didaktisch fix.
 - Vor/Zurück zwischen Runden ist **immer** möglich, unabhängig von Punkten/Fortschritt.
@@ -250,8 +248,8 @@ niemals mit einem stummen No-Op.
   spricht das Erfolgs-Vorsprechen es mit Artikel („Baue das Wort Haus" → „das Haus") —
   Gegenstände und Tiere mit dem bestimmten (der/die/das), Personenbezeichnungen mit dem
   unbestimmten (ein/eine), Namen ohne. Neutrum-Personen bekommen „das": „ein Opa" und
-  „ein Kind" wären sonst nicht unterscheidbar. Betroffen sind Wort-Bauer, Wort-Detektiv und
-  Auditiver Finder (`SuccessSpeech`). **Nicht** betroffen: Prompts, das Antippen von Items,
+  „ein Kind" wären sonst nicht unterscheidbar. Betroffen sind Wort-Bauer und Wort-Detektiv
+  (`SuccessSpeech`). **Nicht** betroffen: Prompts, das Antippen von Items,
   `missTts`, Rechnen („zwei Ameisen" — vor einer Zahl steht kein Artikel) und ganze Sätze,
   die ihre Artikel schon tragen. Abgeleitet wird in `AtomArticleSpeech`; `tools/tts` spiegelt
   die Regel, damit vorproduzierte Clips denselben Text tragen.
@@ -272,26 +270,26 @@ niemals mit einem stummen No-Op.
 - **„Buchstabe" nur für echte Einzelbuchstaben.** Mehrzeichen-Grapheme (`Sch`, `Sp`, `St`, `Ch`,
   `Au`, `Ei`, `Eu`, `Pf`, `Qu`, `ck`, `ks` …) sind kein „Buchstabe" — das Wort ist fachlich falsch
   und für Vorschulkinder irreführend. Prompts, die einen solchen Mehrzeichen-Laut ansprechen,
-  heißen „…den Laut …" statt „…den Buchstaben …" (Auditiver Finder, Spurensucher,
+  heißen „…den Laut …" statt „…den Buchstaben …" (Spurensucher,
   Buchstaben-/Silben-Jagd, Wort-Detektiv). Umlaute (`Ä`, `Ö`, `Ü`) und `ß` bleiben „Buchstabe" — sie sind je ein
   einzelnes Zeichen. Silben (`kind: syllable`, z. B. `ma`, `sp`, `st` als verschmolzenes Ergebnis
   im Silben-Verschmelzer) heißen weiterhin „Silbe", nie „Laut" oder „Buchstabe".
 - **Einzelbuchstaben-Betonung:** Steht ein einzelner Buchstabe/Graphem als eigenständiges Wort in einem
   TTS-String (z. B. „der Buchstabe M", „Hörst du das M …", „M wie Mond"), wird er mit Gedankenstrichen
   isoliert: `- M` wenn danach nur noch Satzzeichen folgt, `M -` wenn er einen Satz eröffnet, `- M -`
-  wenn er mittendrin steht (z. B. „Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am
-  Ende.", „Zeichne den Buchstaben - M - nach …", „M - wie Mond."). Grund: ohne die kurze Pause
+  wenn er mittendrin steht (z. B. „Finde den Buchstaben - M - im Wort - Mama.",
+  „Zeichne den Buchstaben - M - nach …", „M - wie Mond."). Grund: ohne die kurze Pause
   verschluckt die System-TTS den Buchstabennamen im Wortfluss oder betont ihn falsch. Gilt für alle
-  Trainer-`promptTts`/`rewardTts`, die einen einzelnen Buchstaben ansprechen (Auditiver Finder,
-  Spurensucher, Buchstaben-Jagd) — nicht für Silben-Verschmelzer (dort werden Laute bewusst
+  Trainer-`promptTts`/`rewardTts`, die einen einzelnen Buchstaben ansprechen (Spurensucher,
+  Buchstaben-Jagd, Wort-Detektiv) — nicht für Silben-Verschmelzer (dort werden Laute bewusst
   aneinandergezogen) oder für Ganzwörter.
-- **Letzte Frage ohne Fragezeichen:** Endet ein `promptTts`/`missTts` mit einer Frage, verliert nur die
-  **letzte** Frage in diesem String ihr Fragezeichen (z. B. „Wo hörst du den Buchstaben - M? Am Anfang,
-  in der Mitte oder am Ende." — die erste Frage behält ihr „?", die zweite/letzte nicht). Grund: ein
+- **Letzte Frage ohne Fragezeichen:** Endet ein `promptTts` mit einer Frage, verliert nur die
+  **letzte** Frage in diesem String ihr Fragezeichen (eine vorangehende Frage behält ihr „?",
+  die letzte nicht). Grund: ein
   Fragezeichen am Stringende lässt die System-TTS die Stimme am letzten Wort hochziehen, was bei
   Vorschulkindern falsch/unruhig klingt; ohne „?" klingt der Satz natürlich aus.
-- **Auditiver Finder liest ganze Wörter, nicht buchstabiert.** Das `missTts` einer verpassten Runde
-  nennt das Wort am Stück („Ameise.", nicht „A - M - eise."). Eine buchstabierte/segmentierte
+- **Wortwiederholungen werden am Stück gelesen, nicht buchstabiert.** Nennt ein Trainer ein Wort
+  erneut, dann am Stück („Ameise.", nicht „A - M - eise."). Eine buchstabierte/segmentierte
   Wiederholung wird von der System-TTS Buchstabe für Buchstabe vorgelesen und ist für Vorschulkinder
   unverständlich.
 - **Der Feldname wählt das Synthese-Profil.** `tools/tts` leitet aus dem JSON-Feldnamen
@@ -609,7 +607,7 @@ Wenn eine Änderung vorgeschlagen wird, prüfen:
 | Buttons mit Emoji?                                                  | Nein → Vektor/ASCII                  |
 | Zeigt der Wort-Bauer ein noch nicht eingeführtes Graphem?           | Nein → Fibel-Reihenfolge             |
 | Enthält der Rechen-Trainer Lesewörter?                              | Nein → nur Icons und Ziffern         |
-| Hält jede autorierte Lektion die sieben Trainer-Typen in nicht-fallender Rangfolge (Start Auditiver Finder, Ende Rechnen)? | Ja → Validator prüft das             |
+| Hält jede autorierte Lektion die sechs Trainer-Typen in nicht-fallender Rangfolge (Start Visueller Spurensucher, Ende Rechnen)? | Ja → Validator prüft das             |
 | Zeigt der Satz-Versteher zwei ununterscheidbare Karten oder liest sich seine Instruktion in jedem Satz wieder? | Nein → Validator prüft beides |
 | Unterscheiden sich die beiden Karten nur in der Anzahl desselben Bildes?      | Nein → Kategorie tauschen (Tier, Objekt, Akteur, Ort) |
 | Steht ein Satz-Versteher-Satz im Präteritum, obwohl die Karte den Zustand zeigt? | Nein → Präsens; Vergangenheit nur wo sie natürlich klingt |
