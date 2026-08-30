@@ -31,11 +31,20 @@ class PlaceValueInputTest {
 
     @Test
     fun bothFieldsTogetherAreTheAnswer() {
-        assertEquals(24, PlaceValueInput.combine("2", "4"))
-        assertEquals(30, PlaceValueInput.combine("3", "0"))
-        assertEquals(7, PlaceValueInput.combine("", "7"))
-        assertNull(PlaceValueInput.combine("2", ""))
-        assertNull(PlaceValueInput.combine("", ""))
+        assertEquals(24, PlaceValueInput.combine("2", "4", 2))
+        assertEquals(30, PlaceValueInput.combine("3", "0", 2))
+        assertEquals(7, PlaceValueInput.combine("", "7", 1))
+        assertNull(PlaceValueInput.combine("2", "", 2))
+        assertNull(PlaceValueInput.combine("", "", 1))
+        assertEquals(5, PlaceValueInput.combine("0", "5", 2))
+    }
+
+    @Test
+    fun combineAndIsCompleteNeverDisagree() {
+        // Eine halb gefüllte Zwei-Feld-Antwort ist keine Zahl, und ein Rest im
+        // Zehnerfeld darf eine Ein-Feld-Antwort nicht verzehnfachen.
+        assertNull(PlaceValueInput.combine("", "4", 2))
+        assertEquals(4, PlaceValueInput.combine("2", "4", 1))
     }
 
     @Test

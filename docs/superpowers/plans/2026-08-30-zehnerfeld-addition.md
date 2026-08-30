@@ -519,7 +519,7 @@ EOF
   - `PlaceValueInput.TensFrom: Int` (= 10)
   - `PlaceValueInput.fieldCount(answer: Int): Int`
   - `PlaceValueInput.lastDigit(raw: String): String`
-  - `PlaceValueInput.combine(tens: String, ones: String): Int?`
+  - `PlaceValueInput.combine(tens: String, ones: String, fieldCount: Int): Int?`
   - `PlaceValueInput.isComplete(tens: String, ones: String, fieldCount: Int): Boolean`
   - `PlaceValueInput.digitsOf(value: Int, fieldCount: Int): Pair<String, String>`
   - `PlaceValueInput.MinSlotWidthDp: Float`, `PlaceValueInput.slotWidthDp(textSp: Float, fontScale: Float): Float`
@@ -563,11 +563,20 @@ class PlaceValueInputTest {
 
     @Test
     fun bothFieldsTogetherAreTheAnswer() {
-        assertEquals(24, PlaceValueInput.combine("2", "4"))
-        assertEquals(30, PlaceValueInput.combine("3", "0"))
-        assertEquals(7, PlaceValueInput.combine("", "7"))
-        assertNull(PlaceValueInput.combine("2", ""))
-        assertNull(PlaceValueInput.combine("", ""))
+        assertEquals(24, PlaceValueInput.combine("2", "4", 2))
+        assertEquals(30, PlaceValueInput.combine("3", "0", 2))
+        assertEquals(5, PlaceValueInput.combine("0", "5", 2))
+        assertEquals(7, PlaceValueInput.combine("", "7", 1))
+        assertNull(PlaceValueInput.combine("2", "", 2))
+        assertNull(PlaceValueInput.combine("", "", 1))
+    }
+
+    @Test
+    fun combineAndIsCompleteNeverDisagree() {
+        // Eine halb gefüllte Zwei-Feld-Antwort ist keine Zahl, und ein Rest im
+        // Zehnerfeld darf eine Ein-Feld-Antwort nicht verzehnfachen.
+        assertNull(PlaceValueInput.combine("", "4", 2))
+        assertEquals(4, PlaceValueInput.combine("2", "4", 1))
     }
 
     @Test
@@ -655,10 +664,16 @@ object PlaceValueInput {
      */
     fun lastDigit(raw: String): String = raw.filter(Char::isDigit).takeLast(1)
 
-    /** Beide Felder zusammen als Zahl; `null`, solange etwas fehlt. */
-    fun combine(tens: String, ones: String): Int? {
-        if (ones.isEmpty()) return null
-        return "${tens}$ones".toIntOrNull()
+    /**
+     * Beide Felder zusammen als Zahl; `null`, solange die Eingabe nach
+     * [isComplete] nicht vollständig ist. Die Feldzahl gehört mit hinein, sonst
+     * beantworten [combine] und [isComplete] dieselbe Frage verschieden: bei
+     * einem einzigen Feld ist ein Rest im Zehnerfeld kein Zehner, sondern Müll
+     * aus einer früheren Runde.
+     */
+    fun combine(tens: String, ones: String, fieldCount: Int): Int? {
+        if (!isComplete(tens, ones, fieldCount)) return null
+        return (if (fieldCount == 1) ones else "$tens$ones").toIntOrNull()
     }
 
     fun isComplete(tens: String, ones: String, fieldCount: Int): Boolean =
@@ -1102,7 +1117,7 @@ fun PlaceValueAnswer(
 
     fun submit() {
         if (!complete) return
-        PlaceValueInput.combine(tens.text, ones.text)?.let(onSubmit)
+        PlaceValueInput.combine(tens.text, ones.text, fields)?.let(onSubmit)
     }
 
     LaunchedEffect(solved) {
