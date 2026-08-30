@@ -9,8 +9,6 @@ import app.abcvorschule.content.CountAddSpec
 import app.abcvorschule.content.Gender
 import app.abcvorschule.content.NounClass
 import app.abcvorschule.content.SentencePictureRound
-import app.abcvorschule.content.SoundPositionRound
-import app.abcvorschule.content.SoundSlot
 import app.abcvorschule.content.SymbolHuntMode
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.content.SymbolInWordMode
@@ -123,20 +121,6 @@ class SuccessSpeechTest {
             mode = SymbolInWordMode.letter,
             segments = listOf("H", "a", "u", "s"),
             targetIndices = listOf(0),
-        )
-        assertEquals(
-            listOf("das Haus"),
-            SuccessSpeech.partsForRound(round, packWithHaus(), praise = false),
-        )
-    }
-
-    @Test
-    fun soundPositionSuccessSpeaksArticleWithWord() {
-        val round = SoundPositionRound(
-            promptTts = "Wo hörst du H?",
-            atomId = haus.id,
-            slot = SoundSlot.start,
-            missTts = "Haus. Hörst du das - H - am Anfang.",
         )
         assertEquals(
             listOf("das Haus"),

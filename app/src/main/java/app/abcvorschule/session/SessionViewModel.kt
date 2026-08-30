@@ -14,7 +14,6 @@ import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SentencePictureRound
 import app.abcvorschule.content.SentencePictureSpec
 import app.abcvorschule.content.SentencePictureSpeech
-import app.abcvorschule.content.SoundPositionRound
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.content.SymbolHuntSpeech
@@ -577,7 +576,6 @@ class SessionViewModel(
 
     /** Miss feedback is spoken; content authors supply the didactic re-reading. */
     private fun missCueForCurrent(): String = when (val round = _ui.value.currentRound) {
-        is SoundPositionRound -> round.missTts
         is SentencePictureRound -> round.promptTts
         else -> "Probiere eine andere Antwort"
     }

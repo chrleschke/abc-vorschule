@@ -1,26 +1,6 @@
 {
   "version": 1,
   "locks": {
-    "article_word:062a39c06faf": {
-      "seed": 354671520,
-      "sourceText": "die Nuss"
-    },
-    "article_word:08628824ece3": {
-      "seed": 1123002408,
-      "sourceText": "die Maus"
-    },
-    "article_word:0a7b2badd352": {
-      "seed": 2053893539,
-      "sourceText": "das Ohr"
-    },
-    "article_word:0c05438d17a6": {
-      "seed": 354671520,
-      "sourceText": "die Straße"
-    },
-    "article_word:0d10136da096": {
-      "seed": 128216919,
-      "sourceText": "die Sonne"
-    },
     "article_word:1028110d4368": {
       "seed": 66028957,
       "sourceText": "das Pony"
@@ -42,25 +22,9 @@
       "textOverride": "die Rübe.",
       "sourceText": "die Rübe"
     },
-    "article_word:20660f53ab32": {
-      "seed": 198819411,
-      "sourceText": "die Quelle"
-    },
-    "article_word:2070b9758446": {
-      "seed": 2053893539,
-      "sourceText": "die Gabel"
-    },
-    "article_word:2c67b999d70d": {
-      "seed": 579800338,
-      "sourceText": "der Tiger"
-    },
     "article_word:302e90b4e5bd": {
       "seed": 1236049303,
       "sourceText": "das Tor"
-    },
-    "article_word:31f8ba1ba172": {
-      "seed": 427919886,
-      "sourceText": "der Elefant"
     },
     "article_word:31fa197389b5": {
       "seed": 104478509,
@@ -79,14 +43,6 @@
       "textOverride": "eine Mama.",
       "sourceText": "eine Mama"
     },
-    "article_word:506482a9a934": {
-      "seed": 822907700,
-      "sourceText": "der Zucker"
-    },
-    "article_word:543242b7aa10": {
-      "seed": 1047430012,
-      "sourceText": "die Suppe"
-    },
     "article_word:6161728ddab9": {
       "seed": 2053893539,
       "sourceText": "die Vase"
@@ -94,15 +50,6 @@
     "article_word:672556b12c13": {
       "seed": 1527238604,
       "sourceText": "das Pferd"
-    },
-    "article_word:706f101a0731": {
-      "seed": 2080298366,
-      "sourceText": "der Igel"
-    },
-    "article_word:721adbe100b7": {
-      "seed": 2053893539,
-      "textOverride": "der Tag.",
-      "sourceText": "der Tag"
     },
     "article_word:767dbc597a1d": {
       "seed": 66028957,
@@ -112,26 +59,9 @@
       "seed": 579800338,
       "sourceText": "eine Oma"
     },
-    "article_word:7bbdf7570db7": {
-      "seed": 1028299224,
-      "sourceText": "die Katze"
-    },
     "article_word:810f27f55ac5": {
       "seed": 579800338,
       "sourceText": "der Löwe"
-    },
-    "article_word:8485ddd26ace": {
-      "seed": 1256047046,
-      "textOverride": "der Wal.",
-      "sourceText": "der Wal"
-    },
-    "article_word:8a5c3f8475db": {
-      "seed": 427919886,
-      "sourceText": "der Himmel"
-    },
-    "article_word:8c83baf28842": {
-      "seed": 1770486514,
-      "sourceText": "die Nase"
     },
     "article_word:8ce357f18cfb": {
       "seed": 2053893539,
@@ -146,21 +76,9 @@
       "seed": 2080298366,
       "sourceText": "ein Papa"
     },
-    "article_word:923a2b14be5c": {
-      "seed": 1123002408,
-      "sourceText": "der Käse"
-    },
     "article_word:92cd4c160870": {
       "seed": 1123002408,
       "sourceText": "das Eis"
-    },
-    "article_word:95cc29849c58": {
-      "seed": 1958806341,
-      "sourceText": "der Uhu"
-    },
-    "article_word:9e15162cf4ac": {
-      "seed": 446502140,
-      "sourceText": "der Hase"
     },
     "article_word:af03a3f0d76e": {
       "seed": 162359775,
@@ -174,10 +92,6 @@
       "seed": 821599947,
       "sourceText": "die Schule"
     },
-    "article_word:b8460049fb0b": {
-      "seed": 1958806341,
-      "sourceText": "das Auto"
-    },
     "article_word:b966fb392d32": {
       "seed": 2080298366,
       "sourceText": "ein Opa"
@@ -185,19 +99,6 @@
     "article_word:ba3338403adf": {
       "seed": 837861076,
       "sourceText": "das Schaf"
-    },
-    "article_word:bb8e7e13b424": {
-      "seed": 354671520,
-      "sourceText": "der Löffel"
-    },
-    "article_word:bc880df7c54d": {
-      "seed": 302229236,
-      "sourceText": "das Feuer"
-    },
-    "article_word:c03821366506": {
-      "seed": 506043488,
-      "textOverride": "das Rad.",
-      "sourceText": "das Rad"
     },
     "article_word:c5acfae3ff25": {
       "seed": 1238263247,
@@ -274,16 +175,6 @@
     "finale:f7ea0a9a8437": {
       "seed": 301950401,
       "sourceText": "Die Qualle quetscht sich ins Taxi!"
-    },
-    "miss:1bdb9dfabccf": {
-      "seed": 167081167,
-      "textOverride": "Ei",
-      "sourceText": "Ei."
-    },
-    "miss:608f99a77ce8": {
-      "seed": 2078418154,
-      "textOverride": "Ameise. Hörst du das M in der Mitte.",
-      "sourceText": "Ameise. Hörst du das - M - in der Mitte."
     },
     "phoneme:07af03fb0629": {
       "seed": 1229924031,
@@ -403,11 +294,6 @@
       "seed": 1171581113,
       "textOverride": "ro.",
       "sourceText": "roh"
-    },
-    "phoneme:59548661e252": {
-      "seed": 252801214,
-      "textOverride": "ka es",
-      "sourceText": "ks"
     },
     "phoneme:5c62e091b8c0": {
       "seed": 1678500400,
@@ -670,10 +556,6 @@
       "seed": 634912039,
       "sourceText": "Zeichne den Laut - Pf - nach und sammle dabei alle Sterne."
     },
-    "prompt:042f5f070491": {
-      "seed": 1184124852,
-      "sourceText": "Wo hörst du den Laut - Qu? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:0620b64d3955": {
       "seed": 94172901,
       "sourceText": "Wir gehen den Weg."
@@ -685,11 +567,6 @@
     "prompt:0755cbe9db0e": {
       "seed": 905134477,
       "sourceText": "Baue das Wort Weg."
-    },
-    "prompt:0845c380bb11": {
-      "seed": 456642538,
-      "textOverride": "Wo hörst du den Buchstaben Ih? Am Anfang, in der Mitte oder am Ende.",
-      "sourceText": "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:087c4b4843da": {
       "seed": 1299926873,
@@ -737,10 +614,6 @@
       "seed": 2134744648,
       "sourceText": "Neunzehn Fische und neun Fische. Wie viele Fische sind das."
     },
-    "prompt:11bc85fc22b6": {
-      "seed": 1070235000,
-      "sourceText": "Wo hörst du den Buchstaben - L? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:11df2bbfe668": {
       "seed": 1212815306,
       "sourceText": "Baue das Wort Keks."
@@ -765,10 +638,6 @@
       "seed": 2058555455,
       "sourceText": "Dreiundzwanzig Ameisen krabbeln im Bau. Acht krabbeln hinaus. Wie viele Ameisen bleiben."
     },
-    "prompt:16551c2f4d33": {
-      "seed": 1512805924,
-      "sourceText": "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:1684a2eff3f3": {
       "seed": 888700001,
       "textOverride": "Schiebe \"B\" und \"Au\" zusammen. Welche Silbe entsteht.",
@@ -791,10 +660,6 @@
       "seed": 1294888618,
       "sourceText": "Baue das Wort Häuser."
     },
-    "prompt:1a6f6b9c07a9": {
-      "seed": 258571559,
-      "sourceText": "Wo hörst du den Laut - Pf? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:1ac28f3a7750": {
       "seed": 122602205,
       "textOverride": "Ordne das Wort Mama dem Bild zu.",
@@ -804,10 +669,6 @@
       "seed": 279242415,
       "textOverride": "Finde den Buchstaben (....)",
       "sourceText": "Finde den Buchstaben"
-    },
-    "prompt:1ec405c1df3a": {
-      "seed": 611051227,
-      "sourceText": "Wo hörst du den Buchstaben - S? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:1fad37147e63": {
       "seed": 548253113,
@@ -867,10 +728,6 @@
       "seed": 786597938,
       "sourceText": "Achtundzwanzig Omas sitzen im Bus. Dreizehn steigen aus. Wie viele Omas bleiben."
     },
-    "prompt:2eab93180bfb": {
-      "seed": 266701721,
-      "sourceText": "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:2f501187e741": {
       "seed": 715232770,
       "sourceText": "Zeichne den Buchstaben - Z - nach und sammle dabei alle Sterne."
@@ -879,17 +736,9 @@
       "seed": 279883260,
       "sourceText": "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das."
     },
-    "prompt:321cf8512c93": {
-      "seed": 1230965277,
-      "sourceText": "Wo hörst du den Buchstaben - V? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:34be3255014f": {
       "seed": 1224807488,
       "sourceText": "Zeichne den Buchstaben - V - nach und sammle dabei alle Sterne."
-    },
-    "prompt:3773ebc27e85": {
-      "seed": 622994529,
-      "sourceText": "Wo hörst du den Laut - Sch? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:377e327f9934": {
       "seed": 1211855472,
@@ -906,10 +755,6 @@
     "prompt:38f76ee9c9cd": {
       "seed": 800145432,
       "sourceText": "Fünfundzwanzig Tomaten hängen am Strauch. Sechzehn werden geerntet. Wie viele Tomaten bleiben."
-    },
-    "prompt:3961ac453bda": {
-      "seed": 21244446,
-      "sourceText": "Wo hörst du den Buchstaben - U? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:3ac24bd996ef": {
       "seed": 349038937,
@@ -938,10 +783,6 @@
     "prompt:410190d7c985": {
       "seed": 1722084190,
       "sourceText": "Das Pferd läuft."
-    },
-    "prompt:4108ef0c0324": {
-      "seed": 943388734,
-      "sourceText": "Wo hörst du den Buchstaben - Ä? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:42562da70a14": {
       "seed": 548253115,
@@ -974,10 +815,6 @@
     "prompt:5073fadea995": {
       "seed": 1235855775,
       "sourceText": "Neunzehn Tomaten und elf Tomaten. Wie viele Tomaten sind das."
-    },
-    "prompt:538c49ab6354": {
-      "seed": 950025203,
-      "sourceText": "Wo hörst du den Laut - Sp? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:54639eb75ea4": {
       "seed": 887871510,
@@ -1047,14 +884,6 @@
       "seed": 251420939,
       "sourceText": "Siebzehn Frösche und acht Frösche. Wie viele Frösche sind das."
     },
-    "prompt:71c013a32788": {
-      "seed": 117708205,
-      "sourceText": "Wo hörst du den Laut - ck? Am Anfang, in der Mitte oder am Ende."
-    },
-    "prompt:71e2030ff4d8": {
-      "seed": 21585718,
-      "sourceText": "Wo hörst du den Buchstaben - P? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:7438d9705028": {
       "seed": 662220618,
       "sourceText": "Baue das Wort Pferd."
@@ -1080,14 +909,6 @@
       "seed": 1145678980,
       "sourceText": "Schiebe qu und a zusammen. Welche Silbe entsteht."
     },
-    "prompt:7b188b50820e": {
-      "seed": 800997525,
-      "sourceText": "Wo hörst du den Buchstaben - A? Am Anfang, in der Mitte oder am Ende."
-    },
-    "prompt:7b33412b12da": {
-      "seed": 1557796273,
-      "sourceText": "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:7c04b37029b3": {
       "seed": 634912039,
       "sourceText": "Vierundzwanzig Rüben und sechs Rüben. Wie viele Rüben sind das."
@@ -1111,14 +932,6 @@
     "prompt:83e32e726f99": {
       "seed": 122602205,
       "sourceText": "Sechzehn Sterne und vierzehn Sterne. Wie viele Sterne sind das."
-    },
-    "prompt:844dd6651f8c": {
-      "seed": 28675494,
-      "sourceText": "Wo hörst du den Buchstaben - Ü? Am Anfang, in der Mitte oder am Ende."
-    },
-    "prompt:84ec3e8f06ab": {
-      "seed": 1614709381,
-      "sourceText": "Wo hörst du den Buchstaben - Ö? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:8630a5c0bbb0": {
       "seed": 869251923,
@@ -1152,14 +965,6 @@
       "seed": 1208583262,
       "sourceText": "Baue das Wort Dose."
     },
-    "prompt:900b49a17a1e": {
-      "seed": 29589449,
-      "sourceText": "Wo hörst du den Buchstaben - H? Am Anfang, in der Mitte oder am Ende."
-    },
-    "prompt:923ee5c167b9": {
-      "seed": 1659395842,
-      "sourceText": "Wo hörst du den Laut - Eu? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:933d817b0d4e": {
       "seed": 762305165,
       "sourceText": "Baue das Wort Nest."
@@ -1179,14 +984,6 @@
     "prompt:94fc2252bc91": {
       "seed": 1811558172,
       "sourceText": "Zeichne den Laut - Sp - nach und sammle dabei alle Sterne."
-    },
-    "prompt:96d68f8451f7": {
-      "seed": 822650500,
-      "sourceText": "Wo hörst du den Buchstaben - G? Am Anfang, in der Mitte oder am Ende."
-    },
-    "prompt:9705f375d308": {
-      "seed": 2015650844,
-      "sourceText": "Wo hörst du den Buchstaben - F? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:970f0fd9f7c9": {
       "seed": 1059656879,
@@ -1220,10 +1017,6 @@
       "seed": 1627656565,
       "sourceText": "Baue das Wort Apfel."
     },
-    "prompt:9f29d23ec573": {
-      "seed": 2068797141,
-      "sourceText": "Wo hörst du den Buchstaben - E? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:a07da5261a62": {
       "seed": 717253512,
       "sourceText": "Achtzehn Bücher stehen im Regal. Neun werden ausgeliehen. Wie viele Bücher bleiben."
@@ -1231,10 +1024,6 @@
     "prompt:a08292b542f0": {
       "seed": 298532852,
       "sourceText": "Fünf Reihen mit je sechs Taxis warten am Bahnhof. Wie viele Taxis sind das."
-    },
-    "prompt:a1300d8ff0ec": {
-      "seed": 1186761860,
-      "sourceText": "Wo hörst du den Buchstaben - O? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:a275f6b39820": {
       "seed": 620124846,
@@ -1272,14 +1061,6 @@
       "seed": 501877366,
       "sourceText": "Siebenundzwanzig Fenster hat das Haus. Achtzehn sind zu. Wie viele Fenster sind offen."
     },
-    "prompt:a9abb07205aa": {
-      "seed": 286715467,
-      "sourceText": "Wo hörst du den Buchstaben - K? Am Anfang, in der Mitte oder am Ende."
-    },
-    "prompt:a9f62754c733": {
-      "seed": 458866785,
-      "sourceText": "Wo hörst du den Buchstaben - B? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:ab454bef1046": {
       "seed": 660905640,
       "sourceText": "Schiebe pf und a zusammen. Welche Silbe entsteht."
@@ -1315,14 +1096,6 @@
     "prompt:b0bdf8a04cdb": {
       "seed": 1936892529,
       "sourceText": "Baue das Wort Vase."
-    },
-    "prompt:b289a5260972": {
-      "seed": 1453059999,
-      "sourceText": "Wo hörst du den Buchstaben - R? Am Anfang, in der Mitte oder am Ende."
-    },
-    "prompt:b49820c08813": {
-      "seed": 1493354105,
-      "sourceText": "Wo hörst du den Buchstaben - X? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:b5001897a747": {
       "seed": 1784794645,
@@ -1444,14 +1217,6 @@
       "seed": 768079997,
       "sourceText": "Zeichne den Buchstaben - S - nach und sammle dabei alle Sterne."
     },
-    "prompt:d37d945d637f": {
-      "seed": 1755733529,
-      "sourceText": "Wo hörst du den Laut - Au? Am Anfang, in der Mitte oder am Ende."
-    },
-    "prompt:d3a4513f8c9a": {
-      "seed": 2063925321,
-      "sourceText": "Wo hörst du den Buchstaben - D? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:d92e1bcffbc8": {
       "seed": 1170587610,
       "sourceText": "Zeichne den Buchstaben - R - nach und sammle dabei alle Sterne."
@@ -1460,14 +1225,6 @@
       "seed": 1940139308,
       "sourceText": "Baue das Wort Tom."
     },
-    "prompt:dc9b335d2595": {
-      "seed": 1684176449,
-      "sourceText": "Wo hörst du den Buchstaben - ß? Am Anfang, in der Mitte oder am Ende."
-    },
-    "prompt:dcfc83effbf7": {
-      "seed": 95260953,
-      "sourceText": "Wo hörst du den Laut - ks? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:dd996e27ce1b": {
       "seed": 444409294,
       "sourceText": "Das ist mein Papa."
@@ -1475,14 +1232,6 @@
     "prompt:ddbcee4e7e47": {
       "seed": 1746058488,
       "sourceText": "Zeichne den Buchstaben - D - nach und sammle dabei alle Sterne."
-    },
-    "prompt:de433e65a6b3": {
-      "seed": 1180294638,
-      "sourceText": "Wo hörst du den Laut - St? Am Anfang, in der Mitte oder am Ende."
-    },
-    "prompt:e00281474263": {
-      "seed": 513047806,
-      "sourceText": "Wo hörst du den Laut - Ei? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:e046378ee798": {
       "seed": 2031461292,
@@ -1501,10 +1250,6 @@
       "seed": 643054273,
       "sourceText": "Schiebe a und m zusammen. Welche Silbe entsteht."
     },
-    "prompt:e2c1b8ed3722": {
-      "seed": 1185257820,
-      "sourceText": "Wo hörst du den Buchstaben - N? Am Anfang, in der Mitte oder am Ende."
-    },
     "prompt:e2d9e26fc1a5": {
       "seed": 772002789,
       "sourceText": "Baue das Wort Hallo."
@@ -1516,10 +1261,6 @@
     "prompt:e4aa0b2d7a35": {
       "seed": 122602205,
       "sourceText": "Baue das Wort Kleid."
-    },
-    "prompt:e4de6e1c5a0c": {
-      "seed": 1216911551,
-      "sourceText": "Wo hörst du den Buchstaben - Z? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:e686e893ca27": {
       "seed": 172005766,
@@ -1577,10 +1318,6 @@
     "prompt:f9b4b3a7dd54": {
       "seed": 1054632290,
       "sourceText": "Zwölf Lamas stehen auf der Wiese. Fünf laufen weg. Wie viele Lamas bleiben."
-    },
-    "prompt:fa6fd5c04915": {
-      "seed": 1534979917,
-      "sourceText": "Wo hörst du den Buchstaben - W? Am Anfang, in der Mitte oder am Ende."
     },
     "prompt:fa9931c06132": {
       "seed": 364355058,

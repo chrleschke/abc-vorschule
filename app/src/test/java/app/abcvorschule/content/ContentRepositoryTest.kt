@@ -32,7 +32,7 @@ class ContentRepositoryTest {
     @Test
     fun polymorphicTasksDeserializeToTheirTrainerType() {
         val tasks = pack.tasksOf(pack.lesson("l01"))
-        assertTrue(tasks.first() is SoundPositionSpec)
+        assertTrue(tasks.first() is LetterTraceSpec)
         assertTrue(tasks.last() is CountAddSpec)
         assertTrue(tasks.any { it is LetterTraceSpec })
     }

@@ -139,7 +139,7 @@ def dual_profile_content(tmp_path: Path) -> Path:
     ):
         (d / name).write_text(json.dumps({key: []}), encoding="utf-8")
     (d / "tasks.json").write_text(json.dumps({"tasks": [
-        {"trainer": "sound_position", "id": "t1", "phonemeTts": "X", "rounds": []},
+        {"id": "t1", "phonemeTts": "X", "rounds": []},
     ]}), encoding="utf-8")
     return d
 

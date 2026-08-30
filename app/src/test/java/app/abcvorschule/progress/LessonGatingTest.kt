@@ -54,21 +54,10 @@ class LessonGatingTest {
     fun touchedButUnfinishedLessonIsInProgress() {
         val progress = LearnerProgress(
             taskStats = mapOf(
-                pack.playableTasksOf(first).first().id to SkillStats(attempts = 2, correct = 0),
+                pack.tasksOf(first).first().id to SkillStats(attempts = 2, correct = 0),
             ),
         )
         assertEquals(LessonState.InProgress, LessonGating.stateOf(pack, progress, first.id))
-    }
-
-    @Test
-    fun touchingOnlyAPausedTrainerDoesNotUnlockProgress() {
-        // sound_position (Trainer 1) is paused — attempts on it must not count
-        // toward touched/mastered, since the child can no longer play it.
-        val pausedTaskId = pack.tasksOf(first).first { it !in pack.playableTasksOf(first) }.id
-        val progress = LearnerProgress(
-            taskStats = mapOf(pausedTaskId to SkillStats(attempts = 3, correct = 1)),
-        )
-        assertEquals(LessonState.Available, LessonGating.stateOf(pack, progress, first.id))
     }
 
     @Test
@@ -141,7 +130,7 @@ class LessonGatingTest {
         val progress = LearnerProgress(
             unlockAllLessons = true,
             taskStats = mapOf(
-                pack.playableTasksOf(second).first().id to SkillStats(attempts = 1, correct = 0),
+                pack.tasksOf(second).first().id to SkillStats(attempts = 1, correct = 0),
             ),
         )
         assertEquals(LessonState.InProgress, LessonGating.states(pack, progress)[second.id])
@@ -199,7 +188,7 @@ class LessonGatingTest {
         // Trainer haben genau eine Runde, ein „Zeig mir" dort ließ `correct` für
         // immer auf 0 — die Lektion lief samt Feier zu Ende, die nächste blieb zu.
         val lesson = pack.lesson(first.id)
-        val playable = pack.playableTasksOf(lesson).map { it.id }
+        val playable = pack.tasksOf(lesson).map { it.id }
         val progress = LearnerProgress(
             taskStats = playable.mapIndexed { i, id ->
                 id to if (i == 0) {
@@ -222,7 +211,7 @@ class LessonGatingTest {
         // Die Gegenprobe: nur angefasst, aber weder gelöst noch aufgelöst, hält die
         // Kette weiterhin auf — sonst wäre „durchgespielt" bedeutungslos.
         val lesson = pack.lesson(first.id)
-        val playable = pack.playableTasksOf(lesson).map { it.id }
+        val playable = pack.tasksOf(lesson).map { it.id }
         val progress = LearnerProgress(
             taskStats = playable.mapIndexed { i, id ->
                 id to if (i == 0) SkillStats(attempts = 3) else SkillStats(attempts = 1, correct = 1)

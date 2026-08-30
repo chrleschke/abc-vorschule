@@ -1,55 +1,6 @@
 {
   "tasks": [
     {
-      "trainer": "sound_position",
-      "id": "l01-t1",
-      "phonemeTts": "M",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "ameise",
-          "slot": "middle",
-          "missTts": "Ameise. Hörst du das - M - in der Mitte.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "maus",
-          "slot": "start",
-          "missTts": "Maus. Hörst du das - M - am Anfang.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "baum",
-          "slot": "end",
-          "missTts": "Baum. Hörst du das - M - am Ende.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l01-t2",
-      "phonemeTts": "A",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - A? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "ampel",
-          "slot": "start",
-          "missTts": "Ampel.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - A? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "salat",
-          "slot": "middle",
-          "missTts": "Salat.",
-          "blocks": []
-        }
-      ]
-    },
-    {
       "trainer": "letter_trace",
       "id": "l01-t3",
       "rounds": [
@@ -149,48 +100,6 @@
           "left": 6,
           "right": 3,
           "answer": 9
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l02-t1",
-      "phonemeTts": "I",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "igel",
-          "slot": "start",
-          "missTts": "Igel.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "insel",
-          "slot": "start",
-          "missTts": "Insel.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l02-t2",
-      "phonemeTts": "O",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - O? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "ohr",
-          "slot": "start",
-          "missTts": "Ohr.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - O? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "radio",
-          "slot": "end",
-          "missTts": "Radio.",
-          "blocks": []
         }
       ]
     },
@@ -326,48 +235,6 @@
           "right": 3,
           "answer": 5,
           "operation": "subtract"
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l03-t1",
-      "phonemeTts": "P",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - P? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "paket",
-          "slot": "start",
-          "missTts": "Paket.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - P? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "suppe",
-          "slot": "middle",
-          "missTts": "Suppe.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l03-t2",
-      "phonemeTts": "T",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "tomate",
-          "slot": "start",
-          "missTts": "Tomate.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "tiger",
-          "slot": "start",
-          "missTts": "Tiger.",
-          "blocks": []
         }
       ]
     },
@@ -519,48 +386,6 @@
       ]
     },
     {
-      "trainer": "sound_position",
-      "id": "l04-t1",
-      "phonemeTts": "L",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - L? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "lama",
-          "slot": "start",
-          "missTts": "Lama.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - L? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "himmel",
-          "slot": "end",
-          "missTts": "Himmel.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l04-t2",
-      "phonemeTts": "H",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - H? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "hut",
-          "slot": "start",
-          "missTts": "Hut.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - H? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "hase",
-          "slot": "start",
-          "missTts": "Hase.",
-          "blocks": []
-        }
-      ]
-    },
-    {
       "trainer": "letter_trace",
       "id": "l04-t3",
       "rounds": [
@@ -704,48 +529,6 @@
       ]
     },
     {
-      "trainer": "sound_position",
-      "id": "l05-t1",
-      "phonemeTts": "F",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - F? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "fuchs",
-          "slot": "start",
-          "missTts": "Fuchs.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - F? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "elefant",
-          "slot": "middle",
-          "missTts": "Elefant.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l05-t2",
-      "phonemeTts": "U",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - U? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "uhu",
-          "slot": "start",
-          "missTts": "Uhu.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - U? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "ufo",
-          "slot": "start",
-          "missTts": "Ufo.",
-          "blocks": []
-        }
-      ]
-    },
-    {
       "trainer": "letter_trace",
       "id": "l05-t3",
       "rounds": [
@@ -868,48 +651,6 @@
           "right": 6,
           "answer": 8,
           "operation": "subtract"
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l06-t1",
-      "phonemeTts": "R",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - R? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "rose",
-          "slot": "start",
-          "missTts": "Rose.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - R? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "ohr",
-          "slot": "end",
-          "missTts": "Ohr.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l06-t2",
-      "phonemeTts": "N",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - N? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "nase",
-          "slot": "start",
-          "missTts": "Nase.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - N? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "nuss",
-          "slot": "start",
-          "missTts": "Nuss.",
-          "blocks": []
         }
       ]
     },
@@ -1054,48 +795,6 @@
           "right": 3,
           "answer": 9,
           "operation": "multiply"
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l07-t1",
-      "phonemeTts": "S",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - S? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "sonne",
-          "slot": "start",
-          "missTts": "Sonne.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - S? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "gras",
-          "slot": "end",
-          "missTts": "Gras.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l07-t2",
-      "phonemeTts": "E",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - E? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "ente",
-          "slot": "start",
-          "missTts": "Ente.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - E? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "erdbeere",
-          "slot": "start",
-          "missTts": "Erdbeere.",
-          "blocks": []
         }
       ]
     },
@@ -1254,48 +953,6 @@
       ]
     },
     {
-      "trainer": "sound_position",
-      "id": "l08-t1",
-      "phonemeTts": "D",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - D? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "dose",
-          "slot": "start",
-          "missTts": "Dose.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - D? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "rad",
-          "slot": "end",
-          "missTts": "Rad.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l08-t2",
-      "phonemeTts": "K",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - K? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "keks",
-          "slot": "start",
-          "missTts": "Keks.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - K? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "katze",
-          "slot": "start",
-          "missTts": "Katze.",
-          "blocks": []
-        }
-      ]
-    },
-    {
       "trainer": "letter_trace",
       "id": "l08-t3",
       "rounds": [
@@ -1446,48 +1103,6 @@
           "left": 13,
           "right": 7,
           "answer": 20
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l09-t1",
-      "phonemeTts": "Ei",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Ei? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "eis",
-          "slot": "start",
-          "missTts": "Eis.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Ei? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "kleid",
-          "slot": "middle",
-          "missTts": "Kleid.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l09-t2",
-      "phonemeTts": "W",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - W? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "wolke",
-          "slot": "start",
-          "missTts": "Wolke.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - W? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "wal",
-          "slot": "start",
-          "missTts": "Wal.",
-          "blocks": []
         }
       ]
     },
@@ -1650,48 +1265,6 @@
       ]
     },
     {
-      "trainer": "sound_position",
-      "id": "l10-t1",
-      "phonemeTts": "G",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - G? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "gabel",
-          "slot": "start",
-          "missTts": "Gabel.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - G? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "tag",
-          "slot": "end",
-          "missTts": "Tag.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l10-t2",
-      "phonemeTts": "Ch",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "dach",
-          "slot": "end",
-          "missTts": "Dach.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "buch",
-          "slot": "end",
-          "missTts": "Buch.",
-          "blocks": []
-        }
-      ]
-    },
-    {
       "trainer": "letter_trace",
       "id": "l10-t3",
       "rounds": [
@@ -1835,48 +1408,6 @@
       ]
     },
     {
-      "trainer": "sound_position",
-      "id": "l11-t1",
-      "phonemeTts": "Au",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Au? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "haus",
-          "slot": "middle",
-          "missTts": "Haus.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Au? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "baum",
-          "slot": "middle",
-          "missTts": "Baum.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l11-t2",
-      "phonemeTts": "B",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - B? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "ball",
-          "slot": "start",
-          "missTts": "Ball.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - B? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "taube",
-          "slot": "middle",
-          "missTts": "Taube.",
-          "blocks": []
-        }
-      ]
-    },
-    {
       "trainer": "letter_trace",
       "id": "l11-t3",
       "rounds": [
@@ -1999,48 +1530,6 @@
           "right": 5,
           "answer": 20,
           "operation": "multiply"
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l12-t1",
-      "phonemeTts": "Ä",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - Ä? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "kaese",
-          "slot": "middle",
-          "missTts": "Käse.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - Ä? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "baer",
-          "slot": "middle",
-          "missTts": "Bär.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l12-t2",
-      "phonemeTts": "Ö",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - Ö? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "loewe",
-          "slot": "middle",
-          "missTts": "Löwe. Hörst du das - Ö - in der Mitte.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - Ö? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "loeffel",
-          "slot": "middle",
-          "missTts": "Löffel.",
-          "blocks": []
         }
       ]
     },
@@ -2200,27 +1689,6 @@
           "left": 17,
           "right": 8,
           "answer": 25
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l13-t1",
-      "phonemeTts": "Sch",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Sch? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "schule",
-          "slot": "start",
-          "missTts": "Schule.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Sch? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "fisch",
-          "slot": "end",
-          "missTts": "Fisch.",
-          "blocks": []
         }
       ]
     },
@@ -2394,48 +1862,6 @@
       ]
     },
     {
-      "trainer": "sound_position",
-      "id": "l14-t1",
-      "phonemeTts": "Z",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - Z? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "zebra",
-          "slot": "start",
-          "missTts": "Zebra.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - Z? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "blitz",
-          "slot": "end",
-          "missTts": "Blitz.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l14-t2",
-      "phonemeTts": "Eu",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Eu? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "eule",
-          "slot": "start",
-          "missTts": "Eule.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Eu? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "feuer",
-          "slot": "middle",
-          "missTts": "Feuer.",
-          "blocks": []
-        }
-      ]
-    },
-    {
       "trainer": "letter_trace",
       "id": "l14-t3",
       "rounds": [
@@ -2569,48 +1995,6 @@
           "right": 5,
           "answer": 25,
           "operation": "multiply"
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l15-t1",
-      "phonemeTts": "ß",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - ß? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "fuss",
-          "slot": "end",
-          "missTts": "Fuß.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - ß? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "strasse",
-          "slot": "middle",
-          "missTts": "Straße.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l15-t2",
-      "phonemeTts": "V",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - V? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "vogel",
-          "slot": "start",
-          "missTts": "Vogel.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - V? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "klavier",
-          "slot": "middle",
-          "missTts": "Klavier.",
-          "blocks": []
         }
       ]
     },
@@ -2750,48 +2134,6 @@
           "right": 9,
           "answer": 14,
           "operation": "subtract"
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l16-t1",
-      "phonemeTts": "ck",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - ck? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "sack",
-          "slot": "end",
-          "missTts": "Sack.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - ck? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "zucker",
-          "slot": "middle",
-          "missTts": "Zucker.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l16-t2",
-      "phonemeTts": "Pf",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Pf? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "pferd",
-          "slot": "start",
-          "missTts": "Pferd.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Pf? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "apfel",
-          "slot": "middle",
-          "missTts": "Apfel.",
-          "blocks": []
         }
       ]
     },
@@ -2943,48 +2285,6 @@
       ]
     },
     {
-      "trainer": "sound_position",
-      "id": "l17-t1",
-      "phonemeTts": "St",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - St? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "stern",
-          "slot": "start",
-          "missTts": "Stern.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - St? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "fenster",
-          "slot": "middle",
-          "missTts": "Fenster.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l17-t2",
-      "phonemeTts": "Sp",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Sp? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "spinne",
-          "slot": "start",
-          "missTts": "Spinne.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Sp? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "wespe",
-          "slot": "middle",
-          "missTts": "Wespe.",
-          "blocks": []
-        }
-      ]
-    },
-    {
       "trainer": "letter_trace",
       "id": "l17-t3",
       "rounds": [
@@ -3116,48 +2416,6 @@
           "left": 16,
           "right": 14,
           "answer": 30
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l18-t1",
-      "phonemeTts": "ks",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - ks? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "taxi",
-          "slot": "middle",
-          "missTts": "Taxi.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - ks? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "fuchs",
-          "slot": "end",
-          "missTts": "Fuchs.",
-          "blocks": []
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l18-t2",
-      "phonemeTts": "Qu",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Qu? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "qualle",
-          "slot": "start",
-          "missTts": "Qualle.",
-          "blocks": []
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Qu? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "quelle",
-          "slot": "start",
-          "missTts": "Quelle.",
-          "blocks": []
         }
       ]
     },
@@ -3337,44 +2595,6 @@
       ]
     },
     {
-      "trainer": "sound_position",
-      "id": "l19-t1",
-      "phonemeTts": "M",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "maus",
-          "slot": "start",
-          "missTts": "Maus."
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - M? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "ameise",
-          "slot": "middle",
-          "missTts": "Ameise."
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l19-t2",
-      "phonemeTts": "A",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - A? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "ampel",
-          "slot": "start",
-          "missTts": "Ampel."
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - A? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "lama",
-          "slot": "middle",
-          "missTts": "Lama."
-        }
-      ]
-    },
-    {
       "trainer": "letter_trace",
       "id": "l19-t3",
       "rounds": [
@@ -3497,44 +2717,6 @@
           "right": 8,
           "answer": 15,
           "operation": "subtract"
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l20-t1",
-      "phonemeTts": "I",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "igel",
-          "slot": "start",
-          "missTts": "Igel."
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - I? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "mimi",
-          "slot": "middle",
-          "missTts": "Mimi."
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l20-t2",
-      "phonemeTts": "O",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - O? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "oma",
-          "slot": "start",
-          "missTts": "Oma."
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - O? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "tomate",
-          "slot": "middle",
-          "missTts": "Tomate."
         }
       ]
     },
@@ -3670,44 +2852,6 @@
       ]
     },
     {
-      "trainer": "sound_position",
-      "id": "l21-t1",
-      "phonemeTts": "P",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - P? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "papa",
-          "slot": "start",
-          "missTts": "Papa."
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - P? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "suppe",
-          "slot": "middle",
-          "missTts": "Suppe."
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l21-t2",
-      "phonemeTts": "T",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "tom",
-          "slot": "start",
-          "missTts": "Tom."
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - T? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "hut",
-          "slot": "end",
-          "missTts": "Hut."
-        }
-      ]
-    },
-    {
       "trainer": "letter_trace",
       "id": "l21-t3",
       "rounds": [
@@ -3834,44 +2978,6 @@
           "right": 16,
           "answer": 9,
           "operation": "subtract"
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l22-t1",
-      "phonemeTts": "Ei",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Ei? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "ei",
-          "slot": "start",
-          "missTts": "Ei."
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Ei? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "kleid",
-          "slot": "middle",
-          "missTts": "Kleid."
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l22-t2",
-      "phonemeTts": "Au",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Au? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "auto",
-          "slot": "start",
-          "missTts": "Auto."
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Au? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "baum",
-          "slot": "middle",
-          "missTts": "Baum."
         }
       ]
     },
@@ -4003,44 +3109,6 @@
       ]
     },
     {
-      "trainer": "sound_position",
-      "id": "l23-t1",
-      "phonemeTts": "Sch",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Sch? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "schaf",
-          "slot": "start",
-          "missTts": "Schaf."
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Sch? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "fisch",
-          "slot": "end",
-          "missTts": "Fisch."
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l23-t2",
-      "phonemeTts": "Ch",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "dach",
-          "slot": "end",
-          "missTts": "Dach."
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Ch? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "buch",
-          "slot": "end",
-          "missTts": "Buch."
-        }
-      ]
-    },
-    {
       "trainer": "letter_trace",
       "id": "l23-t3",
       "rounds": [
@@ -4167,44 +3235,6 @@
           "right": 14,
           "answer": 15,
           "operation": "subtract"
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l24-t1",
-      "phonemeTts": "St",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - St? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "stern",
-          "slot": "start",
-          "missTts": "Stern."
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - St? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "fenster",
-          "slot": "middle",
-          "missTts": "Fenster."
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l24-t2",
-      "phonemeTts": "Sp",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Sp? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "spinne",
-          "slot": "start",
-          "missTts": "Spinne."
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Sp? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "wespe",
-          "slot": "middle",
-          "missTts": "Wespe."
         }
       ]
     },
@@ -4356,44 +3386,6 @@
       ]
     },
     {
-      "trainer": "sound_position",
-      "id": "l25-t1",
-      "phonemeTts": "Ö",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - Ö? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "loewe",
-          "slot": "middle",
-          "missTts": "Löwe."
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - Ö? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "loeffel",
-          "slot": "middle",
-          "missTts": "Löffel."
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l25-t2",
-      "phonemeTts": "Ü",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - Ü? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "ruebe",
-          "slot": "start",
-          "missTts": "Rübe."
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - Ü? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "tuer",
-          "slot": "middle",
-          "missTts": "Tür."
-        }
-      ]
-    },
-    {
       "trainer": "letter_trace",
       "id": "l25-t3",
       "rounds": [
@@ -4528,44 +3520,6 @@
           "right": 15,
           "answer": 15,
           "operation": "subtract"
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l26-t1",
-      "phonemeTts": "Qu",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Laut - Qu? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "qualle",
-          "slot": "start",
-          "missTts": "Qualle."
-        },
-        {
-          "promptTts": "Wo hörst du den Laut - Qu? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "quelle",
-          "slot": "start",
-          "missTts": "Quelle."
-        }
-      ]
-    },
-    {
-      "trainer": "sound_position",
-      "id": "l26-t2",
-      "phonemeTts": "X",
-      "rounds": [
-        {
-          "promptTts": "Wo hörst du den Buchstaben - X? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "taxi",
-          "slot": "middle",
-          "missTts": "Taxi."
-        },
-        {
-          "promptTts": "Wo hörst du den Buchstaben - X? Am Anfang, in der Mitte oder am Ende.",
-          "atomId": "fuchs",
-          "slot": "end",
-          "missTts": "Fuchs."
         }
       ]
     },

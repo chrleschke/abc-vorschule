@@ -46,7 +46,7 @@ PROFILE_PRIORITY = ("phoneme", "word", "article_word", "prompt", "miss", "reward
 _INSTRUCTION_MARKERS = (
     "Baue das Wort", "Ordne das Wort", "Ordne die Wörter",
     "Finde den", "Finde alle", "Finde die",
-    "Schiebe ", "Zeichne den", "Wo hörst du", "Wie viele",
+    "Schiebe ", "Zeichne den", "Wie viele",
 )
 
 
