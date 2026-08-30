@@ -174,7 +174,10 @@
         "max_new_tokens": 35
       },
       "seedPool": [
-        506043488
+        354671520,
+        506043488,
+        1686000936,
+        1958806341
       ],
       "trim": true,
       "normalize": true

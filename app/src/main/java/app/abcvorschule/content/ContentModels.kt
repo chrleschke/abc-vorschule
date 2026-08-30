@@ -49,14 +49,6 @@ enum class NounClass {
     properName,
 }
 
-/** Where a phoneme sits inside a spoken word. */
-@Serializable
-enum class SoundSlot {
-    start,
-    middle,
-    end,
-}
-
 /**
  * One pen stroke of a glyph, as normalized points in a 0..1 box, y pointing down.
  * Stroke order and point order encode the writing direction taught in Trainer 2.
@@ -152,14 +144,6 @@ data class ContentPack(
         lessons.firstOrNull { it.id == lessonId }?.finaleId
 
     fun tasksOf(lesson: Lesson): List<TaskSpec> = lesson.taskIds.map { task(it) }
-
-    /**
-     * [tasksOf], minus any [PausedTrainerKinds] — what a session actually schedules
-     * and what counts toward mastery. Authored content and [tasksOf] itself stay
-     * exhaustive; this is the one seam where a paused trainer disappears from play.
-     */
-    fun playableTasksOf(lesson: Lesson): List<TaskSpec> =
-        tasksOf(lesson).filter { it.kind !in PausedTrainerKinds }
 
     /** Rendered words of a sentence, aligned with [Sentence.atomIds]. */
     fun sentenceWords(sentence: Sentence): List<String> =

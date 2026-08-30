@@ -26,7 +26,6 @@ sealed interface TaskSpec {
 }
 
 enum class TrainerKind {
-    sound_position,
     letter_trace,
     syllable_merge,
     word_build,
@@ -36,43 +35,6 @@ enum class TrainerKind {
     symbol_hunt,
     symbol_in_word,
 }
-
-/**
- * Trainer kinds paused from play. Content and code stay in the repo untouched —
- * a paused kind is simply skipped when a lesson is scheduled ([ContentPack.playableTasksOf])
- * and does not count toward lesson mastery ([app.abcvorschule.progress.LessonGating]).
- *
- * sound_position (Trainer 1, the locomotive/wagon "Zug") is paused: the
- * Anfang/Mitte/Ende position concept was confusing for young testers, and its
- * scoring is ambiguous for words with a repeated phoneme (e.g. both "e"s in
- * "Erdbeere" sit in different slots but only one is marked correct).
- */
-val PausedTrainerKinds: Set<TrainerKind> = setOf(TrainerKind.sound_position)
-
-// --- Trainer 1: Auditiver Finder --------------------------------------------
-
-@Serializable
-@SerialName("sound_position")
-data class SoundPositionSpec(
-    override val id: String,
-    /** Spoken form of the hunted phoneme, e.g. "Mmm". */
-    val phonemeTts: String,
-    val rounds: List<SoundPositionRound>,
-) : TaskSpec
-
-@Serializable
-data class SoundPositionRound(
-    override val promptTts: String,
-    /** Picture-word the child sorts; rendered as emoji only, never as text. */
-    val atomId: String,
-    val slot: SoundSlot,
-    /**
-     * Whole-word re-reading spoken on a miss, e.g. "Ameise. Hörst du das - M - in der Mitte.".
-     * The word is always spoken as one piece — never segmented/spelled out, which system TTS
-     * would read letter by letter (PRODUCT_PRINCIPLES §7).
-     */
-    val missTts: String,
-) : TrainerRound
 
 // --- Trainer 2: Visueller Spurensucher --------------------------------------
 
@@ -295,7 +257,6 @@ data class TasksFile(val tasks: List<TaskSpec>)
 
 val TaskSpec.kind: TrainerKind
     get() = when (this) {
-        is SoundPositionSpec -> TrainerKind.sound_position
         is LetterTraceSpec -> TrainerKind.letter_trace
         is SyllableMergeSpec -> TrainerKind.syllable_merge
         is WordBuildSpec -> TrainerKind.word_build
@@ -308,7 +269,6 @@ val TaskSpec.kind: TrainerKind
 
 val TaskSpec.rounds: List<TrainerRound>
     get() = when (this) {
-        is SoundPositionSpec -> rounds
         is LetterTraceSpec -> rounds
         is SyllableMergeSpec -> rounds
         is WordBuildSpec -> rounds
@@ -338,7 +298,6 @@ fun CountAddRound.spokenAnswer(icon: Atom?): String {
 
 /** Atom ids a round scores against, used for per-atom stats and scaffolds. */
 fun TrainerRound.scoredAtomIds(): List<String> = when (this) {
-    is SoundPositionRound -> listOf(atomId)
     is LetterTraceRound -> listOf(atomId)
     is SyllableMergeRound -> listOf(leftAtomId, rightAtomId, resultAtomId).distinct()
     is WordBuildRound -> (blocks.map { it.atomId } + targetAtomId).distinct()

@@ -126,13 +126,39 @@ der Stimme:
 
 | Stimme | Herkunft |
 | --- | --- |
-| `serena`, `vivian` | westlich, weiblich |
-| `ryan`, `aiden` | westlich, männlich |
-| `sohee` | koreanisch |
-| `ono_anna` | japanisch |
-| `uncle_fu` | chinesisch |
+| `ryan`, `aiden` | englisch, männlich |
+| `serena`, `vivian` | chinesisch, weiblich |
+| `sohee` | koreanisch, weiblich |
+| `ono_anna` | japanisch, weiblich |
+| `uncle_fu` | chinesisch, männlich |
 | `eric` | chinesisch, Sichuan-Dialekt |
 | `dylan` | chinesisch, Peking-Dialekt |
+
+**Eine europäische Frauenstimme gibt es nicht.** Der Checkpoint kennt neun
+Stimmen; europäisch sind nur `ryan` und `aiden`, beide männlich. `serena` und
+`vivian` standen hier bis August 2026 als „westlich, weiblich" — falsch, beide
+sind chinesisch (Modellkarte: „Warm, gentle young female voice", Chinese). Wer
+für Deutsch eine Frauenstimme braucht, wählt deshalb zwangsläufig einen Akzent.
+
+**Der VoiceDesign-Checkpoint ist als Ausweg geprüft und verworfen.** Am
+2026-08-30 gegen `sohee` gehalten: Stimme aus einer Textbeschreibung statt aus
+einem festen Embedding (`Qwen3-TTS-12Hz-1.7B-VoiceDesign`, in `qwen-tts` über
+`generate_voice_design`). Zwei Runden, fünf Stimmbeschreibungen, zuletzt fair
+verglichen — `sohee` mit seinen handoptimierten `textOverride`-Werten gegen
+VoiceDesign mit bloßem Satzpunkt. Ergebnis nach Gehör: **keine Verbesserung
+der Aussprache.** Die Messung sprach dafür (Ausschussquote 1 % gegen 26 %,
+und mit einer als „Erzieherin, mittleren Alters" beschriebenen Stimme 175 Hz
+gegen 220 Hz), das Ohr dagegen — deutsche Problemwörter wie „Zaun" und
+„Schuh" saßen weiterhin nicht, teils mit englischer Aussprache, und die
+Stimmidentität wanderte zwei- bis zweieinhalbmal so weit wie bei einem festen
+Embedding.
+
+Die Versuchsskripte lagen unter `tools/tts/experiments/` und sind wieder
+entfernt; wer nachsehen will, findet sie samt Messwerten in der History
+(`git log --oneline --diff-filter=D -- tools/tts/experiments`). Bleibt als
+Rest die Erkenntnis, dass MLX-Ports von Qwen3-TTS hier nichts ändern — es ist
+derselbe Checkpoint in einem anderen Format, und das Problem ist die
+Aussprache, nicht das Tempo.
 
 Das ist keine Kosmetik. `language` setzt im Modell ein Sprach-Token (`german` → 2053) und
 steuert damit die Phonologie; das Speaker-Embedding bringt trotzdem den Akzent seiner
@@ -157,11 +183,11 @@ identischer Text im selben Profil wird zu einem Clip zusammengefasst.
 
 Das Profil `article_word` trägt die Lösungswörter **mit Artikel** („das Haus"), die das
 Erfolgs-Vorsprechen nennt. Es ist bewusst nicht `word`: dessen `max_new_tokens: 25` (≈ 2,0 s)
-schneidet „die Erdbeere" — der längste der 85 Artikel-Texte — ab, und die Instruktion muss
+schneidet „die Erdbeere" — der längste der Artikel-Texte — ab, und die Instruktion muss
 ausdrücklich verlangen, Artikel und Nomen als eine Einheit zu sprechen — abgesetzt klingt es
 wie zwei aneinandergehängte Clips.
 Ein Artikel-Item entsteht nur für Atome, die `SuccessSpeech` erreichen kann
-(`word_build.targetAtomId` ∪ `sound_position.atomId`); die übrigen klassifizierten
+(`word_build.targetAtomId`); die übrigen klassifizierten
 Substantive stünden sonst dauerhaft als „fehlt" in `tts status` und würden echte Lücken
 verdecken.
 
@@ -170,6 +196,12 @@ im Index stehen. Gewinnt bei Kollisionen zuerst die pädagogisch passende Varian
 (kurzer Satz-Architekt-Text → `sentence`, Buchstaben-Laut → `phoneme`, …); danach
 verified Audio (Fingerprint = letzter Export); sonst `PROFILE_PRIORITY`
 (`phoneme` vor `word`, sonst wie gehabt).
+
+Der Verlierer einer solchen Kollision wird gar nicht erst encodiert, und der
+Export räumt das Zielverzeichnis gegen den Index auf: eine `.ogg`, auf die kein
+Index-Eintrag zeigt, findet die App nie und wandert nur ins APK. Der Lock des
+Verlierers bleibt bestehen — ändert sich die pädagogische Regel, ist der Clip
+mit demselben Seed wieder da.
 
 Bestehende `word:*`-Locks und Kandidaten-Ordner für Buchstaben/Silben einmalig
 umziehen: `tts migrate-locks` (siehe Ablauf oben). Clips mit Produktions-WAV aber

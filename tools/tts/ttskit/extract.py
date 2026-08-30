@@ -120,8 +120,8 @@ def article_speech(atom: dict) -> str | None:
 def _speech_reachable_atom_ids(tasks: list[dict]) -> set[str]:
     """Atome, die SuccessSpeech je mit Artikel spricht.
 
-    Spiegelt SuccessSpeech.partsForRound: Wort-Bauer und Auditiver Finder.
-    Der Wort-Detektiv leitet sich zur Laufzeit aus den word_build-Wörtern ab
+    Spiegelt SuccessSpeech.partsForRound: der Wort-Bauer. Der Wort-Detektiv
+    leitet sich zur Laufzeit aus den word_build-Wörtern ab
     (SymbolInWordDerivation) und ist damit enthalten.
     """
     reachable: set[str] = set()
@@ -130,8 +130,6 @@ def _speech_reachable_atom_ids(tasks: list[dict]) -> set[str]:
         for round_ in task.get("rounds", []):
             if trainer == "word_build" and round_.get("targetAtomId"):
                 reachable.add(round_["targetAtomId"])
-            elif trainer == "sound_position" and round_.get("atomId"):
-                reachable.add(round_["atomId"])
     return reachable
 
 

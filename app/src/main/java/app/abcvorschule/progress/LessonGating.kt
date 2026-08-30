@@ -38,13 +38,8 @@ object LessonGating {
         state == LessonState.Available || state == LessonState.InProgress ||
             state == LessonState.Mastered || (unlockAll && state == LessonState.Locked)
 
-    /**
-     * Gates on [ContentPack.playableTasksOf], not the lesson's raw taskIds — a
-     * paused trainer (see [app.abcvorschule.content.PausedTrainerKinds]) must never
-     * block mastery, since the child can no longer play it to earn a correct.
-     */
     fun isMastered(pack: ContentPack, lesson: Lesson, progress: LearnerProgress): Boolean {
-        val playableIds = pack.playableTasksOf(lesson).map { it.id }
+        val playableIds = pack.tasksOf(lesson).map { it.id }
         return playableIds.isNotEmpty() &&
             playableIds.all { (progress.taskStats[it]?.correct ?: 0) > 0 }
     }
@@ -66,7 +61,7 @@ object LessonGating {
      * aufgelöst heißt weiterhin [LessonState.InProgress].
      */
     fun isCompleted(pack: ContentPack, lesson: Lesson, progress: LearnerProgress): Boolean {
-        val playableIds = pack.playableTasksOf(lesson).map { it.id }
+        val playableIds = pack.tasksOf(lesson).map { it.id }
         return playableIds.isNotEmpty() &&
             playableIds.all {
                 val stats = progress.taskStats[it]
@@ -75,7 +70,7 @@ object LessonGating {
     }
 
     fun isTouched(pack: ContentPack, lesson: Lesson, progress: LearnerProgress): Boolean =
-        pack.playableTasksOf(lesson).map { it.id }.any { (progress.taskStats[it]?.attempts ?: 0) > 0 }
+        pack.tasksOf(lesson).map { it.id }.any { (progress.taskStats[it]?.attempts ?: 0) > 0 }
 
     fun stateOf(pack: ContentPack, progress: LearnerProgress, lessonId: String): LessonState =
         states(pack, progress).getValue(lessonId)
@@ -112,7 +107,7 @@ object LessonGating {
                 // statt die Kette zu kappen: sie ist nicht zu schaffen, also darf
                 // sie auch nichts blockieren — sonst bliebe der ganze restliche
                 // Pfad für immer zu.
-                if (pack.playableTasksOf(lesson).isNotEmpty()) {
+                if (pack.tasksOf(lesson).isNotEmpty()) {
                     previousCompleted = completed
                 }
             }

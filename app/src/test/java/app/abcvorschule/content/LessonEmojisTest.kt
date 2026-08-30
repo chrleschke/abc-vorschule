@@ -9,32 +9,20 @@ class LessonEmojisTest {
 
     @Test
     fun firstLessonShowsItsOwnPictureWords() {
-        // Aus den Trainern, die das Kind in l01 wirklich spielt (M & A): Mama,
-        // Ameise, Maus. Der Auditive Finder derselben Lektion steht in
-        // PausedTrainerKinds und liefert nur noch Auffüllung — vorher stand er
-        // vorn und bestimmte das Schild allein.
+        // Aus den Trainern der Lektion M & A: Mama, Ameise, Sonne.
         assertEquals(
-            listOf("👩", "🐜", "🐭"),
+            listOf("👩", "🐜", "☀️"),
             LessonEmojis.forLesson(pack, pack.lesson("l01")),
         )
     }
 
     @Test
-    fun pausedTrainersOnlyFillUpWhatThePlayedOnesLeaveOpen() {
-        // Die eigentliche Zusage: kein Bild aus einem pausierten Trainer, solange
-        // die gespielten Trainer der Lektion selbst genug hergeben.
-        pack.authoredLessons.forEach { lesson ->
-            val played = LessonEmojis.forLesson(pack, lesson.copy(taskIds = pack.playableTasksOf(lesson).map { it.id }))
-            val shown = LessonEmojis.forLesson(pack, lesson)
-            assertEquals("lesson ${lesson.id}", played, shown.take(played.size))
-        }
-    }
-
-    @Test
-    fun everyAuthoredLessonYieldsThreeEmojis() {
+    fun everyAuthoredLessonYieldsTwoOrThreeEmojis() {
+        // Drei, wo die Lektion genug Bildwörter hat; l19–l26 tragen keinen
+        // Satz-Versteher und kommen auf zwei. Leer darf kein Schild sein.
         pack.authoredLessons.forEach { lesson ->
             val emojis = LessonEmojis.forLesson(pack, lesson)
-            assertEquals("lesson ${lesson.id}", 3, emojis.size)
+            assertTrue("lesson ${lesson.id} has ${emojis.size} emojis", emojis.size in 2..3)
             assertTrue("lesson ${lesson.id} has a blank emoji", emojis.none { it.isBlank() })
         }
     }
@@ -103,16 +91,14 @@ class LessonEmojisTest {
             Atom(id = "other-d", lemma = "other-d", display = "D", emoji = "🟡"),
         ).associateBy { it.id }
 
-        fun round(atomId: String) = SoundPositionRound(
+        fun round(atomId: String) = WordBuildRound(
             promptTts = "prompt",
-            atomId = atomId,
-            slot = SoundSlot.start,
-            missTts = "miss",
+            targetAtomId = atomId,
+            blocks = emptyList(),
         )
 
-        val task = SoundPositionSpec(
+        val task = WordBuildSpec(
             id = "t-collision",
-            phonemeTts = "X",
             // Duplicate pair first, on purpose — the dedup must fire on the second one.
             rounds = listOf(round("twin-a"), round("twin-b"), round("other-c"), round("other-d")),
         )

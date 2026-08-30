@@ -4,8 +4,6 @@ import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.SentencePictureRound
 import app.abcvorschule.content.SentencePictureSpec
-import app.abcvorschule.content.SoundPositionRound
-import app.abcvorschule.content.SoundPositionSpec
 import app.abcvorschule.content.SymbolHuntDerivation
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.rounds
@@ -48,15 +46,6 @@ fun ContentPack.ttsDebugEntries(): List<TtsDebugEntry> {
         // Task-Level-Strings: gesprochene Felder, die nicht an einer Runde hängen.
         // IDs wie in tools/tts/ttskit/extract.py, damit Debug-Screen und Sprach-
         // Pipeline denselben Schlüssel benutzen.
-        if (task is SoundPositionSpec) {
-            entries += TtsDebugEntry(
-                id = "task:${task.id}:phonemeTts",
-                group = TtsDebugGroup.Task,
-                label = "${task.id} · phonemeTts",
-                originalText = task.phonemeTts,
-                sourceFile = "tasks.json",
-            )
-        }
         if (task is SentencePictureSpec) {
             entries += TtsDebugEntry(
                 id = "task:${task.id}:instructionTts",
@@ -81,13 +70,6 @@ fun ContentPack.ttsDebugEntries(): List<TtsDebugEntry> {
                 sourceFile = "tasks.json",
             )
             when (round) {
-                is SoundPositionRound -> entries += TtsDebugEntry(
-                    id = "task:${task.id}:round:$index:missTts",
-                    group = TtsDebugGroup.Task,
-                    label = "${task.id} · round $roundNumber · missTts",
-                    originalText = round.missTts,
-                    sourceFile = "tasks.json",
-                )
                 is LetterTraceRound -> entries += TtsDebugEntry(
                     id = "task:${task.id}:round:$index:rewardTts",
                     group = TtsDebugGroup.Task,

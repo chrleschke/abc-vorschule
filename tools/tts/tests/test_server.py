@@ -813,9 +813,11 @@ def test_state_ships_the_voice_catalogue_with_origins(client):
     names = [v["name"] for v in body["voices"]]
     assert "serena" in names and "sohee" in names
     by_name = {v["name"]: v for v in body["voices"]}
-    assert by_name["sohee"]["origin"] == "koreanisch"
+    assert by_name["sohee"]["origin"] == "koreanisch, weiblich"
     assert by_name["sohee"]["european"] is False
-    assert by_name["serena"]["european"] is True
+    assert by_name["serena"]["european"] is False, \
+        "serena ist chinesisch — siehe voices.py"
+    assert by_name["ryan"]["european"] is True
     assert "german" in body["languages"]
 
 

@@ -10,6 +10,20 @@ Kernsprache mit. Bei einem ganzen Satz gleicht der Kontext das weitgehend aus,
 bei einem einzelnen Laut („M") gibt es keinen Kontext — dort schlägt der Akzent
 voll durch. Deshalb steht die Herkunft im UI hinter jedem Stimmnamen, und
 deshalb warnt es, wenn eine nicht-europäische Stimme deutschen Text spricht.
+
+**Es gibt keine europäische Frauenstimme.** Von den neun Stimmen sind fünf
+chinesisch, eine japanisch, eine koreanisch — europäisch sind nur `ryan` und
+`aiden`, beide männlich und beide englisch. So steht es in der Modellkarte des
+Checkpoints (`serena`: „Warm, gentle young female voice", Chinese; `vivian`:
+„Bright, slightly edgy young female voice", Chinese).
+
+Diese Spalte stand bis August 2026 falsch da: `serena` und `vivian` waren als
+„westlich, weiblich" geführt und damit als `european=True`. Der Abgleich in
+`tests/test_voices.py` konnte das nicht auffangen — die Modell-Config kennt
+unter `spk_id` nur die nackten Namen, nicht die Herkunft. Wer für Deutsch eine
+Frauenstimme will, wählt damit zwangsläufig einen Akzent; der Ausweg führt über
+einen anderen Checkpoint (VoiceDesign oder Voice-Clone), nicht über diese
+Tabelle.
 """
 
 from __future__ import annotations
@@ -36,14 +50,15 @@ class Voice:
 
 
 #: Reihenfolge ist die Anzeigereihenfolge: erst die für Deutsch brauchbaren.
+#: Das sind genau zwei, und beide sind männlich — siehe Modul-Docstring.
 VOICES: tuple[Voice, ...] = (
-    Voice("serena", "westlich, weiblich", True),
-    Voice("vivian", "westlich, weiblich", True),
-    Voice("ryan", "westlich, männlich", True),
-    Voice("aiden", "westlich, männlich", True),
-    Voice("sohee", "koreanisch", False),
-    Voice("ono_anna", "japanisch", False),
-    Voice("uncle_fu", "chinesisch", False),
+    Voice("ryan", "englisch, männlich", True),
+    Voice("aiden", "englisch, männlich (US)", True),
+    Voice("serena", "chinesisch, weiblich", False),
+    Voice("vivian", "chinesisch, weiblich", False),
+    Voice("sohee", "koreanisch, weiblich", False),
+    Voice("ono_anna", "japanisch, weiblich", False),
+    Voice("uncle_fu", "chinesisch, männlich", False),
     Voice("eric", "chinesisch, Sichuan-Dialekt", False),
     Voice("dylan", "chinesisch, Peking-Dialekt", False),
 )

@@ -30,8 +30,8 @@ class SyllableFrameSizingTest {
     }
 
     @Test fun widthDpKeepsItsShippedValues() {
-        // SoundPositionTrainer still sizes its wagons off this — the shipped
-        // numbers (chars x 34 + 36, floor 108) must not drift.
+        // Die Silben-Rahmen hängen daran — die ausgelieferten Zahlen
+        // (chars x 34 + 36, Untergrenze 108) dürfen nicht driften.
         assertEquals(108f, SyllableFrameSizing.widthDp("u"), 0.01f)
         assertEquals(138f, SyllableFrameSizing.widthDp("sch"), 0.01f)
         assertEquals(172f, SyllableFrameSizing.widthDp("Schu"), 0.01f)

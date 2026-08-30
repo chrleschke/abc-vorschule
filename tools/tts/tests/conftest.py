@@ -20,10 +20,12 @@ def content_dir(tmp_path: Path) -> Path:
         {"id": "f-l01", "text": "Mama Maus!", "tts": "Mama Maus!", "pictureAtomIds": ["mama"]},
     ]}), encoding="utf-8")
     (d / "tasks.json").write_text(json.dumps({"tasks": [
-        {"trainer": "sound_position", "id": "l01-t1", "phonemeTts": "M", "rounds": [
-            {"promptTts": "Wo hörst du M?", "atomId": "maus", "slot": "start",
+        # Kein realer Trainer-Typ: der Extractor liest Felder, nicht Trainer —
+        # dieser Eintrag deckt task-level phonemeTts und rundenweises missTts ab.
+        {"id": "l01-t1", "phonemeTts": "M", "rounds": [
+            {"promptTts": "Hörst du M?", "atomId": "maus",
              "missTts": "Maus. Am Anfang.", "blocks": []},
-            {"promptTts": "Wo hörst du M?", "atomId": "baum", "slot": "end",
+            {"promptTts": "Hörst du M?", "atomId": "baum",
              "missTts": "Baum. Am Ende.", "blocks": []},
         ]},
         {"trainer": "letter_trace", "id": "l01-t2", "rounds": [

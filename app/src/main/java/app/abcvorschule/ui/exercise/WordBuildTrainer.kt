@@ -374,8 +374,7 @@ fun WordBuildTrainer(
  * flush against the frame's own [CreamElevated] fill (no page background in between),
  * and [LeafGreen] at full opacity only reaches 2.87:1 there — under the 3:1
  * UI-component floor. This shade clears it at 3.79:1 against CreamElevated (4.71:1
- * against the page's Cream), same fix pattern as SoundPositionTrainer's
- * `wagonBorderColor` in Task 4.
+ * against the page's Cream).
  */
 private val SlotBorderGreen = Color(0xFF3A7A44)
 

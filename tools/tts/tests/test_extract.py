@@ -37,7 +37,7 @@ def test_carries_text_field_and_source(content_dir):
     assert maus.source == "atoms.json"
 
     prompt = by_id["task:l01-t1:round:0:promptTts"]
-    assert prompt.text == "Wo hörst du M?"
+    assert prompt.text == "Hörst du M?"
     assert prompt.field == "promptTts"
     assert prompt.source == "tasks.json"
 
@@ -297,9 +297,9 @@ def test_article_override_beats_the_name_duplicate_check(tmp_path):
          "kind": "word", "nounClass": "name", "articleSpeechOverride": "Herr Kapitän"},
     ]}), encoding="utf-8")
     (d / "tasks.json").write_text(json.dumps({"tasks": [
-        {"trainer": "sound_position", "id": "l01-t1", "rounds": [
-            {"promptTts": "Wo hörst du K?", "atomId": "kapitaen", "slot": "start",
-             "missTts": "Kapitän. Am Anfang.", "blocks": []},
+        {"trainer": "word_build", "id": "l01-t1", "rounds": [
+            {"promptTts": "Baue das Wort Kapitän.", "targetAtomId": "kapitaen",
+             "blocks": []},
         ]},
     ]}), encoding="utf-8")
     for name, key in (("sentences.json", "sentences"), ("finales.json", "finales"),
@@ -315,16 +315,15 @@ def test_article_items_cover_only_reachable_atoms():
     items = extract_items(CONTENT_DIR)
     by_id = {i.id: i for i in items if i.field == "articleTts"}
 
-    # word_build-Ziel und sound_position-Wort → Clip
+    # word_build-Ziel → Clip
     assert by_id["atom:haus:articleTts"].text == "das Haus"
-    assert by_id["atom:ameise:articleTts"].text == "die Ameise"
     # klassifiziert, aber nie vorgesprochen → kein Clip
     assert "atom:banane:articleTts" not in by_id
     # Name: Sprechtext == display, wäre ein Duplikat des word-Clips
     assert "atom:tom:articleTts" not in by_id
     # kein Substantiv
     assert "atom:ich:articleTts" not in by_id
-    assert len(by_id) == 85
+    assert len(by_id) == 41
 
 
 def test_article_items_use_the_article_word_profile():

@@ -2,10 +2,8 @@
 
 Kostenlose, werbefreie Android-Vorschul-App (ca. 4–7 Jahre) für Lesen und Rechnen auf Deutsch.
 Helles, warmes Cream-UI, offline nach Installation. Ein Fibel-Pfad aus 26 Lektionen; jede Lektion
-läuft sieben autorierte Trainer-Typen in fester didaktischer Reihenfolge über einen gemeinsamen
+läuft sechs autorierte Trainer-Typen in fester didaktischer Reihenfolge über einen gemeinsamen
 Content-Graphen — ein Typ darf sich wiederholen oder fehlen, zurück geht die Reihenfolge nie.
-Der **Auditive Finder ist derzeit pausiert** (`PausedTrainerKinds` in `TaskSpecs.kt`); zur Laufzeit
-beginnt eine Lektion deshalb mit dem Spurensucher.
 Zur Laufzeit abgeleitet, nie autoriert: Buchstaben-/Silben-Jagd und Wort-Detektiv als
 Übungselemente zwischen den Trainern.
 
@@ -128,14 +126,14 @@ Autoriert: alle 26 Lektionen (Phase 1–7), inklusive der Wiederholungs-Tracks. 
 Lektion auf `planned`; der Status bleibt im Schema erhalten, damit künftige Lektionen als gesperrte
 Pfad-Knoten angelegt werden können, ohne Code zu ändern.
 
-Die sieben autorierten Trainer-Typen in Rangfolge (`ContentValidator.TrainerOrder`):
-`sound_position` · `letter_trace` · `syllable_merge` · `word_build` · `sentence_order` ·
+Die sechs autorierten Trainer-Typen in Rangfolge (`ContentValidator.TrainerOrder`):
+`letter_trace` · `syllable_merge` · `word_build` · `sentence_order` ·
 `sentence_picture` · `count_add`. `symbol_hunt` und `symbol_in_word` stehen nie im Content —
 sie entstehen erst zur Laufzeit (`SessionTrainers`).
 
 Der Validator prüft die Reihenfolge über den **Rang**, nicht über Vollständigkeit: eine autorierte
-Lektion muss mit `sound_position` beginnen, mit `count_add` enden und dazwischen nicht-fallend
-bleiben. Wiederholte Typen (l01 hat zwei `sound_position`, zwei `letter_trace`, zwei `count_add`)
+Lektion muss mit `letter_trace` beginnen, mit `count_add` enden und dazwischen nicht-fallend
+bleiben. Wiederholte Typen (l01 hat zwei `letter_trace`, zwei `count_add`)
 und ausgelassene Typen sind erlaubt, ein Rücksprung nicht. Abgelehnt wird ein Pack außerdem, wenn
 eine autorierte Lektion einen abgeleiteten Trainer enthält, Kachelfolgen das Zielwort nicht
 buchstabieren, eine Summe nicht stimmt, Strichdaten fehlen oder Referenzen ins Leere zeigen.
@@ -153,9 +151,6 @@ buchstabieren, eine Summe nicht stimmt, Strichdaten fehlen oder Referenzen ins L
    Wort-Bauer (Mama bauen) · Wort-Detektiv (Buchstabe im Wort antippen) ·
    Satz-Architekt (Wortschild aufhängen) · Satz-Versteher (Satz hören, Bildkarte tippen) ·
    zwei Rechenaufgaben.
-   **Der Auditive Finder (Waggon-Zuordnung) taucht nicht auf** — er steht in
-   `PausedTrainerKinds` und wird beim Zusammenstellen der Session herausgefiltert
-   (`ContentPack.playableTasksOf`). Das ist kein Fehler; der Content dazu liegt weiter im Pack.
    Bei Wort-Bauer und Satz-Architekt beide Bedienwege prüfen: eine Kachel per Ziehen platzieren
    (die gezogene Kachel liegt sichtbar über den Zielfeldern, nie darunter) und eine per Tippen
    (Tap-Alternative: Kachel antippen, dann Zielfeld antippen).

@@ -8,7 +8,6 @@ class ContentValidationException(val issues: List<ValidationIssue>) :
 object ContentValidator {
     /** Fixed didactic sequence every authored lesson must follow. */
     val TrainerOrder: List<TrainerKind> = listOf(
-        TrainerKind.sound_position,
         TrainerKind.letter_trace,
         TrainerKind.syllable_merge,
         TrainerKind.word_build,
@@ -22,8 +21,6 @@ object ContentValidator {
      * kind instead of holding exactly one of each. */
     private val TrainerRank: Map<TrainerKind, Int> =
         TrainerOrder.withIndex().associate { (index, kind) -> kind to index }
-
-    private const val MinSoundPositionRounds = 2
 
     /** Rechnen-Zahlenraum: operands and answers stay countable up to 30. */
     private const val MaxMathQuantity = 30
@@ -125,7 +122,6 @@ object ContentValidator {
         val speechReachable: Set<String> = pack.tasks.values.flatMap { spec ->
             when (spec) {
                 is WordBuildSpec -> spec.rounds.map { it.targetAtomId }
-                is SoundPositionSpec -> spec.rounds.map { it.atomId }
                 else -> emptyList()
             }
         }.toSet()
@@ -205,19 +201,6 @@ object ContentValidator {
                 }
             }
             when (spec) {
-                is SoundPositionSpec -> {
-                    if (spec.rounds.size < MinSoundPositionRounds) {
-                        issues += ValidationIssue(
-                            "task $id needs at least $MinSoundPositionRounds rounds to be failable",
-                        )
-                    }
-                    spec.rounds.forEach { round ->
-                        requireAtom("task $id", round.atomId)
-                        if (round.missTts.isBlank()) {
-                            issues += ValidationIssue("task $id has a round without missTts")
-                        }
-                    }
-                }
                 is LetterTraceSpec -> spec.rounds.forEach { round ->
                     requireAtom("task $id", round.atomId)
                     val atom = pack.atoms[round.atomId]
@@ -457,12 +440,12 @@ object ContentValidator {
                     }
                     val ranks = authoredKinds.map { TrainerRank.getValue(it) }
                     val monotonic = ranks.zipWithNext().all { (a, b) -> a <= b }
-                    val startsAndEndsRight = authoredKinds.firstOrNull() == TrainerKind.sound_position &&
+                    val startsAndEndsRight = authoredKinds.firstOrNull() == TrainerKind.letter_trace &&
                         authoredKinds.lastOrNull() == TrainerKind.count_add
                     if (!monotonic || !startsAndEndsRight) {
                         issues += ValidationIssue(
                             "authored lesson ${lesson.id} must hold trainer kinds in " +
-                                "non-decreasing $TrainerOrder rank, starting with sound_position " +
+                                "non-decreasing $TrainerOrder rank, starting with letter_trace " +
                                 "and ending with count_add, but holds $kinds",
                         )
                     }
