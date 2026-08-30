@@ -65,7 +65,9 @@ fun MathExercise(
     // zuzuziehen, während das Kind mittendrin zählt, wäre die schlechteste aller
     // Optionen.
     // Nur noch für Minus und Malnehmen: das Zehnerfeld ist von Anfang an offen
-    // und ist keine Hilfestufe, sondern die Darstellung der Aufgabe.
+    // und ist keine Hilfestufe, sondern die Darstellung der Aufgabe. `!useTenFrame`
+    // steckt darum hier drin — und `aided` kann sich unten allein auf diesen Wert
+    // verlassen, statt die Bedingung dreimal zu wiederholen.
     val countingOpen = usePad && !useTenFrame && misses >= MathHinting.CountingAidFromMisses
 
     // Die Zählanweisung spricht das ViewModel als Miss-Feedback des zweiten
@@ -89,7 +91,7 @@ fun MathExercise(
                     resolved = false,
                     correct = true,
                     guess = guess,
-                    aided = !useTenFrame && countingOpen,
+                    aided = countingOpen,
                     opensAid = false,
                 ),
             )
@@ -106,13 +108,18 @@ fun MathExercise(
                     resolved = false,
                     correct = false,
                     guess = guess,
-                    aided = !useTenFrame && countingOpen,
+                    aided = countingOpen,
                     // Genau dieser Fehlversuch klappt die Hilfe auf: `countingOpen`
                     // ist oben noch der Wert *vor* der Erhöhung.
                     // Im Zehnerfeld klappt nichts auf — der Hinweis zeigt statt
                     // dessen auf das Antippen, das schon die ganze Zeit möglich
                     // ist. `opensAid` heißt hier also „sprich den Tipp-Cue".
-                    opensAid = usePad && misses == MathHinting.CountingAidFromMisses,
+                    // ... aber nicht, wenn im Zehnerfeld längst jeder Platzhalter
+                    // gesetzt ist: „Tippe auf die Bilder" zeigte dann auf ein Feld,
+                    // in dem nichts mehr auf einen Tipp reagiert.
+                    opensAid = usePad &&
+                        misses == MathHinting.CountingAidFromMisses &&
+                        !(useTenFrame && frame.complete),
                 ),
             )
         }
@@ -127,7 +134,7 @@ fun MathExercise(
                 resolved = true,
                 correct = false,
                 guess = null,
-                aided = !useTenFrame && countingOpen,
+                aided = countingOpen,
                 opensAid = false,
             ),
         )
@@ -151,6 +158,12 @@ fun MathExercise(
                 TenFrameBoard(
                     emoji = icon,
                     state = frame,
+                    // Dieselbe Sperre wie am Antwortblock: während des Audio-Locks
+                    // und nach der Entscheidung ist keine Zelle antippbar, keine
+                    // pulsiert, und beide Blöcke blenden gemeinsam ab. Ein
+                    // pulsierender Platzhalter, der jeden Tipp lautlos schluckt,
+                    // wäre ein stummer No-Op.
+                    enabled = !interactionLocked && !locked,
                     onTap = { index ->
                         if (locked || interactionLocked) return@TenFrameBoard
                         val next = frame.tap(index)
@@ -177,7 +190,12 @@ fun MathExercise(
                     resetToken = PlaceValueInput.resetToken(roundKey, misses),
                     onSubmit = { handleGuess(it) },
                     solved = solved != null,
-                    enabled = !interactionLocked && !locked,
+                    // `locked` gehört nicht in `enabled`: sonst zeichnet das Feld
+                    // im selben Ereignis, das die Antwort als richtig annimmt,
+                    // seinen Disabled-Zweig — und die grüne Bestätigung aus §8
+                    // käme nie zustande. Gesperrt wird über `locked` (readOnly).
+                    locked = locked,
+                    enabled = !interactionLocked,
                 )
                 if (misses >= MathHinting.ResolveFromMissesTyped && !locked) {
                     AbcResolveButton(onClick = ::resolve)

@@ -92,6 +92,14 @@ fun PlaceValueAnswer(
     modifier: Modifier = Modifier,
     /** True, sobald die getippte Zahl die Antwort war — die Kästen bestätigen grün. */
     solved: Boolean = false,
+    /**
+     * True, sobald die Runde entschieden ist — richtig geraten **oder** aufgelöst.
+     * Sperrt die Eingabe, ohne sie einzufärben: über [enabled] gesperrt zeichnete
+     * `OutlinedTextField` seinen Disabled-Zweig und überschriebe damit genau die
+     * grüne Bestätigung, die §8 für die richtige Antwort verlangt. Auflösen bleibt
+     * dabei farblos — grün ist [solved] allein.
+     */
+    locked: Boolean = false,
     /** False während des Audio-Locks: Kästen und Pfeil sind blass und stumm. */
     enabled: Boolean = true,
 ) {
@@ -102,8 +110,8 @@ fun PlaceValueAnswer(
     val onesFocus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
     val opacity by animateFloatAsState(
-        targetValue = if (enabled) 1f else 0.5f,
-        animationSpec = tween(durationMillis = 200),
+        targetValue = if (enabled) 1f else StageLockedAlpha,
+        animationSpec = tween(durationMillis = StageLockFadeMillis),
         label = "place_value_lock_opacity",
     )
     val complete = PlaceValueInput.isComplete(tens.text, ones.text, fields)
@@ -112,7 +120,7 @@ fun PlaceValueAnswer(
         // Einmal abgeschickt ist abgeschickt: der Pfeil ist danach zwar aus, das
         // Einerfeld nimmt aber weiter Fokus und IME-Aktionen an — ein zweites
         // „Fertig" auf der Tastatur käme sonst als zweiter Versuch an.
-        if (solved || !complete) return
+        if (solved || locked || !complete) return
         PlaceValueInput.combine(tens.text, ones.text, fields)?.let(onSubmit)
     }
 
@@ -123,7 +131,7 @@ fun PlaceValueAnswer(
     }
 
     val slot = PlaceValueInput.slotWidthDp(
-        textSp = MaterialTheme.typography.displaySmall.fontSize.value,
+        textSp = MaterialTheme.typography.displayLarge.fontSize.value,
         fontScale = LocalDensity.current.fontScale,
     ).dp
 
@@ -166,6 +174,7 @@ fun PlaceValueAnswer(
                     focusRequester = tensFocus,
                     slot = slot,
                     solved = solved,
+                    locked = locked,
                     enabled = enabled,
                     imeAction = ImeAction.Next,
                     onImeAction = { onesFocus.requestFocus() },
@@ -181,9 +190,24 @@ fun PlaceValueAnswer(
                     ones = TextFieldValue(digit, TextRange(digit.length))
                 },
                 onSelectAll = { ones = ones.copy(selection = TextRange(0, ones.text.length)) },
+                // „Fokus startet im Zehnerfeld": bekommt das Einerfeld den Fokus,
+                // während der Zehner noch leer ist, wandert er dorthin zurück. Nur
+                // auf Fokus*gewinn* — beim Rundenaufbau fordert niemand Fokus an,
+                // und genau das muss so bleiben, sonst klappt die System-Tastatur
+                // über das Zehnerfeld, an dem das Kind rechnet.
+                //
+                // Keine Fokus-Schaukel: der Vorwärtssprung aus dem Zehnerfeld
+                // passiert erst, nachdem dort eine Ziffer steht — dann ist
+                // `tens.text` nicht mehr leer und das Einerfeld behält den Fokus.
+                onFocusGained = {
+                    val toTens = fields == 2 && tens.text.isEmpty()
+                    if (toTens) tensFocus.requestFocus()
+                    toTens
+                },
                 focusRequester = onesFocus,
                 slot = slot,
                 solved = solved,
+                locked = locked,
                 enabled = enabled,
                 imeAction = ImeAction.Done,
                 onImeAction = { submit() },
@@ -195,7 +219,7 @@ fun PlaceValueAnswer(
             )
             Surface(
                 onClick = { submit() },
-                enabled = enabled && complete && !solved,
+                enabled = enabled && complete && !solved && !locked,
                 shape = RoundedCornerShape(20.dp),
                 color = SunCoral,
                 modifier = Modifier
@@ -232,7 +256,7 @@ private fun PlaceValueDigits(operator: String, value: Int, slot: Dp) {
 private fun Digit(text: String, width: Dp) {
     Text(
         text = text,
-        style = MaterialTheme.typography.displaySmall,
+        style = MaterialTheme.typography.displayLarge,
         color = WarmInk,
         textAlign = TextAlign.Center,
         modifier = Modifier.width(width),
@@ -246,8 +270,11 @@ private fun DigitField(
     onValueChange: (TextFieldValue) -> Unit,
     onSelectAll: () -> Unit,
     focusRequester: FocusRequester,
+    /** Läuft bei Fokusgewinn; `true` heißt „der Fokus ist weitergereicht worden". */
+    onFocusGained: () -> Boolean = { false },
     slot: Dp,
     solved: Boolean,
+    locked: Boolean,
     enabled: Boolean,
     imeAction: ImeAction,
     onImeAction: () -> Unit,
@@ -261,9 +288,11 @@ private fun DigitField(
             .width(slot)
             .focusRequester(focusRequester)
             .onFocusChanged { focus ->
+                if (!focus.isFocused) return@onFocusChanged
+                if (onFocusGained()) return@onFocusChanged
                 // Beim Antippen wird der Inhalt markiert, damit die nächste Ziffer
                 // ihn ersetzt — ein Kind soll nicht erst löschen müssen.
-                if (focus.isFocused && value.text.isNotEmpty()) onSelectAll()
+                if (value.text.isNotEmpty()) onSelectAll()
             }
             .onPreviewKeyEvent { event ->
                 if (
@@ -279,10 +308,13 @@ private fun DigitField(
                 }
             }
             .testTag(tag),
-        textStyle = MaterialTheme.typography.displaySmall.copy(textAlign = TextAlign.Center),
+        textStyle = MaterialTheme.typography.displayLarge.copy(textAlign = TextAlign.Center),
         singleLine = true,
         enabled = enabled,
-        readOnly = solved,
+        // Gesperrt wird über `readOnly`, nicht über `enabled`: der Disabled-Zweig
+        // von M3 zöge `disabledBorderColor` und färbte die richtige Antwort grau
+        // statt grün.
+        readOnly = solved || locked,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = imeAction),
         keyboardActions = KeyboardActions(
             onNext = { onImeAction() },
