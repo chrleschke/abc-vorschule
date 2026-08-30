@@ -2891,23 +2891,9 @@
       "kind": "syllable"
     },
     {
-      "id": "ru",
-      "lemma": "ruh",
-      "display": "ru",
-      "emoji": "",
-      "kind": "syllable"
-    },
-    {
       "id": "na",
       "lemma": "na",
       "display": "na",
-      "emoji": "",
-      "kind": "syllable"
-    },
-    {
-      "id": "sa",
-      "lemma": "sa",
-      "display": "sa",
       "emoji": "",
       "kind": "syllable"
     },
@@ -2926,30 +2912,9 @@
       "kind": "syllable"
     },
     {
-      "id": "ka",
-      "lemma": "ka",
-      "display": "ka",
-      "emoji": "",
-      "kind": "syllable"
-    },
-    {
       "id": "mei",
       "lemma": "mei",
       "display": "mei",
-      "emoji": "",
-      "kind": "syllable"
-    },
-    {
-      "id": "kei",
-      "lemma": "kei",
-      "display": "kei",
-      "emoji": "",
-      "kind": "syllable"
-    },
-    {
-      "id": "wi",
-      "lemma": "wie",
-      "display": "wi",
       "emoji": "",
       "kind": "syllable"
     },
@@ -2971,13 +2936,6 @@
       "id": "bau",
       "lemma": "bau",
       "display": "bau",
-      "emoji": "",
-      "kind": "syllable"
-    },
-    {
-      "id": "mau",
-      "lemma": "mau",
-      "display": "mau",
       "emoji": "",
       "kind": "syllable"
     },
@@ -3933,16 +3891,6 @@
       "nounClass": "thing"
     },
     {
-      "id": "uhu",
-      "lemma": "Uhu",
-      "display": "Uhu",
-      "emoji": "🦉",
-      "kind": "word",
-      "pluralDisplay": "Uhus",
-      "gender": "m",
-      "nounClass": "thing"
-    },
-    {
       "id": "wolke",
       "lemma": "Wolke",
       "display": "Wolke",
@@ -4322,16 +4270,6 @@
       "nounClass": "thing"
     },
     {
-      "id": "rad",
-      "lemma": "Rad",
-      "display": "Rad",
-      "emoji": "🚲",
-      "kind": "other",
-      "pluralDisplay": "Räder",
-      "gender": "n",
-      "nounClass": "thing"
-    },
-    {
       "id": "kleid",
       "lemma": "Kleid",
       "display": "Kleid",
@@ -4339,16 +4277,6 @@
       "kind": "other",
       "pluralDisplay": "Kleider",
       "gender": "n",
-      "nounClass": "thing"
-    },
-    {
-      "id": "tag",
-      "lemma": "Tag",
-      "display": "Tag",
-      "emoji": "📅",
-      "kind": "other",
-      "pluralDisplay": "Tage",
-      "gender": "m",
       "nounClass": "thing"
     },
     {
@@ -4391,16 +4319,6 @@
       "nounClass": "thing"
     },
     {
-      "id": "wespe",
-      "lemma": "Wespe",
-      "display": "Wespe",
-      "emoji": "🐝",
-      "kind": "other",
-      "pluralDisplay": "Wespen",
-      "gender": "f",
-      "nounClass": "thing"
-    },
-    {
       "id": "ei",
       "lemma": "Ei",
       "display": "Ei",
@@ -4430,17 +4348,6 @@
       "pluralDisplay": "Blätter",
       "pluralHighlight": "Umlaut",
       "gender": "n",
-      "nounClass": "thing"
-    },
-    {
-      "id": "pflanze",
-      "lemma": "Pflanze",
-      "display": "Pflanze",
-      "emoji": "🌱",
-      "kind": "word",
-      "pluralDisplay": "Pflanzen",
-      "pluralHighlight": "n",
-      "gender": "f",
       "nounClass": "thing"
     },
     {
@@ -4539,23 +4446,9 @@
       "nounClass": "thing"
     },
     {
-      "id": "ha",
-      "lemma": "h",
-      "display": "ha",
-      "emoji": "",
-      "kind": "syllable"
-    },
-    {
       "id": "ta",
       "lemma": "ta",
       "display": "ta",
-      "emoji": "",
-      "kind": "syllable"
-    },
-    {
-      "id": "zu",
-      "lemma": "zu",
-      "display": "zu",
       "emoji": "",
       "kind": "syllable"
     },
@@ -4570,20 +4463,6 @@
       "id": "fi",
       "lemma": "fi",
       "display": "fi",
-      "emoji": "",
-      "kind": "syllable"
-    },
-    {
-      "id": "ke",
-      "lemma": "que",
-      "display": "ke",
-      "emoji": "",
-      "kind": "syllable"
-    },
-    {
-      "id": "gu",
-      "lemma": "gu",
-      "display": "gu",
       "emoji": "",
       "kind": "syllable"
     },
@@ -5317,6 +5196,26 @@
       "display": "leer",
       "emoji": "",
       "kind": "word"
+    },
+    {
+      "id": "nashorn",
+      "lemma": "Nashorn",
+      "display": "Nashorn",
+      "emoji": "🦏",
+      "kind": "other",
+      "pluralDisplay": "Nashörner",
+      "gender": "n",
+      "nounClass": "thing"
+    },
+    {
+      "id": "flamingo",
+      "lemma": "Flamingo",
+      "display": "Flamingo",
+      "emoji": "🦩",
+      "kind": "other",
+      "pluralDisplay": "Flamingos",
+      "gender": "m",
+      "nounClass": "thing"
     }
   ]
 }

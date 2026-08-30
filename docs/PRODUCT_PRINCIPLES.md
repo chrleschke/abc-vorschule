@@ -69,6 +69,10 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
   flektierte Formen und freie Verben nutzen — nur die Karten-Nomen sind Atome mit
   Emoji. Die Instruktion ist über alle Lektionen **wortgleich** (Validator prüft das),
   damit sie nur eine einzige Aufnahme braucht. Redaktionsregeln:
+  - Vier Runden je Lektion sind die Regel; eine fünfte ist erlaubt und trägt dort,
+    wo sie steht, ein sonst bildloses Wort als *richtige* Karte ein (Nashorn,
+    Flamingo, Tiger, Nilpferd, Affe, Raupe, Pilz …). `ContentValidator` lässt 3–6 zu,
+    `LessonCoverageTest` hält 4–5 fest.
   - 4–8 Wörter, ein Hauptsatz, Wörter der Lektion, Cartoon-Logik (realistischer als
     die Finale-Sätze).
   - **Die falsche Karte tauscht eine Kategorie, nicht bloß die Anzahl.** Anderes Tier,
@@ -152,8 +156,14 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
   (`word_build`, `syllable_merge`, `sentence_order`) folgen zuerst der Schreibbarkeit;
   dass „Ufo“ in l05 steht, ist eine Folge des Buchstabenpfads, kein Redaktionsfehler.
 - **Kein Atom ohne Auftritt.** Ein Atom, das kein Task, kein Satz und kein Finale
-  referenziert, wird gelöscht statt gepflegt. Der Pack trug im August 2026 60 solcher
-  Karteileichen; die Hälfte davon waren genau die Alltagswörter, die vermeintlich fehlten.
+  referenziert, wird gelöscht oder eingebaut — gepflegt wird es nicht. Der Pack trug im
+  August 2026 60 solcher Karteileichen; die Hälfte davon waren genau die Alltagswörter,
+  die vermeintlich fehlten. Der Stand ist seither **null**, und
+  `LessonCoverageTest.noAtomSitsInThePackWithoutEverBeingShown` hält ihn dort. Ein
+  neues Atom kommt also zusammen mit der Runde, die es zeigt, nicht auf Vorrat.
+- **Emoji-Doppelgänger sind keine zwei Karten.** Zwei Atome mit demselben Glyphen
+  (Uhu/Eule 🦉, Wespe/Biene 🐝, Rad/Fahrrad 🚲, Pflanze/Gras 🌱) sehen für ein Kind
+  gleich aus; das zweite wurde gelöscht statt platziert.
 
 
 
