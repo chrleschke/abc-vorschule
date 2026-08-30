@@ -25,6 +25,32 @@ Das Skript `start-tts-ui.sh` im Project Root startet das Web-Interface direkt �
 weiteren Befehle nötig. `tts extract` und `tts status` laufen bereits beim Start.
 Beenden mit **Ctrl-C** im Terminal; offene Browser-Tabs blockieren den Exit nicht mehr.
 
+## Ein Text, ein Clip
+
+`audio/index.json` schlüsselt nach **Text**, nicht nach Fundstelle. Zwei Stellen mit
+demselben Wortlaut teilen sich also automatisch eine Aufnahme — die 34 Lektionen mit
+„Ordne das richtige Bild zu." brauchen genau einen Clip.
+
+Der Haken war das **Profil**: derselbe Text unter zwei Profilen sind zwei Renders, zwei
+Kuratierungen — und in der App gewinnt nur einer (`export._collision_winner`). Der
+Satz-Architekt stellt seinen Satz als `promptTts` in die Runde, während derselbe Wortlaut
+als `tts` am Satz in `sentences.json` steht: „Tom singt." lief einmal als `prompt` und
+einmal als `sentence`.
+
+`extract.reads_as_bare_sentence` entscheidet das jetzt an der Quelle: ein `promptTts`, das
+keine Aufgabenansage ist (kein „Baue das Wort", „Zeichne den", „Wie viele", „Ordne " …)
+und auf `.`/`!`/`?` endet, bekommt gleich das Profil `sentence`. Das ist auch inhaltlich
+richtig — die fragende Prompt-Melodie wäre für einen Aussagesatz ohnehin falsch. Dieselbe
+Funktion benutzt `export._pedagogical_winner`, damit es eine Wahrheit gibt.
+
+Wer neuen Content schreibt, prüft das mit
+`tests/test_extract.py::test_no_text_is_rendered_under_two_profiles_by_accident`: erlaubt
+ist genau eine Doppelung, der Laut `Ei` und das Wort „Ei" — die klingen gleich.
+
+Zweite Falle derselben Art: `stretchTts` läuft im Profil `phoneme` (es trägt den Laut, der
+beim Ziehen gedehnt wird). Steht dort ein ganzes Wort, kollidiert es mit dem Wortclip —
+und `phoneme` gewinnt, das Kind hörte also die Lautdehnung, wo das Wort gemeint war.
+
 ## Ablauf
 
 ```bash

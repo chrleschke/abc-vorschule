@@ -35,11 +35,42 @@ ROUND_FIELDS = ("promptTts", "sentenceTts", "missTts", "rewardTts", "stretchTts"
 
 _PHONEME_LEMMA_KINDS = frozenset({"letter", "syllable"})
 
+#: Felder, die *normalerweise* eine Aufgabenansage tragen — aber nicht immer,
+#: siehe `reads_as_bare_sentence`.
+_PROMPT_FIELDS = frozenset({"promptTts", "instructionTts"})
+
+#: Textstücke, die eine Ansage an das Kind markieren, auch wenn der String wie
+#: ein Satz auf einen Punkt endet. Einzige Wahrheit für `reads_as_bare_sentence`
+#: und für die Kollisionsauflösung im Export.
+INSTRUCTION_MARKERS = (
+    "Baue das Wort", "Ordne ", "Finde den", "Finde alle", "Finde die",
+    "Schiebe ", "Zeichne den", "Wie viele",
+)
+
+
+def reads_as_bare_sentence(text: str) -> bool:
+    """Ist dieser Text ein Satz für das Kind statt einer Aufgabenansage?
+
+    Der Satz-Architekt stellt seinen Satz als `promptTts` in die Runde — derselbe
+    Wortlaut steht ein zweites Mal als `tts` am Satz in sentences.json. Ohne
+    diese Unterscheidung landete „Tom singt." einmal im Profil `prompt` und
+    einmal in `sentence`: zwei Renders, zwei Kuratierungen, und in der App kann
+    nur einer gewinnen (`export._collision_winner` nimmt den Satz). Der Prompt
+    einer Satzrunde *ist* der Satz, also gehört ihm auch dessen Betonung — die
+    fragende Prompt-Melodie wäre dort ohnehin falsch.
+    """
+    stripped = text.strip()
+    if any(marker in stripped for marker in INSTRUCTION_MARKERS):
+        return False
+    return stripped.endswith((".", "!", "?"))
+
 
 def profile_for_item(item: Item) -> str:
     """Map an extracted item to its synthesis profile."""
     if item.field == "lemma" and item.atom_kind in _PHONEME_LEMMA_KINDS:
         return "phoneme"
+    if item.field in _PROMPT_FIELDS and reads_as_bare_sentence(item.text):
+        return "sentence"
     return FIELD_TO_PROFILE[item.field]
 
 
