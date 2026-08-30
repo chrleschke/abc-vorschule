@@ -3489,17 +3489,6 @@
       "nounClass": "thing"
     },
     {
-      "id": "sack",
-      "lemma": "Sack",
-      "display": "Sack",
-      "emoji": "🛍️",
-      "kind": "word",
-      "pluralDisplay": "Säcke",
-      "pluralHighlight": "Umlaut",
-      "gender": "m",
-      "nounClass": "thing"
-    },
-    {
       "id": "pferd",
       "lemma": "Pferd",
       "display": "Pferd",
@@ -4030,16 +4019,6 @@
       "kind": "word",
       "pluralDisplay": "Käse",
       "gender": "m",
-      "nounClass": "thing"
-    },
-    {
-      "id": "ruebe",
-      "lemma": "Rübe",
-      "display": "Rübe",
-      "emoji": "🫜",
-      "kind": "word",
-      "pluralDisplay": "Rüben",
-      "gender": "f",
       "nounClass": "thing"
     },
     {
@@ -5031,7 +5010,7 @@
       "lemma": "Socke",
       "display": "Socke",
       "emoji": "🧦",
-      "kind": "other",
+      "kind": "word",
       "pluralDisplay": "Socken",
       "gender": "f",
       "nounClass": "thing"
@@ -5216,6 +5195,16 @@
       "kind": "other",
       "pluralDisplay": "Flamingos",
       "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "kueken",
+      "lemma": "Küken",
+      "display": "Küken",
+      "emoji": "🐤",
+      "kind": "word",
+      "pluralDisplay": "Küken",
+      "gender": "n",
       "nounClass": "thing"
     }
   ]

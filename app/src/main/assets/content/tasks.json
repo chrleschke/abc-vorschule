@@ -1640,20 +1640,16 @@
       "id": "l12-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Rübe.",
-          "targetAtomId": "ruebe",
+          "promptTts": "Baue das Wort Küken.",
+          "targetAtomId": "kueken",
           "blocks": [
             {
-              "atomId": "letter-r",
-              "display": "Rü"
+              "atomId": "letter-ue",
+              "display": "Kü"
             },
             {
-              "atomId": "letter-b",
-              "display": "b"
-            },
-            {
-              "atomId": "letter-e",
-              "display": "e"
+              "atomId": "letter-n",
+              "display": "ken"
             }
           ]
         }
@@ -2144,8 +2140,8 @@
           "promptTts": "Zeichne den Laut - ck - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ck",
           "glyph": "ck",
-          "rewardTts": "ck - wie Rucksack.",
-          "rewardEmoji": "🎒",
+          "rewardTts": "ck - wie Socke.",
+          "rewardEmoji": "🧦",
           "blocks": []
         }
       ]
@@ -2186,16 +2182,16 @@
       "id": "l16-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Sack.",
-          "targetAtomId": "sack",
+          "promptTts": "Baue das Wort Socke.",
+          "targetAtomId": "socke",
           "blocks": [
             {
               "atomId": "letter-s",
-              "display": "Sa"
+              "display": "So"
             },
             {
               "atomId": "letter-ck",
-              "display": "ck"
+              "display": "cke"
             }
           ]
         }
@@ -2266,16 +2262,16 @@
       "id": "l16-t10",
       "rounds": [
         {
-          "promptTts": "Vier Reihen mit je sechs Säcken stehen im Lager. Wie viele Säcke sind das.",
-          "iconAtomId": "sack",
+          "promptTts": "Vier Reihen mit je sechs Socken hängen auf der Leine. Wie viele Socken sind das.",
+          "iconAtomId": "socke",
           "left": 4,
           "right": 6,
           "answer": 24,
           "operation": "multiply"
         },
         {
-          "promptTts": "Sechsundzwanzig Säcke stehen im Lager. Dreizehn werden abgeholt. Wie viele Säcke bleiben.",
-          "iconAtomId": "sack",
+          "promptTts": "Sechsundzwanzig Socken liegen im Korb. Dreizehn werden gefaltet. Wie viele Socken bleiben.",
+          "iconAtomId": "socke",
           "left": 26,
           "right": 13,
           "answer": 13,
@@ -3428,8 +3424,8 @@
           "promptTts": "Zeichne den Buchstaben - Ü - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ue",
           "glyph": "Ü",
-          "rewardTts": "Ü - wie Rübe.",
-          "rewardEmoji": "🫜"
+          "rewardTts": "Ü - wie Küken.",
+          "rewardEmoji": "🐤"
         }
       ]
     },
@@ -3494,20 +3490,16 @@
       "id": "l25-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Rübe.",
-          "targetAtomId": "ruebe",
+          "promptTts": "Baue das Wort Küken.",
+          "targetAtomId": "kueken",
           "blocks": [
             {
-              "atomId": "rue",
-              "display": "Rü"
+              "atomId": "letter-ue",
+              "display": "Kü"
             },
             {
-              "atomId": "letter-b",
-              "display": "b"
-            },
-            {
-              "atomId": "letter-e",
-              "display": "e"
+              "atomId": "letter-n",
+              "display": "ken"
             }
           ]
         }
@@ -3534,15 +3526,15 @@
       "id": "l25-t10",
       "rounds": [
         {
-          "promptTts": "Vierundzwanzig Rüben und sechs Rüben. Wie viele Rüben sind das.",
-          "iconAtomId": "ruebe",
+          "promptTts": "Vierundzwanzig Küken und sechs Küken. Wie viele Küken sind das.",
+          "iconAtomId": "kueken",
           "left": 24,
           "right": 6,
           "answer": 30
         },
         {
-          "promptTts": "Dreißig Rüben liegen im Korb. Fünfzehn werden gegessen. Wie viele Rüben bleiben.",
-          "iconAtomId": "ruebe",
+          "promptTts": "Dreißig Küken laufen im Hof. Fünfzehn gehen in den Stall. Wie viele Küken bleiben.",
+          "iconAtomId": "kueken",
           "left": 30,
           "right": 15,
           "answer": 15,
@@ -4225,14 +4217,14 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Die Giraffe frisst aus dem Sack.",
+          "sentenceTts": "Die Giraffe frisst aus dem Eimer.",
           "correctAtomIds": [
             "giraffe",
-            "sack"
+            "eimer"
           ],
           "wrongAtomIds": [
             "pferd",
-            "sack"
+            "eimer"
           ]
         },
         {
@@ -4615,7 +4607,7 @@
           ],
           "wrongAtomIds": [
             "opa",
-            "sack"
+            "tasche"
           ]
         },
         {
@@ -4630,10 +4622,10 @@
           ]
         },
         {
-          "sentenceTts": "Der Zucker steckt im Sack.",
+          "sentenceTts": "Der Zucker steckt in der Dose.",
           "correctAtomIds": [
             "zucker",
-            "sack"
+            "dose"
           ],
           "wrongAtomIds": [
             "zucker",
@@ -5326,9 +5318,9 @@
             "blume"
           ],
           "wrongAtomIds": [
-            "oma",
-            "ruebe",
-            "ruebe"
+            "opa",
+            "blume",
+            "blume"
           ]
         },
         {

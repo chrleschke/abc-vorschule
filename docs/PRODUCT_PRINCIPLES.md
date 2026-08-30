@@ -179,6 +179,13 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
   die vermeintlich fehlten. Der Stand ist seither **null**, und
   `LessonCoverageTest.noAtomSitsInThePackWithoutEverBeingShown` hält ihn dort. Ein
   neues Atom kommt also zusammen mit der Runde, die es zeigt, nicht auf Vorrat.
+- **Emoji-Alter prüfen.** Die App bündelt keinen Emoji-Font (`androidx.emoji2` ist
+  keine Abhängigkeit) und `minSdk` ist 26 — jedes Bild kommt aus dem System-Font des
+  Geräts. Ein Glyph, der jünger ist als das Gerät, rendert als leeres Kästchen. 🫜
+  (Unicode 15.1, 2023) war deshalb im August 2026 unter Android 15 unsichtbar und ist
+  raus. Was noch am Rand steht: 🪼 Qualle (15.0), 🪺 Nest/Vogelnest (14.0), 🪶 Feder
+  (14.0) — alles darunter ist ab Android 12 sicher. Im Zweifel den älteren Glyphen
+  nehmen; ein Bild, das ein Kind nicht sieht, ist kein Bild.
 - **Emoji-Doppelgänger sind keine zwei Karten.** Zwei Atome mit demselben Glyphen
   (Uhu/Eule 🦉, Wespe/Biene 🐝, Rad/Fahrrad 🚲, Pflanze/Gras 🌱) sehen für ein Kind
   gleich aus; das zweite wurde gelöscht statt platziert.
