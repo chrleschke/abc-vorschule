@@ -316,7 +316,8 @@ nachkommt.
 ## Was jetzt im Pack steht
 
 **Pfad:** 26 → **34 Lektionen**, 226 → **332 Tasks**, 18 → **26 Finale-Sätze**
-(l19–l26 erben ihren Satz weiterhin von der Basis-Lektion). Atome: 271 → **314**.
+(l19–l26 erben ihren Satz weiterhin von der Basis-Lektion). Atome: 271 → **299**, davon
+**kein einziges ohne Auftritt** (vorher 60 Karteileichen).
 
 **Phase 8 — zusammengesetzte Wörter (L27–L34).** Nach L18 sind alle 39 Grapheme
 eingeführt; neuer Stoff kann also nicht aus Buchstaben kommen. Die neue Phase lehrt
@@ -355,13 +356,64 @@ Löffel, Eimer, Gras, **Krokodil**.
 Das Krokodil 🐊 auf Wunsch des Nutzers nachgezogen, an sechs Stellen: **L08** hatte drei
 Keks-Runden hintereinander — die dritte ist jetzt „Das Krokodil hat den Keks gefressen",
 und die Rechen-Ikone der Lektion wechselt mit, womit das Tier auch auf dem Pfad-Schild
-steht (🥫 🍪 🐊). Dazu als Gegenkarte in L14, L18, L23 und L31, überall dort, wo ein
-anderes Tier die plausible Verwechslung ist.
+steht (🥫 🍪 🐊). Dazu als Gegenkarte in L14, L18, L23 und L31.
 
-Von den 60 toten Wort-/Bildatomen sind damit **36 übrig** — darunter 12 Funktions- und
-Farbwörter, für die es keinen Satz gibt, und Tiere wie Tiger und Nilpferd, die auf eine
-spätere Zoo-Runde warten. Sie sind bewusst weder gelöscht noch erzwungen platziert; wer
-die Regel „kein Atom ohne Auftritt" ernst nimmt, räumt sie im nächsten Durchgang ab.
+## Der Rest der Karteileichen — abgeräumt
+
+Danach lagen noch 35 Atome ohne Auftritt im Pack. Sie sind jetzt **alle** eingebaut oder
+gelöscht; der Stand ist **null**, und ein neuer Test
+(`LessonCoverageTest.noAtomSitsInThePackWithoutEverBeingShown`) hält ihn dort.
+
+**Siebzehn Lektionen haben eine fünfte Satz-Versteher-Runde bekommen** — je eine, die ein
+bisher totes Bildwort als *richtige* Karte zeigt. Gesehen zu werden ist der Punkt; eine
+Gegenkarte allein reicht nicht:
+
+| | Runde | ✔ / ✘ |
+|---|---|---|
+| L03 | Papa isst einen Becher Quark. | 🥣 / 🍲 |
+| L05 | Am Strand brennt ein Feuer. | 🔥🏖️ / ☀️🏖️ |
+| L06 | Die Raupe kriecht über das Blatt. | 🐛🍃 / 🐜🍃 |
+| L08 | Die Hexe rührt in der Suppe. | 🧙🍲 / 🏴‍☠️🍲 |
+| L09 | Ein Blitz zuckt über den Himmel. | ⚡🌌 / ☁️🌌 |
+| L10 | Das Nilpferd badet im Wasser. | 🦛🌊 / 🐘🌊 |
+| L11 | Im Wald wachsen zwei Pilze. | 🍄🍄 / 🌸🌸 |
+| L12 | Oma isst Salat mit Erdbeeren. | 🥗🍓 / 🥗🌰 |
+| L13 | Der Affe hat die Nuss geknackt. | 🐵🌰 / 🐭🌰 |
+| L14 | Der Tiger schläft im hohen Gras. | 🐯🌱 / 🦁🌱 |
+| L15 | Das Nashorn hat ein dickes Horn. | 🦏 / 🦛 |
+| L16 | Der Hahn steht auf dem Zaun. | 🐓 / 🐔 |
+| L17 | Die Feder fällt langsam zu Boden. | 🪶 / 🍃 |
+| L18 | Der Flamingo steht auf einem Bein. | 🦩 / 🐧 |
+| L20 | Die Bahn fährt in den Bahnhof. | 🚄 / 🚌 |
+| L21 | Tom hat einen Zahn verloren. | 👦🦷 / 👦🍪 |
+| L22 | Das Polizeiauto fährt sehr schnell. | 🚓 / 🚌 |
+
+**Nashorn 🦏 und Flamingo 🦩** sind neu und sitzen bewusst in L15 und L18 — das Nashorn
+gegen das Nilpferd, der Flamingo gegen den Pinguin, beide also gegen ein Tier, das dem
+Kind schon begegnet ist.
+
+**Elf Lektionen haben eine zweite Satzrunde bekommen.** Die Farb- und Funktionswörter
+lagen tot, seit die sechs Schablonensätze („Das Quadrat ist gelb.") gelöscht sind — das
+war die halbe Diagnose aus Befund 5. Sie kommen als zweite Runde in eine bestehende
+Satzrunde zurück, ohne neue Task-IDs:
+
+> Oma und Mia lachen. · Tom singt. · Das Auto ist blau. · Der Fisch ist orange. · Der
+> Stuhl ist grün. · Die Tür ist braun. · Ruf die Kuh! · Die Blume ist lila. · Hol den
+> Ball! · Pepe ist bei Oma. · Es ist kalt.
+
+Damit sind `und`, `lachen`, `singt`, `blau`, `orange`, `grün`, `braun`, `ruf`, `lila`,
+`hol`, `bei` und `es` wieder im Umlauf — und der Satz-Architekt trainiert nicht mehr
+überwiegend eine Schablone.
+
+**Vierzehn Atome gelöscht statt eingebaut.** Fünf, weil sie sich den Glyphen mit einem
+längst benutzten Atom teilen und für ein Kind deshalb dieselbe Karte sind — Uhu/Eule 🦉,
+Wespe/Biene 🐝, Rad/Fahrrad 🚲, Pflanze/Gras 🌱 — oder als Bild nicht fassbar sind
+(Tag 📅). Dazu neun Silben-Atome, die kein Verschmelzer je erzeugt.
+
+**Zwei Gegenkarten nebenbei repariert.** L04 tauschte Tier *und* Anzahl gleichzeitig
+(Maus + Elefant gegen zwei Lamas), was die Redaktionsregel verbietet — jetzt zwei
+Nilpferde. L14 tauschte nur das Objekt beim selben Tier (Zebra mit Ball gegen Zebra mit
+Jojo) — jetzt ein Tiger am selben Jojo.
 
 Nicht aufgenommen, obwohl auf der Liste: **Auge** und **Mund** — es gab keine Runde, in
 die sie ohne Verrenkung passten, und ein neues totes Atom wäre genau der Fehler, den

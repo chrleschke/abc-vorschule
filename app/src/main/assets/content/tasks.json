@@ -2826,6 +2826,11 @@
           "promptTts": "Ordne das Wort - Oma - dem Bild zu.",
           "sentenceId": "s-oma",
           "illustrationAtomId": "oma"
+        },
+        {
+          "promptTts": "Oma und Mia lachen.",
+          "sentenceId": "s-oma-und-mia-lachen",
+          "illustrationAtomId": "oma"
         }
       ]
     },
@@ -2956,6 +2961,11 @@
           "promptTts": "Tom ruft Opa.",
           "sentenceId": "s-tom-ruft-opa",
           "illustrationAtomId": "tom"
+        },
+        {
+          "promptTts": "Tom singt.",
+          "sentenceId": "s-tom-singt",
+          "illustrationAtomId": "tom"
         }
       ]
     },
@@ -3083,6 +3093,11 @@
           "promptTts": "Das ist mein Ei.",
           "sentenceId": "s-das-ist-mein-ei",
           "illustrationAtomId": "ei"
+        },
+        {
+          "promptTts": "Das Auto ist blau.",
+          "sentenceId": "s-das-auto-ist-blau",
+          "illustrationAtomId": "auto"
         }
       ]
     },
@@ -3212,6 +3227,11 @@
         {
           "promptTts": "Der Fisch schwimmt.",
           "sentenceId": "s-fisch-schwimmt",
+          "illustrationAtomId": "fisch"
+        },
+        {
+          "promptTts": "Der Fisch ist orange.",
+          "sentenceId": "s-der-fisch-ist-orange",
           "illustrationAtomId": "fisch"
         }
       ]
@@ -3360,6 +3380,11 @@
           "promptTts": "Die Spinne spielt.",
           "sentenceId": "s-spinne-spielt",
           "illustrationAtomId": "spinne"
+        },
+        {
+          "promptTts": "Der Stuhl ist grün.",
+          "sentenceId": "s-der-stuhl-ist-gruen",
+          "illustrationAtomId": "stuhl"
         }
       ]
     },
@@ -3498,6 +3523,11 @@
           "promptTts": "Der Löwe ist da.",
           "sentenceId": "s-der-loewe-ist-da",
           "illustrationAtomId": "loewe"
+        },
+        {
+          "promptTts": "Die Tür ist braun.",
+          "sentenceId": "s-die-tuer-ist-braun",
+          "illustrationAtomId": "tuer"
         }
       ]
     },
@@ -3641,6 +3671,11 @@
           "promptTts": "Das Taxi ist gelb.",
           "sentenceId": "s-taxi-ist-gelb",
           "illustrationAtomId": "taxi"
+        },
+        {
+          "promptTts": "Ruf die Kuh!",
+          "sentenceId": "s-ruf-die-kuh",
+          "illustrationAtomId": "kuh"
         }
       ]
     },
@@ -3821,6 +3856,15 @@
             "tomate",
             "papa"
           ]
+        },
+        {
+          "sentenceTts": "Papa isst einen Becher Quark.",
+          "correctAtomIds": [
+            "quark"
+          ],
+          "wrongAtomIds": [
+            "suppe"
+          ]
         }
       ]
     },
@@ -3847,8 +3891,8 @@
             "lama"
           ],
           "wrongAtomIds": [
-            "maus",
-            "elefant"
+            "nilpferd",
+            "nilpferd"
           ]
         },
         {
@@ -3922,6 +3966,17 @@
           "wrongAtomIds": [
             "flugzeug"
           ]
+        },
+        {
+          "sentenceTts": "Am Strand brennt ein Feuer.",
+          "correctAtomIds": [
+            "feuer",
+            "strand"
+          ],
+          "wrongAtomIds": [
+            "sonne",
+            "strand"
+          ]
         }
       ]
     },
@@ -3974,6 +4029,17 @@
           "wrongAtomIds": [
             "tom",
             "ohr"
+          ]
+        },
+        {
+          "sentenceTts": "Die Raupe kriecht über das Blatt.",
+          "correctAtomIds": [
+            "raupe",
+            "blatt"
+          ],
+          "wrongAtomIds": [
+            "ameise",
+            "blatt"
           ]
         }
       ]
@@ -4079,6 +4145,17 @@
             "hund",
             "keks"
           ]
+        },
+        {
+          "sentenceTts": "Die Hexe rührt in der Suppe.",
+          "correctAtomIds": [
+            "hexe",
+            "suppe"
+          ],
+          "wrongAtomIds": [
+            "pirat",
+            "suppe"
+          ]
         }
       ]
     },
@@ -4129,6 +4206,17 @@
           "wrongAtomIds": [
             "hase",
             "eier"
+          ]
+        },
+        {
+          "sentenceTts": "Ein Blitz zuckt über den Himmel.",
+          "correctAtomIds": [
+            "blitz",
+            "himmel"
+          ],
+          "wrongAtomIds": [
+            "wolke",
+            "himmel"
           ]
         }
       ]
@@ -4182,6 +4270,17 @@
             "drache",
             "weg"
           ]
+        },
+        {
+          "sentenceTts": "Das Nilpferd badet im Wasser.",
+          "correctAtomIds": [
+            "nilpferd",
+            "wasser"
+          ],
+          "wrongAtomIds": [
+            "elefant",
+            "wasser"
+          ]
         }
       ]
     },
@@ -4234,6 +4333,17 @@
             "haus",
             "dino"
           ]
+        },
+        {
+          "sentenceTts": "Im Wald wachsen zwei Pilze.",
+          "correctAtomIds": [
+            "pilz",
+            "pilz"
+          ],
+          "wrongAtomIds": [
+            "blume",
+            "blume"
+          ]
         }
       ]
     },
@@ -4282,6 +4392,17 @@
           "wrongAtomIds": [
             "maus",
             "sack"
+          ]
+        },
+        {
+          "sentenceTts": "Oma isst Salat mit Erdbeeren.",
+          "correctAtomIds": [
+            "salat",
+            "erdbeere"
+          ],
+          "wrongAtomIds": [
+            "salat",
+            "nuss"
           ]
         }
       ]
@@ -4334,6 +4455,17 @@
             "opa",
             "kleid"
           ]
+        },
+        {
+          "sentenceTts": "Der Affe hat die Nuss geknackt.",
+          "correctAtomIds": [
+            "affe",
+            "nuss"
+          ],
+          "wrongAtomIds": [
+            "maus",
+            "nuss"
+          ]
         }
       ]
     },
@@ -4349,8 +4481,8 @@
             "jojo"
           ],
           "wrongAtomIds": [
-            "zebra",
-            "ball"
+            "tiger",
+            "jojo"
           ]
         },
         {
@@ -4385,6 +4517,17 @@
           "wrongAtomIds": [
             "krokodil",
             "maus"
+          ]
+        },
+        {
+          "sentenceTts": "Der Tiger schläft im hohen Gras.",
+          "correctAtomIds": [
+            "tiger",
+            "gras"
+          ],
+          "wrongAtomIds": [
+            "loewe",
+            "gras"
           ]
         }
       ]
@@ -4438,6 +4581,15 @@
             "maus",
             "fuss"
           ]
+        },
+        {
+          "sentenceTts": "Das Nashorn hat ein dickes Horn.",
+          "correctAtomIds": [
+            "nashorn"
+          ],
+          "wrongAtomIds": [
+            "nilpferd"
+          ]
         }
       ]
     },
@@ -4488,6 +4640,15 @@
           "wrongAtomIds": [
             "zucker",
             "paket"
+          ]
+        },
+        {
+          "sentenceTts": "Der Hahn steht auf dem Zaun.",
+          "correctAtomIds": [
+            "hahn"
+          ],
+          "wrongAtomIds": [
+            "huhn"
           ]
         }
       ]
@@ -4542,6 +4703,15 @@
             "ameise",
             "strasse"
           ]
+        },
+        {
+          "sentenceTts": "Die Feder fällt langsam zu Boden.",
+          "correctAtomIds": [
+            "feder"
+          ],
+          "wrongAtomIds": [
+            "blatt"
+          ]
         }
       ]
     },
@@ -4592,6 +4762,15 @@
           "wrongAtomIds": [
             "bus",
             "ampel"
+          ]
+        },
+        {
+          "sentenceTts": "Der Flamingo steht auf einem Bein.",
+          "correctAtomIds": [
+            "flamingo"
+          ],
+          "wrongAtomIds": [
+            "pinguin"
           ]
         }
       ]
@@ -4781,6 +4960,15 @@
             "uhr",
             "bett"
           ]
+        },
+        {
+          "sentenceTts": "Die Bahn fährt in den Bahnhof.",
+          "correctAtomIds": [
+            "bahn"
+          ],
+          "wrongAtomIds": [
+            "bus"
+          ]
         }
       ]
     },
@@ -4854,6 +5042,17 @@
             "baby",
             "park"
           ]
+        },
+        {
+          "sentenceTts": "Tom hat einen Zahn verloren.",
+          "correctAtomIds": [
+            "tom",
+            "zahn"
+          ],
+          "wrongAtomIds": [
+            "tom",
+            "keks"
+          ]
         }
       ]
     },
@@ -4926,6 +5125,15 @@
           "wrongAtomIds": [
             "fahrrad",
             "haus"
+          ]
+        },
+        {
+          "sentenceTts": "Das Polizeiauto fährt sehr schnell.",
+          "correctAtomIds": [
+            "polizei"
+          ],
+          "wrongAtomIds": [
+            "bus"
           ]
         }
       ]
@@ -5866,6 +6074,11 @@
               "display": "klein"
             }
           ]
+        },
+        {
+          "promptTts": "Die Blume ist lila.",
+          "sentenceId": "s-die-blume-ist-lila",
+          "illustrationAtomId": "blume"
         }
       ]
     },
@@ -6072,6 +6285,11 @@
               "display": "gut"
             }
           ]
+        },
+        {
+          "promptTts": "Hol den Ball!",
+          "sentenceId": "s-hol-den-ball",
+          "illustrationAtomId": "ball"
         }
       ]
     },
@@ -6283,6 +6501,11 @@
               "display": "klein"
             }
           ]
+        },
+        {
+          "promptTts": "Pepe ist bei Oma.",
+          "sentenceId": "s-pepe-ist-bei-oma",
+          "illustrationAtomId": "pepe"
         }
       ]
     },
@@ -6515,6 +6738,11 @@
               "display": "warm"
             }
           ]
+        },
+        {
+          "promptTts": "Es ist kalt.",
+          "sentenceId": "s-es-ist-kalt",
+          "illustrationAtomId": "schneemann"
         }
       ]
     },

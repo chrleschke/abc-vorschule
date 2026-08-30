@@ -251,6 +251,126 @@
         "hell"
       ],
       "tts": "Die Lampe ist hell."
+    },
+    {
+      "id": "s-oma-und-mia-lachen",
+      "atomIds": [
+        "oma",
+        "und",
+        "mia",
+        "lachen"
+      ],
+      "tts": "Oma und Mia lachen."
+    },
+    {
+      "id": "s-tom-singt",
+      "atomIds": [
+        "tom",
+        "singt"
+      ],
+      "tts": "Tom singt."
+    },
+    {
+      "id": "s-das-auto-ist-blau",
+      "atomIds": [
+        "das",
+        "auto",
+        "ist",
+        "blau"
+      ],
+      "tts": "Das Auto ist blau."
+    },
+    {
+      "id": "s-der-fisch-ist-orange",
+      "atomIds": [
+        "der",
+        "fisch",
+        "ist",
+        "orange"
+      ],
+      "tts": "Der Fisch ist orange."
+    },
+    {
+      "id": "s-der-stuhl-ist-gruen",
+      "atomIds": [
+        "der",
+        "stuhl",
+        "ist",
+        "gruen"
+      ],
+      "tts": "Der Stuhl ist grün."
+    },
+    {
+      "id": "s-die-tuer-ist-braun",
+      "atomIds": [
+        "die",
+        "tuer",
+        "ist",
+        "braun"
+      ],
+      "tts": "Die Tür ist braun."
+    },
+    {
+      "id": "s-ruf-die-kuh",
+      "atomIds": [
+        "ruf",
+        "die",
+        "kuh"
+      ],
+      "tts": "Ruf die Kuh!",
+      "displayOverride": [
+        "Ruf",
+        "die",
+        "Kuh"
+      ]
+    },
+    {
+      "id": "s-die-blume-ist-lila",
+      "atomIds": [
+        "die",
+        "blume",
+        "ist",
+        "lila"
+      ],
+      "tts": "Die Blume ist lila."
+    },
+    {
+      "id": "s-hol-den-ball",
+      "atomIds": [
+        "hol",
+        "den",
+        "ball"
+      ],
+      "tts": "Hol den Ball!",
+      "displayOverride": [
+        "Hol",
+        "den",
+        "Ball"
+      ]
+    },
+    {
+      "id": "s-pepe-ist-bei-oma",
+      "atomIds": [
+        "pepe",
+        "ist",
+        "bei",
+        "oma"
+      ],
+      "tts": "Pepe ist bei Oma."
+    },
+    {
+      "id": "s-es-ist-kalt",
+      "atomIds": [
+        "es",
+        "ist",
+        "kalt"
+      ],
+      "tts": "Es ist kalt.",
+      "displayOverride": [
+        "Es",
+        "ist",
+        "kalt"
+      ]
     }
   ]
 }

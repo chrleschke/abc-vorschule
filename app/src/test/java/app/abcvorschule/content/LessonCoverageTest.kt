@@ -121,13 +121,61 @@ class LessonCoverageTest {
     }
 
     @Test
-    fun satzVersteherRunsOnceInEveryLessonWithFourRounds() {
+    fun noAtomSitsInThePackWithoutEverBeingShown() {
+        // „Kein Atom ohne Auftritt" (PRODUCT_PRINCIPLES §4). Im August 2026 lagen
+        // 60 Wort- und Bildatome im Pack, die kein Task, kein Satz und kein Finale
+        // je referenziert hat — darunter genau die Alltagswörter, die vermeintlich
+        // fehlten. Ein gepflegtes Atom, das kein Kind je sieht, ist kein Vorrat,
+        // sondern eine Karteileiche: es kostet Kuratierung, TTS-Aufnahmen und
+        // Review-Zeit und zahlt nichts zurück.
+        val referenced = buildSet {
+            pack.tasks.values.forEach { spec ->
+                when (spec) {
+                    is LetterTraceSpec -> spec.rounds.forEach { add(it.atomId) }
+                    is SyllableMergeSpec -> spec.rounds.forEach {
+                        add(it.leftAtomId); add(it.rightAtomId); add(it.resultAtomId)
+                    }
+                    is WordBuildSpec -> spec.rounds.forEach { round ->
+                        add(round.targetAtomId)
+                        (round.blocks + round.distractors).forEach { add(it.atomId) }
+                    }
+                    is SentenceOrderSpec -> spec.rounds.forEach { round ->
+                        round.illustrationAtomId?.let { add(it) }
+                        round.distractors.forEach { add(it.atomId) }
+                        addAll(round.holisticAtomIds)
+                        pack.sentences[round.sentenceId]?.let { addAll(it.atomIds) }
+                    }
+                    is SentencePictureSpec -> spec.rounds.forEach {
+                        addAll(it.correctAtomIds); addAll(it.wrongAtomIds)
+                    }
+                    is CountAddSpec -> spec.rounds.forEach { add(it.iconAtomId) }
+                    else -> Unit
+                }
+            }
+            pack.finales.values.forEach { addAll(it.pictureAtomIds) }
+            pack.lessons.forEach { addAll(it.focusAtomIds) }
+        }
+        assertEquals(
+            "atoms that no trainer, sentence or finale ever shows",
+            emptySet<String>(),
+            pack.atoms.keys - referenced,
+        )
+    }
+
+    @Test
+    fun satzVersteherRunsOnceInEveryLessonWithFourOrFiveRounds() {
         // Bis 2026-08 trugen nur die 18 Basis-Lektionen den Satz-Versteher; die
         // Wiederholungen l19–l26 waren ohne ihn zu dünn, um ein Kind zu halten.
         pack.authoredLessons.forEach { lesson ->
             val specs = pack.tasksOf(lesson).filterIsInstance<SentencePictureSpec>()
             assertEquals("lesson ${lesson.id}", 1, specs.size)
-            assertEquals("lesson ${lesson.id}", 4, specs.single().rounds.size)
+            // Vier Runden sind die Regel; siebzehn Lektionen tragen eine fünfte,
+            // die je ein sonst totes Bildwort als *richtige* Karte zeigt
+            // (Nashorn, Flamingo, Tiger, Nilpferd, Affe, Raupe, Pilz …).
+            assertTrue(
+                "lesson ${lesson.id} holds ${specs.single().rounds.size} rounds",
+                specs.single().rounds.size in 4..5,
+            )
             assertEquals(
                 "lesson ${lesson.id}",
                 "Ordne das richtige Bild zu.",
