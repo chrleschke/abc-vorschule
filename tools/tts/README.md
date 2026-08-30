@@ -126,13 +126,21 @@ der Stimme:
 
 | Stimme | Herkunft |
 | --- | --- |
-| `serena`, `vivian` | westlich, weiblich |
-| `ryan`, `aiden` | westlich, männlich |
-| `sohee` | koreanisch |
-| `ono_anna` | japanisch |
-| `uncle_fu` | chinesisch |
+| `ryan`, `aiden` | englisch, männlich |
+| `serena`, `vivian` | chinesisch, weiblich |
+| `sohee` | koreanisch, weiblich |
+| `ono_anna` | japanisch, weiblich |
+| `uncle_fu` | chinesisch, männlich |
 | `eric` | chinesisch, Sichuan-Dialekt |
 | `dylan` | chinesisch, Peking-Dialekt |
+
+**Eine europäische Frauenstimme gibt es nicht.** Der Checkpoint kennt neun
+Stimmen; europäisch sind nur `ryan` und `aiden`, beide männlich. `serena` und
+`vivian` standen hier bis August 2026 als „westlich, weiblich" — falsch, beide
+sind chinesisch (Modellkarte: „Warm, gentle young female voice", Chinese). Wer
+für Deutsch eine Frauenstimme braucht, wählt deshalb zwangsläufig einen Akzent.
+Der Ausweg führt nicht über diese Tabelle, sondern über einen anderen
+Checkpoint — siehe „VoiceDesign" unten.
 
 Das ist keine Kosmetik. `language` setzt im Modell ein Sprach-Token (`german` → 2053) und
 steuert damit die Phonologie; das Speaker-Embedding bringt trotzdem den Akzent seiner
