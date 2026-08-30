@@ -332,3 +332,49 @@ def test_article_items_use_the_article_word_profile():
     items = [i for i in extract_items(CONTENT_DIR) if i.field == "articleTts"]
     assert items
     assert all(profile_for_item(i) == "article_word" for i in items)
+
+def test_a_sentence_round_prompt_shares_the_clip_of_its_sentence():
+    """Der Satz-Architekt spricht seinen Satz, nicht eine Aufgaben-Frage.
+
+    „Tom singt." steht zweimal im Pack: als `tts` am Satz und als `promptTts` der
+    Runde, die ihn baut. Landete der Prompt im Profil `prompt`, entstünden zwei
+    Renders und zwei Kuratierungen für denselben Wortlaut — und in der App könnte
+    nur einer gewinnen, weil `audio/index.json` nach Text schlüsselt.
+    """
+    from ttskit.extract import profile_for_item, reads_as_bare_sentence
+
+    items = extract_items(CONTENT_DIR)
+    by_id = {i.id: i for i in items}
+
+    prompt = by_id["task:l21-t9:round:1:promptTts"]
+    assert prompt.text == "Tom singt."
+    assert profile_for_item(prompt) == "sentence"
+    assert profile_for_item(by_id["sentence:s-tom-singt:tts"]) == "sentence"
+
+    # Aufgabenansagen bleiben Prompts, auch wenn sie auf einen Punkt enden.
+    for text in (
+        "Baue das Wort Mama.",
+        "Ordne das Wort - Mama - dem Bild zu.",
+        "Ordne das richtige Bild zu.",
+        "Zeichne den Buchstaben - M - nach und sammle dabei alle Sterne.",
+        "Schiebe m und a zusammen. Welche Silbe entsteht.",
+        "Zwölf und fünf. Wie viele sind das.",
+    ):
+        assert not reads_as_bare_sentence(text), text
+
+
+def test_no_text_is_rendered_under_two_profiles_by_accident():
+    """Ein Text, zwei Profile heißt: doppelt rendern, doppelt kuratieren, einer fliegt raus.
+
+    Erlaubt bleibt genau eine Paarung: der Laut `Ei` und das Wort „Ei" klingen
+    gleich, ein Clip trägt beide.
+    """
+    from collections import defaultdict
+
+    from ttskit.extract import profile_for_item
+
+    profiles_by_text = defaultdict(set)
+    for item in extract_items(CONTENT_DIR):
+        profiles_by_text[item.text].add(profile_for_item(item))
+    collisions = {t: sorted(p) for t, p in profiles_by_text.items() if len(p) > 1}
+    assert collisions == {"Ei": ["phoneme", "word"]}, collisions

@@ -36,6 +36,7 @@ from pathlib import Path
 
 import soundfile as sf
 
+from .extract import reads_as_bare_sentence
 from .paths import Paths
 from .plan import fingerprint, orphan_locks, status_of
 
@@ -47,15 +48,6 @@ from .plan import fingerprint, orphan_locks, status_of
 PROFILE_PRIORITY = ("phoneme", "word", "article_word", "prompt", "miss", "reward",
                     "sentence", "finale", "ui")
 
-#: Substrings that mark an authored task prompt — not a bare sentence even
-#: when the string ends with a full stop (Rechnen, Spurensucher, …).
-_INSTRUCTION_MARKERS = (
-    "Baue das Wort", "Ordne das Wort", "Ordne die Wörter",
-    "Finde den", "Finde alle", "Finde die",
-    "Schiebe ", "Zeichne den", "Wie viele",
-)
-
-
 def _pedagogical_winner(text: str, prof_a: str, prof_b: str) -> str | None:
     """Preferred index profile when the same text appears in two profiles."""
     pair = {prof_a, prof_b}
@@ -64,11 +56,11 @@ def _pedagogical_winner(text: str, prof_a: str, prof_b: str) -> str | None:
     if pair == {"miss", "sentence"}:
         return "sentence"
     if pair == {"prompt", "sentence"}:
-        stripped = text.strip()
-        if any(marker in stripped for marker in _INSTRUCTION_MARKERS):
-            return "prompt"
-        if stripped.endswith((".", "!", "?")):
-            return "sentence"
+        # Seit `extract.profile_for_item` einen Satz-Prompt gleich als `sentence`
+        # ausgibt, kann diese Kollision aus dem Pack nicht mehr entstehen. Die
+        # Regel bleibt für Altbestand in locks.json — und als eine Wahrheit,
+        # geteilt mit dem Extractor.
+        return "sentence" if reads_as_bare_sentence(text) else "prompt"
     return None
 
 

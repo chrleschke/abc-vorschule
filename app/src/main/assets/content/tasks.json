@@ -5444,7 +5444,7 @@
           "rightDisplay": "schuh",
           "resultAtomId": "handschuh",
           "resultDisplay": "Handschuh",
-          "stretchTts": "Hand"
+          "stretchTts": "H"
         }
       ]
     },
@@ -5460,7 +5460,7 @@
           "rightDisplay": "schuh",
           "resultAtomId": "hausschuh",
           "resultDisplay": "Hausschuh",
-          "stretchTts": "Haus"
+          "stretchTts": "H"
         }
       ]
     },
@@ -5678,7 +5678,7 @@
           "rightDisplay": "kuchen",
           "resultAtomId": "apfelkuchen",
           "resultDisplay": "Apfelkuchen",
-          "stretchTts": "Apfel"
+          "stretchTts": "A"
         }
       ]
     },
@@ -5694,7 +5694,7 @@
           "rightDisplay": "dose",
           "resultAtomId": "brotdose",
           "resultDisplay": "Brotdose",
-          "stretchTts": "Brot"
+          "stretchTts": "B"
         }
       ]
     },
@@ -5909,7 +5909,7 @@
           "rightDisplay": "jacke",
           "resultAtomId": "regenjacke",
           "resultDisplay": "Regenjacke",
-          "stretchTts": "Regen"
+          "stretchTts": "R"
         }
       ]
     },
@@ -5925,7 +5925,7 @@
           "rightDisplay": "blume",
           "resultAtomId": "sonnenblume",
           "resultDisplay": "Sonnenblume",
-          "stretchTts": "Sonnen"
+          "stretchTts": "S"
         }
       ]
     },
@@ -6159,7 +6159,7 @@
           "rightDisplay": "ball",
           "resultAtomId": "fussball",
           "resultDisplay": "Fußball",
-          "stretchTts": "Fuß"
+          "stretchTts": "F"
         }
       ]
     },
@@ -6175,7 +6175,7 @@
           "rightDisplay": "haus",
           "resultAtomId": "baumhaus",
           "resultDisplay": "Baumhaus",
-          "stretchTts": "Baum"
+          "stretchTts": "B"
         }
       ]
     },
@@ -6374,7 +6374,7 @@
           "rightDisplay": "bär",
           "resultAtomId": "eisbaer",
           "resultDisplay": "Eisbär",
-          "stretchTts": "Eis"
+          "stretchTts": "Ei"
         }
       ]
     },
@@ -6390,7 +6390,7 @@
           "rightDisplay": "nest",
           "resultAtomId": "vogelnest",
           "resultDisplay": "Vogelnest",
-          "stretchTts": "Vogel"
+          "stretchTts": "V"
         }
       ]
     },
@@ -6590,7 +6590,7 @@
           "rightDisplay": "mann",
           "resultAtomId": "schneemann",
           "resultDisplay": "Schneemann",
-          "stretchTts": "Schnee"
+          "stretchTts": "Sch"
         }
       ]
     },
@@ -6606,7 +6606,7 @@
           "rightDisplay": "ball",
           "resultAtomId": "schneeball",
           "resultDisplay": "Schneeball",
-          "stretchTts": "Schnee"
+          "stretchTts": "Sch"
         }
       ]
     },
@@ -6823,7 +6823,7 @@
           "rightDisplay": "tasche",
           "resultAtomId": "schultasche",
           "resultDisplay": "Schultasche",
-          "stretchTts": "Schul"
+          "stretchTts": "Sch"
         }
       ]
     },
@@ -6839,7 +6839,7 @@
           "rightDisplay": "bus",
           "resultAtomId": "schulbus",
           "resultDisplay": "Schulbus",
-          "stretchTts": "Schul"
+          "stretchTts": "Sch"
         }
       ]
     },
@@ -7050,7 +7050,7 @@
           "rightDisplay": "tonne",
           "resultAtomId": "muelltonne",
           "resultDisplay": "Mülltonne",
-          "stretchTts": "Müll"
+          "stretchTts": "M"
         }
       ]
     },
@@ -7066,7 +7066,7 @@
           "rightDisplay": "lampe",
           "resultAtomId": "taschenlampe",
           "resultDisplay": "Taschenlampe",
-          "stretchTts": "Taschen"
+          "stretchTts": "T"
         }
       ]
     },
