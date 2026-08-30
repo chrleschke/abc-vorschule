@@ -422,6 +422,27 @@ Befund 2 beschreibt.
 **Gelöscht:** Nanu, Tram, Quelle, Insel, Markt, Ofen, Xylofon, Yacht, Tal, wind, Mimi,
 Kreis, Quadrat, Dreieck — dazu fünf nie benutzte Schablonensätze („Das Quadrat ist gelb.“).
 
+## Nachzügler: Rübe und Sack
+
+Beide hatten den Umbau überlebt, weil sie im Bestand standen und ich nur nach toten
+Atomen gesucht habe. Nach meinem eigenen Kriterium gehörten sie in die Challenge-Tabelle
+— ein Kind sagt Möhre, nicht Rübe, und „Sack" hört es höchstens als Teil von Rucksack.
+
+* **Rübe → Küken 🐤** (L12, L25). Gleich lautgetreu (`Kü`+`ken`), ab L12 schreibbar, und
+  ungleich attraktiver. Dazu ein technisches Argument: 🫜 ist **Unicode 15.1 von 2023**
+  und war damit das jüngste Emoji im Pack. Die App bündelt keinen Emoji-Font und `minSdk`
+  ist 26 — unter Android 15 war der Ü-Merksatz ein leeres Kästchen. Das Finale „Der Löwe
+  klaut die Rübe!" wird „Das Küken sitzt auf dem Löwen!" — beide Wörter tragen einen
+  Umlaut, worum es in L12 geht.
+* **Sack → Socke 🧦** (L16). Steht auf der Vorschlagsliste, ist kürzer, und trägt endlich
+  ein Emoji, das zum Wort passt — 🛍️ war eine Einkaufstüte. Der Merksatz heißt jetzt
+  „ck wie Socke" statt „ck wie Rucksack", damit Belohnungswort und Bauwort dasselbe sind.
+  Die Rechen-Runde wird dabei sogar wahrer: Socken auf der Wäscheleine sind eine echte
+  Reihe, Säcke im Lager waren eine erfundene. Finale: „Das Pferd zieht sich Socken an!"
+
+Nicht angefasst: **Regen**, **Brot** und die übrigen Wörter mit rollendem R am Anfang —
+die sind für die Sprachsynthese unbequem, aber inhaltlich einwandfrei.
+
 ## Was offen bleibt
 
 **Audio.** Der Pack braucht rund **420 neue Clips** (Prompts, Belohnungssätze,
