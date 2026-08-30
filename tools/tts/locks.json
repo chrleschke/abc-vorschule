@@ -70,6 +70,10 @@
       "seed": 1958806341,
       "sourceText": "der Vogel"
     },
+    "article_word:35da0bb87b07": {
+      "seed": 354671520,
+      "sourceText": "die Spinne"
+    },
     "article_word:3ebe749c9e3f": {
       "seed": 943836457,
       "sourceText": "das Lama"
@@ -202,6 +206,22 @@
     "article_word:c5acfae3ff25": {
       "seed": 1238263247,
       "sourceText": "das Kleid"
+    },
+    "article_word:e5ea5c5dc87b": {
+      "seed": 1958806341,
+      "sourceText": "die Insel"
+    },
+    "article_word:e69cbb9a57fd": {
+      "seed": 2080298366,
+      "sourceText": "das Fenster"
+    },
+    "article_word:edef7161a78e": {
+      "seed": 392610737,
+      "sourceText": "das Nest"
+    },
+    "article_word:f494d7101cf8": {
+      "seed": 2014897295,
+      "sourceText": "die Ente"
     },
     "finale:0e8ee2e401d0": {
       "seed": 445173952,
