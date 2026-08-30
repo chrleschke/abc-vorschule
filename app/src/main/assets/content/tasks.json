@@ -1090,16 +1090,16 @@
       "id": "l08-t10",
       "rounds": [
         {
-          "promptTts": "Drei Reihen mit je vier Dosen stehen im Regal. Wie viele Dosen sind das.",
-          "iconAtomId": "dose",
+          "promptTts": "Drei Reihen mit je vier Krokodilen liegen am Fluss. Wie viele Krokodile sind das.",
+          "iconAtomId": "krokodil",
           "left": 3,
           "right": 4,
           "answer": 12,
           "operation": "multiply"
         },
         {
-          "promptTts": "Dreizehn Dosen und sieben Dosen. Wie viele Dosen sind das.",
-          "iconAtomId": "dose",
+          "promptTts": "Dreizehn Krokodile und sieben Krokodile. Wie viele Krokodile sind das.",
+          "iconAtomId": "krokodil",
           "left": 13,
           "right": 7,
           "answer": 20
@@ -4059,14 +4059,14 @@
           ]
         },
         {
-          "sentenceTts": "Tom isst den letzten Keks.",
+          "sentenceTts": "Das Krokodil hat den Keks gefressen.",
           "correctAtomIds": [
-            "tom",
+            "krokodil",
             "keks"
           ],
           "wrongAtomIds": [
-            "tom",
-            "brokkoli"
+            "dino",
+            "keks"
           ]
         },
         {
@@ -4383,7 +4383,7 @@
             "maus"
           ],
           "wrongAtomIds": [
-            "katze",
+            "krokodil",
             "maus"
           ]
         }
@@ -4568,8 +4568,8 @@
             "qualle"
           ],
           "wrongAtomIds": [
-            "fisch",
-            "fisch"
+            "krokodil",
+            "krokodil"
           ]
         },
         {
@@ -4963,7 +4963,7 @@
           ],
           "wrongAtomIds": [
             "fisch",
-            "qualle"
+            "krokodil"
           ]
         },
         {
@@ -6335,7 +6335,7 @@
             "ei"
           ],
           "wrongAtomIds": [
-            "ente",
+            "krokodil",
             "ei"
           ]
         }

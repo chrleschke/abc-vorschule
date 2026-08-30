@@ -350,13 +350,18 @@ Schwein, Huhn, Kind, Baby, Freund, Hand, Regen, Schnee, Blume, Tasche, Müll, To
 
 **Reaktiviert statt gelöscht** (lagen tot im Pack, stehen jetzt auf Bildkarten oder als
 Rechen-Ikone): Tür, Tisch, Lampe, Milch, Pizza, Salami, Kuh, Igel, Pinguin, Gabel,
-Löffel, Eimer, Gras.
+Löffel, Eimer, Gras, **Krokodil**.
 
-Von den 60 toten Wort-/Bildatomen sind damit **37 übrig** — darunter 12 Funktions- und
-Farbwörter, für die es keinen Satz gibt, und Tiere wie Tiger, Krokodil und Nilpferd, die
-auf eine spätere Zoo-Runde warten. Sie sind bewusst weder gelöscht noch erzwungen
-platziert; wer die Regel „kein Atom ohne Auftritt" ernst nimmt, räumt sie im nächsten
-Durchgang ab.
+Das Krokodil 🐊 auf Wunsch des Nutzers nachgezogen, an sechs Stellen: **L08** hatte drei
+Keks-Runden hintereinander — die dritte ist jetzt „Das Krokodil hat den Keks gefressen",
+und die Rechen-Ikone der Lektion wechselt mit, womit das Tier auch auf dem Pfad-Schild
+steht (🥫 🍪 🐊). Dazu als Gegenkarte in L14, L18, L23 und L31, überall dort, wo ein
+anderes Tier die plausible Verwechslung ist.
+
+Von den 60 toten Wort-/Bildatomen sind damit **36 übrig** — darunter 12 Funktions- und
+Farbwörter, für die es keinen Satz gibt, und Tiere wie Tiger und Nilpferd, die auf eine
+spätere Zoo-Runde warten. Sie sind bewusst weder gelöscht noch erzwungen platziert; wer
+die Regel „kein Atom ohne Auftritt" ernst nimmt, räumt sie im nächsten Durchgang ab.
 
 Nicht aufgenommen, obwohl auf der Liste: **Auge** und **Mund** — es gab keine Runde, in
 die sie ohne Verrenkung passten, und ein neues totes Atom wäre genau der Fehler, den
