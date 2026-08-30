@@ -64,8 +64,12 @@ class ContentRepositoryTest {
     fun countAddRoundsUseLessonContextIcons() {
         pack.tasksOf(pack.lesson("l01")).filterIsInstance<CountAddSpec>().forEach { math ->
             math.rounds.forEach { round ->
-                assertTrue(round.iconAtomId in pack.atoms.keys)
-                assertTrue(pack.atom(round.iconAtomId).emoji.isNotBlank())
+                // Ohne Bildwort zeigt die Aufgabe nur Ziffern; steht eins da,
+                // muss es auflösen und ein Emoji tragen.
+                round.iconAtomId?.let { icon ->
+                    assertTrue(icon in pack.atoms.keys)
+                    assertTrue(pack.atom(icon).emoji.isNotBlank())
+                }
             }
         }
     }

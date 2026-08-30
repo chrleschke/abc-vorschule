@@ -124,7 +124,7 @@ fun TrainerHost(
             trainer = trainer,
             round = round,
             roundIndex = roundIndex,
-            icon = pack.atom(round.iconAtomId).emoji,
+            icon = round.iconAtomId?.let { pack.atoms[it]?.emoji }.orEmpty(),
             input = trainer.mathInputs[ProgressionEngine.mathKey(round)]
                 ?: MathInputMode.Tiles,
             showSymbolPrompt = !ttsAvailable,

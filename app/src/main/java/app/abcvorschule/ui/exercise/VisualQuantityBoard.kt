@@ -155,6 +155,23 @@ fun QuantityCluster(
      * tiles keep equal height and width regardless of their count (§8). */
     minClusterRows: Int = 0,
 ) {
+    // Ohne Bildwort zeigt die Menge nur ihre Ziffer. Ein Emoji hier wäre bei den
+    // Zahlen, um die es dann geht, ohnehin ein einzelnes Symbol neben der Zahl —
+    // also Dekoration, die eine Szene behauptet, die es nicht gibt.
+    if (emoji.isBlank()) {
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = count.toString(),
+                style = MaterialTheme.typography.displaySmall,
+                color = numberColor,
+            )
+        }
+        return
+    }
     if (forceSymbolic || QuantityRepresentation.isSymbolic(count)) {
         Column(
             modifier = modifier,
@@ -213,7 +230,8 @@ fun MathQuantityPrompt(
     emojiSizeSp: Int,
 ) {
     if (operation == MathOperation.Multiply) {
-        MultiplicationMatrixGrid(emoji = emoji, rows = left, columns = right)
+        // Die Matrix lebt von der Fläche — ohne Bildwort tut es das Zählplättchen.
+        MultiplicationMatrixGrid(emoji = emoji.ifBlank { NeutralCountingToken }, rows = left, columns = right)
         return
     }
     val forceSymbolic = QuantityRepresentation.forceSymbolicFor(left, right)

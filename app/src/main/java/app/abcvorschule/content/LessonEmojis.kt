@@ -42,7 +42,7 @@ object LessonEmojis {
      */
     private fun sourceAtomIds(specs: List<TaskSpec>): List<String> =
         specs.filterIsInstance<WordBuildSpec>().flatMap { spec -> spec.rounds.map { it.targetAtomId } } +
-            specs.filterIsInstance<CountAddSpec>().flatMap { spec -> spec.rounds.map { it.iconAtomId } } +
+            specs.filterIsInstance<CountAddSpec>().flatMap { spec -> spec.rounds.mapNotNull { it.iconAtomId } } +
             specs.filterIsInstance<SentenceOrderSpec>()
                 .flatMap { spec -> spec.rounds.mapNotNull { it.illustrationAtomId } } +
             specs.filterIsInstance<SentencePictureSpec>()

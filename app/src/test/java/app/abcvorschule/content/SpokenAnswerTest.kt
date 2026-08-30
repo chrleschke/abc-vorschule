@@ -52,7 +52,7 @@ class SpokenAnswerTest {
         // Authoring gap guard: every counted atom must carry a usable noun form.
         pack.tasks.values.filterIsInstance<CountAddSpec>().forEach { spec ->
             spec.rounds.forEach { round ->
-                val icon = pack.atom(round.iconAtomId)
+                val icon = round.iconAtomId?.let { pack.atom(it) } ?: return@forEach
                 val spoken = round.spokenAnswer(icon)
                 assertFalse(
                     "task ${spec.id} round for ${icon.id} produced a blank spoken answer",

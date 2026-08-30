@@ -18,6 +18,15 @@ enum class MathOperation(val wireName: String, val symbol: String) {
     }
 }
 
+/**
+ * Zählplättchen für Aufgaben ohne Bildwort. Die Menge selbst zeigt dann nur ihre
+ * Ziffer (siehe [CountAddRound.iconAtomId]) — aber wo die *Form* die Didaktik
+ * trägt, braucht es trotzdem etwas Zählbares: die Multiplikations-Matrix lebt
+ * von der Fläche, die Zähl-Hilfe vom einzelnen antippbaren Ding. Ein schlichter
+ * Punkt behauptet nichts über die Welt und bleibt zählbar.
+ */
+const val NeutralCountingToken = "●"
+
 /** Amounts above ten stay countable as a number, but are no longer a wall of emoji. */
 object QuantityRepresentation {
     const val SymbolicFrom = 11
