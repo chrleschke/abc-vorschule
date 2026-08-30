@@ -109,7 +109,10 @@ fun PlaceValueAnswer(
     val complete = PlaceValueInput.isComplete(tens.text, ones.text, fields)
 
     fun submit() {
-        if (!complete) return
+        // Einmal abgeschickt ist abgeschickt: der Pfeil ist danach zwar aus, das
+        // Einerfeld nimmt aber weiter Fokus und IME-Aktionen an — ein zweites
+        // „Fertig" auf der Tastatur käme sonst als zweiter Versuch an.
+        if (solved || !complete) return
         PlaceValueInput.combine(tens.text, ones.text, fields)?.let(onSubmit)
     }
 
