@@ -61,7 +61,7 @@ Bewegung erhöht nebenbei die Bildvielfalt der Pfad-Schilder, die aus denselben 
 abgeleitet werden.
 
 Gegenprobe zur Streichung: Nicht alle 60 sind Rettungskandidaten. `Nanu`, `Tram`,
-`Quelle`, `Insel`, `Markt`, `Ofen`, `Salami`, `Xylofon`, `Yacht` würde ich **löschen**
+`Quelle`, `Insel`, `Markt`, `Ofen`, `Xylofon`, `Yacht` würde ich **löschen**
 statt aktivieren (siehe Challenge unten).
 
 ---
@@ -106,7 +106,7 @@ Kein einziges Atom für: **Handy, Kopfhörer, Foto, Akku, Rucksack, Helm, Roller
 Zahnbürste, Seife, Pflaster, Müll, Kita, Dusche, Rutsche, Schaukel, Regen, Schnee, Wind,
 Regenbogen, Uhr, Nudeln, Hose, Tasche, Tasse, Hand, Auge, Mund, Blume, Torte, Party**.
 
-Stattdessen trägt der Pack: `Ofen`, `Markt`, `Tram`, `Radio`, `Klavier`, `Salami`,
+Stattdessen trägt der Pack: `Ofen`, `Markt`, `Tram`, `Radio`, `Klavier`,
 `Quelle`, `Insel`, `Ähre`, `Yacht`, `Xylofon`.
 
 Bemerkenswert: Was der Pack **an** Modernem hat, ist gut gewählt — `Paket` 📦 (L03,
@@ -181,7 +181,8 @@ kein Vorschlag zwingt zu einem Umbau des Buchstabenpfads.
 | **Dose** | L08 „D wie Dose" 🥫 + `word_build` | Konserve ist im Kinderalltag randständig | Belohnungswort **„D wie Dino"** 🦕 (Atom existiert). Das `word_build`-Wort `Dose` würde ich **lassen** — lautgetreu, und `Dino` bräuchte ein neues Silbenpaar |
 | **Nanu** | Atom, tot | Veraltete Interjektion | ersatzlos löschen; die Liste liefert **ups, hey, okay, tschüss, miau, muh, wuff** |
 | **Tram** | Atom, tot | Regionalismus (CH/München). Kinder sagen „Straßenbahn" | löschen, `Bus`/`Zug`/`Bahn` decken es ab |
-| **Quelle, Insel, Markt, Ofen, Salami** | Atome, tot | Randständig, nie gezeigt | löschen statt aktivieren |
+| **Quelle, Insel, Markt, Ofen** | Atome, tot | Randständig, nie gezeigt | löschen statt aktivieren |
+| ~~Salami~~ | Atom, tot | *Nutzerentscheidung: bleibt.* Salami gehört zur Pizza, und die lieben die Kinder | aktiviert statt gelöscht — L21 zeigt beide zusammen |
 | **Tal** | 4× `sentence_picture` (L05, L14) | Kein Alltagswort, und als Bildkarte nicht darstellbar | Sätze „Ein Ufo ist im Tal gelandet" / „Der Zug fuhr durch das Tal" → `Park`, `Straße`, `Strand` (Atome existieren). **Kostet zwei neue Aufnahmen** — nur machen, wenn die Sätze ohnehin angefasst werden |
 | **Xylofon** | L18 „X wie Xylofon" 🎵, Atom tot | Grenzfall: Kita-Instrument, aber Schreibweise und Emoji tragen nicht | halten, aber Atom löschen; L26 hat mit „X wie Taxi" 🚕 schon die bessere Variante |
 | **Radio, Klavier** | je 1× Bildkarte | Grenzfälle, keine Priorität | belassen |
@@ -195,7 +196,7 @@ Altersgruppe. Die Liste unterschätzt sie.
 
 ## Challenge gegen die Liste — was ich nicht übernehmen würde
 
-1. **Zahlwörter als Lesewörter** (eins … zehn, null, erste/zweite).
+1. **Zahlwörter als Lesewörter** (eins … zehn, null, erste/zweite). *— vom Nutzer bestätigt.*
    Widerspricht PRODUCT_PRINCIPLES §3/§7: Rechnen läuft bewusst **ohne Wörter zum Lesen
    oder Schreiben**, Mengen kommen als Icon + Ziffer, Singular/Plural nur gesprochen. Die
    Zahlwörter *hört* das Kind in jeder Lektion — sie zusätzlich als Graphemketten
@@ -239,7 +240,7 @@ heute **732 Clips**.
   Damit lassen sich `Tür`, `Tisch`*, `Lampe`, `Rad`, `Milch`, `Pizza`, `Kuh`, `Affe`,
   `Igel`, `Uhu`, `Pinguin`, `Gabel`, `Löffel`, `Zahn`, `Eimer`, `Nuss`, `Erdbeere`,
   `Salat`, `Feuer`, `Hexe` in Umlauf bringen. (*`Tisch` braucht vorher ein Emoji.)
-* **Tote Atome löschen**: Nanu, Tram, Quelle, Insel, Markt, Ofen, Salami, Xylofon, Yacht.
+* **Tote Atome löschen**: Nanu, Tram, Quelle, Insel, Markt, Ofen, Xylofon, Yacht, Tal, wind.
 * **Neue Bildatome anlegen** (Emoji + `gender`/`nounClass`), noch ohne sie zu verwenden:
   Handy 📱, Kopfhörer 🎧, Rucksack 🎒, Helm ⛑️, Roller 🛴, Zahnbürste 🪥, Seife 🧼,
   Pflaster 🩹, Kita 🏫, Regen 🌧️, Schnee ❄️, Regenbogen 🌈, Rutsche 🛝, Uhr ⏰, Hose 👖,
@@ -289,3 +290,88 @@ Eingriffe:
 * Die **Rechnen-Regel ohne Lesewörter** (§3/§7).
 * Die **wortgleiche Satz-Versteher-Instruktion** — sie hat genau eine Aufnahme, und der
   Validator hält das fest.
+
+
+---
+
+# Nachtrag — Entscheidungen und Umsetzung (30.08.2026)
+
+Der Review lag dem Nutzer vor; die folgenden Entscheidungen kamen zurück und sind
+umgesetzt. Zwei Randbedingungen des Reviews sind damit hinfällig: **Audio ist keine
+Kostenbremse mehr** (die Aufnahmen werden nachgezogen), und **mehr Lektionen sind ein
+ausdrückliches Ziel** — das Kind ist regelmäßig schneller durch den Pfad als neuer Inhalt
+nachkommt.
+
+## Entscheidungen
+
+| Punkt | Entscheidung |
+|---|---|
+| Zahlwörter als Lesewörter | **Raus** — bestätigt, kommen nicht in den Pack |
+| Salami | **Bleibt** — gehört zur Pizza; beide sind jetzt in L21 aktiv statt tot |
+| Katze **Pepe** | **Neu**, ab L07 (`Pe`+`pe`) — ein Doppelsilbenwort genau dort, wo das E ankommt |
+| Mimi | **Wird Mia** (L02/L20) — Pepe übernimmt die Katzenrolle, und Mia ist ab der zweiten Lektion das erste Kind im Pfad |
+| Neue Lektionen | **Beides**: L19–L26 ausgebaut *und* eine neue Phase 8 mit acht Lektionen |
+| Umfang | Voll durch — Wortschatz-Umbau und alle neuen Lektionen in einem Durchgang |
+
+## Was jetzt im Pack steht
+
+**Pfad:** 26 → **34 Lektionen**, 226 → **332 Tasks**, 18 → **26 Finale-Sätze**
+(l19–l26 erben ihren Satz weiterhin von der Basis-Lektion). Atome: 271 → **314**.
+
+**Phase 8 — zusammengesetzte Wörter (L27–L34).** Nach L18 sind alle 39 Grapheme
+eingeführt; neuer Stoff kann also nicht aus Buchstaben kommen. Die neue Phase lehrt
+stattdessen: *lange Wörter sind aus kurzen gebaut, die du schon kennst.* Der
+Silben-Verschmelzer schiebt dafür zwei ganze Wörter zusammen („Schiebe Hand und Schuh
+zusammen“), der Wort-Bauer setzt sie als zwei Blöcke. Sechzehn Komposita, jedes aus zwei
+Teilen, die das Kind vorher selbst gebaut hat:
+
+| Lektion | Wörter |
+|---|---|
+| L27 | Handschuh · Hausschuh |
+| L28 | Apfelkuchen · Brotdose |
+| L29 | Regenjacke · Sonnenblume |
+| L30 | Fußball · Baumhaus |
+| L31 | Eisbär · Vogelnest |
+| L32 | Schneemann · Schneeball |
+| L33 | Schultasche · Schulbus |
+| L34 | Mülltonne · Taschenlampe |
+
+**L19–L26 sind keine Stummel mehr.** Jede Wiederholung hat jetzt ein drittes, modernes
+Bauwort (Maus, Milch, Pizza, Auto, Tisch, Stuhl, Tür, Kuh) und den fehlenden
+Satz-Versteher mit vier Runden — vorher endeten sie nach zwei Wörtern und einem Satz.
+
+**Belohnungswörter modernisiert:** Ä wie **Äpfel** (statt Ähre) · W wie **Wolke** (statt
+Weg) · D wie **Dino** (statt Dose) · ck wie **Rucksack** (statt Sack) · Y wie **Yoga**
+(statt Yacht).
+
+**Neue Bildwörter im Umlauf:** Handy, Kopfhörer, Helm, Roller, Zahnbürste, Seife,
+Pflaster, Uhr, Hose, Socke, Tasse, Nudeln, Torte, Rutsche, Dusche, Regenbogen, Foto,
+Schwein, Huhn, Kind, Baby, Freund, Hand, Regen, Schnee, Blume, Tasche, Müll, Tonne, Mann.
+
+**Reaktiviert statt gelöscht** (lagen tot im Pack, stehen jetzt auf Bildkarten oder als
+Rechen-Ikone): Tür, Tisch, Lampe, Milch, Pizza, Salami, Kuh, Igel, Pinguin, Gabel,
+Löffel, Eimer, Gras.
+
+Von den 60 toten Wort-/Bildatomen sind damit **37 übrig** — darunter 12 Funktions- und
+Farbwörter, für die es keinen Satz gibt, und Tiere wie Tiger, Krokodil und Nilpferd, die
+auf eine spätere Zoo-Runde warten. Sie sind bewusst weder gelöscht noch erzwungen
+platziert; wer die Regel „kein Atom ohne Auftritt" ernst nimmt, räumt sie im nächsten
+Durchgang ab.
+
+Nicht aufgenommen, obwohl auf der Liste: **Auge** und **Mund** — es gab keine Runde, in
+die sie ohne Verrenkung passten, und ein neues totes Atom wäre genau der Fehler, den
+Befund 2 beschreibt.
+
+**Gelöscht:** Nanu, Tram, Quelle, Insel, Markt, Ofen, Xylofon, Yacht, Tal, wind, Mimi,
+Kreis, Quadrat, Dreieck — dazu fünf nie benutzte Schablonensätze („Das Quadrat ist gelb.“).
+
+## Was offen bleibt
+
+**Audio.** Der Pack braucht rund **420 neue Clips** (Prompts, Belohnungssätze,
+Satz-Versteher-Sätze, Finale-Sätze, Wort- und Artikelaufnahmen). `tools/tts/` findet sie
+selbst über `tts extract` / `tts status`; kuratiert wird wie gewohnt im Web-Interface.
+Bis dahin spricht die App die neuen Texte über Android-TTS.
+
+**Sichtprüfung.** Unit-Tests und Build sind grün, am Gerät ist die neue Phase noch nicht
+gelaufen — besonders der Wort-Bauer mit zwei langen Blöcken („Taschen“ + „lampe“) und die
+Wort-Verschmelzung sind Kandidaten für Layout-Überraschungen bei font_scale 1.3.

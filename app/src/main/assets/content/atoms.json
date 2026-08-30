@@ -3072,14 +3072,6 @@
       "kind": "word"
     },
     {
-      "id": "mimi",
-      "lemma": "Mimi",
-      "display": "Mimi",
-      "emoji": "🐱",
-      "kind": "word",
-      "nounClass": "name"
-    },
-    {
       "id": "papa",
       "lemma": "Papa",
       "display": "Papa",
@@ -3122,16 +3114,6 @@
       "display": "Hallo",
       "emoji": "👋",
       "kind": "word"
-    },
-    {
-      "id": "tal",
-      "lemma": "Tal",
-      "display": "Tal",
-      "emoji": "⛰️",
-      "kind": "word",
-      "pluralDisplay": "Täler",
-      "gender": "n",
-      "nounClass": "thing"
     },
     {
       "id": "hol",
@@ -3211,13 +3193,6 @@
       "pluralHighlight": "n",
       "gender": "f",
       "nounClass": "thing"
-    },
-    {
-      "id": "nanu",
-      "lemma": "Nanu",
-      "display": "Nanu",
-      "emoji": "😮",
-      "kind": "word"
     },
     {
       "id": "sand",
@@ -3423,17 +3398,6 @@
       "emoji": "🍎",
       "kind": "word",
       "pluralDisplay": "Äpfel",
-      "pluralHighlight": "Umlaut",
-      "gender": "m",
-      "nounClass": "thing"
-    },
-    {
-      "id": "ofen",
-      "lemma": "Ofen",
-      "display": "Ofen",
-      "emoji": "",
-      "kind": "word",
-      "pluralDisplay": "Öfen",
       "pluralHighlight": "Umlaut",
       "gender": "m",
       "nounClass": "thing"
@@ -3664,26 +3628,6 @@
       "nounClass": "thing"
     },
     {
-      "id": "tram",
-      "lemma": "Tram",
-      "display": "Tram",
-      "emoji": "🚋",
-      "kind": "word",
-      "pluralDisplay": "Trams",
-      "gender": "f",
-      "nounClass": "thing"
-    },
-    {
-      "id": "markt",
-      "lemma": "Markt",
-      "display": "Markt",
-      "emoji": "",
-      "kind": "word",
-      "pluralDisplay": "Märkte",
-      "gender": "m",
-      "nounClass": "thing"
-    },
-    {
       "id": "polizei",
       "lemma": "Polizei",
       "display": "Polizei",
@@ -3715,7 +3659,7 @@
       "id": "salami",
       "lemma": "Salami",
       "display": "Salami",
-      "emoji": "",
+      "emoji": "🥓",
       "kind": "word",
       "gender": "f",
       "nounClass": "thing"
@@ -3757,16 +3701,6 @@
       "kind": "other",
       "pluralDisplay": "Igel",
       "gender": "m",
-      "nounClass": "thing"
-    },
-    {
-      "id": "insel",
-      "lemma": "Insel",
-      "display": "Insel",
-      "emoji": "🏝️",
-      "kind": "other",
-      "pluralDisplay": "Inseln",
-      "gender": "f",
       "nounClass": "thing"
     },
     {
@@ -3983,7 +3917,7 @@
       "id": "quark",
       "lemma": "Quark",
       "display": "Quark",
-      "emoji": "",
+      "emoji": "🥣",
       "kind": "word",
       "gender": "m",
       "nounClass": "thing"
@@ -4026,26 +3960,6 @@
       "kind": "word",
       "pluralDisplay": "Wale",
       "gender": "m",
-      "nounClass": "thing"
-    },
-    {
-      "id": "xylofon",
-      "lemma": "Xylofon",
-      "display": "Xylofon",
-      "emoji": "🎹",
-      "kind": "word",
-      "pluralDisplay": "Xylofone",
-      "gender": "n",
-      "nounClass": "thing"
-    },
-    {
-      "id": "yacht",
-      "lemma": "Yacht",
-      "display": "Yacht",
-      "emoji": "⛵",
-      "kind": "word",
-      "pluralDisplay": "Yachten",
-      "gender": "f",
       "nounClass": "thing"
     },
     {
@@ -4156,13 +4070,6 @@
       "id": "spielt",
       "lemma": "spielt",
       "display": "spielt",
-      "emoji": "",
-      "kind": "word"
-    },
-    {
-      "id": "wind",
-      "lemma": "wind",
-      "display": "wind",
       "emoji": "",
       "kind": "word"
     },
@@ -4375,16 +4282,6 @@
       "pluralDisplay": "Hexen",
       "gender": "f",
       "nounClass": "person"
-    },
-    {
-      "id": "quelle",
-      "lemma": "Quelle",
-      "display": "Quelle",
-      "emoji": "💧",
-      "kind": "other",
-      "pluralDisplay": "Quellen",
-      "gender": "f",
-      "nounClass": "thing"
     },
     {
       "id": "suppe",
@@ -4623,7 +4520,7 @@
       "id": "tisch",
       "lemma": "Tisch",
       "display": "Tisch",
-      "emoji": "",
+      "emoji": "🍽️",
       "kind": "word",
       "pluralDisplay": "Tische",
       "pluralHighlight": "e",
@@ -4752,39 +4649,6 @@
       "display": "braun",
       "emoji": "🟫",
       "kind": "word"
-    },
-    {
-      "id": "kreis",
-      "lemma": "Kreis",
-      "display": "Kreis",
-      "emoji": "🔵",
-      "kind": "word",
-      "pluralDisplay": "Kreise",
-      "pluralHighlight": "e",
-      "gender": "m",
-      "nounClass": "thing"
-    },
-    {
-      "id": "quadrat",
-      "lemma": "Quadrat",
-      "display": "Quadrat",
-      "emoji": "🟨",
-      "kind": "word",
-      "pluralDisplay": "Quadrate",
-      "pluralHighlight": "e",
-      "gender": "n",
-      "nounClass": "thing"
-    },
-    {
-      "id": "dreieck",
-      "lemma": "Dreieck",
-      "display": "Dreieck",
-      "emoji": "🔺",
-      "kind": "word",
-      "pluralDisplay": "Dreiecke",
-      "pluralHighlight": "e",
-      "gender": "n",
-      "nounClass": "thing"
     },
     {
       "id": "herz",
@@ -4930,6 +4794,529 @@
       "kind": "other",
       "gender": "n",
       "nounClass": "thing"
+    },
+    {
+      "id": "mia",
+      "lemma": "Mia",
+      "display": "Mia",
+      "emoji": "👧",
+      "kind": "word",
+      "nounClass": "name"
+    },
+    {
+      "id": "pepe",
+      "lemma": "Pepe",
+      "display": "Pepe",
+      "emoji": "🐱",
+      "kind": "word",
+      "nounClass": "name"
+    },
+    {
+      "id": "pe",
+      "lemma": "pe",
+      "display": "pe",
+      "emoji": "",
+      "kind": "syllable"
+    },
+    {
+      "id": "hand",
+      "lemma": "Hand",
+      "display": "Hand",
+      "emoji": "✋",
+      "kind": "word",
+      "pluralDisplay": "Hände",
+      "pluralHighlight": "Umlaut",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "regen",
+      "lemma": "Regen",
+      "display": "Regen",
+      "emoji": "🌧️",
+      "kind": "word",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "blume",
+      "lemma": "Blume",
+      "display": "Blume",
+      "emoji": "🌸",
+      "kind": "word",
+      "pluralDisplay": "Blumen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "schnee",
+      "lemma": "Schnee",
+      "display": "Schnee",
+      "emoji": "❄️",
+      "kind": "word",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "mann",
+      "lemma": "Mann",
+      "display": "Mann",
+      "emoji": "🧑",
+      "kind": "word",
+      "pluralDisplay": "Männer",
+      "gender": "m",
+      "nounClass": "person"
+    },
+    {
+      "id": "tasche",
+      "lemma": "Tasche",
+      "display": "Tasche",
+      "emoji": "👜",
+      "kind": "word",
+      "pluralDisplay": "Taschen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "muell",
+      "lemma": "Müll",
+      "display": "Müll",
+      "emoji": "🚮",
+      "kind": "word",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "tonne",
+      "lemma": "Tonne",
+      "display": "Tonne",
+      "emoji": "🛢️",
+      "kind": "word",
+      "pluralDisplay": "Tonnen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "handschuh",
+      "lemma": "Handschuh",
+      "display": "Handschuh",
+      "emoji": "🧤",
+      "kind": "word",
+      "pluralDisplay": "Handschuhe",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "hausschuh",
+      "lemma": "Hausschuh",
+      "display": "Hausschuh",
+      "emoji": "🥿",
+      "kind": "word",
+      "pluralDisplay": "Hausschuhe",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "apfelkuchen",
+      "lemma": "Apfelkuchen",
+      "display": "Apfelkuchen",
+      "emoji": "🥧",
+      "kind": "word",
+      "pluralDisplay": "Apfelkuchen",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "brotdose",
+      "lemma": "Brotdose",
+      "display": "Brotdose",
+      "emoji": "🍱",
+      "kind": "word",
+      "pluralDisplay": "Brotdosen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "regenjacke",
+      "lemma": "Regenjacke",
+      "display": "Regenjacke",
+      "emoji": "🧥",
+      "kind": "word",
+      "pluralDisplay": "Regenjacken",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "sonnenblume",
+      "lemma": "Sonnenblume",
+      "display": "Sonnenblume",
+      "emoji": "🌻",
+      "kind": "word",
+      "pluralDisplay": "Sonnenblumen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "fussball",
+      "lemma": "Fußball",
+      "display": "Fußball",
+      "emoji": "⚽",
+      "kind": "word",
+      "pluralDisplay": "Fußbälle",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "baumhaus",
+      "lemma": "Baumhaus",
+      "display": "Baumhaus",
+      "emoji": "🛖",
+      "kind": "word",
+      "pluralDisplay": "Baumhäuser",
+      "gender": "n",
+      "nounClass": "thing"
+    },
+    {
+      "id": "eisbaer",
+      "lemma": "Eisbär",
+      "display": "Eisbär",
+      "emoji": "🐻‍❄️",
+      "kind": "word",
+      "pluralDisplay": "Eisbären",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "vogelnest",
+      "lemma": "Vogelnest",
+      "display": "Vogelnest",
+      "emoji": "🪺",
+      "kind": "word",
+      "pluralDisplay": "Vogelnester",
+      "gender": "n",
+      "nounClass": "thing"
+    },
+    {
+      "id": "schneemann",
+      "lemma": "Schneemann",
+      "display": "Schneemann",
+      "emoji": "⛄",
+      "kind": "word",
+      "pluralDisplay": "Schneemänner",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "schneeball",
+      "lemma": "Schneeball",
+      "display": "Schneeball",
+      "emoji": "🥎",
+      "kind": "word",
+      "pluralDisplay": "Schneebälle",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "schultasche",
+      "lemma": "Schultasche",
+      "display": "Schultasche",
+      "emoji": "🎒",
+      "kind": "word",
+      "pluralDisplay": "Schultaschen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "schulbus",
+      "lemma": "Schulbus",
+      "display": "Schulbus",
+      "emoji": "🚌",
+      "kind": "word",
+      "pluralDisplay": "Schulbusse",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "muelltonne",
+      "lemma": "Mülltonne",
+      "display": "Mülltonne",
+      "emoji": "🗑️",
+      "kind": "word",
+      "pluralDisplay": "Mülltonnen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "taschenlampe",
+      "lemma": "Taschenlampe",
+      "display": "Taschenlampe",
+      "emoji": "🔦",
+      "kind": "word",
+      "pluralDisplay": "Taschenlampen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "handy",
+      "lemma": "Handy",
+      "display": "Handy",
+      "emoji": "📱",
+      "kind": "other",
+      "pluralDisplay": "Handys",
+      "gender": "n",
+      "nounClass": "thing"
+    },
+    {
+      "id": "kopfhoerer",
+      "lemma": "Kopfhörer",
+      "display": "Kopfhörer",
+      "emoji": "🎧",
+      "kind": "other",
+      "pluralDisplay": "Kopfhörer",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "helm",
+      "lemma": "Helm",
+      "display": "Helm",
+      "emoji": "⛑️",
+      "kind": "other",
+      "pluralDisplay": "Helme",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "roller",
+      "lemma": "Roller",
+      "display": "Roller",
+      "emoji": "🛴",
+      "kind": "other",
+      "pluralDisplay": "Roller",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "zahnbuerste",
+      "lemma": "Zahnbürste",
+      "display": "Zahnbürste",
+      "emoji": "🪥",
+      "kind": "other",
+      "pluralDisplay": "Zahnbürsten",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "seife",
+      "lemma": "Seife",
+      "display": "Seife",
+      "emoji": "🧼",
+      "kind": "other",
+      "pluralDisplay": "Seifen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "pflaster",
+      "lemma": "Pflaster",
+      "display": "Pflaster",
+      "emoji": "🩹",
+      "kind": "other",
+      "pluralDisplay": "Pflaster",
+      "gender": "n",
+      "nounClass": "thing"
+    },
+    {
+      "id": "uhr",
+      "lemma": "Uhr",
+      "display": "Uhr",
+      "emoji": "⏰",
+      "kind": "other",
+      "pluralDisplay": "Uhren",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "hose",
+      "lemma": "Hose",
+      "display": "Hose",
+      "emoji": "👖",
+      "kind": "other",
+      "pluralDisplay": "Hosen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "socke",
+      "lemma": "Socke",
+      "display": "Socke",
+      "emoji": "🧦",
+      "kind": "other",
+      "pluralDisplay": "Socken",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "tasse",
+      "lemma": "Tasse",
+      "display": "Tasse",
+      "emoji": "☕",
+      "kind": "other",
+      "pluralDisplay": "Tassen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "torte",
+      "lemma": "Torte",
+      "display": "Torte",
+      "emoji": "🎂",
+      "kind": "other",
+      "pluralDisplay": "Torten",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "rutsche",
+      "lemma": "Rutsche",
+      "display": "Rutsche",
+      "emoji": "🛝",
+      "kind": "other",
+      "pluralDisplay": "Rutschen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "dusche",
+      "lemma": "Dusche",
+      "display": "Dusche",
+      "emoji": "🚿",
+      "kind": "other",
+      "pluralDisplay": "Duschen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "regenbogen",
+      "lemma": "Regenbogen",
+      "display": "Regenbogen",
+      "emoji": "🌈",
+      "kind": "other",
+      "pluralDisplay": "Regenbögen",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "foto",
+      "lemma": "Foto",
+      "display": "Foto",
+      "emoji": "📷",
+      "kind": "other",
+      "pluralDisplay": "Fotos",
+      "gender": "n",
+      "nounClass": "thing"
+    },
+    {
+      "id": "schwein",
+      "lemma": "Schwein",
+      "display": "Schwein",
+      "emoji": "🐖",
+      "kind": "other",
+      "pluralDisplay": "Schweine",
+      "gender": "n",
+      "nounClass": "thing"
+    },
+    {
+      "id": "huhn",
+      "lemma": "Huhn",
+      "display": "Huhn",
+      "emoji": "🐔",
+      "kind": "other",
+      "pluralDisplay": "Hühner",
+      "gender": "n",
+      "nounClass": "thing"
+    },
+    {
+      "id": "kind",
+      "lemma": "Kind",
+      "display": "Kind",
+      "emoji": "🧒",
+      "kind": "other",
+      "pluralDisplay": "Kinder",
+      "gender": "n",
+      "nounClass": "person"
+    },
+    {
+      "id": "baby",
+      "lemma": "Baby",
+      "display": "Baby",
+      "emoji": "👶",
+      "kind": "other",
+      "pluralDisplay": "Babys",
+      "gender": "n",
+      "nounClass": "person"
+    },
+    {
+      "id": "freund",
+      "lemma": "Freund",
+      "display": "Freund",
+      "emoji": "🧑‍🤝‍🧑",
+      "kind": "other",
+      "pluralDisplay": "Freunde",
+      "gender": "m",
+      "nounClass": "person"
+    },
+    {
+      "id": "nudeln",
+      "lemma": "Nudeln",
+      "display": "Nudeln",
+      "emoji": "🍝",
+      "kind": "other",
+      "gender": "f",
+      "nounClass": "thing",
+      "articleSpeechOverride": "die Nudeln"
+    },
+    {
+      "id": "warm",
+      "lemma": "warm",
+      "display": "warm",
+      "emoji": "",
+      "kind": "word"
+    },
+    {
+      "id": "kalt",
+      "lemma": "kalt",
+      "display": "kalt",
+      "emoji": "",
+      "kind": "word"
+    },
+    {
+      "id": "voll",
+      "lemma": "voll",
+      "display": "voll",
+      "emoji": "",
+      "kind": "word"
+    },
+    {
+      "id": "hell",
+      "lemma": "hell",
+      "display": "hell",
+      "emoji": "",
+      "kind": "word"
+    },
+    {
+      "id": "klein",
+      "lemma": "klein",
+      "display": "klein",
+      "emoji": "",
+      "kind": "word"
+    },
+    {
+      "id": "leer",
+      "lemma": "leer",
+      "display": "leer",
+      "emoji": "",
+      "kind": "word"
     }
   ]
 }

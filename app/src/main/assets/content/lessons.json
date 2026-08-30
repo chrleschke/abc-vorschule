@@ -158,9 +158,11 @@
         "l07-t3",
         "l07-t4",
         "l07-t5",
+        "l07-t5b",
         "l07-t6",
         "l07-t7",
         "l07-t8",
+        "l07-t8b",
         "l07-t9",
         "l07-sp1",
         "l07-t10"
@@ -454,7 +456,9 @@
         "l19-t6",
         "l19-t7",
         "l19-t8",
+        "l19-t8b",
         "l19-t9",
+        "l19-sp1",
         "l19-t10"
       ]
     },
@@ -477,7 +481,9 @@
         "l20-t6",
         "l20-t7",
         "l20-t8",
+        "l20-t8b",
         "l20-t9",
+        "l20-sp1",
         "l20-t10"
       ]
     },
@@ -500,7 +506,9 @@
         "l21-t6",
         "l21-t7",
         "l21-t8",
+        "l21-t8b",
         "l21-t9",
+        "l21-sp1",
         "l21-t10"
       ]
     },
@@ -523,7 +531,9 @@
         "l22-t6",
         "l22-t7",
         "l22-t8",
+        "l22-t8b",
         "l22-t9",
+        "l22-sp1",
         "l22-t10"
       ]
     },
@@ -546,7 +556,9 @@
         "l23-t6",
         "l23-t7",
         "l23-t8",
+        "l23-t8b",
         "l23-t9",
+        "l23-sp1",
         "l23-t10"
       ]
     },
@@ -569,7 +581,9 @@
         "l24-t6",
         "l24-t7",
         "l24-t8",
+        "l24-t8b",
         "l24-t9",
+        "l24-sp1",
         "l24-t10"
       ]
     },
@@ -592,7 +606,9 @@
         "l25-t6",
         "l25-t7",
         "l25-t8",
+        "l25-t8b",
         "l25-t9",
+        "l25-sp1",
         "l25-t10"
       ]
     },
@@ -615,8 +631,218 @@
         "l26-t6",
         "l26-t7",
         "l26-t8",
+        "l26-t8b",
         "l26-t9",
+        "l26-sp1",
         "l26-t10"
+      ]
+    },
+    {
+      "id": "l27",
+      "index": 27,
+      "phase": 8,
+      "title": "Handschuh & Hausschuh (Zusammengesetzt)",
+      "nodeLabel": "Hand schuh",
+      "status": "authored",
+      "finaleId": "f-l27",
+      "focusAtomIds": [
+        "letter-h",
+        "letter-sch"
+      ],
+      "taskIds": [
+        "l27-t1",
+        "l27-t2",
+        "l27-m1",
+        "l27-m2",
+        "l27-w1",
+        "l27-w2",
+        "l27-c1",
+        "l27-c2",
+        "l27-s1",
+        "l27-sp1",
+        "l27-r1"
+      ]
+    },
+    {
+      "id": "l28",
+      "index": 28,
+      "phase": 8,
+      "title": "Apfelkuchen & Brotdose (Zusammengesetzt)",
+      "nodeLabel": "Apfel kuchen",
+      "status": "authored",
+      "finaleId": "f-l28",
+      "focusAtomIds": [
+        "letter-b",
+        "letter-k"
+      ],
+      "taskIds": [
+        "l28-t1",
+        "l28-t2",
+        "l28-m1",
+        "l28-m2",
+        "l28-w1",
+        "l28-w2",
+        "l28-c1",
+        "l28-c2",
+        "l28-s1",
+        "l28-sp1",
+        "l28-r1"
+      ]
+    },
+    {
+      "id": "l29",
+      "index": 29,
+      "phase": 8,
+      "title": "Regenjacke & Sonnenblume (Zusammengesetzt)",
+      "nodeLabel": "Regen jacke",
+      "status": "authored",
+      "finaleId": "f-l29",
+      "focusAtomIds": [
+        "letter-r",
+        "letter-s"
+      ],
+      "taskIds": [
+        "l29-t1",
+        "l29-t2",
+        "l29-m1",
+        "l29-m2",
+        "l29-w1",
+        "l29-w2",
+        "l29-w3",
+        "l29-c1",
+        "l29-c2",
+        "l29-s1",
+        "l29-sp1",
+        "l29-r1"
+      ]
+    },
+    {
+      "id": "l30",
+      "index": 30,
+      "phase": 8,
+      "title": "Fußball & Baumhaus (Zusammengesetzt)",
+      "nodeLabel": "Fuß ball",
+      "status": "authored",
+      "finaleId": "f-l30",
+      "focusAtomIds": [
+        "letter-sz",
+        "letter-b"
+      ],
+      "taskIds": [
+        "l30-t1",
+        "l30-t2",
+        "l30-m1",
+        "l30-m2",
+        "l30-w1",
+        "l30-c1",
+        "l30-c2",
+        "l30-s1",
+        "l30-sp1",
+        "l30-r1"
+      ]
+    },
+    {
+      "id": "l31",
+      "index": 31,
+      "phase": 8,
+      "title": "Eisbär & Vogelnest (Zusammengesetzt)",
+      "nodeLabel": "Eis bär",
+      "status": "authored",
+      "finaleId": "f-l31",
+      "focusAtomIds": [
+        "letter-ei",
+        "letter-v"
+      ],
+      "taskIds": [
+        "l31-t1",
+        "l31-t2",
+        "l31-m1",
+        "l31-m2",
+        "l31-w1",
+        "l31-c1",
+        "l31-c2",
+        "l31-s1",
+        "l31-sp1",
+        "l31-r1"
+      ]
+    },
+    {
+      "id": "l32",
+      "index": 32,
+      "phase": 8,
+      "title": "Schneemann & Schneeball (Zusammengesetzt)",
+      "nodeLabel": "Schnee mann",
+      "status": "authored",
+      "finaleId": "f-l32",
+      "focusAtomIds": [
+        "letter-sch",
+        "letter-m"
+      ],
+      "taskIds": [
+        "l32-t1",
+        "l32-t2",
+        "l32-m1",
+        "l32-m2",
+        "l32-w1",
+        "l32-w2",
+        "l32-c1",
+        "l32-c2",
+        "l32-s1",
+        "l32-sp1",
+        "l32-r1"
+      ]
+    },
+    {
+      "id": "l33",
+      "index": 33,
+      "phase": 8,
+      "title": "Schultasche & Schulbus (Zusammengesetzt)",
+      "nodeLabel": "Schul bus",
+      "status": "authored",
+      "finaleId": "f-l33",
+      "focusAtomIds": [
+        "letter-t",
+        "letter-b"
+      ],
+      "taskIds": [
+        "l33-t1",
+        "l33-t2",
+        "l33-m1",
+        "l33-m2",
+        "l33-w1",
+        "l33-w2",
+        "l33-c1",
+        "l33-c2",
+        "l33-s1",
+        "l33-sp1",
+        "l33-r1"
+      ]
+    },
+    {
+      "id": "l34",
+      "index": 34,
+      "phase": 8,
+      "title": "Mülltonne & Taschenlampe (Zusammengesetzt)",
+      "nodeLabel": "Müll tonne",
+      "status": "authored",
+      "finaleId": "f-l34",
+      "focusAtomIds": [
+        "letter-ue",
+        "letter-l"
+      ],
+      "taskIds": [
+        "l34-t1",
+        "l34-t2",
+        "l34-m1",
+        "l34-m2",
+        "l34-w1",
+        "l34-w2",
+        "l34-w3",
+        "l34-c1",
+        "l34-c2",
+        "l34-s1",
+        "l34-sp1",
+        "l34-r1"
       ]
     }
   ]

@@ -1,7 +1,7 @@
 # ABC-Vorschul App
 
 Kostenlose, werbefreie Android-Vorschul-App (ca. 4–7 Jahre) für Lesen und Rechnen auf Deutsch.
-Helles, warmes Cream-UI, offline nach Installation. Ein Fibel-Pfad aus 26 Lektionen; jede Lektion
+Helles, warmes Cream-UI, offline nach Installation. Ein Fibel-Pfad aus 34 Lektionen; jede Lektion
 läuft sechs autorierte Trainer-Typen in fester didaktischer Reihenfolge über einen gemeinsamen
 Content-Graphen — ein Typ darf sich wiederholen oder fehlen, zurück geht die Reihenfolge nie.
 Zur Laufzeit abgeleitet, nie autoriert: Buchstaben-/Silben-Jagd und Wort-Detektiv als
@@ -119,10 +119,11 @@ Storage aber nicht zuverlässig, also besser über Gradle laufen lassen.
 | `atoms.json` | Buchstaben (mit Strichdaten für den Spurensucher), Silben, Wörter, Bildwörter |
 | `sentences.json` | Sätze als Atom-Folgen |
 | `tasks.json` | Ein Eintrag pro Trainer, `trainer`-Feld als Typ-Diskriminator, 1..n Runden |
-| `lessons.json` | 26 Lektionen in Fibel-Reihenfolge; `authored` = spielbar, `planned` = Knoten gesperrt |
+| `lessons.json` | 34 Lektionen in Fibel-Reihenfolge; `authored` = spielbar, `planned` = Knoten gesperrt |
 | `finales.json` | Ein kurzer Satz plus Bildreihe (`pictureAtomIds`) je Lektions-Ende |
 
-Autoriert: alle 26 Lektionen (Phase 1–7), inklusive der Wiederholungs-Tracks. Derzeit steht keine
+Autoriert: alle 34 Lektionen (Phase 1–8) — 18 Basis-Lektionen mit dem Buchstabenpfad, 8
+Wiederholungen und 8 Lektionen der Phase 8 für zusammengesetzte Wörter. Derzeit steht keine
 Lektion auf `planned`; der Status bleibt im Schema erhalten, damit künftige Lektionen als gesperrte
 Pfad-Knoten angelegt werden können, ohne Code zu ändern.
 

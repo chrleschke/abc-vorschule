@@ -165,27 +165,6 @@
       "tts": "Das ist mein Ei."
     },
     {
-      "id": "s-hase-im-sand",
-      "atomIds": [
-        "der",
-        "hase",
-        "ist",
-        "im",
-        "sand"
-      ],
-      "tts": "Der Hase ist im Sand."
-    },
-    {
-      "id": "s-das-auto-ist-gelb",
-      "atomIds": [
-        "das",
-        "auto",
-        "ist",
-        "gelb"
-      ],
-      "tts": "Das Auto ist gelb."
-    },
-    {
       "id": "s-der-loewe-ist-da",
       "atomIds": [
         "der",
@@ -206,44 +185,72 @@
       "tts": "Das ist mein Brot."
     },
     {
-      "id": "s-der-kreis-ist-blau",
+      "id": "s-mein-handschuh",
+      "atomIds": [
+        "mein",
+        "handschuh",
+        "ist",
+        "warm"
+      ],
+      "tts": "Mein Handschuh ist warm."
+    },
+    {
+      "id": "s-die-blume-ist-gross",
+      "atomIds": [
+        "die",
+        "blume",
+        "ist",
+        "gross"
+      ],
+      "tts": "Die Blume ist groß."
+    },
+    {
+      "id": "s-wir-spielen-fussball",
+      "atomIds": [
+        "wir",
+        "spielen",
+        "fussball"
+      ],
+      "tts": "Wir spielen Fußball."
+    },
+    {
+      "id": "s-der-eisbaer-schwimmt",
       "atomIds": [
         "der",
-        "kreis",
-        "ist",
-        "blau"
+        "eisbaer",
+        "schwimmt"
       ],
-      "tts": "Der Kreis ist blau."
+      "tts": "Der Eisbär schwimmt."
     },
     {
-      "id": "s-das-quadrat-ist-gelb",
+      "id": "s-der-schneemann-ist-kalt",
       "atomIds": [
-        "das",
-        "quadrat",
+        "der",
+        "schneemann",
         "ist",
-        "gelb"
+        "kalt"
       ],
-      "tts": "Das Quadrat ist gelb."
+      "tts": "Der Schneemann ist kalt."
     },
     {
-      "id": "s-das-dreieck-ist-rot",
+      "id": "s-die-tasche-ist-voll",
       "atomIds": [
-        "das",
-        "dreieck",
+        "die",
+        "tasche",
         "ist",
-        "rot"
+        "voll"
       ],
-      "tts": "Das Dreieck ist rot."
+      "tts": "Die Tasche ist voll."
     },
     {
-      "id": "s-das-herz-ist-rot",
+      "id": "s-die-lampe-ist-hell",
       "atomIds": [
-        "das",
-        "herz",
+        "die",
+        "lampe",
         "ist",
-        "rot"
+        "hell"
       ],
-      "tts": "Das Herz ist rot."
+      "tts": "Die Lampe ist hell."
     }
   ]
 }

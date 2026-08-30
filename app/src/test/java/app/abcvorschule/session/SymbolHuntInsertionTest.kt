@@ -109,7 +109,7 @@ class SymbolHuntInsertionTest {
     // lack a syllable-hunt. l25, l26 are now review lessons with syllable_merge.
     @Test
     fun theWholePackProducesTheExpectedNumberOfLetterAndSyllableHunts() {
-        assertEquals(26, pack.authoredLessons.size)
+        assertEquals(34, pack.authoredLessons.size)
         val letterHuntLessons = pack.authoredLessons.count { lesson ->
             val trainers = scheduledTrainersFor(lesson.id)
             SymbolHuntInsertion.insertSymbolHunts(trainers, pack, lesson.id, lesson.index)
@@ -120,9 +120,11 @@ class SymbolHuntInsertionTest {
             SymbolHuntInsertion.insertSymbolHunts(trainers, pack, lesson.id, lesson.index)
                 .any { it.spec is SymbolHuntSpec && it.spec.id.endsWith(":syllable") }
         }
-        assertEquals("expected every authored lesson to get a letter-hunt", 26, letterHuntLessons)
+        assertEquals("expected every authored lesson to get a letter-hunt", 34, letterHuntLessons)
         assertEquals(
-            "expected all but l01 (degenerate pool) and l12 (no syllable_merge) to get a syllable-hunt",
+            "expected all but l01 (degenerate pool), l12 (no syllable_merge) and the " +
+                "eight Phase-8 lessons (their merges join whole words, not syllables) " +
+                "to get a syllable-hunt",
             24,
             syllableHuntLessons,
         )

@@ -100,10 +100,13 @@ class SymbolHuntDerivationTest {
         // regression made buildRound return null for every single round in the
         // whole pack, this test would still report green with nothing actually
         // checked. The counts below, computed directly against the real pack:
-        // - Letter traces: l01-l18 (36 single + 3 for l18) + l19-l26 review (16) = 55 total, all build hunts.
-        // - Syllable merges: l01-l11 (11) + l13-l24 (12) + l25-l26 review (4) = 27 total.
-        //   39 total syllable_merge tasks across all lessons (some lessons have 2).
-        //   38 build hunts (l01's "ma" is degenerate — its pool, excluding itself, is empty).
+        // - Letter traces: l01-l18 (36 single + 3 for l18) + l19-l26 review (16)
+        //   + l27-l34 Phase 8 (16) = 71 total, all build hunts.
+        // - Syllable merges: 56 rounds across all lessons (some lessons have 2).
+        //   Only 38 build hunts: l01's "ma" is degenerate (its pool, excluding
+        //   itself, is empty), and the 16 merges of Phase 8 join two whole *words*
+        //   into a compound — their result is no syllable atom, so there is nothing
+        //   to hunt for.
         var letterRoundsChecked = 0
         var letterHuntsBuilt = 0
         var syllableRoundsChecked = 0
@@ -127,9 +130,9 @@ class SymbolHuntDerivationTest {
                 }
             }
         }
-        assertEquals(55, letterRoundsChecked)
-        assertEquals(55, letterHuntsBuilt)
-        assertEquals(39, syllableRoundsChecked)
-        assertEquals(37, syllableHuntsBuilt)
+        assertEquals(71, letterRoundsChecked)
+        assertEquals(71, letterHuntsBuilt)
+        assertEquals(56, syllableRoundsChecked)
+        assertEquals(38, syllableHuntsBuilt)
     }
 }

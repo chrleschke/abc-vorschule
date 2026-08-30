@@ -393,16 +393,16 @@ class ContentValidatorTest {
     fun finalePictureMustCarryAnEmoji() {
         // `tisch` exists but carries emoji "" on purpose — there is no usable table emoji.
         val issues = issuesOf { p ->
-            p.copy(finales = p.finales + ("f-l01" to p.finale("f-l01").copy(pictureAtomIds = listOf("mama", "tisch"))))
+            p.copy(finales = p.finales + ("f-l01" to p.finale("f-l01").copy(pictureAtomIds = listOf("mama", "ist"))))
         }
-        assertTrue(issues.toString(), issues.any { it.contains("tisch") && it.contains("emoji") })
+        assertTrue(issues.toString(), issues.any { it.contains("ist") && it.contains("emoji") })
     }
 
     @Test
     fun finaleMustNotRepeatTheSameGlyph() {
-        // `katze` and `mimi` are both 🐱 — two identical pictures read as a bug.
+        // `katze` and `pepe` are both 🐱 — two identical pictures read as a bug.
         val issues = issuesOf { p ->
-            p.copy(finales = p.finales + ("f-l01" to p.finale("f-l01").copy(pictureAtomIds = listOf("katze", "mimi"))))
+            p.copy(finales = p.finales + ("f-l01" to p.finale("f-l01").copy(pictureAtomIds = listOf("katze", "pepe"))))
         }
         assertTrue(issues.toString(), issues.any { it.contains("f-l01") && it.contains("glyph") })
     }
