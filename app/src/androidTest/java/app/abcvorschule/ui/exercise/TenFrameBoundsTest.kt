@@ -65,6 +65,34 @@ class TenFrameBoundsTest {
     }
 
     @Test
+    fun theActiveCellIsBigEnoughForAChildsFingerOnTheNarrowPhone() {
+        // Die JVM-Rechnung (TenFrameTest) prüft nur, dass `hitTargetDp` groß genug
+        // *rechnet*. Sie lief an dem Fehler vorbei, der hier saß: die klickbare Box
+        // steckte in einer `size(cell)`-Box und wurde von deren Constraints wieder
+        // auf Zellgröße geklemmt — ~27dp statt 40dp, auf jedem Gerät. Nur die
+        // gemessenen Bounds des gerenderten Knotens zeigen das.
+        stage(left = 16, right = 8)
+        val active = rule.onNodeWithTag("ten_frame_cell_16").getUnclippedBoundsInRoot()
+        assertTrue(
+            "aktive Zelle $active ist schmaler als ${TenFrame.MinHitTargetDp}dp",
+            active.width.value >= TenFrame.MinHitTargetDp,
+        )
+        assertTrue(
+            "aktive Zelle $active ist flacher als ${TenFrame.MinHitTargetDp}dp",
+            active.height.value >= TenFrame.MinHitTargetDp,
+        )
+
+        // Gegenprobe: eine *nicht* aktive Zelle bleibt zellgroß. Ohne sie wäre oben
+        // auch ein Feld grün, das schlicht alle Zellen auf 40dp aufbläst — und das
+        // wäre ein anderes, breiteres Feld als das gerechnete.
+        val quiet = rule.onNodeWithTag("ten_frame_cell_17").getUnclippedBoundsInRoot()
+        assertTrue(
+            "Nachbarzelle $quiet ist so groß wie die aktive",
+            quiet.width.value < active.width.value,
+        )
+    }
+
+    @Test
     fun onlyTheNextPlaceholderReactsAndTheFrameGrowsToTwenty() {
         // Alle Callback-Aufrufe sammeln statt nur den letzten Zustand zu halten:
         // ein Callback, der nie aufgerufen wird, sähe sonst genauso aus wie einer,
@@ -108,7 +136,10 @@ class TenFrameBoundsTest {
             rule.onNodeWithTag("ten_frame_cell_$index").performClick()
             rule.waitForIdle()
         }
-        rule.onNodeWithTag("ten_frame_total").assertExists()
+        // Die Marke der *zweiten* vollen Zeile — „20", die Zahl, die beim
+        // Einrasten gesprochen wird. Die Marke der ersten Zeile („10") steht seit
+        // dem Rundenstart da, sie bewiese nichts.
+        rule.onNodeWithTag("ten_frame_total_1").assertExists()
         val last = taps.last()
         assertTrue("filled=${last.filled}", last.filled == 4)
         assertTrue("tens=${last.fullTens}", last.fullTens == 20)

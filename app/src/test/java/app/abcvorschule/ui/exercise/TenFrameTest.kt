@@ -84,6 +84,53 @@ class TenFrameTest {
     }
 
     @Test
+    fun theEmojiNeverOutgrowsItsCell() {
+        // Die Zelle ist gegen TenFrame.LayoutFontScale gerechnet, der Text rendert
+        // mit der echten fontScale: ohne Deckel stünden bei font_scale 2.0 38dp
+        // Glyph in einer 26,7dp-Zelle — überlappende oder abgeschnittene Bilder.
+        listOf(1f, 1.15f, 1.3f, 1.5f, 1.8f, 2f).forEach { fontScale ->
+            (TenFrame.MinEmojiSp..TenFrame.MaxEmojiSp).forEach { size ->
+                val renderedDp = TenFrame.renderedEmojiSp(size, fontScale) * fontScale
+                assertTrue(
+                    "fontScale $fontScale, size $size -> ${renderedDp}dp in ${TenFrame.cellSizeDp(size)}dp",
+                    renderedDp <= TenFrame.cellSizeDp(size),
+                )
+            }
+        }
+    }
+
+    @Test
+    fun belowTheLayoutScaleTheEmojiKeepsItsFullSize() {
+        // Gegenprobe: der Deckel greift erst *über* der Auslegungsskalierung. Ohne
+        // sie wäre auch ein Deckel grün, der das Bild immer kleinrechnet.
+        assertEquals(21f, TenFrame.renderedEmojiSp(21, 1f), 0.001f)
+        assertEquals(21f, TenFrame.renderedEmojiSp(21, TenFrame.LayoutFontScale), 0.001f)
+        assertTrue(TenFrame.renderedEmojiSp(21, 2f) < 21f)
+    }
+
+    @Test
+    fun theFieldReservesTheHeightOfItsEndStateFromTheStart() {
+        // Der Rahmen wächst über die verdienten Zeilen, aber die Gruppe hält von
+        // Anfang an die Höhe ihres Endzustands: gerechnet wird darum immer mit der
+        // Endzahl voller Zeilen, und der gezeichnete Rahmen bleibt darin.
+        val cell = TenFrame.cellSizeDp(21)
+        val mark = TenFrame.markSlotDp(16f, 1.3f)
+        val end = TenFrame.framedBlockHeightDp(TenFrame.fullRowCount(24), cell, mark)
+        assertTrue("leer", TenFrame.framedBlockHeightDp(0, cell, mark) == 0f)
+        assertTrue(
+            "eine Zeile ${TenFrame.framedBlockHeightDp(1, cell, mark)} >= $end",
+            TenFrame.framedBlockHeightDp(1, cell, mark) < end,
+        )
+        // Eine Zeile mehr kostet genau eine Zeile plus Zeilenabstand — die
+        // Rahmen-Chrome zahlt man nur einmal, und zwar von Anfang an.
+        assertEquals(
+            cell + mark + TenFrame.RowGapDp,
+            TenFrame.framedBlockHeightDp(2, cell, mark) - TenFrame.framedBlockHeightDp(1, cell, mark),
+            0.001f,
+        )
+    }
+
+    @Test
     fun onlyWholeRowsCountAsTens() {
         assertEquals(0, TenFrame.fullRowCount(9))
         assertEquals(1, TenFrame.fullRowCount(10))

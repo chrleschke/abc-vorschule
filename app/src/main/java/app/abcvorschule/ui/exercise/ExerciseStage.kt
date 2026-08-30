@@ -54,6 +54,15 @@ enum class AnswerAnchor {
 private const val PromptHeightFraction = 0.52f
 
 /**
+ * Deckkraft, auf die ein Block der Bühne abblendet, solange er gesperrt ist —
+ * und die Dauer dieser Blende. Geteilt, weil Aufgaben- und Antwortblock während
+ * derselben Sperre (Audio-Lock beim Rundenstart) **gemeinsam** abblenden müssen:
+ * zwei eigene Werte liefen sichtbar gegeneinander.
+ */
+internal const val StageLockedAlpha = 0.5f
+internal const val StageLockFadeMillis = 200
+
+/**
  * Bühne einer Übung: Speaker-Kopfzeile ganz oben, darunter der Aufgabenblock,
  * darunter der Antwortblock, alle drei auf 420dp Breite gedeckelt, damit nichts
  * am Bildschirmrand klebt.

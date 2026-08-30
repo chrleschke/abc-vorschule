@@ -67,6 +67,25 @@ object TenFrame {
      * wie [CountingField.FieldWidthDp]. */
     const val FallbackFieldWidthDp = 320f
 
+    /** Strichstärke des Zehnerrahmens, in dp. */
+    const val FrameBorderDp = 2f
+
+    /** Eckenradius des Zehnerrahmens, in dp. */
+    const val FrameCornerDp = 10f
+
+    /**
+     * Luft zwischen Rahmen und Objekten **plus** Strichstärke, in dp. Dieser
+     * Abstand wird von der ersten Sekunde an reserviert, auch solange noch kein
+     * Zehner voll ist: entstünde er erst beim Einrasten, wüchse das Feld genau in
+     * dem Moment, in dem das Kind den nächsten Platzhalter treffen will.
+     */
+    const val FrameInsetDp = 8f
+
+    /** Zeilenhöhe der Standmarke als Vielfaches ihrer Schriftgröße — Zuschlag für
+     * Ober- und Unterlängen, damit die reservierte Höhe die gezeichnete Zeile
+     * sicher fasst. */
+    const val MarkLineFactor = 1.3f
+
     /** Zehnerzeilen einer Menge; die letzte Zeile ist kürzer. */
     fun rows(count: Int): List<Int> {
         if (count <= 0) return emptyList()
@@ -100,6 +119,42 @@ object TenFrame {
         val byWidth = ((fieldWidthDp - RowGapsDp) / RowSize - 2 * CellPadDp) / LayoutFontScale
         return byWidth.toInt().coerceIn(MinEmojiSp, MaxEmojiSp)
     }
+
+    /**
+     * Schriftgröße, mit der das Emoji tatsächlich gezeichnet wird.
+     *
+     * [cellSizeDp] und [emojiSizeSp] rechnen bewusst gegen die Konstante
+     * [LayoutFontScale]: die Zelle darf nicht mit der System-Schrift wachsen, weil
+     * zehn Objekte nebeneinander bei jeder Schriftgröße in dieselbe Breite müssen.
+     * Der `Text` darin rendert aber mit der **echten** `fontScale` — ab ~1.4 wäre
+     * der Glyph breiter als seine Zelle, bei 2.0 stünden 38dp in 26,7dp.
+     *
+     * Gewählt ist darum das Deckeln der gerenderten Größe (die zweite der beiden
+     * Möglichkeiten): oberhalb von [LayoutFontScale] wird die sp-Zahl so weit
+     * heruntergerechnet, dass das Emoji **physisch** genau so groß bleibt wie bei
+     * [LayoutFontScale] — es passt damit per Konstruktion in die Zelle. Die
+     * Alternative (die Zelle aus der echten `fontScale` herleiten) hätte
+     * [MinEmojiSp] als sp-Boden gegen die Breite antreten lassen und die Zeile bei
+     * font_scale 2.0 überlaufen. Die Trefferfläche bleibt davon unberührt: sie ist
+     * in dp gedeckelt ([MinHitTargetDp]) und schrumpft nie mit.
+     */
+    fun renderedEmojiSp(emojiSizeSp: Int, fontScale: Float): Float =
+        if (fontScale <= LayoutFontScale) emojiSizeSp.toFloat()
+        else emojiSizeSp * LayoutFontScale / fontScale
+
+    /** Höhe der Standmarken-Zeile in dp — reserviert, auch wenn dort noch nichts
+     * steht. Sie ist Teil der Höhe, die das Feld von Anfang an hält. */
+    fun markSlotDp(markSizeSp: Float, fontScale: Float): Float =
+        markSizeSp * fontScale * MarkLineFactor
+
+    /**
+     * Höhe des gezeichneten Rahmens über [rows] vollen Zeilen, in dp. Der Rahmen
+     * wird gezeichnet statt gelayoutet — nur so kann er wachsen, ohne irgendetwas
+     * zu verschieben.
+     */
+    fun framedBlockHeightDp(rows: Int, cellSizeDp: Float, markSlotDp: Float): Float =
+        if (rows <= 0) 0f
+        else 2 * FrameInsetDp + rows * (cellSizeDp + markSlotDp) + (rows - 1) * RowGapDp
 
     /**
      * Trefferfläche der **aktiven** Zelle. Sie ragt bewusst über ihre Nachbarn
