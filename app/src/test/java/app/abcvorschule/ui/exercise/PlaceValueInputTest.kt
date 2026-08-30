@@ -58,18 +58,32 @@ class PlaceValueInputTest {
     }
 
     @Test
-    fun aResolvedAnswerSplitsBackIntoItsFields() {
-        assertEquals("2" to "4", PlaceValueInput.digitsOf(24, 2))
-        assertEquals("3" to "0", PlaceValueInput.digitsOf(30, 2))
-        assertEquals("" to "7", PlaceValueInput.digitsOf(7, 1))
-    }
-
-    @Test
     fun theSlotGrowsWithTheSystemFontSoADigitNeverClips() {
         val small = PlaceValueInput.slotWidthDp(textSp = 40f, fontScale = 1f)
         val large = PlaceValueInput.slotWidthDp(textSp = 40f, fontScale = 2f)
         assertTrue("$small / $large", large > small)
         assertTrue(small >= PlaceValueInput.MinSlotWidthDp)
+    }
+
+    @Test
+    fun atDoubleSystemFontTheBoxStillHoldsItsOwnDigit() {
+        // Der Fall, an dem die vorherigen 24dp Innenabstand scheiterten: displayLarge
+        // (40sp) bei font_scale 2.0. Der Kasten muss den Glyphenvorschub **plus**
+        // den M3-Innenabstand fassen, sonst beschneidet er die Ziffer, die das Kind
+        // gerade getippt hat — und eine Zahl, die es nicht sieht, kann es nicht
+        // prüfen.
+        val textSp = 40f
+        val fontScale = 2f
+        val width = PlaceValueInput.slotWidthDp(textSp = textSp, fontScale = fontScale)
+        val glyph = textSp * fontScale * PlaceValueInput.DigitAspect
+        assertTrue(
+            "Kasten ${width}dp fasst Glyph ${glyph}dp plus Innenabstand nicht",
+            width >= glyph + PlaceValueInput.SlotPaddingDp,
+        )
+        // Und er passt neben seinen Zwilling, das Rechenzeichen und den Pfeil auf
+        // die 320dp-Breite des schmalsten angenommenen Geräts: 12dp Bühnenrand je
+        // Seite, 32dp Zeichenspalte, 72dp Pfeil, dreimal 8dp Spaltenlücke.
+        assertTrue("zwei Kästen zu ${width}dp passen nicht auf 320dp", 2 * width + 128 <= 296)
     }
 
     @Test

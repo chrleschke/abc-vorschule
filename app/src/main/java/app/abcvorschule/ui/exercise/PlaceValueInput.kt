@@ -22,8 +22,12 @@ object PlaceValueInput {
      * [NumberPadInput.DigitAspect], damit beide Felder gleich rechnen. */
     const val DigitAspect = 0.6f
 
-    /** Innenabstand eines Ziffernkastens, in dp. */
-    const val SlotPaddingDp = 24f
+    /** Innenabstand eines Ziffernkastens, in dp: OutlinedTextField-Default von M3,
+     * 16dp je Seite — derselbe Wert und derselbe Grund wie
+     * [NumberPadInput.FieldPaddingDp]. Mit den vorherigen 24f beschnitt der Kasten
+     * bei font_scale 2.0 die eigene Ziffer: genau der Fehler, gegen den
+     * [NumberPadInput.fieldWidthDp] geschrieben wurde. */
+    const val SlotPaddingDp = 32f
 
     /**
      * Wie viele Ziffernfelder die Antwort bekommt. Das verrät die Größenordnung
@@ -53,10 +57,6 @@ object PlaceValueInput {
 
     fun isComplete(tens: String, ones: String, fieldCount: Int): Boolean =
         ones.isNotEmpty() && (fieldCount == 1 || tens.isNotEmpty())
-
-    /** Eine fertige Zahl zurück in ihre Felder — für das Auflösen. */
-    fun digitsOf(value: Int, fieldCount: Int): Pair<String, String> =
-        if (fieldCount == 1) "" to value.toString() else (value / 10).toString() to (value % 10).toString()
 
     /**
      * Breite eines Ziffernkastens aus der *effektiven* Textgröße. Gleiche
