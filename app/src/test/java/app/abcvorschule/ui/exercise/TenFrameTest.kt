@@ -6,6 +6,16 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class TenFrameTest {
+    /**
+     * Die Zeilenbreite, wie sie tatsächlich gezeichnet wird: zehn Zellen und
+     * neun Zwischenräume, deren Breite [TenFrame.hasFiveGapAfter] bestimmt.
+     */
+    private fun rowWidthDp(emojiSizeSp: Int): Float =
+        TenFrame.RowSize * TenFrame.cellSizeDp(emojiSizeSp) +
+            (0 until TenFrame.RowSize - 1).fold(0f) { acc, column ->
+                acc + (if (TenFrame.hasFiveGapAfter(column)) TenFrame.FiveGapDp
+                else TenFrame.CellGapDp)
+            }
     @Test
     fun quantitiesBreakIntoRowsOfTen() {
         assertEquals(emptyList<Int>(), TenFrame.rows(0))
@@ -42,7 +52,8 @@ class TenFrameTest {
 
     @Test
     fun emojiStaysWithinItsBoundsOnEveryPlausibleWidth() {
-        // 320dp ist das schmale Telefon in Hochkant, 420dp der Deckel der Bühne.
+        // Hier wird bewusst **unter** die angenommene Breite des schmalen Telefons
+        // (320dp) gemessen, bis 280dp, damit die Schranken auch dort halten.
         (280..420 step 4).forEach { width ->
             val size = TenFrame.emojiSizeSp(width.toFloat())
             assertTrue("width $width -> $size", size >= TenFrame.MinEmojiSp)
@@ -57,9 +68,7 @@ class TenFrameTest {
         // das den Zehner sehen soll.
         (320..420 step 4).forEach { width ->
             val size = TenFrame.emojiSizeSp(width.toFloat())
-            val rowWidth = TenFrame.RowSize * TenFrame.cellSizeDp(size) +
-                TenFrame.CellGapDp * (TenFrame.RowSize - 2) + TenFrame.FiveGapDp
-            assertTrue("width $width -> $rowWidth", rowWidth <= width)
+            assertTrue("width $width -> ${rowWidthDp(size)}", rowWidthDp(size) <= width)
         }
     }
 

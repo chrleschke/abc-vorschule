@@ -91,6 +91,10 @@ object TenFrame {
      * Emoji-Größe in sp aus der verfügbaren Breite. Hergeleitet, nicht gestuft —
      * dieselbe Begründung wie bei [CountingField.emojiSizeSp]: eine Stufentabelle
      * deckt den echten Content nicht ab, eine Herleitung gilt per Konstruktion.
+     *
+     * Unterhalb von ~278dp Breite gewinnt [MinEmojiSp] gegen die Breitenschranke,
+     * die Zeile liefe dann über. Dies ist absichtlich: [MinEmojiSp] hat Vorrang,
+     * um Erkennbarkeit zu sichern. Das schmalste angenommene Gerät liegt bei 320dp.
      */
     fun emojiSizeSp(fieldWidthDp: Float): Int {
         val byWidth = ((fieldWidthDp - RowGapsDp) / RowSize - 2 * CellPadDp) / LayoutFontScale
