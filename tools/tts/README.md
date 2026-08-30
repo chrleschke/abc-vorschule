@@ -197,6 +197,12 @@ im Index stehen. Gewinnt bei Kollisionen zuerst die pädagogisch passende Varian
 verified Audio (Fingerprint = letzter Export); sonst `PROFILE_PRIORITY`
 (`phoneme` vor `word`, sonst wie gehabt).
 
+Der Verlierer einer solchen Kollision wird gar nicht erst encodiert, und der
+Export räumt das Zielverzeichnis gegen den Index auf: eine `.ogg`, auf die kein
+Index-Eintrag zeigt, findet die App nie und wandert nur ins APK. Der Lock des
+Verlierers bleibt bestehen — ändert sich die pädagogische Regel, ist der Clip
+mit demselben Seed wieder da.
+
 Bestehende `word:*`-Locks und Kandidaten-Ordner für Buchstaben/Silben einmalig
 umziehen: `tts migrate-locks` (siehe Ablauf oben). Clips mit Produktions-WAV aber
 ohne Lock (typisch nach Batch-`render`): `tts wire-locks`, danach `tts export`.
