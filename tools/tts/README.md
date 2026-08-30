@@ -139,8 +139,26 @@ Stimmen; europäisch sind nur `ryan` und `aiden`, beide männlich. `serena` und
 `vivian` standen hier bis August 2026 als „westlich, weiblich" — falsch, beide
 sind chinesisch (Modellkarte: „Warm, gentle young female voice", Chinese). Wer
 für Deutsch eine Frauenstimme braucht, wählt deshalb zwangsläufig einen Akzent.
-Der Ausweg führt nicht über diese Tabelle, sondern über einen anderen
-Checkpoint — siehe „VoiceDesign" unten.
+
+**Der VoiceDesign-Checkpoint ist als Ausweg geprüft und verworfen.** Am
+2026-08-30 gegen `sohee` gehalten: Stimme aus einer Textbeschreibung statt aus
+einem festen Embedding (`Qwen3-TTS-12Hz-1.7B-VoiceDesign`, in `qwen-tts` über
+`generate_voice_design`). Zwei Runden, fünf Stimmbeschreibungen, zuletzt fair
+verglichen — `sohee` mit seinen handoptimierten `textOverride`-Werten gegen
+VoiceDesign mit bloßem Satzpunkt. Ergebnis nach Gehör: **keine Verbesserung
+der Aussprache.** Die Messung sprach dafür (Ausschussquote 1 % gegen 26 %,
+und mit einer als „Erzieherin, mittleren Alters" beschriebenen Stimme 175 Hz
+gegen 220 Hz), das Ohr dagegen — deutsche Problemwörter wie „Zaun" und
+„Schuh" saßen weiterhin nicht, teils mit englischer Aussprache, und die
+Stimmidentität wanderte zwei- bis zweieinhalbmal so weit wie bei einem festen
+Embedding.
+
+Die Versuchsskripte lagen unter `tools/tts/experiments/` und sind wieder
+entfernt; wer nachsehen will, findet sie samt Messwerten in der History
+(`git log --oneline --diff-filter=D -- tools/tts/experiments`). Bleibt als
+Rest die Erkenntnis, dass MLX-Ports von Qwen3-TTS hier nichts ändern — es ist
+derselbe Checkpoint in einem anderen Format, und das Problem ist die
+Aussprache, nicht das Tempo.
 
 Das ist keine Kosmetik. `language` setzt im Modell ein Sprach-Token (`german` → 2053) und
 steuert damit die Phonologie; das Speaker-Embedding bringt trotzdem den Akzent seiner
