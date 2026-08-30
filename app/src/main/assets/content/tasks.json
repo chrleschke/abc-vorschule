@@ -1286,7 +1286,7 @@
           "promptTts": "Zeichne den Laut - Ch - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ch",
           "glyph": "Ch",
-          "rewardTts": "Ch - wie Dach.",
+          "rewardTts": "Ch - wie in Dach.",
           "rewardEmoji": "🏠",
           "blocks": []
         }
@@ -1555,7 +1555,7 @@
           "promptTts": "Zeichne den Buchstaben - Ö - nach und sammle dabei alle Sterne.",
           "atomId": "letter-oe",
           "glyph": "Ö",
-          "rewardTts": "Ö - wie Löwe.",
+          "rewardTts": "Ö - wie in Löwe.",
           "rewardEmoji": "🦁",
           "blocks": []
         }
@@ -2001,7 +2001,7 @@
           "promptTts": "Zeichne den Buchstaben - ß - nach und sammle dabei alle Sterne.",
           "atomId": "letter-sz",
           "glyph": "ß",
-          "rewardTts": "ß - wie Fuß.",
+          "rewardTts": "ß - wie in Fuß.",
           "rewardEmoji": "🦶",
           "blocks": []
         }
@@ -2140,7 +2140,7 @@
           "promptTts": "Zeichne den Laut - ck - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ck",
           "glyph": "ck",
-          "rewardTts": "ck - wie Socke.",
+          "rewardTts": "ck - wie in Socke.",
           "rewardEmoji": "🧦",
           "blocks": []
         }
@@ -3137,7 +3137,7 @@
           "promptTts": "Zeichne den Laut - Ch - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ch",
           "glyph": "Ch",
-          "rewardTts": "Ch - wie Dach.",
+          "rewardTts": "Ch - wie in Dach.",
           "rewardEmoji": "🏠"
         }
       ]
@@ -3411,7 +3411,7 @@
           "promptTts": "Zeichne den Buchstaben - Ö - nach und sammle dabei alle Sterne.",
           "atomId": "letter-oe",
           "glyph": "Ö",
-          "rewardTts": "Ö - wie Löwe.",
+          "rewardTts": "Ö - wie in Löwe.",
           "rewardEmoji": "🦁"
         }
       ]
@@ -3424,7 +3424,7 @@
           "promptTts": "Zeichne den Buchstaben - Ü - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ue",
           "glyph": "Ü",
-          "rewardTts": "Ü - wie Küken.",
+          "rewardTts": "Ü - wie in Küken.",
           "rewardEmoji": "🐤"
         }
       ]
@@ -3563,7 +3563,7 @@
           "promptTts": "Zeichne den Buchstaben - X - nach und sammle dabei alle Sterne.",
           "atomId": "letter-x",
           "glyph": "X",
-          "rewardTts": "X - wie Taxi.",
+          "rewardTts": "X - wie in Taxi.",
           "rewardEmoji": "🚕"
         }
       ]
@@ -5445,7 +5445,7 @@
           "promptTts": "Zeichne den Laut - Sch - nach und sammle dabei alle Sterne.",
           "atomId": "letter-sch",
           "glyph": "Sch",
-          "rewardTts": "Sch - wie Hausschuh.",
+          "rewardTts": "Sch - wie in Hausschuh.",
           "rewardEmoji": "🥿"
         }
       ]
@@ -5680,8 +5680,8 @@
           "promptTts": "Zeichne den Buchstaben - K - nach und sammle dabei alle Sterne.",
           "atomId": "letter-k",
           "glyph": "K",
-          "rewardTts": "K - wie Apfelkuchen.",
-          "rewardEmoji": "🥧"
+          "rewardTts": "K - wie Kuchen.",
+          "rewardEmoji": "🍰"
         }
       ]
     },
@@ -6149,7 +6149,7 @@
           "promptTts": "Zeichne den Laut - ß - nach und sammle dabei alle Sterne.",
           "atomId": "letter-sz",
           "glyph": "ß",
-          "rewardTts": "ß - wie Fußball.",
+          "rewardTts": "ß - wie in Fußball.",
           "rewardEmoji": "⚽"
         }
       ]
@@ -6595,8 +6595,8 @@
           "promptTts": "Zeichne den Buchstaben - M - nach und sammle dabei alle Sterne.",
           "atomId": "letter-m",
           "glyph": "M",
-          "rewardTts": "M - wie Schneemann.",
-          "rewardEmoji": "⛄"
+          "rewardTts": "M - wie Mann.",
+          "rewardEmoji": "🧑"
         }
       ]
     },
@@ -6816,8 +6816,8 @@
           "promptTts": "Zeichne den Buchstaben - T - nach und sammle dabei alle Sterne.",
           "atomId": "letter-t",
           "glyph": "T",
-          "rewardTts": "T - wie Schultasche.",
-          "rewardEmoji": "🎒"
+          "rewardTts": "T - wie Tasche.",
+          "rewardEmoji": "👜"
         }
       ]
     },
@@ -6829,7 +6829,7 @@
           "promptTts": "Zeichne den Buchstaben - B - nach und sammle dabei alle Sterne.",
           "atomId": "letter-b",
           "glyph": "B",
-          "rewardTts": "B - wie Schulbus.",
+          "rewardTts": "B - wie Bus.",
           "rewardEmoji": "🚌"
         }
       ]
@@ -7044,7 +7044,7 @@
           "promptTts": "Zeichne den Buchstaben - Ü - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ue",
           "glyph": "Ü",
-          "rewardTts": "Ü - wie Mülltonne.",
+          "rewardTts": "Ü - wie in Mülltonne.",
           "rewardEmoji": "🗑️"
         }
       ]
@@ -7057,8 +7057,8 @@
           "promptTts": "Zeichne den Buchstaben - L - nach und sammle dabei alle Sterne.",
           "atomId": "letter-l",
           "glyph": "L",
-          "rewardTts": "L - wie Taschenlampe.",
-          "rewardEmoji": "🔦"
+          "rewardTts": "L - wie Lampe.",
+          "rewardEmoji": "💡"
         }
       ]
     },

@@ -46,6 +46,15 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
   Stern hält der fertige Buchstabe eine halbe
   Sekunde, dann folgt die Belohnungsseite: Bild groß, darunter die Wortzeile („**T** wie Tomate")
   mit fettem Graphem. Kein zusätzlicher Buchstaben-Text unter dem Pfad.
+  **Der Merksatz muss halten, was er behauptet.** „X wie Y" heißt: Y fängt mit X an.
+  „M wie Schneemann" tut das nicht — ein Kind, das gerade M lernt, hört am Wortanfang ein
+  Sch. Zwei Regeln, von `LessonCoverageTest.everyMerksatzNamesAWordThatReallyStartsWithItsGrapheme`
+  erzwungen:
+  1. Gibt es ein Wort, das mit dem Graphem **anfängt**, nimm es — und das kurze, nicht das
+     Kompositum: „B wie Bus", nicht „B wie Schulbus".
+  2. Kann das Graphem gar kein deutsches Wort anfangen (ß, ck, Ch, Ö, X) oder gibt die
+     Lektion keins her, heißt es „wie **in**": „Ü wie in Küken", „ck wie in Socke".
+     Das Wort bleibt wahr, und das Kind hört, wo der Laut wirklich sitzt.
   Umlaut-Pünktchen und andere kurze Diakritika (Strichlänge < ~12 % der Glyphenbox) werden
   dünner gezeichnet als die Hauptbalken — sonst machen die runden Straßenkappen aus einem
   kurzen Tick einen dicken Blob, der den Buchstabenkörper frisst. Sterne werden entlang der
