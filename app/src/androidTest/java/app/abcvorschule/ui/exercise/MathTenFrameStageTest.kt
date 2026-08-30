@@ -6,6 +6,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsNotFocused
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
@@ -134,6 +135,33 @@ class MathTenFrameStageTest {
         // fokussiertes Feld beim Aufbau ist die Tastatur.
         rule.onNodeWithTag("place_value_tens").assertIsNotFocused()
         rule.onNodeWithTag("place_value_ones").assertIsNotFocused()
+    }
+
+    @Test
+    fun tappingTheOnesFieldWhileTheTensFieldIsEmptyJumpsFocusToTens() {
+        stage()
+        // Bei „12" fragt das Kind: welche Ziffer zuerst? Die Antwort ist der
+        // Zehner — der Fokus muss also dort landen, auch wenn der Finger den
+        // Einer-Kasten trifft. `PlaceValueAnswer.onFocusGained` fängt genau das
+        // ab, solange das Zehnerfeld noch leer ist.
+        rule.onNodeWithTag("place_value_ones").performClick()
+        rule.onNodeWithTag("place_value_tens").assertIsFocused()
+        rule.onNodeWithTag("place_value_ones").assertIsNotFocused()
+    }
+
+    @Test
+    fun tappingTheOnesFieldWithTheTensAlreadyFilledKeepsFocusThere() {
+        stage()
+        // Gegenprobe: steht die Zehnerziffer schon, darf ein Tipp auf den Einer
+        // nicht mehr zurückspringen — sonst käme das Kind nie zur Korrektur der
+        // Einerziffer.
+        rule.onNodeWithTag("place_value_tens").performClick()
+        rule.onNodeWithTag("place_value_tens").performTextInput("1")
+        // Der Zehner tippt selbst zum Einer weiter (siehe oben) — einmal zurück
+        // auf den Zehner, um für den Einer einen frischen Fokusgewinn zu erzwingen.
+        rule.onNodeWithTag("place_value_tens").performClick()
+        rule.onNodeWithTag("place_value_ones").performClick()
+        rule.onNodeWithTag("place_value_ones").assertIsFocused()
     }
 
     @Test
