@@ -157,8 +157,13 @@ def test_collision_prefers_phoneme_over_word(tmp_path):
     index = json.loads((paths.app_audio_dir / "index.json").read_text())
     assert index["clips"]["X"]["profile"] == "phoneme"
     assert not report.warnings
-    assert (paths.app_audio_dir / asset_name(word_key)).exists()
     assert (paths.app_audio_dir / asset_name(phoneme_key)).exists()
+    # Der Verlierer steht in keinem Index-Eintrag — die App könnte ihn nie
+    # abspielen, also wird er auch nicht encodiert.
+    assert not (paths.app_audio_dir / asset_name(word_key)).exists()
+    assert report.exported == [phoneme_key]
+    assert dict(report.skipped)[word_key] == (
+        "Text wird von einem anderen Profil abgedeckt — kein eigener Clip im Index")
 
 
 def test_collision_prefers_verified_audio(tmp_path):
@@ -183,8 +188,10 @@ def test_collision_prefers_verified_audio(tmp_path):
     lock_and_render(paths, prompt_key)
     lock_and_render(paths, finale_key)
 
+    # Ohne pädagogische Regel entscheidet PROFILE_PRIORITY: prompt gewinnt den
+    # Index — und nur der Gewinner wird encodiert.
     first = export_to_app(paths)
-    assert len(first.exported) == 2
+    assert first.exported == [prompt_key]
 
     index_path = paths.app_audio_dir / "index.json"
     index = json.loads(index_path.read_text())
@@ -237,6 +244,71 @@ def test_collision_prefers_sentence_over_prompt_for_bare_sentence(tmp_path):
     index = json.loads((paths.app_audio_dir / "index.json").read_text())
     assert index["clips"]["Hallo Lama!"]["profile"] == "sentence"
     assert not report.warnings
+
+
+def test_collision_loser_is_never_written(tmp_path):
+    """Zwei gelockte Clips, ein Text: nur der Gewinner landet im Index — und
+    nur er wird encodiert. Sonst liegt eine .ogg im APK, die keine Call-Site
+    findet."""
+    paths = make_paths(tmp_path, prompt_sentence_content(tmp_path))
+    prompt_key = clip_key("prompt", "Hallo Lama!")
+    sentence_key = clip_key("sentence", "Hallo Lama!")
+    lock_and_render(paths, prompt_key)
+    lock_and_render(paths, sentence_key)
+
+    report = export_to_app(paths)
+
+    assert report.exported == [sentence_key]
+    assert (paths.app_audio_dir / asset_name(sentence_key)).exists()
+    assert not (paths.app_audio_dir / asset_name(prompt_key)).exists()
+
+
+def test_pre_existing_collision_loser_is_cleaned_up(tmp_path):
+    """Regression: ältere Exporte haben den Kollisions-Verlierer geschrieben
+    und liegen lassen — 18 solcher Dateien lagen in app/src/main/assets/audio.
+    Ein Export muss sie einsammeln, nicht nur künftige verhindern."""
+    paths = make_paths(tmp_path, prompt_sentence_content(tmp_path))
+    prompt_key = clip_key("prompt", "Hallo Lama!")
+    sentence_key = clip_key("sentence", "Hallo Lama!")
+    lock_and_render(paths, prompt_key)
+    lock_and_render(paths, sentence_key)
+
+    # Zielverzeichnis wie nach einem alten Export: Verlierer-Datei da, aber
+    # ohne Eintrag im Index.
+    paths.app_audio_dir.mkdir(parents=True)
+    stale = paths.app_audio_dir / asset_name(prompt_key)
+    stale.write_bytes(b"alter Export")
+
+    report = export_to_app(paths)
+
+    assert not stale.exists()
+    assert report.removed == [asset_name(prompt_key)]
+    index = json.loads((paths.app_audio_dir / "index.json").read_text())
+    files = {e["file"] for e in index["clips"].values()}
+    assert {p.name for p in paths.app_audio_dir.glob("*.ogg")} == files
+
+
+def test_retained_file_without_index_entry_is_kept_but_reported(tmp_path, content_dir):
+    """Eine zurückbehaltene Datei ist lokal nicht neu encodierbar (out/ ist
+    gitignored). Fehlt ihr Index-Eintrag, wird sie deshalb behalten — aber
+    gemeldet, statt still im APK mitzufahren."""
+    paths = make_paths(tmp_path, content_dir)
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)
+    export_to_app(paths)
+    ogg = paths.app_audio_dir / asset_name(key)
+
+    # Frischer Checkout (kein out/) plus ein Index, der diese Datei nicht kennt.
+    shutil.rmtree(paths.out)
+    (paths.app_audio_dir / "index.json").write_text(
+        json.dumps({"version": 1, "clips": {}}) + "\n", encoding="utf-8")
+
+    report = export_to_app(paths)
+
+    assert ogg.exists()
+    assert report.removed == []
+    assert any(asset_name(key) in w and "keinen Index-Eintrag" in w
+               for w in report.warnings)
 
 
 def test_fresh_checkout_keeps_existing_assets_when_local_state_missing(tmp_path, content_dir):

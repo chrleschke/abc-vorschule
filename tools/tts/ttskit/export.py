@@ -12,6 +12,12 @@ Index-Eintrag — nur ein echter Unlock (oder ein Text, der zu keinem Lock mehr
 gehört) entfernt eine Datei. index.json wird immer neu geschrieben —
 deterministisch, ohne Zeitstempel, für saubere Diffs.
 
+Aufgeräumt wird gegen den Index: eine .ogg im Zielverzeichnis, auf die kein
+Index-Eintrag zeigt, kann die App nie abspielen und wandert nur ins APK. Das
+betrifft vor allem Kollisions-Verlierer — teilen sich zwei gelockte Clips
+denselben gesprochenen Text, bekommt nur einer den Eintrag (siehe
+`_collision_winner`), und der andere wird deshalb gar nicht erst encodiert.
+
 Determinismus heißt hier: ein wiederholter Lauf ohne geänderte Eingaben fasst
 keine Datei an. Die OGG-Bytes selbst sind pro Encode NICHT reproduzierbar —
 `soundfile`/libsndfile schreibt eine zufällige Ogg-Bitstream-Seriennummer, also
@@ -189,21 +195,17 @@ def export_to_app(paths: Paths) -> ExportReport:
             continue
         exportable.append(clip)
 
-    index: dict[str, dict] = {}
+    # Der Index entscheidet zuerst, welche Datei die App überhaupt erreichen
+    # kann — erst danach wird encodiert. Bei einer Textkollision landet nur der
+    # Gewinner im Index; den Verlierer trotzdem zu schreiben, hinterlässt eine
+    # Datei, die im APK liegt, aber von keinem Call-Site gefunden wird.
+    planned = []
     for clip in sorted(exportable, key=lambda c: c.key):
         profile = ctx.profiles.profiles[clip.profile]
-        fp = fingerprint(clip, profile)
-        name = asset_name(clip.key)
-        dest = target / name
+        planned.append((clip, asset_name(clip.key), fingerprint(clip, profile)))
 
-        prev = previous.get(name)
-        if prev is not None and prev[1].get("fingerprint") == fp and dest.exists():
-            report.unchanged.append(clip.key)
-        else:
-            data, sr = sf.read(paths.audio / f"{clip.key}.wav", dtype="float32")
-            sf.write(dest, data, sr, format="OGG", subtype="OPUS")
-            report.exported.append(clip.key)
-
+    index: dict[str, dict] = {}
+    for clip, name, fp in planned:
         text = clip.source_text.strip()
         existing = index.get(text)
         if existing is None:
@@ -225,11 +227,39 @@ def export_to_app(paths: Paths) -> ExportReport:
     for text, entry in retained_entries.items():
         index.setdefault(text, entry)
 
-    keep = {asset_name(c.key) for c in exportable} | retained_files | {"index.json"}
+    indexed_files = {entry["file"] for entry in index.values()}
+
+    for clip, name, fp in planned:
+        if name not in indexed_files:
+            report.skipped.append(
+                (clip.key,
+                 "Text wird von einem anderen Profil abgedeckt — "
+                 "kein eigener Clip im Index"))
+            continue
+        dest = target / name
+        prev = previous.get(name)
+        if prev is not None and prev[1].get("fingerprint") == fp and dest.exists():
+            report.unchanged.append(clip.key)
+        else:
+            data, sr = sf.read(paths.audio / f"{clip.key}.wav", dtype="float32")
+            sf.write(dest, data, sr, format="OGG", subtype="OPUS")
+            report.exported.append(clip.key)
+
+    # Aufgeräumt wird gegen den Index, nicht gegen die Menge der gelockten
+    # Clips: eine .ogg, auf die kein Eintrag zeigt, kann die App nie abspielen.
+    # `retained_files` bleibt die eine Ausnahme — diese Dateien sind lokal
+    # nicht neu encodierbar (out/ ist gitignored, die WAV fehlt), also wird
+    # eine ohne Index-Eintrag zwar behalten, aber gemeldet statt still
+    # mitgeschleppt.
+    keep = indexed_files | retained_files | {"index.json"}
     for path in sorted(target.glob("*.ogg")):
         if path.name not in keep:
             path.unlink()
             report.removed.append(path.name)
+    for name in sorted(retained_files - indexed_files):
+        report.warnings.append(
+            f"{name} bleibt erhalten, hat aber keinen Index-Eintrag — "
+            "die App kann diesen Clip nicht abspielen")
 
     payload = {"version": 1,
                "clips": {t: index[t] for t in sorted(index)}}
