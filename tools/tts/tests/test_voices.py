@@ -36,9 +36,26 @@ def test_the_default_voice_is_flagged_as_an_accent_risk_for_german():
 def test_accent_risk_only_fires_when_voice_and_text_disagree():
     assert voices.accent_risk("sohee", "german") is True
     assert voices.accent_risk("sohee", "korean") is False
-    assert voices.accent_risk("serena", "german") is False
+    assert voices.accent_risk("serena", "german") is True, \
+        "serena ist chinesisch, nicht westlich — siehe Modul-Docstring"
+    assert voices.accent_risk("serena", "chinese") is False
+    assert voices.accent_risk("ryan", "german") is False
     assert voices.accent_risk("gibtsnicht", "german") is False, \
         "über eine unbekannte Stimme lässt sich nichts behaupten"
+
+
+def test_no_european_voice_is_female():
+    """Der teuerste Irrtum dieser Tabelle, festgenagelt.
+
+    `serena` und `vivian` standen hier als „westlich, weiblich" — beide sind
+    chinesisch. Damit gibt es für deutschen Text überhaupt keine akzentfreie
+    Frauenstimme, und jede Runde „warum klingt das asiatisch" endet wieder
+    hier. Der Abgleich gegen die Modell-Config kann das nicht prüfen: dort
+    stehen nur die Namen. Also prüft es dieser Test."""
+    european = [v.name for v in voices.VOICES if v.european]
+    assert european == ["ryan", "aiden"], european
+    for name in european:
+        assert "männlich" in voices.origin_of(name)
 
 
 def test_origin_is_stated_for_every_voice_and_guessed_for_none():
