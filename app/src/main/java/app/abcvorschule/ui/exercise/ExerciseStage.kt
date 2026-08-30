@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -31,6 +32,19 @@ enum class AnswerAnchor {
      * Hand dann die Bildkarten, die den ganzen Inhalt der Aufgabe ausmachen.
      */
     BelowCenter,
+
+    /**
+     * Direkt unter dem Aufgabenblock, die freie Höhe sammelt sich **darunter**.
+     * Für Übungen, deren Antwortblock zur Aufgabe gehört statt ihr
+     * gegenüberzustehen: im Zehnerfeld ist die Stellenwert-Zeile dieselbe
+     * Rechnung wie das Bild darüber, nur in Ziffern. Am unteren Rand hing sie
+     * weit unter den Bildern und las sich wie eine zweite, eigene Aufgabe.
+     *
+     * Es ist zugleich das Bild, das das Kind ohnehin kennt: sobald die Tastatur
+     * aufgeht, rückt die Bühne genau so zusammen. Der Abstand springt beim
+     * Öffnen also nicht mehr.
+     */
+    UnderPrompt,
 }
 
 /**
@@ -76,6 +90,11 @@ internal const val StageLockFadeMillis = 200
  * Oberkante liegt damit knapp unter der Bildschirmmitte, solange sein Inhalt in
  * den Rest passt.
  *
+ * [AnswerAnchor.UnderPrompt]: der Aufgabenblock behält seine eigene Höhe statt
+ * sich zu dehnen, der Antwortblock schließt direkt an ihn an, und die freie Höhe
+ * sammelt sich darunter. Für Übungen, deren Antwort zur Aufgabe gehört, statt
+ * ihr gegenüberzustehen.
+ *
  * @param promptChrome Kopf des Aufgabenbereichs — in allen Trainern der Speaker
  * ([TaskPromptChrome]). Eigener Slot **über** dem Aufgabenblock statt dessen
  * erstes Kind: der Aufgabenblock ist zentriert, also wanderte der Speaker mit
@@ -118,7 +137,13 @@ fun ExerciseStage(
             )
             Box(
                 modifier = Modifier
-                    .weight(1f)
+                    .then(
+                        // Ohne Gewicht wickelt sich der Aufgabenblock um seinen
+                        // Inhalt und sitzt damit oben; die freie Höhe geht an den
+                        // Spacer unter dem Antwortblock. Mit Gewicht dehnt er sich
+                        // und zentriert — die Grundform (§9).
+                        if (answerAnchor == AnswerAnchor.UnderPrompt) Modifier else Modifier.weight(1f),
+                    )
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center,
             ) {
@@ -138,7 +163,7 @@ fun ExerciseStage(
                     .fillMaxWidth()
                     .then(
                         when (answerAnchor) {
-                            AnswerAnchor.Bottom -> Modifier
+                            AnswerAnchor.Bottom, AnswerAnchor.UnderPrompt -> Modifier
                             AnswerAnchor.BelowCenter ->
                                 Modifier.heightIn(min = answersMinHeight)
                         },
@@ -148,6 +173,12 @@ fun ExerciseStage(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
                 content = answers,
             )
+            if (answerAnchor == AnswerAnchor.UnderPrompt) {
+                // Die freie Höhe sammelt sich hier, unter der Antwort. Sie ist
+                // zugleich das, was die Tastatur zuerst aufbraucht — der Block
+                // rückt beim Öffnen also nicht mehr sprunghaft nach oben.
+                Spacer(Modifier.weight(1f))
+            }
         }
     }
 }

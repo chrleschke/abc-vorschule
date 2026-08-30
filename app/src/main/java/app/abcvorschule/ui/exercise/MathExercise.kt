@@ -143,6 +143,12 @@ fun MathExercise(
     if (useTenFrame) {
         ExerciseStage(
             modifier = modifier.fillMaxSize(),
+            // Die Stellenwert-Zeile schließt direkt an das Zehnerfeld an, statt am
+            // unteren Rand zu sitzen: sie ist dieselbe Rechnung wie das Bild
+            // darüber, nur in Ziffern. Mit der Grundform dazwischen las sie sich
+            // wie eine zweite, eigene Aufgabe — und beim Aufgehen der Tastatur
+            // sprang der Abstand ohnehin auf genau dieses Maß zusammen.
+            answerAnchor = AnswerAnchor.UnderPrompt,
             promptChrome = {
                 TaskPromptChrome(
                     title = null,
