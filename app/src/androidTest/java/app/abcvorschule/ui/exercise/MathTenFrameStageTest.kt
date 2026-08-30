@@ -64,17 +64,30 @@ class MathTenFrameStageTest {
 
     private val results = mutableListOf<MathAttempt>()
 
-    private fun stage(interactionLocked: Boolean = false) {
+    /** Die größte zulässige Runde: 30 Objekte, drei Zeilen, zweistellige Antwort. */
+    private val biggestRound = CountAddRound(
+        promptTts = "",
+        iconAtomId = "apfel",
+        left = 16,
+        right = 14,
+        answer = 30,
+    )
+
+    private fun stage(
+        interactionLocked: Boolean = false,
+        shown: CountAddRound = round,
+        width: Dp = 360.dp,
+    ) {
         rule.setContent {
             val base = LocalDensity.current
             CompositionLocalProvider(
                 LocalDensity provides Density(density = base.density, fontScale = 1.3f),
             ) {
                 AbcTheme {
-                    Box(Modifier.size(width = 360.dp, height = 640.dp)) {
+                    Box(Modifier.size(width = width, height = 640.dp)) {
                         MathExercise(
                             trainer = trainer,
-                            round = round,
+                            round = shown,
                             roundIndex = 0,
                             icon = "🍎",
                             input = MathInputMode.Typed,
@@ -91,6 +104,10 @@ class MathTenFrameStageTest {
                 }
             }
         }
+        // Auf dem Testgerät kehrt `setContent` gelegentlich zurück, bevor das
+        // Fenster der Testaktivität angehängt ist — die erste Messung fand dann
+        // keine Compose-Hierarchie. Einmal synchronisieren, dann steht die Bühne.
+        rule.waitForIdle()
     }
 
     @Test
@@ -168,6 +185,23 @@ class MathTenFrameStageTest {
         stage(interactionLocked = true)
         rule.onNodeWithTag("place_value_ones").assertIsNotEnabled()
         rule.onNodeWithTag("place_value_tens").assertIsNotEnabled()
+    }
+
+    @Test
+    fun theBiggestRoundStillFitsOnTheNarrowPhone() {
+        // 16 + 14 = 30: drei Zeilen Bild und eine zweistellige Antwort, auf 320dp
+        // bei font_scale 1.3. Läuft die Bühne hier über, sieht das Kind entweder
+        // das Bild oder den Absenden-Pfeil nicht mehr.
+        stage(shown = biggestRound, width = 320.dp)
+        val board = rule.onNodeWithTag("ten_frame").getUnclippedBoundsInRoot()
+        val submit = rule.onNodeWithTag("place_value_submit").getUnclippedBoundsInRoot()
+        assertTrue("Zehnerfeld beginnt über der Bühne: $board", board.top.value >= 0f)
+        assertTrue("Zehnerfeld ragt nach rechts hinaus: $board", board.right.value <= 320f)
+        assertTrue(
+            "Bild ($board) und Antwortblock ($submit) überlappen",
+            board.bottom.value <= submit.top.value,
+        )
+        assertTrue("Absenden-Pfeil unterhalb der Bühne: $submit", submit.bottom.value <= 640f)
     }
 
     /** Oberkante und Höhe des Zehnerfeldes — der Aufgabenblock der Bühne. */

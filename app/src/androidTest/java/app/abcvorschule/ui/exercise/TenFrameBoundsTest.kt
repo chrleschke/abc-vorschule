@@ -55,6 +55,10 @@ class TenFrameBoundsTest {
                 }
             }
         }
+        // Einmal synchronisieren: auf dem Testgerät kehrt `setContent` gelegentlich
+        // zurück, bevor das Fenster der Testaktivität angehängt ist, und die erste
+        // Messung fände dann keine Compose-Hierarchie.
+        rule.waitForIdle()
     }
 
     @Test
