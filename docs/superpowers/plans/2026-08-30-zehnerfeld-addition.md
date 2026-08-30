@@ -18,7 +18,7 @@
 - **Kommentarstil:** Deutsch, erklärt das *Warum*, nicht das *Was* — wie in den Nachbardateien. Kein Kommentar, der nur den Code nacherzählt.
 - **Farben** kommen aus `app.abcvorschule.ui.theme`: `Cream`, `CreamElevated`, `LeafGreen`, `SkyBlue`, `SunCoral`, `WarmInk`, `WarmMuted`. Keine Literale.
 - **Grün heißt „richtig", Rot gibt es nicht** (§8).
-- **Tests laufen mit:** `./gradlew :app:testDebugUnitTest`
+- **Tests laufen mit:** `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest` — der Worktree hat keine `local.properties`, ohne das Präfix findet Gradle das SDK nicht.
 - **Commit-Sprache:** Deutsch, Präsens, wie `git log` es zeigt. Jeder Commit endet mit:
   ```
   Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
@@ -142,7 +142,7 @@ class TenFrameTest {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `./gradlew :app:testDebugUnitTest --tests '*TenFrameTest'`
+Run: `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest --tests '*TenFrameTest'`
 Expected: FAIL — `Unresolved reference: TenFrame`
 
 - [ ] **Step 3: Write the implementation**
@@ -266,7 +266,7 @@ object TenFrame {
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `./gradlew :app:testDebugUnitTest --tests '*TenFrameTest'`
+Run: `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest --tests '*TenFrameTest'`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -415,7 +415,7 @@ Hinweis für den Implementierenden: der Test `theTapThatFillsARowReportsTheTenIt
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `./gradlew :app:testDebugUnitTest --tests '*TenFrameStateTest'`
+Run: `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest --tests '*TenFrameStateTest'`
 Expected: FAIL — `Unresolved reference: TenFrameState`
 
 - [ ] **Step 3: Write the implementation**
@@ -490,7 +490,7 @@ data class TenFrameState(
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `./gradlew :app:testDebugUnitTest --tests '*TenFrameStateTest'`
+Run: `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest --tests '*TenFrameStateTest'`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -606,7 +606,7 @@ class PlaceValueInputTest {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `./gradlew :app:testDebugUnitTest --tests '*PlaceValueInputTest'`
+Run: `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest --tests '*PlaceValueInputTest'`
 Expected: FAIL — `Unresolved reference: PlaceValueInput`
 
 - [ ] **Step 3: Write the implementation**
@@ -684,7 +684,7 @@ object PlaceValueInput {
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `./gradlew :app:testDebugUnitTest --tests '*PlaceValueInputTest'`
+Run: `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest --tests '*PlaceValueInputTest'`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -940,12 +940,12 @@ private fun TenFrameCell(
 
 - [ ] **Step 2: Compile**
 
-Run: `./gradlew :app:compileDebugKotlin`
+Run: `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:compileDebugKotlin`
 Expected: BUILD SUCCESSFUL. Unbenutzte Importe entfernen, bis `ktlint`/der Compiler keine Warnung mehr zeigt.
 
 - [ ] **Step 3: Run the whole unit suite**
 
-Run: `./gradlew :app:testDebugUnitTest`
+Run: `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest`
 Expected: PASS (nichts Bestehendes darf brechen)
 
 - [ ] **Step 4: Commit**
@@ -1292,12 +1292,12 @@ private fun DigitField(
 
 - [ ] **Step 2: Compile and clean**
 
-Run: `./gradlew :app:compileDebugKotlin`
+Run: `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:compileDebugKotlin`
 Expected: BUILD SUCCESSFUL. Alle unbenutzten Importe entfernen.
 
 - [ ] **Step 3: Run the unit suite**
 
-Run: `./gradlew :app:testDebugUnitTest`
+Run: `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest`
 Expected: PASS
 
 - [ ] **Step 4: Commit**
@@ -1423,7 +1423,7 @@ Ersetze im `if (usePad)`-Zweig den `prompt`-Block durch eine vorgelagerte Verzwe
 
 - [ ] **Step 4: Compile and run the unit suite**
 
-Run: `./gradlew :app:testDebugUnitTest`
+Run: `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest`
 Expected: PASS. Falls `MathHintingTest` bricht, prüfe zuerst, ob `MathHinting` wirklich unverändert ist — dieser Task ändert es nicht.
 
 - [ ] **Step 5: Document the shifted meaning of `opensAid`**
@@ -1613,6 +1613,6 @@ EOF
 
 ## Abschluss
 
-- [ ] `./gradlew :app:testDebugUnitTest` — alles grün
-- [ ] `./gradlew :app:assembleDebug` — baut
+- [ ] `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:testDebugUnitTest` — alles grün
+- [ ] `ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:assembleDebug` — baut
 - [ ] Auf dem Gerät ansehen: eine Lektion mit Addition ≥ 11 (z. B. `l04-t10`, `8 + 6`, oder `l09-t10`, `12 + 9`) durchspielen und prüfen: Platzhalter sichtbar, nur der nächste reagiert, „zwanzig" beim Einrasten, Tastatur erst nach Tipp ins Feld, Fokussprung Zehner → Einer.
