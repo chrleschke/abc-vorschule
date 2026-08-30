@@ -52,13 +52,21 @@ fun MathExercise(
     // light up the green confirmation meant for a correct answer.
     var solved by remember(roundKey) { mutableStateOf<Int?>(null) }
     val usePad = input == MathInputMode.Typed
+    // Addition im Tipp-Modus bekommt das Zehnerfeld: es steht von Anfang an da,
+    // ist von Anfang an antippbar, und es gibt darum keine Zähl-Hilfe mehr, die
+    // aufklappen müsste (design doc 2026-08-30-zehnerfeld-addition). Minus und
+    // Malnehmen laufen unverändert über CountingAid.
+    val useTenFrame = usePad && operation == MathOperation.Add
+    var frame by remember(roundKey) { mutableStateOf(TenFrameState.forRound(round.left, round.right)) }
     var counting by remember(roundKey) {
         mutableStateOf(CountingState.forRound(operation, round.left, round.right))
     }
     // Die Hilfe klappt bei der Schwelle auf und bleibt danach offen: sie wieder
     // zuzuziehen, während das Kind mittendrin zählt, wäre die schlechteste aller
     // Optionen.
-    val countingOpen = usePad && misses >= MathHinting.CountingAidFromMisses
+    // Nur noch für Minus und Malnehmen: das Zehnerfeld ist von Anfang an offen
+    // und ist keine Hilfestufe, sondern die Darstellung der Aufgabe.
+    val countingOpen = usePad && !useTenFrame && misses >= MathHinting.CountingAidFromMisses
 
     // Die Zählanweisung spricht das ViewModel als Miss-Feedback des zweiten
     // Fehlversuchs (MathAttempt.opensAid) — sie *ersetzt* dort den allgemeinen
@@ -81,7 +89,7 @@ fun MathExercise(
                     resolved = false,
                     correct = true,
                     guess = guess,
-                    aided = countingOpen,
+                    aided = !useTenFrame && countingOpen,
                     opensAid = false,
                 ),
             )
@@ -98,9 +106,12 @@ fun MathExercise(
                     resolved = false,
                     correct = false,
                     guess = guess,
-                    aided = countingOpen,
+                    aided = !useTenFrame && countingOpen,
                     // Genau dieser Fehlversuch klappt die Hilfe auf: `countingOpen`
                     // ist oben noch der Wert *vor* der Erhöhung.
+                    // Im Zehnerfeld klappt nichts auf — der Hinweis zeigt statt
+                    // dessen auf das Antippen, das schon die ganze Zeit möglich
+                    // ist. `opensAid` heißt hier also „sprich den Tipp-Cue".
                     opensAid = usePad && misses == MathHinting.CountingAidFromMisses,
                 ),
             )
@@ -116,13 +127,64 @@ fun MathExercise(
                 resolved = true,
                 correct = false,
                 guess = null,
-                aided = countingOpen,
+                aided = !useTenFrame && countingOpen,
                 opensAid = false,
             ),
         )
     }
 
-    if (usePad) {
+    if (useTenFrame) {
+        ExerciseStage(
+            modifier = modifier.fillMaxSize(),
+            promptChrome = {
+                TaskPromptChrome(
+                    title = null,
+                    ttsAvailable = ttsAvailable,
+                    speaking = speaking,
+                    onSpeakPrompt = onSpeakPrompt,
+                )
+            },
+            prompt = {
+                // Keine symbolische Zeile hier: die Stellenwert-Notation im
+                // Antwortblock trägt die Aufgabe, und zweimal stünde sie sonst
+                // auf demselben Schirm (§9).
+                TenFrameBoard(
+                    emoji = icon,
+                    state = frame,
+                    onTap = { index ->
+                        if (locked || interactionLocked) return@TenFrameBoard
+                        val next = frame.tap(index)
+                        if (next == frame) return@TenFrameBoard
+                        val ten = frame.completedTenAfter(next)
+                        frame = next
+                        if (ten != null) {
+                            // Gesprochen wird nur der volle Zehner — alles andere
+                            // sieht das Kind. Als Wort, nicht als Ziffer: „20." wäre
+                            // im Deutschen die Ordinalzahl (GermanNumberWord).
+                            haptics.nudge()
+                            onSpeakCounting(GermanNumberWord.of(ten))
+                        } else {
+                            haptics.tick()
+                        }
+                    },
+                )
+            },
+            answers = {
+                PlaceValueAnswer(
+                    left = round.left,
+                    right = round.right,
+                    answer = round.answer,
+                    resetToken = PlaceValueInput.resetToken(roundKey, misses),
+                    onSubmit = { handleGuess(it) },
+                    solved = solved != null,
+                    enabled = !interactionLocked && !locked,
+                )
+                if (misses >= MathHinting.ResolveFromMissesTyped && !locked) {
+                    AbcResolveButton(onClick = ::resolve)
+                }
+            },
+        )
+    } else if (usePad) {
         ExerciseStage(
             modifier = modifier.fillMaxSize(),
             promptChrome = {

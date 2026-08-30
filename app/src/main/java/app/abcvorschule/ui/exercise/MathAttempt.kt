@@ -25,6 +25,10 @@ data class MathAttempt(
      * Zählanweisung an die Stelle des allgemeinen Miss-Hinweises: „probier es noch
      * mal" ist in dem Moment die falsche Auskunft, weil sich die Aufgabe gerade in
      * etwas anderes verwandelt hat.
+     *
+     * Im Zehnerfeld der Addition klappt nichts auf — dort heißt dasselbe Flag
+     * „sprich jetzt den Tipp-Cue": das Bild ist von Anfang an antippbar, und der
+     * zweite Fehlversuch zeigt darauf, statt eine neue Ansicht zu öffnen.
      */
     val opensAid: Boolean,
 )
