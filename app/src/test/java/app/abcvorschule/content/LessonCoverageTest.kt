@@ -37,6 +37,39 @@ class LessonCoverageTest {
     }
 
     @Test
+    fun everyMerksatzNamesAWordThatReallyStartsWithItsGrapheme() {
+        // „X wie Y" behauptet, dass Y mit X anfängt. „M wie Schneemann" tut das
+        // nicht — ein Kind, das gerade M lernt, hört am Wortanfang ein Sch. Wo das
+        // Graphem mitten im Wort sitzt (ß, ck, Ch, Ö, X können gar kein deutsches
+        // Wort anfangen), heißt es „wie **in**": „Ü wie in Küken".
+        val shape = Regex("""^(.+?) - wie (in )?(.+)\.$""")
+        pack.authoredLessons.forEach { lesson ->
+            pack.tasksOf(lesson).filterIsInstance<LetterTraceSpec>().flatMap { it.rounds }
+                .forEach { round ->
+                    val match = shape.matchEntire(round.rewardTts)
+                    assertTrue(
+                        "lesson ${lesson.id}: '${round.rewardTts}' is not '<Graphem> - wie [in] <Wort>.'",
+                        match != null,
+                    )
+                    val (spoken, inWord, word) = match!!.destructured
+                    assertEquals(
+                        "lesson ${lesson.id}: '${round.rewardTts}' names ${'$'}spoken but traces ${round.glyph}",
+                        round.glyph,
+                        spoken,
+                    )
+                    val initial = word.lowercase().startsWith(round.glyph.lowercase())
+                    assertEquals(
+                        "lesson ${lesson.id}: '${round.rewardTts}' — " +
+                            if (initial) "'${'$'}word' starts with ${round.glyph}, so drop the 'in'"
+                            else "'${'$'}word' does not start with ${round.glyph}, so it must read 'wie in'",
+                        !initial,
+                        inWord.isNotEmpty(),
+                    )
+                }
+        }
+    }
+
+    @Test
     fun rechnenIsPresentInEveryAuthoredLesson() {
         // User decision: Rechnen runs in every lesson for variety.
         pack.authoredLessons.forEach { lesson ->

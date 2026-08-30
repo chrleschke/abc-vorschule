@@ -443,6 +443,28 @@ Atomen gesucht habe. Nach meinem eigenen Kriterium gehörten sie in die Challeng
 Nicht angefasst: **Regen**, **Brot** und die übrigen Wörter mit rollendem R am Anfang —
 die sind für die Sprachsynthese unbequem, aber inhaltlich einwandfrei.
 
+## Die Merksätze des Spurensuchers
+
+„X wie Y" behauptet, dass Y mit X anfängt. Acht meiner neuen Merksätze taten das nicht —
+„M wie Schneemann", „B wie Schulbus", „T wie Schultasche", „K wie Apfelkuchen": überall
+hört das Kind am Wortanfang etwas anderes als den Laut, den es gerade zeichnet. In der
+Phase 8 war das systematisch, weil ich das Kompositum als Belohnungswort genommen habe.
+
+Dieselbe Unsauberkeit lag längst im Altbestand: „Ö wie Löwe", „ß wie Fuß", „Ch wie Dach",
+„X wie Taxi" — bei diesen Graphemen gibt es allerdings gar keine Wahl, ß und ck können
+kein deutsches Wort anfangen.
+
+Zwei Regeln, jetzt in PRODUCT_PRINCIPLES §3.2 und per Test erzwungen:
+
+1. **Gibt es ein Wort, das mit dem Graphem anfängt, nimm es** — und das kurze, nicht das
+   Kompositum. `B wie Bus` statt `B wie Schulbus`, `K wie Kuchen` statt `K wie
+   Apfelkuchen`, `M wie Mann`, `T wie Tasche`, `L wie Lampe`.
+2. **Sonst heißt es „wie in"**: `Ü wie in Küken`, `ck wie in Socke`, `Ch wie in Dach`,
+   `Ö wie in Löwe`, `ß wie in Fuß`, `X wie in Taxi`, `Sch wie in Hausschuh`.
+
+Das kostet fünf Neuaufnahmen im Altbestand (Ch, Ö, ß, X) — dafür stimmt zum ersten Mal
+jeder der 71 Merksätze im Pack.
+
 ## Was offen bleibt
 
 **Audio.** Der Pack braucht rund **420 neue Clips** (Prompts, Belohnungssätze,
