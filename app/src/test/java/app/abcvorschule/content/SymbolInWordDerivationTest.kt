@@ -149,15 +149,15 @@ class SymbolInWordDerivationTest {
 
     @Test
     fun aRepeatedGraphemeYieldsTwoHits() {
-        // "Mimi" would give `Mi·mi` with the target `mi` in syllable mode — every
+        // "Pepe" would give `Pe·pe` with the target `pe` in syllable mode — every
         // segment a hit, so unfailable and rejected (see the all-hits guard tests
         // below). The letter round it falls back to has two hits in four segments.
-        val mimi = rounds("l02").last()
-        assertEquals(SymbolInWordMode.letter, mimi.mode)
-        assertEquals("letter-i", mimi.targetAtomId)
-        assertEquals(listOf("M", "i", "m", "i"), mimi.segments)
-        assertEquals(listOf(1, 3), mimi.targetIndices)
-        assertEquals("Finde alle Buchstaben - I - im Wort - Mimi.", mimi.promptTts)
+        val pepe = rounds("l07").last()
+        assertEquals(SymbolInWordMode.letter, pepe.mode)
+        assertEquals("letter-e", pepe.targetAtomId)
+        assertEquals(listOf("P", "e", "p", "e"), pepe.segments)
+        assertEquals(listOf(1, 3), pepe.targetIndices)
+        assertEquals("Finde alle Buchstaben - E - im Wort - Pepe.", pepe.promptTts)
     }
 
     @Test
@@ -227,7 +227,7 @@ class SymbolInWordDerivationTest {
         // l22 builds "Ei", one segment — the word would be the answer.
         val l22 = rounds("l22")
         assertTrue("Ei must not become a round", l22.none { it.wordAtomId == "ei" })
-        assertEquals(listOf("letter-au"), l22.map { it.targetAtomId })
+        assertEquals(listOf("letter-au", "to"), l22.map { it.targetAtomId })
     }
 
     @Test
@@ -247,15 +247,21 @@ class SymbolInWordDerivationTest {
 
     @Test
     fun anAllHitsSyllableRoundFallsBackToLetterMode() {
-        // l02's second word is "Mimi": the syllable candidate `Mi·mi` / `mi` is two
+        // l07's third word is "Pepe": the syllable candidate `Pe·pe` / `pe` is two
         // hits in two segments and is dropped, exactly like the block-display
         // mismatch in l17. The letter round that replaces it hunts the lesson's own
-        // focus grapheme I and can be failed.
+        // focus grapheme E and can be failed.
+        val l07 = rounds("l07")
+        assertEquals(
+            listOf(SymbolInWordMode.letter, SymbolInWordMode.syllable, SymbolInWordMode.letter),
+            l07.map { it.mode },
+        )
+        assertEquals(listOf("letter-s", "se", "letter-e"), l07.map { it.targetAtomId })
+        // Die Wiederholungslektion leitet aus denselben Wörtern ab und muss folgen —
+        // l20 hängt nur sein eigenes drittes Wort hinten an.
         val l02 = rounds("l02")
-        assertEquals(listOf(SymbolInWordMode.letter, SymbolInWordMode.letter), l02.map { it.mode })
-        assertEquals(listOf("letter-o", "letter-i"), l02.map { it.targetAtomId })
-        // The repeat lesson derives from the same words and must agree.
-        assertEquals(l02.map { it.targetAtomId }, rounds("l20").map { it.targetAtomId })
+        assertEquals(listOf("letter-o", "mi"), l02.map { it.targetAtomId })
+        assertEquals(l02.map { it.targetAtomId }, rounds("l20").map { it.targetAtomId }.take(2))
     }
 
     @Test

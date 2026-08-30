@@ -8,9 +8,9 @@ class LessonCoverageTest {
     private val pack = ContentRepository.fromClasspath().load()
 
     @Test
-    fun allTwentySixLessonsAreAuthoredInPhaseOrder() {
+    fun allThirtyFourLessonsAreAuthoredInPhaseOrder() {
         assertEquals(
-            (1..26).map { "l%02d".format(it) },
+            (1..34).map { "l%02d".format(it) },
             pack.authoredLessons.map { it.id },
         )
     }
@@ -61,7 +61,12 @@ class LessonCoverageTest {
 
     @Test
     fun wordBuilderNeverOffersAnUntaughtGrapheme() {
-        // A block may only use graphemes/syllables introduced in this or an earlier lesson.
+        // A block may only use graphemes/syllables introduced in this or an earlier
+        // lesson — plus **words the child has already built**. Phase 8 rests on that
+        // second half: "Fußball" is offered as `Fuß` + `ball`, and a compound is only
+        // a legible task if both of its parts are old acquaintances. The target is
+        // added *after* its own round is checked, so a lesson still has to build the
+        // simple word before it may reuse it inside a compound.
         val introduced = mutableSetOf<String>()
         pack.authoredLessons.forEach { lesson ->
             introduced += lesson.focusAtomIds
@@ -75,6 +80,7 @@ class LessonCoverageTest {
                             block.atomId in introduced,
                         )
                     }
+                    introduced += round.targetAtomId
                 }
             }
         }
@@ -115,8 +121,10 @@ class LessonCoverageTest {
     }
 
     @Test
-    fun satzVersteherRunsOnceInEveryBaseLessonWithFourRounds() {
-        pack.authoredLessons.filter { it.index <= 18 }.forEach { lesson ->
+    fun satzVersteherRunsOnceInEveryLessonWithFourRounds() {
+        // Bis 2026-08 trugen nur die 18 Basis-Lektionen den Satz-Versteher; die
+        // Wiederholungen l19–l26 waren ohne ihn zu dünn, um ein Kind zu halten.
+        pack.authoredLessons.forEach { lesson ->
             val specs = pack.tasksOf(lesson).filterIsInstance<SentencePictureSpec>()
             assertEquals("lesson ${lesson.id}", 1, specs.size)
             assertEquals("lesson ${lesson.id}", 4, specs.single().rounds.size)

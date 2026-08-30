@@ -20,7 +20,7 @@ class FinaleLayoutTest {
     fun picturesSkipAtomsWithoutAnEmoji() {
         // Defensive: the validator rejects such content, but a half-rendered row
         // would be worse than a shorter one.
-        val finale = pack.finale("f-l01").copy(pictureAtomIds = listOf("mama", "tisch", "apfel"))
+        val finale = pack.finale("f-l01").copy(pictureAtomIds = listOf("mama", "ist", "apfel"))
         assertEquals(listOf("mama", "apfel"), FinaleLayout.picturesOf(pack, finale).map { it.atomId })
     }
 
@@ -32,7 +32,7 @@ class FinaleLayoutTest {
 
     @Test
     fun everyShippedFinaleRendersAllItsPictures() {
-        assertEquals(18, pack.finales.size)
+        assertEquals(26, pack.finales.size)
         pack.finales.values.forEach { finale ->
             assertEquals(
                 "finale ${finale.id} loses a picture",

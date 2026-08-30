@@ -29,7 +29,7 @@ Bei Konflikten mit Implementierungsdetails oder älteren Planabschnitten gelten 
 
 ## 3. Lernprogression (Fibel-Lernpfad)
 
-Der Lehrplan besteht aus 18 Lektionen in fünf Phasen (Fibel-Reihenfolge). Jede Lektion führt die sechs Trainer-**Typen** unten in fester Rangfolge durch — ein Typ kann sich wiederholen oder ganz fehlen (z. B. keine Satzrunde in einer Lektion), die Reihenfolge geht aber nie zurück; jede Lektion beginnt mit dem Visuellen Spurensucher und endet mit Rechnen.
+Der Lehrplan besteht aus 34 Lektionen in acht Phasen (Fibel-Reihenfolge): 18 Basis-Lektionen führen die 39 Grapheme ein (Phase 1–5), 8 Wiederholungen vertiefen sie (Phase 6–7), und 8 Lektionen der **Phase 8** bringen keine neuen Grapheme mehr, sondern zusammengesetzte Wörter (siehe unten). Jede Lektion führt die sechs Trainer-**Typen** unten in fester Rangfolge durch — ein Typ kann sich wiederholen oder ganz fehlen (z. B. keine Satzrunde in einer Lektion), die Reihenfolge geht aber nie zurück; jede Lektion beginnt mit dem Visuellen Spurensucher und endet mit Rechnen.
 Die Nummerierung beginnt bei 2, weil Trainer 1 (Auditiver Finder, Anfang/Mitte/Ende) entfernt wurde;
 die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
 
@@ -118,6 +118,43 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
 - Satzrunden (Satz-Architekt) nutzen nur gebaute Wörter, kleingeschriebene Funktionswörter oder ausdrücklich als `holisticAtomIds` markierte Ganzwort-Bilder (so führt die Fibel z. B. „Tor" vor dem R ein). Der **Satz-Versteher ist davon ausgenommen** — wie die Finale-Sätze lebt er von grammatischer Freiheit (Hör-Trainer, keine Bauen-Anforderung).
 - Gemeisterte Lektionen bleiben zum Wiederholen antippbar.
 
+### Phase 8 — zusammengesetzte Wörter (l27–l34)
+
+Nach l18 sind alle 39 Grapheme eingeführt; Nachschub kann also nicht mehr aus neuen
+Buchstaben kommen. Phase 8 lehrt stattdessen ein eigenes Prinzip: **lange Wörter sind
+aus kurzen gebaut, die das Kind schon kennt.** Sie nutzt dieselben sechs Trainer-Typen,
+aber zwei davon in erweiterter Bedeutung:
+
+- **Silben-Verschmelzer** schiebt zwei *ganze Wörter* zusammen statt zweier Laute
+  („Schiebe Hand und Schuh zusammen. Welches Wort entsteht.“). Die Magnet-Metapher trägt
+  das unverändert; nur der Prompt fragt nach dem Wort, nicht nach der Silbe. Das Ergebnis
+  ist ein Wort-Atom, kein Silben-Atom — deshalb leitet sich hier **keine Silben-Jagd** ab
+  (`SymbolHuntDerivation` findet nichts zu jagen), der Wort-Detektiv fällt auf den
+  Buchstaben-Modus zurück.
+- **Wort-Bauer** darf ein **bereits gebautes Wort als Baustein** wiederverwenden
+  (`Fuß` + `ball`). Das ist die einzige Erweiterung der Regel „nie ein untaugliches
+  Graphem": ein Wort zählt als eingeführt, sobald eine frühere Runde es gebaut hat.
+  Innerhalb einer Lektion gilt das erst *nach* seiner eigenen Runde — jede Phase-8-Lektion
+  baut die fehlenden Einzelteile zuerst (`Hand`, `Jacke`), dann das Kompositum.
+  `LessonCoverageTest.wordBuilderNeverOffersAnUntaughtGrapheme` hält beides fest.
+
+Der Spurensucher bleibt Pflicht (jede Lektion beginnt damit) und zeichnet ein Graphem
+nach, das in den Wörtern der Lektion wirklich vorkommt — sonst findet der Wort-Detektiv
+keinen Treffer.
+
+### Redaktionsregel Wortschatz
+
+Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Regeln:
+
+- **Freie Slots gehören dem Alltag des Kindes.** Belohnungswörter des Spurensuchers,
+  Rechen-Ikonen, Bildkarten und Finale-Bilder unterliegen **keiner** Graphem-Beschränkung —
+  dort steht kein Wort, das ein heutiges Vorschulkind nicht kennt. Gebundene Slots
+  (`word_build`, `syllable_merge`, `sentence_order`) folgen zuerst der Schreibbarkeit;
+  dass „Ufo“ in l05 steht, ist eine Folge des Buchstabenpfads, kein Redaktionsfehler.
+- **Kein Atom ohne Auftritt.** Ein Atom, das kein Task, kein Satz und kein Finale
+  referenziert, wird gelöscht statt gepflegt. Der Pack trug im August 2026 60 solcher
+  Karteileichen; die Hälfte davon waren genau die Alltagswörter, die vermeintlich fehlten.
+
 
 
 ## 4. Content-Graph
@@ -127,7 +164,8 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
   Emojis je Lektion, abgeleitet aus word_build → count_add → sentence_order → sentence_picture
   (deterministisch, über den Emoji-Glyph dedupliziert). Der Satz-Versteher steht bewusst am Ende:
   seine Bildkarten sind Antwortmaterial und füllen nur auf, was die übrigen Trainer offenlassen.
-  Lektionen ohne Satz-Versteher (l19–l26) kommen mit zwei Bildern aus. `letter_trace.rewardEmoji` bleibt
+  Jede autorierte Lektion trägt den Satz-Versteher; bis August 2026 fehlte er den Wiederholungen
+  l19–l26, die damit auf zwei Bilder kamen. `letter_trace.rewardEmoji` bleibt
   bewusst außen vor — er ist die Belohnung des Trainers und wird nicht vorweggenommen.
 - Tasks referenzieren Atom-IDs; Validierung verhindert tote Referenzen.
 - **Glyphen-Strichenden treffen sich exakt oder deutlich nicht.** Ein Querstrich, der den Stamm

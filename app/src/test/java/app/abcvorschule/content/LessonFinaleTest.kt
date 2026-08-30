@@ -17,9 +17,10 @@ class LessonFinaleTest {
     }
 
     @Test
-    fun eighteenFinalesCoverTwentySixLessons() {
-        assertEquals(18, pack.finales.size)
-        assertEquals(26, pack.authoredLessons.size)
+    fun twentySixFinalesCoverThirtyFourLessons() {
+        // 18 Basis-Lektionen + 8 der Phase 8; l19–l26 erben ihren Satz.
+        assertEquals(26, pack.finales.size)
+        assertEquals(34, pack.authoredLessons.size)
     }
 
     @Test
