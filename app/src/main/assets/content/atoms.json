@@ -3629,7 +3629,8 @@
       "emoji": "🍕",
       "kind": "word",
       "gender": "f",
-      "nounClass": "thing"
+      "nounClass": "thing",
+      "pluralDisplay": "Pizzen"
     },
     {
       "id": "ampel",

@@ -59,6 +59,10 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
   verschmelzen, es gibt keinen separaten Bestätigungs-Button.
 4. **Wort-Bauer** — Silben-/Buchstabenklötze in Schablonen unter dem Bild.
 5. **Satz-Architekt** — Wortschilder an die Wäscheleine; Einwort-Runden sind Wort-Bild-Zuordnung.
+  Die `illustrationAtomId` darf dem Satz nicht widersprechen: „Das Auto ist blau" neben
+  einem roten 🚗 bringt einem Kind, das gerade Farben lernt, das Gegenteil bei. Bei
+  Farbsätzen zeigt das Bild deshalb die **Farbe** (🟦), nicht das Nomen — sie ist ohnehin
+  das neue Wort der Runde.
 6. **Satz-Versteher** — „Ordne das richtige Bild zu": ein Satz mit bewusst
   schwieriger Grammatik (Plural, Partizip II, Präteritum — auch kombiniert) wird
   vorgelesen, das Kind tippt eine von zwei Bildkarten (Emoji-Reihen, 1–3 Bilder;
@@ -102,6 +106,20 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
     markiert nur, es feiert nicht.**
 7. **Rechnen** — reine Mengen-Arithmetik in *jeder* Lektion, Icons aus dem Wortschatz
   derselben Lektion. **Keine Wörter zum Lesen oder Schreiben**; Singular/Plural nur gesprochen.
+  - **Der Prompt behauptet eine Szene — die muss stimmen.** „Vier Reihen mit je sechs
+    Eisbären sitzen am Ufer" ist gleich dreifach falsch: Eisbären sind Einzelgänger, ein
+    Ufer ist kein Eismeer, und in Reihen sitzt gar kein Tier. Reihen (Malnehmen) gibt es
+    nur dort, wo die Welt wirklich Reihen kennt: Beet, Regal, Parkplatz, Bussitze,
+    Eierkarton, Vögel auf der Leitung. Bei Einzelgängern (Eisbär, Krokodil, Eule, Maus)
+    und bei Mengen, die es nie gibt (dreißig Türen an einem Haus, neunundzwanzig
+    Schneemänner in einem Garten) wird die Runde zu Plus oder Wegnehmen — oder ganz ohne
+    Szene gestellt („Vierzehn Mäuse und neun Mäuse."), was immer trägt.
+  - **Icon, gezähltes Nomen und gesprochene Antwort sind dasselbe Ding.** Ein Prompt, der
+    Kinder zählt, während das Icon Busse zeigt und die Antwort „24 Schulbusse" sagt, ist
+    drei Aufgaben in einer. Das Icon-Atom braucht ein `pluralDisplay`, sonst spricht der
+    Erfolg „18 Pizza".
+  - **Nur der Finale-Satz darf Quatsch sein** (Abschnitt 12) — und dann muss er lustig
+    sein. Alles andere, was das Kind hört, beschreibt eine Welt, die es wiedererkennt.
 
 Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Treffer füllen eine Batterie, Fehltipp mischt neu ohne Batterieverlust.
 

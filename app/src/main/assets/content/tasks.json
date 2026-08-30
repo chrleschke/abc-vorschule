@@ -1090,19 +1090,19 @@
       "id": "l08-t10",
       "rounds": [
         {
-          "promptTts": "Drei Reihen mit je vier Krokodilen liegen am Fluss. Wie viele Krokodile sind das.",
-          "iconAtomId": "krokodil",
-          "left": 3,
-          "right": 4,
-          "answer": 12,
-          "operation": "multiply"
-        },
-        {
           "promptTts": "Dreizehn Krokodile und sieben Krokodile. Wie viele Krokodile sind das.",
           "iconAtomId": "krokodil",
           "left": 13,
           "right": 7,
           "answer": 20
+        },
+        {
+          "promptTts": "Zwanzig Krokodile liegen am Fluss. Acht gleiten ins Wasser. Wie viele Krokodile bleiben.",
+          "iconAtomId": "krokodil",
+          "left": 20,
+          "right": 8,
+          "answer": 12,
+          "operation": "subtract"
         }
       ]
     },
@@ -1845,19 +1845,19 @@
       "id": "l13-t10",
       "rounds": [
         {
-          "promptTts": "Fünf Reihen mit je vier Fischen schwimmen im Aquarium. Wie viele Fische sind das.",
-          "iconAtomId": "fisch",
-          "left": 5,
-          "right": 4,
-          "answer": 20,
-          "operation": "multiply"
-        },
-        {
           "promptTts": "Neunzehn Fische und neun Fische. Wie viele Fische sind das.",
           "iconAtomId": "fisch",
           "left": 19,
           "right": 9,
           "answer": 28
+        },
+        {
+          "promptTts": "Achtundzwanzig Fische schwimmen im Teich. Neun schwimmen weg. Wie viele Fische bleiben.",
+          "iconAtomId": "fisch",
+          "left": 28,
+          "right": 9,
+          "answer": 19,
+          "operation": "subtract"
         }
       ]
     },
@@ -1989,12 +1989,11 @@
           "operation": "subtract"
         },
         {
-          "promptTts": "Fünf Reihen mit je fünf Eulen sitzen auf den Ästen. Wie viele Eulen sind das.",
+          "promptTts": "Sechzehn Eulen und neun Eulen. Wie viele Eulen sind das.",
           "iconAtomId": "eule",
-          "left": 5,
-          "right": 5,
-          "answer": 25,
-          "operation": "multiply"
+          "left": 16,
+          "right": 9,
+          "answer": 25
         }
       ]
     },
@@ -2711,12 +2710,12 @@
           "answer": 23
         },
         {
-          "promptTts": "Vier Reihen mit je fünf Mäusen sitzen im Stall. Wie viele Mäuse sind das.",
+          "promptTts": "Dreiundzwanzig Mäuse sitzen im Stall. Neun laufen davon. Wie viele Mäuse bleiben.",
           "iconAtomId": "maus",
-          "left": 4,
-          "right": 5,
-          "answer": 20,
-          "operation": "multiply"
+          "left": 23,
+          "right": 9,
+          "answer": 14,
+          "operation": "subtract"
         }
       ]
     },
@@ -2839,19 +2838,19 @@
       "id": "l20-t10",
       "rounds": [
         {
-          "promptTts": "Vierundzwanzig Milchtüten stehen im Regal. Elf werden gekauft. Wie viele Milchtüten bleiben.",
-          "iconAtomId": "milch",
+          "promptTts": "Dreizehn Uhren und zwölf Uhren. Wie viele Uhren sind das.",
+          "iconAtomId": "uhr",
+          "left": 13,
+          "right": 12,
+          "answer": 25
+        },
+        {
+          "promptTts": "Vierundzwanzig Uhren hängen im Laden. Elf werden verkauft. Wie viele Uhren bleiben.",
+          "iconAtomId": "uhr",
           "left": 24,
           "right": 11,
           "answer": 13,
           "operation": "subtract"
-        },
-        {
-          "promptTts": "Dreizehn Milchtüten und zwölf Milchtüten. Wie viele Milchtüten sind das.",
-          "iconAtomId": "milch",
-          "left": 13,
-          "right": 12,
-          "answer": 25
         }
       ]
     },
@@ -2974,15 +2973,14 @@
       "id": "l21-t10",
       "rounds": [
         {
-          "promptTts": "Drei Reihen mit je sechs Pizzen stehen im Ofen. Wie viele Pizzen sind das.",
+          "promptTts": "Sechzehn Pizzen und dreizehn Pizzen. Wie viele Pizzen sind das.",
           "iconAtomId": "pizza",
-          "left": 3,
-          "right": 6,
-          "answer": 18,
-          "operation": "multiply"
+          "left": 16,
+          "right": 13,
+          "answer": 29
         },
         {
-          "promptTts": "Neunundzwanzig Pizzen sind fertig. Vierzehn werden geholt. Wie viele Pizzen bleiben.",
+          "promptTts": "Neunundzwanzig Pizzen sind fertig. Vierzehn werden abgeholt. Wie viele Pizzen bleiben.",
           "iconAtomId": "pizza",
           "left": 29,
           "right": 14,
@@ -3097,7 +3095,7 @@
         {
           "promptTts": "Das Auto ist blau.",
           "sentenceId": "s-das-auto-ist-blau",
-          "illustrationAtomId": "auto"
+          "illustrationAtomId": "blau"
         }
       ]
     },
@@ -3113,7 +3111,7 @@
           "answer": 29
         },
         {
-          "promptTts": "Fünf Reihen mit je fünf Autos stehen im Stau. Wie viele Autos sind das.",
+          "promptTts": "Fünf Reihen mit je fünf Autos stehen auf dem Parkplatz. Wie viele Autos sind das.",
           "iconAtomId": "auto",
           "left": 5,
           "right": 5,
@@ -3232,7 +3230,7 @@
         {
           "promptTts": "Der Fisch ist orange.",
           "sentenceId": "s-der-fisch-ist-orange",
-          "illustrationAtomId": "fisch"
+          "illustrationAtomId": "orange"
         }
       ]
     },
@@ -3241,7 +3239,7 @@
       "id": "l23-t10",
       "rounds": [
         {
-          "promptTts": "Zwanzig Tische stehen im Saal. Sieben werden weggeräumt. Wie viele Tische bleiben.",
+          "promptTts": "Zwanzig Tische stehen im Café. Sieben werden weggeräumt. Wie viele Tische bleiben.",
           "iconAtomId": "tisch",
           "left": 20,
           "right": 7,
@@ -3384,7 +3382,7 @@
         {
           "promptTts": "Der Stuhl ist grün.",
           "sentenceId": "s-der-stuhl-ist-gruen",
-          "illustrationAtomId": "stuhl"
+          "illustrationAtomId": "gruen"
         }
       ]
     },
@@ -3400,7 +3398,7 @@
           "answer": 30
         },
         {
-          "promptTts": "Sechsundzwanzig Stühle stehen im Kreis. Neunzehn werden gebraucht. Wie viele Stühle bleiben.",
+          "promptTts": "Sechsundzwanzig Stühle stehen im Kreis. Neunzehn Kinder setzen sich. Wie viele Stühle bleiben leer.",
           "iconAtomId": "stuhl",
           "left": 26,
           "right": 19,
@@ -3527,7 +3525,7 @@
         {
           "promptTts": "Die Tür ist braun.",
           "sentenceId": "s-die-tuer-ist-braun",
-          "illustrationAtomId": "tuer"
+          "illustrationAtomId": "braun"
         }
       ]
     },
@@ -3536,19 +3534,18 @@
       "id": "l25-t10",
       "rounds": [
         {
-          "promptTts": "Fünf Reihen mit je sechs Türen hat das Haus. Wie viele Türen sind das.",
-          "iconAtomId": "tuer",
-          "left": 5,
+          "promptTts": "Vierundzwanzig Rüben und sechs Rüben. Wie viele Rüben sind das.",
+          "iconAtomId": "ruebe",
+          "left": 24,
           "right": 6,
-          "answer": 30,
-          "operation": "multiply"
+          "answer": 30
         },
         {
-          "promptTts": "Dreißig Türen sind zu. Sechzehn gehen auf. Wie viele Türen bleiben zu.",
-          "iconAtomId": "tuer",
+          "promptTts": "Dreißig Rüben liegen im Korb. Fünfzehn werden gegessen. Wie viele Rüben bleiben.",
+          "iconAtomId": "ruebe",
           "left": 30,
-          "right": 16,
-          "answer": 14,
+          "right": 15,
+          "answer": 15,
           "operation": "subtract"
         }
       ]
@@ -3673,9 +3670,9 @@
           "illustrationAtomId": "taxi"
         },
         {
-          "promptTts": "Ruf die Kuh!",
-          "sentenceId": "s-ruf-die-kuh",
-          "illustrationAtomId": "kuh"
+          "promptTts": "Ruf Mama!",
+          "sentenceId": "s-ruf-mama",
+          "illustrationAtomId": "mama"
         }
       ]
     },
@@ -3995,7 +3992,7 @@
           "wrongAtomIds": [
             "tom",
             "apfel",
-            "nest"
+            "tor"
           ]
         },
         {
@@ -4069,7 +4066,8 @@
           ],
           "wrongAtomIds": [
             "opa",
-            "rose"
+            "rose",
+            "tropfen"
           ]
         },
         {
@@ -4084,14 +4082,14 @@
           ]
         },
         {
-          "sentenceTts": "Pepe hat sich im Nest versteckt.",
+          "sentenceTts": "Pepe hat sich im Bett versteckt.",
           "correctAtomIds": [
             "pepe",
-            "nest"
+            "bett"
           ],
           "wrongAtomIds": [
-            "pepe",
-            "dose"
+            "hund",
+            "bett"
           ]
         }
       ]
@@ -4319,7 +4317,7 @@
           ],
           "wrongAtomIds": [
             "busch",
-            "vogel"
+            "eule"
           ]
         },
         {
@@ -4380,7 +4378,7 @@
           ],
           "wrongAtomIds": [
             "banane",
-            "sack"
+            "baum"
           ]
         },
         {
@@ -4391,11 +4389,11 @@
           ],
           "wrongAtomIds": [
             "maus",
-            "sack"
+            "brot"
           ]
         },
         {
-          "sentenceTts": "Oma isst Salat mit Erdbeeren.",
+          "sentenceTts": "Oma isst Salat und eine Erdbeere.",
           "correctAtomIds": [
             "salat",
             "erdbeere"
@@ -4453,7 +4451,7 @@
           ],
           "wrongAtomIds": [
             "opa",
-            "kleid"
+            "schuh"
           ]
         },
         {
@@ -5310,14 +5308,14 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Der Löwe schläft hinter der Tür.",
+          "sentenceTts": "Der Löwe liegt faul in der Sonne.",
           "correctAtomIds": [
             "loewe",
-            "tuer"
+            "sonne"
           ],
           "wrongAtomIds": [
-            "loewe",
-            "busch"
+            "tiger",
+            "sonne"
           ]
         },
         {
@@ -5345,16 +5343,14 @@
           ]
         },
         {
-          "sentenceTts": "Zwei Vögel baden in der Dusche.",
+          "sentenceTts": "Nach dem Sport geht Tom duschen.",
           "correctAtomIds": [
-            "vogel",
-            "vogel",
+            "tom",
             "dusche"
           ],
           "wrongAtomIds": [
-            "vogel",
-            "vogel",
-            "wasser"
+            "mia",
+            "dusche"
           ]
         }
       ]
@@ -5625,13 +5621,13 @@
           ]
         },
         {
-          "sentenceTts": "Der Bär zieht seine Jacke an.",
+          "sentenceTts": "Tom zieht seine Jacke an.",
           "correctAtomIds": [
-            "baer",
+            "tom",
             "jacke"
           ],
           "wrongAtomIds": [
-            "baer",
+            "tom",
             "hose"
           ]
         },
@@ -5662,11 +5658,11 @@
           "answer": 21
         },
         {
-          "promptTts": "Vier Reihen mit je fünf Handschuhen liegen im Korb. Wie viele Handschuhe sind das.",
+          "promptTts": "Fünf Kinder ziehen je zwei Handschuhe an. Wie viele Handschuhe sind das.",
           "iconAtomId": "handschuh",
-          "left": 4,
-          "right": 5,
-          "answer": 20,
+          "left": 5,
+          "right": 2,
+          "answer": 10,
           "operation": "multiply"
         }
       ]
@@ -6076,9 +6072,9 @@
           ]
         },
         {
-          "promptTts": "Die Blume ist lila.",
-          "sentenceId": "s-die-blume-ist-lila",
-          "illustrationAtomId": "blume"
+          "promptTts": "Die Jacke ist lila.",
+          "sentenceId": "s-die-jacke-ist-lila",
+          "illustrationAtomId": "lila"
         }
       ]
     },
@@ -6360,7 +6356,7 @@
           "answer": 29
         },
         {
-          "promptTts": "Fünf Reihen mit je sechs Fußbällen liegen im Netz. Wie viele Fußbälle sind das.",
+          "promptTts": "Fünf Reihen mit je sechs Fußbällen liegen auf dem Rasen. Wie viele Fußbälle sind das.",
           "iconAtomId": "fussball",
           "left": 5,
           "right": 6,
@@ -6569,20 +6565,20 @@
       "id": "l31-r1",
       "rounds": [
         {
-          "promptTts": "Dreißig Eisbären stehen auf dem Eis. Zwölf springen ins Wasser. Wie viele Eisbären bleiben.",
-          "iconAtomId": "eisbaer",
-          "left": 30,
-          "right": 12,
-          "answer": 18,
-          "operation": "subtract"
-        },
-        {
-          "promptTts": "Vier Reihen mit je sechs Eisbären sitzen am Ufer. Wie viele Eisbären sind das.",
-          "iconAtomId": "eisbaer",
+          "promptTts": "Vier Reihen mit je sechs Pinguinen stehen auf dem Eis. Wie viele Pinguine sind das.",
+          "iconAtomId": "pinguin",
           "left": 4,
           "right": 6,
           "answer": 24,
           "operation": "multiply"
+        },
+        {
+          "promptTts": "Dreißig Pinguine stehen auf dem Eis. Zwölf springen ins Wasser. Wie viele Pinguine bleiben.",
+          "iconAtomId": "pinguin",
+          "left": 30,
+          "right": 12,
+          "answer": 18,
+          "operation": "subtract"
         }
       ]
     },
@@ -6729,8 +6725,8 @@
       "id": "l32-s1",
       "rounds": [
         {
-          "promptTts": "Der Schneemann ist kalt.",
-          "sentenceId": "s-der-schneemann-ist-kalt",
+          "promptTts": "Der Schneemann ist groß.",
+          "sentenceId": "s-der-schneemann-ist-gross",
           "illustrationAtomId": "schneemann",
           "distractors": [
             {
@@ -6804,15 +6800,15 @@
       "id": "l32-r1",
       "rounds": [
         {
-          "promptTts": "Vierzehn Schneemänner und sechzehn Schneemänner. Wie viele Schneemänner sind das.",
-          "iconAtomId": "schneemann",
+          "promptTts": "Vierzehn Schneebälle und sechzehn Schneebälle. Wie viele Schneebälle sind das.",
+          "iconAtomId": "schneeball",
           "left": 14,
           "right": 16,
           "answer": 30
         },
         {
-          "promptTts": "Neunundzwanzig Schneemänner stehen im Garten. Dreizehn schmelzen. Wie viele Schneemänner bleiben.",
-          "iconAtomId": "schneemann",
+          "promptTts": "Neunundzwanzig Schneebälle liegen im Schnee. Dreizehn werden geworfen. Wie viele Schneebälle bleiben.",
+          "iconAtomId": "schneeball",
           "left": 29,
           "right": 13,
           "answer": 16,
@@ -7031,7 +7027,7 @@
       "id": "l33-r1",
       "rounds": [
         {
-          "promptTts": "Vier Reihen mit je sechs Kindern sitzen im Schulbus. Wie viele Kinder sind das.",
+          "promptTts": "Vier Reihen mit je sechs Schulbussen stehen im Hof. Wie viele Schulbusse sind das.",
           "iconAtomId": "schulbus",
           "left": 4,
           "right": 6,
@@ -7039,7 +7035,7 @@
           "operation": "multiply"
         },
         {
-          "promptTts": "Siebenundzwanzig Schulbusse stehen am Hof. Fünfzehn fahren los. Wie viele Schulbusse bleiben.",
+          "promptTts": "Siebenundzwanzig Schulbusse warten am Busbahnhof. Fünfzehn fahren los. Wie viele Schulbusse bleiben.",
           "iconAtomId": "schulbus",
           "left": 27,
           "right": 15,

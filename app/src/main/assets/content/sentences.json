@@ -223,16 +223,6 @@
       "tts": "Der Eisbär schwimmt."
     },
     {
-      "id": "s-der-schneemann-ist-kalt",
-      "atomIds": [
-        "der",
-        "schneemann",
-        "ist",
-        "kalt"
-      ],
-      "tts": "Der Schneemann ist kalt."
-    },
-    {
       "id": "s-die-tasche-ist-voll",
       "atomIds": [
         "die",
@@ -311,30 +301,6 @@
       "tts": "Die Tür ist braun."
     },
     {
-      "id": "s-ruf-die-kuh",
-      "atomIds": [
-        "ruf",
-        "die",
-        "kuh"
-      ],
-      "tts": "Ruf die Kuh!",
-      "displayOverride": [
-        "Ruf",
-        "die",
-        "Kuh"
-      ]
-    },
-    {
-      "id": "s-die-blume-ist-lila",
-      "atomIds": [
-        "die",
-        "blume",
-        "ist",
-        "lila"
-      ],
-      "tts": "Die Blume ist lila."
-    },
-    {
       "id": "s-hol-den-ball",
       "atomIds": [
         "hol",
@@ -370,6 +336,38 @@
         "Es",
         "ist",
         "kalt"
+      ]
+    },
+    {
+      "id": "s-die-jacke-ist-lila",
+      "atomIds": [
+        "die",
+        "jacke",
+        "ist",
+        "lila"
+      ],
+      "tts": "Die Jacke ist lila."
+    },
+    {
+      "id": "s-der-schneemann-ist-gross",
+      "atomIds": [
+        "der",
+        "schneemann",
+        "ist",
+        "gross"
+      ],
+      "tts": "Der Schneemann ist groß."
+    },
+    {
+      "id": "s-ruf-mama",
+      "atomIds": [
+        "ruf",
+        "mama"
+      ],
+      "tts": "Ruf Mama!",
+      "displayOverride": [
+        "Ruf",
+        "Mama"
       ]
     }
   ]
