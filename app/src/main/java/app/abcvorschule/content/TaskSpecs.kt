@@ -180,7 +180,17 @@ data class CountAddSpec(
 @Serializable
 data class CountAddRound(
     override val promptTts: String,
-    val iconAtomId: String,
+    /**
+     * Bild der gezählten Dinge — **null, wenn die Aufgabe keins verdient**.
+     *
+     * Ein Bild lohnt sich nur, wo die Szene trägt: acht Kühe auf der Wiese kann
+     * ein Kind sich vorstellen, achtundzwanzig nicht, und ab elf zeichnet §8
+     * ohnehin nur noch *ein* Symbol neben der Ziffer — dort ist das Icon reine
+     * Dekoration, die eine Behauptung über die Welt aufstellt („dreißig
+     * Mülltonnen stehen am Weg"). Ohne Icon zeigt der Trainer nur die Zahlen,
+     * und der Prompt behauptet nichts mehr.
+     */
+    val iconAtomId: String? = null,
     val left: Int,
     val right: Int,
     val answer: Int,

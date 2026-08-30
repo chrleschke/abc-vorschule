@@ -7,6 +7,9 @@ import org.junit.Test
 class LessonCoverageTest {
     private val pack = ContentRepository.fromClasspath().load()
 
+    /** Bis hierher zeigt der Trainer echte Stückzahlen (§8, `SymbolicFrom = 11`). */
+    private val PictureableQuantity = 10
+
     @Test
     fun allThirtyFourLessonsAreAuthoredInPhaseOrder() {
         assertEquals(
@@ -83,12 +86,41 @@ class LessonCoverageTest {
     }
 
     @Test
-    fun rechnenIconsComeFromTheLessonsOwnVocabulary() {
+    fun rechnenIconsAreEarnedPerRound() {
+        // Bis August 2026 galt „ein Icon pro Lektion". Das zwang eine Kuh-Lektion,
+        // auch die Dreißiger-Aufgabe mit Kühen zu rechnen — dreißig Kühe kann sich
+        // niemand vorstellen. Jetzt entscheidet die einzelne Runde: ein Bild nur,
+        // wo die Szene trägt, sonst gar keins und nur Ziffern.
         pack.authoredLessons.forEach { lesson ->
-            val math = pack.tasksOf(lesson).filterIsInstance<CountAddSpec>()
-            val icons = math.flatMap { it.rounds }.map { it.iconAtomId }.distinct()
-            assertEquals("lesson ${lesson.id} should stay on one icon", 1, icons.size)
-            assertTrue(pack.atom(icons.single()).emoji.isNotBlank())
+            pack.tasksOf(lesson).filterIsInstance<CountAddSpec>().flatMap { it.rounds }
+                .forEach { round ->
+                    val icon = round.iconAtomId ?: return@forEach
+                    assertTrue(
+                        "lesson ${lesson.id} counts $icon, which carries no emoji",
+                        pack.atom(icon).emoji.isNotBlank(),
+                    )
+                }
+        }
+    }
+
+    @Test
+    fun aPictureIsOnlyPromisedWhereAChildCanPictureIt() {
+        // §8: bis 10 zeigt der Trainer echte Stückzahlen, ab 11 nur noch ein
+        // Symbol neben der Ziffer. Genau dort hört das Bild auf zu arbeiten und
+        // fängt an, eine Szene zu behaupten ("dreißig Mülltonnen stehen am Weg").
+        // Ein Bildwort darf deshalb nur an Runden hängen, deren Mengen ein Kind
+        // sich wirklich hinstellen kann.
+        pack.authoredLessons.forEach { lesson ->
+            pack.tasksOf(lesson).filterIsInstance<CountAddSpec>().flatMap { it.rounds }
+                .forEach { round ->
+                    if (round.iconAtomId == null) return@forEach
+                    val largest = maxOf(round.left, round.right, round.answer)
+                    assertTrue(
+                        "lesson ${lesson.id}: ${round.promptTts} shows ${round.iconAtomId} " +
+                            "for a quantity of $largest — drop the icon or shrink the numbers",
+                        largest <= PictureableQuantity,
+                    )
+                }
         }
     }
 
@@ -181,7 +213,7 @@ class LessonCoverageTest {
                     is SentencePictureSpec -> spec.rounds.forEach {
                         addAll(it.correctAtomIds); addAll(it.wrongAtomIds)
                     }
-                    is CountAddSpec -> spec.rounds.forEach { add(it.iconAtomId) }
+                    is CountAddSpec -> spec.rounds.forEach { r -> r.iconAtomId?.let { add(it) } }
                     else -> Unit
                 }
             }

@@ -74,7 +74,7 @@ fun CountingAid(
 
     if (operation == MathOperation.Multiply) {
         MultiplicationMatrixGrid(
-            emoji = emoji,
+            emoji = emoji.ifBlank { NeutralCountingToken },
             rows = left,
             columns = right,
             modifier = modifier.testTag("counting_aid"),
@@ -104,7 +104,7 @@ fun CountingAid(
             Row(horizontalArrangement = Arrangement.spacedBy(CountingField.RowGapDp.dp)) {
                 repeat(rowLength) {
                     CountingCell(
-                        emoji = emoji,
+                        emoji = emoji.ifBlank { NeutralCountingToken },
                         index = index++,
                         sizeSp = sizeSp,
                         state = state,

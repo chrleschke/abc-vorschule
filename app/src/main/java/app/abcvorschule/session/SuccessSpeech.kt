@@ -27,7 +27,7 @@ object SuccessSpeech {
         is CountAddRound -> {
             // Praise first, answer last (§7): the quantity must be the last thing
             // the child hears — "Ausgezeichnet! Zwei Ameisen", never the reverse.
-            val answer = round.spokenAnswer(pack.atoms[round.iconAtomId])
+            val answer = round.spokenAnswer(round.iconAtomId?.let { pack.atoms[it] })
             if (praise) listOf(PraisePhrases.pick(random), answer) else listOf(answer)
         }
         is SyllableMergeRound -> listOf(
