@@ -295,3 +295,42 @@ def test_web_builds_the_app_and_serves_it_on_the_requested_address(
     assert served["port"] == 9999
     assert served["timeout_graceful_shutdown"] == 1
     assert "http://0.0.0.0:9999" in capsys.readouterr().out
+
+
+def test_export_summarises_instead_of_listing_every_skip(
+    tmp_path, content_dir, monkeypatch, capsys,
+):
+    """Der Bericht war ein Schadensbericht: eine Zeile pro übersprungenem Clip
+    und eine Komma-Liste aller entfernten Dateien — bei ~1000 Clips und 800
+    Locks zweihundert Zeilen für den Normalfall. Jetzt zählt er nach Grund."""
+    from ttskit.export import ExportReport
+
+    paths = make_root(tmp_path, content_dir)
+    paths.app_audio_dir.mkdir(parents=True, exist_ok=True)
+    report = ExportReport(
+        exported=["word:a"],
+        unchanged=["word:b", "word:c"],
+        removed=[f"stale_{i}.ogg" for i in range(40)],
+        skipped=[(f"word:{i}", "Lock ist verwaist — Quelltext existiert nicht mehr")
+                 for i in range(120)]
+        + [(f"prompt:{i}", "Lokal nicht gerendert (status missing)") for i in range(7)],
+    )
+    monkeypatch.setattr(cli, "Paths", lambda: paths)
+    monkeypatch.setattr("ttskit.export.export_to_app", lambda p: report)
+
+    assert cli.main(["export"]) == 0
+    out = capsys.readouterr().out
+
+    assert "127 übersprungen" in out
+    assert "120 × Lock ist verwaist" in out
+    assert "7 × Lokal nicht gerendert" in out
+    assert "40 entfernt" in out
+    # Kein einzelner Clip-Key und kein einzelner Dateiname in der Kurzfassung.
+    assert "word:42" not in out
+    assert "stale_7.ogg" not in out
+    assert len(out.splitlines()) < 15
+
+    assert cli.main(["export", "--verbose"]) == 0
+    verbose = capsys.readouterr().out
+    assert "word:42" in verbose
+    assert "stale_7.ogg" in verbose

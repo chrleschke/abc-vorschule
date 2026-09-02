@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import collections
 import json
+from pathlib import Path
 import time
 from dataclasses import dataclass, field
 
@@ -240,21 +241,52 @@ def cmd_wire_locks(paths: Paths, dry_run: bool = False) -> int:
     return 0
 
 
-def cmd_export(paths: Paths) -> int:
+def cmd_export(paths: Paths, args) -> int:
+    """Exportiert und berichtet in drei Zeilen statt in dreihundert.
+
+    Der Bericht listete jede übersprungene Clip-ID und jeden entfernten
+    Dateinamen einzeln — bei ~1000 Clips und 800 Locks sind das zweihundert
+    Zeilen „übersprungen" und eine Komma-Liste über hundert Dateien. Beides
+    liest sich wie ein Schadensbericht, obwohl es der Normalfall ist: was kein
+    Lock hat, ist noch nicht kuratiert, und was der Index nicht mehr kennt,
+    gehört weg. Zusammengefasst nach Grund bleibt die Information erhalten,
+    die vollständigen Listen holt `--verbose`.
+    """
     from .export import export_to_app
 
     report = export_to_app(paths)
-    print(f"{len(report.exported)} Clips exportiert → {paths.app_audio_dir}")
-    if report.unchanged:
-        print(f"{len(report.unchanged)} Clips unverändert übersprungen "
-              f"(Fingerprint gleich)")
+    target = Path(paths.app_audio_dir)
+    print(f"{len(list(target.glob('*.ogg')))} Clips im Paket → {target}")
+    line = f"  {len(report.exported)} neu · {len(report.unchanged)} unverändert"
     if report.removed:
-        print(f"{len(report.removed)} nicht mehr benötigte Dateien entfernt: "
-              f"{', '.join(report.removed)}")
-    for key, reason in report.skipped:
-        print(f"  übersprungen {key}: {reason}")
+        line += f" · {len(report.removed)} entfernt"
+    print(line)
+
+    if report.skipped:
+        # Kein Sammelurteil über die Gründe: verwaiste Locks sind Altlast in
+        # locks.json und kosten die App nichts, ein nicht gerenderter Clip
+        # dagegen fehlt ihr wirklich. Die alte Ausgabe warf beides in einen
+        # Topf aus zweihundert „übersprungen"-Zeilen.
+        print(f"\n{len(report.skipped)} übersprungen (nicht exportiert, "
+              "aber auch kein Fehlschlag):")
+        by_reason = collections.Counter(reason for _, reason in report.skipped)
+        for reason, count in by_reason.most_common():
+            print(f"  {count:4} × {reason}")
+        print("  Ein Text ohne freigegebene Aufnahme läuft in der App über "
+              "Android-TTS.")
+
+    # Warnungen bleiben vollständig: sie sind selten und jede einzelne ist eine
+    # Aufforderung („App spielt das falsche Profil").
     for warning in report.warnings:
-        print(f"  Achtung: {warning}")
+        print(f"\nAchtung: {warning}")
+
+    if args.verbose:
+        for key, reason in report.skipped:
+            print(f"  übersprungen {key}: {reason}")
+        for name in report.removed:
+            print(f"  entfernt {name}")
+    elif report.skipped or report.removed:
+        print("\n(`--verbose` zeigt jede übersprungene und entfernte Datei einzeln)")
     return 0
 
 
@@ -296,7 +328,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     wire_parser.add_argument("--dry-run", action="store_true",
                              help="nur anzeigen, nichts schreiben")
-    sub.add_parser("export", help="Approvete Clips als OGG in die App-Assets")
+    export_parser = sub.add_parser("export", help="Approvete Clips als OGG in die App-Assets")
+    export_parser.add_argument("--verbose", "-v", action="store_true",
+                               help="jede übersprungene und entfernte Datei einzeln")
 
     render_parser = sub.add_parser("render", help="Finaler Lauf, inkrementell")
     render_parser.add_argument("--profile", help="nur dieses Profil")
@@ -328,7 +362,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "wire-locks":
         return cmd_wire_locks(paths, dry_run=args.dry_run)
     if args.command == "export":
-        return cmd_export(paths)
+        return cmd_export(paths, args)
     if args.command == "render":
         return cmd_render(paths, args)
     if args.command == "sample":
