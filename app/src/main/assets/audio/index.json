@@ -720,11 +720,6 @@
       "fingerprint": "79af06504782f442",
       "profile": "word"
     },
-    "Das Auto ist blau.": {
-      "file": "prompt_d201c5055b66.ogg",
-      "fingerprint": "56cc51d27ee4c1a3",
-      "profile": "prompt"
-    },
     "Das Eis ist in der Sonne geschmolzen.": {
       "file": "sentence_2cee5d335761.ogg",
       "fingerprint": "4e522e31c6e638fd",
@@ -895,11 +890,6 @@
       "fingerprint": "ce1899b9c96b2181",
       "profile": "sentence"
     },
-    "Der Eisbär schwimmt.": {
-      "file": "prompt_3243701fc035.ogg",
-      "fingerprint": "8206fa9703dd1231",
-      "profile": "prompt"
-    },
     "Der Eisbär sitzt im Vogelnest!": {
       "file": "finale_5f748dc8f896.ogg",
       "fingerprint": "53e80294e7c72893",
@@ -1030,11 +1020,6 @@
       "fingerprint": "ac355a199635372f",
       "profile": "finale"
     },
-    "Die Blume ist groß.": {
-      "file": "prompt_462fb2b6f7d0.ogg",
-      "fingerprint": "e94ca12c9a139e22",
-      "profile": "prompt"
-    },
     "Die Eule fing eine Maus.": {
       "file": "sentence_12e277a45f58.ogg",
       "fingerprint": "a47aa5a45b802cf1",
@@ -1079,11 +1064,6 @@
       "file": "sentence_04fc81917dc6.ogg",
       "fingerprint": "48cba622df47e3b3",
       "profile": "sentence"
-    },
-    "Die Lampe ist hell.": {
-      "file": "prompt_d712ce5deaf8.ogg",
-      "fingerprint": "da59c6cf2d83b261",
-      "profile": "prompt"
     },
     "Die Maus hat den Käse geklaut.": {
       "file": "sentence_aa532e2f6e8f.ogg",
@@ -1134,16 +1114,6 @@
       "file": "sentence_147f2a0d4995.ogg",
       "fingerprint": "3dc03f44a8de1cdb",
       "profile": "sentence"
-    },
-    "Die Tasche ist voll.": {
-      "file": "prompt_e2a229b793ed.ogg",
-      "fingerprint": "dbee138c34938c6d",
-      "profile": "prompt"
-    },
-    "Die Tür ist braun.": {
-      "file": "prompt_ed923538284e.ogg",
-      "fingerprint": "beb894e25435e518",
-      "profile": "prompt"
     },
     "Die Uhr liegt auf dem Sofa.": {
       "file": "sentence_6f6adb9b331d.ogg",
@@ -1299,11 +1269,6 @@
       "file": "word_33d0ffb3cdb7.ogg",
       "fingerprint": "b440cd570263eebf",
       "profile": "word"
-    },
-    "Es ist kalt.": {
-      "file": "prompt_2b28e37abada.ogg",
-      "fingerprint": "ece4830b5cc33780",
-      "profile": "prompt"
     },
     "Eu": {
       "file": "phoneme_ff22e6c0c305.ogg",
@@ -2000,11 +1965,6 @@
       "fingerprint": "97945b1c44a91f88",
       "profile": "finale"
     },
-    "Oma und Mia lachen.": {
-      "file": "prompt_18fe1cfadea6.ogg",
-      "fingerprint": "64935d1153c390f4",
-      "profile": "prompt"
-    },
     "Oma.": {
       "file": "sentence_ba35c984dbf8.ogg",
       "fingerprint": "706380ec3677b34d",
@@ -2265,11 +2225,6 @@
       "fingerprint": "c724f0dbdc2875ed",
       "profile": "word"
     },
-    "Ruf Mama!": {
-      "file": "prompt_7742b47244c2.ogg",
-      "fingerprint": "9997b6a73ae29fc9",
-      "profile": "prompt"
-    },
     "Rutsche": {
       "file": "word_7d1affa5f00b.ogg",
       "fingerprint": "96f569d7787fc4d1",
@@ -2493,11 +2448,6 @@
     "Schiebe p und e zusammen. Welche Silbe entsteht.": {
       "file": "prompt_5a24bebafe98.ogg",
       "fingerprint": "a8b6cee79d19edf5",
-      "profile": "prompt"
-    },
-    "Schiebe pf und a zusammen. Welche Silbe entsteht.": {
-      "file": "prompt_ab454bef1046.ogg",
-      "fingerprint": "0620c146f9024160",
       "profile": "prompt"
     },
     "Schiebe qu und a zusammen. Welche Silbe entsteht.": {
@@ -3794,11 +3744,6 @@
       "file": "word_c0bc1e08f974.ogg",
       "fingerprint": "0c8c784cb01c13f2",
       "profile": "word"
-    },
-    "fa": {
-      "file": "phoneme_3097e26b7f3c.ogg",
-      "fingerprint": "1fc21f86d359edc2",
-      "profile": "phoneme"
     },
     "fi": {
       "file": "phoneme_b4bdc8481097.ogg",
