@@ -388,7 +388,7 @@ def test_a_math_task_gets_its_own_profile_not_the_prompt_melody():
     Melodie, als `sentence` (sie endet auf einen Punkt!) die erzählende."""
     math = Item(id="task:l01-t10:round:0:promptTts",
                 text="Sechs Ameisen krabbeln im Bau. Drei krabbeln hinaus. "
-                     "Wie viele Ameisen bleiben.",
+                     "Wie viele Ameisen bleiben?",
                 field="promptTts", source="tasks.json", lesson="l01", label="")
     assert profile_for_item(math) == "math"
 
@@ -399,9 +399,9 @@ def test_a_math_task_gets_its_own_profile_not_the_prompt_melody():
 
 
 def test_a_question_is_never_a_bare_sentence():
-    """Ein „?" am Stringende verstößt schon gegen die Autorierungsregel
-    („Letzte Frage ohne Fragezeichen"); es darf nicht zusätzlich die
-    erzählende Satz-Melodie bekommen."""
+    """Die einzigen Fragen der Fibel sind Rechenaufgaben, und die haben ihr
+    eigenes Profil. Alles andere mit „?" ist ein Autorenfehler — der darf nicht
+    zusätzlich die erzählende Satz-Melodie bekommen."""
     assert not reads_as_bare_sentence("Hörst du das M?")
     assert reads_as_bare_sentence("Tom singt.")
     assert reads_as_bare_sentence("Mama Maus!")

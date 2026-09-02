@@ -129,7 +129,7 @@ class ClipIndexTest {
         assertTrue("committed index.json darf nicht leer sein", index.size > 0)
 
         val fileNamePattern = Regex(
-            "^(article_word|word|phoneme|prompt|miss|reward|sentence|finale|ui)_[0-9a-f]{12}\\.ogg$",
+            "^(article_word|word|phoneme|prompt|math|miss|reward|sentence|finale|ui)_[0-9a-f]{12}\\.ogg$",
         )
         index.entries().forEach { entry ->
             assertTrue(

@@ -48,10 +48,10 @@ _PROMPT_FIELDS = frozenset({"promptTts", "instructionTts"})
 #: will eine andere Melodie als eine reine Aufforderung („Baue das Wort Mama."),
 #: also bekommt es ein eigenes Profil mit eigenem Seed-Pool.
 #:
-#: Am Satzende ist die Frage nicht zu erkennen: die Fibel schreibt sie mit Punkt
-#: (PRODUCT_PRINCIPLES, „Letzte Frage ohne Fragezeichen" — ein „?" am Stringende
-#: lässt die System-TTS die Stimme hochziehen, was bei Vorschulkindern unruhig
-#: klingt). An ihrem Anfang schon.
+#: Erkannt wird sie am Anfang ihres letzten Satzes, nicht am „?" — das steht seit
+#: September 2026 zwar dran (Qwen soll nur den letzten Satz fragend anheben),
+#: aber der Marker trug die Zuordnung schon, als die Fibel Fragen noch mit Punkt
+#: schrieb, und er bleibt die Wahrheit, falls ein Autor das „?" vergisst.
 MATH_MARKER = "Wie viele"
 
 #: Woran eine Aufgabenansage erkennbar ist. Alles Imperative — bis auf
@@ -78,9 +78,9 @@ def reads_as_bare_sentence(text: str) -> bool:
     erzählender Satz; sie im Satz-Profil aufzunehmen wäre derselbe Fehler wie
     „Tom singt." im Prompt-Profil, nur umgekehrt. Bis September 2026 stand „?"
     hier mit in der Liste und schob jede Frage, die keinen Marker trug, ins
-    Satz-Profil. Getroffen hat es nie eine echte Aufnahme — die Hausregel oben
-    verbietet „?" am Stringende, im Pack endet kein Text darauf —, aber sechs
-    Tests fielen darüber, weil das Testpaket noch „Hörst du M?" trug.
+    Satz-Profil. Die einzigen Fragen der Fibel sind die Rechenaufgaben, und die
+    fängt [reads_as_math_task] vorher ab — hier landet also heute gar keine
+    Frage mehr; das „?" bleibt trotzdem draußen, damit es dabei bleibt.
     """
     stripped = text.strip()
     if any(marker in stripped for marker in INSTRUCTION_MARKERS):

@@ -382,11 +382,15 @@ niemals mit einem stummen No-Op.
   Trainer-`promptTts`/`rewardTts`, die einen einzelnen Buchstaben ansprechen (Spurensucher,
   Buchstaben-Jagd, Wort-Detektiv) — nicht für Silben-Verschmelzer (dort werden Laute bewusst
   aneinandergezogen) oder für Ganzwörter.
-- **Letzte Frage ohne Fragezeichen:** Endet ein `promptTts` mit einer Frage, verliert nur die
-  **letzte** Frage in diesem String ihr Fragezeichen (eine vorangehende Frage behält ihr „?",
-  die letzte nicht). Grund: ein
-  Fragezeichen am Stringende lässt die System-TTS die Stimme am letzten Wort hochziehen, was bei
-  Vorschulkindern falsch/unruhig klingt; ohne „?" klingt der Satz natürlich aus.
+- **Die Rechenaufgabe endet auf „?" — und sie ist die einzige Frage.** Alle anderen Prompts
+  sind Aufforderungen („Baue das Wort …", „Finde alle …") und enden auf einen Punkt. Die
+  Rechenaufgabe trägt Erzählung und Frage in einem String („Neun Tomaten liegen im Korb. Vier
+  werden gegessen. Wie viele Tomaten bleiben?"); das „?" sagt der kuratierten Stimme
+  (TTS-Profil `math`), dass nur der letzte Satz fragend anzuheben ist, die Erzählung davor nicht.
+  Bis September 2026 galt das Gegenteil („Letzte Frage ohne Fragezeichen"), weil die
+  System-TTS am „?" die Stimme unruhig hochzieht — diese Regel zielte auf den Fallback, nicht auf
+  die kuratierten Clips. Wo noch kein `math`-Clip liegt, klingt der Fallback deshalb fragend;
+  das ist der Preis, und er ist befristet.
 - **Wortwiederholungen werden am Stück gelesen, nicht buchstabiert.** Nennt ein Trainer ein Wort
   erneut, dann am Stück („Ameise.", nicht „A - M - eise."). Eine buchstabierte/segmentierte
   Wiederholung wird von der System-TTS Buchstabe für Buchstabe vorgelesen und ist für Vorschulkinder
