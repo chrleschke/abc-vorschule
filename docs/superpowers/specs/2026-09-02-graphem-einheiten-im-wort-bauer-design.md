@@ -79,17 +79,31 @@ Apfel/Pferd bekommen bewusst *nicht* die linguistisch korrekte Trennung
 `A + pf + e + l` ist zugleich genau das, was der Wort-Detektiv in derselben
 Lektion zeigt.
 
-### 3. `pfa` → `cke`
+### 3. l16 verliert seinen Verschmelzer
 
-`pfa` wird gelöscht. `l16-t5` verschmilzt stattdessen `ck + e = cke` — eine
-Silbe, die in Socke steht, dem Wort, das dieselbe Lektion zwei Aufgaben später
-baut, und in Jacke (l27). Beide Kacheln hängen heute als Schnipsel am
-Graphem-Atom `ck`; mit dem neuen Silben-Atom `cke` hängen sie richtig, bekommen
-einen kuratierten Clip, und der Wort-Detektiv kann in l27 „Finde die Silbe -
-cke - im Wort - Jacke." fragen statt auf den Buchstaben-Modus zurückzufallen.
+`pfa` wird gelöscht und `l16-t5` ersatzlos entfernt. Für l16 gibt es keine
+ehrliche Silbe: `ck` kann im Deutschen keine Silbe anfangen (es steht immer nach
+kurzem Vokal — „So-cke" ist eine Trennregel, keine Lautstruktur), und `pf`
+bildet mit keinem Vokal eine offene Silbe, die in einem Fibel-Wort vorkommt
+(„Pfanne" trennt `Pfan-ne`, „Pfad" und „Pferd" sind einsilbig).
 
-Das Graphem `Pf` verliert nichts: l12 … l16 zeichnet es nach und baut Apfel und
-Pferd damit.
+Damit steht l16 wie **l12**, das nie einen Verschmelzer hatte — der Zustand ist
+etabliert, kein Loch. Die Silben-Jagd von l16 fällt mit weg; sie leitet sich aus
+dem Verschmelzer ab. Das Graphem `Pf` verliert nichts: l16 zeichnet es nach und
+baut Apfel und Pferd damit.
+
+Verworfene Alternativen:
+
+- **`ck + e = cke`** — würde in Socke (dieselbe Lektion) und Jacke landen und
+  zwei Schnipsel-Kacheln richtig ankern. Aber „cke" ist keine lesbare Silbe:
+  keine deutsche Silbe beginnt mit `ck`.
+- **`p + f = pf`** — lautlich wahr (zwei Laute werden zu einem, genau das ist
+  die Affrikate) und mit Präzedenz (l24 verschmilzt `s + t = st` und
+  `s + p = sp`, ebenfalls zu einem Graphem statt zu einer Silbe). Verworfen,
+  weil der Trainer nach einer *Silbe* fragt; die zwei l24-Runden sind damit die
+  letzten, die „Welche Silbe entsteht" zu einem Laut sagen — eigener Durchgang.
+- **`pf + au = Pfau`** — echtes einsilbiges Wort mit starkem Bild, aber ein Wort
+  als Verschmelzungsergebnis ist die Phase-8-Form mitten in Phase 5.
 
 ### 4. Validator-Regel
 
@@ -106,11 +120,9 @@ auseinandergehen (Ap-fel, Wes-pe, bes-te) — und tut es in Apfel auch.
 
 ## Neue Aufnahmen
 
-Vier Texte brauchen Kuratierung und laufen bis dahin über Android-TTS:
+Drei Texte brauchen Kuratierung und laufen bis dahin über Android-TTS:
 
 - `Äu` (Phonem, Atom-Lemma)
-- `cke` (Phonem, Atom-Lemma) — falls Qwen die Schreibung nicht trägt, ist die
-  Umschrift der etablierte Ausweg (`se`→„seh", `vo`→„fo")
 - die zwei Sätze von `l12-t5b` (Prompt und Merksatz)
 
 Der Clip `fa` (bisheriges Lemma von `pfa`) wird verwaist.
@@ -121,8 +133,14 @@ Der Clip `fa` (bisheriges Lemma von `pfa`) wird verwaist.
   Häuser und Bäume tragen das äu. Bisher tauchte „ä" nur auf, weil der
   Diphthong falsch zerschnitten war. Das zu schließen bräuchte neue Wörter
   (Dächer aus Dach, Löwe von l25 vorgezogen) — eigener Durchgang.
-- **`pfa`s Umschrift „fa"** verlor den /pf/-Laut. Mit dem Atom fällt die Frage
-  weg; die übrigen neun Umschriften (`do`→„dough", `ste`→„steh") sind korrekt.
-- **Die 60 Schnipsel-Kacheln** („gel" am Atom G, „Ster" am St, „Bro" am B)
-  bleiben. `cke` ist der erste, der ein eigenes Atom bekommt, weil sein
-  Verschmelzer sowieso ersetzt werden musste.
+- **Die Schnipsel-Kacheln** („gel" am Atom G, „Ster" am St, „Bro" am B, und neu
+  „uh" am U) bleiben: 60 Bausteine tragen einen Silbenschnipsel als Beschriftung
+  und hängen an einem Einzelbuchstaben-Atom. `SpeechClipText.forWordBlock` hält
+  sie davon ab, den falschen Laut in kuratierter Stimme zu sprechen; sie laufen
+  über Android-TTS. Eigene Baustelle.
+- **`cke` als Silben-Atom** würde Socke und Jacke richtig ankern und dem
+  Wort-Detektiv in l27 „Finde die Silbe - cke - im Wort - Jacke." erlauben.
+  Ausgesetzt, weil `cke` als *lesbare* Silbe nicht taugt (keine deutsche Silbe
+  beginnt mit `ck`) — der Anker wäre richtig, die Silbe nicht.
+- **l24s zwei Verschmelzer-Runden** (`s + t = st`, `s + p = sp`) fragen „Welche
+  Silbe entsteht", produzieren aber einen Laut.

@@ -457,4 +457,23 @@ class SymbolInWordDerivationTest {
             }
         }
     }
+
+    @Test
+    fun l12HuntsTheDiphthongItJustTracedInsteadOfALooseUmlaut() {
+        // `WordGraphemes` zieht seine Tabelle aus den Spurensucher-Runden: seit l12
+        // `Äu` nachzeichnet, ist „Häuser" H·äu·s·e·r statt H·ä·u·s·e·r. Vorher war
+        // das lose „ä" der einzige Grund, warum die Runde überhaupt einen Treffer
+        // fand — mit dem richtigen Segment jagt sie den Laut, den das Wort trägt.
+        // Häuser und Bäume tragen beide das äu, Küken das ü — ein einzelnes ä oder
+        // ö kommt in l12 in keinem Wort vor (siehe residual-review-findings).
+        assertEquals(
+            listOf("letter-aeu", "letter-aeu", "letter-ue"),
+            rounds("l12").map { it.targetAtomId },
+        )
+        val haeuser = rounds("l12").first { it.wordAtomId == "haeusser" }
+        assertEquals("letter-aeu", haeuser.targetAtomId)
+        assertEquals(listOf("H", "äu", "s", "e", "r"), haeuser.segments)
+        assertEquals(listOf(1), haeuser.targetIndices)
+        assertEquals("Finde den Laut - Äu - im Wort - Häuser.", haeuser.promptTts)
+    }
 }

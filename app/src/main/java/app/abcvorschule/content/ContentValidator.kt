@@ -231,6 +231,11 @@ object ContentValidator {
                             "task $id merge parts '$spelled' do not spell result '$expected'",
                         )
                     }
+                    issues += cutGraphemeUnits(
+                        pack,
+                        "task $id merge",
+                        listOf(round.leftDisplay, round.rightDisplay),
+                    )
                 }
                 is WordBuildSpec -> spec.rounds.forEach { round ->
                     requireAtom("task $id", round.targetAtomId)
@@ -250,6 +255,11 @@ object ContentValidator {
                             "task $id blocks '$spelled' do not spell target '$expected'",
                         )
                     }
+                    issues += cutGraphemeUnits(
+                        pack,
+                        "task $id blocks",
+                        round.blocks.map { it.display },
+                    )
                     val duplicate = round.distractors.map { it.display }
                         .intersect(round.blocks.map { it.display }.toSet())
                     if (duplicate.isNotEmpty()) {
@@ -507,6 +517,68 @@ object ContentValidator {
         val issues = validate(pack)
         if (issues.isNotEmpty()) throw ContentValidationException(issues)
         return pack
+    }
+
+    /**
+     * Mehrbuchstabige Grapheme, die an einer Silbengrenze auseinandergehen dürfen.
+     *
+     * Die Trennlinie ist der Laut, nicht die Buchstabenzahl: `Sch`, `Ch`, `ck`,
+     * `Qu`, `Ei`, `Au`, `Eu`, `Äu` sind *ein* Zeichen für *einen* Laut und bleiben
+     * ganz. `Pf`, `St`, `Sp` tragen zwei Laute, und die können in verschiedene
+     * Silben fallen — „Apfel" trennt `Ap-fel`, „Wespe" `Wes-pe`. Genau deshalb
+     * baut der Wort-Bauer Apfel als `A + pf + e + l`, aber Bäume nicht als
+     * `Bä + u + m + e`.
+     */
+    private val ClusterGraphemes: Set<String> = setOf("pf", "st", "sp")
+
+    /**
+     * Vokal + Dehnungs-h („uh" in Kuh) und Doppelvokal („ee" in Schnee). Beides
+     * steht für einen Laut und wird von keinem Atom getragen, muss also getrennt
+     * beschrieben werden.
+     */
+    private val StretchedVowel = Regex("[aeiouäöü]h|aa|ee|oo")
+
+    /**
+     * Buchstabenfolgen, die ein Baustein-Schnitt nicht zerteilen darf. Aus dem
+     * Pack abgeleitet statt fest verdrahtet — wie [WordGraphemes.table], damit ein
+     * neues Graphem-Atom die Regel automatisch mitnimmt.
+     */
+    private fun graphemeUnits(pack: ContentPack): List<String> =
+        pack.atoms.values
+            .filter { it.kind == AtomKind.letter }
+            .map { it.display.lowercase() }
+            .filter { it.length > 1 && it !in ClusterGraphemes }
+            .distinct()
+
+    /**
+     * Meldet jede Graphem-Einheit, durch die ein Schnitt zwischen [parts] mitten
+     * hindurchläuft. Ein Schnitt *am* Anfang oder Ende einer Einheit ist in
+     * Ordnung — „Fisch" darf `F + i + sch` heißen.
+     */
+    private fun cutGraphemeUnits(
+        pack: ContentPack,
+        what: String,
+        parts: List<String>,
+    ): List<ValidationIssue> {
+        val cuts = mutableSetOf<Int>()
+        var offset = 0
+        parts.dropLast(1).forEach { part ->
+            offset += part.length
+            cuts += offset
+        }
+        val word = parts.joinToString("").lowercase()
+        val units = graphemeUnits(pack).flatMap { unit ->
+            Regex(Regex.escape(unit)).findAll(word).map { it.range }.toList()
+        } + StretchedVowel.findAll(word).map { it.range }.toList()
+        return units
+            .filter { unit -> (unit.first + 1..unit.last).any { it in cuts } }
+            .map { word.substring(it.first, it.last + 1) }
+            .distinct()
+            .map { unit ->
+                ValidationIssue(
+                    "$what '${parts.joinToString(" + ")}' cut the grapheme unit '$unit'",
+                )
+            }
     }
 
     /** Prompt is exactly `Baue das Wort {Wort}.` — no tray-ordering instructions. */

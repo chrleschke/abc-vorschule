@@ -1569,6 +1569,20 @@
       ]
     },
     {
+      "trainer": "letter_trace",
+      "id": "l12-t5b",
+      "rounds": [
+        {
+          "promptTts": "Zeichne den Laut - Äu - nach und sammle dabei alle Sterne.",
+          "atomId": "letter-aeu",
+          "glyph": "Äu",
+          "rewardTts": "Äu - wie in Häuser.",
+          "rewardEmoji": "🏘️",
+          "blocks": []
+        }
+      ]
+    },
+    {
       "trainer": "word_build",
       "id": "l12-t6",
       "rounds": [
@@ -1577,12 +1591,12 @@
           "targetAtomId": "haeusser",
           "blocks": [
             {
-              "atomId": "letter-ae",
-              "display": "Hä"
+              "atomId": "letter-h",
+              "display": "H"
             },
             {
-              "atomId": "letter-u",
-              "display": "u"
+              "atomId": "letter-aeu",
+              "display": "äu"
             },
             {
               "atomId": "letter-s",
@@ -1610,11 +1624,11 @@
           "blocks": [
             {
               "atomId": "letter-b",
-              "display": "Bä"
+              "display": "B"
             },
             {
-              "atomId": "letter-u",
-              "display": "u"
+              "atomId": "letter-aeu",
+              "display": "äu"
             },
             {
               "atomId": "letter-m",
@@ -1738,12 +1752,12 @@
           "targetAtomId": "schuh",
           "blocks": [
             {
-              "atomId": "schu",
-              "display": "Schu"
+              "atomId": "letter-sch",
+              "display": "Sch"
             },
             {
-              "atomId": "letter-h",
-              "display": "h"
+              "atomId": "letter-u",
+              "display": "uh"
             }
           ]
         }
@@ -2151,23 +2165,6 @@
       ]
     },
     {
-      "trainer": "syllable_merge",
-      "id": "l16-t5",
-      "rounds": [
-        {
-          "promptTts": "Schiebe pf und a zusammen. Welche Silbe entsteht.",
-          "leftAtomId": "letter-pf",
-          "leftDisplay": "pf",
-          "rightAtomId": "letter-a",
-          "rightDisplay": "a",
-          "resultAtomId": "pfa",
-          "resultDisplay": "pfa",
-          "stretchTts": "Pf",
-          "blocks": []
-        }
-      ]
-    },
-    {
       "trainer": "word_build",
       "id": "l16-t6",
       "rounds": [
@@ -2201,7 +2198,11 @@
             },
             {
               "atomId": "letter-pf",
-              "display": "pfe"
+              "display": "pf"
+            },
+            {
+              "atomId": "letter-e",
+              "display": "e"
             },
             {
               "atomId": "letter-l",
@@ -2221,7 +2222,11 @@
           "blocks": [
             {
               "atomId": "letter-pf",
-              "display": "Pfe"
+              "display": "Pf"
+            },
+            {
+              "atomId": "letter-e",
+              "display": "e"
             },
             {
               "atomId": "letter-r",
@@ -3167,12 +3172,12 @@
           "targetAtomId": "schuh",
           "blocks": [
             {
-              "atomId": "schu",
-              "display": "Schu"
+              "atomId": "letter-sch",
+              "display": "Sch"
             },
             {
-              "atomId": "letter-h",
-              "display": "h"
+              "atomId": "letter-u",
+              "display": "uh"
             }
           ]
         }
@@ -4792,12 +4797,12 @@
           "targetAtomId": "maus",
           "blocks": [
             {
-              "atomId": "ma",
-              "display": "Ma"
+              "atomId": "letter-m",
+              "display": "M"
             },
             {
-              "atomId": "letter-u",
-              "display": "u"
+              "atomId": "letter-au",
+              "display": "au"
             },
             {
               "atomId": "letter-s",
@@ -5193,11 +5198,15 @@
           "blocks": [
             {
               "atomId": "letter-st",
-              "display": "Stu"
+              "display": "St"
             },
             {
-              "atomId": "letter-h",
-              "display": "hl"
+              "atomId": "letter-u",
+              "display": "uh"
+            },
+            {
+              "atomId": "letter-l",
+              "display": "l"
             }
           ]
         }
@@ -5343,11 +5352,7 @@
             },
             {
               "atomId": "letter-u",
-              "display": "u"
-            },
-            {
-              "atomId": "letter-h",
-              "display": "h"
+              "display": "uh"
             }
           ]
         }

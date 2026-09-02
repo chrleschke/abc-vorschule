@@ -105,8 +105,9 @@ class SymbolHuntInsertionTest {
     // derivation return null/empty for every lesson, both would still pass, since
     // there'd be nothing to iterate over. These counts were computed directly from
     // the real 26-lesson pack: review lessons (l19-l26) can have syllable_merge if
-    // needed. Only l01 (degenerate "ma" pool) and l12 (no syllable_merge trainer)
-    // lack a syllable-hunt. l25, l26 are now review lessons with syllable_merge.
+    // needed. Only l01 (degenerate "ma" pool), l12 and l16 (no syllable_merge
+    // trainer) lack a syllable-hunt. l25, l26 are now review lessons with
+    // syllable_merge.
     @Test
     fun theWholePackProducesTheExpectedNumberOfLetterAndSyllableHunts() {
         assertEquals(34, pack.authoredLessons.size)
@@ -122,10 +123,10 @@ class SymbolHuntInsertionTest {
         }
         assertEquals("expected every authored lesson to get a letter-hunt", 34, letterHuntLessons)
         assertEquals(
-            "expected all but l01 (degenerate pool), l12 (no syllable_merge) and the " +
-                "eight Phase-8 lessons (their merges join whole words, not syllables) " +
-                "to get a syllable-hunt",
-            24,
+            "expected all but l01 (degenerate pool), l12 and l16 (no syllable_merge) " +
+                "and the eight Phase-8 lessons (their merges join whole words, not " +
+                "syllables) to get a syllable-hunt",
+            23,
             syllableHuntLessons,
         )
     }
