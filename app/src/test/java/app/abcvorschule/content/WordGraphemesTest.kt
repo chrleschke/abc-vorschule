@@ -74,10 +74,24 @@ class WordGraphemesTest {
     }
 
     @Test
-    fun umlautPlusVowelIsNotFusedBecauseAuDoesNotMatchAeu() {
+    fun aeuIsOneUnitFromL12OnBecauseItIsATracedGrapheme() {
+        // Bis September 2026 gab es kein `äu`-Atom, also zerfiel „Häuser" in
+        // H·ä·u·s·e·r — und der Wort-Bauer bot dazu passend `Bä + u + m + e` an.
+        // Beides hing an derselben Lücke: die Tabelle kommt aus den
+        // Spurensucher-Runden, und l12 zeichnete nur ä, ö, ü nach.
+        assertEquals(
+            listOf("H", "äu", "s", "e", "r"),
+            WordGraphemes.split(pack, indexOf("l12"), "Häuser"),
+        )
+    }
+
+    @Test
+    fun aeuIsStillTwoLettersBeforeItIsTaught() {
+        // Lektionsgebunden wie `st`: „Bäume" gibt es vor l12 nicht zu lesen, aber
+        // die Tabelle darf den Laut auch nicht rückwirkend behaupten.
         assertEquals(
             listOf("H", "ä", "u", "s", "e", "r"),
-            WordGraphemes.split(pack, indexOf("l12"), "Häuser"),
+            WordGraphemes.split(pack, indexOf("l11"), "Häuser"),
         )
     }
 

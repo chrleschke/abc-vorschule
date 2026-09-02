@@ -19,10 +19,13 @@ Grund, warum es nicht im selben Zug erledigt wurde.
 mit; die nackten Wörter liegen im Index, die Artikel-Fassung nicht. Auf einem
 Gerät ohne deutsches TTS bleibt der Erfolgs-Vorsprech dort still.
 
-**23 Silbenschnipsel** des Wort-Bauers: `Ha`, `Ro`, `Da`, `Hä`, `Bä`, `Rü`, `le`,
-`ra`, `Fu`, `gel`, `Va`, `se`, `Sa`, `pfe`, `Pfe`, `Ster`, `Spin`, `ne`, `Ta`,
-`Po`, `ny`. Seit dem Fix an `SpeechClipText.forWordBlock` spricht die Kachel, was
-auf ihr steht — ohne Clip über Android-TTS statt in kuratierter Stimme.
+**Silbenschnipsel** des Wort-Bauers: `Ha`, `Ro`, `Da`, `Rü`, `le`, `ra`, `Fu`,
+`gel`, `Va`, `se`, `Sa`, `Ster`, `Spin`, `ne`, `Ta`, `Po`, `ny` — und neu `uh`
+(Kuh, Stuhl, Schuh). Seit dem Fix an `SpeechClipText.forWordBlock` spricht die
+Kachel, was auf ihr steht — ohne Clip über Android-TTS statt in kuratierter
+Stimme. `Hä`, `Bä`, `pfe` und `Pfe` sind am 2026-09-02 entfallen, weil sie eine
+Graphem-Einheit zerschnitten haben (siehe
+`docs/superpowers/specs/2026-09-02-graphem-einheiten-im-wort-bauer-design.md`).
 
 Beides braucht einen Lauf von `tools/tts/` (lokales Qwen3-TTS, eigene venv, siehe
 `tools/tts/README.md`) und danach ein Durchhören — deshalb nicht nebenbei erledigt.

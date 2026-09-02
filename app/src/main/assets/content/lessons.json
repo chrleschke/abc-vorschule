@@ -274,12 +274,14 @@
       "focusAtomIds": [
         "letter-ae",
         "letter-oe",
-        "letter-ue"
+        "letter-ue",
+        "letter-aeu"
       ],
       "taskIds": [
         "l12-t3",
         "l12-t4",
         "l12-t5",
+        "l12-t5b",
         "l12-t6",
         "l12-t7",
         "l12-t8",
@@ -376,7 +378,6 @@
       "taskIds": [
         "l16-t3",
         "l16-t4",
-        "l16-t5",
         "l16-t6",
         "l16-t7",
         "l16-t8",

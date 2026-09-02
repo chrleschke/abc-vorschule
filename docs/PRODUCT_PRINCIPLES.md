@@ -29,7 +29,7 @@ Bei Konflikten mit Implementierungsdetails oder älteren Planabschnitten gelten 
 
 ## 3. Lernprogression (Fibel-Lernpfad)
 
-Der Lehrplan besteht aus 34 Lektionen in acht Phasen (Fibel-Reihenfolge): 18 Basis-Lektionen führen die 39 Grapheme ein (Phase 1–5), 8 Wiederholungen vertiefen sie (Phase 6–7), und 8 Lektionen der **Phase 8** bringen keine neuen Grapheme mehr, sondern zusammengesetzte Wörter (siehe unten). Jede Lektion führt die sechs Trainer-**Typen** unten in fester Rangfolge durch — ein Typ kann sich wiederholen oder ganz fehlen (z. B. keine Satzrunde in einer Lektion), die Reihenfolge geht aber nie zurück; jede Lektion beginnt mit dem Visuellen Spurensucher und endet mit Rechnen.
+Der Lehrplan besteht aus 34 Lektionen in acht Phasen (Fibel-Reihenfolge): 18 Basis-Lektionen führen die 40 Grapheme ein (Phase 1–5), 8 Wiederholungen vertiefen sie (Phase 6–7), und 8 Lektionen der **Phase 8** bringen keine neuen Grapheme mehr, sondern zusammengesetzte Wörter (siehe unten). Jede Lektion führt die sechs Trainer-**Typen** unten in fester Rangfolge durch — ein Typ kann sich wiederholen oder ganz fehlen (z. B. keine Satzrunde in einer Lektion), die Reihenfolge geht aber nie zurück; jede Lektion beginnt mit dem Visuellen Spurensucher und endet mit Rechnen.
 Die Nummerierung beginnt bei 2, weil Trainer 1 (Auditiver Finder, Anfang/Mitte/Ende) entfernt wurde;
 die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
 
@@ -146,12 +146,29 @@ Silben stehen nur klein. Details und Beispiele:
 Reihenfolge-Regeln, die Content und Validator erzwingen:
 
 - Der Wort-Bauer zeigt nie ein Graphem oder eine Silbe, die noch nicht eingeführt wurde.
+- **Graphem-Einheiten bleiben ganz.** Kein Baustein-Schnitt (Wort-Bauer *und*
+  Silben-Verschmelzer) läuft mitten durch ein Zeichen, das einen Laut trägt: `Sch`, `Ch`,
+  `ck`, `Qu`, `Ei`, `Au`, `Eu`, `Äu`, dazu Vokal + Dehnungs-h (`uh` in Kuh) und Doppelvokal
+  (`ee` in Schnee). „Bäume" als `Bä + u + m + e` stand bis September 2026 im Pack — ein
+  Kind, das die Kacheln lautiert, liest `bä-u-me`, und die Silbe „Bä" gibt es nicht.
+  Ausgenommen sind `Pf`, `St`, `Sp`: sie tragen *zwei* Laute, die in verschiedene Silben
+  fallen dürfen („Apfel" trennt `Ap-fel`, „Wespe" `Wes-pe`). Die Trennlinie ist also der
+  Laut, nicht die Buchstabenzahl. `ContentValidator` erzwingt es und leitet die Einheiten
+  aus dem Pack ab, damit ein neues Graphem-Atom sie automatisch mitnimmt.
+- **Eine Silbe wird nur eingeführt, wenn sie in einem Wort vorkommt.** Der
+  Silben-Verschmelzer darf keine Silbe erfinden, die die Kombinatorik der Fokus-Grapheme
+  hergibt, das Deutsche aber nicht: l16 verschmolz `pf + a = pfa` — die einzige Silbe des
+  Packs, deren Buchstabenfolge in *keinem* Wort stand, auch in keinem Bildwort. `ck` kann
+  im Deutschen gar keine Silbe anfangen (es steht immer nach kurzem Vokal, „So-cke" ist
+  eine Trennregel), und `pf` bildet mit keinem Vokal eine offene Silbe, die in einem
+  Fibel-Wort vorkommt. Deshalb hat l16 seit September 2026 **keinen Verschmelzer** — wie
+  l12 nie einen hatte. Ein Trainer, der nichts Echtes zu zeigen hat, fällt aus.
 - Satzrunden (Satz-Architekt) nutzen nur gebaute Wörter, kleingeschriebene Funktionswörter oder ausdrücklich als `holisticAtomIds` markierte Ganzwort-Bilder (so führt die Fibel z. B. „Tor" vor dem R ein). Der **Satz-Versteher ist davon ausgenommen** — wie die Finale-Sätze lebt er von grammatischer Freiheit (Hör-Trainer, keine Bauen-Anforderung).
 - Gemeisterte Lektionen bleiben zum Wiederholen antippbar.
 
 ### Phase 8 — zusammengesetzte Wörter (l27–l34)
 
-Nach l18 sind alle 39 Grapheme eingeführt; Nachschub kann also nicht mehr aus neuen
+Nach l18 sind alle 40 Grapheme eingeführt; Nachschub kann also nicht mehr aus neuen
 Buchstaben kommen. Phase 8 lehrt stattdessen ein eigenes Prinzip: **lange Wörter sind
 aus kurzen gebaut, die das Kind schon kennt.** Sie nutzt dieselben sechs Trainer-Typen,
 aber zwei davon in erweiterter Bedeutung:
@@ -350,11 +367,11 @@ niemals mit einem stummen No-Op.
 ### TTS-Grenzen und Autorierungs-Konventionen
 
 - **„Buchstabe" nur für echte Einzelbuchstaben.** Mehrzeichen-Grapheme (`Sch`, `Sp`, `St`, `Ch`,
-  `Au`, `Ei`, `Eu`, `Pf`, `Qu`, `ck`, `ks` …) sind kein „Buchstabe" — das Wort ist fachlich falsch
+  `Au`, `Ei`, `Eu`, `Äu`, `Pf`, `Qu`, `ck`, `ks` …) sind kein „Buchstabe" — das Wort ist fachlich falsch
   und für Vorschulkinder irreführend. Prompts, die einen solchen Mehrzeichen-Laut ansprechen,
   heißen „…den Laut …" statt „…den Buchstaben …" (Spurensucher,
   Buchstaben-/Silben-Jagd, Wort-Detektiv). Umlaute (`Ä`, `Ö`, `Ü`) und `ß` bleiben „Buchstabe" — sie sind je ein
-  einzelnes Zeichen. Silben (`kind: syllable`, z. B. `ma`, `sp`, `st` als verschmolzenes Ergebnis
+  einzelnes Zeichen; `Äu` ist einer der vier Diphthonge und heißt „Laut". Silben (`kind: syllable`, z. B. `ma`, `sp`, `st` als verschmolzenes Ergebnis
   im Silben-Verschmelzer) heißen weiterhin „Silbe", nie „Laut" oder „Buchstabe".
 - **Einzelbuchstaben-Betonung:** Steht ein einzelner Buchstabe/Graphem als eigenständiges Wort in einem
   TTS-String (z. B. „der Buchstabe M", „Hörst du das M …", „M wie Mond"), wird er mit Gedankenstrichen

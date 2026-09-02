@@ -283,6 +283,73 @@ class ContentValidatorTest {
     }
 
     @Test
+    fun aBlockCutThroughADiphthongIsRejected() {
+        // Der Defekt, der die Regel erzwungen hat: „Bäume" stand als
+        // `Bä + u + m + e` im Pack, obwohl `au` seit l11 ein eigener Baustein ist.
+        // Ein Kind, das die Kacheln lautiert, liest `bä-u-me`.
+        val spec = pack.tasks.values.filterIsInstance<WordBuildSpec>()
+            .first { it.id == "l12-t7" }
+        val broken = spec.copy(
+            rounds = spec.rounds.map {
+                it.copy(
+                    blocks = listOf(
+                        WordBlock("letter-b", "Bä"),
+                        WordBlock("letter-u", "u"),
+                        WordBlock("letter-m", "m"),
+                        WordBlock("letter-e", "e"),
+                    ),
+                )
+            },
+        )
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.toString(), issues.any { it.contains("cut the grapheme unit 'äu'") })
+    }
+
+    @Test
+    fun aBlockCutThroughAStretchingHIsRejected() {
+        // „Stuhl" stand als `Stu + hl` da. Ein Baustein „hl" ist keine Einheit,
+        // und ein „h" nach dem Vokal behauptet den Laut /h/, den das Dehnungs-h
+        // nicht hat.
+        val spec = pack.tasks.values.filterIsInstance<WordBuildSpec>()
+            .first { it.id == "l24-t8b" }
+        val broken = spec.copy(
+            rounds = spec.rounds.map {
+                it.copy(
+                    blocks = listOf(WordBlock("letter-st", "Stu"), WordBlock("letter-h", "hl")),
+                )
+            },
+        )
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.toString(), issues.any { it.contains("cut the grapheme unit 'uh'") })
+    }
+
+    @Test
+    fun aClusterGraphemeMayBeCutAtTheSyllableBoundary() {
+        // Gegenprobe: `Pf`, `St`, `Sp` tragen zwei Laute, die in verschiedene
+        // Silben fallen dürfen — „Apfel" trennt `Ap-fel`. Die Regel darf das nicht
+        // mit einem echten Digraph verwechseln.
+        val spec = pack.tasks.values.filterIsInstance<WordBuildSpec>()
+            .first { it.id == "l16-t7" }
+        val broken = spec.copy(
+            rounds = spec.rounds.map {
+                it.copy(blocks = listOf(WordBlock("letter-a", "Ap"), WordBlock("letter-f", "fel")))
+            },
+        )
+        val issues = issuesOf { it.copy(tasks = it.tasks + (broken.id to broken)) }
+        assertTrue(issues.toString(), issues.none { it.contains("grapheme unit") })
+    }
+
+    @Test
+    fun aBoundaryAtTheEdgeOfAUnitIsFine() {
+        // „Fisch" darf `F + i + sch` heißen: der Schnitt liegt *am* Digraph, nicht
+        // in ihm.
+        val spec = pack.tasks.values.filterIsInstance<WordBuildSpec>()
+            .first { it.id == "l13-t6" }
+        val issues = issuesOf { it }
+        assertTrue(spec.rounds.first().blocks.map { it.display }.toString(), issues.isEmpty())
+    }
+
+    @Test
     fun wordBuildTrayOverflowIsRejected() {
         val spec = pack.tasks.values.filterIsInstance<WordBuildSpec>().first()
         val broken = spec.copy(
