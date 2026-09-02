@@ -1,4 +1,5 @@
-from ttskit.extract import FIELD_TO_PROFILE, extract_items, profile_for_item
+from ttskit.extract import (FIELD_TO_PROFILE, extract_items, profile_for_item,
+                            reads_as_bare_sentence)
 from ttskit.models import Item
 from ttskit.paths import Paths
 
@@ -37,7 +38,7 @@ def test_carries_text_field_and_source(content_dir):
     assert maus.source == "atoms.json"
 
     prompt = by_id["task:l01-t1:round:0:promptTts"]
-    assert prompt.text == "Hörst du M?"
+    assert prompt.text == "Finde alle Buchstaben - M - im Wort - Maus."
     assert prompt.field == "promptTts"
     assert prompt.source == "tasks.json"
 
@@ -378,3 +379,29 @@ def test_no_text_is_rendered_under_two_profiles_by_accident():
         profiles_by_text[item.text].add(profile_for_item(item))
     collisions = {t: sorted(p) for t, p in profiles_by_text.items() if len(p) > 1}
     assert collisions == {"Ei": ["phoneme", "word"]}, collisions
+
+
+def test_a_math_task_gets_its_own_profile_not_the_prompt_melody():
+    """„Sechs Ameisen krabbeln im Bau. Drei krabbeln hinaus. Wie viele Ameisen
+    bleiben." trägt Erzählung *und* Frage in einem String — die einzige Aufgabe
+    der Fibel, die fragt. Als `prompt` bekäme der ganze Text die fragende
+    Melodie, als `sentence` (sie endet auf einen Punkt!) die erzählende."""
+    math = Item(id="task:l01-t10:round:0:promptTts",
+                text="Sechs Ameisen krabbeln im Bau. Drei krabbeln hinaus. "
+                     "Wie viele Ameisen bleiben.",
+                field="promptTts", source="tasks.json", lesson="l01", label="")
+    assert profile_for_item(math) == "math"
+
+    instruction = Item(id="task:l01-t6:round:0:promptTts",
+                       text="Baue das Wort Mama.", field="promptTts",
+                       source="tasks.json", lesson="l01", label="")
+    assert profile_for_item(instruction) == "prompt"
+
+
+def test_a_question_is_never_a_bare_sentence():
+    """Ein „?" am Stringende verstößt schon gegen die Autorierungsregel
+    („Letzte Frage ohne Fragezeichen"); es darf nicht zusätzlich die
+    erzählende Satz-Melodie bekommen."""
+    assert not reads_as_bare_sentence("Hörst du das M?")
+    assert reads_as_bare_sentence("Tom singt.")
+    assert reads_as_bare_sentence("Mama Maus!")

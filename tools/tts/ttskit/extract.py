@@ -42,9 +42,24 @@ _PROMPT_FIELDS = frozenset({"promptTts", "instructionTts"})
 #: Textstücke, die eine Ansage an das Kind markieren, auch wenn der String wie
 #: ein Satz auf einen Punkt endet. Einzige Wahrheit für `reads_as_bare_sentence`
 #: und für die Kollisionsauflösung im Export.
+#: Die Rechenaufgabe. Sie ist die einzige Aufgabe der Fibel, die *fragt* — und
+#: sie fragt nicht nur: „Sechs Ameisen krabbeln im Bau. Drei krabbeln hinaus.
+#: Wie viele Ameisen bleiben." trägt Erzählung und Frage in einem String. Beides
+#: will eine andere Melodie als eine reine Aufforderung („Baue das Wort Mama."),
+#: also bekommt es ein eigenes Profil mit eigenem Seed-Pool.
+#:
+#: Am Satzende ist die Frage nicht zu erkennen: die Fibel schreibt sie mit Punkt
+#: (PRODUCT_PRINCIPLES, „Letzte Frage ohne Fragezeichen" — ein „?" am Stringende
+#: lässt die System-TTS die Stimme hochziehen, was bei Vorschulkindern unruhig
+#: klingt). An ihrem Anfang schon.
+MATH_MARKER = "Wie viele"
+
+#: Woran eine Aufgabenansage erkennbar ist. Alles Imperative — bis auf
+#: [MATH_MARKER], der sein eigenes Profil hat und hier nur mitläuft, damit eine
+#: Rechenaufgabe niemals als erzählender Satz durchgeht.
 INSTRUCTION_MARKERS = (
     "Baue das Wort", "Ordne ", "Finde den", "Finde alle", "Finde die",
-    "Schiebe ", "Zeichne den", "Wie viele",
+    "Schiebe ", "Zeichne den", MATH_MARKER,
 )
 
 
@@ -58,19 +73,38 @@ def reads_as_bare_sentence(text: str) -> bool:
     nur einer gewinnen (`export._collision_winner` nimmt den Satz). Der Prompt
     einer Satzrunde *ist* der Satz, also gehört ihm auch dessen Betonung — die
     fragende Prompt-Melodie wäre dort ohnehin falsch.
+
+    Ein **Fragezeichen zählt nicht als Satzende**. Eine Frage ist kein
+    erzählender Satz; sie im Satz-Profil aufzunehmen wäre derselbe Fehler wie
+    „Tom singt." im Prompt-Profil, nur umgekehrt. Bis September 2026 stand „?"
+    hier mit in der Liste und schob jede Frage, die keinen Marker trug, ins
+    Satz-Profil. Getroffen hat es nie eine echte Aufnahme — die Hausregel oben
+    verbietet „?" am Stringende, im Pack endet kein Text darauf —, aber sechs
+    Tests fielen darüber, weil das Testpaket noch „Hörst du M?" trug.
     """
     stripped = text.strip()
     if any(marker in stripped for marker in INSTRUCTION_MARKERS):
         return False
-    return stripped.endswith((".", "!", "?"))
+    return stripped.endswith((".", "!"))
+
+
+def reads_as_math_task(text: str) -> bool:
+    """Trägt dieser Text eine Rechenaufgabe? Siehe [MATH_MARKER]."""
+    return MATH_MARKER in text
 
 
 def profile_for_item(item: Item) -> str:
     """Map an extracted item to its synthesis profile."""
     if item.field == "lemma" and item.atom_kind in _PHONEME_LEMMA_KINDS:
         return "phoneme"
-    if item.field in _PROMPT_FIELDS and reads_as_bare_sentence(item.text):
-        return "sentence"
+    if item.field in _PROMPT_FIELDS:
+        # Reihenfolge: die Rechenaufgabe zuerst. Sie endet auf einen Punkt und
+        # wäre ohne ihren Marker ein „erzählender Satz" — die Frage am Ende
+        # bekäme dann Aussage-Melodie.
+        if reads_as_math_task(item.text):
+            return "math"
+        if reads_as_bare_sentence(item.text):
+            return "sentence"
     return FIELD_TO_PROFILE[item.field]
 
 

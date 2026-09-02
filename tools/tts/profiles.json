@@ -333,6 +333,25 @@
       "trim": true,
       "normalize": true
     },
+    "math": {
+      "label": "Rechenaufgabe",
+      "speaker": "sohee",
+      "language": "german",
+      "instruct": "Sprich wie eine freundliche Kindergärtnerin zu einem fünfjährigen Kind: erzähle die Situation ruhig und deutlich, mache eine kleine Pause vor der letzten Frage und hebe nur diese leicht fragend an. Warm zugewandt, ruhiges Tempo, nicht übertrieben fröhlich.",
+      "sampling": {
+        "temperature": 0.6,
+        "top_k": 30,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05,
+        "subtalker_temperature": 0.9,
+        "subtalker_top_k": 50,
+        "subtalker_top_p": 1.0,
+        "max_new_tokens": 200
+      },
+      "seedPool": [],
+      "trim": true,
+      "normalize": true
+    },
     "miss": {
       "label": "Sanftes Feedback",
       "speaker": "sohee",

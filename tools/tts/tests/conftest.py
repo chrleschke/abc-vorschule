@@ -22,14 +22,17 @@ def content_dir(tmp_path: Path) -> Path:
     (d / "tasks.json").write_text(json.dumps({"tasks": [
         # Kein realer Trainer-Typ: der Extractor liest Felder, nicht Trainer —
         # dieser Eintrag deckt task-level phonemeTts und rundenweises missTts ab.
+        # Die Texte trugen bis September 2026 den ausgebauten Hör-Trainer
+        # („Hörst du M?", „Maus. Am Anfang.“); geblieben ist die Feld-Abdeckung.
         {"id": "l01-t1", "phonemeTts": "M", "rounds": [
-            {"promptTts": "Hörst du M?", "atomId": "maus",
-             "missTts": "Maus. Am Anfang.", "blocks": []},
-            {"promptTts": "Hörst du M?", "atomId": "baum",
-             "missTts": "Baum. Am Ende.", "blocks": []},
+            {"promptTts": "Finde alle Buchstaben - M - im Wort - Maus.",
+             "atomId": "maus", "missTts": "Maus.", "blocks": []},
+            {"promptTts": "Finde alle Buchstaben - M - im Wort - Baum.",
+             "atomId": "baum", "missTts": "Baum.", "blocks": []},
         ]},
         {"trainer": "letter_trace", "id": "l01-t2", "rounds": [
-            {"promptTts": "Zeichne M nach.", "atomId": "letter-m", "glyph": "M",
+            {"promptTts": "Zeichne den Buchstaben - M - nach und sammle dabei alle Sterne.",
+             "atomId": "letter-m", "glyph": "M",
              "rewardTts": "M - wie Mond.", "rewardEmoji": "🌙", "blocks": []},
         ]},
         {"trainer": "syllable_merge", "id": "l01-t3", "rounds": [
