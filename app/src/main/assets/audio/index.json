@@ -1146,9 +1146,9 @@
       "profile": "word"
     },
     "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das.": {
-      "file": "prompt_2f9dd72c4bd9.ogg",
-      "fingerprint": "65931ee389b2df33",
-      "profile": "prompt"
+      "file": "math_2f9dd72c4bd9.ogg",
+      "fingerprint": "6a37caed17b2c3f2",
+      "profile": "math"
     },
     "Du hast es drauf!": {
       "file": "reward_bd22ab11f640.ogg",
@@ -1381,9 +1381,9 @@
       "profile": "word"
     },
     "Fünf Omas und vier Omas. Wie viele Omas sind das.": {
-      "file": "prompt_970f0fd9f7c9.ogg",
-      "fingerprint": "9e9ec1ff0bbabb6d",
-      "profile": "prompt"
+      "file": "math_970f0fd9f7c9.ogg",
+      "fingerprint": "ac2ab5683e5562e6",
+      "profile": "math"
     },
     "G": {
       "file": "phoneme_333e0a1e2781.ogg",
@@ -1871,9 +1871,9 @@
       "profile": "word"
     },
     "Neun Tomaten liegen im Korb. Vier werden gegessen. Wie viele Tomaten bleiben.": {
-      "file": "prompt_f486c3cf6f4e.ogg",
-      "fingerprint": "67e5bd26ca3b838d",
-      "profile": "prompt"
+      "file": "math_f486c3cf6f4e.ogg",
+      "fingerprint": "63d85a5d87d45a47",
+      "profile": "math"
     },
     "Nilpferd": {
       "file": "word_f7d8232215e4.ogg",
@@ -2556,9 +2556,9 @@
       "profile": "word"
     },
     "Sechzehn weniger sieben. Wie viele bleiben.": {
-      "file": "prompt_f4bba2526491.ogg",
-      "fingerprint": "993782f72730fe42",
-      "profile": "prompt"
+      "file": "math_f4bba2526491.ogg",
+      "fingerprint": "617cb747a94be367",
+      "profile": "math"
     },
     "Sehr gut": {
       "file": "reward_9f24cc311ede.ogg",
@@ -3261,9 +3261,9 @@
       "profile": "sentence"
     },
     "Zwei Reihen mit je vier Rosen blühen im Beet. Wie viele Rosen sind das.": {
-      "file": "prompt_8c2b7c6c4b52.ogg",
-      "fingerprint": "275c04a07454dcb1",
-      "profile": "prompt"
+      "file": "math_8c2b7c6c4b52.ogg",
+      "fingerprint": "9935d112884989db",
+      "profile": "math"
     },
     "Zwei Spinnen krabbeln über die Straße.": {
       "file": "sentence_cd68ea07b79e.ogg",

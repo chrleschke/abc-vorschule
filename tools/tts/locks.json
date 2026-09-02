@@ -463,6 +463,26 @@
       "seed": 301950401,
       "sourceText": "Die Qualle quetscht sich ins Taxi!"
     },
+    "math:2f9dd72c4bd9": {
+      "seed": 279883260,
+      "sourceText": "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das."
+    },
+    "math:8c2b7c6c4b52": {
+      "seed": 1607038802,
+      "sourceText": "Zwei Reihen mit je vier Rosen blühen im Beet. Wie viele Rosen sind das."
+    },
+    "math:970f0fd9f7c9": {
+      "seed": 1059656879,
+      "sourceText": "Fünf Omas und vier Omas. Wie viele Omas sind das."
+    },
+    "math:f486c3cf6f4e": {
+      "seed": 1720327602,
+      "sourceText": "Neun Tomaten liegen im Korb. Vier werden gegessen. Wie viele Tomaten bleiben."
+    },
+    "math:f4bba2526491": {
+      "seed": 1521286730,
+      "sourceText": "Sechzehn weniger sieben. Wie viele bleiben."
+    },
     "phoneme:07af03fb0629": {
       "seed": 1229924031,
       "sourceText": "Sch"
