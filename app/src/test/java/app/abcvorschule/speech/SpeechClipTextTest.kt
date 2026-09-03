@@ -1,7 +1,5 @@
 package app.abcvorschule.speech
 
-import app.abcvorschule.content.Atom
-import app.abcvorschule.content.AtomKind
 import app.abcvorschule.content.ContentRepository
 import app.abcvorschule.content.SymbolHuntDerivation
 import app.abcvorschule.content.SymbolHuntRound
@@ -36,22 +34,15 @@ class SpeechClipTextTest {
             segments = listOf("sp", "i", "n", "n", "e"),
             targetIndices = listOf(2, 3),
         )
-        // The pack carries no lowercase `sp` atom any more (l24 merges `sp + i`
-        // since September 2026), so the exact-display preference is exercised
-        // against a pack that has both spellings.
-        val lowerSp = Atom(id = "sp", lemma = "sp", display = "sp", emoji = "", kind = AtomKind.syllable)
-        val bothSpellings = pack.copy(atoms = pack.atoms + (lowerSp.id to lowerSp))
-        assertEquals("sp", SpeechClipText.forSegment(bothSpellings, round, 0))
+        assertEquals("sp", SpeechClipText.forSegment(pack, round, 0))
         assertEquals(
             "Sp",
             SpeechClipText.forSegment(
-                bothSpellings,
+                pack,
                 round.copy(segments = listOf("Sp", "i", "n", "n", "e")),
                 0,
             ),
         )
-        // Without the lowercase atom the letter atom's curated lemma wins.
-        assertEquals(pack.atom("letter-sp").lemma, SpeechClipText.forSegment(pack, round, 0))
     }
 
     @Test

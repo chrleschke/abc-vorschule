@@ -3302,14 +3302,14 @@
       "id": "l24-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe st und u zusammen. Welche Silbe entsteht.",
-          "leftAtomId": "letter-st",
-          "leftDisplay": "st",
-          "rightAtomId": "letter-u",
-          "rightDisplay": "u",
-          "resultAtomId": "stu",
-          "resultDisplay": "stu",
-          "stretchTts": "St"
+          "promptTts": "Schiebe s und t zusammen. Welcher Laut entsteht.",
+          "leftAtomId": "letter-s",
+          "leftDisplay": "s",
+          "rightAtomId": "letter-t",
+          "rightDisplay": "t",
+          "resultAtomId": "st",
+          "resultDisplay": "st",
+          "stretchTts": "S"
         }
       ]
     },
@@ -3318,14 +3318,14 @@
       "id": "l24-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe sp und i zusammen. Welche Silbe entsteht.",
-          "leftAtomId": "letter-sp",
-          "leftDisplay": "sp",
-          "rightAtomId": "letter-i",
-          "rightDisplay": "i",
-          "resultAtomId": "spi",
-          "resultDisplay": "spi",
-          "stretchTts": "Sp"
+          "promptTts": "Schiebe s und p zusammen. Welcher Laut entsteht.",
+          "leftAtomId": "letter-s",
+          "leftDisplay": "s",
+          "rightAtomId": "letter-p",
+          "rightDisplay": "p",
+          "resultAtomId": "sp",
+          "resultDisplay": "sp",
+          "stretchTts": "S"
         }
       ]
     },

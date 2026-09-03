@@ -4627,9 +4627,16 @@
       "kind": "syllable"
     },
     {
-      "id": "stu",
-      "lemma": "stu",
-      "display": "stu",
+      "id": "st",
+      "lemma": "s t",
+      "display": "st",
+      "emoji": "",
+      "kind": "syllable"
+    },
+    {
+      "id": "sp",
+      "lemma": "sp",
+      "display": "sp",
       "emoji": "",
       "kind": "syllable"
     },
