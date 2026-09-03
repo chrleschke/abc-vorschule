@@ -4793,6 +4793,22 @@
       "nounClass": "name"
     },
     {
+      "id": "mateo",
+      "lemma": "Mateo",
+      "display": "Mateo",
+      "emoji": "👦🏽",
+      "kind": "word",
+      "nounClass": "name"
+    },
+    {
+      "id": "lennard",
+      "lemma": "Lennard",
+      "display": "Lennard",
+      "emoji": "👦🏼",
+      "kind": "word",
+      "nounClass": "name"
+    },
+    {
       "id": "pe",
       "lemma": "pe",
       "display": "pe",
