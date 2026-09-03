@@ -11,9 +11,9 @@ class FinaleLayoutTest {
     @Test
     fun picturesKeepSentenceOrderAndCarryTheSpokenWord() {
         val pictures = FinaleLayout.picturesOf(pack, pack.finale("f-l01"))
-        assertEquals(listOf("mama", "maus", "apfel"), pictures.map { it.atomId })
-        assertEquals(listOf("👩", "🐭", "🍎"), pictures.map { it.emoji })
-        assertEquals(listOf("Mama", "Maus", "Apfel"), pictures.map { it.lemma })
+        assertEquals(listOf("maus", "mama", "apfel"), pictures.map { it.atomId })
+        assertEquals(listOf("🐭", "👩", "🍎"), pictures.map { it.emoji })
+        assertEquals(listOf("Maus", "Mama", "Apfel"), pictures.map { it.lemma })
     }
 
     @Test

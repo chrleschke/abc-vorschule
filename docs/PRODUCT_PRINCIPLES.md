@@ -86,8 +86,13 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
     wo sie steht, ein sonst bildloses Wort als *richtige* Karte ein (Nashorn,
     Flamingo, Tiger, Nilpferd, Affe, Raupe, Pilz …). `ContentValidator` lässt 3–6 zu,
     `LessonCoverageTest` hält 4–5 fest.
-  - 4–8 Wörter, ein Hauptsatz, Wörter der Lektion, Cartoon-Logik (realistischer als
-    die Finale-Sätze).
+  - 4–8 Wörter, ein Hauptsatz, Wörter der Lektion, **lebensnah**: Der Satz beschreibt
+    etwas, das ein Kind so erleben oder in einem Sachbuch sehen kann. Tiere tun, was
+    Tiere tun — kein Pony im Taxi, kein Frosch auf dem Fahrrad, kein Lama, das Hallo
+    ruft, kein Schaf mit neuen Schuhen (alles bis September 2026 im Pack). Figuren wie
+    Pirat, Hexe oder Dino dürfen auftreten, wo sie als Spiel- oder Märchenfigur tragen
+    („Tom spielt mit dem Dino"). Der einzige Ort für Quatsch ist der Finale-Satz (§12),
+    und der muss lustig sein.
   - **Die falsche Karte tauscht eine Kategorie, nicht bloß die Anzahl.** Anderes Tier,
     anderes Kleidungsstück, anderer Akteur, anderes Objekt, anderer Ort. Zwei Äpfel
     gegen einen Apfel ist zu wenig Unterschied — das Kind rät die Menge, statt den
@@ -189,6 +194,17 @@ aber zwei davon in erweiterter Bedeutung:
 Der Spurensucher bleibt Pflicht (jede Lektion beginnt damit) und zeichnet ein Graphem
 nach, das in den Wörtern der Lektion wirklich vorkommt — sonst findet der Wort-Detektiv
 keinen Treffer.
+Sein Merksatz nennt den **Bestandteil**, nicht das Kompositum („H wie Hand", nicht „H wie
+Handschuh") — Regel 1 oben gilt hier unverändert.
+
+**Reihenfolge der Phase 8:** erst die Komposita, deren Teile unverändert aneinanderstoßen
+(Hand+schuh, Apfel+kuchen, Fuß+ball, Eis+bär, Schnee+mann), danach die mit Fugenelement
+oder gekürztem Erstglied (Sonne**n**+blume, Tasche**n**+lampe, Schul+tasche) — dort muss
+das Kind hören, dass das erste Wort sich beim Zusammenschieben verändert, und das ist
+der schwierigere Schritt. Seit September 2026 also: Handschuh/Hausschuh →
+Apfelkuchen/Brotdose → Fußball/Baumhaus → Eisbär/Vogelnest → Schneemann/Schneeball →
+Regenjacke/Sonnenblume → Schultasche/Schulbus → Mülltonne/Taschenlampe. Jedes Teilwort
+ist gebaut, bevor ein Kompositum es braucht (Ball vor Schneeball, Jacke vor Regenjacke).
 
 ### Redaktionsregel Wortschatz
 

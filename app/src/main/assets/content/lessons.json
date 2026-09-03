@@ -67,6 +67,7 @@
         "l03-t7",
         "l03-t8",
         "l03-t9",
+        "l03-t9b",
         "l03-sp1",
         "l03-t10"
       ]
@@ -267,7 +268,7 @@
       "id": "l12",
       "index": 12,
       "phase": 3,
-      "title": "Umlaut-Rätsel (Mathematisch)",
+      "title": "Ä, Ö & Ü (Die Umlaute)",
       "nodeLabel": "ä ö ü",
       "status": "authored",
       "finaleId": "f-l12",
@@ -694,13 +695,13 @@
       "id": "l29",
       "index": 29,
       "phase": 8,
-      "title": "Regenjacke & Sonnenblume (Zusammengesetzt)",
-      "nodeLabel": "Regen jacke",
+      "title": "Fußball & Baumhaus (Zusammengesetzt)",
+      "nodeLabel": "Fuß ball",
       "status": "authored",
       "finaleId": "f-l29",
       "focusAtomIds": [
-        "letter-r",
-        "letter-s"
+        "letter-sz",
+        "letter-b"
       ],
       "taskIds": [
         "l29-t1",
@@ -708,8 +709,6 @@
         "l29-m1",
         "l29-m2",
         "l29-w1",
-        "l29-w2",
-        "l29-w3",
         "l29-c1",
         "l29-c2",
         "l29-s1",
@@ -721,13 +720,13 @@
       "id": "l30",
       "index": 30,
       "phase": 8,
-      "title": "Fußball & Baumhaus (Zusammengesetzt)",
-      "nodeLabel": "Fuß ball",
+      "title": "Eisbär & Vogelnest (Zusammengesetzt)",
+      "nodeLabel": "Eis bär",
       "status": "authored",
       "finaleId": "f-l30",
       "focusAtomIds": [
-        "letter-sz",
-        "letter-b"
+        "letter-ei",
+        "letter-v"
       ],
       "taskIds": [
         "l30-t1",
@@ -746,13 +745,13 @@
       "id": "l31",
       "index": 31,
       "phase": 8,
-      "title": "Eisbär & Vogelnest (Zusammengesetzt)",
-      "nodeLabel": "Eis bär",
+      "title": "Schneemann & Schneeball (Zusammengesetzt)",
+      "nodeLabel": "Schnee mann",
       "status": "authored",
       "finaleId": "f-l31",
       "focusAtomIds": [
-        "letter-ei",
-        "letter-v"
+        "letter-sch",
+        "letter-m"
       ],
       "taskIds": [
         "l31-t1",
@@ -760,6 +759,7 @@
         "l31-m1",
         "l31-m2",
         "l31-w1",
+        "l31-w2",
         "l31-c1",
         "l31-c2",
         "l31-s1",
@@ -771,13 +771,13 @@
       "id": "l32",
       "index": 32,
       "phase": 8,
-      "title": "Schneemann & Schneeball (Zusammengesetzt)",
-      "nodeLabel": "Schnee mann",
+      "title": "Regenjacke & Sonnenblume (Zusammengesetzt)",
+      "nodeLabel": "Regen jacke",
       "status": "authored",
       "finaleId": "f-l32",
       "focusAtomIds": [
-        "letter-sch",
-        "letter-m"
+        "letter-r",
+        "letter-s"
       ],
       "taskIds": [
         "l32-t1",
@@ -786,6 +786,7 @@
         "l32-m2",
         "l32-w1",
         "l32-w2",
+        "l32-w3",
         "l32-c1",
         "l32-c2",
         "l32-s1",

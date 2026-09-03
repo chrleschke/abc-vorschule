@@ -224,10 +224,26 @@ class SymbolInWordDerivationTest {
 
     @Test
     fun aSingleGraphemeWordProducesNoRound() {
-        // l22 builds "Ei", one segment — the word would be the answer.
-        val l22 = rounds("l22")
-        assertTrue("Ei must not become a round", l22.none { it.wordAtomId == "ei" })
-        assertEquals(listOf("letter-au", "to"), l22.map { it.targetAtomId })
+        // A word of one segment ("Ei" as a single `Ei` block) would be its own
+        // answer. The pack no longer builds one — l22 builds "Eimer" since September
+        // 2026 — so the case is synthesized onto l22 instead of read from the pack.
+        val single = WordBuildSpec(
+            id = "l22-ei",
+            rounds = listOf(
+                WordBuildRound(
+                    promptTts = "Baue das Wort Ei.",
+                    targetAtomId = "ei",
+                    blocks = listOf(WordBlock(atomId = "letter-ei", display = "Ei")),
+                ),
+            ),
+        )
+        val synthetic = pack.copy(tasks = pack.tasks + (single.id to single))
+        val base = pack.lesson("l22")
+        val lesson = base.copy(taskIds = base.taskIds + single.id)
+        val derived = SymbolInWordDerivation.buildRounds(synthetic, lesson)
+        assertTrue("Ei must not become a round", derived.none { it.wordAtomId == "ei" })
+        assertEquals(rounds("l22").map { it.targetAtomId }, derived.map { it.targetAtomId })
+        assertEquals(listOf("letter-ei", "bau", "letter-au"), derived.map { it.targetAtomId })
     }
 
     @Test
