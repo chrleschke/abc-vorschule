@@ -3741,7 +3741,7 @@
           ]
         },
         {
-          "sentenceTts": "Mama malt eine Sonne.",
+          "sentenceTts": "Mama malte am Morgen eine Sonne.",
           "correctAtomIds": [
             "mama",
             "sonne"
@@ -3845,7 +3845,7 @@
           ]
         },
         {
-          "sentenceTts": "Opa kocht eine Suppe.",
+          "sentenceTts": "Opa trug einen Topf voll Suppe.",
           "correctAtomIds": [
             "opa",
             "suppe"
@@ -3856,7 +3856,7 @@
           ]
         },
         {
-          "sentenceTts": "Tom wirft den Ball zu Papa.",
+          "sentenceTts": "Tom warf den Ball zu Papa.",
           "correctAtomIds": [
             "tom",
             "ball",
@@ -3885,18 +3885,18 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Tom ruft laut Hallo.",
+          "sentenceTts": "Das Lama hat laut Hallo gerufen.",
           "correctAtomIds": [
-            "tom",
+            "lama",
             "hallo"
           ],
           "wrongAtomIds": [
-            "mia",
+            "opa",
             "hallo"
           ]
         },
         {
-          "sentenceTts": "Zwei Lamas laufen über die Wiese.",
+          "sentenceTts": "Zwei Lamas liefen über die Wiese.",
           "correctAtomIds": [
             "lama",
             "lama"
@@ -3907,10 +3907,10 @@
           ]
         },
         {
-          "sentenceTts": "Das Lama frisst Gras.",
+          "sentenceTts": "Das Lama hat einen Hut gefressen.",
           "correctAtomIds": [
             "lama",
-            "gras"
+            "hut"
           ],
           "wrongAtomIds": [
             "lama",
@@ -3918,13 +3918,13 @@
           ]
         },
         {
-          "sentenceTts": "Oma streichelt das Lama.",
+          "sentenceTts": "Oma ist auf dem Lama geritten.",
           "correctAtomIds": [
             "oma",
             "lama"
           ],
           "wrongAtomIds": [
-            "oma",
+            "opa",
             "pferd"
           ]
         }
@@ -3936,14 +3936,14 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Der Fuchs sitzt unter dem Baum.",
+          "sentenceTts": "Ein Ufo ist im Park gelandet.",
           "correctAtomIds": [
-            "fuchs",
-            "baum"
+            "ufo",
+            "park"
           ],
           "wrongAtomIds": [
-            "hund",
-            "baum"
+            "elefant",
+            "park"
           ]
         },
         {
@@ -3958,25 +3958,25 @@
           ]
         },
         {
-          "sentenceTts": "Der Wind weht Omas Hut davon.",
+          "sentenceTts": "Der Wind trug Omas Hut davon.",
           "correctAtomIds": [
             "oma",
             "hut"
           ],
           "wrongAtomIds": [
             "oma",
-            "tasche"
+            "kleid"
           ]
         },
         {
-          "sentenceTts": "Zwei Flugzeuge fliegen am Himmel.",
+          "sentenceTts": "Zwei Ufos fliegen am Himmel.",
           "correctAtomIds": [
-            "flugzeug",
-            "flugzeug"
+            "ufo",
+            "ufo"
           ],
           "wrongAtomIds": [
-            "vogel",
-            "vogel"
+            "flugzeug",
+            "flugzeug"
           ]
         },
         {
@@ -3998,7 +3998,7 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Tom schießt den Ball ins Tor.",
+          "sentenceTts": "Tom hat den Ball ins Tor geworfen.",
           "correctAtomIds": [
             "tom",
             "ball",
@@ -4062,7 +4062,7 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Ein kleiner Vogel sitzt im Nest.",
+          "sentenceTts": "Ein kleiner Vogel liegt im Nest.",
           "correctAtomIds": [
             "nest",
             "vogel"
@@ -4128,25 +4128,25 @@
           ]
         },
         {
-          "sentenceTts": "Tom spielt mit dem Dino.",
+          "sentenceTts": "Der Dino hat den Kuchen gefressen.",
           "correctAtomIds": [
-            "tom",
-            "dino"
+            "dino",
+            "kuchen"
           ],
           "wrongAtomIds": [
-            "tom",
-            "hund"
+            "hund",
+            "kuchen"
           ]
         },
         {
-          "sentenceTts": "Das Krokodil hat viele Zähne.",
+          "sentenceTts": "Das Krokodil hat den Keks gefressen.",
           "correctAtomIds": [
             "krokodil",
-            "zahn"
+            "keks"
           ],
           "wrongAtomIds": [
-            "kuh",
-            "zahn"
+            "dino",
+            "keks"
           ]
         },
         {
@@ -4276,16 +4276,14 @@
           ]
         },
         {
-          "sentenceTts": "Opa geht mit dem Hund in den Park.",
+          "sentenceTts": "Der Drache flog über den Park.",
           "correctAtomIds": [
-            "opa",
-            "hund",
+            "drache",
             "park"
           ],
           "wrongAtomIds": [
-            "opa",
-            "igel",
-            "park"
+            "drache",
+            "weg"
           ]
         },
         {
@@ -4330,7 +4328,7 @@
           ]
         },
         {
-          "sentenceTts": "Die Eule sitzt auf dem Baum.",
+          "sentenceTts": "Die Eule flog auf den Baum.",
           "correctAtomIds": [
             "baum",
             "eule"
@@ -4341,7 +4339,7 @@
           ]
         },
         {
-          "sentenceTts": "Aus dem Haus kommen zwei Mäuse.",
+          "sentenceTts": "Aus dem Haus kamen zwei Mäuse.",
           "correctAtomIds": [
             "haus",
             "maus",
@@ -4349,8 +4347,8 @@
           ],
           "wrongAtomIds": [
             "haus",
-            "hund",
-            "hund"
+            "dino",
+            "dino"
           ]
         },
         {
@@ -4381,14 +4379,14 @@
           ]
         },
         {
-          "sentenceTts": "Mia fährt mit dem Fahrrad.",
+          "sentenceTts": "Der Frosch ist mit dem Fahrrad gefahren.",
           "correctAtomIds": [
-            "mia",
+            "frosch",
             "fahrrad"
           ],
           "wrongAtomIds": [
-            "mia",
-            "roller"
+            "dino",
+            "fahrrad"
           ]
         },
         {
@@ -4433,14 +4431,14 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Das Schaf frisst einen Apfel.",
+          "sentenceTts": "Das Schaf hat neue Schuhe bekommen.",
           "correctAtomIds": [
             "schaf",
-            "apfel"
+            "schuh"
           ],
           "wrongAtomIds": [
             "schaf",
-            "keks"
+            "hut"
           ]
         },
         {
@@ -4495,14 +4493,14 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Mia spielt mit dem Jojo.",
+          "sentenceTts": "Das Zebra hat ein Jojo gefunden.",
           "correctAtomIds": [
-            "mia",
+            "zebra",
             "jojo"
           ],
           "wrongAtomIds": [
-            "mia",
-            "ball"
+            "tiger",
+            "jojo"
           ]
         },
         {
@@ -4519,7 +4517,7 @@
           ]
         },
         {
-          "sentenceTts": "Der Zug fährt durch den Schnee.",
+          "sentenceTts": "Der Zug fuhr durch den Schnee.",
           "correctAtomIds": [
             "zug",
             "schnee"
@@ -4530,7 +4528,7 @@
           ]
         },
         {
-          "sentenceTts": "Die Eule hat eine Maus gefangen.",
+          "sentenceTts": "Die Eule fing eine Maus.",
           "correctAtomIds": [
             "eule",
             "maus"
@@ -4583,14 +4581,14 @@
           ]
         },
         {
-          "sentenceTts": "Der Vogel sitzt auf dem Dach.",
+          "sentenceTts": "Der Vogel setzt sich auf den Fuß.",
           "correctAtomIds": [
             "vogel",
-            "dach"
+            "fuss"
           ],
           "wrongAtomIds": [
             "vogel",
-            "baum"
+            "hut"
           ]
         },
         {
@@ -4654,14 +4652,14 @@
           ]
         },
         {
-          "sentenceTts": "Die Socke liegt unter dem Bett.",
+          "sentenceTts": "Der Zucker steckt in der Dose.",
           "correctAtomIds": [
-            "socke",
-            "bett"
+            "zucker",
+            "dose"
           ],
           "wrongAtomIds": [
-            "socke",
-            "stuhl"
+            "zucker",
+            "paket"
           ]
         },
         {
@@ -4681,7 +4679,7 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Die Spinne krabbelt über den Spiegel.",
+          "sentenceTts": "Die Spinne hat sich im Spiegel gesehen.",
           "correctAtomIds": [
             "spinne",
             "spiegel"
@@ -4743,13 +4741,13 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Papa ruft ein Taxi.",
+          "sentenceTts": "Das Pony ist mit dem Taxi gefahren.",
           "correctAtomIds": [
-            "papa",
+            "pony",
             "taxi"
           ],
           "wrongAtomIds": [
-            "papa",
+            "pony",
             "bus"
           ]
         },
@@ -4772,11 +4770,11 @@
           ],
           "wrongAtomIds": [
             "clown",
-            "handy"
+            "radio"
           ]
         },
         {
-          "sentenceTts": "Das Taxi hält an der Ampel.",
+          "sentenceTts": "Das Taxi hielt an der Ampel.",
           "correctAtomIds": [
             "taxi",
             "ampel"
@@ -4863,14 +4861,14 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Die Maus schläft im Gras.",
+          "sentenceTts": "Die Maus hat den Käse geklaut.",
           "correctAtomIds": [
             "maus",
-            "gras"
+            "kaese"
           ],
           "wrongAtomIds": [
             "ameise",
-            "gras"
+            "kaese"
           ]
         },
         {
@@ -4973,7 +4971,7 @@
           ]
         },
         {
-          "sentenceTts": "Die Uhr liegt auf dem Sofa.",
+          "sentenceTts": "Lennard hat die Uhr auf das Sofa gelegt.",
           "correctAtomIds": [
             "uhr",
             "sofa"
@@ -5042,7 +5040,7 @@
           ]
         },
         {
-          "sentenceTts": "Tom hat ein Pflaster am Knie.",
+          "sentenceTts": "Tom hat sein Pflaster verloren.",
           "correctAtomIds": [
             "tom",
             "pflaster"
@@ -5104,14 +5102,14 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Mama fährt mit dem Auto zur Arbeit.",
+          "sentenceTts": "Das Auto hält an der Ampel.",
           "correctAtomIds": [
-            "mama",
-            "auto"
+            "auto",
+            "ampel"
           ],
           "wrongAtomIds": [
-            "mama",
-            "bus"
+            "bus",
+            "ampel"
           ]
         },
         {
@@ -5139,7 +5137,7 @@
           ]
         },
         {
-          "sentenceTts": "Der Roller steht vor dem Haus.",
+          "sentenceTts": "Mateos Roller stand vor dem Haus.",
           "correctAtomIds": [
             "roller",
             "haus"
@@ -5451,7 +5449,7 @@
           ],
           "wrongAtomIds": [
             "papa",
-            "klavier"
+            "radio"
           ]
         }
       ]
@@ -5896,7 +5894,7 @@
           ]
         },
         {
-          "sentenceTts": "Mia bekommt eine Torte zum Geburtstag.",
+          "sentenceTts": "Mia hat eine Torte zum Geburtstag bekommen.",
           "correctAtomIds": [
             "mia",
             "torte"
@@ -6075,7 +6073,7 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Der Fußball fliegt ins Tor.",
+          "sentenceTts": "Tom hat den Fußball ins Tor geschossen.",
           "correctAtomIds": [
             "fussball",
             "tor"
@@ -6086,7 +6084,7 @@
           ]
         },
         {
-          "sentenceTts": "Zwei Kinder klettern ins Baumhaus.",
+          "sentenceTts": "Mateo und Lennard sind ins Baumhaus geklettert.",
           "correctAtomIds": [
             "kind",
             "kind",
@@ -6805,14 +6803,12 @@
           ]
         },
         {
-          "sentenceTts": "Die Sonnenblume ist so groß wie Tom.",
+          "sentenceTts": "Nach dem Regen steht ein Regenbogen da.",
           "correctAtomIds": [
-            "sonnenblume",
-            "tom"
+            "regenbogen"
           ],
           "wrongAtomIds": [
-            "blume",
-            "tom"
+            "wolke"
           ]
         },
         {
@@ -7030,7 +7026,7 @@
           ]
         },
         {
-          "sentenceTts": "In der Schultasche liegt ein Buch.",
+          "sentenceTts": "Mateo hat sein Buch eingepackt.",
           "correctAtomIds": [
             "schultasche",
             "buch"
@@ -7052,7 +7048,7 @@
           ]
         },
         {
-          "sentenceTts": "Mia packt ihre Tasche.",
+          "sentenceTts": "Mia packt ihre Tasche und geht.",
           "correctAtomIds": [
             "mia",
             "tasche"

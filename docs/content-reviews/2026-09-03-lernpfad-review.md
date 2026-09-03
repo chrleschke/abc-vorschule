@@ -10,11 +10,15 @@ Prüfkriterien, wie vom Nutzer vorgegeben:
 2. **Plausibilität der Items** — ist jede Aufgabe das, was ihr Prompt behauptet
    (eine Silbe ist eine Silbe, ein Wort-Bauer hat etwas zu bauen, eine Rechenszene
    stimmt)?
-3. **Sätze** — Satz-Architekt und Satz-Versteher lebensnah und sinnvoll; **nur der
-   Finale-Satz darf unreal sein**, und dann lustig, nicht beliebig.
+3. **Sätze** — sinnvoll und lebensnah, **außer** wo Quatsch das Mittel ist: der
+   Finale-Satz (lustig, nicht beliebig) und der Satz-Versteher, der kurios sein darf und
+   dessen Vergangenheitsformen Absicht sind. Beides habe ich im ersten Durchgang falsch
+   verstanden, siehe Befund 3.
 4. **Wortschatz** — keine Wörter, die aus der Zeit gefallen sind.
 
-Alle Befunde sind umgesetzt; Validator und `LessonCoverageTest` sind grün.
+Alle Befunde sind umgesetzt; 716 Unit-Tests grün. **Befund 3 wurde nach Rückmeldung des
+Nutzers am 03.09. weitgehend zurückgenommen** — die Begründung steht dort und die Regel
+dahinter jetzt in PRODUCT_PRINCIPLES §3.6.
 
 ---
 
@@ -73,42 +77,66 @@ Sch wie Schuh · B wie Brot · R wie Regen · S wie Sonne · ß wie in Fuß · B
 wie Eis · V wie Vogel · Sch wie Schnee · Ü wie in Müll. Dazu l18 „X wie Xylofon" 🎵 —
 das Emoji zeigte eine Note, kein Instrument — jetzt „X wie in Hexe" 🧙.
 
-## Befund 3 — Sätze, die unreal waren, ohne Finale zu sein
+## Befund 3 — Sätze (nach Nutzer-Korrektur größtenteils zurückgenommen)
 
-Der Satz-Versteher trug an elf Stellen Cartoon-Logik, die dem Kind eine falsche Welt
-erzählt: **Pony fährt Taxi, Frosch fährt Fahrrad, Lama ruft Hallo, Lama frisst einen
-Hut, Oma reitet auf dem Lama, Zebra findet ein Jojo, Schaf bekommt neue Schuhe,
-Krokodil frisst Keks, Dino frisst Kuchen, Drache fliegt über den Park, Ufo landet im
-Park / zwei Ufos am Himmel.** Alle ersetzt durch Szenen aus dem Kinderalltag oder aus
-dem Sachbuch:
+Der erste Durchgang dieses Reviews hat elf Satz-Versteher-Runden als „unreal" und zehn
+weitere als „falsche Zeitform" umgeschrieben. **Beides war falsch, und beides ist
+zurückgenommen.** Die Korrektur kam am 03.09. vom Nutzer und ist jetzt in
+PRODUCT_PRINCIPLES §3.6 dokumentiert, damit sie nicht wieder passiert:
 
-> Tom spielt mit dem Dino. · Mia fährt mit dem Fahrrad. · Papa ruft ein Taxi. · Tom ruft
-> laut Hallo. · Das Lama frisst Gras. · Oma streichelt das Lama. · Mia spielt mit dem
-> Jojo. · Das Schaf frisst einen Apfel. · Das Krokodil hat viele Zähne. · Opa geht mit
-> dem Hund in den Park. · Der Fuchs sitzt unter dem Baum. · Zwei Flugzeuge fliegen am
-> Himmel.
+1. **Der Satz-Versteher darf kurios sein.** Pony im Taxi, Frosch auf dem Fahrrad, Lama
+   mit Hut, Krokodil, das den Keks frisst, Drache über dem Park — Kinder mögen Drachen,
+   Krokodile und Kekse, und genau dafür schauen sie sich die Aufgabe an. Die Grenze ist
+   Cartoon-Logik, nicht Alltagsrealismus. Die Sachlichkeitsregel, die ich hier angewandt
+   habe, gilt für **Rechen-Szenen** (§3.7), nicht für Bildkarten.
+2. **Die Vergangenheitsform ist der Zweck des Trainers.** Perfekt, Präteritum und
+   Partizip II stehen dort mit Absicht: es ist die einzige Stelle im Pfad, an der ein
+   Kind sie zu hören bekommt. Ich hatte eine engere Vorgabe von 2026-08 („Zwei Vögel
+   saßen auf dem Baum" neben zwei sitzenden Vögeln) als Generalregel gelesen und zehn
+   Sätze zu Unrecht ins Präsens gezogen.
 
-Pirat und Hexe (l08) bleiben — Spiel- und Märchenfiguren, keine Tiere, die Menschen
-spielen. Das Ufo bleibt gebundenes Bauwort (l05) und Finale-Bild (l02).
+**Alle 44 Satz-Versteher-Runden stehen damit wieder im Originalwortlaut.** Erhalten
+bleiben nur Änderungen, die keinen Satz anfassen (Befund 4) und diese eine Ausnahme:
 
-**Zeitform folgt dem Bild** (§3.6) war an neun Stellen verletzt — Präteritum bei einer
-Karte, die den Zustand zeigt: „Zwei Lamas liefen", „Der Drache flog", „Die Eule flog",
-„Aus dem Haus kamen", „Der Zug fuhr", „Die Eule fing", „Opa trug", „Tom warf", „Das
-Taxi hielt", „Mama malte". Jetzt Präsens oder natürliches Perfekt („Die Eule hat eine
-Maus gefangen"). „Das Pferd sprang über das Tor" bleibt — ausdrücklich als natürlicher
-Fall in §3 genannt.
+* **l28 „Der Kuchen ist für Oma." ✔🍰 ✘🎂** — eine Torte *ist* ein Kuchen, die falsche
+  Karte war also nicht falsch. Jetzt „Mia hat eine Torte zum Geburtstag bekommen."
+  ✔👧🎂 ✘👧🍪, im Perfekt wie die Nachbarrunden.
 
-**Satz-Architekt:** „Die Spinne spielt." (l17, l24) ist kein Satz über Spinnen; jetzt
-„Der Stern ist hell." und „Die Spinne ist klein.". „Lama ist da." (l07, vor dem D von
-„da") wird „Tom hat eine Rose." — vier Wörter, alle aus gelehrten Graphemen. Neu in l33:
-„Wir gehen zur Schule." (bringt `gehen` zurück in Umlauf, neues Funktionswort `zur`). In l22
-weicht „Das ist mein Ei." dem neuen Bauwort: „Der Eimer ist voll.".
+**Namen: Mateo und Lennard.** Der Pfad lief fast ausschließlich über Tom (18 Karten).
+Vier Runden in späteren Lektionen tragen jetzt die beiden anderen Namen — früh bleibt es
+bei Tom, das ist dort sinnvoll. Beide stehen **nur im Satz, nie auf einer Karte**: 👦
+gehört Tom, und zwei Jungen mit demselben Glyphen sind für ein Kind dieselbe Karte
+(§3 „Emoji-Doppelgänger"). Die Karten der vier Runden sind unberührt:
 
-**Finale:** „Mama Maus mampft einen dicken Apfel" zeigte 👩🐭🍎 — Mama Maus ist eine
-Figur, die Bilder zeigten zwei. Jetzt „Die Maus mampft Mamas Apfel!". „Deine Nase ist
-rot wie eine Rose." war der einzige Finale-Satz ohne Handlung und ohne Witz — jetzt „Die
-Rose kitzelt Opas Nase!". „Die Schultasche fährt im Schulbus mit!" war zu alltäglich
-für eine Belohnung — jetzt „Der Schulbus trägt eine Schultasche!".
+| | vorher | jetzt |
+|---|---|---|
+| l20 | Die Uhr liegt auf dem Sofa. | Lennard hat die Uhr auf das Sofa gelegt. |
+| l22 | Der Roller steht vor dem Haus. | Mateos Roller stand vor dem Haus. |
+| l29 | Zwei Kinder klettern ins Baumhaus. | Mateo und Lennard sind ins Baumhaus geklettert. |
+| l33 | In der Schultasche liegt ein Buch. | Mateo hat sein Buch eingepackt. |
+
+Erster Versuch für l29 war „Lennards Ball rollte über die Straße."; das hat
+`SentencePictureSidesTest` abgefangen — die Seite der richtigen Karte hängt am Satz-Hash,
+und der neue Wortlaut hätte alle vier Runden der Lektion auf dieselbe Seite gelegt („immer
+rechts tippen"). Deshalb tragen die Namen die Baumhaus-Runde, die schon auf dieser Seite
+lag, und der Ball-Satz bleibt unverändert.
+
+**Satz-Architekt** (vom Nutzer abgesegnet): „Die Spinne spielt." (l17, l24) ist kein Satz
+über Spinnen; jetzt „Der Stern ist hell." und „Die Spinne ist klein.". „Lama ist da."
+(l07) wird „Tom hat eine Rose.", „Wir gehen den Weg." (l10) wird „Der Regen ist kalt.",
+„Das ist mein Ei." (l22) wird „Der Eimer ist voll." — die drei folgen den neuen
+Bauwörtern. Neu dazu: l03 bekommt überhaupt erst eine Satzrunde („Papa."), l33 eine
+zweite („Wir gehen zur Schule.").
+
+**Finale:** „Mama Maus mampft einen dicken Apfel!" bleibt — es ist der Lieblingssatz des
+Kindes. Berechtigt war nur die Bildkritik: Mama Maus ist **eine** Figur, die Reihe zeigte
+👩🐭🍎 also zwei. Jetzt 🐭🍎. „Die Schultasche fährt im Schulbus mit!" (l33) war weder
+lustig noch ein Bild; mein erster Ersatz („Der Schulbus trägt eine Schultasche!") war es
+genauso wenig. Jetzt: **„Die Schultasche frisst meine Brotdose!"** 🎒🍱 — eine Handlung
+aus der Quatsch-Familie (klauen, mampfen, stecken) und ein Bild, das jedes Kind kennt,
+das schon mal eine zerdrückte Brotdose ausgepackt hat. „Deine Nase ist rot wie eine
+Rose." (l06) war der einzige Finale-Satz ohne Handlung und ohne Witz — jetzt „Die Rose
+kitzelt Opas Nase!".
 
 ## Befund 4 — Gegenkarten und Rechenszenen
 
@@ -130,16 +158,22 @@ stehen jetzt in der Kita.
 
 ## Befund 5 — Wortschatz aus der Zeit
 
-Wenig zu tun, der Umbau vom 30.08. hat das Gröbste erledigt. Raus sind jetzt noch
-**Radio** 📻 (zweimal Gegenkarte; ein Kind von 2026 kennt Kopfhörer und Handy, kein
-Radio), **Zucker** 🍬 (das Emoji ist ein Bonbon, die Runde „Der Zucker steckt in der
-Dose" ergab kein Bild — jetzt „Die Socke liegt unter dem Bett"), **Weg** (siehe oben)
-und **Drache** 🐉 (einziger Auftritt war die unreale Park-Runde). Gelöscht wurden
-außerdem `spielt` und `rü`. Neu: `eine`, `zur`, `kü`.
-Atome: 298 → **295**, weiterhin keines ohne Auftritt.
+Hier war fast nichts zu tun, der Umbau vom 30.08. hat das Gröbste erledigt. Mein erster
+Durchgang hatte **Radio** 📻, **Zucker** 🍬 und **Drache** 🐉 gestrichen; alle drei sind
+zurück. Radio war im August ausdrücklich als Grenzfall zum Belassen entschieden, und
+Zucker und Drache hingen an Sätzen, die nach der Nutzer-Korrektur wieder gelten. Was
+tatsächlich weg ist:
+
+* **`spielt`** — hing nur an „Die Spinne spielt." (Satz-Architekt, abgesegnet).
+* **`rü`** — Silben-Atom, das kein Verschmelzer mehr erzeugt, seit Rübe raus ist.
+* **`Weg`** bleibt als Atom, weil die Drachen-Runde es als Gegenkarte braucht; als
+  Bauwort ist es durch **Regen** ersetzt (🛣️ war eine Autobahn, dieselbe wie `Straße`).
+
+Neu: `eine`, `zur`, `kü`. Atome: 298 → **299**, weiterhin keines ohne Auftritt.
 
 Bewusst **nicht** angefasst: Hut, Rose, Dose, Vase, Uhu — klassischer Fibel-Wortschatz,
-nicht veraltet; Ufo, Pirat, Hexe, Dino — Motivationsfiguren, an den richtigen Stellen.
+nicht veraltet; Ufo, Pirat, Hexe, Dino, Drache — Motivationsfiguren, an den richtigen
+Stellen.
 
 ## Was offen bleibt
 

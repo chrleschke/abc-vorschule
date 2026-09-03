@@ -86,13 +86,16 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
     wo sie steht, ein sonst bildloses Wort als *richtige* Karte ein (Nashorn,
     Flamingo, Tiger, Nilpferd, Affe, Raupe, Pilz …). `ContentValidator` lässt 3–6 zu,
     `LessonCoverageTest` hält 4–5 fest.
-  - 4–8 Wörter, ein Hauptsatz, Wörter der Lektion, **lebensnah**: Der Satz beschreibt
-    etwas, das ein Kind so erleben oder in einem Sachbuch sehen kann. Tiere tun, was
-    Tiere tun — kein Pony im Taxi, kein Frosch auf dem Fahrrad, kein Lama, das Hallo
-    ruft, kein Schaf mit neuen Schuhen (alles bis September 2026 im Pack). Figuren wie
-    Pirat, Hexe oder Dino dürfen auftreten, wo sie als Spiel- oder Märchenfigur tragen
-    („Tom spielt mit dem Dino"). Der einzige Ort für Quatsch ist der Finale-Satz (§12),
-    und der muss lustig sein.
+  - 4–8 Wörter, ein Hauptsatz, Wörter der Lektion, Cartoon-Logik (realistischer als
+    die Finale-Sätze).
+  - **Kurios ist erlaubt, und zwar ausdrücklich.** Ein Pony, das Taxi fährt, ein Frosch
+    auf dem Fahrrad, ein Lama mit Hut, ein Krokodil, das den Keks frisst, ein Drache
+    über dem Park: genau die Bilder, für die Kinder dieser Altersgruppe die Aufgabe
+    überhaupt anschauen. Die Grenze ist Cartoon-Logik (§12), nicht Alltagsrealismus —
+    und „lebensnah" ist **keine** Anforderung an diesen Trainer. Im September 2026 hat
+    ein Review elf solcher Runden gegen Alltagsszenen getauscht und musste komplett
+    zurückgenommen werden. Wer hier aufräumen will, hat den Trainer missverstanden;
+    die Sachlichkeitsregel gilt für **Rechen-Szenen** (§3.7), nicht für die Bildkarten.
   - **Die falsche Karte tauscht eine Kategorie, nicht bloß die Anzahl.** Anderes Tier,
     anderes Kleidungsstück, anderer Akteur, anderes Objekt, anderer Ort. Zwei Äpfel
     gegen einen Apfel ist zu wenig Unterschied — das Kind rät die Menge, statt den
@@ -102,12 +105,16 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
     das Haus" ist die sprachlich wertvollere Form und darf auf einer Karte mit einer
     Wolke stehen — bei unscharfen Mengen (Wolken, Sand, Sterne) zählt niemand nach.
     Die Doppelung ist ein Mittel, keine Pflicht.
-  - **Zeitform folgt dem Bild, nicht dem Lernziel.** Beschreibt der Satz einen Zustand,
-    der auf der Karte zu sehen ist, steht er im Präsens („Zwei Eulen sitzen auf dem
-    Baum"). Partizip II und Präteritum kommen dort, wo sie ohnehin natürlich klingen
-    („Der Bär hat im Bett geschlafen", „Das Pferd sprang über das Tor") — nie erzwungen.
-    „Zwei Vögel saßen auf dem Baum" ist der Fehlerfall: die Vergangenheitsform sagt, dass
-    sie weg sind, das Bild zeigt sie aber.
+  - **Die Vergangenheitsform ist der Zweck, nicht ein Versehen.** Perfekt, Präteritum
+    und Partizip II stehen hier mit Absicht: dieser Trainer ist die einzige Stelle im
+    Pfad, an der ein Kind sie überhaupt zu hören bekommt, und das ist sein Lernziel
+    („Die Eule fing eine Maus", „Der Zug fuhr durch den Schnee", „Die Maus hat den Käse
+    geklaut"). Eine bestehende Runde **nie** ins Präsens umschreiben.
+    Die einzige Grenze ist der Fall, den der Nutzer 2026-08 gemeldet hat: eine Form, die
+    behauptet, die Situation sei vorbei, während die Karte sie zeigt („Zwei Vögel saßen
+    auf dem Baum" neben zwei sitzenden Vögeln). Das ist ein Einzelfall-Veto gegen eine
+    unglückliche Form, **keine** Regel „Zustand → Präsens"; als solche gelesen hat sie
+    im September 2026 zehn Sätze zu Unrecht ins Präsens gezogen.
   - **Kartenoptik und Feedback.** Die Bildkarten sind Rahmen ohne Füllfläche (der
     `CreamElevated`-Grund verdunkelte die Emojis, ohne die Kartengrenze
     sichtbarer zu machen), stehen mit ihrer Oberkante knapp unterhalb der
