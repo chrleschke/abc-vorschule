@@ -3,22 +3,81 @@ package app.abcvorschule.ui.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * "Warmer Tag" palette — the light theme. Semantic roles, not raw hues: callers
- * pick by meaning (StarGold for stars, LeafGreen for correct, SkyBlue for
- * progress, SunCoral for CTAs) rather than reaching for `primary` directly.
+ * Die Papierfläche der App — `paper green` aus dem Babbel GDS
+ * (`lessonnine/design-tokens.lib`, Set `semantic/paper green`).
  *
- * Contrast against Cream (background): WarmInk ~11.1:1, WarmMuted ~4.45:1.
+ * Der Trainer-Grund ist keine Fläche mehr, sondern ein radialer Verlauf von
+ * [PaperCenter] in der Mitte nach [PaperEdge] an den Rändern; gezeichnet wird er
+ * in `TaskShell`. Die Namen mit `Cream`-Präfix sind geblieben, weil sie quer
+ * durch die App importiert werden — sie tragen jetzt Papiertöne, keine Cremetöne.
  *
- * Contrast rule for the accent surfaces below (WCAG-differentiated, not a flat
- * 4.5:1 everywhere): Cream text/glyphs drawn *on* an accent fill only need to
- * clear 3:1 (large text / icons / UI components), since these fills carry short
- * labels, icons, or the progress track — never small body copy. ClayRed is the
- * exception: it also renders as error *text* on the Cream background for
- * adults, so it is tuned to clear the small-text bar of 4.5:1 there instead.
+ * Warum ein Verlauf und nicht die flache GDS-Fläche: die Kacheln der
+ * Buchstaben-Jagd liegen dann im aufgehellten Mittelfeld statt auf dem vollen
+ * `app-background`. Der schwächste Ring gemessen am Ort seiner Kachel steigt
+ * dadurch von 3.04:1 (flach) auf 3.83:1 — der Verlauf kauft die Reserve, die die
+ * flache Fläche nicht hatte.
+ *
+ * Die Amplitude begrenzt die **Ecke**, nicht die Mitte: Kacheln streuen bis an
+ * die Ränder, also muss der dunkelste Punkt des Verlaufs noch die 3:1 für
+ * UI-Komponenten tragen. Für paper green ist dort bei `green 400` Schluss
+ * (3.04:1 gegen den schwächsten Ring), eine Stufe tiefer wären es 2.85:1.
+ * [PaperEdge] darf also **nicht** weiter abgedunkelt werden.
+ *
+ * Zwei Alternativen, gemessen und verworfen — falls wir es später drehen wollen:
+ *
+ * `paper blue` (dieselbe Bauart, eine Spur mehr Luft, weil blue bis `500` tragen
+ * darf; wirkt kühler und im Wort-Bauer etwas flacher als green):
+ * ```
+ * val PaperCenter    = Color(0xFFFAFBFC)  // paper blue 50
+ * val PaperEdge      = Color(0xFFC7CDD6)  // paper blue 500 — Ring am Ort 3.89:1
+ * val Cream          = Color(0xFFFAFBFC)
+ * val CreamPanel     = Color(0xFFF1F3F5)  // paper blue 150
+ * val CreamElevated  = Color(0xFFF6F7F8)  // paper blue 100
+ * ```
+ *
+ * Die ursprüngliche „Warmer Tag"-Fassung ohne Verlauf (flaches Cream; dort lag
+ * der schwächste Jagd-Ring bei 3.29:1, WarmInk bei 11.1:1, WarmMuted bei 4.45:1):
+ * ```
+ * val Cream          = Color(0xFFFBF3E4)
+ * val CreamPanel     = Color(0xFFF4E8D0)
+ * val CreamElevated  = Color(0xFFE9DBBD)
+ * ```
+ * Beim Zurückdrehen auf eine dieser Fassungen muss auch [TilePalette] in
+ * `SymbolHuntTrainer` mitwandern (siehe dort) — die Ringe sind gegen den
+ * jeweiligen Grund kalibriert.
  */
-val Cream = Color(0xFFFBF3E4)
-val CreamPanel = Color(0xFFF4E8D0)
-val CreamElevated = Color(0xFFE9DBBD)
+val PaperCenter = Color(0xFFF8F9F8)
+val PaperEdge = Color(0xFFC5CDC9)
+
+/**
+ * Doppelrolle, geerbt aus der Cream-Fassung: heller Grundton **und** die helle
+ * Schrift/Glyphe AUF den Akzentflächen (`onPrimary` & Co., der Chevron auf
+ * SunCoral, die Ziffer auf der richtigen Menge). Hex-gleich mit [PaperCenter] —
+ * der Verlauf startet in genau diesem Ton.
+ *
+ * Kontraste auf [PaperCenter]: WarmInk 11.58:1, WarmMuted 4.65:1, ClayRed 5.50:1.
+ * Auf [PaperEdge], dem dunkelsten Punkt: WarmInk 7.53:1, ClayRed 3.58:1 —
+ * und WarmMuted nur noch 3.03:1. Für Glyphen und UI-Bauteile reicht das, für
+ * **kleinen Fließtext** nicht mehr: sekundärer Text in WarmMuted gehört damit in
+ * die Bildmitte, nicht an den Rand. Betroffen wäre in erster Linie der
+ * Eltern-Bereich; die Kind-Screens tragen dort keinen Kleintext.
+ */
+val Cream = Color(0xFFF8F9F8)
+
+/** paper green 100 — Panels, Kacheln, die Bausteine des Wort-Bauers. */
+val CreamPanel = Color(0xFFF1F3F2)
+
+/**
+ * paper green 50 — die erhabenen Bauteile, in der Praxis der Lautsprecher-Knopf.
+ *
+ * Hex-gleich mit [Cream] und damit mit der hellsten Stelle des Verlaufs: der
+ * Knopf sitzt oben im Bild, wo der Grund schon abgefallen ist, und liest sich
+ * dort als heller Chip. Wandert je ein Bauteil in die Bildmitte, braucht es
+ * einen eigenen Ton — die Familie hat darüber nichts mehr, dann muss der Grund
+ * eine Stufe tiefer statt das Bauteil eine höher.
+ */
+val CreamElevated = Color(0xFFF8F9F8)
+
 val WarmInk = Color(0xFF3D3427)
 val WarmMuted = Color(0xFF7C6F5A)
 val StarGold = Color(0xFFF0A818)

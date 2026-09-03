@@ -8,9 +8,17 @@
       müsste jeder Aufsatz die ganze Liste wiederholen.
     -->
     <style name="Base.Theme.AbcVorschule" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">#FFFBF3E4</item>
-        <item name="android:navigationBarColor">#FFFBF3E4</item>
-        <item name="android:windowBackground">#FFFBF3E4</item>
+        <!--
+          PaperCenter aus Color.kt (#F8F9F8, paper green 50) — der Ton, in dem der
+          radiale Grund der App startet. Das Fenster zeigt diese Farbe, bevor Compose
+          zeichnet; träfe sie den Grund nicht, blitzte beim Start eine fremde Fläche auf.
+          Die Systemleisten liegen zwar über dem dunkleren Rand des Verlaufs, tragen dort
+          aber nichts Eigenes — ein Ton reicht, und der helle ist der unauffälligere.
+          Frühere Cream-Fassung: #FFFBF3E4.
+        -->
+        <item name="android:statusBarColor">#FFF8F9F8</item>
+        <item name="android:navigationBarColor">#FFF8F9F8</item>
+        <item name="android:windowBackground">#FFF8F9F8</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
 

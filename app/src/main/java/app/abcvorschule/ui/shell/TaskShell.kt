@@ -1,6 +1,9 @@
 package app.abcvorschule.ui.shell
 
 import androidx.compose.foundation.background
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +48,8 @@ import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.SuccessBurst
 import app.abcvorschule.ui.rewards.playBlockedBlip
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.PaperCenter
+import app.abcvorschule.ui.theme.PaperEdge
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -74,12 +79,31 @@ fun TaskShell(
         if (state.screen != AppScreen.Practice) onStopSpeak()
     }
     // Bewusst OHNE globales safeDrawing-Padding: sonst liegt über und unter dem
-    // Inhalt ein Cream-Band statt der Landschaft. Die Schutzbereiche sind
+    // Inhalt ein Papierband statt der Landschaft. Die Schutzbereiche sind
     // durchsichtig, jedes Element konsumiert seinen Inset selbst.
+    //
+    // Der Grund ist ein radialer Verlauf, keine Fläche ([PaperCenter] → [PaperEdge],
+    // Herleitung und Messwerte in Color.kt). Der Lichtpunkt sitzt auf 42 % der Höhe
+    // statt in der Mitte: dort liegt das Spielfeld der Trainer, während das obere
+    // Fünftel Kopfzeile und Fortschrittsband trägt. Radius 78 % der Höhe, damit der
+    // dunkelste Ton erst in den Ecken erreicht wird und nicht schon an den Längsseiten.
+    //
+    // `drawBehind` statt `background(Brush)`: nur hier ist die tatsächliche Größe
+    // bekannt, und ohne sie ließen sich Mitte und Radius nicht relativ setzen —
+    // `Brush.radialGradient` würde auf die halbe *kürzere* Kante zurückfallen und den
+    // Verlauf schon an den Seitenrändern auslaufen lassen.
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .drawBehind {
+                drawRect(
+                    Brush.radialGradient(
+                        colors = listOf(PaperCenter, PaperEdge),
+                        center = Offset(size.width / 2f, size.height * 0.42f),
+                        radius = size.height * 0.78f,
+                    ),
+                )
+            },
     ) {
         when {
             state.error != null -> {

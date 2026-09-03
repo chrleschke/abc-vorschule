@@ -77,7 +77,9 @@ Kernpunkte (Kurzfassung):
 
 ## Technik-Kurzüberblick
 
-- Kotlin + Jetpack Compose, helles Warmer-Tag-Theme (Farbrollen + Haptik-Vokabular siehe PRODUCT_PRINCIPLES §10)
+- Kotlin + Jetpack Compose, heller Papiergrund aus dem Babbel GDS (`paper green`, radialer
+  Verlauf statt Fläche — Farbrollen, Kontrastgrenzen und Haptik-Vokabular siehe
+  PRODUCT_PRINCIPLES §10; verworfene Alternativen als Kommentar in `Color.kt`)
 - Content: versioniertes JSON unter `app/src/main/assets/content/`
 - Progress: DataStore
 - Content-Schema v2: ein polymorpher `TaskSpec` pro Trainer (`trainer`-Diskriminator), Lektionen in `lessons.json`

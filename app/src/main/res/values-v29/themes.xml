@@ -6,10 +6,10 @@
       Prüfung stummzuschalten. Unter 29 fehlt das Attribut damit — dort gibt es
       auch kein Force Dark, das es abschalten müsste.
 
-      Abgeschaltet, weil das Cream der App keine helle Variante eines dunklen
+      Abgeschaltet, weil der Papiergrund der App keine helle Variante eines dunklen
       Themes ist: die automatische Invertierung würde Landschaft, Schilder und
-      Karten umfärben, und die Kontraste, die überall gegen Cream gerechnet sind,
-      gelten dann nicht mehr.
+      Karten umfärben, und die Kontraste, die überall gegen diesen Grund gerechnet
+      sind, gelten dann nicht mehr.
     -->
     <style name="Theme.AbcVorschule" parent="Base.Theme.AbcVorschule">
         <item name="android:forceDarkAllowed">false</item>

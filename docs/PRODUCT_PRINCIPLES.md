@@ -104,7 +104,7 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
     „Zwei Vögel saßen auf dem Baum" ist der Fehlerfall: die Vergangenheitsform sagt, dass
     sie weg sind, das Bild zeigt sie aber.
   - **Kartenoptik und Feedback.** Die Bildkarten sind Rahmen ohne Füllfläche (der
-    graue `CreamElevated`-Grund verdunkelte die Emojis, ohne die Kartengrenze
+    `CreamElevated`-Grund verdunkelte die Emojis, ohne die Kartengrenze
     sichtbarer zu machen), stehen mit ihrer Oberkante knapp unterhalb der
     Bildschirmmitte, und die Emoji-Reihe füllt die Karte so weit die Breite es
     zulässt. Ein Fehltipp wird **bewegt** quittiert, nicht gefärbt: die getippte
@@ -276,7 +276,7 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
 Gesperrte und noch nicht autorierte Schilder reagieren auf Tippen mit einem gesprochenen Hinweis —
 niemals mit einem stummen No-Op.
 - **„Du bist hier“-Marker**: über dem Schild der aktuellen Lektion steht eine Pin-Nadel
-  (`SunCoral` mit Cream-Kontur), die sanft auf und ab wippt — das Kind soll auf einem Screen
+  (`SunCoral` mit heller Kontur in `Cream`), die sanft auf und ab wippt — das Kind soll auf einem Screen
   voller Wegweiser ohne Text erkennen, welches Schild dran ist. Der Pfad scrollt beim Öffnen
   automatisch zu diesem Schild; wer selbst weiterscrollt, wird nicht zurückgerissen.
 - **Nach dem Abschluss animiert der Fortschritt**: der Marker hüpft in einem Bogen vom gerade
@@ -556,12 +556,29 @@ niemals mit einem stummen No-Op.
   Slot garantiert die feste Höhe aus §7.
   Der Parameter `answerAnchor` ist mit `Bottom` vorbelegt; `BelowCenter` ist die
   eine benannte Ausnahme (§9, Satz-Versteher).
+- **Papiergrund (verbindlich).** Der Trainer-Grund ist eine Fläche des Babbel GDS,
+  Familie `paper green`, und er ist **kein Volltonfeld**, sondern ein radialer Verlauf von
+  `PaperCenter` (#F8F9F8) in der Mitte nach `PaperEdge` (#C5CDC9) an den Rändern —
+  Lichtpunkt auf 42 % der Höhe, Radius 78 % der Höhe, gezeichnet in `TaskShell`.
+  Die frühere flache Cream-Fläche (#FBF3E4) ist damit abgelöst; die Konstantennamen mit
+  `Cream`-Präfix sind geblieben, tragen aber Papiertöne.
+  Zwei Regeln hängen daran und dürfen nicht stillschweigend gebrochen werden:
+  1. `PaperEdge` wird **nicht** dunkler. Kacheln der Jagd streuen bis in die Ecken, und
+     dort muss der Grund die 3:1 für UI-Bauteile noch tragen: bei `green 400` sind es
+     3.04:1, eine Stufe tiefer nur noch 2.85:1.
+  2. Kleiner Fließtext in `WarmMuted` gehört in die Bildmitte, nicht an den Rand — auf
+     `PaperEdge` liegt er bei 3.03:1 und damit unter der 4.5:1 für Kleintext.
+  Die Ringe der Jagd sind gegen diesen Grund kalibriert (`TilePalette` in
+  `SymbolHuntTrainer`, rund 11 % dunkler als die App-Akzente): schwächster Ring 3.83:1,
+  gemessen gegen den Grund am Ort der jeweiligen Kachel. Wer den Grund ändert, ändert
+  die Ringe mit. Die verworfene `paper blue`-Fassung und die ursprünglichen Cream-Werte
+  stehen als Kommentar in `Color.kt`.
 - Farbrollen (verbindlich): `StarGold` = Sterne/Punkte/Belohnung (`StarGoldDeep` als Kontur-/
   Tiefton für den Stern-Glyph auf hellem Grund), `LeafGreen` = richtig/erledigt, `SkyBlue` =
   Fortschritt/aktiv, `SunCoral` = Handlungs-CTA (auch der „Du bist hier“-Marker auf dem Pfad —
   er sagt „hier tippen“), `ClayRed` = Fehlertext (Erwachsene).
   `LeafGreenLight`/`SkyBlueLight` sind helle Ring-Varianten ausschließlich für Akzente AUF
-  dunklen Flächen (Holzschilder auf dem Pfad) — nie als Fläche oder Akzent auf Cream.
+  dunklen Flächen (Holzschilder auf dem Pfad) — nie als Fläche oder Akzent auf dem Papiergrund.
   Eine Bedeutung pro Farbe — Sterne und Progress greifen nie auf `primary` zu.
   Benannte Ausnahme: die **warm gelaufenen Trittspuren** des Pfades nutzen ein transparentes
   StarGold (§5 verlangt „wärmer", und ein kaltes SkyBlue widerspräche dem) — das ist eine
