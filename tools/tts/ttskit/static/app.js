@@ -1569,13 +1569,21 @@ el("btn-export").onclick = guard(async () => {
   const parts = [`${report.exported.length} Clips in die App exportiert`];
   if (report.unchanged.length) parts.push(`${report.unchanged.length} unverändert`);
   if (report.removed.length) parts.push(`${report.removed.length} nicht mehr benötigte entfernt`);
-  if (report.skipped.length) {
-    parts.push(`${report.skipped.length} übersprungen: ` +
-      report.skipped.map((s) => `${s.key} (${s.reason})`).join(", "));
-  }
+  if (report.skipped.length) parts.push(`${report.skipped.length} übersprungen`);
   parts.push(...report.warnings);
   showBanner(parts.join(" — "), report.skipped.length || report.warnings.length
     ? "warn" : "info");
+  // Die einzelnen Clip-IDs sagen niemandem etwas — die volle Liste, nach
+  // Grund gruppiert, landet nur in der Konsole für den seltenen Fall, dass
+  // sie jemand nachschlagen will.
+  if (report.skipped.length) {
+    const byReason = new Map();
+    for (const { key, reason } of report.skipped) {
+      if (!byReason.has(reason)) byReason.set(reason, []);
+      byReason.get(reason).push(key);
+    }
+    console.info("Export: übersprungene Clips nach Grund", byReason);
+  }
 });
 
 el("btn-cancel").onclick = guard(() => post("/api/jobs/cancel", {}));
