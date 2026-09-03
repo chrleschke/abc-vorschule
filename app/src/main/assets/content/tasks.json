@@ -95,12 +95,11 @@
       "id": "l01-t10",
       "rounds": [
         {
-          "promptTts": "Sechs Ameisen krabbeln im Bau. Drei krabbeln hinaus. Wie viele Ameisen bleiben?",
-          "left": 6,
+          "promptTts": "Vier Ameisen und drei Ameisen. Wie viele Ameisen sind das?",
+          "left": 4,
           "right": 3,
-          "answer": 3,
-          "iconAtomId": "ameise",
-          "operation": "subtract"
+          "answer": 7,
+          "iconAtomId": "ameise"
         }
       ]
     },
@@ -223,18 +222,18 @@
       "id": "l02-t10",
       "rounds": [
         {
-          "promptTts": "Fünf Omas und vier Omas. Wie viele Omas sind das?",
+          "promptTts": "Fünf Igel und vier Igel. Wie viele Igel sind das?",
           "left": 5,
           "right": 4,
           "answer": 9,
-          "iconAtomId": "oma"
+          "iconAtomId": "igel"
         },
         {
-          "promptTts": "Acht Omas winken. Drei gehen nach Hause. Wie viele Omas bleiben?",
+          "promptTts": "Acht Igel laufen im Garten. Drei verstecken sich. Wie viele Igel bleiben?",
           "left": 8,
           "right": 3,
           "answer": 5,
-          "iconAtomId": "oma",
+          "iconAtomId": "igel",
           "operation": "subtract"
         }
       ]
@@ -362,6 +361,18 @@
               "display": "m"
             }
           ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l03-t9b",
+      "rounds": [
+        {
+          "promptTts": "Ordne das Wort - Papa - dem Bild zu.",
+          "sentenceId": "s-papa",
+          "illustrationAtomId": "papa",
+          "blocks": []
         }
       ]
     },
@@ -922,9 +933,9 @@
       "id": "l07-t9",
       "rounds": [
         {
-          "promptTts": "Lama ist da.",
-          "sentenceId": "s-lama-ist-da",
-          "illustrationAtomId": "lama",
+          "promptTts": "Tom hat eine Rose.",
+          "sentenceId": "s-tom-hat-eine-rose",
+          "illustrationAtomId": "rose",
           "blocks": []
         }
       ]
@@ -1244,11 +1255,11 @@
       "id": "l09-t10",
       "rounds": [
         {
-          "promptTts": "Sieben Eis sind im Gefrierfach. Drei werden gegessen. Wie viele Eis bleiben?",
+          "promptTts": "Sieben Eier liegen im Korb. Drei werden gekocht. Wie viele Eier bleiben?",
           "left": 7,
           "right": 3,
           "answer": 4,
-          "iconAtomId": "eis",
+          "iconAtomId": "ei",
           "operation": "subtract"
         },
         {
@@ -1309,20 +1320,16 @@
       "id": "l10-t6",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Weg.",
-          "targetAtomId": "weg",
+          "promptTts": "Baue das Wort Regen.",
+          "targetAtomId": "regen",
           "blocks": [
             {
-              "atomId": "letter-w",
-              "display": "W"
+              "atomId": "letter-r",
+              "display": "Re"
             },
             {
-              "atomId": "letter-e",
-              "display": "e"
-            },
-            {
-              "atomId": "letter-g",
-              "display": "g"
+              "atomId": "ge",
+              "display": "gen"
             }
           ]
         }
@@ -1373,9 +1380,9 @@
       "id": "l10-t9",
       "rounds": [
         {
-          "promptTts": "Wir gehen den Weg.",
-          "sentenceId": "s-wir-gehen",
-          "illustrationAtomId": "weg",
+          "promptTts": "Der Regen ist kalt.",
+          "sentenceId": "s-der-regen-ist-kalt",
+          "illustrationAtomId": "regen",
           "blocks": []
         }
       ]
@@ -1669,7 +1676,7 @@
         {
           "promptTts": "Hier sind Häuser.",
           "sentenceId": "s-viele-haeuser",
-          "illustrationAtomId": "haus",
+          "illustrationAtomId": "haeusser",
           "blocks": []
         }
       ]
@@ -1936,11 +1943,7 @@
             },
             {
               "atomId": "letter-b",
-              "display": "b"
-            },
-            {
-              "atomId": "letter-r",
-              "display": "ra"
+              "display": "bra"
             }
           ]
         }
@@ -2345,7 +2348,15 @@
           "blocks": [
             {
               "atomId": "letter-st",
-              "display": "Ster"
+              "display": "St"
+            },
+            {
+              "atomId": "letter-e",
+              "display": "e"
+            },
+            {
+              "atomId": "letter-r",
+              "display": "r"
             },
             {
               "atomId": "letter-n",
@@ -2380,9 +2391,9 @@
       "id": "l17-t9",
       "rounds": [
         {
-          "promptTts": "Die Spinne spielt.",
-          "sentenceId": "s-spinne-spielt",
-          "illustrationAtomId": "spinne",
+          "promptTts": "Der Stern ist hell.",
+          "sentenceId": "s-der-stern-ist-hell",
+          "illustrationAtomId": "stern",
           "blocks": []
         }
       ]
@@ -2443,8 +2454,8 @@
           "promptTts": "Zeichne den Buchstaben - X - nach und sammle dabei alle Sterne.",
           "atomId": "letter-x",
           "glyph": "X",
-          "rewardTts": "X - wie Xylofon.",
-          "rewardEmoji": "🎵",
+          "rewardTts": "X - wie in Hexe.",
+          "rewardEmoji": "🧙",
           "blocks": []
         }
       ]
@@ -2664,12 +2675,20 @@
       "id": "l19-t8",
       "rounds": [
         {
-          "promptTts": "Baue das Wort am.",
-          "targetAtomId": "am",
+          "promptTts": "Baue das Wort Ameise.",
+          "targetAtomId": "ameise",
           "blocks": [
             {
-              "atomId": "am",
-              "display": "am"
+              "atomId": "letter-a",
+              "display": "A"
+            },
+            {
+              "atomId": "mei",
+              "display": "mei"
+            },
+            {
+              "atomId": "se",
+              "display": "se"
             }
           ]
         }
@@ -3038,12 +3057,24 @@
       "id": "l22-t7",
       "rounds": [
         {
-          "promptTts": "Baue das Wort Ei.",
-          "targetAtomId": "ei",
+          "promptTts": "Baue das Wort Eimer.",
+          "targetAtomId": "eimer",
           "blocks": [
             {
               "atomId": "letter-ei",
               "display": "Ei"
+            },
+            {
+              "atomId": "letter-m",
+              "display": "m"
+            },
+            {
+              "atomId": "letter-e",
+              "display": "e"
+            },
+            {
+              "atomId": "letter-r",
+              "display": "r"
             }
           ]
         }
@@ -3074,9 +3105,9 @@
       "id": "l22-t9",
       "rounds": [
         {
-          "promptTts": "Das ist mein Ei.",
-          "sentenceId": "s-das-ist-mein-ei",
-          "illustrationAtomId": "ei"
+          "promptTts": "Der Eimer ist voll.",
+          "sentenceId": "s-der-eimer-ist-voll",
+          "illustrationAtomId": "eimer"
         },
         {
           "promptTts": "Das Auto ist blau.",
@@ -3224,7 +3255,7 @@
       "id": "l23-t10",
       "rounds": [
         {
-          "promptTts": "Acht Tische stehen im Café. Drei werden weggeräumt. Wie viele Tische bleiben?",
+          "promptTts": "Acht Tische stehen in der Kita. Drei werden weggeräumt. Wie viele Tische bleiben?",
           "left": 8,
           "right": 3,
           "answer": 5,
@@ -3271,14 +3302,14 @@
       "id": "l24-t5",
       "rounds": [
         {
-          "promptTts": "Schiebe s und t zusammen. Welche Silbe entsteht.",
-          "leftAtomId": "letter-s",
-          "leftDisplay": "s",
-          "rightAtomId": "letter-t",
-          "rightDisplay": "t",
-          "resultAtomId": "st",
-          "resultDisplay": "st",
-          "stretchTts": "S"
+          "promptTts": "Schiebe st und u zusammen. Welche Silbe entsteht.",
+          "leftAtomId": "letter-st",
+          "leftDisplay": "st",
+          "rightAtomId": "letter-u",
+          "rightDisplay": "u",
+          "resultAtomId": "stu",
+          "resultDisplay": "stu",
+          "stretchTts": "St"
         }
       ]
     },
@@ -3287,14 +3318,14 @@
       "id": "l24-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe s und p zusammen. Welche Silbe entsteht.",
-          "leftAtomId": "letter-s",
-          "leftDisplay": "s",
-          "rightAtomId": "letter-p",
-          "rightDisplay": "p",
-          "resultAtomId": "sp",
-          "resultDisplay": "sp",
-          "stretchTts": "S"
+          "promptTts": "Schiebe sp und i zusammen. Welche Silbe entsteht.",
+          "leftAtomId": "letter-sp",
+          "leftDisplay": "sp",
+          "rightAtomId": "letter-i",
+          "rightDisplay": "i",
+          "resultAtomId": "spi",
+          "resultDisplay": "spi",
+          "stretchTts": "Sp"
         }
       ]
     },
@@ -3335,8 +3366,12 @@
           "targetAtomId": "spinne",
           "blocks": [
             {
-              "atomId": "spi",
-              "display": "Spi"
+              "atomId": "letter-sp",
+              "display": "Sp"
+            },
+            {
+              "atomId": "letter-i",
+              "display": "i"
             },
             {
               "atomId": "letter-n",
@@ -3359,8 +3394,8 @@
       "id": "l24-t9",
       "rounds": [
         {
-          "promptTts": "Die Spinne spielt.",
-          "sentenceId": "s-spinne-spielt",
+          "promptTts": "Die Spinne ist klein.",
+          "sentenceId": "s-die-spinne-ist-klein",
           "illustrationAtomId": "spinne"
         },
         {
@@ -3438,14 +3473,14 @@
       "id": "l25-t6",
       "rounds": [
         {
-          "promptTts": "Schiebe r und ü zusammen. Welche Silbe entsteht.",
-          "leftAtomId": "letter-r",
-          "leftDisplay": "r",
+          "promptTts": "Schiebe k und ü zusammen. Welche Silbe entsteht.",
+          "leftAtomId": "letter-k",
+          "leftDisplay": "k",
           "rightAtomId": "letter-ue",
           "rightDisplay": "ü",
-          "resultAtomId": "rue",
-          "resultDisplay": "rü",
-          "stretchTts": "R"
+          "resultAtomId": "kue",
+          "resultDisplay": "kü",
+          "stretchTts": "K"
         }
       ]
     },
@@ -3482,7 +3517,7 @@
           "targetAtomId": "kueken",
           "blocks": [
             {
-              "atomId": "letter-ue",
+              "atomId": "kue",
               "display": "Kü"
             },
             {
@@ -3706,7 +3741,7 @@
           ]
         },
         {
-          "sentenceTts": "Mama malte am Morgen eine Sonne.",
+          "sentenceTts": "Mama malt eine Sonne.",
           "correctAtomIds": [
             "mama",
             "sonne"
@@ -3810,7 +3845,7 @@
           ]
         },
         {
-          "sentenceTts": "Opa trug einen Topf voll Suppe.",
+          "sentenceTts": "Opa kocht eine Suppe.",
           "correctAtomIds": [
             "opa",
             "suppe"
@@ -3821,7 +3856,7 @@
           ]
         },
         {
-          "sentenceTts": "Tom warf den Ball zu Papa.",
+          "sentenceTts": "Tom wirft den Ball zu Papa.",
           "correctAtomIds": [
             "tom",
             "ball",
@@ -3850,18 +3885,18 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Das Lama hat laut Hallo gerufen.",
+          "sentenceTts": "Tom ruft laut Hallo.",
           "correctAtomIds": [
-            "lama",
+            "tom",
             "hallo"
           ],
           "wrongAtomIds": [
-            "opa",
+            "mia",
             "hallo"
           ]
         },
         {
-          "sentenceTts": "Zwei Lamas liefen über die Wiese.",
+          "sentenceTts": "Zwei Lamas laufen über die Wiese.",
           "correctAtomIds": [
             "lama",
             "lama"
@@ -3872,10 +3907,10 @@
           ]
         },
         {
-          "sentenceTts": "Das Lama hat einen Hut gefressen.",
+          "sentenceTts": "Das Lama frisst Gras.",
           "correctAtomIds": [
             "lama",
-            "hut"
+            "gras"
           ],
           "wrongAtomIds": [
             "lama",
@@ -3883,13 +3918,13 @@
           ]
         },
         {
-          "sentenceTts": "Oma ist auf dem Lama geritten.",
+          "sentenceTts": "Oma streichelt das Lama.",
           "correctAtomIds": [
             "oma",
             "lama"
           ],
           "wrongAtomIds": [
-            "opa",
+            "oma",
             "pferd"
           ]
         }
@@ -3901,14 +3936,14 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Ein Ufo ist im Park gelandet.",
+          "sentenceTts": "Der Fuchs sitzt unter dem Baum.",
           "correctAtomIds": [
-            "ufo",
-            "park"
+            "fuchs",
+            "baum"
           ],
           "wrongAtomIds": [
-            "elefant",
-            "park"
+            "hund",
+            "baum"
           ]
         },
         {
@@ -3923,24 +3958,25 @@
           ]
         },
         {
-          "sentenceTts": "Der Wind trug Omas Hut davon.",
+          "sentenceTts": "Der Wind weht Omas Hut davon.",
           "correctAtomIds": [
             "oma",
             "hut"
           ],
           "wrongAtomIds": [
             "oma",
-            "kleid"
+            "tasche"
           ]
         },
         {
-          "sentenceTts": "Zwei Ufos fliegen am Himmel.",
+          "sentenceTts": "Zwei Flugzeuge fliegen am Himmel.",
           "correctAtomIds": [
-            "ufo",
-            "ufo"
+            "flugzeug",
+            "flugzeug"
           ],
           "wrongAtomIds": [
-            "flugzeug"
+            "vogel",
+            "vogel"
           ]
         },
         {
@@ -3962,7 +3998,7 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Tom hat den Ball ins Tor geworfen.",
+          "sentenceTts": "Tom schießt den Ball ins Tor.",
           "correctAtomIds": [
             "tom",
             "ball",
@@ -4026,7 +4062,7 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Ein kleiner Vogel liegt im Nest.",
+          "sentenceTts": "Ein kleiner Vogel sitzt im Nest.",
           "correctAtomIds": [
             "nest",
             "vogel"
@@ -4087,29 +4123,30 @@
           ],
           "wrongAtomIds": [
             "dose",
+            "eis",
             "eis"
           ]
         },
         {
-          "sentenceTts": "Der Dino hat den Kuchen gefressen.",
+          "sentenceTts": "Tom spielt mit dem Dino.",
           "correctAtomIds": [
-            "dino",
-            "kuchen"
+            "tom",
+            "dino"
           ],
           "wrongAtomIds": [
-            "hund",
-            "kuchen"
+            "tom",
+            "hund"
           ]
         },
         {
-          "sentenceTts": "Das Krokodil hat den Keks gefressen.",
+          "sentenceTts": "Das Krokodil hat viele Zähne.",
           "correctAtomIds": [
             "krokodil",
-            "keks"
+            "zahn"
           ],
           "wrongAtomIds": [
-            "dino",
-            "keks"
+            "kuh",
+            "zahn"
           ]
         },
         {
@@ -4223,6 +4260,7 @@
           ],
           "wrongAtomIds": [
             "dach",
+            "eule",
             "eule"
           ]
         },
@@ -4238,14 +4276,16 @@
           ]
         },
         {
-          "sentenceTts": "Der Drache flog über den Park.",
+          "sentenceTts": "Opa geht mit dem Hund in den Park.",
           "correctAtomIds": [
-            "drache",
+            "opa",
+            "hund",
             "park"
           ],
           "wrongAtomIds": [
-            "drache",
-            "weg"
+            "opa",
+            "igel",
+            "park"
           ]
         },
         {
@@ -4274,6 +4314,7 @@
           ],
           "wrongAtomIds": [
             "haus",
+            "busch",
             "busch"
           ]
         },
@@ -4289,7 +4330,7 @@
           ]
         },
         {
-          "sentenceTts": "Die Eule flog auf den Baum.",
+          "sentenceTts": "Die Eule sitzt auf dem Baum.",
           "correctAtomIds": [
             "baum",
             "eule"
@@ -4300,7 +4341,7 @@
           ]
         },
         {
-          "sentenceTts": "Aus dem Haus kamen zwei Mäuse.",
+          "sentenceTts": "Aus dem Haus kommen zwei Mäuse.",
           "correctAtomIds": [
             "haus",
             "maus",
@@ -4308,7 +4349,8 @@
           ],
           "wrongAtomIds": [
             "haus",
-            "dino"
+            "hund",
+            "hund"
           ]
         },
         {
@@ -4339,14 +4381,14 @@
           ]
         },
         {
-          "sentenceTts": "Der Frosch ist mit dem Fahrrad gefahren.",
+          "sentenceTts": "Mia fährt mit dem Fahrrad.",
           "correctAtomIds": [
-            "frosch",
+            "mia",
             "fahrrad"
           ],
           "wrongAtomIds": [
-            "dino",
-            "fahrrad"
+            "mia",
+            "roller"
           ]
         },
         {
@@ -4356,6 +4398,7 @@
             "baum"
           ],
           "wrongAtomIds": [
+            "banane",
             "banane",
             "baum"
           ]
@@ -4390,14 +4433,14 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Das Schaf hat neue Schuhe bekommen.",
+          "sentenceTts": "Das Schaf frisst einen Apfel.",
           "correctAtomIds": [
             "schaf",
-            "schuh"
+            "apfel"
           ],
           "wrongAtomIds": [
             "schaf",
-            "hut"
+            "keks"
           ]
         },
         {
@@ -4452,14 +4495,14 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Das Zebra hat ein Jojo gefunden.",
+          "sentenceTts": "Mia spielt mit dem Jojo.",
           "correctAtomIds": [
-            "zebra",
+            "mia",
             "jojo"
           ],
           "wrongAtomIds": [
-            "tiger",
-            "jojo"
+            "mia",
+            "ball"
           ]
         },
         {
@@ -4471,11 +4514,12 @@
           ],
           "wrongAtomIds": [
             "maus",
+            "maus",
             "baum"
           ]
         },
         {
-          "sentenceTts": "Der Zug fuhr durch den Schnee.",
+          "sentenceTts": "Der Zug fährt durch den Schnee.",
           "correctAtomIds": [
             "zug",
             "schnee"
@@ -4486,7 +4530,7 @@
           ]
         },
         {
-          "sentenceTts": "Die Eule fing eine Maus.",
+          "sentenceTts": "Die Eule hat eine Maus gefangen.",
           "correctAtomIds": [
             "eule",
             "maus"
@@ -4523,6 +4567,7 @@
           ],
           "wrongAtomIds": [
             "vogel",
+            "vogel",
             "wasser"
           ]
         },
@@ -4538,14 +4583,14 @@
           ]
         },
         {
-          "sentenceTts": "Der Vogel setzt sich auf den Fuß.",
+          "sentenceTts": "Der Vogel sitzt auf dem Dach.",
           "correctAtomIds": [
             "vogel",
-            "fuss"
+            "dach"
           ],
           "wrongAtomIds": [
             "vogel",
-            "hut"
+            "baum"
           ]
         },
         {
@@ -4609,14 +4654,14 @@
           ]
         },
         {
-          "sentenceTts": "Der Zucker steckt in der Dose.",
+          "sentenceTts": "Die Socke liegt unter dem Bett.",
           "correctAtomIds": [
-            "zucker",
-            "dose"
+            "socke",
+            "bett"
           ],
           "wrongAtomIds": [
-            "zucker",
-            "paket"
+            "socke",
+            "stuhl"
           ]
         },
         {
@@ -4625,7 +4670,7 @@
             "hahn"
           ],
           "wrongAtomIds": [
-            "huhn"
+            "ente"
           ]
         }
       ]
@@ -4636,7 +4681,7 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Die Spinne hat sich im Spiegel gesehen.",
+          "sentenceTts": "Die Spinne krabbelt über den Spiegel.",
           "correctAtomIds": [
             "spinne",
             "spiegel"
@@ -4698,13 +4743,13 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Das Pony ist mit dem Taxi gefahren.",
+          "sentenceTts": "Papa ruft ein Taxi.",
           "correctAtomIds": [
-            "pony",
+            "papa",
             "taxi"
           ],
           "wrongAtomIds": [
-            "pony",
+            "papa",
             "bus"
           ]
         },
@@ -4727,11 +4772,11 @@
           ],
           "wrongAtomIds": [
             "clown",
-            "radio"
+            "handy"
           ]
         },
         {
-          "sentenceTts": "Das Taxi hielt an der Ampel.",
+          "sentenceTts": "Das Taxi hält an der Ampel.",
           "correctAtomIds": [
             "taxi",
             "ampel"
@@ -4818,14 +4863,14 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Die Maus hat den Käse geklaut.",
+          "sentenceTts": "Die Maus schläft im Gras.",
           "correctAtomIds": [
             "maus",
-            "kaese"
+            "gras"
           ],
           "wrongAtomIds": [
             "ameise",
-            "kaese"
+            "gras"
           ]
         },
         {
@@ -4997,7 +5042,7 @@
           ]
         },
         {
-          "sentenceTts": "Tom hat sein Pflaster verloren.",
+          "sentenceTts": "Tom hat ein Pflaster am Knie.",
           "correctAtomIds": [
             "tom",
             "pflaster"
@@ -5059,14 +5104,14 @@
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Das Auto hält an der Ampel.",
+          "sentenceTts": "Mama fährt mit dem Auto zur Arbeit.",
           "correctAtomIds": [
-            "auto",
-            "ampel"
+            "mama",
+            "auto"
           ],
           "wrongAtomIds": [
-            "bus",
-            "ampel"
+            "mama",
+            "bus"
           ]
         },
         {
@@ -5406,7 +5451,7 @@
           ],
           "wrongAtomIds": [
             "papa",
-            "radio"
+            "klavier"
           ]
         }
       ]
@@ -5419,8 +5464,8 @@
           "promptTts": "Zeichne den Buchstaben - H - nach und sammle dabei alle Sterne.",
           "atomId": "letter-h",
           "glyph": "H",
-          "rewardTts": "H - wie Handschuh.",
-          "rewardEmoji": "🧤"
+          "rewardTts": "H - wie Hand.",
+          "rewardEmoji": "✋"
         }
       ]
     },
@@ -5432,8 +5477,8 @@
           "promptTts": "Zeichne den Laut - Sch - nach und sammle dabei alle Sterne.",
           "atomId": "letter-sch",
           "glyph": "Sch",
-          "rewardTts": "Sch - wie in Hausschuh.",
-          "rewardEmoji": "🥿"
+          "rewardTts": "Sch - wie Schuh.",
+          "rewardEmoji": "👟"
         }
       ]
     },
@@ -5653,8 +5698,8 @@
           "promptTts": "Zeichne den Buchstaben - B - nach und sammle dabei alle Sterne.",
           "atomId": "letter-b",
           "glyph": "B",
-          "rewardTts": "B - wie Brotdose.",
-          "rewardEmoji": "🍱"
+          "rewardTts": "B - wie Brot.",
+          "rewardEmoji": "🍞"
         }
       ]
     },
@@ -5713,7 +5758,15 @@
           "blocks": [
             {
               "atomId": "letter-b",
-              "display": "Bro"
+              "display": "B"
+            },
+            {
+              "atomId": "letter-r",
+              "display": "r"
+            },
+            {
+              "atomId": "letter-o",
+              "display": "o"
             },
             {
               "atomId": "letter-t",
@@ -5813,7 +5866,7 @@
           ],
           "wrongAtomIds": [
             "oma",
-            "torte"
+            "pizza"
           ]
         },
         {
@@ -5843,14 +5896,14 @@
           ]
         },
         {
-          "sentenceTts": "Der Kuchen ist für Oma.",
+          "sentenceTts": "Mia bekommt eine Torte zum Geburtstag.",
           "correctAtomIds": [
-            "kuchen",
-            "oma"
+            "mia",
+            "torte"
           ],
           "wrongAtomIds": [
-            "torte",
-            "oma"
+            "mia",
+            "keks"
           ]
         }
       ]
@@ -5881,11 +5934,11 @@
       "id": "l29-t1",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben - R - nach und sammle dabei alle Sterne.",
-          "atomId": "letter-r",
-          "glyph": "R",
-          "rewardTts": "R - wie Regenjacke.",
-          "rewardEmoji": "🧥"
+          "promptTts": "Zeichne den Buchstaben - ß - nach und sammle dabei alle Sterne.",
+          "atomId": "letter-sz",
+          "glyph": "ß",
+          "rewardTts": "ß - wie in Fuß.",
+          "rewardEmoji": "🦶"
         }
       ]
     },
@@ -5894,267 +5947,17 @@
       "id": "l29-t2",
       "rounds": [
         {
-          "promptTts": "Zeichne den Buchstaben - S - nach und sammle dabei alle Sterne.",
-          "atomId": "letter-s",
-          "glyph": "S",
-          "rewardTts": "S - wie Sonnenblume.",
-          "rewardEmoji": "🌻"
+          "promptTts": "Zeichne den Buchstaben - B - nach und sammle dabei alle Sterne.",
+          "atomId": "letter-b",
+          "glyph": "B",
+          "rewardTts": "B - wie Baum.",
+          "rewardEmoji": "🌳"
         }
       ]
     },
     {
       "trainer": "syllable_merge",
       "id": "l29-m1",
-      "rounds": [
-        {
-          "promptTts": "Schiebe Regen und Jacke zusammen. Welches Wort entsteht.",
-          "leftAtomId": "regen",
-          "leftDisplay": "Regen",
-          "rightAtomId": "jacke",
-          "rightDisplay": "jacke",
-          "resultAtomId": "regenjacke",
-          "resultDisplay": "Regenjacke",
-          "stretchTts": "R"
-        }
-      ]
-    },
-    {
-      "trainer": "syllable_merge",
-      "id": "l29-m2",
-      "rounds": [
-        {
-          "promptTts": "Schiebe Sonnen und Blume zusammen. Welches Wort entsteht.",
-          "leftAtomId": "sonne",
-          "leftDisplay": "Sonnen",
-          "rightAtomId": "blume",
-          "rightDisplay": "blume",
-          "resultAtomId": "sonnenblume",
-          "resultDisplay": "Sonnenblume",
-          "stretchTts": "S"
-        }
-      ]
-    },
-    {
-      "trainer": "word_build",
-      "id": "l29-w1",
-      "rounds": [
-        {
-          "promptTts": "Baue das Wort Regen.",
-          "targetAtomId": "regen",
-          "blocks": [
-            {
-              "atomId": "letter-r",
-              "display": "Re"
-            },
-            {
-              "atomId": "ge",
-              "display": "gen"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "trainer": "word_build",
-      "id": "l29-w2",
-      "rounds": [
-        {
-          "promptTts": "Baue das Wort Sonne.",
-          "targetAtomId": "sonne",
-          "blocks": [
-            {
-              "atomId": "letter-s",
-              "display": "Son"
-            },
-            {
-              "atomId": "letter-n",
-              "display": "ne"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "trainer": "word_build",
-      "id": "l29-w3",
-      "rounds": [
-        {
-          "promptTts": "Baue das Wort Blume.",
-          "targetAtomId": "blume",
-          "blocks": [
-            {
-              "atomId": "letter-b",
-              "display": "Blu"
-            },
-            {
-              "atomId": "letter-m",
-              "display": "me"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "trainer": "word_build",
-      "id": "l29-c1",
-      "rounds": [
-        {
-          "promptTts": "Baue das Wort Regenjacke.",
-          "targetAtomId": "regenjacke",
-          "blocks": [
-            {
-              "atomId": "regen",
-              "display": "Regen"
-            },
-            {
-              "atomId": "jacke",
-              "display": "jacke"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "trainer": "word_build",
-      "id": "l29-c2",
-      "rounds": [
-        {
-          "promptTts": "Baue das Wort Sonnenblume.",
-          "targetAtomId": "sonnenblume",
-          "blocks": [
-            {
-              "atomId": "sonne",
-              "display": "Sonnen"
-            },
-            {
-              "atomId": "blume",
-              "display": "blume"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "trainer": "sentence_order",
-      "id": "l29-s1",
-      "rounds": [
-        {
-          "promptTts": "Die Blume ist groß.",
-          "sentenceId": "s-die-blume-ist-gross",
-          "illustrationAtomId": "blume",
-          "distractors": [
-            {
-              "atomId": "klein",
-              "display": "klein"
-            }
-          ]
-        },
-        {
-          "promptTts": "Die Jacke ist lila.",
-          "sentenceId": "s-die-jacke-ist-lila",
-          "illustrationAtomId": "lila"
-        }
-      ]
-    },
-    {
-      "trainer": "sentence_picture",
-      "id": "l29-sp1",
-      "instructionTts": "Ordne das richtige Bild zu.",
-      "rounds": [
-        {
-          "sentenceTts": "Mia trägt ihre Regenjacke im Regen.",
-          "correctAtomIds": [
-            "mia",
-            "regenjacke"
-          ],
-          "wrongAtomIds": [
-            "mia",
-            "hose"
-          ]
-        },
-        {
-          "sentenceTts": "Zwei Sonnenblumen wachsen im Garten.",
-          "correctAtomIds": [
-            "sonnenblume",
-            "sonnenblume"
-          ],
-          "wrongAtomIds": [
-            "blume",
-            "blume"
-          ]
-        },
-        {
-          "sentenceTts": "Nach dem Regen steht ein Regenbogen da.",
-          "correctAtomIds": [
-            "regenbogen"
-          ],
-          "wrongAtomIds": [
-            "wolke"
-          ]
-        },
-        {
-          "sentenceTts": "Eine Biene sitzt auf der Blume.",
-          "correctAtomIds": [
-            "biene",
-            "blume"
-          ],
-          "wrongAtomIds": [
-            "vogel",
-            "blume"
-          ]
-        }
-      ]
-    },
-    {
-      "trainer": "count_add",
-      "id": "l29-r1",
-      "rounds": [
-        {
-          "promptTts": "Zwei Reihen mit je fünf Sonnenblumen wachsen im Beet. Wie viele Sonnenblumen sind das?",
-          "left": 2,
-          "right": 5,
-          "answer": 10,
-          "iconAtomId": "sonnenblume",
-          "operation": "multiply"
-        },
-        {
-          "promptTts": "Dreißig weniger zehn. Wie viele bleiben?",
-          "left": 30,
-          "right": 10,
-          "answer": 20,
-          "operation": "subtract"
-        }
-      ]
-    },
-    {
-      "trainer": "letter_trace",
-      "id": "l30-t1",
-      "rounds": [
-        {
-          "promptTts": "Zeichne den Laut - ß - nach und sammle dabei alle Sterne.",
-          "atomId": "letter-sz",
-          "glyph": "ß",
-          "rewardTts": "ß - wie in Fußball.",
-          "rewardEmoji": "⚽"
-        }
-      ]
-    },
-    {
-      "trainer": "letter_trace",
-      "id": "l30-t2",
-      "rounds": [
-        {
-          "promptTts": "Zeichne den Buchstaben - B - nach und sammle dabei alle Sterne.",
-          "atomId": "letter-b",
-          "glyph": "B",
-          "rewardTts": "B - wie Baumhaus.",
-          "rewardEmoji": "🛖"
-        }
-      ]
-    },
-    {
-      "trainer": "syllable_merge",
-      "id": "l30-m1",
       "rounds": [
         {
           "promptTts": "Schiebe Fuß und Ball zusammen. Welches Wort entsteht.",
@@ -6170,7 +5973,7 @@
     },
     {
       "trainer": "syllable_merge",
-      "id": "l30-m2",
+      "id": "l29-m2",
       "rounds": [
         {
           "promptTts": "Schiebe Baum und Haus zusammen. Welches Wort entsteht.",
@@ -6186,7 +5989,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l30-w1",
+      "id": "l29-w1",
       "rounds": [
         {
           "promptTts": "Baue das Wort Ball.",
@@ -6194,11 +5997,11 @@
           "blocks": [
             {
               "atomId": "letter-b",
-              "display": "Bal"
+              "display": "Ba"
             },
             {
               "atomId": "letter-l",
-              "display": "l"
+              "display": "ll"
             }
           ]
         }
@@ -6206,7 +6009,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l30-c1",
+      "id": "l29-c1",
       "rounds": [
         {
           "promptTts": "Baue das Wort Fußball.",
@@ -6226,7 +6029,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l30-c2",
+      "id": "l29-c2",
       "rounds": [
         {
           "promptTts": "Baue das Wort Baumhaus.",
@@ -6246,7 +6049,7 @@
     },
     {
       "trainer": "sentence_order",
-      "id": "l30-s1",
+      "id": "l29-s1",
       "rounds": [
         {
           "promptTts": "Wir spielen Fußball.",
@@ -6268,11 +6071,11 @@
     },
     {
       "trainer": "sentence_picture",
-      "id": "l30-sp1",
+      "id": "l29-sp1",
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
-          "sentenceTts": "Tom hat den Fußball ins Tor geschossen.",
+          "sentenceTts": "Der Fußball fliegt ins Tor.",
           "correctAtomIds": [
             "fussball",
             "tor"
@@ -6323,7 +6126,7 @@
     },
     {
       "trainer": "count_add",
-      "id": "l30-r1",
+      "id": "l29-r1",
       "rounds": [
         {
           "promptTts": "Acht Fußbälle liegen auf dem Rasen. Drei werden geholt. Wie viele Fußbälle bleiben?",
@@ -6343,33 +6146,33 @@
     },
     {
       "trainer": "letter_trace",
-      "id": "l31-t1",
+      "id": "l30-t1",
       "rounds": [
         {
           "promptTts": "Zeichne den Laut - Ei - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ei",
           "glyph": "Ei",
-          "rewardTts": "Ei - wie Eisbär.",
-          "rewardEmoji": "🐻‍❄️"
+          "rewardTts": "Ei - wie Eis.",
+          "rewardEmoji": "🍦"
         }
       ]
     },
     {
       "trainer": "letter_trace",
-      "id": "l31-t2",
+      "id": "l30-t2",
       "rounds": [
         {
           "promptTts": "Zeichne den Buchstaben - V - nach und sammle dabei alle Sterne.",
           "atomId": "letter-v",
           "glyph": "V",
-          "rewardTts": "V - wie Vogelnest.",
-          "rewardEmoji": "🪺"
+          "rewardTts": "V - wie Vogel.",
+          "rewardEmoji": "🐦"
         }
       ]
     },
     {
       "trainer": "syllable_merge",
-      "id": "l31-m1",
+      "id": "l30-m1",
       "rounds": [
         {
           "promptTts": "Schiebe Eis und Bär zusammen. Welches Wort entsteht.",
@@ -6385,7 +6188,7 @@
     },
     {
       "trainer": "syllable_merge",
-      "id": "l31-m2",
+      "id": "l30-m2",
       "rounds": [
         {
           "promptTts": "Schiebe Vogel und Nest zusammen. Welches Wort entsteht.",
@@ -6401,7 +6204,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l31-w1",
+      "id": "l30-w1",
       "rounds": [
         {
           "promptTts": "Baue das Wort Bär.",
@@ -6421,7 +6224,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l31-c1",
+      "id": "l30-c1",
       "rounds": [
         {
           "promptTts": "Baue das Wort Eisbär.",
@@ -6441,7 +6244,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l31-c2",
+      "id": "l30-c2",
       "rounds": [
         {
           "promptTts": "Baue das Wort Vogelnest.",
@@ -6461,7 +6264,7 @@
     },
     {
       "trainer": "sentence_order",
-      "id": "l31-s1",
+      "id": "l30-s1",
       "rounds": [
         {
           "promptTts": "Der Eisbär schwimmt.",
@@ -6483,7 +6286,7 @@
     },
     {
       "trainer": "sentence_picture",
-      "id": "l31-sp1",
+      "id": "l30-sp1",
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
@@ -6538,7 +6341,7 @@
     },
     {
       "trainer": "count_add",
-      "id": "l31-r1",
+      "id": "l30-r1",
       "rounds": [
         {
           "promptTts": "Neun Pinguine stehen auf dem Eis. Vier springen ins Wasser. Wie viele Pinguine bleiben?",
@@ -6559,20 +6362,20 @@
     },
     {
       "trainer": "letter_trace",
-      "id": "l32-t1",
+      "id": "l31-t1",
       "rounds": [
         {
           "promptTts": "Zeichne den Laut - Sch - nach und sammle dabei alle Sterne.",
           "atomId": "letter-sch",
           "glyph": "Sch",
-          "rewardTts": "Sch - wie Schneeball.",
-          "rewardEmoji": "🥎"
+          "rewardTts": "Sch - wie Schnee.",
+          "rewardEmoji": "❄️"
         }
       ]
     },
     {
       "trainer": "letter_trace",
-      "id": "l32-t2",
+      "id": "l31-t2",
       "rounds": [
         {
           "promptTts": "Zeichne den Buchstaben - M - nach und sammle dabei alle Sterne.",
@@ -6585,7 +6388,7 @@
     },
     {
       "trainer": "syllable_merge",
-      "id": "l32-m1",
+      "id": "l31-m1",
       "rounds": [
         {
           "promptTts": "Schiebe Schnee und Mann zusammen. Welches Wort entsteht.",
@@ -6601,7 +6404,7 @@
     },
     {
       "trainer": "syllable_merge",
-      "id": "l32-m2",
+      "id": "l31-m2",
       "rounds": [
         {
           "promptTts": "Schiebe Schnee und Ball zusammen. Welches Wort entsteht.",
@@ -6617,7 +6420,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l32-w1",
+      "id": "l31-w1",
       "rounds": [
         {
           "promptTts": "Baue das Wort Schnee.",
@@ -6625,7 +6428,11 @@
           "blocks": [
             {
               "atomId": "letter-sch",
-              "display": "Schn"
+              "display": "Sch"
+            },
+            {
+              "atomId": "letter-n",
+              "display": "n"
             },
             {
               "atomId": "letter-e",
@@ -6637,7 +6444,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l32-w2",
+      "id": "l31-w2",
       "rounds": [
         {
           "promptTts": "Baue das Wort Mann.",
@@ -6657,7 +6464,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l32-c1",
+      "id": "l31-c1",
       "rounds": [
         {
           "promptTts": "Baue das Wort Schneemann.",
@@ -6677,7 +6484,7 @@
     },
     {
       "trainer": "word_build",
-      "id": "l32-c2",
+      "id": "l31-c2",
       "rounds": [
         {
           "promptTts": "Baue das Wort Schneeball.",
@@ -6697,7 +6504,7 @@
     },
     {
       "trainer": "sentence_order",
-      "id": "l32-s1",
+      "id": "l31-s1",
       "rounds": [
         {
           "promptTts": "Der Schneemann ist groß.",
@@ -6719,7 +6526,7 @@
     },
     {
       "trainer": "sentence_picture",
-      "id": "l32-sp1",
+      "id": "l31-sp1",
       "instructionTts": "Ordne das richtige Bild zu.",
       "rounds": [
         {
@@ -6772,7 +6579,7 @@
     },
     {
       "trainer": "count_add",
-      "id": "l32-r1",
+      "id": "l31-r1",
       "rounds": [
         {
           "promptTts": "Neun Schneebälle liegen im Schnee. Vier werden geworfen. Wie viele Schneebälle bleiben?",
@@ -6787,6 +6594,258 @@
           "left": 12,
           "right": 8,
           "answer": 20
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l32-t1",
+      "rounds": [
+        {
+          "promptTts": "Zeichne den Buchstaben - R - nach und sammle dabei alle Sterne.",
+          "atomId": "letter-r",
+          "glyph": "R",
+          "rewardTts": "R - wie Regen.",
+          "rewardEmoji": "🌧️"
+        }
+      ]
+    },
+    {
+      "trainer": "letter_trace",
+      "id": "l32-t2",
+      "rounds": [
+        {
+          "promptTts": "Zeichne den Buchstaben - S - nach und sammle dabei alle Sterne.",
+          "atomId": "letter-s",
+          "glyph": "S",
+          "rewardTts": "S - wie Sonne.",
+          "rewardEmoji": "☀️"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l32-m1",
+      "rounds": [
+        {
+          "promptTts": "Schiebe Regen und Jacke zusammen. Welches Wort entsteht.",
+          "leftAtomId": "regen",
+          "leftDisplay": "Regen",
+          "rightAtomId": "jacke",
+          "rightDisplay": "jacke",
+          "resultAtomId": "regenjacke",
+          "resultDisplay": "Regenjacke",
+          "stretchTts": "R"
+        }
+      ]
+    },
+    {
+      "trainer": "syllable_merge",
+      "id": "l32-m2",
+      "rounds": [
+        {
+          "promptTts": "Schiebe Sonnen und Blume zusammen. Welches Wort entsteht.",
+          "leftAtomId": "sonne",
+          "leftDisplay": "Sonnen",
+          "rightAtomId": "blume",
+          "rightDisplay": "blume",
+          "resultAtomId": "sonnenblume",
+          "resultDisplay": "Sonnenblume",
+          "stretchTts": "S"
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l32-w1",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Regen.",
+          "targetAtomId": "regen",
+          "blocks": [
+            {
+              "atomId": "letter-r",
+              "display": "Re"
+            },
+            {
+              "atomId": "ge",
+              "display": "gen"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l32-w2",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Sonne.",
+          "targetAtomId": "sonne",
+          "blocks": [
+            {
+              "atomId": "letter-s",
+              "display": "Son"
+            },
+            {
+              "atomId": "letter-n",
+              "display": "ne"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l32-w3",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Blume.",
+          "targetAtomId": "blume",
+          "blocks": [
+            {
+              "atomId": "letter-b",
+              "display": "Blu"
+            },
+            {
+              "atomId": "letter-m",
+              "display": "me"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l32-c1",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Regenjacke.",
+          "targetAtomId": "regenjacke",
+          "blocks": [
+            {
+              "atomId": "regen",
+              "display": "Regen"
+            },
+            {
+              "atomId": "jacke",
+              "display": "jacke"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l32-c2",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Sonnenblume.",
+          "targetAtomId": "sonnenblume",
+          "blocks": [
+            {
+              "atomId": "sonne",
+              "display": "Sonnen"
+            },
+            {
+              "atomId": "blume",
+              "display": "blume"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_order",
+      "id": "l32-s1",
+      "rounds": [
+        {
+          "promptTts": "Die Blume ist groß.",
+          "sentenceId": "s-die-blume-ist-gross",
+          "illustrationAtomId": "blume",
+          "distractors": [
+            {
+              "atomId": "klein",
+              "display": "klein"
+            }
+          ]
+        },
+        {
+          "promptTts": "Die Jacke ist lila.",
+          "sentenceId": "s-die-jacke-ist-lila",
+          "illustrationAtomId": "lila"
+        }
+      ]
+    },
+    {
+      "trainer": "sentence_picture",
+      "id": "l32-sp1",
+      "instructionTts": "Ordne das richtige Bild zu.",
+      "rounds": [
+        {
+          "sentenceTts": "Mia trägt ihre Regenjacke im Regen.",
+          "correctAtomIds": [
+            "mia",
+            "regenjacke"
+          ],
+          "wrongAtomIds": [
+            "mia",
+            "hose"
+          ]
+        },
+        {
+          "sentenceTts": "Zwei Sonnenblumen wachsen im Garten.",
+          "correctAtomIds": [
+            "sonnenblume",
+            "sonnenblume"
+          ],
+          "wrongAtomIds": [
+            "blume",
+            "blume"
+          ]
+        },
+        {
+          "sentenceTts": "Die Sonnenblume ist so groß wie Tom.",
+          "correctAtomIds": [
+            "sonnenblume",
+            "tom"
+          ],
+          "wrongAtomIds": [
+            "blume",
+            "tom"
+          ]
+        },
+        {
+          "sentenceTts": "Eine Biene sitzt auf der Blume.",
+          "correctAtomIds": [
+            "biene",
+            "blume"
+          ],
+          "wrongAtomIds": [
+            "vogel",
+            "blume"
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "count_add",
+      "id": "l32-r1",
+      "rounds": [
+        {
+          "promptTts": "Zwei Reihen mit je fünf Sonnenblumen wachsen im Beet. Wie viele Sonnenblumen sind das?",
+          "left": 2,
+          "right": 5,
+          "answer": 10,
+          "iconAtomId": "sonnenblume",
+          "operation": "multiply"
+        },
+        {
+          "promptTts": "Dreißig weniger zehn. Wie viele bleiben?",
+          "left": 30,
+          "right": 10,
+          "answer": 20,
+          "operation": "subtract"
         }
       ]
     },
@@ -6878,7 +6937,11 @@
           "blocks": [
             {
               "atomId": "letter-b",
-              "display": "Bu"
+              "display": "B"
+            },
+            {
+              "atomId": "letter-u",
+              "display": "u"
             },
             {
               "atomId": "letter-s",
@@ -6942,6 +7005,11 @@
               "display": "leer"
             }
           ]
+        },
+        {
+          "promptTts": "Wir gehen zur Schule.",
+          "sentenceId": "s-wir-gehen-zur-schule",
+          "illustrationAtomId": "schule"
         }
       ]
     },
@@ -6984,7 +7052,7 @@
           ]
         },
         {
-          "sentenceTts": "Mia packt ihre Tasche und geht.",
+          "sentenceTts": "Mia packt ihre Tasche.",
           "correctAtomIds": [
             "mia",
             "tasche"
@@ -7025,8 +7093,8 @@
           "promptTts": "Zeichne den Buchstaben - Ü - nach und sammle dabei alle Sterne.",
           "atomId": "letter-ue",
           "glyph": "Ü",
-          "rewardTts": "Ü - wie in Mülltonne.",
-          "rewardEmoji": "🗑️"
+          "rewardTts": "Ü - wie in Müll.",
+          "rewardEmoji": "🚮"
         }
       ]
     },

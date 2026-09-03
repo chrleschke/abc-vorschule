@@ -15,6 +15,13 @@
       "tts": "Oma."
     },
     {
+      "id": "s-papa",
+      "atomIds": [
+        "papa"
+      ],
+      "tts": "Papa."
+    },
+    {
       "id": "s-hallo-lama",
       "atomIds": [
         "hallo",
@@ -42,13 +49,14 @@
       "tts": "Oma hat einen Hut."
     },
     {
-      "id": "s-lama-ist-da",
+      "id": "s-tom-hat-eine-rose",
       "atomIds": [
-        "lama",
-        "ist",
-        "da"
+        "tom",
+        "hat",
+        "eine",
+        "rose"
       ],
-      "tts": "Lama ist da."
+      "tts": "Tom hat eine Rose."
     },
     {
       "id": "s-oma-ist-da",
@@ -70,14 +78,14 @@
       "tts": "Das ist mein Papa."
     },
     {
-      "id": "s-wir-gehen",
+      "id": "s-der-regen-ist-kalt",
       "atomIds": [
-        "wir",
-        "gehen",
-        "den",
-        "weg"
+        "der",
+        "regen",
+        "ist",
+        "kalt"
       ],
-      "tts": "Wir gehen den Weg."
+      "tts": "Der Regen ist kalt."
     },
     {
       "id": "s-mama-im-haus",
@@ -136,13 +144,24 @@
       "tts": "Das Pferd läuft."
     },
     {
-      "id": "s-spinne-spielt",
+      "id": "s-der-stern-ist-hell",
+      "atomIds": [
+        "der",
+        "stern",
+        "ist",
+        "hell"
+      ],
+      "tts": "Der Stern ist hell."
+    },
+    {
+      "id": "s-die-spinne-ist-klein",
       "atomIds": [
         "die",
         "spinne",
-        "spielt"
+        "ist",
+        "klein"
       ],
-      "tts": "Die Spinne spielt."
+      "tts": "Die Spinne ist klein."
     },
     {
       "id": "s-taxi-ist-gelb",
@@ -153,16 +172,6 @@
         "gelb"
       ],
       "tts": "Das Taxi ist gelb."
-    },
-    {
-      "id": "s-das-ist-mein-ei",
-      "atomIds": [
-        "das",
-        "ist",
-        "mein",
-        "ei"
-      ],
-      "tts": "Das ist mein Ei."
     },
     {
       "id": "s-der-loewe-ist-da",
@@ -233,6 +242,16 @@
       "tts": "Die Tasche ist voll."
     },
     {
+      "id": "s-wir-gehen-zur-schule",
+      "atomIds": [
+        "wir",
+        "gehen",
+        "zur",
+        "schule"
+      ],
+      "tts": "Wir gehen zur Schule."
+    },
+    {
       "id": "s-die-lampe-ist-hell",
       "atomIds": [
         "die",
@@ -241,6 +260,16 @@
         "hell"
       ],
       "tts": "Die Lampe ist hell."
+    },
+    {
+      "id": "s-der-eimer-ist-voll",
+      "atomIds": [
+        "der",
+        "eimer",
+        "ist",
+        "voll"
+      ],
+      "tts": "Der Eimer ist voll."
     },
     {
       "id": "s-oma-und-mia-lachen",

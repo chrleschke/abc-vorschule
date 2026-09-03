@@ -106,14 +106,14 @@ class ContentRepositoryTest {
     fun finalesAreParsedFromTheirOwnFile() {
         val pack = ContentRepository.fromClasspath().load()
         val finale = pack.finale("f-l01")
-        assertEquals("Mama Maus mampft einen dicken Apfel!", finale.text)
-        assertEquals(listOf("mama", "maus", "apfel"), finale.pictureAtomIds)
+        assertEquals("Die Maus mampft Mamas Apfel!", finale.text)
+        assertEquals(listOf("maus", "mama", "apfel"), finale.pictureAtomIds)
     }
 
     @Test
     fun finalePicturesResolveToAtomsWithEmojis() {
         val pack = ContentRepository.fromClasspath().load()
         val emojis = pack.finale("f-l01").pictureAtomIds.map { pack.atom(it).emoji }
-        assertEquals(listOf("👩", "🐭", "🍎"), emojis)
+        assertEquals(listOf("🐭", "👩", "🍎"), emojis)
     }
 }

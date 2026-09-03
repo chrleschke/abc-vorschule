@@ -3156,6 +3156,13 @@
       "kind": "word"
     },
     {
+      "id": "zur",
+      "lemma": "zur",
+      "display": "zur",
+      "emoji": "",
+      "kind": "word"
+    },
+    {
       "id": "papa",
       "lemma": "Papa",
       "display": "Papa",
@@ -3383,17 +3390,6 @@
       "display": "mein",
       "emoji": "",
       "kind": "word"
-    },
-    {
-      "id": "weg",
-      "lemma": "Weg",
-      "display": "Weg",
-      "emoji": "🛣️",
-      "kind": "word",
-      "pluralDisplay": "Wege",
-      "pluralHighlight": "e",
-      "gender": "m",
-      "nounClass": "thing"
     },
     {
       "id": "dach",
@@ -3788,16 +3784,6 @@
       "nounClass": "thing"
     },
     {
-      "id": "radio",
-      "lemma": "Radio",
-      "display": "Radio",
-      "emoji": "📻",
-      "kind": "other",
-      "pluralDisplay": "Radios",
-      "gender": "n",
-      "nounClass": "thing"
-    },
-    {
       "id": "sonne",
       "lemma": "Sonne",
       "display": "Sonne",
@@ -3856,16 +3842,6 @@
       "pluralDisplay": "Clowns",
       "gender": "m",
       "nounClass": "person"
-    },
-    {
-      "id": "drache",
-      "lemma": "Drache",
-      "display": "Drache",
-      "emoji": "🐉",
-      "kind": "word",
-      "pluralDisplay": "Drachen",
-      "gender": "m",
-      "nounClass": "thing"
     },
     {
       "id": "frosch",
@@ -4131,13 +4107,6 @@
       "kind": "word"
     },
     {
-      "id": "spielt",
-      "lemma": "spielt",
-      "display": "spielt",
-      "emoji": "",
-      "kind": "word"
-    },
-    {
       "id": "kaese",
       "lemma": "Käse",
       "display": "Käse",
@@ -4305,16 +4274,6 @@
       "kind": "other",
       "pluralDisplay": "Feuer",
       "gender": "n",
-      "nounClass": "thing"
-    },
-    {
-      "id": "zucker",
-      "lemma": "Zucker",
-      "display": "Zucker",
-      "emoji": "🍬",
-      "kind": "other",
-      "pluralDisplay": "Zucker",
-      "gender": "m",
       "nounClass": "thing"
     },
     {
@@ -4654,23 +4613,23 @@
       "kind": "word"
     },
     {
-      "id": "rue",
-      "lemma": "rü",
-      "display": "rü",
+      "id": "eine",
+      "lemma": "eine",
+      "display": "eine",
+      "emoji": "",
+      "kind": "word"
+    },
+    {
+      "id": "kue",
+      "lemma": "kü",
+      "display": "kü",
       "emoji": "",
       "kind": "syllable"
     },
     {
-      "id": "st",
-      "lemma": "s t",
-      "display": "st",
-      "emoji": "",
-      "kind": "syllable"
-    },
-    {
-      "id": "sp",
-      "lemma": "sp",
-      "display": "sp",
+      "id": "stu",
+      "lemma": "stu",
+      "display": "stu",
       "emoji": "",
       "kind": "syllable"
     },
