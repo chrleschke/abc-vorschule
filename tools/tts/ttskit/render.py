@@ -138,6 +138,8 @@ def render_batch_candidates(
     profile: str | None = None,
     dry_run: bool = False,
     progress: Callable[[Progress], None] | None = None,
+    clip_start: Callable[[str], None] | None = None,
+    clip_done: Callable[[str], None] | None = None,
     cancel: Callable[[], bool] | None = None,
 ) -> RenderReport:
     """Batch-Lauf im Web-Interface: erzeugt pro Clip `count` Kandidaten statt
@@ -149,6 +151,15 @@ def render_batch_candidates(
     unbestätigter Treffer würde sonst beim nächsten Profil- oder Pool-Wechsel
     stillschweigend durch einen anderen Seed ersetzt, ohne dass ihn je jemand
     gehört hat.
+
+    `clip_start(key)` und `clip_done(key)` melden jeden Clip einzeln, beim
+    Anfangen und beim Fertigwerden. `progress` kann das nicht leisten: es
+    feuert erst *nach* jedem Kandidaten und zählt nur Einheiten über den
+    ganzen Lauf, aus denen ein Client die Clip-Grenze bloß erraten könnte —
+    der erste Kandidat eines Clips wäre damit nirgends sichtbar. Das
+    Web-Interface braucht beide Momente aber genau: um zu zeigen, wo der Lauf
+    steht, und um einen fertigen Clip sofort zum Abhören freizugeben, während
+    der Lauf weitergeht.
     """
     selected = _select(clips, only, profile)
     report = RenderReport()
@@ -175,6 +186,8 @@ def render_batch_candidates(
     for index, clip in enumerate(todo, start=1):
         if cancel is not None and cancel():
             break
+        if clip_start is not None:
+            clip_start(clip.key)
         prof = profiles.profiles[clip.profile]
         seeds = seeds_for_candidates(
             count=count, clip=clip, profile=prof, paths=paths, locks=locks,
@@ -196,6 +209,11 @@ def render_batch_candidates(
             report.failed.append((
                 clip.key,
                 f"{len(seeds) - len(written)} von {len(seeds)} Kandidaten fehlgeschlagen"))
+        # Auch ein fehlgeschlagener Clip ist abgearbeitet: bliebe er aus, wäre
+        # er in der UI für den Rest des Laufs „erzeugt gerade". Was schief ging,
+        # sagt am Ende `job-summary`.
+        if clip_done is not None:
+            clip_done(clip.key)
     return report
 
 

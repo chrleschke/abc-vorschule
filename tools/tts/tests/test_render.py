@@ -276,6 +276,42 @@ def test_render_batch_candidates_progress_spans_the_whole_batch(setup):
     assert seen == [(1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6)]
 
 
+def test_render_batch_candidates_reports_every_clip_start_and_finish(setup):
+    # Die Web-UI zeigt und entsperrt Clips einzeln, sobald sie das hier hört —
+    # aus `progress` allein wäre die Clip-Grenze nur zu erraten.
+    paths, profiles, clips, state = setup
+    seen = []
+    render_batch_candidates(clips, profiles, FakeEngine(), state, paths, Locks(),
+                            count=2,
+                            clip_start=lambda key: seen.append(("start", key)),
+                            clip_done=lambda key: seen.append(("done", key)))
+    assert seen == [step for c in clips
+                    for step in (("start", c.key), ("done", c.key))]
+
+
+def test_render_batch_candidates_announces_a_clip_before_its_first_candidate(setup):
+    # Der erste Kandidat eines Clips dauert so lange wie jeder andere. Käme
+    # `clip_start` erst mit dem ersten `progress`, stünde der Clip diese ganze
+    # Zeit in der UI als „wartet noch" da, obwohl er längst gerendert wird.
+    paths, profiles, clips, state = setup
+    seen = []
+    render_batch_candidates(clips[:1], profiles, FakeEngine(), state, paths, Locks(),
+                            count=2,
+                            clip_start=lambda key: seen.append(("start", key)),
+                            progress=lambda p: seen.append(("progress", p.clip_key)))
+    assert seen[0] == ("start", clips[0].key)
+
+
+def test_render_batch_candidates_reports_a_failed_clip_as_done_too(setup):
+    # Sonst bliebe ein fehlgeschlagener Clip in der UI für immer „erzeugt gerade".
+    paths, profiles, clips, state = setup
+    done = []
+    render_batch_candidates(clips, profiles, FakeEngine(fail_on={"Frage eins?"}),
+                            state, paths, Locks(), count=2,
+                            clip_done=done.append)
+    assert done == [c.key for c in clips]
+
+
 def test_render_batch_candidates_reports_a_failing_clip(setup):
     paths, profiles, clips, state = setup
     engine = FakeEngine(fail_on={"Frage eins?"})

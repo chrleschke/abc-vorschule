@@ -50,7 +50,12 @@ def wait_for_idle(client, timeout=10.0):
     import time
     deadline = time.time() + timeout
     while time.time() < deadline:
-        if client.get("/api/jobs").json()["running"] is None:
+        status = client.get("/api/jobs").json()
+        # Die Warteschlange muss mit: zwischen zwei Jobs ist `running` kurz
+        # None, obwohl der nächste schon eingereiht ist — ein Test, der auf
+        # eine Kette aus Batch-Lauf und angehängtem Job wartet, wäre sonst
+        # mitten in der Kette weitergelaufen.
+        if status["running"] is None and not status["queued"]:
             return
         time.sleep(0.02)
     raise AssertionError("job did not finish")
@@ -763,6 +768,44 @@ def test_a_successful_render_publishes_its_counts(client):
     summary = next(e for e in seen if e["type"] == "job-summary")
     assert summary["failed"] == 0
     assert summary["rendered"] > 0
+
+
+def test_batch_render_publishes_start_and_done_per_clip(client):
+    # Der Auslöser: wer einen langen Lauf startet, hört die ersten Clips ab,
+    # während der Rest noch rendert. Ohne diese Ereignisse erfährt die UI erst
+    # am Ende des ganzen Laufs, dass ein einzelner Clip fertig ist — und hält
+    # ihn bis dahin für „erzeugt gerade" (Generate blockiert).
+    jobs = client.app.state.jobs
+    seen = []
+    original_publish = jobs.publish
+    jobs.publish = lambda event: (seen.append(event), original_publish(event))[1]
+
+    keys = [c["key"] for c in client.get("/api/state").json()["clips"]
+            if c["profile"] == "finale"]
+    assert keys
+    client.post("/api/render", json={"keys": keys})
+    wait_for_idle(client)
+
+    done = [e for e in seen if e["type"] == "clip-done"]
+    assert [e["clipKey"] for e in done] == keys
+    assert [e["clipKey"] for e in seen if e["type"] == "clip-start"] == keys
+    # Vor dem Abschluss des ganzen Laufs, sonst nützt es der UI nichts.
+    assert seen.index(done[0]) < seen.index(
+        next(e for e in seen if e["type"] == "job-done"))
+
+
+def test_a_candidates_job_queues_behind_a_running_batch(client):
+    # Aus der Review-Schleife: Aufnahmen eines fertigen Clips verworfen, sofort
+    # neue anfordern — das muss auch dann angenommen werden, wenn der Batch-Lauf
+    # noch läuft, statt bis zu seinem Ende abgewiesen zu werden.
+    keys = [c["key"] for c in client.get("/api/state").json()["clips"]]
+    assert client.post("/api/render", json={"keys": keys}).status_code == 202
+    assert client.post(f"/api/clips/{keys[0]}/candidates",
+                       json={"n": 1}).status_code == 202
+    wait_for_idle(client)
+    clip = next(c for c in client.get("/api/state").json()["clips"]
+                if c["key"] == keys[0])
+    assert len(clip["candidates"]) == 3, "2 aus dem Batch-Lauf + 1 aus der Warteschlange"
 
 
 def test_events_streams_the_initial_status_frame(client):
