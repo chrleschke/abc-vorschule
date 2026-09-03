@@ -3774,6 +3774,16 @@
       "nounClass": "thing"
     },
     {
+      "id": "radio",
+      "lemma": "Radio",
+      "display": "Radio",
+      "emoji": "📻",
+      "kind": "other",
+      "pluralDisplay": "Radios",
+      "gender": "n",
+      "nounClass": "thing"
+    },
+    {
       "id": "ohr",
       "lemma": "Ohr",
       "display": "Ohr",
@@ -3842,6 +3852,16 @@
       "pluralDisplay": "Clowns",
       "gender": "m",
       "nounClass": "person"
+    },
+    {
+      "id": "drache",
+      "lemma": "Drache",
+      "display": "Drache",
+      "emoji": "🐉",
+      "kind": "word",
+      "pluralDisplay": "Drachen",
+      "gender": "m",
+      "nounClass": "thing"
     },
     {
       "id": "frosch",
@@ -4274,6 +4294,16 @@
       "kind": "other",
       "pluralDisplay": "Feuer",
       "gender": "n",
+      "nounClass": "thing"
+    },
+    {
+      "id": "zucker",
+      "lemma": "Zucker",
+      "display": "Zucker",
+      "emoji": "🍬",
+      "kind": "other",
+      "pluralDisplay": "Zucker",
+      "gender": "m",
       "nounClass": "thing"
     },
     {
@@ -5297,6 +5327,17 @@
       "kind": "word",
       "pluralDisplay": "Küken",
       "gender": "n",
+      "nounClass": "thing"
+    },
+    {
+      "id": "weg",
+      "lemma": "Weg",
+      "display": "Weg",
+      "emoji": "🛣️",
+      "kind": "word",
+      "pluralDisplay": "Wege",
+      "pluralHighlight": "e",
+      "gender": "m",
       "nounClass": "thing"
     }
   ]

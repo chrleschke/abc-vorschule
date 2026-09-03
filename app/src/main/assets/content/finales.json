@@ -1,6 +1,6 @@
 {
   "finales": [
-    { "id": "f-l01", "text": "Die Maus mampft Mamas Apfel!", "tts": "Die Maus mampft Mamas Apfel!", "pictureAtomIds": ["maus", "mama", "apfel"] },
+    { "id": "f-l01", "text": "Mama Maus mampft einen dicken Apfel!", "tts": "Mama Maus mampft einen dicken Apfel!", "pictureAtomIds": ["maus", "apfel"] },
     { "id": "f-l02", "text": "Oma und Mia fliegen im Ufo!", "tts": "Oma und Mia fliegen im Ufo!", "pictureAtomIds": ["oma", "mia", "ufo"] },
     { "id": "f-l03", "text": "Papa und Opa tanzen auf dem Tisch!", "tts": "Papa und Opa tanzen auf dem Tisch!", "pictureAtomIds": ["papa", "opa"] },
     { "id": "f-l04", "text": "Das Lama hat einen roten Hut!", "tts": "Das Lama hat einen roten Hut!", "pictureAtomIds": ["lama", "hut"] },
@@ -24,7 +24,7 @@
     { "id": "f-l30", "text": "Der Eisbär sitzt im Vogelnest!", "tts": "Der Eisbär sitzt im Vogelnest!", "pictureAtomIds": ["eisbaer", "vogelnest"] },
     { "id": "f-l31", "text": "Der Schneemann wirft einen Schneeball!", "tts": "Der Schneemann wirft einen Schneeball!", "pictureAtomIds": ["schneemann", "schneeball"] },
     { "id": "f-l32", "text": "Die Biene schläft in der Sonnenblume!", "tts": "Die Biene schläft in der Sonnenblume!", "pictureAtomIds": ["biene", "sonnenblume"] },
-    { "id": "f-l33", "text": "Der Schulbus trägt eine Schultasche!", "tts": "Der Schulbus trägt eine Schultasche!", "pictureAtomIds": ["schulbus", "schultasche"] },
+    { "id": "f-l33", "text": "Die Schultasche frisst meine Brotdose!", "tts": "Die Schultasche frisst meine Brotdose!", "pictureAtomIds": ["schultasche", "brotdose"] },
     { "id": "f-l34", "text": "Pepe schläft in der Mülltonne!", "tts": "Pepe schläft in der Mülltonne!", "pictureAtomIds": ["pepe", "muelltonne"] }
   ]
 }
