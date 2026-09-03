@@ -104,16 +104,24 @@ bleiben nur Änderungen, die keinen Satz anfassen (Befund 4) und diese eine Ausn
 
 **Namen: Mateo und Lennard.** Der Pfad lief fast ausschließlich über Tom (18 Karten).
 Vier Runden in späteren Lektionen tragen jetzt die beiden anderen Namen — früh bleibt es
-bei Tom, das ist dort sinnvoll. Beide stehen **nur im Satz, nie auf einer Karte**: 👦
-gehört Tom, und zwei Jungen mit demselben Glyphen sind für ein Kind dieselbe Karte
-(§3 „Emoji-Doppelgänger"). Die Karten der vier Runden sind unberührt:
+bei Tom, das ist dort sinnvoll.
+
+Beide sind **eigene Figuren mit eigenem Bild**, nicht bloß Namen im Satztext. Ich hatte
+sie zuerst aus den Karten herausgehalten, weil 👦 schon Tom gehört; der Nutzer hat das
+kassiert — es darf mehrere Jungen geben, und die **Hautton-Varianten** trennen sie:
+Tom bleibt 👦 (neutrales Gelb), **Mateo ist 👦🏽**, **Lennard 👦🏼**. Die Modifikatoren sind
+Unicode 8.0 von 2015, also unbedenklich ab `minSdk` 26. Regel jetzt in §3.
 
 | | vorher | jetzt |
 |---|---|---|
-| l20 | Die Uhr liegt auf dem Sofa. | Lennard hat die Uhr auf das Sofa gelegt. |
-| l22 | Der Roller steht vor dem Haus. | Mateos Roller stand vor dem Haus. |
-| l29 | Zwei Kinder klettern ins Baumhaus. | Mateo und Lennard sind ins Baumhaus geklettert. |
-| l33 | In der Schultasche liegt ein Buch. | Mateo hat sein Buch eingepackt. |
+| l20 | Die Uhr liegt auf dem Sofa. ✔⏰🛋️ ✘⏰🛏️ | Lennard hat die Uhr auf das Sofa gelegt. ✔👦🏼⏰🛋️ ✘👦🏼⏰🛏️ |
+| l22 | Der Roller steht vor dem Haus. ✔🛴🏠 ✘🚲🏠 | Mateos Roller stand vor dem Haus. ✔👦🏽🛴🏠 ✘👦🏽🚲🏠 |
+| l29 | Zwei Kinder klettern ins Baumhaus. ✔🧒🧒🛖 ✘🧒🧒🛝 | Mateo und Lennard sind ins Baumhaus geklettert. ✔👦🏽👦🏼🛖 ✘👦🏽👦🏼🛝 |
+| l33 | In der Schultasche liegt ein Buch. ✔🎒📖 ✘🎒🍞 | Mateo hat sein Buch eingepackt. ✔👦🏽📖 ✘👦🏽🍞 |
+
+Die Gegenkarte tauscht überall weiter genau eine Kategorie (Sofa/Bett, Roller/Fahrrad,
+Baumhaus/Rutsche, Buch/Brot). Kartenbilder brauchen kein Audio — die vier neuen
+Aufnahmen sind die Sätze selbst.
 
 Erster Versuch für l29 war „Lennards Ball rollte über die Straße."; das hat
 `SentencePictureSidesTest` abgefangen — die Seite der richtigen Karte hängt am Satz-Hash,
@@ -169,7 +177,7 @@ tatsächlich weg ist:
 * **`Weg`** bleibt als Atom, weil die Drachen-Runde es als Gegenkarte braucht; als
   Bauwort ist es durch **Regen** ersetzt (🛣️ war eine Autobahn, dieselbe wie `Straße`).
 
-Neu: `eine`, `zur`, `kü`. Atome: 298 → **299**, weiterhin keines ohne Auftritt.
+Neu: `eine`, `zur`, `kü`, `Mateo` 👦🏽, `Lennard` 👦🏼. Atome: 298 → **301**, weiterhin keines ohne Auftritt.
 
 Bewusst **nicht** angefasst: Hut, Rose, Dose, Vase, Uhu — klassischer Fibel-Wortschatz,
 nicht veraltet; Ufo, Pirat, Hexe, Dino, Drache — Motivationsfiguren, an den richtigen

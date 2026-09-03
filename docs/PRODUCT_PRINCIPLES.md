@@ -237,7 +237,17 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
   nehmen; ein Bild, das ein Kind nicht sieht, ist kein Bild.
 - **Emoji-Doppelgänger sind keine zwei Karten.** Zwei Atome mit demselben Glyphen
   (Uhu/Eule 🦉, Wespe/Biene 🐝, Rad/Fahrrad 🚲, Pflanze/Gras 🌱) sehen für ein Kind
-  gleich aus; das zweite wurde gelöscht statt platziert.
+  gleich aus; das zweite wurde gelöscht statt platziert. Die Regel gilt für Dinge und
+  Tiere, die ohnehin dasselbe Bild wären.
+- **Mehrere Kinder sind ausdrücklich erwünscht — die Doppelgänger-Regel ist kein Deckel
+  auf einen Jungen.** Figuren, die dasselbe Basis-Emoji brauchen, unterscheidet die
+  **Hautton-Variante**: Tom bleibt 👦 (die neutrale gelbe Grundform), Mateo ist 👦🏽,
+  Lennard 👦🏼. Damit sind sie drei unterscheidbare Karten und dürfen auch zusammen auf
+  einer stehen („Mateo und Lennard sind ins Baumhaus geklettert" → 👦🏽👦🏼🛖). Die
+  Modifikatoren sind Unicode 8.0 (2015), liegen also weit unter der Altersgrenze aus der
+  Redaktionsregel Wortschatz und rendern ab `minSdk` 26 überall. Im September 2026 hatte
+  ein Review daraus fälschlich geschlossen, ein zweiter Junge sei unmöglich, und die
+  Namen nur in den Satztext geschrieben.
 
 
 

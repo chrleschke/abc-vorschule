@@ -4973,10 +4973,12 @@
         {
           "sentenceTts": "Lennard hat die Uhr auf das Sofa gelegt.",
           "correctAtomIds": [
+            "lennard",
             "uhr",
             "sofa"
           ],
           "wrongAtomIds": [
+            "lennard",
             "uhr",
             "bett"
           ]
@@ -5139,10 +5141,12 @@
         {
           "sentenceTts": "Mateos Roller stand vor dem Haus.",
           "correctAtomIds": [
+            "mateo",
             "roller",
             "haus"
           ],
           "wrongAtomIds": [
+            "mateo",
             "fahrrad",
             "haus"
           ]
@@ -6086,13 +6090,13 @@
         {
           "sentenceTts": "Mateo und Lennard sind ins Baumhaus geklettert.",
           "correctAtomIds": [
-            "kind",
-            "kind",
+            "mateo",
+            "lennard",
             "baumhaus"
           ],
           "wrongAtomIds": [
-            "kind",
-            "kind",
+            "mateo",
+            "lennard",
             "rutsche"
           ]
         },
@@ -7028,11 +7032,11 @@
         {
           "sentenceTts": "Mateo hat sein Buch eingepackt.",
           "correctAtomIds": [
-            "schultasche",
+            "mateo",
             "buch"
           ],
           "wrongAtomIds": [
-            "schultasche",
+            "mateo",
             "brot"
           ]
         },
