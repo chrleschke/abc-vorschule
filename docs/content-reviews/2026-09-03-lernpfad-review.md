@@ -57,7 +57,7 @@ Wort-Bauer zum Satz-Versteher. Jetzt wie l01/l02 eine Einwort-Runde („Papa").
 
 | Wo | Problem | Jetzt |
 |---|---|---|
-| l24 Verschmelzer | `s + t = st`, `s + p = sp` mit „Welche Silbe entsteht" — `st` ist keine Silbe, und s-t lautiert nicht zu „scht" | `st + u = stu` (Stuhl), `sp + i = spi` (Spinne) |
+| l24 Verschmelzer | `s + t = st`, `s + p = sp` fragten „Welche Silbe entsteht" — das Ergebnis ist ein Laut, keine Silbe | Runden bleiben (sie zeigen, aus welchen Buchstaben St und Sp bestehen — wie Sch, Ch, ck); Prompt fragt „Welcher Laut entsteht." |
 | l25 Verschmelzer | `r + ü = rü` — die Silbe kam in keinem Wort der Lektion vor (Rübe ist raus) | `k + ü = kü`, und Küken wird direkt daraus gebaut (`Kü + ken`) |
 | l19 Wort-Bauer | „Baue das Wort am" mit **einem** Block — nichts zu bauen | **Ameise** = `A + mei + se`, drei Silben, nutzt die l09-Silbe `mei` |
 | l22 Wort-Bauer | „Baue das Wort Ei" mit einem Block | **Eimer** = `Ei + m + e + r` — das Belohnungswort der Lektion |
@@ -135,8 +135,8 @@ Wenig zu tun, der Umbau vom 30.08. hat das Gröbste erledigt. Raus sind jetzt no
 Radio), **Zucker** 🍬 (das Emoji ist ein Bonbon, die Runde „Der Zucker steckt in der
 Dose" ergab kein Bild — jetzt „Die Socke liegt unter dem Bett"), **Weg** (siehe oben)
 und **Drache** 🐉 (einziger Auftritt war die unreale Park-Runde). Gelöscht wurden
-außerdem `spielt`, die Nicht-Silben `st`/`sp` und `rü`. Neu: `eine`, `zur`, `stu`, `kü`.
-Atome: 298 → **294**, weiterhin keines ohne Auftritt.
+außerdem `spielt` und `rü`. Neu: `eine`, `zur`, `kü`.
+Atome: 298 → **295**, weiterhin keines ohne Auftritt.
 
 Bewusst **nicht** angefasst: Hut, Rose, Dose, Vase, Uhu — klassischer Fibel-Wortschatz,
 nicht veraltet; Ufo, Pirat, Hexe, Dino — Motivationsfiguren, an den richtigen Stellen.
@@ -144,8 +144,7 @@ nicht veraltet; Ufo, Pirat, Hexe, Dino — Motivationsfiguren, an den richtigen 
 ## Was offen bleibt
 
 - **Audio:** Jede geänderte Zeile ist eine neue Aufnahme — rund 60 Prompts, Sätze und
-  Merksätze plus die neuen Wörter (Ameise, Eimer, Regen als Bauwort; `eine`, `zur`, `stu`,
-  `kü`). `tts extract` / `tts status` finden sie.
+  Merksätze plus die neuen Wörter (Ameise, Eimer, Regen als Bauwort; `eine`, `zur`, `kü`). `tts extract` / `tts status` finden sie.
 - **Sichtprüfung am Gerät:** Ameise (`A + mei + se`) und Eimer (vier Kacheln) im
   Wort-Bauer, Sonnenblume neu in l32 — Layout bei font_scale 1.3 nicht geprüft.
 - **Fortschritt bestehender Installationen:** Die Phase-8-IDs sind umbenannt; ein Kind,
