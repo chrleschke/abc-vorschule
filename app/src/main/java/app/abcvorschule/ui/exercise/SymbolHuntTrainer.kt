@@ -61,13 +61,36 @@ private val TileSize = AbcDimens.kidTouch
  * Mehrzeichen-Symbole („Sch") und große Schriftskalierungen schrumpfen darunter. */
 private const val MaxTileGlyphSp = 28f
 
-// Four, not five: the dark theme's fifth entry (SoftSand, near-white) worked against a
-// dark field but a near-Cream tile on the light field would vanish into the page. Also
-// swaps StarGold for StarGoldDeep — StarGold's own border-solid contrast against Cream
-// is only ~1.85:1 (see Color.kt), well under the 3:1 UI-component floor this tile's ring
-// needs; StarGoldDeep clears it at ~3.29:1. The other three, at full opacity against
-// Cream: SunCoral ~3.61:1, SkyBlue ~3.88:1, LeafGreen ~3.57:1 — all pass.
-private val TilePalette = listOf(SunCoral, SkyBlue, StarGoldDeep, LeafGreen)
+// Vier Ringe, nicht fünf: die fünfte Farbe der alten Nachtpalette (SoftSand, fast weiß)
+// trug auf dunklem Feld, würde auf dem hellen Papiergrund aber in der Seite verschwinden.
+//
+// Diese vier sind **abgedunkelte** Fassungen der App-Akzente SunCoral / SkyBlue /
+// StarGoldDeep / LeafGreen — rund 11 % dunkler. Grund ist der Papiergrund: die
+// Originaltöne sind gegen das alte flache Cream kalibriert und liegen dort selbst nur bei
+// 3.29–3.88:1. Auf dem Papierverlauf fiel der schwächste von ihnen auf 2.24:1, deutlich
+// unter die 3:1, die der Ring als Abgrenzung der Kachel (UI-Bauteil) braucht — die
+// Füllung trägt diese Grenze nicht, sie ist halbtransparent und liegt gegen jeden Grund
+// bei rund 1.2:1.
+//
+// Gemessen am gerenderten Pixel, jede Kachel gegen den Grund **an ihrer Stelle** (bei
+// einem Verlauf ist nur das die ehrliche Zahl): der schwächste Ring liegt bei 3.83:1.
+// Gegen den dunkelsten Punkt des Verlaufs, PaperEdge, sind es 3.04–3.07:1 — das ist die
+// Grenze, die PaperEdge festnagelt (siehe Color.kt).
+//
+// Die Originaltöne, falls der Grund je auf das flache Cream zurückgeht — dann gehören
+// diese vier Zeilen ersetzt durch `listOf(SunCoral, SkyBlue, StarGoldDeep, LeafGreen)`:
+//   SunCoral     #D25B2D   (Cream 3.61:1)
+//   SkyBlue      #3F7FB5   (Cream 3.88:1)
+//   StarGoldDeep #B07D0A   (Cream 3.29:1)
+//   LeafGreen    #43904F   (Cream 3.57:1)
+// Für die verworfene paper-blue-Fassung (siehe Color.kt) bleiben genau die vier Werte
+// unten gültig: blue trägt bis `500`, dort liegt der schwächste Ring bei 3.89:1.
+private val TilePalette = listOf(
+    Color(0xFFBA5028), // SunCoral, abgedunkelt
+    Color(0xFF3974A6), // SkyBlue, abgedunkelt
+    Color(0xFF936808), // StarGoldDeep, abgedunkelt
+    Color(0xFF3A7E45), // LeafGreen, abgedunkelt
+)
 
 /**
  * Buchstaben-/Silben-Jagd: tiles scatter across the whole task area under a
