@@ -102,11 +102,24 @@ dann „▶ Batch-Lauf" in der Kopfzeile — angefasst wird nur, was noch fehlt.
 Der Batch-Lauf nutzt immer die **Top-Seeds**-Logik (wie „Use top seeds" bei Generate):
 zufällig gezogen aus den am häufigsten gelockten Seeds des Profils; hat das Profil
 noch keine Locks, fällt er wie Generate auf frische Zufalls-Seeds zurück.
-In der Clip-Liste zeigt ein **Spinner** pro Zeile, solange für diesen Clip Kandidaten
-erzeugt werden (Generate, Batch-Lauf oder Warteschlange); ist er fertig und der Clip
-noch nicht geöffnet, erscheint eine **Zahl** — wie viele neue Aufnahmen seit dem
-letzten Öffnen dazukamen (beim Anklicken verschwindet sie, auch ohne Anhören). Das
-📌-Symbol für festgelegte Seeds entfällt in der Liste (in der Detailsicht bleibt es).
+In der Clip-Liste zeigt ein **Spinner** pro Zeile, solange für genau diesen Clip
+Kandidaten erzeugt werden (eigenes Generate oder der Clip, an dem der Batch-Lauf
+gerade arbeitet); ein blasses **⏳** heißt „kommt im Batch-Lauf noch dran". Ist der
+Clip fertig und noch nicht geöffnet, erscheint eine **Zahl** — wie viele neue
+Aufnahmen seit dem letzten Öffnen dazukamen (beim Anklicken verschwindet sie, auch
+ohne Anhören). Das 📌-Symbol für festgelegte Seeds entfällt in der Liste (in der
+Detailsicht bleibt es).
+
+**Review während der Lauf läuft:** der Server meldet jeden Clip einzeln, sobald er
+fertig ist — die UI lädt dann sofort nach. Ein abgearbeiteter Clip ist also
+mitten im Lauf schon anzuhören, zu bewerten, zu bestätigen und zu löschen, und sein
+„🎲 Generate" ist wieder klickbar: die Anfrage reiht sich hinter dem Lauf in die
+Warteschlange ein (der Knopf sagt dann „⏳ In der Warteschlange …"). Genau der Fall,
+wenn alle Aufnahmen eines Clips nichts geworden sind und man sofort neue braucht.
+Blockiert ist nur der Clip, an dem der Lauf gerade arbeitet. Das Nachladen lässt eine
+gerade abgespielte Aufnahme in Ruhe: die Detailsicht wird nur neu gezeichnet, wenn
+sich an ihrem Clip wirklich etwas geändert hat.
+
 Der Lauf erzeugt Kandidaten wie „🎲 Generate", aber für alle ausgewählten Clips
 auf einmal; er schreibt nie direkt in die Produktion. Die Entwürfe stehen danach in
 derselben Kandidaten-Tabelle wie jede andere Probeaufnahme — dort per Radio-Button

@@ -13,7 +13,13 @@ const state = {
   lastAcknowledgedCount: {},
   // Erzeugung angefordert oder laufend (Generate, Batch-Lauf, Warteschlange).
   generatingKeys: new Set(),
-  batchGeneratingKeys: new Set(),
+  // Der Batch-Lauf wird live mitgeschrieben, Clip für Clip: `batchActiveKey`
+  // ist der, an dem er gerade arbeitet, `batchPendingKeys` sind die, die noch
+  // kommen. Ein pauschales „alle ausgewählten sind beschäftigt" bis zum Ende
+  // des Laufs war der Grund, warum ein längst fertiger Clip nicht mehr
+  // anzuhören und sein Generate blockiert war.
+  batchActiveKey: null,
+  batchPendingKeys: new Set(),
 };
 const el = (id) => document.getElementById(id);
 
@@ -181,7 +187,8 @@ function restoreViewState() {
 
 let restored = false;
 
-async function refresh() {
+async function refresh({ keepDetail = false } = {}) {
+  const before = keepDetail && state.selected ? clipSignature(state.selected) : null;
   const data = await api("/api/state");
   Object.assign(state, data);
 
@@ -211,8 +218,24 @@ async function refresh() {
     showBanner(`Engine offline: ${state.engine.error || "unbekannt"}`, "warn");
   }
   renderList();
-  if (state.selected) withPreservedInput(() => renderDetail(state.selected));
+  const detailStale = before === null || before !== clipSignature(state.selected);
+  if (state.selected && detailStale) redrawDetail();
   if (state.paramsOpen) renderParams();
+}
+
+// Ein Batch-Lauf lädt nach jedem fertigen Clip nach — und währenddessen hört
+// jemand Aufnahmen ab. renderDetail() baut die Karte komplett neu, ein
+// spielendes <audio> verstummt dabei. `keepDetail` zeichnet die Detailsicht
+// deshalb nur neu, wenn sich an ihrem Clip laut dieser Signatur wirklich etwas
+// geändert hat.
+function clipSignature(key) {
+  const clip = state.clips.find((c) => c.key === key);
+  if (!clip) return "";
+  return JSON.stringify([
+    clip.status, clip.locked, clip.seed, clip.text, clip.speaker, clip.profile,
+    clip.generateSeed,
+    clip.candidates.map((c) => [c.seed, c.good, c.isProductionOnly, c.createdAt]),
+  ]);
 }
 
 // renderDetail() ersetzt die komplette Detailsicht. Ohne das hier verliert man
@@ -277,6 +300,7 @@ function renderList() {
     const spoken = clip.text !== clip.sourceText;
     const ownVoice = clip.speaker !== state.profiles[clip.profile].speaker;
     const generating = isClipGenerating(clip.key);
+    const waiting = isClipWaitingForBatch(clip.key);
     const unseen = unseenCount(clip.key);
     row.innerHTML = `
       <input type="checkbox" class="sel" ${state.selectedKeys.has(clip.key) ? "checked" : ""}
@@ -290,9 +314,11 @@ function renderList() {
       <span class="row-indicators">
         ${generating
           ? '<span class="spinner row-spinner" title="Erzeugung läuft …"></span>'
-          : unseen > 0
-            ? `<span class="badge-unseen" title="Neue Aufnahmen zum Anhören">${unseen}</span>`
-            : ""}
+          : waiting
+            ? '<span class="row-waiting" title="Kommt im Batch-Lauf noch dran">⏳</span>'
+            : unseen > 0
+              ? `<span class="badge-unseen" title="Neue Aufnahmen zum Anhören">${unseen}</span>`
+              : ""}
       </span>
       <span class="chip ${clip.status}">${STATUS_LABELS[clip.status] || clip.status}</span>`;
     const checkbox = row.querySelector(".sel");
@@ -599,12 +625,22 @@ function unseenCount(key) {
   return Math.max(0, clip.candidates.length - ack);
 }
 
+// „Erzeugt gerade oder gleich" — der Clip ist blockiert: sein eigener
+// Kandidaten-Job läuft, ist abgeschickt oder eingereiht, oder der Batch-Lauf
+// steht genau bei ihm.
 function isClipGenerating(key) {
   if (candidateJobRunning(key)) return true;
   if (isActionPending("generate", key)) return true;
   if (state.generatingKeys.has(key)) return true;
-  if (state.batchGeneratingKeys.has(key)) return true;
+  if (state.batchActiveKey === key) return true;
   return false;
+}
+
+// „Kommt im Batch-Lauf noch dran" — kein blockierender Zustand: Generate
+// bleibt klickbar und reiht sich hinter dem Lauf ein. Der Clip, an dem der Lauf
+// gerade arbeitet, steht nicht mehr in der Menge (siehe `startBatchClip`).
+function isClipWaitingForBatch(key) {
+  return state.batchPendingKeys.has(key);
 }
 
 function seedOrigin(clip, profile) {
@@ -767,9 +803,14 @@ function detailTitleHtml(clip) {
 
 function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
   const ownVoice = clip.speaker !== profile.speaker;
-  const genRunning = candidateJobRunning(clip.key);
-  const genQueued = isActionPending("generate", clip.key);
+  const genRunning = candidateJobRunning(clip.key) || state.batchActiveKey === clip.key;
+  // Eingereiht statt gestartet: der Job hängt hinter einem anderen (meist
+  // einem Batch-Lauf) in der Warteschlange. Ohne eigenes Label stünde der
+  // Knopf bis dahin auf „Starte …" — bei einem langen Lauf minutenlang.
+  const genQueued = !genRunning && state.generatingKeys.has(clip.key)
+    && Boolean(state.jobs.running);
   const generating = isClipGenerating(clip.key);
+  const waitingForBatch = isClipWaitingForBatch(clip.key);
   const deletableCount = deletableCandidates(clip).length;
   const deleteBusy = globalCandidateActionBusy(clip.key)
     || isActionPending("deleteAll", clip.key);
@@ -808,8 +849,17 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
         · Sprache ${escapeHtml(profile.language)} (aus dem Profil)</p>
       <div class="generate-row">
         <button id="btn-candidates" class="primary ${generating ? "pending" : ""}"
-                ${generating ? "disabled" : ""}>
-          ${genRunning ? "⏳ Erzeuge …" : generating ? "⏳ Starte …" : "🎲 Generate"}</button>
+                ${generating ? "disabled" : ""}
+                title="${waitingForBatch
+                  ? "Der Batch-Lauf kommt später auch zu diesem Clip — eine Anfrage " +
+                    "von hier reiht sich dahinter ein"
+                  : "Neue Probeaufnahmen erzeugen — läuft schon ein Job, wird die " +
+                    "Anfrage eingereiht"}">
+          ${genRunning
+            ? "⏳ Erzeuge …"
+            : genQueued
+              ? "⏳ In der Warteschlange …"
+              : generating ? "⏳ Starte …" : "🎲 Generate"}</button>
         <input id="cand-count" type="number" min="1" max="${max}"
                value="${candidateCount()}"
                ${generating || fixedSeedActive ? "disabled" : ""}
@@ -849,7 +899,10 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
             ? `(${topSize} Top-Seeds)`
             : "(keine Locks — es kommen Zufalls-Seeds)"}</span>
         </label>
-        <span id="cand-progress" class="muted small"></span>
+        <span id="cand-progress" class="muted small">${
+          genRunning ? "Erzeuge Probeaufnahmen …"
+            : genQueued ? "eingereiht — wartet auf den laufenden Job …"
+              : waitingForBatch ? "steht noch im Batch-Lauf" : ""}</span>
       </div>
       <details class="help">
         <summary>Was bedeuten die Spalten?</summary>
@@ -1208,8 +1261,6 @@ function renderDetail(key) {
     btnGenerate.textContent = "⏳ Starte …";
     try {
       await post(`/api/clips/${encoded}/candidates`, body);
-      el("cand-progress").textContent = state.jobs.running
-        ? "eingereiht — wartet auf den laufenden Job …" : "eingereiht …";
     } finally {
       state.actionPending = null;
       if (state.selected === clip.key) renderDetail(clip.key);
@@ -1254,14 +1305,6 @@ function renderDetail(key) {
   wireCandidateHandlers(clip);
   wireDeleteAllCandidates(clip);
   wireClearProduction(clip);
-
-  // Generate-Button während laufendem Job aktuell halten (SSE triggert refresh).
-  if (candidateJobRunning(clip.key)) {
-    const progress = el("cand-progress");
-    if (progress && !progress.textContent) {
-      progress.textContent = "Erzeuge Probeaufnahmen …";
-    }
-  }
 }
 
 // --------------------------------------------------------- Parameter-Panel
@@ -1371,6 +1414,10 @@ function queueSuffix() {
 
 function setJobIdle(text) {
   job.name = null;
+  // Auch hier mitschreiben: `state.jobs` kommt sonst nur über refresh() rein,
+  // und bis dahin hielte candidateJobRunning() einen längst beendeten Job für
+  // laufend (und umgekehrt).
+  state.jobs.running = null;
   el("job-spinner").classList.add("hidden");
   el("job-bar-track").classList.add("hidden");
   el("btn-cancel").classList.add("hidden");
@@ -1379,6 +1426,7 @@ function setJobIdle(text) {
 
 function setJobRunning(name) {
   job.name = name;
+  state.jobs.running = name;
   job.startedAt = Date.now();
   el("job-spinner").classList.remove("hidden");
   el("job-bar-track").classList.remove("hidden");
@@ -1402,6 +1450,45 @@ function onProgress(event) {
     const inline = el("cand-progress");
     if (inline) inline.textContent = `erzeuge Probeaufnahme ${event.index}/${event.total} …`;
   }
+}
+
+// Der Batch-Lauf arbeitet die Clips einzeln ab und sagt zu jedem Bescheid,
+// wenn er ihn anfängt: nur dieser eine Clip ist beschäftigt, der Rest der
+// Auswahl wartet bloß.
+function startBatchClip(key) {
+  state.batchActiveKey = key;
+  state.batchPendingKeys.delete(key);
+  renderList();
+  // Nur der betroffene Clip wird neu gezeichnet: nebenbei hört jemand
+  // Aufnahmen ab, und renderDetail() reißt ein spielendes <audio> mit.
+  if (state.selected === key) redrawDetail();
+}
+
+// Ein Clip des Laufs ist fertig. Die Aufnahmen liegen auf der Platte, aber
+// noch nicht im State — ohne dieses Nachladen sähe man sie erst, wenn der
+// ganze Lauf durch ist.
+function finishBatchClip(key) {
+  if (state.batchActiveKey === key) state.batchActiveKey = null;
+  state.batchPendingKeys.delete(key);
+  renderList();
+  refresh({ keepDetail: true }).catch(showError);
+}
+
+// Beim Abbrechen kann der Lauf genau zwischen zwei Clips stehen: dann ändert
+// sich an den Daten des offenen Clips nichts, sein Knopf müsste aber von
+// „Erzeuge …" zurück auf „Generate" — deshalb hier neu zeichnen und nicht auf
+// das nachfolgende refresh() hoffen, das keinen Unterschied findet.
+function clearBatchTracking() {
+  const affected = state.selected !== null
+    && (state.batchActiveKey === state.selected
+        || state.batchPendingKeys.has(state.selected));
+  state.batchActiveKey = null;
+  state.batchPendingKeys.clear();
+  if (affected) redrawDetail();
+}
+
+function redrawDetail() {
+  withPreservedInput(() => renderDetail(state.selected));
 }
 
 // ------------------------------------------------------------------ Events
@@ -1466,7 +1553,13 @@ el("btn-render").onclick = guard(async () => {
                `Erzeugt wird nur, was noch fehlt — fertige Clips ` +
                `werden übersprungen. Pro Clip entstehen ${n} Kandidaten, die du ` +
                `danach in der Liste als Produktion bestätigst.`)) return;
-  keys.forEach((k) => state.batchGeneratingKeys.add(k));
+  // Dieselbe Regel wie im Server (`force` ist hier nie gesetzt): fertige Clips
+  // überspringt der Lauf. Sie als „wartet" zu markieren hieße, sie auf einen
+  // Lauf warten zu lassen, der sie nie anfasst.
+  state.batchPendingKeys = new Set(
+    state.clips.filter((c) => keys.includes(c.key) && c.status !== "rendered")
+      .map((c) => c.key));
+  state.batchActiveKey = null;
   renderList();
   await post("/api/render", { keys, n });
 });
@@ -1496,6 +1589,10 @@ events.onmessage = (message) => {
   const event = JSON.parse(message.data);
   if (event.type === "render" || event.type === "candidate") {
     onProgress(event);
+  } else if (event.type === "clip-start") {
+    startBatchClip(event.clipKey);
+  } else if (event.type === "clip-done") {
+    finishBatchClip(event.clipKey);
   } else if (event.type === "job-summary") {
     lastSummary = event;
   } else if (event.type === "job-done") {
@@ -1505,7 +1602,7 @@ events.onmessage = (message) => {
       state.generatingKeys.delete(event.job.slice("candidates:".length));
     }
     if (event.job?.startsWith("render:")) {
-      state.batchGeneratingKeys.clear();
+      clearBatchTracking();
     }
     if (summary && summary.failed > 0) {
       setJobIdle("");
@@ -1516,25 +1613,29 @@ events.onmessage = (message) => {
     } else {
       setJobIdle("fertig");
     }
-    refresh().catch(showError);
+    refresh({ keepDetail: true }).catch(showError);
   } else if (event.type === "job-error") {
     lastSummary = null;
     if (event.job?.startsWith("candidates:")) {
       state.generatingKeys.delete(event.job.slice("candidates:".length));
     }
     if (event.job?.startsWith("render:")) {
-      state.batchGeneratingKeys.clear();
+      clearBatchTracking();
     }
     setJobIdle("");
     showBanner(event.message, "warn");
-    refresh().catch(showError);
+    refresh({ keepDetail: true }).catch(showError);
   } else if (event.type === "job-start") {
     lastSummary = null;
-    if (event.job?.startsWith("candidates:")) {
-      state.generatingKeys.add(event.job.slice("candidates:".length));
-    }
+    const started = event.job?.startsWith("candidates:")
+      ? event.job.slice("candidates:".length) : null;
+    if (started) state.generatingKeys.add(started);
     setJobRunning(event.job);
     renderList();
+    // Aus „In der Warteschlange …" wird jetzt „Erzeuge …" — ohne das hier
+    // bliebe der Knopf des offenen Clips beim alten Text stehen, bis
+    // irgendwann ein refresh() vorbeikommt.
+    if (started && started === state.selected) redrawDetail();
   } else if ("running" in event) {
     if (event.running) {
       // Initialframe des SSE-Streams: es läuft bereits ein Job.

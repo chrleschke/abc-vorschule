@@ -635,7 +635,17 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
                 progress=lambda p: jobs.publish({
                     "type": "render", "clipKey": p.clip_key,
                     "index": p.index, "total": p.total,
-                    "status": p.status, "message": p.message}))
+                    "status": p.status, "message": p.message}),
+                # Ein Batch-Lauf dauert Minuten bis Stunden, und wer ihn
+                # startet, hört die ersten Clips ab, während der Rest noch
+                # rendert. Deshalb pro Clip zwei eigene Ereignisse: damit weiß
+                # die UI, wo der Lauf gerade steht, und gibt einen fertigen
+                # Clip sofort frei (Aufnahmen sichtbar, Generate wieder
+                # klickbar) statt erst am Ende des ganzen Laufs.
+                clip_start=lambda key: jobs.publish({
+                    "type": "clip-start", "clipKey": key}),
+                clip_done=lambda key: jobs.publish({
+                    "type": "clip-done", "clipKey": key}))
             # render_batch_candidates swallows per-clip failures so the batch
             # continues. Without this summary the job publishes `job-done` and
             # the UI says "fertig" even when every single clip failed.
