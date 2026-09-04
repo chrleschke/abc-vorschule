@@ -272,14 +272,30 @@ ein Sch-Laut) — deshalb steht das Profil jetzt auf `temperature: 0.6`,
 `max_new_tokens: 25`; die `phoneme`-Werte (`temperature: 0.3`) zischen genauso
 zuverlässig.
 
-Empfehlung für den Clip `sss`: `textOverride: "Sss."`, Stimme `uncle_fu`, Profil
-`monster` mit den Werten oben. Unter genau diesen Einstellungen geprüfte Seeds, die
-zischen und ausklingen: 2046445861 (1,3 s), 686087737 (1,7 s), 1846837193 (1,7 s),
-1290703503 (1,8 s), 1389847500 (1,9 s), 479499922, 1079144366, 1334626947,
-1898632806, 2042992639 (je ≈ 1,9 s). Die Aufnahmen liegen als Kandidaten am Clip;
-ob das Zischen als Monster-S trägt, entscheidet wie immer das Ohr. Offen bleibt ein
-Ausblenden für Clips, die am Token-Limit hart enden — dafür gibt es noch keinen
-Schritt in `audio.py`.
+**Hörurteil (2026-09-04, Christian): alle diese Dauer-Zischer klingen wie rauschender
+Sand, nicht wie das S in „Sofa".** Das Spektrum-Maß hat also breitbandiges Rauschen
+gemessen, nicht ein Sprach-S — der grobe Spektralverlauf ist bei beiden gleich (auch das
+echte /s/ des Vocoders hat sein Maximum um 11 kHz). Was sie unterscheidet, ist die
+Textur: ein S im Wort dauert 75–220 ms und ist im Pegel ruhig (Energie-Modulation
+0,2–0,5), die Dauer-Zischer flattern (0,6–1,1) und wechseln das Spektrum von Frame zu
+Frame. Und das Modell hat für zwei Sekunden reines /s/ schlicht keine Trainingsdaten;
+sobald es länger zischt als ein Wort-Anlaut, kippt es in Codec-Rauschen.
+
+Der gangbare Weg ist deshalb der **Anlaut aus einem echten Wort**: `uncle_fu` spricht
+„Sofa", „Sonne", „Sophie", „Sonntag" (Referenz laut Christian: das S wie in Sofa —
+nicht Nuss/Bus), `experiments/onset_s.py` schneidet vom ersten Zischen bis zum
+Stimmeinsatz (120–220 ms) und verlängert das Segment granular auf ~450 ms — für
+stationäres Rauschen unhörbar, der natürliche Einsatz bleibt. Gedehnte Schreibweisen
+(„Sssonne", „Ssssonne") liefern bei einem Teil der Seeds ein natürlich langes S
+(≈ 1,2 s), dem tatsächlich „onne" folgt; bei den übrigen zischt das Modell wieder bis
+zum Token-Limit. Solche geschnittenen Aufnahmen liegen als Kandidaten am Clip `sss`
+(Text „✂ S aus …"). Bestätigt ist nach Gehör noch nichts.
+
+Offen, falls das Ohr die Schnitte annimmt: ein Schnitt ist nicht per Seed reproduzierbar
+— `render --force` würde wieder das ganze Wort erzeugen. Dafür bräuchte der Lock ein
+Feld für den Schnitt (Anlaut bis Stimmeinsatz, Ziel-Länge), das `postprocess` anwendet
+und der Fingerprint kennt. Ebenso offen bleibt ein Ausblenden für Clips, die am
+Token-Limit hart enden — dafür gibt es noch keinen Schritt in `audio.py`.
 
 
 Das Profil `article_word` trägt die Lösungswörter **mit Artikel** („das Haus"), die das
