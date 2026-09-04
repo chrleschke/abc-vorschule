@@ -2,7 +2,10 @@ package app.abcvorschule.session
 
 import app.abcvorschule.content.ContentRepository
 import app.abcvorschule.content.SentenceOrderRound
+import app.abcvorschule.content.SoundFeederSpec
+import app.abcvorschule.content.SymbolHuntSpec
 import app.abcvorschule.content.SymbolInWordSpec
+import app.abcvorschule.content.SyllableMergeSpec
 import app.abcvorschule.content.TaskSpec
 import app.abcvorschule.content.TrainerRound
 import app.abcvorschule.content.rounds
@@ -94,5 +97,19 @@ class SessionTrainersTest {
         // second pass exactly as they went into the first.
         val once = assemble("l03")
         assertEquals(once, once.map { schedule(it.spec) })
+    }
+
+    @Test
+    fun theFeederSitsBetweenLetterHuntAndSyllableMergeAndCarriesScaffoldsForBothSounds() {
+        val assembled = assemble("l13")
+        val feederIndex = assembled.indexOfFirst { it.spec is SoundFeederSpec }
+        assertTrue(feederIndex > 0)
+        assertTrue(assembled[feederIndex - 1].spec is SymbolHuntSpec)
+        assertTrue(assembled.drop(feederIndex + 1).any { it.spec is SyllableMergeSpec })
+        val feeder = assembled[feederIndex]
+        (feeder.spec as SoundFeederSpec).rounds.single().let { round ->
+            assertEquals(ScaffoldLevel.Advanced, feeder.scaffolds[round.leftAtomId])
+            assertEquals(ScaffoldLevel.Advanced, feeder.scaffolds[round.rightAtomId])
+        }
     }
 }
