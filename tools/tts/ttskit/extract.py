@@ -16,9 +16,10 @@ FIELD_TO_PROFILE: dict[str, str] = {
     # strict subset of phonemeTts. Same treatment, same profile — otherwise
     # the same 20 sounds get rendered and curated twice.
     "stretchTts": "phoneme",
-    # Der Laut-Fresser spricht den Laut, nicht den Buchstabennamen — eigenes
-    # Profil, weil `phoneme` ausdrücklich Buchstaben *vorliest*.
-    "soundTts": "sound",
+    # Laute und Reaktionen des Laut-Fressers sind eine Stimme — die der
+    # Monster. Die App legt die Stereo-Verteilung (links/rechts) je
+    # VoiceStyle trotzdem selbst zur Laufzeit fest.
+    "soundTts": "monster",
     "promptTts": "prompt",
     "instructionTts": "prompt",
     "missTts": "miss",

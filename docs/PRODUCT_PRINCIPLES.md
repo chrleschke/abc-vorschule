@@ -431,7 +431,7 @@ niemals mit einem stummen No-Op.
   Tonhöhe kippt zur Laufzeit (`VoiceStyle`: links tiefer, rechts höher) — die Artikulation
   ist der Engpass der App und darf nicht leiden. Echte Monster-Sprache gibt es nur für
   „Bäh!" und „Mmmmh!" (TTS-Profil `monster`). Der Fresser spricht dabei den *Laut*
-  (`soundTts`, Profil `sound`: „sss" statt „Es"), während Jagd, Wort-Detektiv und
+  (`soundTts`, Profil `monster`: „sss" statt „Es"), während Jagd, Wort-Detektiv und
   Spurensucher beim Buchstaben-Clip bleiben. Der Trainer spricht seine Ansage und
   Vorstellung selbst (`currentPromptParts` ist für ihn leer), damit Wackeln und Laut
   zusammenfallen. Ohne deutsches TTS steht das Wort als Text unter dem Emoji — ein

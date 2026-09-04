@@ -68,12 +68,12 @@ def test_every_field_has_a_profile(content_dir):
 
 
 def test_the_feeder_sound_has_its_own_profile():
-    """„sss" statt „Es": der Laut-Fresser bekommt eigene Clips, eigenes Profil."""
+    """„sss" statt „Es": der Laut-Fresser bekommt eigene Clips, im Monster-Profil."""
     by_id = {i.id: i for i in extract_items(CONTENT_DIR)}
     item = by_id["atom:letter-s:soundTts"]
     assert item.text == "sss"
-    assert profile_for_item(item) == "sound"
-    assert FIELD_TO_PROFILE["soundTts"] == "sound"
+    assert profile_for_item(item) == "monster"
+    assert FIELD_TO_PROFILE["soundTts"] == "monster"
 
 
 def test_stretch_and_phoneme_share_the_phoneme_profile():

@@ -229,25 +229,6 @@
       "trim": true,
       "normalize": true
     },
-    "sound": {
-      "label": "Laut (Aussprache)",
-      "speaker": "sohee",
-      "language": "german",
-      "instruct": "Sprich ausschließlich den Laut, wie er in einem Wort klingt — gedehnt bei Reibelauten und Vokalen (sss, mmm, aaa), kurz und ohne angehängten Vokal bei Verschlusslauten (k, t, p). Kein Buchstabenname, kein „e“ dahinter, kein Wort. Deutlich, freundlich, 1 Sekunde.",
-      "sampling": {
-        "temperature": 0.3,
-        "top_k": 30,
-        "top_p": 0.9,
-        "repetition_penalty": 1.05,
-        "subtalker_temperature": 0.8,
-        "subtalker_top_k": 50,
-        "subtalker_top_p": 1,
-        "max_new_tokens": 13
-      },
-      "seedPool": [],
-      "trim": true,
-      "normalize": true
-    },
     "prompt": {
       "label": "Aufgaben-Frage",
       "speaker": "sohee",
@@ -524,10 +505,10 @@
       "normalize": true
     },
     "monster": {
-      "label": "Monster-Reaktion",
-      "speaker": "sohee",
+      "label": "Monster (Laute und Reaktionen)",
+      "speaker": "uncle_fu",
       "language": "german",
-      "instruct": "Sprich wie ein kleines, gutmütiges Monster, das gerade etwas gefressen hat: knurrig, tief, kurz, mit Freude. Kein echtes Wort, nur der Ausruf. Übertreibe die Stimme, bleibe aber deutlich. Innerhalb von 1 Sekunde. Niemals englische Aussprache.",
+      "instruct": "Du bist ein kleines, gutmütiges Monster mit tiefer, knurriger Stimme. Sprich genau das, was da steht, als Laut — nicht als Buchstabenname, nicht als Wort: Reibelaute und Vokale gedehnt (sss, mmm, aaa), Verschlusslaute kurz und ohne angehängten Vokal (kk, tt, pp). Ausrufe wie „Bäh!“ und „Mmmmh!“ mit Freude. Deutlich artikuliert trotz Monsterstimme, deutsche Aussprache, höchstens 1,5 Sekunden.",
       "sampling": {
         "temperature": 1.2,
         "top_k": 30,

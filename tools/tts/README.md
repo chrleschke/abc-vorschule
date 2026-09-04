@@ -220,13 +220,19 @@ Profil `phoneme` (Lautwert), alle anderen Lemmata im Profil `word`. Damit kollid
 Buchstaben wie `M` und Silben wie `ma` nicht doppelt mit `phonemeTts`/`stretchTts` —
 identischer Text im selben Profil wird zu einem Clip zusammengefasst.
 
-Das Profil `sound` ist der *Laut* selbst („sss", „schhh") und gehört allein dem
-Laut-Fresser: `phoneme` liest ausdrücklich Buchstaben*namen* vor („Es", „Ka"), und genau
-die sollen die Monster nicht rülpsen. Quelle ist das optionale `soundTts` an den
-Buchstaben-Atomen; Jagd, Wort-Detektiv und Spurensucher bleiben beim Lemma-Clip.
-Gleiche Laut-Texte teilen sich einen Clip (ß/S, V/F, ck/K, C/Z sprechen sich gleich),
-und kein `soundTts` sieht aus wie ein Lemma oder Display — sonst zöge der Index still
-den Buchstabennamen-Clip.
+Das Profil `monster` ist die Stimme des Laut-Fressers: sowohl die *Laute* selbst
+(„sss", „schhh", aus dem optionalen `soundTts` an den Buchstaben-Atomen) als auch seine
+zwei Reaktionen („Bäh!", „Mmmmh!", Feld `monsterTts` in `extra-strings.json`) — eine
+Stimme für beides, weil beides derselbe Charakter ist. `phoneme` liest ausdrücklich
+Buchstaben*namen* vor („Es", „Ka"), und genau die sollen die Monster nicht rülpsen;
+Jagd, Wort-Detektiv und Spurensucher bleiben beim Lemma-Clip. Gleiche Laut-Texte teilen
+sich einen Clip (ß/S, V/F, ck/K, C/Z sprechen sich gleich), und kein `soundTts` sieht
+aus wie ein Lemma oder Display — sonst zöge der Index still den Buchstabennamen-Clip.
+Sprecher ist `uncle_fu` (tief, männlich) statt sohee — eigens für die Monster, nicht
+sohees Stimme mit Tonhöhen-Trick; die Oberfläche warnt hier bewusst per `accent_risk`
+(eine nicht-europäische Stimme spricht deutschen Text), das ist für die Monster-Laute
+akzeptiert. Die App verteilt links/rechts weiterhin selbst per `VoiceStyle`, das ändert
+an der Aufnahme nichts. 40 Laut-Clips plus 2 Reaktionen — nur der Fresser nutzt sie.
 
 Das Profil `article_word` trägt die Lösungswörter **mit Artikel** („das Haus"), die das
 Erfolgs-Vorsprechen nennt. Es ist bewusst nicht `word`: dessen `max_new_tokens: 25` (≈ 2,0 s)
@@ -253,12 +259,6 @@ mit demselben Seed wieder da.
 Bestehende `word:*`-Locks und Kandidaten-Ordner für Buchstaben/Silben einmalig
 umziehen: `tts migrate-locks` (siehe Ablauf oben). Clips mit Produktions-WAV aber
 ohne Lock (typisch nach Batch-`render`): `tts wire-locks`, danach `tts export`.
-
-Das Profil `monster` trägt nur die zwei Reaktionen des Laut-Fressers („Bäh!", „Mmmmh!",
-Feld `monsterTts` in `extra-strings.json`). Laute und Wörter des Trainers sind die
-normalen `phoneme`-/`word`-Clips — die Monster-Stimme entsteht in der App per Tonhöhe
-(`VoiceStyle`), damit die Artikulation sauber bleibt. Ein anderer Sprecher als sohee ist
-für `monster` erlaubt.
 
 ## Umfang
 

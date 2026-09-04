@@ -304,7 +304,7 @@ verzerrtes „sss" schlechter trifft als ein sauberes.
    Fallback-Pfad. Die TTS-Tonhöhe ist **engineweit** und muss nach jeder Äußerung auf 1.0
    zurück, sonst spricht die nächste Ansage im Monsterton.
    Der Laut ist dabei **nicht** der Buchstabenname: die Fresser sprechen `soundTts` am
-   Buchstaben-Atom („sss", „schhh", TTS-Profil `sound`), nicht `lemma` („Es", „Sch") — nur
+   Buchstaben-Atom („sss", „schhh", TTS-Profil `monster`), nicht `lemma` („Es", „Sch") — nur
    hier, und nur weil das Kind hier den Laut vergleicht. Fehlt `soundTts`, bleibt es beim
    Lemma-Clip.
    `SpeechController.speak`/`speakAndAwait` bekommen dafür einen Parameter
