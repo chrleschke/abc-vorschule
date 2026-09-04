@@ -155,6 +155,29 @@ als Formenpaar (`P / p`), damit „finde alle P" in „Papa" nicht schwerer ist 
 Silben stehen nur klein. Details und Beispiele:
 [Wort-Detektiv-Design](superpowers/specs/2026-07-31-wort-detektiv-design.md).
 
+Dritter abgeleiteter Zusatz-Trainer: der **Laut-Fresser** direkt nach der Buchstaben-Jagd
+(ohne Jagd nach dem letzten Spurensucher), ab Lektion 3 — „Füttere die Laut-Fresser." Zwei
+Figuren tragen je einen Laut auf dem Bauch (`S / s`, `Sch / sch`), oben erscheinen
+nacheinander bis zu sieben Bildkarten; das Kind hört das Wort und zieht die Karte zu dem
+Fresser, dessen Laut es hört. Gefragt wird nur **welcher** Laut, nie **wo** im Wort — das
+Anfang/Mitte/Ende-Konzept hat den früheren Auditiven Finder gekostet. Welche Lektion
+welches Paar spielt, entscheidet eine kuratierte Tabelle in drei Stufen (`SoundPairs`):
+**Kontrast** (S/Sch, S/Z, F/W, W/B, B/P, D/T, G/K, K/T, M/N, L/R, St/Sp, Pf/F — echte
+Verwechslungen nach Fox-Boyer und H-LAD, nur am Anlaut), **Aufwärmen** (P/T, L/H, F/T, S/T
+für L03–L07, damit das Kind Monster und Geste an leichten Kontrasten lernt) und **Vokal**
+(Ei/Au, Ei/Eu, Ö/Ü, I/O — irgendwo im Wort). Ein Paar ist Kandidat, wenn ein Laut Fokus
+der Lektion ist, beide eingeführt sind und der Pack je Seite mindestens zwei und zusammen
+mindestens sechs Karten hergibt; nie gespielt schlägt gespielt, sonst das am längsten
+Zurückliegende. Ohne Kandidaten wiederholt die Lektion ein bekanntes Kontrast-Paar. Karten
+sind Substantive mit genau einem Emoji, der Partnerlaut kommt nirgends im Wort vor (auch
+nicht als `ß`), und für S zählt auch ein `st`/`sp`, das nicht am Wortanfang steht;
+Minimalpaare (Fisch/Tisch, Kanne/Tanne) werden bevorzugt und liegen nebeneinander, und die
+Karten rotieren über die Lektionen durch den alphabetischen Vorrat. Richtiger Fresser kaut
+und spricht Laut und Wort, falscher spuckt („Bäh!") und die Karte hüpft zurück, beim
+zweiten Fehlgriff derselben Karte pulsiert das richtige Maul — kein „Zeig mir". Details
+und Zuordnung aller Lektionen:
+[Laut-Fresser-Design](superpowers/specs/2026-09-04-laut-fresser-design.md).
+
 Reihenfolge-Regeln, die Content und Validator erzwingen:
 
 - Der Wort-Bauer zeigt nie ein Graphem oder eine Silbe, die noch nicht eingeführt wurde.
@@ -387,8 +410,10 @@ niemals mit einem stummen No-Op.
   unbestimmten (ein/eine), Namen ohne. Neutrum-Personen bekommen „das": „ein Opa" und
   „ein Kind" wären sonst nicht unterscheidbar. Betroffen sind Wort-Bauer und Wort-Detektiv
   (`SuccessSpeech`). **Nicht** betroffen: Prompts, das Antippen von Items,
-  `missTts`, Rechnen („zwei Ameisen" — vor einer Zahl steht kein Artikel) und ganze Sätze,
-  die ihre Artikel schon tragen. Abgeleitet wird in `AtomArticleSpeech`; `tools/tts` spiegelt
+  `missTts`, Rechnen („zwei Ameisen" — vor einer Zahl steht kein Artikel), ganze Sätze,
+  die ihre Artikel schon tragen, und die Fress-Sequenz des Laut-Fressers („Sch … Schuh"),
+  weil ein Artikel zwischen Laut und Wort genau die Kopplung zerschnitte, die der Trainer
+  lehrt. Abgeleitet wird in `AtomArticleSpeech`; `tools/tts` spiegelt
   die Regel, damit vorproduzierte Clips denselben Text tragen.
 - Lob (**nur Rechnen, nur gesprochen**): ein zufälliges Wort oder ein kurzer Ausruf aus
   `PraisePhrases` steht vor der Antwort („Ausgezeichnet! zwei Ameisen"), damit die Menge das Letzte
@@ -400,6 +425,13 @@ niemals mit einem stummen No-Op.
 - Wenn kein deutsches TTS: visuelle Fallbacks, Aufgabe bleibt spielbar.
 - Wort-Bauer (Trainer 4): Prompt „Baue das Wort ….“ (ohne Tray-Instruktion); Silben-/Buchstabenklötze in Schablonen tragen die Aufgabe, keine zusätzliche Lese-Titelzeile.
 - Satz-Architekt (Trainer 5): Mehrwort-Prompt = Satztext ohne „Ordne die Wörter…“; Einwort-Bild-Zuordnung behält „Ordne das Wort … dem Bild zu.“
+- **Monster-Stimme (Laut-Fresser):** Laute und Wörter bleiben die kuratierten Clips, nur die
+  Tonhöhe kippt zur Laufzeit (`VoiceStyle`: links tiefer, rechts höher) — die Artikulation
+  ist der Engpass der App und darf nicht leiden. Echte Monster-Sprache gibt es nur für
+  „Bäh!" und „Mmmmh!" (TTS-Profil `monster`). Der Trainer spricht seine Ansage und
+  Vorstellung selbst (`currentPromptParts` ist für ihn leer), damit Wackeln und Laut
+  zusammenfallen. Ohne deutsches TTS steht das Wort als Text unter dem Emoji — ein
+  Hörspiel ist sonst unspielbar.
 - Feedback bei Fehlern (besonders Rechnen): **vorsprechen**, nicht als Fehler-Satz anzeigen.
 
 ### TTS-Grenzen und Autorierungs-Konventionen
@@ -555,6 +587,12 @@ niemals mit einem stummen No-Op.
 - Ausnahme Wort-Detektiv: der Antwortbereich trägt **Quittungs-Striche statt Wahloptionen**.
   Sie sind bloße Grundstriche ohne Rahmen und ohne Tray — die einzige Symbolquelle ist das
   Wort im Aufgabenblock. Damit sind sie von den Schablonen des Wort-Bauers unterscheidbar.
+- Ausnahme Laut-Fresser: der Antwortblock trägt **zwei Drop-Zonen** (die Fresser) statt
+  Kacheln, der Aufgabenblock die aktuelle Bildkarte und rechts daneben den Futterhaufen als
+  Rundenfortschritt; er hält seine Höhe, wenn die letzte Karte gefressen ist. Weil das Kind
+  die Karte nach unten zu den Fressern zieht, zeichnet der Aufgabenblock über dem
+  Antwortblock (`ExerciseStage(promptAboveAnswers = true)`) — Wort-Bauer und Satz-Architekt
+  ziehen aufwärts und bleiben bei der Vorbelegung `false`.
 - **Satz-Architekt: die Peg-Reihe bricht nie um.** Ein Satz steht immer in *einer*
   Zeile. Damit das auf jeder Breite und bei jeder Systemschriftgröße gilt, ist die
   Rangfolge in `SentencePegSizing` verbindlich: (1) die Reihe passt, (2) jeder Peg
@@ -593,7 +631,9 @@ niemals mit einem stummen No-Op.
   Antwortblock. Der Speaker geht in den Slot `promptChrome`, nie in `prompt` — nur der
   Slot garantiert die feste Höhe aus §7.
   Der Parameter `answerAnchor` ist mit `Bottom` vorbelegt; `BelowCenter` ist die
-  eine benannte Ausnahme (§9, Satz-Versteher).
+  eine benannte Ausnahme (§9, Satz-Versteher). Zweite benannte Ausnahme ist
+  `promptAboveAnswers`, mit `false` vorbelegt und nur beim Laut-Fresser `true`
+  (§9), weil dort abwärts statt aufwärts gezogen wird.
 - **Papiergrund (verbindlich).** Der Trainer-Grund ist eine Fläche des Babbel GDS,
   Familie `paper green`, und er ist **kein Volltonfeld**, sondern ein radialer Verlauf von
   `PaperCenter` (#F8F9F8) in der Mitte nach `PaperEdge` (#C5CDC9) an den Rändern —
@@ -621,6 +661,9 @@ niemals mit einem stummen No-Op.
   Benannte Ausnahme: die **warm gelaufenen Trittspuren** des Pfades nutzen ein transparentes
   StarGold (§5 verlangt „wärmer", und ein kaltes SkyBlue widerspräche dem) — das ist eine
   Landschafts-Färbung, kein Präzedenzfall für „Gold = Fortschritt" im UI-Chrome.
+  Die beiden Laut-Fresser tragen `SkyBlue` (links) und `SunCoral` (rechts) mit einem
+  `Cream`-Bauchfleck — bewusst weder `LeafGreen` noch `StarGold`, damit keine Seite
+  ‚richtig' aussieht.
 - Haptik-Vokabular `AbcHaptics` (tick/success/celebrate/nudge): tick = kleiner Sammel-Erfolg
   (Trace-Stern, Jagd-Treffer, Einrasten), success = Aufgabe richtig, celebrate = Lektions-/
   Batterie-Feier, nudge = sanfte Korrektur. Haptik ergänzt Ton, ersetzt ihn nie.

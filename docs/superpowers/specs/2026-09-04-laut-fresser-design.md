@@ -1,6 +1,6 @@
 # Laut-Fresser — Design
 
-Status: `design-approved`
+Status: `implemented`
 Datum: 2026-09-04
 
 Ein dritter abgeleiteter Zusatz-Trainer: **„Füttere die Laut-Fresser."** Zwei hungrige
