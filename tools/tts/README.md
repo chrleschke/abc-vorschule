@@ -234,6 +234,54 @@ sohees Stimme mit Tonhöhen-Trick; die Oberfläche warnt hier bewusst per `accen
 akzeptiert. Die App verteilt links/rechts weiterhin selbst per `VoiceStyle`, das ändert
 an der Aufnahme nichts. 40 Laut-Clips plus 2 Reaktionen — nur der Fresser nutzt sie.
 
+### Zischlaute: der Text entscheidet
+
+Gemessen am 2026-09-04 für das harte S des Fressers (`soundTts: "sss"`), weil `uncle_fu`
+dafür meist nur Husten und Knurren lieferte. Bewertet wurde nicht per Ohr, sondern am
+Spektrum: ein /s/ ist unstimmhaftes Rauschen mit fast aller Energie über 4 kHz und
+einem Maximum um 11 kHz — genau so sieht das /s/ aus, das derselbe Vocoder in „Bus",
+„Eis" oder „Nuss" erzeugt. Skript und Schwellwerte: `experiments/sibilant_grid.py`.
+
+**Die Schreibweise macht den Unterschied, nicht Stimme, Instruktion oder Sampling.**
+Anteil sauberer Zischlaute, `uncle_fu`, Monster-Instruktion, jeweils dieselben sechs Seeds:
+
+| Text | zischt | Bemerkung |
+| --- | --- | --- |
+| `sss`, `sss.`, `sss…`, `sss!`, `SSS`, `ß` | 0–1 von 6 | Husten, Knurren, Stimmhaftes — der bekannte Ausschuss |
+| `Sss.`, `ssss`, `ssst` | 6 von 6 | |
+| `Sss!`, `psst`, `ssssss` | 5 von 6 | |
+| `sssss` | 3 von 6 | fünf s sind schlechter als vier oder sechs |
+| `schhh` | 1 von 6 | eher /ʃ/ mit Maximum um 3–4 kHz — als Sch-Laut richtig, hier Vergleichswert |
+
+Kleines dreifaches `sss` scheitert unabhängig von Satzzeichen; die Großschreibung
+(`Sss.`) oder eine andere Anzahl s reicht, damit das Modell zischt statt zu husten.
+Mit 16 frischen Zufalls-Seeds und `max_new_tokens: 25` bestätigt: `Sss.` zischt in
+15 von 16 Fällen, `ssss`/`ssst`/`psst`/`ssssss` nur in 11–12 von 16. `Sss.` läuft dafür
+fast immer bis ans Token-Limit (≈ 1,9 s), klingt aber in 13 von 15 Fällen vor dem
+Schnitt hörbar aus (Pegel am Ende ≤ ⅓ des Mittelwerts); die kürzeren Schreibweisen
+hören öfter von selbst nach 0,5–1,3 s auf, dafür seltener sauber.
+
+Was **keinen** messbaren Einfluss hatte (`Sss!`, sechs Seeds): die Instruktion
+(ohne, kurz, Schlangen-Vergleich auf Deutsch/Englisch/Chinesisch — alle 6 von 6) und
+die Stimme (`uncle_fu`, `eric`, `dylan`, `aiden`, `ryan` — alle 6 von 6). Ein /s/ hat
+keine Stimmlippenbeteiligung, das Speaker-Embedding hat also nichts zu sagen; die tiefe
+Stimme braucht der Fresser nur für Vokale, Nasale und „Bäh!". Was schadet: das alte
+Monster-Sampling mit `temperature: 1.2`/`subtalker_temperature: 1.1` (3 von 6, dazu
+ein Sch-Laut) — deshalb steht das Profil jetzt auf `temperature: 0.6`,
+`subtalker_temperature: 0.2`, `subtalker_top_k: 20`, `subtalker_top_p: 0.5`,
+`max_new_tokens: 25`; die `phoneme`-Werte (`temperature: 0.3`) zischen genauso
+zuverlässig.
+
+Empfehlung für den Clip `sss`: `textOverride: "Sss."`, Stimme `uncle_fu`, Profil
+`monster` mit den Werten oben. Unter genau diesen Einstellungen geprüfte Seeds, die
+zischen und ausklingen: 2046445861 (1,3 s), 686087737 (1,7 s), 1846837193 (1,7 s),
+1290703503 (1,8 s), 1389847500 (1,9 s), 479499922, 1079144366, 1334626947,
+1898632806, 2042992639 (je ≈ 1,9 s). Die Aufnahmen liegen als Kandidaten am Clip;
+ob das Zischen als Monster-S trägt, entscheidet wie immer das Ohr. Offen bleibt ein
+Ausblenden für Clips, die am Token-Limit hart enden — dafür gibt es noch keinen
+Schritt in `audio.py`.
+
+
 Das Profil `article_word` trägt die Lösungswörter **mit Artikel** („das Haus"), die das
 Erfolgs-Vorsprechen nennt. Es ist bewusst nicht `word`: dessen `max_new_tokens: 25` (≈ 2,0 s)
 schneidet „die Erdbeere" — der längste der Artikel-Texte — ab, und die Instruktion muss
