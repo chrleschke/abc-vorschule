@@ -427,6 +427,10 @@ object ContentValidator {
                     issues += ValidationIssue(
                         "task $id is a derived trainer (${spec.kind}) and must not appear in authored content",
                     )
+                is SoundFeederSpec ->
+                    issues += ValidationIssue(
+                        "task $id is a derived trainer (${spec.kind}) and must not appear in authored content",
+                    )
             }
         }
 

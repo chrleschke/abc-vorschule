@@ -14,6 +14,7 @@ import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SentencePictureRound
 import app.abcvorschule.content.SentencePictureSpec
 import app.abcvorschule.content.SentencePictureSpeech
+import app.abcvorschule.content.SoundFeederRound
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.content.SymbolHuntSpeech
@@ -338,6 +339,9 @@ class SessionViewModel(
                 round,
                 _ui.value.roundIndex,
             )
+            // Der Trainer spricht Ansage und Vorstellung selbst, synchron zu seinen
+            // Figuren (design doc §5) — die Bühne darf hier nichts sprechen.
+            is SoundFeederRound -> emptyList()
             else -> listOfNotNull(round.promptTts.takeIf { it.isNotBlank() })
         }
     }
@@ -563,7 +567,7 @@ class SessionViewModel(
             // here as a harmless, defensive suppression rather than a required one.
             // Every other round type has no such synchronous speech.
             val speaksMissItself = _ui.value.currentRound.let {
-                it is SymbolHuntRound || it is SymbolInWordRound
+                it is SymbolHuntRound || it is SymbolInWordRound || it is SoundFeederRound
             }
             _ui.update {
                 it.copy(

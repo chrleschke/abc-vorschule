@@ -8,6 +8,7 @@ import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SentencePictureRound
+import app.abcvorschule.content.SoundFeederRound
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.content.SymbolInWordRound
 import app.abcvorschule.content.SyllableMergeRound
@@ -163,5 +164,8 @@ fun TrainerHost(
             onResult = callbacks.onResult,
             modifier = modifier.fillMaxSize(),
         )
+        // Wird in SoundFeederTrainer (Task 11 des Plans) ersetzt — bis dahin nur
+        // damit die sealed-Verzweigung kompiliert.
+        is SoundFeederRound -> Unit
     }
 }
