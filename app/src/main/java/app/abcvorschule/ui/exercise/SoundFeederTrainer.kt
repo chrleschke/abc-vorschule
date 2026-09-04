@@ -110,6 +110,12 @@ fun SoundFeederTrainer(
     // er beim Kartenwechsel nicht. Der Zustand trägt nichts über die Karte hinaus:
     // endDrag/cancelDrag setzen Drag-Offset und -Key ohnehin zurück.
     val dragState = rememberDragFieldState(roundKey)
+    // Der Stapel liegt bei jedem neuen Spiel anders da (Nutzerwunsch): ein Seed je
+    // Runde, gewürfelt statt aus der Lektion gesät. Innerhalb des Spiels bleibt er
+    // stehen, sonst zappelte der Haufen bei jeder Neukomposition. Welche Karten
+    // kommen und in welcher Reihenfolge, bleibt deterministisch (design doc §4) —
+    // zufällig ist nur, wie der Haufen daneben aussieht.
+    val pileSeed = remember(roundKey) { kotlin.random.Random.nextInt() }
     // Nur Vokalpaare zeigen beide Formen ("Ei / ei"). Konsonantenpaare stehen immer
     // am Anlaut eines Substantivs — dort gibt es die Kleinform gar nicht zu sehen, und
     // "S / s" auf dem Bauch wäre fachliches Beiwerk statt Aufgabe.
@@ -331,7 +337,7 @@ fun SoundFeederTrainer(
                         Spacer(Modifier.size(cardSize.dp, cardHeight.dp))
                     }
                     Spacer(Modifier.width(18.dp))
-                    FoodPile(remaining = (state.remaining - 1).coerceAtLeast(0))
+                    FoodPile(remaining = (state.remaining - 1).coerceAtLeast(0), seed = pileSeed)
                 }
             }
         },
@@ -422,9 +428,12 @@ private fun FeederCard(emoji: String, wordText: String?, minWidthDp: Float, minH
  * demselben Fleck, jede ein wenig verrutscht und verdreht ([SoundFeederSizing.pileOffset]).
  * Vorher war es eine Treppe aus leeren Rahmen — durchsichtig und langweilig; jetzt
  * ist es ein Stapel, dem man ansieht, dass noch etwas darin steckt.
+ *
+ * [seed] kommt aus dem Trainer und wechselt mit jedem Spiel: derselbe Haufen liegt
+ * nie zweimal gleich da.
  */
 @Composable
-private fun FoodPile(remaining: Int) {
+private fun FoodPile(remaining: Int, seed: Int) {
     val back = lerp(Cream, WarmMuted, 0.55f)
     val shape = RoundedCornerShape(8.dp)
     // Der Platz wird **immer** für eine Karte reserviert, auch wenn der Haufen leer ist
@@ -439,7 +448,7 @@ private fun FoodPile(remaining: Int) {
         contentAlignment = Alignment.Center,
     ) {
         repeat(remaining) { index ->
-            val (dx, dy, rot) = SoundFeederSizing.pileOffset(index)
+            val (dx, dy, rot) = SoundFeederSizing.pileOffset(index, seed)
             Box(
                 modifier = Modifier
                     .offset(x = dx.dp, y = dy.dp)

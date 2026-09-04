@@ -191,7 +191,10 @@ sonst keinen Leser — Rechnen und Satz-Versteher referenzieren sie nicht, das i
 - Rechts daneben der **Futterhaufen**: die noch ausstehenden Karten liegen als
   **Rückseiten übereinander** auf demselben Fleck (`lerp(Cream, WarmMuted, 0.55f)`,
   `WarmMuted`-Rahmen 2dp), jede leicht verschoben und verdreht
-  (`SoundFeederSizing.pileOffset`, deterministisch aus dem Index: ±4dp, ±8°). Der Stapel ist
+  (`SoundFeederSizing.pileOffset(index, seed)`: ±4dp, ±8°). Der Seed wird **je Spiel
+  gewürfelt** (`pileSeed` im Trainer) — der Haufen liegt bei jedem neuen Anlauf anders da,
+  bleibt aber während des Spiels ruhig liegen. Kartenwahl und -reihenfolge bleiben davon
+  unberührt: die sind weiterhin deterministisch aus der Lektion (§4). Der Stapel ist
   immer gleich breit (`pileWidthDp` hängt nicht von der Anzahl ab), damit die Bildkarte
   daneben bei jedem Zug stehen bleibt. Er wird mit jeder gefressenen Karte dünner und ist
   der Rundenfortschritt, den das Kind ohne Zahl lesen kann.

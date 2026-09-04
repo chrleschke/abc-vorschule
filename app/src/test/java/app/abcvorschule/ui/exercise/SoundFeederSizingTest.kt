@@ -91,13 +91,26 @@ class SoundFeederSizingTest {
 
     @Test
     fun pileOffsetsAreDeterministicAndBounded() {
-        (0 until 7).forEach { index ->
-            val (dx, dy, rot) = SoundFeederSizing.pileOffset(index)
-            assertEquals(SoundFeederSizing.pileOffset(index), Triple(dx, dy, rot))
-            assertTrue(kotlin.math.abs(dx) <= SoundFeederSizing.PileJitterDp)
-            assertTrue(kotlin.math.abs(dy) <= SoundFeederSizing.PileJitterDp)
-            assertTrue(kotlin.math.abs(rot) <= SoundFeederSizing.PileRotationDeg)
+        // Innerhalb eines Spiels (ein Seed) liegt jede Karte fest — sonst zappelte der
+        // Haufen bei jeder Neukomposition.
+        listOf(0, 4711, -13).forEach { seed ->
+            (0 until 7).forEach { index ->
+                val (dx, dy, rot) = SoundFeederSizing.pileOffset(index, seed)
+                assertEquals(SoundFeederSizing.pileOffset(index, seed), Triple(dx, dy, rot))
+                assertTrue(kotlin.math.abs(dx) <= SoundFeederSizing.PileJitterDp)
+                assertTrue(kotlin.math.abs(dy) <= SoundFeederSizing.PileJitterDp)
+                assertTrue(kotlin.math.abs(rot) <= SoundFeederSizing.PileRotationDeg)
+            }
+            assertTrue((0 until 7).map { SoundFeederSizing.pileOffset(it, seed) }.toSet().size >= 5)
         }
-        assertTrue((0 until 7).map { SoundFeederSizing.pileOffset(it) }.toSet().size >= 5)
+    }
+
+    @Test
+    fun aNewGameLaysThePileOutDifferently() {
+        // Nutzerwunsch: „Mache die Karten im Stapel bei jedem neuen Spiel zufällig."
+        // Zwei Spiele = zwei Seeds; mindestens eine der sieben Karten muss anders liegen.
+        val first = (0 until 7).map { SoundFeederSizing.pileOffset(it, 1) }
+        val second = (0 until 7).map { SoundFeederSizing.pileOffset(it, 2) }
+        assertTrue(first.indices.any { first[it] != second[it] })
     }
 }

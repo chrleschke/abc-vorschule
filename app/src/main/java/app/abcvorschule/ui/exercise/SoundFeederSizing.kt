@@ -91,11 +91,14 @@ object SoundFeederSizing {
 
     /**
      * Versatz und Drehung der [index]-ten Karte im Stapel: (dx, dy in dp, Rotation in
-     * Grad). Zufällig *aussehend*, aber aus dem Index gesät — derselbe Haufen sieht
-     * bei jeder Neukomposition gleich aus, sonst zappelte er bei jedem Frame.
+     * Grad). Aus [index] **und** [seed] gesät: innerhalb eines Spiels liegt der Haufen
+     * still (derselbe Seed über alle Neukompositionen, sonst zappelte er bei jedem
+     * Frame), aber jedes neue Spiel würfelt einen neuen Seed und der Stapel liegt
+     * anders da. Nur der *Anblick* ist zufällig — Kartenwahl und -reihenfolge bleiben
+     * deterministisch aus der Lektion (design doc §4).
      */
-    fun pileOffset(index: Int): Triple<Float, Float, Float> {
-        val rng = kotlin.random.Random(index * 7919 + 17)
+    fun pileOffset(index: Int, seed: Int): Triple<Float, Float, Float> {
+        val rng = kotlin.random.Random(seed * 31 + index * 7919 + 17)
         val dx = rng.nextFloat() * 2 * PileJitterDp - PileJitterDp
         val dy = rng.nextFloat() * 2 * PileJitterDp - PileJitterDp
         val rot = rng.nextFloat() * 2 * PileRotationDeg - PileRotationDeg
