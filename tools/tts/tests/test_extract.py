@@ -67,6 +67,15 @@ def test_every_field_has_a_profile(content_dir):
         assert item.field in FIELD_TO_PROFILE, f"no profile for field {item.field}"
 
 
+def test_the_feeder_sound_has_its_own_profile():
+    """„sss" statt „Es": der Laut-Fresser bekommt eigene Clips, eigenes Profil."""
+    by_id = {i.id: i for i in extract_items(CONTENT_DIR)}
+    item = by_id["atom:letter-s:soundTts"]
+    assert item.text == "sss"
+    assert profile_for_item(item) == "sound"
+    assert FIELD_TO_PROFILE["soundTts"] == "sound"
+
+
 def test_stretch_and_phoneme_share_the_phoneme_profile():
     assert FIELD_TO_PROFILE["stretchTts"] == "phoneme"
     assert FIELD_TO_PROFILE["phonemeTts"] == "phoneme"
@@ -383,7 +392,8 @@ def test_no_text_is_rendered_under_two_profiles_by_accident():
     """Ein Text, zwei Profile heißt: doppelt rendern, doppelt kuratieren, einer fliegt raus.
 
     Erlaubt bleibt genau eine Paarung: der Laut `Ei` und das Wort „Ei" klingen
-    gleich, ein Clip trägt beide.
+    gleich, ein Clip trägt beide. Die `soundTts`-Texte („sss", „schhh") kollidieren
+    per Konstruktion mit nichts — kein Lemma und kein Display sieht so aus.
     """
     from collections import defaultdict
 

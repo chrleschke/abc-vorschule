@@ -220,6 +220,14 @@ Profil `phoneme` (Lautwert), alle anderen Lemmata im Profil `word`. Damit kollid
 Buchstaben wie `M` und Silben wie `ma` nicht doppelt mit `phonemeTts`/`stretchTts` —
 identischer Text im selben Profil wird zu einem Clip zusammengefasst.
 
+Das Profil `sound` ist der *Laut* selbst („sss", „schhh") und gehört allein dem
+Laut-Fresser: `phoneme` liest ausdrücklich Buchstaben*namen* vor („Es", „Ka"), und genau
+die sollen die Monster nicht rülpsen. Quelle ist das optionale `soundTts` an den
+Buchstaben-Atomen; Jagd, Wort-Detektiv und Spurensucher bleiben beim Lemma-Clip.
+Gleiche Laut-Texte teilen sich einen Clip (ß/S, V/F, ck/K, C/Z sprechen sich gleich),
+und kein `soundTts` sieht aus wie ein Lemma oder Display — sonst zöge der Index still
+den Buchstabennamen-Clip.
+
 Das Profil `article_word` trägt die Lösungswörter **mit Artikel** („das Haus"), die das
 Erfolgs-Vorsprechen nennt. Es ist bewusst nicht `word`: dessen `max_new_tokens: 25` (≈ 2,0 s)
 schneidet „die Erdbeere" — der längste der Artikel-Texte — ab, und die Instruktion muss

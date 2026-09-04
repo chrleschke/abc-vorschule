@@ -229,6 +229,25 @@
       "trim": true,
       "normalize": true
     },
+    "sound": {
+      "label": "Laut (Aussprache)",
+      "speaker": "sohee",
+      "language": "german",
+      "instruct": "Sprich ausschließlich den Laut, wie er in einem Wort klingt — gedehnt bei Reibelauten und Vokalen (sss, mmm, aaa), kurz und ohne angehängten Vokal bei Verschlusslauten (k, t, p). Kein Buchstabenname, kein „e“ dahinter, kein Wort. Deutlich, freundlich, 1 Sekunde.",
+      "sampling": {
+        "temperature": 0.3,
+        "top_k": 30,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05,
+        "subtalker_temperature": 0.8,
+        "subtalker_top_k": 50,
+        "subtalker_top_p": 1,
+        "max_new_tokens": 13
+      },
+      "seedPool": [],
+      "trim": true,
+      "normalize": true
+    },
     "prompt": {
       "label": "Aufgaben-Frage",
       "speaker": "sohee",

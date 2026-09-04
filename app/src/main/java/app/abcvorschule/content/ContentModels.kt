@@ -77,6 +77,13 @@ data class Atom(
     val nounClass: NounClass? = null,
     /** Fertiger Artikel-Sprechtext, wenn die Ableitung nicht passt (Plural-Atome). */
     val articleSpeechOverride: String? = null,
+    /**
+     * Der *Laut* des Graphems („sss", nicht „S") — nur der Laut-Fresser spricht ihn.
+     * Jagd, Wort-Detektiv und Spurensucher bleiben beim Buchstabennamen ([lemma]).
+     * Bewusst nirgends gleich einem `lemma`/`display`, weil der ClipIndex nach Text
+     * (case-insensitiv) auflöst und sonst der Buchstabenname-Clip käme.
+     */
+    val soundTts: String? = null,
     /** Uppercase glyph strokes; required for atoms used by a letter_trace round. */
     val strokes: List<GlyphStroke> = emptyList(),
 )

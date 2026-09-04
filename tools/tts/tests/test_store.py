@@ -460,8 +460,8 @@ def test_the_shipped_profiles_json_carries_every_registry_parameter():
 
     profiles = Profiles.load(Paths().profiles)
     assert set(profiles.profiles) == {
-        "word", "article_word", "phoneme", "prompt", "math", "miss", "reward",
-        "sentence", "finale", "ui", "monster",
+        "word", "article_word", "phoneme", "sound", "prompt", "math", "miss",
+        "reward", "sentence", "finale", "ui", "monster",
     }
     for name, profile in profiles.profiles.items():
         assert set(profile.sampling) == set(SAMPLING_PARAMS), name

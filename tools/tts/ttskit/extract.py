@@ -16,6 +16,9 @@ FIELD_TO_PROFILE: dict[str, str] = {
     # strict subset of phonemeTts. Same treatment, same profile — otherwise
     # the same 20 sounds get rendered and curated twice.
     "stretchTts": "phoneme",
+    # Der Laut-Fresser spricht den Laut, nicht den Buchstabennamen — eigenes
+    # Profil, weil `phoneme` ausdrücklich Buchstaben *vorliest*.
+    "soundTts": "sound",
     "promptTts": "prompt",
     "instructionTts": "prompt",
     "missTts": "miss",
@@ -242,6 +245,10 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
         add(f"atom:{atom['id']}:lemma", atom.get("lemma", ""), "lemma",
             "atoms.json", None, f"{atom.get('display', atom['id'])} ({atom.get('kind', '?')})",
             atom_kind=atom.get("kind"))
+
+        if atom.get("soundTts"):
+            add(f"atom:{atom['id']}:soundTts", atom["soundTts"], "soundTts",
+                "atoms.json", None, f"{atom.get('display', atom['id'])} (Laut)")
 
         if atom["id"] not in reachable:
             continue

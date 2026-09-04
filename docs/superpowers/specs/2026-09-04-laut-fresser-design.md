@@ -296,13 +296,17 @@ werden.
 die Aussprache der Engpass der App ist und ein Kind, das genau diesen Kontrast lernt, ein
 verzerrtes „sss" schlechter trifft als ein sauberes.
 
-1. **Laute und Wörter bleiben die kuratierten Clips**, in Monster-Stimme **zur Laufzeit**
+1. **Laute und Wörter bleiben kuratierte Clips**, in Monster-Stimme **zur Laufzeit**
    verwandelt: der linke Fresser spielt tiefer (Tonhöhe ≈ 0.75), der rechte höher (≈ 1.3),
    Tempo unverändert. Artikulation und Dauer bleiben, nur die Tonhöhe kippt — zwei
    unterscheidbare Monster ohne eine neue Aufnahme. Technisch: `MediaPlayer.setPlaybackParams`
    mit `setPitch` (API 23+, minSdk ist 26) auf dem Clip-Pfad, `TextToSpeech.setPitch` auf dem
    Fallback-Pfad. Die TTS-Tonhöhe ist **engineweit** und muss nach jeder Äußerung auf 1.0
    zurück, sonst spricht die nächste Ansage im Monsterton.
+   Der Laut ist dabei **nicht** der Buchstabenname: die Fresser sprechen `soundTts` am
+   Buchstaben-Atom („sss", „schhh", TTS-Profil `sound`), nicht `lemma` („Es", „Sch") — nur
+   hier, und nur weil das Kind hier den Laut vergleicht. Fehlt `soundTts`, bleibt es beim
+   Lemma-Clip.
    `SpeechController.speak`/`speakAndAwait` bekommen dafür einen Parameter
    `voice: VoiceStyle = Normal` (`Normal`, `MonsterLow`, `MonsterHigh`); `TrainerCallbacks`
    reicht ihn durch. Das Wort nach dem Laut läuft **normal**.

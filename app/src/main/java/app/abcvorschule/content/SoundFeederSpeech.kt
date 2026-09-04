@@ -4,8 +4,9 @@ import app.abcvorschule.speech.SpokenPart
 import app.abcvorschule.speech.VoiceStyle
 
 /**
- * Was der Laut-Fresser wann sagt (design doc §5–§7). Laute und Wörter sind die
- * kuratierten Lemma-Clips; nur die Stimme wechselt. „Bäh!" und „Mmmmh!" sind die
+ * Was der Laut-Fresser wann sagt (design doc §5–§7). Wörter sind die kuratierten
+ * Lemma-Clips, Laute die `soundTts`-Clips (Profil `sound`); nur die Stimme
+ * wechselt — die Tonhöhe macht daraus das Monster. „Bäh!" und „Mmmmh!" sind die
  * einzigen Monster-eigenen Strings (extra-strings.json, Profil `monster`).
  */
 object SoundFeederSpeech {
@@ -20,8 +21,15 @@ object SoundFeederSpeech {
             ?: pack.atoms[atomId]?.display?.takeIf { it.isNotBlank() }
             ?: atomId
 
-    fun soundPart(round: SoundFeederRound, side: FeederSide, pack: ContentPack): SpokenPart =
-        SpokenPart(lemma(pack, round.atomIdFor(side)), voiceFor(side))
+    /**
+     * Der Laut, nicht der Buchstabenname: „sss" statt „Es". Kommt aus [Atom.soundTts]
+     * (Profil `sound`); ohne kuratierten Laut bleibt es beim Lemma-Clip.
+     */
+    fun soundPart(round: SoundFeederRound, side: FeederSide, pack: ContentPack): SpokenPart {
+        val atomId = round.atomIdFor(side)
+        val sound = pack.atoms[atomId]?.soundTts?.takeIf { it.isNotBlank() }
+        return SpokenPart(sound ?: lemma(pack, atomId), voiceFor(side))
+    }
 
     fun wordPart(card: SoundFeederCard, pack: ContentPack): SpokenPart =
         SpokenPart(lemma(pack, card.atomId))

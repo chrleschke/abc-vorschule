@@ -6,6 +6,7 @@
       "display": "M",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "mmm",
       "strokes": [
         {
           "points": [
@@ -39,6 +40,7 @@
       "display": "A",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "aaa",
       "strokes": [
         {
           "points": [
@@ -84,6 +86,7 @@
       "display": "I",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "iii",
       "strokes": [
         {
           "points": [
@@ -105,6 +108,7 @@
       "display": "O",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "ooo",
       "strokes": [
         {
           "points": [
@@ -186,6 +190,7 @@
       "display": "P",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "pp",
       "strokes": [
         {
           "points": [
@@ -271,6 +276,7 @@
       "display": "T",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "tt",
       "strokes": [
         {
           "points": [
@@ -304,6 +310,7 @@
       "display": "L",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "lll",
       "strokes": [
         {
           "points": [
@@ -329,6 +336,7 @@
       "display": "H",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "hh",
       "strokes": [
         {
           "points": [
@@ -374,6 +382,7 @@
       "display": "F",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "fff",
       "strokes": [
         {
           "points": [
@@ -419,6 +428,7 @@
       "display": "U",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "uuu",
       "strokes": [
         {
           "points": [
@@ -492,6 +502,7 @@
       "display": "R",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "rrr",
       "strokes": [
         {
           "points": [
@@ -589,6 +600,7 @@
       "display": "N",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "nnn",
       "strokes": [
         {
           "points": [
@@ -618,6 +630,7 @@
       "display": "S",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "sss",
       "strokes": [
         {
           "points": [
@@ -679,6 +692,7 @@
       "display": "E",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "eee",
       "strokes": [
         {
           "points": [
@@ -736,6 +750,7 @@
       "display": "D",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "dd",
       "strokes": [
         {
           "points": [
@@ -821,6 +836,7 @@
       "display": "K",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "kk",
       "strokes": [
         {
           "points": [
@@ -866,6 +882,7 @@
       "display": "Ei",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "eii",
       "strokes": [
         {
           "points": [
@@ -935,6 +952,7 @@
       "display": "W",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "www",
       "strokes": [
         {
           "points": [
@@ -968,6 +986,7 @@
       "display": "G",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "gg",
       "strokes": [
         {
           "points": [
@@ -1033,6 +1052,7 @@
       "display": "Ch",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "chhh",
       "strokes": [
         {
           "points": [
@@ -1122,6 +1142,7 @@
       "display": "Au",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "auu",
       "strokes": [
         {
           "points": [
@@ -1231,6 +1252,7 @@
       "display": "Äu",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "äuu",
       "strokes": [
         {
           "points": [
@@ -1364,6 +1386,7 @@
       "display": "B",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "bb",
       "strokes": [
         {
           "points": [
@@ -1513,6 +1536,7 @@
       "display": "Ä",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "äää",
       "strokes": [
         {
           "points": [
@@ -1582,6 +1606,7 @@
       "display": "Ö",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "ööö",
       "strokes": [
         {
           "points": [
@@ -1679,6 +1704,7 @@
       "display": "Ü",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "üüü",
       "strokes": [
         {
           "points": [
@@ -1776,6 +1802,7 @@
       "display": "Sch",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "schhh",
       "strokes": [
         {
           "points": [
@@ -1917,6 +1944,7 @@
       "display": "J",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "jjj",
       "strokes": [
         {
           "points": [
@@ -1962,6 +1990,7 @@
       "display": "Z",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "ts",
       "strokes": [
         {
           "points": [
@@ -2007,6 +2036,7 @@
       "display": "Eu",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "euu",
       "strokes": [
         {
           "points": [
@@ -2128,6 +2158,7 @@
       "display": "ß",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "sss",
       "strokes": [
         {
           "points": [
@@ -2237,6 +2268,7 @@
       "display": "V",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "fff",
       "strokes": [
         {
           "points": [
@@ -2270,6 +2302,7 @@
       "display": "ck",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "kk",
       "strokes": [
         {
           "points": [
@@ -2359,6 +2392,7 @@
       "display": "Pf",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "pff",
       "strokes": [
         {
           "points": [
@@ -2464,6 +2498,7 @@
       "display": "St",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "scht",
       "strokes": [
         {
           "points": [
@@ -2549,6 +2584,7 @@
       "display": "Sp",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "schp",
       "strokes": [
         {
           "points": [
@@ -2678,6 +2714,7 @@
       "display": "C",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "ts",
       "strokes": [
         {
           "points": [
@@ -2731,6 +2768,7 @@
       "display": "Y",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "üüü",
       "strokes": [
         {
           "points": [
@@ -2776,6 +2814,7 @@
       "display": "X",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "ks",
       "strokes": [
         {
           "points": [
@@ -2809,6 +2848,7 @@
       "display": "Qu",
       "emoji": "",
       "kind": "letter",
+      "soundTts": "kw",
       "strokes": [
         {
           "points": [

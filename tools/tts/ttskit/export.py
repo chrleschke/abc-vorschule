@@ -45,8 +45,8 @@ from .plan import fingerprint, orphan_locks, status_of
 #: phoneme vor word, damit Buchstaben-/Silben-Laute nicht von Wort-Clips
 #: verdrängt werden. Die App kennt am Call-Site nur den Text — der Index
 #: muss eindeutig sein.
-PROFILE_PRIORITY = ("phoneme", "word", "article_word", "prompt", "miss", "reward",
-                    "sentence", "finale", "ui", "monster")
+PROFILE_PRIORITY = ("phoneme", "sound", "word", "article_word", "prompt", "miss",
+                    "reward", "sentence", "finale", "ui", "monster")
 
 def _pedagogical_winner(text: str, prof_a: str, prof_b: str) -> str | None:
     """Preferred index profile when the same text appears in two profiles."""
