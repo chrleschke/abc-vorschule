@@ -219,6 +219,9 @@ class LessonCoverageTest {
             }
             pack.finales.values.forEach { addAll(it.pictureAtomIds) }
             pack.lessons.forEach { addAll(it.focusAtomIds) }
+            // Der Laut-Fresser ist abgeleitet: seine Karten stehen in keinem Task,
+            // sind aber genauso ein Auftritt (design doc §4).
+            addAll(SoundFeederDerivation.shownAtomIds(pack))
         }
         assertEquals(
             "atoms that no trainer, sentence or finale ever shows",
