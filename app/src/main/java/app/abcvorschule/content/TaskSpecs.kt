@@ -295,6 +295,13 @@ data class SoundFeederRound(
     val leftAtomId: String,
     val rightAtomId: String,
     val cards: List<SoundFeederCard>,
+    /**
+     * Steht der Laut irgendwo im Wort (Vokalpaare) statt nur am Anfang? Der Bildschirm
+     * beschriftet die Fresser danach: Anlaut-Paare stehen immer am Wortanfang eines
+     * Substantivs, dort reicht die Großform („S", „Sch"); ein Vokal steckt klein im
+     * Wortinneren und braucht beide Formen („Ei / ei").
+     */
+    val anywhere: Boolean = false,
 ) : TrainerRound {
     init {
         require(leftAtomId != rightAtomId) { "SoundFeederRound needs two different sounds" }

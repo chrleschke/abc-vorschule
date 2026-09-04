@@ -181,26 +181,45 @@ sonst keinen Leser — Rechnen und Satz-Versteher referenzieren sie nicht, das i
 
 **Aufgabenblock (oben, zentriert):**
 
-- Die **aktuelle Bildkarte**: ein großes Emoji auf Papiergrund mit dem Rahmen der
-  Satz-Versteher-Karten (`WarmMuted` @ 0.9, kein Füllton), Größe nach Bühnenbreite
-  gerechnet wie `SentencePictureCardSizing`. Sie ploppt auf (Skalierung 0 → 1 mit Überschwung)
-  und spricht dabei ihr Wort. Tipp wiederholt das Wort (Feedback-Kanal, würgt keine laufende
-  Ansage ab).
-- Rechts daneben, kleiner, der **Futterhaufen**: ein Stapel verdeckter Karten (bloße
-  Rahmen mit versetzten Kanten), einer je noch ausstehender Karte. Er schrumpft mit jeder
-  gefressenen Karte und ist der Rundenfortschritt, den das Kind ohne Zahl lesen kann.
+- Die **aktuelle Bildkarte**: ein großes Emoji auf **weißer** Fläche mit dem Rahmen der
+  Satz-Versteher-Karten (`WarmMuted` @ 0.9, 3dp) und einem leichten Schlagschatten (4dp,
+  `RoundedCornerShape(22.dp)`), Größe nach Bühnenbreite gerechnet wie
+  `SentencePictureCardSizing`. Weiß und nicht papierfarben: die offene Karte muss sich vom
+  Bühnengrund abheben, sonst liest sie sich als leerer Rahmen. Sie ploppt auf (Skalierung
+  0 → 1 mit Überschwung) und spricht dabei ihr Wort. Tipp wiederholt das Wort
+  (Feedback-Kanal, würgt keine laufende Ansage ab).
+- Rechts daneben der **Futterhaufen**: die noch ausstehenden Karten liegen als
+  **Rückseiten übereinander** auf demselben Fleck (`lerp(Cream, WarmMuted, 0.55f)`,
+  `WarmMuted`-Rahmen 2dp), jede leicht verschoben und verdreht
+  (`SoundFeederSizing.pileOffset`, deterministisch aus dem Index: ±4dp, ±8°). Der Stapel ist
+  immer gleich breit (`pileWidthDp` hängt nicht von der Anzahl ab), damit die Bildkarte
+  daneben bei jedem Zug stehen bleibt. Er wird mit jeder gefressenen Karte dünner und ist
+  der Rundenfortschritt, den das Kind ohne Zahl lesen kann.
 - Der Block hält seine größte Höhe (`holdTallest`-Prinzip aus §9): ist die letzte Karte
   weg, bleibt die Fläche stehen, die Fresser rücken nicht nach oben.
 
 **Antwortblock (unten):**
 
 - **Zwei Laut-Fresser**, links und rechts, jeder mindestens `kidTouch × 2` breit. Ein
-  Fresser ist eine runde, weiche Figur (Canvas, keine Emojis, kein Bild-Asset) mit großem
-  offenem Maul oben, zwei Augen und dem Laut groß auf dem Bauch. Der Laut zeigt wie beim
-  Detektiv **beide Formen** (`S / s`, `Sch / sch`), nur eine bei `ck`/`ß`; Vokalpaare ebenso
-  (`Ei / ei`, `Ö / ö`).
-- Ein kleines **Speaker-Icon** (`AbcSpeakerButton`-Glyph) sitzt am Fresser. Tipp auf Icon
-  **oder** Figur spielt den Laut in Monster-Stimme (§7) und lässt die Figur kurz wackeln.
+  Fresser ist eine **Geisterform** (Canvas, keine Emojis, kein Bild-Asset): runde Kuppel,
+  gerade Flanken, unten drei Wellen — eine Material-Form aus `androidx.graphics.shapes`
+  (`RoundedPolygon`; `MaterialShapes.Ghostish` gibt es in material3 1.4.0 noch nicht, siehe
+  §8). Der Körper ist mit einem **Radialverlauf** gefüllt (Licht oben links, Schatten unten
+  rechts) — erst dadurch sieht die Figur nach Körper aus statt nach ausgeschnittenem Papier.
+  Darauf zwei Augen mit Glanzpunkt, ein **Halbkreis-Maul** mit flacher Oberkante, das beim
+  Öffnen nach unten wächst, und der Laut groß auf dem Bauch.
+- **Bauch und Glyph sind Stufen der Körperfarbe**, nicht Cream und WarmInk (`FeederPalette`:
+  Bauch `lerp(body, White, 0.78)`, Glyph `lerp(body, Black, 0.45)`, Licht `0.30` zu Weiß,
+  Schatten `0.25` zu Schwarz). Der Laut gehört so zur Figur, statt als weißes Schild darauf
+  zu liegen; die Grenze ist die Lesbarkeit — der Glyph muss auf dem Bauch **≥ 3:1** erreichen
+  (`FeederPaletteTest`).
+- Der Laut zeigt bei **Anlaut-Paaren nur die Großform** (`S`, `Sch`): diese Wörter sind
+  Substantive und der Laut steht immer am Wortanfang, die Kleinform kommt gar nicht vor.
+  **Vokalpaare** (`SoundFeederRound.anywhere`) stecken klein im Wortinneren und zeigen weiter
+  **beide Formen** (`Ei / ei`, `Ö / ö`).
+- **Kein Speaker-Icon** an der Figur. Tipp auf die Figur spielt den Laut in Monster-Stimme
+  (§7) und lässt sie kurz wackeln — das Icon sah nach einem eigenen Knopf mit eigener
+  Trefferfläche aus und lenkte vom Füttern ab.
 - Die Fresser sind in jeder Lektion **dieselben zwei Figuren** in zwei festen Farben (links
   und rechts, aus den Rollenfarben in PRODUCT_PRINCIPLES §10 — keine der beiden darf die
   Erfolgs-/Fehlerrolle tragen, sonst liest das Kind „grün = richtig" in eine Seite). Nur der
@@ -312,12 +331,21 @@ Compose-freie Kerne, damit die Logik ohne Emulator prüfbar ist, Screens ohne En
 | `content/SoundFeederSpeech.kt` | Ansage-Teile, Fress-Sequenz (Laut, Wort), Miss-Sequenz („Bäh!", Wort) |
 | `ui/exercise/SoundFeederProgress.kt` | Zustandsautomat: `drop(side)` → `Eaten`, `RoundComplete`, `Miss`, `MissAlreadyReported`, `Hint`; hält Kartenindex, `missesOnCard`, `reportedMissThisRound` |
 | `ui/exercise/SoundFeederTrainer.kt` | Screen: Stage, Karte, Futterhaufen, zwei `FeederCreature`s, Drag-Verdrahtung, Sequenz-Steuerung |
-| `ui/exercise/FeederCreature.kt` | die Figur als Canvas: Körper, Maul (Öffnungsgrad 0..1), Augen, Bauch-Glyph, Speaker-Icon; Zustände idle/hover/chew/spit/hint/full |
+| `ui/exercise/FeederCreature.kt` | die Figur als Canvas: Geisterkörper mit Verlauf, Halbkreis-Maul (Öffnungsgrad 0..1), Augen, Bauch-Glyph; Zustände idle/hover/chew/spit/hint/full |
+| `ui/exercise/FeederPalette.kt` | Bauch, Glyph, Licht und Schatten als Stufen der Körperfarbe |
 | `ui/exercise/SoundFeederSizing.kt` | Karten- und Figurgrößen aus Bühnenbreite und `fontScale` |
 | `ui/exercise/TrainerHost.kt` | Dispatch |
 | `speech/SpeechController.kt`, `ClipPlayer.kt` | `VoiceStyle` und Tonhöhe |
 | `assets/content/atoms.json` | die zehn neuen Atome |
 | `tools/tts/extra-strings.json`, `profiles.json`, `ttskit/extract.py` | Ansage, Monster-Strings, Profil `monster`, Feldzuordnung `monsterTts → monster` |
+
+Die Geisterform kommt aus `androidx.graphics:graphics-shapes` (`RoundedPolygon` mit
+Wellensaum, auf 0..1 normiert, beim Zeichnen auf die Figurgröße skaliert). Der kürzere Weg
+wäre `MaterialShapes.Ghostish` — die Klasse gibt es in material3 1.4.0 (Compose BOM
+2025.12.00) aber noch nicht, sie kommt erst mit 1.5.0-alpha, und graphics-shapes hängt in
+dieser BOM auch nicht transitiv am Klassenpfad. Deshalb ist die Bibliothek ausdrücklich
+deklariert (`libs.androidx.graphics.shapes`); steigt die BOM auf 1.5.0, darf der Umriss
+gegen `MaterialShapes.Ghostish` getauscht werden.
 
 `SoundFeederRound` erfüllt `TrainerRound` (`promptTts` = „Füttere die Laut-Fresser.") und
 validiert im `init`: beide Seiten ≥ 2 Karten, keine Karte doppelt, `leftAtomId ≠ rightAtomId`.

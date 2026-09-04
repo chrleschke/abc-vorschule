@@ -83,9 +83,21 @@ class SoundFeederSizingTest {
     }
 
     @Test
-    fun thePileShrinksToNothing() {
+    fun thePileIsAJitteredStackNotARow() {
         assertEquals(0f, SoundFeederSizing.pileWidthDp(0))
-        assertEquals(SoundFeederSizing.PileCardWidthDp, SoundFeederSizing.pileWidthDp(1))
-        assertEquals(SoundFeederSizing.PileCardWidthDp + 5 * SoundFeederSizing.PileStepDp, SoundFeederSizing.pileWidthDp(6))
+        assertEquals(SoundFeederSizing.PileCardWidthDp + 2 * SoundFeederSizing.PileJitterDp, SoundFeederSizing.pileWidthDp(1))
+        assertEquals(SoundFeederSizing.pileWidthDp(1), SoundFeederSizing.pileWidthDp(6))
+    }
+
+    @Test
+    fun pileOffsetsAreDeterministicAndBounded() {
+        (0 until 7).forEach { index ->
+            val (dx, dy, rot) = SoundFeederSizing.pileOffset(index)
+            assertEquals(SoundFeederSizing.pileOffset(index), Triple(dx, dy, rot))
+            assertTrue(kotlin.math.abs(dx) <= SoundFeederSizing.PileJitterDp)
+            assertTrue(kotlin.math.abs(dy) <= SoundFeederSizing.PileJitterDp)
+            assertTrue(kotlin.math.abs(rot) <= SoundFeederSizing.PileRotationDeg)
+        }
+        assertTrue((0 until 7).map { SoundFeederSizing.pileOffset(it) }.toSet().size >= 5)
     }
 }

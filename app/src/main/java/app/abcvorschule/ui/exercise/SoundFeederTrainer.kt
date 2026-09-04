@@ -5,6 +5,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,7 +35,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
@@ -51,6 +56,7 @@ import app.abcvorschule.ui.exercise.drag.DragCard
 import app.abcvorschule.ui.exercise.drag.DropZone
 import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
@@ -103,12 +109,16 @@ fun SoundFeederTrainer(
     // er beim Kartenwechsel nicht. Der Zustand trägt nichts über die Karte hinaus:
     // endDrag/cancelDrag setzen Drag-Offset und -Key ohnehin zurück.
     val dragState = rememberDragFieldState(roundKey)
-    val leftLabel = remember(roundKey) {
-        SymbolInWordDerivation.targetLabel(pack.atom(round.leftAtomId), SymbolInWordMode.letter)
+    // Nur Vokalpaare zeigen beide Formen ("Ei / ei"). Konsonantenpaare stehen immer
+    // am Anlaut eines Substantivs — dort gibt es die Kleinform gar nicht zu sehen, und
+    // "S / s" auf dem Bauch wäre fachliches Beiwerk statt Aufgabe.
+    fun creatureLabel(atomId: String) = if (round.anywhere) {
+        SymbolInWordDerivation.targetLabel(pack.atom(atomId), SymbolInWordMode.letter)
+    } else {
+        SymbolInWordDerivation.TargetLabel(pack.atom(atomId).display, null)
     }
-    val rightLabel = remember(roundKey) {
-        SymbolInWordDerivation.targetLabel(pack.atom(round.rightAtomId), SymbolInWordMode.letter)
-    }
+    val leftLabel = remember(roundKey) { creatureLabel(round.leftAtomId) }
+    val rightLabel = remember(roundKey) { creatureLabel(round.rightAtomId) }
     val density = LocalDensity.current
     val fontScale = density.fontScale
     val cardSize = SoundFeederSizing.cardSizeDp(fontScale)
@@ -336,18 +346,12 @@ fun SoundFeederTrainer(
                                 color = if (side == FeederSide.left) LeftCreatureColor else RightCreatureColor,
                                 animator = animatorFor(side),
                                 hint = state.hintActive && state.current?.side == side,
-                                speaking = speaking,
                                 widthDp = creatureWidth,
                                 // Dieselbe Sperre wie für die Karte: ein Tipp während
                                 // Kauen/Spucken (Busy) oder während die Bühne gesperrt
                                 // ist, würde wiggle() auf dasselbe Animatable legen und
                                 // die laufende Fress-Animation abbrechen.
                                 enabled = enabled,
-                                // Nicht `enabled`: Busy (Kauen/Spucken) sperrt zwar den
-                                // Tipp, ist aber kein Zustand, den das Icon optisch zeigen
-                                // soll — sonst blinkt es bei jedem Fressen kurz dunkel.
-                                // Gedimmt wird nur, wenn die ganze Bühne gesperrt ist.
-                                dimmed = interactionLocked,
                                 onTap = {
                                     scope.launch { animatorFor(side).wiggle() }
                                     onSpeakFeedbackVoiced(SoundFeederSpeech.soundPart(round, side, pack))
@@ -373,11 +377,17 @@ fun SoundFeederTrainer(
  */
 @Composable
 private fun FeederCard(emoji: String, wordText: String?, minWidthDp: Float, minHeightDp: Float, fontScale: Float) {
+    val shape = RoundedCornerShape(22.dp)
     Column(
         modifier = Modifier
             .widthIn(min = minWidthDp.dp)
             .heightIn(min = minHeightDp.dp)
-            .border(3.dp, WarmMuted.copy(alpha = 0.9f), RoundedCornerShape(22.dp))
+            // Weiß mit Schatten, nicht durchsichtig: die offene Karte muss sich vom
+            // Bühnen-Cream abheben und über dem Futterhaufen liegen — vorher hatte sie
+            // dieselbe Farbe wie der Hintergrund und sah wie ein leerer Rahmen aus.
+            .shadow(elevation = 4.dp, shape = shape)
+            .background(Color.White, shape)
+            .border(3.dp, WarmMuted.copy(alpha = 0.9f), shape)
             .testTag("feeder_card"),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -397,21 +407,32 @@ private fun FeederCard(emoji: String, wordText: String?, minWidthDp: Float, minH
     }
 }
 
-/** Der Futterhaufen: ein verdeckter Kartenrahmen je ausstehender Karte, versetzt gestapelt. */
+/**
+ * Der Futterhaufen: die ausstehenden Karten liegen als Rückseiten übereinander auf
+ * demselben Fleck, jede ein wenig verrutscht und verdreht ([SoundFeederSizing.pileOffset]).
+ * Vorher war es eine Treppe aus leeren Rahmen — durchsichtig und langweilig; jetzt
+ * ist es ein Stapel, dem man ansieht, dass noch etwas darin steckt.
+ */
 @Composable
 private fun FoodPile(remaining: Int) {
+    val back = lerp(Cream, WarmMuted, 0.55f)
+    val shape = RoundedCornerShape(8.dp)
     Box(
         modifier = Modifier
             .width(SoundFeederSizing.pileWidthDp(remaining).coerceAtLeast(1f).dp)
-            .height((SoundFeederSizing.PileCardHeightDp + remaining * SoundFeederSizing.PileStepDp).dp)
+            .height((SoundFeederSizing.PileCardHeightDp + 2 * SoundFeederSizing.PileJitterDp).dp)
             .testTag("feeder_pile"),
+        contentAlignment = Alignment.Center,
     ) {
         repeat(remaining) { index ->
+            val (dx, dy, rot) = SoundFeederSizing.pileOffset(index)
             Box(
                 modifier = Modifier
-                    .offset(x = (index * SoundFeederSizing.PileStepDp).dp, y = ((remaining - 1 - index) * SoundFeederSizing.PileStepDp).dp)
+                    .offset(x = dx.dp, y = dy.dp)
+                    .rotate(rot)
                     .size(SoundFeederSizing.PileCardWidthDp.dp, SoundFeederSizing.PileCardHeightDp.dp)
-                    .border(2.dp, WarmMuted.copy(alpha = 0.7f), RoundedCornerShape(6.dp)),
+                    .background(back, shape)
+                    .border(2.dp, WarmMuted, shape),
             )
         }
     }

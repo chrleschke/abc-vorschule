@@ -1,6 +1,7 @@
 package app.abcvorschule.content
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -113,6 +114,12 @@ class SoundFeederDerivationTest {
         val shown = SoundFeederDerivation.shownAtomIds(pack)
         listOf("turm", "wurm", "kanne", "tanne", "wanne", "moehre", "muetze", "pfanne", "pfeil", "ziege")
             .forEach { assertTrue("$it never shown", it in shown) }
+    }
+
+    @Test
+    fun vowelRoundsCarryTheAnywhereFlagConsonantRoundsDoNot() {
+        assertFalse(rounds.getValue("l13").anywhere) // S/Sch
+        assertTrue(rounds.getValue("l22").anywhere) // Ei/Au
     }
 
     @Test

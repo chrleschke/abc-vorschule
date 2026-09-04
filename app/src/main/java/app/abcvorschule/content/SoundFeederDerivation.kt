@@ -164,6 +164,7 @@ object SoundFeederDerivation {
             leftAtomId = SoundPairs.letterAtom(pack, pair.left)?.id ?: error("no letter atom for ${pair.left}"),
             rightAtomId = SoundPairs.letterAtom(pack, pair.right)?.id ?: error("no letter atom for ${pair.right}"),
             cards = cards,
+            anywhere = pair.anywhere,
         )
     }
 }

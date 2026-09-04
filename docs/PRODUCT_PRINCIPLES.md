@@ -661,9 +661,11 @@ niemals mit einem stummen No-Op.
   Benannte Ausnahme: die **warm gelaufenen Trittspuren** des Pfades nutzen ein transparentes
   StarGold (§5 verlangt „wärmer", und ein kaltes SkyBlue widerspräche dem) — das ist eine
   Landschafts-Färbung, kein Präzedenzfall für „Gold = Fortschritt" im UI-Chrome.
-  Die beiden Laut-Fresser tragen `SkyBlue` (links) und `SunCoral` (rechts) mit einem
-  `Cream`-Bauchfleck — bewusst weder `LeafGreen` noch `StarGold`, damit keine Seite
-  ‚richtig' aussieht.
+  Die beiden Laut-Fresser tragen `SkyBlue` (links) und `SunCoral` (rechts) — bewusst weder
+  `LeafGreen` noch `StarGold`, damit keine Seite ‚richtig' aussieht. Bauch und Glyph sind
+  eine helle bzw. dunkle Stufe der Körperfarbe (`FeederPalette`, Glyph ≥ 3:1 auf dem Bauch),
+  ebenso Licht und Schatten ihres Verlaufs: die Figur ist ein Körper, keine Collage aus
+  Fremdfarben.
 - Haptik-Vokabular `AbcHaptics` (tick/success/celebrate/nudge): tick = kleiner Sammel-Erfolg
   (Trace-Stern, Jagd-Treffer, Einrasten), success = Aufgabe richtig, celebrate = Lektions-/
   Batterie-Feier, nudge = sanfte Korrektur. Haptik ergänzt Ton, ersetzt ihn nie.

@@ -37,9 +37,13 @@ object SoundFeederSizing {
     const val CardWordLineEm = 1.35f
     /** Luft zwischen Emoji und Wort plus Rahmen-Innenabstand. */
     const val CardWordPadDp = 8f
-    const val PileCardWidthDp = 22f
-    const val PileCardHeightDp = 30f
-    const val PileStepDp = 4f
+    /** Der Futterhaufen: ein Stapel halbgroßer Kartenrückseiten, keine Reihe. */
+    const val PileCardWidthDp = 48f
+    const val PileCardHeightDp = 60f
+    /** Wie weit eine Karte im Stapel höchstens verrutscht (je Achse). */
+    const val PileJitterDp = 4f
+    /** Wie weit eine Karte im Stapel höchstens verdreht liegt. */
+    const val PileRotationDeg = 8f
 
     fun creatureWidthDp(stageWidthDp: Float): Float =
         ((stageWidthDp.coerceAtMost(StageContentDp) - CreatureGapDp) / 2f)
@@ -77,6 +81,24 @@ object SoundFeederSizing {
     fun cardHeightDp(fontScale: Float, hasWord: Boolean): Float =
         cardSizeDp(fontScale) + if (hasWord) cardWordLineDp(fontScale) else 0f
 
+    /**
+     * Der Stapel ist so breit wie **eine** Karte plus den Versatz nach beiden Seiten —
+     * egal wie viele noch liegen. Ein Haufen, der mit jeder gefressenen Karte
+     * schrumpft, schöbe die Bildkarte daneben bei jedem Zug ein Stück zur Seite (§9).
+     */
     fun pileWidthDp(count: Int): Float =
-        if (count <= 0) 0f else PileCardWidthDp + (count - 1) * PileStepDp
+        if (count <= 0) 0f else PileCardWidthDp + 2 * PileJitterDp
+
+    /**
+     * Versatz und Drehung der [index]-ten Karte im Stapel: (dx, dy in dp, Rotation in
+     * Grad). Zufällig *aussehend*, aber aus dem Index gesät — derselbe Haufen sieht
+     * bei jeder Neukomposition gleich aus, sonst zappelte er bei jedem Frame.
+     */
+    fun pileOffset(index: Int): Triple<Float, Float, Float> {
+        val rng = kotlin.random.Random(index * 7919 + 17)
+        val dx = rng.nextFloat() * 2 * PileJitterDp - PileJitterDp
+        val dy = rng.nextFloat() * 2 * PileJitterDp - PileJitterDp
+        val rot = rng.nextFloat() * 2 * PileRotationDeg - PileRotationDeg
+        return Triple(dx, dy, rot)
+    }
 }
