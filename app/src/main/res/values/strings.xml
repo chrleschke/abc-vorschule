@@ -6,9 +6,10 @@
     <string name="parent_title">Eltern</string>
     <!-- TalkBack-Label des Parent-Gates: erklärt Erwachsenen die Long-Press-Geste. -->
     <string name="parent_gate_description">Eltern-Einstellungen, lange drücken zum Öffnen</string>
+    <!-- Hinweis auf die Long-Press-Geste, wenn ein kurzer Tipp am Parent-Gate landet. -->
+    <string name="parent_gate_hint">Lange drücken für das Eltern-Menü</string>
     <string name="parent_section_difficulty">Hilfestufe</string>
     <string name="parent_unlock_all">Reihenfolge frei wählbar</string>
-    <string name="parent_tts_debug">TTS Debug</string>
     <string name="mode_auto">Auto</string>
     <string name="mode_beginner">Mit Hilfe</string>
     <string name="mode_advanced">Ohne Hilfe</string>

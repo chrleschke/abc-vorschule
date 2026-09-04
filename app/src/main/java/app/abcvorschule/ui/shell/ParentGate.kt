@@ -1,5 +1,6 @@
 package app.abcvorschule.ui.shell
 
+import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -13,10 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -38,6 +41,11 @@ private const val ParentGateMs = 1500L
  * ohne Text, dass hier ein Menü liegt, und ein Vektor wächst nicht mit der
  * Schriftskalierung aus dem 48-dp-Knopf heraus, wie es der Glyph tat.
  *
+ * Ein kurzer Tipp öffnet nichts — er ist die häufigste Fehlbedienung, und ohne
+ * Antwort sieht der Knopf kaputt aus. Statt einer eigenen Sprechblase, die die
+ * Landschaft überdeckt, kommt der native Toast: kurz, außerhalb der Bühne, und
+ * skaliert mit den Systemeinstellungen (Testgerät läuft auf font_scale 1.3).
+ *
  * Nur auf dem Pfad-Screen. In der Lektion gibt es ihn nicht: dort führt der Weg
  * zu den Eltern-Einstellungen über das Verlassen der Lektion.
  */
@@ -47,7 +55,12 @@ fun ParentGateButton(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalAbcHaptics.current
+    val context = LocalContext.current
     val gateDescription = stringResource(R.string.parent_gate_description)
+    val gateHint = stringResource(R.string.parent_gate_hint)
+    val showHint = {
+        Toast.makeText(context, gateHint, Toast.LENGTH_SHORT).show()
+    }
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = CircleShape,
@@ -61,19 +74,28 @@ fun ParentGateButton(
             .semantics {
                 role = Role.Button
                 contentDescription = gateDescription
+                onClick {
+                    showHint()
+                    true
+                }
                 onLongClick {
                     haptics.tick()
                     onUnlocked()
                     true
                 }
             }
-            .pointerInput(onUnlocked) {
+            .pointerInput(onUnlocked, gateHint) {
                 detectTapGestures(
                     onPress = {
                         try {
-                            withTimeout(ParentGateMs) {
+                            val released = withTimeout(ParentGateMs) {
                                 tryAwaitRelease()
                             }
+                            // Vor der Schwelle losgelassen: kein Tor, aber ein Hinweis.
+                            // Ein abgebrochener Druck (Finger wandert weg) gibt
+                            // `false` zurück und bleibt stumm — sonst käme der
+                            // Toast beim Scrollen über den Knopf.
+                            if (released) showHint()
                         } catch (_: TimeoutCancellationException) {
                             // Long-press threshold reached: confirm the gesture landed
                             // before the gate unlocks. tick = Einrasten (§10), keine

@@ -359,8 +359,13 @@ niemals mit einem stummen No-Op.
   ⋯-Glyph: Erwachsene erkennen daran ohne Text, dass hier ein Menü liegt, und ein Vektor wächst
   nicht mit der Schriftskalierung aus dem 48-dp-Knopf heraus. In der Lektion gibt es ihn nicht: dort führt der Weg zu den Einstellungen über das Verlassen der Lektion. Das Sheet
   bietet die Hilfestufe (**Auto / Mit Hilfe / Ohne Hilfe**) und die Freigabe „Reihenfolge frei
-  wählbar“, die die Fortschrittssperre des Pfades aufhebt. In Debug-Builds zusätzlich
-  „TTS Debug“ am Ende des Sheets (Entwickler-Werkzeug, nicht für Release).
+  wählbar“, die die Fortschrittssperre des Pfades aufhebt — sonst nichts. Kein Entwickler-Eintrag,
+  auch nicht in Debug-Builds: die frühere Seite „TTS Debug“ ist entfernt, die Clip-Texte entstehen
+  in `tools/tts`.
+- Ein **kurzer Tipp** auf das Drei-Punkte-Menü öffnet nichts, sondern zeigt den nativen Toast
+  „Lange drücken für das Eltern-Menü“ (`R.string.parent_gate_hint`). Die Kindersicherung bleibt
+  damit unangetastet, aber der Knopf antwortet auf die häufigste Fehlbedienung statt stumm zu
+  bleiben. Ein abgebrochener Druck (Finger wandert weg) bleibt stumm.
 - Auto passt Gerüste sanft an; erzwungene Stufen frieren Auto-Streaks ein.
 - Gerüste pro Atom/Slot (Silhouette vs. Lücke), nicht global starr über die ganze Aufgabe.
 
