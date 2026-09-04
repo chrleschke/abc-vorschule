@@ -1,0 +1,63 @@
+package app.abcvorschule.ui.exercise
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class SoundFeederSizingTest {
+    @Test
+    fun twoCreaturesAndTheGapFitTheNarrowestStage() {
+        // 320dp-Gerät: ExerciseStage lässt 296dp, zwei Figuren plus 16dp Lücke.
+        val width = SoundFeederSizing.creatureWidthDp(296f)
+        assertTrue(2 * width + SoundFeederSizing.CreatureGapDp <= 296f)
+        assertTrue(width >= SoundFeederSizing.MinCreatureDp)
+    }
+
+    @Test
+    fun creaturesStopGrowingOnWideStages() {
+        assertEquals(SoundFeederSizing.MaxCreatureDp, SoundFeederSizing.creatureWidthDp(396f))
+        assertEquals(SoundFeederSizing.MaxCreatureDp, SoundFeederSizing.creatureWidthDp(800f))
+    }
+
+    @Test
+    fun theBellyGlyphNeverLeavesTheBellyEvenForSchAtFontScaleOnePointThree() {
+        val width = SoundFeederSizing.creatureWidthDp(296f)
+        val chars = SoundFeederSizing.labelChars("Sch", "sch") // "Sch / sch"
+        listOf(1f, 1.3f).forEach { scale ->
+            val sp = SoundFeederSizing.bellyGlyphSp(chars, width, scale)
+            val renderedWidthDp = chars * SoundFeederSizing.GlyphAdvanceEm * sp * scale
+            assertTrue("scale $scale: $renderedWidthDp dp on ${width * SoundFeederSizing.BellyWidthFraction}", renderedWidthDp <= width * SoundFeederSizing.BellyWidthFraction + 0.01f)
+            assertTrue(sp >= SoundFeederSizing.MinBellyGlyphSp)
+        }
+    }
+
+    @Test
+    fun aSingleLetterGetsTheFullGlyphSize() {
+        assertEquals(SoundFeederSizing.MaxBellyGlyphSp, SoundFeederSizing.bellyGlyphSp(SoundFeederSizing.labelChars("ß", null), 176f, 1f))
+    }
+
+    @Test
+    fun labelCharsCountsBothFormsAndTheSeparator() {
+        assertEquals(5, SoundFeederSizing.labelChars("S", "s")) // "S / s"
+        assertEquals(9, SoundFeederSizing.labelChars("Sch", "sch"))
+        assertEquals(2, SoundFeederSizing.labelChars("ck", null))
+    }
+
+    @Test
+    fun theCardStaysAtOneAndAHalfKidTouchAtEverySystemFontScale() {
+        // TaskPromptSizing.pictureSp deckelt die *effektive* Bildgröße auf 84dp: die
+        // Karte ist bei 1.0, 1.3 und 2.0 praktisch gleich groß (Ganzzahl-Kürzung
+        // nimmt bei 1.3 ein paar Zehntel) und nie kleiner als 120dp.
+        listOf(1f, 1.3f, 2f).forEach { scale ->
+            val size = SoundFeederSizing.cardSizeDp(scale)
+            assertTrue("scale $scale: $size", size >= SoundFeederSizing.MinCardDp && size <= 130f)
+        }
+    }
+
+    @Test
+    fun thePileShrinksToNothing() {
+        assertEquals(0f, SoundFeederSizing.pileWidthDp(0))
+        assertEquals(SoundFeederSizing.PileCardWidthDp, SoundFeederSizing.pileWidthDp(1))
+        assertEquals(SoundFeederSizing.PileCardWidthDp + 5 * SoundFeederSizing.PileStepDp, SoundFeederSizing.pileWidthDp(6))
+    }
+}
