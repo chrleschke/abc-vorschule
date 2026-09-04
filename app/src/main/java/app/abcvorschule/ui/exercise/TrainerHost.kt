@@ -170,8 +170,18 @@ fun TrainerHost(
             onResult = callbacks.onResult,
             modifier = modifier.fillMaxSize(),
         )
-        // Wird in SoundFeederTrainer (Task 11 des Plans) ersetzt — bis dahin nur
-        // damit die sealed-Verzweigung kompiliert.
-        is SoundFeederRound -> Unit
+        is SoundFeederRound -> SoundFeederTrainer(
+            round = round,
+            roundIndex = roundIndex,
+            pack = pack,
+            ttsAvailable = ttsAvailable,
+            speaking = speaking,
+            interactionLocked = interactionLocked,
+            onSpeakParts = callbacks.onSpeakParts,
+            onSpeakFeedback = callbacks.onSpeakFeedback,
+            onSpeakFeedbackVoiced = callbacks.onSpeakFeedbackVoiced,
+            onResult = callbacks.onResult,
+            modifier = modifier.fillMaxSize(),
+        )
     }
 }
