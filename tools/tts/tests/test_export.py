@@ -167,24 +167,30 @@ def test_collision_prefers_phoneme_over_word(tmp_path):
 
 
 def test_collision_prefers_verified_audio(tmp_path):
-    """Ohne pädagogische Regel gewinnt verified Audio vor PROFILE_PRIORITY."""
+    """Ohne pädagogische Regel gewinnt verified Audio vor PROFILE_PRIORITY.
+
+    Der Prompt trägt einen Anweisungs-Marker („Baue das Wort"), damit er im
+    Profil `prompt` bleibt: seit `reads_as_bare_sentence` wandert ein Prompt, der
+    wie ein Aussagesatz endet, gleich nach `sentence` — und dann gäbe es hier gar
+    keine prompt/finale-Kollision mehr zu entscheiden.
+    """
     d = tmp_path / "verified"
     d.mkdir()
     (d / "atoms.json").write_text(json.dumps({"atoms": []}), encoding="utf-8")
     (d / "sentences.json").write_text(json.dumps({"sentences": []}), encoding="utf-8")
     (d / "lessons.json").write_text(json.dumps({"lessons": []}), encoding="utf-8")
     (d / "finales.json").write_text(json.dumps({"finales": [
-        {"id": "f1", "tts": "Nur ein Finale."},
+        {"id": "f1", "tts": "Baue das Wort Finale."},
     ]}), encoding="utf-8")
     (d / "tasks.json").write_text(json.dumps({"tasks": [
         {"trainer": "sentence_order", "id": "t1", "rounds": [
-            {"promptTts": "Nur ein Finale.", "sentenceId": "s", "blocks": []},
+            {"promptTts": "Baue das Wort Finale.", "sentenceId": "s", "blocks": []},
         ]},
     ]}), encoding="utf-8")
 
     paths = make_paths(tmp_path, d)
-    prompt_key = clip_key("prompt", "Nur ein Finale.")
-    finale_key = clip_key("finale", "Nur ein Finale.")
+    prompt_key = clip_key("prompt", "Baue das Wort Finale.")
+    finale_key = clip_key("finale", "Baue das Wort Finale.")
     lock_and_render(paths, prompt_key)
     lock_and_render(paths, finale_key)
 
@@ -198,7 +204,7 @@ def test_collision_prefers_verified_audio(tmp_path):
     ctx = load_context(paths)
     finale_clip = next(c for c in ctx.clips if c.key == finale_key)
     finale_fp = fingerprint(finale_clip, ctx.profiles.profiles["finale"])
-    index["clips"]["Nur ein Finale."] = {
+    index["clips"]["Baue das Wort Finale."] = {
         "file": asset_name(finale_key),
         "profile": "finale",
         "fingerprint": finale_fp,
@@ -209,9 +215,9 @@ def test_collision_prefers_verified_audio(tmp_path):
     report = export_to_app(paths)
 
     index_after = json.loads(index_path.read_text())
-    assert index_after["clips"]["Nur ein Finale."]["profile"] == "finale"
-    assert index_after["clips"]["Nur ein Finale."]["fingerprint"] == finale_fp
-    assert any("Nur ein Finale." in w for w in report.warnings)
+    assert index_after["clips"]["Baue das Wort Finale."]["profile"] == "finale"
+    assert index_after["clips"]["Baue das Wort Finale."]["fingerprint"] == finale_fp
+    assert any("Baue das Wort Finale." in w for w in report.warnings)
 
 
 def prompt_sentence_content(tmp_path: Path) -> Path:

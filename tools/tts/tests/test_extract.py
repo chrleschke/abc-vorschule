@@ -1,3 +1,5 @@
+import json
+
 from ttskit.extract import (FIELD_TO_PROFILE, extract_items, profile_for_item,
                             reads_as_bare_sentence)
 from ttskit.models import Item
@@ -324,7 +326,20 @@ def test_article_items_cover_only_reachable_atoms():
     assert "atom:tom:articleTts" not in by_id
     # kein Substantiv
     assert "atom:ich:articleTts" not in by_id
-    assert len(by_id) == 41
+    # Kein Zahlen-Snapshot: die Menge ist genau „erreichbar UND Sprechtext ≠
+    # display" — dieselbe Regel, mit der der Extractor sie baut. Eine feste 41
+    # rottete mit jedem neuen word_build-Wort (Phase 8 brachte 40 dazu).
+    from ttskit.extract import _speech_reachable_atom_ids, article_speech
+    atoms = json.loads((CONTENT_DIR / "atoms.json").read_text())["atoms"]
+    tasks = json.loads((CONTENT_DIR / "tasks.json").read_text())["tasks"]
+    reachable = _speech_reachable_atom_ids(tasks)
+    expected = {
+        f"atom:{a['id']}:articleTts" for a in atoms
+        if a["id"] in reachable
+        and article_speech(a) and article_speech(a) != a.get("display")
+    }
+    assert set(by_id) == expected
+    assert len(expected) > 41
 
 
 def test_article_items_use_the_article_word_profile():
