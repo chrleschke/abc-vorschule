@@ -71,6 +71,10 @@
       "seed": 104478509,
       "sourceText": "der Fisch"
     },
+    "article_word:32a997431252": {
+      "seed": 2053893539,
+      "sourceText": "der Eimer"
+    },
     "article_word:3327104c5600": {
       "seed": 1958806341,
       "sourceText": "der Vogel"
@@ -86,6 +90,10 @@
     "article_word:380cbcf49a6f": {
       "seed": 1477078404,
       "sourceText": "das Taxi"
+    },
+    "article_word:39602c0f0bc2": {
+      "seed": 943836457,
+      "sourceText": "die Ameise"
     },
     "article_word:3a8d5538b9de": {
       "seed": 579800338,
@@ -386,6 +394,10 @@
       "seed": 421699219,
       "sourceText": "Der Fußball fliegt ins Baumhaus!"
     },
+    "finale:53fbbf1c5de2": {
+      "seed": 1964793779,
+      "sourceText": "Die Rose kitzelt Opas Nase!"
+    },
     "finale:5f748dc8f896": {
       "seed": 724798956,
       "sourceText": "Der Eisbär sitzt im Vogelnest!"
@@ -434,6 +446,10 @@
       "seed": 241093924,
       "sourceText": "Das Lama hat einen roten Hut!"
     },
+    "finale:cffa4ebf326d": {
+      "seed": 176257191,
+      "sourceText": "Die Schultasche frisst meine Brotdose!"
+    },
     "finale:d10867c62ad2": {
       "seed": 1964793779,
       "sourceText": "Der Fuchs futtert den Kuchen!"
@@ -463,9 +479,21 @@
       "seed": 301950401,
       "sourceText": "Die Qualle quetscht sich ins Taxi!"
     },
+    "math:2578debe3052": {
+      "seed": 1059656879,
+      "sourceText": "Fünf Igel und vier Igel. Wie viele Igel sind das?"
+    },
     "math:2f9dd72c4bd9": {
       "seed": 279883260,
       "sourceText": "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das."
+    },
+    "math:610f19e043b3": {
+      "seed": 279883260,
+      "sourceText": "Acht Tische stehen in der Kita. Drei werden weggeräumt. Wie viele Tische bleiben?"
+    },
+    "math:79c28a9f6c9c": {
+      "seed": 1059656879,
+      "sourceText": "Vier Ameisen und drei Ameisen. Wie viele Ameisen sind das?"
     },
     "math:8c2b7c6c4b52": {
       "seed": 1607038802,
@@ -475,6 +503,11 @@
       "seed": 1059656879,
       "sourceText": "Fünf Omas und vier Omas. Wie viele Omas sind das."
     },
+    "math:c1f53397c0bc": {
+      "seed": 1209181937,
+      "textOverride": "Sieben Eier liegen im Korb, drei werden gekocht. Wie viele Eier bleiben?",
+      "sourceText": "Sieben Eier liegen im Korb. Drei werden gekocht. Wie viele Eier bleiben?"
+    },
     "math:f486c3cf6f4e": {
       "seed": 1720327602,
       "sourceText": "Neun Tomaten liegen im Korb. Vier werden gegessen. Wie viele Tomaten bleiben."
@@ -482,6 +515,10 @@
     "math:f4bba2526491": {
       "seed": 1521286730,
       "sourceText": "Sechzehn weniger sieben. Wie viele bleiben."
+    },
+    "math:ff4a2bf1aba9": {
+      "seed": 490982172,
+      "sourceText": "Acht Igel laufen im Garten. Drei verstecken sich. Wie viele Igel bleiben?"
     },
     "phoneme:07af03fb0629": {
       "seed": 1229924031,
@@ -491,6 +528,11 @@
       "seed": 1819803021,
       "textOverride": "Em.",
       "sourceText": "M"
+    },
+    "phoneme:170b16880561": {
+      "seed": 2057075583,
+      "textOverride": "küh",
+      "sourceText": "kü"
     },
     "phoneme:1897ba465985": {
       "seed": 1157452082,
@@ -620,8 +662,8 @@
       "sourceText": "roh"
     },
     "phoneme:5c62e091b8c0": {
-      "seed": 1678500400,
-      "textOverride": "Peh.",
+      "seed": 1035585537,
+      "textOverride": "P.",
       "sourceText": "P"
     },
     "phoneme:6152d43caa49": {
@@ -993,6 +1035,11 @@
       "seed": 122602205,
       "sourceText": "Dreizehn Dosen und sieben Dosen. Wie viele Dosen sind das."
     },
+    "prompt:0c244730a109": {
+      "seed": 1697857322,
+      "textOverride": "Schiebe \"Es\" und \"Tee\" zusammen, Welcher Laut entsteht?",
+      "sourceText": "Schiebe s und t zusammen. Welcher Laut entsteht."
+    },
     "prompt:0c7bdb3341bb": {
       "seed": 122602205,
       "textOverride": "Zeichne den Buchstaben W nach und sammle dabei alle Sterne.",
@@ -1103,6 +1150,10 @@
     "prompt:21ad5a3f5efa": {
       "seed": 548253113,
       "sourceText": "Pepe ist bei Oma."
+    },
+    "prompt:22d108e09367": {
+      "seed": 21781570,
+      "sourceText": "Zeichne den Laut - Äu - nach und sammle dabei alle Sterne."
     },
     "prompt:24bcc5fc883e": {
       "seed": 1521286730,
@@ -1289,6 +1340,11 @@
       "seed": 1061282096,
       "sourceText": "Fünf Reihen mit je fünf Autos stehen auf dem Parkplatz. Wie viele Autos sind das."
     },
+    "prompt:413b70f3fd4b": {
+      "seed": 1045518429,
+      "textOverride": "Ordne das Wort \"Papa\" dem Bild zu.",
+      "sourceText": "Ordne das Wort - Papa - dem Bild zu."
+    },
     "prompt:419f7828ccd5": {
       "seed": 1061282096,
       "sourceText": "Der Stuhl ist grün."
@@ -1385,6 +1441,10 @@
       "seed": 156440210,
       "sourceText": "Elf Rosen und sieben Rosen. Wie viele Rosen sind das."
     },
+    "prompt:5cda0d93bd24": {
+      "seed": 1521286730,
+      "sourceText": "Baue das Wort Ameise."
+    },
     "prompt:5da5adfeaff0": {
       "seed": 888486522,
       "sourceText": "Der Fuß ist groß."
@@ -1396,6 +1456,11 @@
     "prompt:624f6c4c88e2": {
       "seed": 1521286730,
       "sourceText": "Vier Reihen mit je sechs Pinguinen stehen auf dem Eis. Wie viele Pinguine sind das."
+    },
+    "prompt:62ff81448538": {
+      "seed": 279242415,
+      "textOverride": "Schiebe Schul und Tasche zusammen. Welches Wort entsteht?",
+      "sourceText": "Schiebe Schul und Tasche zusammen. Welches Wort entsteht."
     },
     "prompt:64613a759339": {
       "seed": 844134317,
@@ -1420,6 +1485,11 @@
     "prompt:6a071b523412": {
       "seed": 1969913352,
       "sourceText": "Acht Lamas und sechs Lamas. Wie viele Lamas sind das."
+    },
+    "prompt:6b21dec5cd1b": {
+      "seed": 716323404,
+      "textOverride": "Schiebe k und ü zusammen. Welche Silbe entsteht?",
+      "sourceText": "Schiebe k und ü zusammen. Welche Silbe entsteht."
     },
     "prompt:6b3be7a73fb7": {
       "seed": 634912039,
@@ -1614,6 +1684,11 @@
     "prompt:981f9b9bb548": {
       "seed": 914920784,
       "sourceText": "Vier Reihen mit je sechs Säcken stehen im Lager. Wie viele Säcke sind das."
+    },
+    "prompt:98569a9880a1": {
+      "seed": 438664829,
+      "textOverride": "Schiebe \"Es\" und \"P\" zusammen. Welcher Laut entsteht?",
+      "sourceText": "Schiebe s und p zusammen. Welcher Laut entsteht."
     },
     "prompt:9a122ef89769": {
       "seed": 1302185031,
@@ -2013,6 +2088,10 @@
       "seed": 172005766,
       "sourceText": "Baue das Wort Qualle."
     },
+    "prompt:e785085f24d7": {
+      "seed": 716323404,
+      "sourceText": "Baue das Wort Eimer."
+    },
     "prompt:ea0d0f938a70": {
       "seed": 577107423,
       "sourceText": "Mama ist im Haus."
@@ -2157,6 +2236,10 @@
       "textOverride": "\"Sch\" wie Schaf.",
       "sourceText": "Sch - wie Schaf."
     },
+    "reward:0a725815897a": {
+      "seed": 1869530881,
+      "sourceText": "Äu - wie in Häuser."
+    },
     "reward:0bb238d289d0": {
       "seed": 1869530881,
       "sourceText": "Einfach cool!"
@@ -2279,10 +2362,19 @@
       "textOverride": "\"Geh\" wie Gabel.",
       "sourceText": "G - wie Gabel."
     },
+    "reward:47230044f3fc": {
+      "seed": 194958023,
+      "textOverride": "\"Sch\" wie Schnee.",
+      "sourceText": "Sch - wie Schnee."
+    },
     "reward:4a21745e952d": {
       "seed": 244251654,
       "textOverride": "\"Fau\" wie Vogel.",
       "sourceText": "V - wie Vogel."
+    },
+    "reward:4b4640ff6600": {
+      "seed": 1771886242,
+      "sourceText": "B - wie Baum."
     },
     "reward:4ca6b18005c7": {
       "seed": 1869530881,
@@ -2320,6 +2412,11 @@
     "reward:67fc68c98c2f": {
       "seed": 873012571,
       "sourceText": "Du kleiner Einstein!"
+    },
+    "reward:6d1e6ef425e6": {
+      "seed": 222084438,
+      "textOverride": "H wie Hand.",
+      "sourceText": "H - wie Hand."
     },
     "reward:6f6d00e1b28e": {
       "seed": 1869530881,
@@ -2439,6 +2536,10 @@
       "seed": 873012571,
       "sourceText": "Einhorn-Power pur!"
     },
+    "reward:968c30b886ac": {
+      "seed": 1179549907,
+      "sourceText": "Sch - wie Schuh."
+    },
     "reward:97a51154731f": {
       "seed": 1771886242,
       "textOverride": "\"Äh\" - wie Äpfel.",
@@ -2509,7 +2610,7 @@
       "sourceText": "Einfach weggemuckelt!"
     },
     "reward:b74a6060340c": {
-      "seed": 1771886242,
+      "seed": 66188601,
       "textOverride": "Ypsilon - wie Yoga.",
       "sourceText": "Y - wie Yoga."
     },
@@ -2545,6 +2646,10 @@
       "textOverride": "\"B\" wie Ball.",
       "sourceText": "B - wie Ball."
     },
+    "reward:c7b6f864ad7c": {
+      "seed": 244251654,
+      "sourceText": "B - wie Brot."
+    },
     "reward:ca68e09ab818": {
       "seed": 1869530881,
       "textOverride": "\"X wie in Taxi.",
@@ -2563,6 +2668,10 @@
       "seed": 1516666763,
       "textOverride": "\"Jott\"  wie Jacke.",
       "sourceText": "J - wie Jacke."
+    },
+    "reward:cfa7c16008df": {
+      "seed": 249461506,
+      "sourceText": "X - wie in Hexe."
     },
     "reward:d0d1ee4bce5c": {
       "seed": 1677039810,
@@ -2600,9 +2709,19 @@
       "seed": 1771886242,
       "sourceText": "Das war spitze!"
     },
+    "reward:e6def0b819e8": {
+      "seed": 2066582740,
+      "textOverride": "\"Er\" wie Regen.",
+      "sourceText": "R - wie Regen."
+    },
     "reward:ea0277374838": {
       "seed": 1771886242,
       "sourceText": "Und... Tadaaa!"
+    },
+    "reward:ebd0698e0269": {
+      "seed": 775129279,
+      "textOverride": "\"Em\" wie Mann.",
+      "sourceText": "M - wie Mann."
     },
     "reward:eebeec9dcb97": {
       "seed": 1869530881,
@@ -2615,8 +2734,8 @@
       "sourceText": "N - wie Nase."
     },
     "reward:f28a4debbc30": {
-      "seed": 1179549907,
-      "textOverride": "\"S Z\" - wie in Fuß.",
+      "seed": 431729723,
+      "textOverride": "\"S z\" wie in Fuß.",
       "sourceText": "ß - wie in Fuß."
     },
     "reward:f3d687a5973d": {
@@ -2630,8 +2749,8 @@
       "sourceText": "Gut gemacht"
     },
     "reward:f639ea1f9b48": {
-      "seed": 183009980,
-      "textOverride": "\"c k\" - wie in Socke.",
+      "seed": 1486409243,
+      "textOverride": "\"zeh ka\" wie in Socke.",
       "sourceText": "ck - wie in Socke."
     },
     "reward:f6be5ef80851": {
@@ -2645,7 +2764,7 @@
       "sourceText": "T - wie Tom."
     },
     "reward:f9256b0d6e58": {
-      "seed": 1179549907,
+      "seed": 635701106,
       "textOverride": "\"Fau\" - wie Vogelnest.",
       "sourceText": "V - wie Vogelnest."
     },
@@ -2659,9 +2778,21 @@
       "textOverride": "\"Zeh\" wie Clown.",
       "sourceText": "C - wie Clown."
     },
+    "reward:fd9c804d8538": {
+      "seed": 893467947,
+      "sourceText": "Ü - wie in Müll."
+    },
     "sentence:0064ed49f99f": {
       "seed": 1095904114,
       "sourceText": "Der Affe hat die Nuss geknackt."
+    },
+    "sentence:0074e39ae17d": {
+      "seed": 1502192888,
+      "sourceText": "Mia ist auf das Sofa gesprungen."
+    },
+    "sentence:00d192bac4c1": {
+      "seed": 727230989,
+      "sourceText": "Wir gehen zur Schule."
     },
     "sentence:027d7fa9791a": {
       "seed": 439084397,
@@ -2676,6 +2807,10 @@
       "seed": 432945842,
       "sourceText": "Im Schnee steht ein kleines Haus."
     },
+    "sentence:04a98fe7cabb": {
+      "seed": 312820997,
+      "sourceText": "Mia packt ihre Tasche und geht."
+    },
     "sentence:04fc81917dc6": {
       "seed": 1659905595,
       "sourceText": "Die Kuh frisst auf der Wiese."
@@ -2687,6 +2822,10 @@
     "sentence:06771466d9ce": {
       "seed": 432945842,
       "sourceText": "Im Baumhaus leuchtet eine Lampe."
+    },
+    "sentence:06e10bd1919f": {
+      "seed": 432945842,
+      "sourceText": "Das Nashorn hat ein dickes Horn."
     },
     "sentence:078532d7b12f": {
       "seed": 312820997,
@@ -2715,6 +2854,10 @@
     "sentence:0d80f7ba0e5c": {
       "seed": 1601555549,
       "sourceText": "Tom warf den Ball zu Papa."
+    },
+    "sentence:0e42916e8e0a": {
+      "seed": 825161231,
+      "sourceText": "Oma gießt die Blumen im Garten."
     },
     "sentence:0f7df5461bdf": {
       "seed": 1095904114,
@@ -2748,6 +2891,10 @@
       "seed": 1624620892,
       "sourceText": "Papa hat zwei Tomaten geschnitten."
     },
+    "sentence:18fe1cfadea6": {
+      "seed": 1624620892,
+      "sourceText": "Oma und Mia lachen."
+    },
     "sentence:19048a388ae2": {
       "seed": 312820997,
       "sourceText": "Die Giraffe frisst aus dem Sack."
@@ -2755,6 +2902,10 @@
     "sentence:195e1df3eb1d": {
       "seed": 1502192888,
       "sourceText": "Tom hat sein Pflaster verloren."
+    },
+    "sentence:19bec2364697": {
+      "seed": 432945842,
+      "sourceText": "Die Giraffe frisst aus dem Eimer."
     },
     "sentence:19d32f06186f": {
       "seed": 1095904114,
@@ -2772,6 +2923,11 @@
     "sentence:1d228a508663": {
       "seed": 1624620892,
       "sourceText": "Papa hat zwei Hüte gekauft."
+    },
+    "sentence:1df1053d890f": {
+      "seed": 439084397,
+      "textOverride": "Tom hat den Fußball ins Tor geschossen!",
+      "sourceText": "Tom hat den Fußball ins Tor geschossen."
     },
     "sentence:1ed32fdcd687": {
       "seed": 1095904114,
@@ -2811,6 +2967,10 @@
       "seed": 1776987163,
       "sourceText": "Das ist mein Ei."
     },
+    "sentence:2680cc47d071": {
+      "seed": 1502192888,
+      "sourceText": "Der Eimer ist voll."
+    },
     "sentence:2723db5e341b": {
       "seed": 1502192888,
       "sourceText": "Der Fisch schwimmt."
@@ -2819,6 +2979,10 @@
       "seed": 1095904114,
       "sourceText": "Oma hat die Rosen gegossen."
     },
+    "sentence:285f6a18a68f": {
+      "seed": 1118182004,
+      "sourceText": "Papa isst einen Becher Quark."
+    },
     "sentence:28b5e10a723d": {
       "seed": 1659905595,
       "sourceText": "Zwei Eier liegen im Vogelnest."
@@ -2826,6 +2990,18 @@
     "sentence:293e595419b7": {
       "seed": 1273693101,
       "sourceText": "Der Fisch ist orange."
+    },
+    "sentence:2b28e37abada": {
+      "seed": 439084397,
+      "sourceText": "Es ist kalt."
+    },
+    "sentence:2c4ce32e4176": {
+      "seed": 432945842,
+      "sourceText": "Das Nilpferd badet im Wasser."
+    },
+    "sentence:2ca4966f2376": {
+      "seed": 1095904114,
+      "sourceText": "Die Raupe kriecht über das Blatt."
     },
     "sentence:2cee5d335761": {
       "seed": 1273693101,
@@ -2838,6 +3014,18 @@
     "sentence:31c732a9fe85": {
       "seed": 312820997,
       "sourceText": "Oma hat Mia gesucht und gefunden."
+    },
+    "sentence:323c739220fb": {
+      "seed": 1095904114,
+      "sourceText": "Mateo hat sein Buch eingepackt."
+    },
+    "sentence:323e1a412e31": {
+      "seed": 1273693101,
+      "sourceText": "Zwei Sonnenblumen wachsen im Garten."
+    },
+    "sentence:3243701fc035": {
+      "seed": 432945842,
+      "sourceText": "Der Eisbär schwimmt."
     },
     "sentence:343420116adb": {
       "seed": 1585345271,
@@ -2927,9 +3115,17 @@
       "seed": 1659905595,
       "sourceText": "Oma ist auf dem Lama geritten."
     },
+    "sentence:462fb2b6f7d0": {
+      "seed": 432945842,
+      "sourceText": "Die Blume ist groß."
+    },
     "sentence:481705858577": {
       "seed": 1659905595,
       "sourceText": "Der Löwe liegt faul in der Sonne."
+    },
+    "sentence:488e74f29da4": {
+      "seed": 1585345271,
+      "sourceText": "Oma isst Salat und eine Erdbeere."
     },
     "sentence:48bbe3bc10a1": {
       "seed": 1273693101,
@@ -2948,6 +3144,10 @@
       "seed": 1624620892,
       "sourceText": "Am Himmel stehen viele Sterne."
     },
+    "sentence:539b9d85217b": {
+      "seed": 1624620892,
+      "sourceText": "Der Roller steht vor dem Haus."
+    },
     "sentence:548ba90bb4a2": {
       "seed": 1624620892,
       "sourceText": "Ein Ufo ist im Tal gelandet."
@@ -2959,6 +3159,10 @@
     "sentence:574ac24e60c0": {
       "seed": 1502192888,
       "sourceText": "Tom aß den letzten Keks."
+    },
+    "sentence:588f322790c2": {
+      "seed": 1624620892,
+      "sourceText": "Papa bringt den Müll zur Mülltonne."
     },
     "sentence:5a4e84504740": {
       "seed": 312820997,
@@ -2984,6 +3188,10 @@
       "seed": 1624620892,
       "sourceText": "Die Spinne hat sich im Spiegel gesehen."
     },
+    "sentence:626096b53852": {
+      "seed": 1624620892,
+      "sourceText": "Pepe hat sich im Bett versteckt."
+    },
     "sentence:646dfbb5549c": {
       "seed": 1674724842,
       "sourceText": "Die Mäuse haben den Käse geklaut."
@@ -2996,6 +3204,11 @@
       "seed": 1659905595,
       "textOverride": "Zwei Lamas liefen um die Wette.",
       "sourceText": "Zwei Lamas liefen über die Wiese."
+    },
+    "sentence:675d0dda2043": {
+      "seed": 581843993,
+      "textOverride": "Das Krokodil hat den Keks gefressen!",
+      "sourceText": "Das Krokodil hat den Keks gefressen."
     },
     "sentence:69a524a305ff": {
       "seed": 1624620892,
@@ -3029,6 +3242,10 @@
       "seed": 1095904114,
       "sourceText": "Oma hat einen Apfelkuchen gebacken."
     },
+    "sentence:73549afe7773": {
+      "seed": 432945842,
+      "sourceText": "Die Bahn fährt in den Bahnhof."
+    },
     "sentence:7383bff16440": {
       "seed": 1585345271,
       "sourceText": "Hier stehen viele Häuser."
@@ -3037,9 +3254,17 @@
       "seed": 312820997,
       "sourceText": "Zwei Ufos fliegen am Himmel."
     },
+    "sentence:7742b47244c2": {
+      "seed": 1095904114,
+      "sourceText": "Ruf Mama!"
+    },
     "sentence:7880a46218bf": {
       "seed": 439084397,
       "sourceText": "Mama trinkt aus der Tasse."
+    },
+    "sentence:799e61735fee": {
+      "seed": 1502192888,
+      "sourceText": "Mia hat die Milch getrunken."
     },
     "sentence:7c198468f299": {
       "seed": 1624620892,
@@ -3057,9 +3282,21 @@
       "seed": 1659905595,
       "sourceText": "Mama hat ein schönes, neues Kleid."
     },
+    "sentence:7ffa0f799174": {
+      "seed": 1659905595,
+      "sourceText": "Mateos Roller stand vor dem Haus."
+    },
+    "sentence:84692fb73d83": {
+      "seed": 1624620892,
+      "sourceText": "Am Morgen scheint die Sonne."
+    },
     "sentence:85b0a2c5bc41": {
       "seed": 432945842,
       "sourceText": "Zwei Pinguine watscheln über den Schnee."
+    },
+    "sentence:8729c433cd52": {
+      "seed": 1228004130,
+      "sourceText": "Mia hat eine Torte zum Geburtstag bekommen."
     },
     "sentence:873c6007352d": {
       "seed": 1228004130,
@@ -3076,6 +3313,10 @@
     "sentence:8cef79759fe2": {
       "seed": 1502192888,
       "sourceText": "Das Taxi hielt an der Ampel."
+    },
+    "sentence:8d60df04482e": {
+      "seed": 1585345271,
+      "sourceText": "Zwei Schafe fressen im Gras."
     },
     "sentence:906211d04850": {
       "seed": 1095904114,
@@ -3105,13 +3346,26 @@
       "seed": 1095904114,
       "sourceText": "Die Eule fliegt."
     },
+    "sentence:9dde7b01f72b": {
+      "seed": 312820997,
+      "textOverride": "Der Ball rollt über die Straße!",
+      "sourceText": "Der Ball rollt über die Straße."
+    },
     "sentence:9e533d98b8eb": {
       "seed": 439084397,
       "sourceText": "Ein kleiner Vogel liegt im Nest."
     },
+    "sentence:9ee481cc936c": {
+      "seed": 1585345271,
+      "sourceText": "Das Auto hält an der Ampel."
+    },
     "sentence:9f1f1902b079": {
       "seed": 1273693101,
       "sourceText": "Die Wolken zogen über das Haus."
+    },
+    "sentence:9f99d1cd0524": {
+      "seed": 1095904114,
+      "sourceText": "Mia fährt mit dem Roller zum Park."
     },
     "sentence:9fcd6c7923ba": {
       "seed": 432945842,
@@ -3120,6 +3374,10 @@
     "sentence:a2b1bcad9ae8": {
       "seed": 58873926,
       "sourceText": "Das Quadrat ist gelb."
+    },
+    "sentence:a3a4983f9a85": {
+      "seed": 312820997,
+      "sourceText": "Lennard hat die Uhr auf das Sofa gelegt."
     },
     "sentence:a6ea8f7fc3ad": {
       "seed": 1624620892,
@@ -3165,6 +3423,10 @@
       "seed": 312820997,
       "sourceText": "Ein Blitz zuckt über den Himmel."
     },
+    "sentence:b2235688f510": {
+      "seed": 1228004130,
+      "sourceText": "Zwei Kinder klettern ins Baumhaus."
+    },
     "sentence:b309c28c2c33": {
       "seed": 439084397,
       "sourceText": "Das ist mein Brot."
@@ -3172,6 +3434,10 @@
     "sentence:b30eb1c60821": {
       "seed": 447155165,
       "sourceText": "Zwei Ameisen sind zu Mama gekrabbelt."
+    },
+    "sentence:b55a3b6a853a": {
+      "seed": 1659905595,
+      "sourceText": "Der Flamingo steht auf einem Bein."
     },
     "sentence:b6ee878578ef": {
       "seed": 1273693101,
@@ -3181,13 +3447,25 @@
       "seed": 1659905595,
       "sourceText": "Tom ruft Opa."
     },
+    "sentence:b8baf0458ab7": {
+      "seed": 439084397,
+      "sourceText": "Mateo und Lennard sind ins Baumhaus geklettert."
+    },
     "sentence:b8df3b338bb7": {
       "seed": 432945842,
       "sourceText": "Der Frosch ist mit dem Fahrrad gefahren."
     },
+    "sentence:b8faf838e5ae": {
+      "seed": 912195132,
+      "sourceText": "Der Regen ist kalt."
+    },
     "sentence:ba35c984dbf8": {
       "seed": 1125768222,
       "sourceText": "Oma."
+    },
+    "sentence:baa6d556da03": {
+      "seed": 1502192888,
+      "sourceText": "Papa."
     },
     "sentence:bbb0a73f9b40": {
       "seed": 1659905595,
@@ -3209,6 +3487,10 @@
       "seed": 439084397,
       "sourceText": "Die Rose wächst neben dem Tor."
     },
+    "sentence:c368a5d082ce": {
+      "seed": 312820997,
+      "sourceText": "Der Zug fuhr durch den Schnee."
+    },
     "sentence:c3f01ea1599d": {
       "seed": 432945842,
       "sourceText": "In der Dose sind zwei Kekse."
@@ -3220,6 +3502,10 @@
     "sentence:c6b127018a11": {
       "seed": 1228004130,
       "sourceText": "Oma hat Mama gerufen."
+    },
+    "sentence:c6c1b6065824": {
+      "seed": 1228004130,
+      "sourceText": "Der Zucker steckt in der Dose."
     },
     "sentence:c74c8774dfc4": {
       "seed": 432945842,
@@ -3249,6 +3535,10 @@
       "seed": 1776987163,
       "sourceText": "Die Eule flog auf den Baum."
     },
+    "sentence:ccbd79d1f9e0": {
+      "seed": 1429978759,
+      "sourceText": "Der Stern ist hell."
+    },
     "sentence:cd30e8529bd7": {
       "seed": 439084397,
       "sourceText": "Das Polizeiauto fährt sehr schnell."
@@ -3256,6 +3546,10 @@
     "sentence:cd68ea07b79e": {
       "seed": 404743588,
       "sourceText": "Zwei Spinnen krabbeln über die Straße."
+    },
+    "sentence:ce06bb1812a2": {
+      "seed": 1095904114,
+      "sourceText": "Opa liest ein dickes Buch."
     },
     "sentence:ceefce133f22": {
       "seed": 432945842,
@@ -3265,10 +3559,22 @@
       "seed": 1095904114,
       "sourceText": "Das Pony ist mit dem Taxi gefahren."
     },
+    "sentence:d201c5055b66": {
+      "seed": 1095904114,
+      "sourceText": "Das Auto ist blau."
+    },
     "sentence:d487b42d5216": {
       "seed": 1776987163,
       "textOverride": "Mama hat eine Ameise gefunden.",
       "sourceText": "Mama hat die Ameise gefunden."
+    },
+    "sentence:d712ce5deaf8": {
+      "seed": 432945842,
+      "sourceText": "Die Lampe ist hell."
+    },
+    "sentence:d81f84250262": {
+      "seed": 1502192888,
+      "sourceText": "Papa wäscht seine Hände mit Seife."
     },
     "sentence:d88e7efd2bf7": {
       "seed": 58873926,
@@ -3277,6 +3583,10 @@
     "sentence:dadd0a4118c6": {
       "seed": 1585345271,
       "sourceText": "Zwei Freunde warten an der Ampel."
+    },
+    "sentence:dd7b97003c73": {
+      "seed": 312820997,
+      "sourceText": "Auf dem Tisch steht eine Lampe."
     },
     "sentence:dd996e27ce1b": {
       "seed": 1897889202,
@@ -3289,6 +3599,18 @@
     "sentence:e25b8b1a367d": {
       "seed": 1095904114,
       "sourceText": "Nach dem Regen steht ein Regenbogen da."
+    },
+    "sentence:e264c731e345": {
+      "seed": 432945842,
+      "sourceText": "Tom hat eine Rose."
+    },
+    "sentence:e2a229b793ed": {
+      "seed": 1624620892,
+      "sourceText": "Die Tasche ist voll."
+    },
+    "sentence:e2f9dc621726": {
+      "seed": 1502192888,
+      "sourceText": "In der Schultasche liegt ein Buch."
     },
     "sentence:e56162c8f1a2": {
       "seed": 1585345271,
@@ -3311,6 +3633,10 @@
       "seed": 432945842,
       "sourceText": "Im Vogelnest liegen zwei Eier."
     },
+    "sentence:ed923538284e": {
+      "seed": 1502192888,
+      "sourceText": "Die Tür ist braun."
+    },
     "sentence:efb58a554733": {
       "seed": 1624620892,
       "sourceText": "Pepe hat den Schuh versteckt."
@@ -3318,6 +3644,10 @@
     "sentence:f0717c3fe572": {
       "seed": 1273693101,
       "sourceText": "In der Dose waren zwei Kekse."
+    },
+    "sentence:f22625fb909b": {
+      "seed": 1095904114,
+      "sourceText": "Im Taxi liegt ein Handy."
     },
     "sentence:f26883dfedb4": {
       "seed": 1624620892,
@@ -3339,6 +3669,10 @@
       "seed": 312820997,
       "sourceText": "Auf der Pizza liegt Salami."
     },
+    "sentence:f77fc4cbdb6e": {
+      "seed": 1095904114,
+      "sourceText": "Zwei Quallen schwimmen neben dem Wal."
+    },
     "sentence:f7aca856104d": {
       "seed": 404743588,
       "sourceText": "Das Pferd sprang über das Tor."
@@ -3351,9 +3685,55 @@
       "seed": 1313172770,
       "sourceText": "Das Auto ist gelb."
     },
+    "sentence:fbbd698b59d7": {
+      "seed": 1624620892,
+      "sourceText": "Mia hat ihren Helm aufgesetzt."
+    },
+    "sentence:fc77656244f3": {
+      "seed": 1732156515,
+      "sourceText": "Die Spinne ist klein."
+    },
+    "ui:06385de71001": {
+      "seed": 843304287,
+      "sourceText": "neunzehn"
+    },
+    "ui:08d45bd49176": {
+      "seed": 541584008,
+      "sourceText": "vierundzwanzig"
+    },
+    "ui:15175528482f": {
+      "seed": 393662429,
+      "sourceText": "dreiundzwanzig"
+    },
+    "ui:154020524df6": {
+      "seed": 173037020,
+      "sourceText": "siebzehn"
+    },
+    "ui:1d5dadc8645b": {
+      "seed": 173037020,
+      "sourceText": "achtzehn"
+    },
+    "ui:1e9d34deb9f9": {
+      "seed": 856104118,
+      "textOverride": "7",
+      "sourceText": "sieben"
+    },
+    "ui:211a0073b640": {
+      "seed": 393662429,
+      "sourceText": "dreißig"
+    },
+    "ui:25c6fc8bf8fb": {
+      "seed": 722032169,
+      "sourceText": "siebenundzwanzig"
+    },
     "ui:2ab0e9ffab7a": {
       "seed": 843304287,
       "sourceText": "Tippe auf die Bilder, um sie wegzunehmen."
+    },
+    "ui:2cf3fbb812da": {
+      "seed": 697291382,
+      "textOverride": "sechzehn.",
+      "sourceText": "sechzehn"
     },
     "ui:49699d5cebb6": {
       "seed": 541584008,
@@ -3369,29 +3749,135 @@
       "textOverride": "Probier's noch mal...",
       "sourceText": "Probiere eine andere Antwort"
     },
+    "ui:628c0cd262e6": {
+      "seed": 173037020,
+      "sourceText": "neunundzwanzig"
+    },
+    "ui:6b70e2d592dd": {
+      "seed": 198878665,
+      "textOverride": "Drei.",
+      "sourceText": "drei"
+    },
+    "ui:6b8baccb2f21": {
+      "seed": 843304287,
+      "sourceText": "vier"
+    },
     "ui:6d42ce6fdfae": {
       "seed": 393662429,
       "sourceText": "...im Wort..."
     },
+    "ui:6e6dc944a834": {
+      "seed": 722032169,
+      "sourceText": "fünfundzwanzig"
+    },
+    "ui:70f5f8852578": {
+      "seed": 393662429,
+      "sourceText": "zwölf"
+    },
+    "ui:74234e98afe7": {
+      "seed": 162698559,
+      "textOverride": "null.",
+      "sourceText": "null"
+    },
+    "ui:780d84b20d7a": {
+      "seed": 1378102812,
+      "textOverride": "11",
+      "sourceText": "elf"
+    },
+    "ui:7f60bc06d7cc": {
+      "seed": 722032169,
+      "sourceText": "sechsundzwanzig"
+    },
+    "ui:7fd87fbf5eca": {
+      "seed": 1045240051,
+      "textOverride": "14",
+      "sourceText": "vierzehn"
+    },
+    "ui:86d832a39638": {
+      "seed": 613487399,
+      "textOverride": "15",
+      "sourceText": "fünfzehn"
+    },
     "ui:8d0d96ca4976": {
       "seed": 173037020,
       "sourceText": "Das üben wir später."
+    },
+    "ui:9dbe3cfc5af7": {
+      "seed": 1291272210,
+      "textOverride": "zwei.",
+      "sourceText": "zwei"
     },
     "ui:bedd6f98909f": {
       "seed": 541584008,
       "textOverride": "zehn.",
       "sourceText": "zehn"
     },
+    "ui:bfd6b995588e": {
+      "seed": 52174945,
+      "textOverride": "eins.",
+      "sourceText": "eins"
+    },
+    "ui:c7c7556a0110": {
+      "seed": 1798534704,
+      "textOverride": "dreizehn.",
+      "sourceText": "dreizehn"
+    },
+    "ui:c89c1f59565b": {
+      "seed": 235461947,
+      "textOverride": "einundzwanzig.",
+      "sourceText": "einundzwanzig"
+    },
     "ui:cd2a56ee1cb6": {
       "seed": 722032169,
       "textOverride": "zwanzig.",
       "sourceText": "zwanzig"
+    },
+    "ui:d26898598758": {
+      "seed": 173037020,
+      "sourceText": "fünf"
+    },
+    "ui:d5b7e81295ca": {
+      "seed": 722032169,
+      "sourceText": "neun"
+    },
+    "ui:d66628127edf": {
+      "seed": 1358096850,
+      "textOverride": "Tippe auf jede Reihe um sie zu zählen.",
+      "sourceText": "Tippe auf jede Reihe, um sie zu zählen."
+    },
+    "ui:ed8862db32fe": {
+      "seed": 1100639268,
+      "textOverride": "sechs.",
+      "sourceText": "sechs"
+    },
+    "ui:f7ecf587ae23": {
+      "seed": 722032169,
+      "sourceText": "zweiundzwanzig"
+    },
+    "ui:fb33ab7105db": {
+      "seed": 1827027911,
+      "textOverride": "8",
+      "sourceText": "acht"
+    },
+    "ui:fbbbc9228ea1": {
+      "seed": 783010756,
+      "textOverride": "28",
+      "sourceText": "achtundzwanzig"
     },
     "word:006a933c950f": {
       "seed": 1197660154,
       "speaker": "sohee",
       "textOverride": "Sackg.",
       "sourceText": "Sack"
+    },
+    "word:015fb49305fa": {
+      "seed": 1677023100,
+      "sourceText": "5 Schneebälle"
+    },
+    "word:02174cb0981f": {
+      "seed": 1743755203,
+      "textOverride": "4 Uhren.",
+      "sourceText": "4 Uhren"
     },
     "word:0286249762f7": {
       "seed": 1389618019,
@@ -3422,6 +3908,11 @@
       "seed": 1389964126,
       "sourceText": "Eisbär"
     },
+    "word:09890dd421f0": {
+      "seed": 1886983250,
+      "textOverride": "zur.",
+      "sourceText": "zur"
+    },
     "word:0a7cb27e5292": {
       "seed": 942923981,
       "sourceText": "das"
@@ -3439,12 +3930,12 @@
       "sourceText": "Pinguin"
     },
     "word:0ebdc3317b75": {
-      "seed": 1619665835,
+      "seed": 1733215662,
       "textOverride": "hell.",
       "sourceText": "hell"
     },
     "word:0f0aa408c183": {
-      "seed": 1940105498,
+      "seed": 924320298,
       "textOverride": "warm.",
       "sourceText": "warm"
     },
@@ -3469,7 +3960,7 @@
       "sourceText": "Vase"
     },
     "word:165bd88f55d2": {
-      "seed": 1591300623,
+      "seed": 1765179368,
       "textOverride": "Torte.",
       "sourceText": "Torte"
     },
@@ -3493,6 +3984,10 @@
     "word:192da8644770": {
       "seed": 153000027,
       "sourceText": "Clown"
+    },
+    "word:19581e27de7c": {
+      "seed": 1765179368,
+      "sourceText": "9"
     },
     "word:19c3fd6de646": {
       "seed": 1229619544,
@@ -3533,6 +4028,10 @@
       "textOverride": "Zucker.",
       "sourceText": "Zucker"
     },
+    "word:24451d454566": {
+      "seed": 144801741,
+      "sourceText": "9 Igel"
+    },
     "word:25352d33fff0": {
       "seed": 1752272296,
       "sourceText": "mein"
@@ -3551,12 +4050,17 @@
       "seed": 1017467044,
       "sourceText": "8 Hüte"
     },
+    "word:266d39696701": {
+      "seed": 1021092278,
+      "textOverride": "10 Autos.",
+      "sourceText": "10 Autos"
+    },
     "word:27b3b03e6b57": {
       "seed": 1229619544,
       "sourceText": "15 Ameisen"
     },
     "word:28a119f6ed6f": {
-      "seed": 2124478754,
+      "seed": 826805010,
       "textOverride": "Freund.",
       "sourceText": "Freund"
     },
@@ -3564,6 +4068,10 @@
       "seed": 514015760,
       "textOverride": "Radio.",
       "sourceText": "Radio"
+    },
+    "word:2bb42011956c": {
+      "seed": 1017467044,
+      "sourceText": "4 Pilze"
     },
     "word:2d3af8db3690": {
       "seed": 63383879,
@@ -3582,6 +4090,10 @@
       "seed": 144801741,
       "sourceText": "16 Bücher"
     },
+    "word:308deceac8be": {
+      "seed": 1512463413,
+      "sourceText": "5 Fußbälle"
+    },
     "word:3142c2c88913": {
       "seed": 1512463413,
       "sourceText": "Dusche"
@@ -3590,9 +4102,21 @@
       "seed": 603063517,
       "sourceText": "Erdbeere"
     },
+    "word:3401a160f5f2": {
+      "seed": 1229619544,
+      "sourceText": "5 Mülltonnen"
+    },
+    "word:349367abf032": {
+      "seed": 1512463413,
+      "sourceText": "4 Eier"
+    },
     "word:354bc956b8a4": {
       "seed": 114642735,
       "sourceText": "Tisch"
+    },
+    "word:36749a204230": {
+      "seed": 1512463413,
+      "sourceText": "10 Handschuhe"
     },
     "word:36dd3613ecc9": {
       "seed": 1389964126,
@@ -3619,7 +4143,7 @@
       "sourceText": "30 Fische"
     },
     "word:38f92fa97917": {
-      "seed": 1000888094,
+      "seed": 1389964126,
       "textOverride": "Tasse.",
       "sourceText": "Tasse"
     },
@@ -3628,7 +4152,7 @@
       "sourceText": "Wolke"
     },
     "word:3d0ac364ae2b": {
-      "seed": 354537140,
+      "seed": 1765179368,
       "textOverride": "Mann.",
       "sourceText": "Mann"
     },
@@ -3641,13 +4165,12 @@
       "sourceText": "Tiger"
     },
     "word:41509508705b": {
-      "seed": 1167117814,
+      "seed": 1365805799,
       "textOverride": "Mia.",
       "sourceText": "Mia"
     },
     "word:4221b9b80815": {
       "seed": 32521571,
-      "textOverride": "Uhr.",
       "sourceText": "Uhr"
     },
     "word:42f3f7e9341e": {
@@ -3665,6 +4188,10 @@
     "word:447d5f2a9d57": {
       "seed": 1765179368,
       "sourceText": "25 Taxis"
+    },
+    "word:4523540f1504": {
+      "seed": 153000027,
+      "sourceText": "17"
     },
     "word:453c9aa8c895": {
       "seed": 254035842,
@@ -3693,12 +4220,16 @@
       "textOverride": "Kwark!",
       "sourceText": "Quark"
     },
+    "word:489981ca2c24": {
+      "seed": 1765179368,
+      "sourceText": "Mülltonne"
+    },
     "word:491b9dfec5e6": {
       "seed": 1389964126,
       "sourceText": "15 Füße"
     },
     "word:494e0843d958": {
-      "seed": 1872665776,
+      "seed": 1365805799,
       "textOverride": "Foto.",
       "sourceText": "Foto"
     },
@@ -3710,8 +4241,17 @@
       "seed": 955950463,
       "sourceText": "Papa"
     },
+    "word:4a85329862f7": {
+      "seed": 634327529,
+      "sourceText": "5 Sterne"
+    },
+    "word:4bef8ba63310": {
+      "seed": 1299784779,
+      "textOverride": "8 Bücher.",
+      "sourceText": "8 Bücher"
+    },
     "word:4c5811fcb4a6": {
-      "seed": 18311644,
+      "seed": 266718176,
       "textOverride": "Rolla.",
       "sourceText": "Roller"
     },
@@ -3723,6 +4263,11 @@
       "seed": 1365805799,
       "sourceText": "9 Kühe"
     },
+    "word:4e3d5e8b121a": {
+      "seed": 1641277208,
+      "textOverride": "3 Hüte.",
+      "sourceText": "3 Hüte"
+    },
     "word:4ec3c3ac2171": {
       "seed": 139858617,
       "sourceText": "Salami"
@@ -3730,6 +4275,10 @@
     "word:4ec94c2dc51a": {
       "seed": 1389964126,
       "sourceText": "Flamingo"
+    },
+    "word:4ec9599fc203": {
+      "seed": 351611493,
+      "sourceText": "18"
     },
     "word:4fd44eac0e28": {
       "seed": 1365805799,
@@ -3766,9 +4315,17 @@
       "seed": 1816427025,
       "sourceText": "hier"
     },
+    "word:535fa30d7e25": {
+      "seed": 1843606498,
+      "sourceText": "23"
+    },
     "word:5380d1dd5931": {
       "seed": 85322428,
       "sourceText": "Nanu"
+    },
+    "word:53f65f53a942": {
+      "seed": 1677023100,
+      "sourceText": "4 Kühe"
     },
     "word:53f8e1a2ac39": {
       "seed": 144801741,
@@ -3822,6 +4379,10 @@
       "seed": 1300021411,
       "sourceText": "Buch"
     },
+    "word:5f9886d0174e": {
+      "seed": 1017467044,
+      "sourceText": "5 Igel"
+    },
     "word:5fe72d4ce475": {
       "seed": 2086737733,
       "sourceText": "ruft"
@@ -3842,6 +4403,11 @@
     "word:61dc14c4749b": {
       "seed": 1389964126,
       "sourceText": "9 Fenster"
+    },
+    "word:624b60c58c9d": {
+      "seed": 899457179,
+      "textOverride": "dreißig",
+      "sourceText": "30"
     },
     "word:6302480a07e6": {
       "seed": 1512463413,
@@ -3885,6 +4451,10 @@
       "textOverride": "Schpinne.",
       "sourceText": "Spinne"
     },
+    "word:6b51d431df5d": {
+      "seed": 634327529,
+      "sourceText": "12"
+    },
     "word:6b942766c4e4": {
       "seed": 1144058823,
       "textOverride": "Dose.",
@@ -3903,6 +4473,15 @@
       "seed": 1389964126,
       "textOverride": "Fahrrad.",
       "sourceText": "Fahrrad"
+    },
+    "word:6eb16c54d766": {
+      "seed": 1861702658,
+      "textOverride": "Sieben Ameisen",
+      "sourceText": "7 Ameisen"
+    },
+    "word:6f4b6612125f": {
+      "seed": 1765179368,
+      "sourceText": "21"
     },
     "word:6fb86a981cf3": {
       "seed": 1420845013,
@@ -3925,6 +4504,14 @@
       "textOverride": "Der Nudelauflauf ist fertig! H",
       "sourceText": "30 Rüben"
     },
+    "word:72fc3b037c27": {
+      "seed": 1512463413,
+      "sourceText": "5 Rosen"
+    },
+    "word:74ba2763c201": {
+      "seed": 1512463413,
+      "sourceText": "3 Ameisen"
+    },
     "word:753692ec36ad": {
       "seed": 1956026513,
       "sourceText": "Hallo"
@@ -3943,10 +4530,23 @@
       "textOverride": "Taxi.",
       "sourceText": "Taxi"
     },
+    "word:784a20e47715": {
+      "seed": 1511568329,
+      "textOverride": "Brot-Dose.",
+      "sourceText": "Brotdose"
+    },
+    "word:785f3ec7eb32": {
+      "seed": 1677023100,
+      "sourceText": "22"
+    },
     "word:7b39b80f141a": {
       "seed": 2532180,
       "textOverride": "groß.",
       "sourceText": "groß"
+    },
+    "word:7b4a2c24482a": {
+      "seed": 421733991,
+      "sourceText": "Lennard"
     },
     "word:7d1affa5f00b": {
       "seed": 1765179368,
@@ -3991,13 +4591,30 @@
       "textOverride": "Rot.",
       "sourceText": "rot"
     },
+    "word:7ecdd27346e0": {
+      "seed": 1389964126,
+      "sourceText": "5 Pinguine"
+    },
     "word:80619cbf258a": {
       "seed": 514043483,
       "sourceText": "Milch"
     },
+    "word:8078310e585b": {
+      "seed": 634327529,
+      "sourceText": "5 Mäuse"
+    },
+    "word:80a58460deda": {
+      "seed": 153000027,
+      "sourceText": "4 Pizzen"
+    },
     "word:81f3bf42a93c": {
       "seed": 1827038225,
       "sourceText": "Tom"
+    },
+    "word:8272dcce0d71": {
+      "seed": 141083382,
+      "textOverride": "Mateo.",
+      "sourceText": "Mateo"
     },
     "word:82855c11ae69": {
       "seed": 821256265,
@@ -4011,6 +4628,10 @@
     "word:82f1643a857d": {
       "seed": 2058271745,
       "sourceText": "Insel"
+    },
+    "word:83242251044a": {
+      "seed": 144801741,
+      "sourceText": "9 Vögel"
     },
     "word:837ceb63da79": {
       "seed": 1024574992,
@@ -4068,13 +4689,17 @@
       "sourceText": "Drache"
     },
     "word:8b43a8335561": {
-      "seed": 1619665835,
+      "seed": 1965481699,
       "textOverride": "Seife.",
       "sourceText": "Seife"
     },
     "word:8baebabc53fb": {
       "seed": 2022971530,
       "sourceText": "Dach"
+    },
+    "word:8ca2591eeff9": {
+      "seed": 1017467044,
+      "sourceText": "5 Frösche"
     },
     "word:8cc3a3ea0583": {
       "seed": 634327529,
@@ -4089,6 +4714,10 @@
       "seed": 238445762,
       "textOverride": "Quh.",
       "sourceText": "Kuh"
+    },
+    "word:903969068580": {
+      "seed": 1677023100,
+      "sourceText": "4 Krokodile"
     },
     "word:906c6a0ed3ef": {
       "seed": 1017467044,
@@ -4131,10 +4760,19 @@
       "seed": 1503563029,
       "sourceText": "braun"
     },
+    "word:9607fdb34d59": {
+      "seed": 89862859,
+      "sourceText": "10 Sonnenblumen"
+    },
     "word:9615231ee629": {
       "seed": 780461947,
       "textOverride": "G'ras.",
       "sourceText": "Gras"
+    },
+    "word:967f7ce2672e": {
+      "seed": 290522711,
+      "textOverride": "8 Taxis.",
+      "sourceText": "8 Taxis"
     },
     "word:96eaefafc3db": {
       "seed": 630856893,
@@ -4172,7 +4810,7 @@
       "sourceText": "wind"
     },
     "word:9ba9e19cf045": {
-      "seed": 828536127,
+      "seed": 1422241972,
       "textOverride": "Tonne.",
       "sourceText": "Tonne"
     },
@@ -4208,7 +4846,7 @@
       "sourceText": "Ofen"
     },
     "word:a2452e12544f": {
-      "seed": 1231117997,
+      "seed": 2038074085,
       "textOverride": "Huhn.",
       "sourceText": "Huhn"
     },
@@ -4224,6 +4862,11 @@
     "word:a410d513bba1": {
       "seed": 244473108,
       "sourceText": "Nuss"
+    },
+    "word:a42517945927": {
+      "seed": 1461961070,
+      "textOverride": "eine.",
+      "sourceText": "eine"
     },
     "word:a4f6cf282483": {
       "seed": 315718800,
@@ -4258,9 +4901,17 @@
       "seed": 1229619544,
       "sourceText": "9 Omas"
     },
+    "word:a988da7cf317": {
+      "seed": 1677023100,
+      "sourceText": "9 Zebras"
+    },
     "word:aa58b21b01d6": {
       "seed": 531240575,
       "sourceText": "da"
+    },
+    "word:aa81d1163cbf": {
+      "seed": 153000027,
+      "sourceText": "4 Eis"
     },
     "word:aaa6cab49ca4": {
       "seed": 1240188675,
@@ -4294,9 +4945,17 @@
       "textOverride": "kalt.",
       "sourceText": "kalt"
     },
+    "word:af2d613b7354": {
+      "seed": 144801741,
+      "sourceText": "4 Stühle"
+    },
     "word:b0034fdf5386": {
       "seed": 2033479896,
       "sourceText": "Kleid"
+    },
+    "word:b17ef6d19c7a": {
+      "seed": 1659708680,
+      "sourceText": "16"
     },
     "word:b1cba0fae462": {
       "seed": 1677023100,
@@ -4319,6 +4978,10 @@
       "seed": 182928163,
       "sourceText": "spielt"
     },
+    "word:b7a56873cd77": {
+      "seed": 634327529,
+      "sourceText": "25"
+    },
     "word:b9579d748f5c": {
       "seed": 1389964126,
       "sourceText": "Handschuh"
@@ -4336,9 +4999,26 @@
       "seed": 877129697,
       "sourceText": "Klavier"
     },
+    "word:bc7df20ca51f": {
+      "seed": 1992503263,
+      "textOverride": "Taschenlampe.",
+      "sourceText": "Taschenlampe"
+    },
+    "word:bcac0629cfaf": {
+      "seed": 144801741,
+      "sourceText": "4 Bücher"
+    },
+    "word:bd4c18419ce9": {
+      "seed": 1017467044,
+      "sourceText": "5 Tische"
+    },
     "word:bd9d5f862fab": {
       "seed": 1229619544,
       "sourceText": "15 Rüben"
+    },
+    "word:bd9fd8e07847": {
+      "seed": 1017467044,
+      "sourceText": "Schultasche"
     },
     "word:be39f4733f40": {
       "seed": 960095982,
@@ -4366,6 +5046,10 @@
       "seed": 2098672070,
       "sourceText": "Hase"
     },
+    "word:c2356069e9d1": {
+      "seed": 1765179368,
+      "sourceText": "24"
+    },
     "word:c55da5036006": {
       "seed": 2114714255,
       "sourceText": "gelb"
@@ -4391,6 +5075,14 @@
       "seed": 1017467044,
       "sourceText": "13 Säcke"
     },
+    "word:c920b540a0ed": {
+      "seed": 1512463413,
+      "sourceText": "Fußball"
+    },
+    "word:ca35e8e21a75": {
+      "seed": 634327529,
+      "sourceText": "5 Küken"
+    },
     "word:ca6744f733d5": {
       "seed": 1017467044,
       "textOverride": "Blitz.",
@@ -4403,6 +5095,10 @@
     "word:caf054761428": {
       "seed": 1829684699,
       "sourceText": "Hut"
+    },
+    "word:cb39945badc3": {
+      "seed": 1229619544,
+      "sourceText": "5 Lamas"
     },
     "word:cdc2def9aec4": {
       "seed": 634327529,
@@ -4452,6 +5148,10 @@
       "seed": 158222434,
       "sourceText": "Opa"
     },
+    "word:d63bb6715016": {
+      "seed": 1365805799,
+      "sourceText": "7 Fische"
+    },
     "word:d658cc20598b": {
       "seed": 1164320468,
       "textOverride": "...Mondt.",
@@ -4465,6 +5165,11 @@
       "seed": 634327529,
       "sourceText": "30 Tomaten"
     },
+    "word:d871bd57754c": {
+      "seed": 272945142,
+      "textOverride": "Sokke.",
+      "sourceText": "Socke"
+    },
     "word:d87da4304c4a": {
       "seed": 1365805799,
       "sourceText": "14 Lamas"
@@ -4476,6 +5181,11 @@
     "word:dd12db9683fb": {
       "seed": 1353624861,
       "sourceText": "Pilz"
+    },
+    "word:dda0b47afa17": {
+      "seed": 1603068851,
+      "textOverride": "Schul-bus.",
+      "sourceText": "Schulbus"
     },
     "word:df12796da0cc": {
       "seed": 1365805799,
@@ -4490,6 +5200,10 @@
       "seed": 207550357,
       "sourceText": "Fuß"
     },
+    "word:e09b6c1fc25a": {
+      "seed": 1512463413,
+      "sourceText": "Pepe"
+    },
     "word:e0c93d09e0c6": {
       "seed": 1765179368,
       "sourceText": "20 Häuser"
@@ -4498,6 +5212,10 @@
       "seed": 387500886,
       "textOverride": "Ro'se.",
       "sourceText": "Rose"
+    },
+    "word:e126893893b4": {
+      "seed": 153000027,
+      "sourceText": "klein"
     },
     "word:e1f7ce180233": {
       "seed": 1229619544,
@@ -4525,6 +5243,10 @@
       "seed": 1854465165,
       "sourceText": "Fisch"
     },
+    "word:e629fa6598d7": {
+      "seed": 144801741,
+      "sourceText": "15"
+    },
     "word:e65491290432": {
       "seed": 1512463413,
       "textOverride": "Bett.",
@@ -4542,6 +5264,10 @@
       "seed": 1002546988,
       "sourceText": "fliegt"
     },
+    "word:e80649a6418b": {
+      "seed": 634327529,
+      "sourceText": "Handy"
+    },
     "word:e89bbd48dc17": {
       "seed": 1765179368,
       "textOverride": "Ameise!",
@@ -4558,6 +5284,11 @@
     "word:ebf2411bebda": {
       "seed": 388871546,
       "sourceText": "Äpfel"
+    },
+    "word:ecbab20caa7b": {
+      "seed": 1677023100,
+      "textOverride": "Vier Apfelkuchen.",
+      "sourceText": "4 Apfelkuchen"
     },
     "word:ecf465693113": {
       "seed": 1365805799,
@@ -4594,6 +5325,11 @@
       "seed": 1094852413,
       "sourceText": "Gans"
     },
+    "word:f13f8e16a9f7": {
+      "seed": 634327529,
+      "textOverride": "leer.",
+      "sourceText": "leer"
+    },
     "word:f26be819db48": {
       "seed": 1765179368,
       "sourceText": "30 Taxis"
@@ -4601,6 +5337,10 @@
     "word:f3102c6b2fc2": {
       "seed": 1512463413,
       "sourceText": "7 Eis"
+    },
+    "word:f3a627ca2300": {
+      "seed": 1229619544,
+      "sourceText": "Kopfhörer"
     },
     "word:f3f1c1906d53": {
       "seed": 1017467044,
@@ -4610,6 +5350,10 @@
       "seed": 1409681767,
       "sourceText": "blau"
     },
+    "word:f4af8d8ef4ff": {
+      "seed": 153000027,
+      "sourceText": "Baumhaus"
+    },
     "word:f506063e8efb": {
       "seed": 144801741,
       "sourceText": "20 Eier"
@@ -4618,9 +5362,18 @@
       "seed": 605276852,
       "sourceText": "Bäume"
     },
+    "word:f5387f9bb6ed": {
+      "seed": 2084343361,
+      "textOverride": "Kind.",
+      "sourceText": "Kind"
+    },
     "word:f5c9347df608": {
       "seed": 1677023100,
       "sourceText": "24 Säcke"
+    },
+    "word:f5ca38f748a1": {
+      "seed": 153000027,
+      "sourceText": "20"
     },
     "word:f65724d513c2": {
       "seed": 144801741,
@@ -4651,9 +5404,17 @@
       "seed": 928440568,
       "sourceText": "Käse"
     },
+    "word:fa18c06733fb": {
+      "seed": 1365805799,
+      "sourceText": "Hand"
+    },
     "word:fb9aa9a7b3d8": {
       "seed": 1069728556,
       "sourceText": "Mama"
+    },
+    "word:fe011508d05f": {
+      "seed": 634327529,
+      "sourceText": "10 Socken"
     },
     "word:fe263064ba02": {
       "seed": 1765179368,
