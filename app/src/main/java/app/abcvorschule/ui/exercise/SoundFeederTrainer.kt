@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -145,6 +146,9 @@ fun SoundFeederTrainer(
     // Skalierung 0 stehen.
     val currentCardPop = rememberUpdatedState(cardPop)
     val cardBounce = remember(roundKey) { Animatable(0f) }
+    // Eigener Anzeigezähler für den Haufen, entkoppelt vom Fortschritt: er zählt
+    // erst herunter, wenn presentCard() die nächste Karte tatsächlich aufploppt.
+    var pileShown by remember(roundKey) { mutableIntStateOf((round.cards.size - 1).coerceAtLeast(0)) }
     val enabled = phase == FeederPhase.Playing && !interactionLocked
     // handleDrop wird aus einer Gesten-Closure gerufen, die beim Anfassen der Karte
     // entstand — ein direkt eingefangenes `enabled` wäre dort immer der Wert von
@@ -182,9 +186,15 @@ fun SoundFeederTrainer(
         }
     }
 
-    suspend fun presentCard() {
+    suspend fun presentCard(fromPile: Boolean = true) {
         val pop = currentCardPop.value
         pop.snapTo(0f)
+        // Der Stapel schrumpft genau hier — im selben Moment, in dem die neue Karte
+        // aufploppt. Vorher las der Haufen den Fortschritt (state.remaining), der
+        // schon beim Drop weiterrückt: eine Karte war weg, während oben noch gar
+        // keine zu sehen war. Die erste Karte zählt nicht mit, sie liegt beim
+        // Startwert schon nicht mehr auf dem Haufen.
+        if (fromPile) pileShown = (pileShown - 1).coerceAtLeast(0)
         pop.animateTo(1f, spring(dampingRatio = 0.5f, stiffness = Spring.StiffnessMediumLow))
         val card = state.current ?: return
         if (ttsAvailable) onSpeakParts(listOf(SoundFeederSpeech.wordPart(card, pack)))
@@ -193,7 +203,7 @@ fun SoundFeederTrainer(
     LaunchedEffect(roundKey) {
         phase = FeederPhase.Intro
         introduce()
-        presentCard()
+        presentCard(fromPile = false)
         phase = FeederPhase.Playing
     }
 
@@ -350,7 +360,7 @@ fun SoundFeederTrainer(
                         Spacer(Modifier.size(cardSize.dp, cardHeight.dp))
                     }
                     Spacer(Modifier.width(18.dp))
-                    FoodPile(remaining = (state.remaining - 1).coerceAtLeast(0), seed = pileSeed)
+                    FoodPile(remaining = pileShown, seed = pileSeed)
                 }
             }
         },
