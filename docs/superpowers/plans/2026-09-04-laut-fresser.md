@@ -2827,6 +2827,116 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 ---
 
+### Task 16: Design-Politur nach Nutzer-Sichtprüfung (vor Task 15 ausführen)
+
+Der Nutzer hat den Trainer auf dem Emulator gesehen und fünf Änderungen verlangt. Sie
+ersetzen die entsprechenden Stellen aus Task 10/11 und Spec §5.
+
+**Files:**
+- Modify: `app/src/main/java/app/abcvorschule/ui/exercise/FeederCreature.kt`
+- Modify: `app/src/main/java/app/abcvorschule/ui/exercise/SoundFeederTrainer.kt` (`FeederCard`, `FoodPile`, Aufrufe von `FeederCreature`)
+- Modify: `app/src/main/java/app/abcvorschule/ui/exercise/SoundFeederSizing.kt` (+ Test)
+- Modify: `app/src/main/java/app/abcvorschule/content/TaskSpecs.kt` (`SoundFeederRound.anywhere`), `content/SoundFeederDerivation.kt` (+ Test)
+- Create: `app/src/main/java/app/abcvorschule/ui/exercise/FeederPalette.kt` (+ Test)
+- Modify: `app/src/androidTest/java/app/abcvorschule/ui/exercise/SoundFeederShotTest.kt` (Signatur)
+- Modify: `docs/superpowers/specs/2026-09-04-laut-fresser-design.md` §5, `docs/PRODUCT_PRINCIPLES.md` §10 (Farbsatz der Fresser)
+
+**Interfaces:**
+- Produces: `SoundFeederRound.anywhere: Boolean = false` (Vokalpaar → true, gesetzt in der Derivation aus `pair.anywhere`);
+  `object FeederPalette { fun belly(body: Color): Color; fun glyph(body: Color): Color; fun highlight(body: Color): Color; fun shade(body: Color): Color }`;
+  `FeederCreature(label, color, animator, hint, widthDp, enabled, onTap, testTag, modifier)` — **ohne** `speaking` und `dimmed`;
+  `SoundFeederSizing`: `PileCardWidthDp = 48f`, `PileCardHeightDp = 60f`, `PileJitterDp = 4f`, `PileRotationDeg = 8f`, `fun pileWidthDp(count) = if (count <= 0) 0f else PileCardWidthDp + 2 * PileJitterDp`, `fun pileOffset(index: Int): Triple<Float, Float, Float>` (dx, dy in dp, Rotation in Grad — deterministisch aus `index`).
+
+- [ ] **Step 1: Failing Tests**
+
+`SoundFeederDerivationTest`:
+
+```kotlin
+    @Test
+    fun vowelRoundsCarryTheAnywhereFlagConsonantRoundsDoNot() {
+        assertFalse(rounds.getValue("l13").anywhere) // S/Sch
+        assertTrue(rounds.getValue("l22").anywhere) // Ei/Au
+    }
+```
+
+`SoundFeederSizingTest` (die alte `thePileShrinksToNothing` ersetzen):
+
+```kotlin
+    @Test
+    fun thePileIsAJitteredStackNotARow() {
+        assertEquals(0f, SoundFeederSizing.pileWidthDp(0))
+        assertEquals(SoundFeederSizing.PileCardWidthDp + 2 * SoundFeederSizing.PileJitterDp, SoundFeederSizing.pileWidthDp(1))
+        assertEquals(SoundFeederSizing.pileWidthDp(1), SoundFeederSizing.pileWidthDp(6))
+    }
+
+    @Test
+    fun pileOffsetsAreDeterministicAndBounded() {
+        (0 until 7).forEach { index ->
+            val (dx, dy, rot) = SoundFeederSizing.pileOffset(index)
+            assertEquals(SoundFeederSizing.pileOffset(index), Triple(dx, dy, rot))
+            assertTrue(kotlin.math.abs(dx) <= SoundFeederSizing.PileJitterDp)
+            assertTrue(kotlin.math.abs(dy) <= SoundFeederSizing.PileJitterDp)
+            assertTrue(kotlin.math.abs(rot) <= SoundFeederSizing.PileRotationDeg)
+        }
+        assertTrue((0 until 7).map { SoundFeederSizing.pileOffset(it) }.toSet().size >= 5)
+    }
+```
+
+`FeederPaletteTest` (neu, `relativeLuminance` wie in `HuntBatteryDesignTest`):
+
+```kotlin
+    @Test
+    fun theGlyphClearsThreeToOneOnTheBellyForBothCreatures() {
+        listOf(SkyBlue, SunCoral).forEach { body ->
+            val ratio = contrast(FeederPalette.glyph(body), FeederPalette.belly(body))
+            assertTrue("$body: $ratio", ratio >= 3.0)
+        }
+    }
+
+    @Test
+    fun bellyAndGlyphStayInTheBodyHue() {
+        // Kein reines Weiß, kein reines Schwarz: der Bauch ist eine helle, der Glyph eine
+        // dunkle Stufe der Körperfarbe.
+        listOf(SkyBlue, SunCoral).forEach { body ->
+            assertNotEquals(Color.White, FeederPalette.belly(body))
+            assertNotEquals(WarmInk, FeederPalette.glyph(body))
+            assertTrue(relativeLuminance(FeederPalette.highlight(body)) > relativeLuminance(body))
+            assertTrue(relativeLuminance(FeederPalette.shade(body)) < relativeLuminance(body))
+        }
+    }
+```
+
+- [ ] **Step 2: Fehlschlag sehen** — `--tests '*SoundFeederDerivationTest' --tests '*SoundFeederSizingTest' --tests '*FeederPaletteTest'` → Compile-Fehler.
+
+- [ ] **Step 3: Implementieren**
+
+1. **`anywhere`**: `SoundFeederRound` bekommt `val anywhere: Boolean = false`; `SoundFeederDerivation.buildRound` setzt `anywhere = pair.anywhere`. Im Trainer: `label = if (round.anywhere) SymbolInWordDerivation.targetLabel(atom, letter) else TargetLabel(atom.display, null)` — Konsonantenpaare stehen am Anlaut von Substantiven, also reicht die Großform (`S`, `Sch`); Vokalpaare stecken klein im Wortinneren und zeigen weiter beide Formen (`Ei / ei`).
+2. **`FeederPalette`** (`ui/exercise/FeederPalette.kt`): `belly = lerp(body, Color.White, 0.78f)`, `glyph = lerp(body, Color.Black, 0.45f)`, `highlight = lerp(body, Color.White, 0.30f)`, `shade = lerp(body, Color.Black, 0.25f)` (`androidx.compose.ui.graphics.lerp`). Werte so wählen, dass der Kontrast-Test besteht; falls 3:1 knapp verfehlt wird, `glyph` dunkler (0.55f), nicht den Test lockern.
+3. **Figur** (`FeederCreature.kt`):
+   - Körper als **Material-Form**: `MaterialShapes.Ghostish` (`androidx.compose.material3.MaterialShapes`, `@OptIn(ExperimentalMaterial3ExpressiveApi::class)`), per `toPath()` (`androidx.graphics.shapes`) in die Größe des Canvas transformiert (die Form ist auf 0..1 normiert: `Matrix().apply { scale(w, h) }` bzw. `path.transform`), gefüllt mit `Brush.radialGradient(0f to highlight, 0.55f to body, 1f to shade, center = Offset(w*0.38f, h*0.30f), radius = w*0.9f)` — Licht oben links, Schatten unten rechts. Fällt `MaterialShapes` in dieser material3-Version doch weg (Compile-Fehler), stattdessen `RoundedPolygon` aus `androidx.graphics.shapes` mit 8 Ecken, `CornerRounding(radius = 0.35f)`, unten drei Wellen per `RoundedPolygon(vertices = …)` — nicht zum Kreis zurückfallen.
+   - **Maul als Halbkreis**: eine nach unten offene Halbscheibe (`drawArc(startAngle = 0f, sweepAngle = 180f, useCenter = true)`) mit flacher Oberkante, Farbe `shade(body)` dunkler → `lerp(shade, Color.Black, 0.5f)`; Höhe = `h * (0.05f + 0.22f * mouthOpen)`, Breite `w * 0.58f`, Oberkante bei `h * 0.34f`. Beim Öffnen wächst der Halbkreis nach unten.
+   - **Augen** bleiben (weiße Kreise, Pupille), plus ein kleiner Glanzpunkt `Cream` auf der Pupille.
+   - **Bauch**: Ellipse in `belly(body)`, Glyph in `glyph(body)` (statt `Cream`/`WarmInk`).
+   - **Kein Speaker-Icon.** Parameter `speaking` und `dimmed` entfallen; `enabled` steuert weiterhin nur `clickable`. Kommentar: der Tipp auf die Figur spricht den Laut, ein Icon irritierte.
+4. **Karte** (`FeederCard` in `SoundFeederTrainer.kt`): Fläche `Color.White`, `shadow(elevation = 4.dp, shape = RoundedCornerShape(22.dp))` vor dem `border`, Rahmen bleibt `WarmMuted` 3dp.
+5. **Futterhaufen** (`FoodPile`): alle verbleibenden Karten liegen **übereinander** an derselben Stelle (`Box`, `contentAlignment = Center`), jede mit `offset(dx, dy)` und `rotate(rot)` aus `SoundFeederSizing.pileOffset(index)`; Rückseite gefüllt mit `WarmMuted.copy(alpha = 0.55f)` **über** einer deckenden `Cream`-Fläche (also zwei `background`-Aufrufe oder eine vorher gemischte Farbe `lerp(Cream, WarmMuted, 0.55f)`), Rahmen `WarmMuted` 2dp, `RoundedCornerShape(8.dp)`. Der Stapel hat eine feste Box-Größe `pileWidthDp(remaining) × (PileCardHeightDp + 2 * PileJitterDp)`, damit die Karte daneben nicht wandert. `pileOffset(index)`: `val rng = Random(index * 7919 + 17)`; `dx = rng.nextFloat() * 2 * PileJitterDp - PileJitterDp`, `dy` ebenso, `rot = rng.nextFloat() * 2 * PileRotationDeg - PileRotationDeg`.
+6. **Shot-Test**: Signatur anpassen (kein `speaking` an `FeederCreature`; der Trainer-Aufruf bleibt).
+7. **Doku**: Spec §5 — Bildkarte weiß mit Schatten, Futterhaufen als gestapelte, leicht verdrehte Rückseiten; Fresser als Material-Geisterform mit Verlauf, Halbkreis-Maul, ohne Speaker-Icon; Bauch und Glyph als helle/dunkle Stufe der Körperfarbe; Großform allein bei Anlaut-Paaren, beide Formen bei Vokalpaaren. PRODUCT_PRINCIPLES §10: den Satz „mit einem `Cream`-Bauchfleck" durch „Bauch und Glyph sind eine helle bzw. dunkle Stufe der Körperfarbe (`FeederPalette`, Glyph ≥ 3:1 auf dem Bauch)" ersetzen.
+
+- [ ] **Step 4: Tests + Build** — `:app:testDebugUnitTest :app:assembleDebug` grün.
+
+- [ ] **Step 5: Sichtprüfung** — Shot-Test nach Weg A auf dem Emulator (Lock!), PNGs ansehen; zusätzlich `installDebug` und Screenshot in Lektion 13 mit gezogener Karte. Prüfen: Geisterform mit sichtbarem Verlauf, Halbkreis-Maul, kein Icon, Karte weiß mit Schatten, Stapel dunkler und verdreht, Glyph `S` / `Sch` groß, lesbar, in der Körperfarbe.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git commit -m "feat(exercise): Laut-Fresser — Geisterform mit Verlauf, weiße Karte, gestapelter Haufen, nur Großform
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+```
+
+---
+
 ### Task 15: Abschluss — Verifikation und Merge
 
 - [ ] **Step 1: Volle Verifikation**
