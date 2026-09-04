@@ -68,6 +68,7 @@ fun TaskShell(
     onSpeakPromptSequence: suspend (List<String>) -> Unit,
     onSpeakIntroSequence: suspend (List<String>, onPartComplete: (Int) -> Unit) -> Unit,
     onSpeakParts: suspend (List<SpokenPart>) -> Unit = {},
+    onSpeakPartsSequenced: suspend (List<SpokenPart>, onPartComplete: (Int) -> Unit) -> Unit = { _, _ -> },
     onSpeakFeedbackVoiced: (SpokenPart) -> Unit = {},
     onStopSpeak: () -> Unit,
     modifier: Modifier = Modifier,
@@ -181,6 +182,7 @@ fun TaskShell(
                 onSpeakPromptSequence = onSpeakPromptSequence,
                 onSpeakIntroSequence = onSpeakIntroSequence,
                 onSpeakParts = onSpeakParts,
+                onSpeakPartsSequenced = onSpeakPartsSequenced,
                 onSpeakFeedbackVoiced = onSpeakFeedbackVoiced,
                 onStopSpeak = onStopSpeak,
             )
@@ -225,6 +227,7 @@ private fun PracticeBody(
     onSpeakPromptSequence: suspend (List<String>) -> Unit,
     onSpeakIntroSequence: suspend (List<String>, onPartComplete: (Int) -> Unit) -> Unit,
     onSpeakParts: suspend (List<SpokenPart>) -> Unit = {},
+    onSpeakPartsSequenced: suspend (List<SpokenPart>, onPartComplete: (Int) -> Unit) -> Unit = { _, _ -> },
     onSpeakFeedbackVoiced: (SpokenPart) -> Unit = {},
     onStopSpeak: () -> Unit,
 ) {
@@ -393,6 +396,7 @@ private fun PracticeBody(
                         onSpeakAndAwait = onSpeakAndAwait,
                         onSpeakPrompt = speakPrompt,
                         onSpeakParts = onSpeakParts,
+                        onSpeakPartsSequenced = onSpeakPartsSequenced,
                         onSpeakFeedbackVoiced = onSpeakFeedbackVoiced,
                     ),
                     modifier = Modifier.fillMaxSize(),

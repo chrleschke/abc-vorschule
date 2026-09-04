@@ -36,6 +36,14 @@ data class TrainerCallbacks(
     /** Primär-Kanal, Sequenz mit Stimme je Teil — der Laut-Fresser spricht Ansage,
      * Fressen und Spucken selbst (design doc §5/§7). */
     val onSpeakParts: suspend (List<SpokenPart>) -> Unit = {},
+    /**
+     * Primär-Kanal wie [onSpeakParts], aber mit Rückmeldung nach jedem Teil: ruft
+     * `onPartComplete(index)` genau dann, wenn Teil `index` zu Ende gesprochen ist.
+     * Der Laut-Fresser startet damit das Wackeln einer Figur exakt in dem Moment, in
+     * dem ihr Laut anfängt — also wenn der vorige Teil fertig ist. Vorher waren es
+     * geratene `delay()`-Werte, die mit der echten Sprechdauer nicht zusammenfielen.
+     */
+    val onSpeakPartsSequenced: suspend (parts: List<SpokenPart>, onPartComplete: (Int) -> Unit) -> Unit = { _, _ -> },
     /** Feedback-Kanal mit Stimme: Tipp auf einen Fresser. */
     val onSpeakFeedbackVoiced: (SpokenPart) -> Unit = {},
 )
@@ -178,6 +186,7 @@ fun TrainerHost(
             speaking = speaking,
             interactionLocked = interactionLocked,
             onSpeakParts = callbacks.onSpeakParts,
+            onSpeakPartsSequenced = callbacks.onSpeakPartsSequenced,
             onSpeakFeedback = callbacks.onSpeakFeedback,
             onSpeakFeedbackVoiced = callbacks.onSpeakFeedbackVoiced,
             onResult = callbacks.onResult,

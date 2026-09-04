@@ -87,7 +87,8 @@ class SoundFeederShotTest {
                         SoundFeederTrainer(
                             round = round, roundIndex = 0, pack = pack,
                             ttsAvailable = false, speaking = false,
-                            onSpeakParts = {}, onSpeakFeedback = {},
+                            onSpeakParts = {}, onSpeakPartsSequenced = { _, _ -> },
+                            onSpeakFeedback = {},
                             onSpeakFeedbackVoiced = {}, onResult = { _, _, _ -> },
                         )
                     }

@@ -142,6 +142,9 @@ fun AbcApp(onFinish: () -> Unit = {}) {
             speech.speakAndAwaitSequence(texts, onPartComplete = onPartComplete)
         },
         onSpeakParts = { parts -> speech.speakAndAwaitSequence(parts) },
+        onSpeakPartsSequenced = { parts, onPartComplete ->
+            speech.speakAndAwaitSequence(parts, onPartComplete = onPartComplete)
+        },
         onSpeakFeedbackVoiced = { part -> speech.speak(part.text, channel = SpeechChannel.Feedback, voice = part.voice) },
         onStopSpeak = speech::stop,
     )

@@ -230,7 +230,11 @@ sonst keinen Leser — Rechnen und Satz-Versteher referenzieren sie nicht, das i
 **Einstieg einer Runde:**
 
 1. Ansage „Füttere die Laut-Fresser." (Primär-Kanal, kuratierter Prompt-Clip).
-2. Der linke Fresser wackelt und macht seinen Laut, dann der rechte. Kein Fragesatz — die
+2. Der linke Fresser wackelt und macht seinen Laut, dann der rechte. Das Wackeln hängt an
+   den **Teilgrenzen der Sprechsequenz**, nicht an Timern: `onSpeakPartsSequenced` meldet
+   das Ende jedes Teils, und das Ende des Ansagesatzes ist der Beginn des linken Lauts, das
+   Ende des linken Lauts der Beginn des rechten. Geratene `delay()`-Werte lagen je nach
+   Satzlänge und Stimme daneben — die Figur wackelte mitten im Intro-Satz. Kein Fragesatz — die
    Rechenaufgabe bleibt die einzige Frage in der App (§7). Die Vorstellung ersetzt die Frage
    „Hörst du S oder Sch?" und zeigt zugleich, wer wofür steht.
 3. Die erste Karte ploppt auf und spricht ihr Wort.
@@ -381,6 +385,16 @@ Systemschriftgröße: Figur- und Kartenmaße rechnen mit `fontScale`; das Testge
   Rotation aus §4 garantiert das; `LessonCoverageTest` zählt die Fresser-Karten als Auftritt)
 - Vorrat-Guard: eine synthetische Tabelle mit einem Paar, das nur 1 Wort auf einer Seite
   hat, wird nie gewählt
+- `anywhere`: Vokalrunden tragen die Flagge, Konsonantenrunden nicht (l13 S/Sch false,
+  l22 Ei/Au true) — daran hängt, ob der Bauch beide Formen zeigt (§5)
+
+**`FeederPaletteTest`**
+
+- Der Glyph erreicht auf dem Bauch **≥ 3:1** — für **beide** Körperfarben (SkyBlue und
+  SunCoral), gemessen wie in `HuntBatteryDesignTest` über die relative Leuchtdichte
+- Bauch und Glyph bleiben in der Körperfarbe: kein reines Weiß, kein `WarmInk`; `highlight`
+  ist heller als der Körper, `shade` dunkler. Der Test hält die Regel fest, dass die Palette
+  Stufen **einer** Farbe sind — wer sie auf Cream/WarmInk zurückdreht, bricht ihn
 
 **`SoundFeederProgressTest`**
 

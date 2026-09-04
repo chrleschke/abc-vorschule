@@ -90,6 +90,7 @@ fun SoundFeederTrainer(
     speaking: Boolean,
     interactionLocked: Boolean = false,
     onSpeakParts: suspend (List<SpokenPart>) -> Unit,
+    onSpeakPartsSequenced: suspend (List<SpokenPart>, onPartComplete: (Int) -> Unit) -> Unit,
     onSpeakFeedback: (String) -> Unit,
     onSpeakFeedbackVoiced: (SpokenPart) -> Unit,
     onResult: (correct: Boolean, resolved: Boolean, atomIds: List<String>) -> Unit,
@@ -154,12 +155,21 @@ fun SoundFeederTrainer(
     // Die ganze Vorstellung: Ansage, dann wackelt links und spricht, dann rechts.
     // Der Trainer spricht selbst (design doc §5), weil nur er weiß, welche Figur
     // gerade dran ist. Auch der Speaker-Tipp spielt genau diese Sequenz.
+    //
+    // Das Wackeln hängt an den Sprechteilen, nicht an einer Uhr: Teil 0 ist der
+    // Ansagesatz, sein Ende ist genau der Moment, in dem der linke Laut anfängt;
+    // Teil 1 ist der linke Laut, sein Ende der Beginn des rechten. Vorher rieten
+    // zwei `delay()`-Werte diese Zeitpunkte — je nach Satzlänge und Stimme wackelte
+    // die Figur mitten im Intro-Satz statt zu ihrem eigenen Geräusch.
     suspend fun introduce() {
         val parts = SoundFeederSpeech.introParts(round, pack)
         if (ttsAvailable) {
-            scope.launch { delay(900); leftAnimator.wiggle() }
-            scope.launch { delay(1800); rightAnimator.wiggle() }
-            onSpeakParts(parts)
+            onSpeakPartsSequenced(parts) { index ->
+                when (index) {
+                    0 -> scope.launch { leftAnimator.wiggle() }
+                    1 -> scope.launch { rightAnimator.wiggle() }
+                }
+            }
         } else {
             leftAnimator.wiggle()
             rightAnimator.wiggle()
@@ -417,9 +427,13 @@ private fun FeederCard(emoji: String, wordText: String?, minWidthDp: Float, minH
 private fun FoodPile(remaining: Int) {
     val back = lerp(Cream, WarmMuted, 0.55f)
     val shape = RoundedCornerShape(8.dp)
+    // Der Platz wird **immer** für eine Karte reserviert, auch wenn der Haufen leer ist
+    // (`pileWidthDp(0) == 0f`): sonst fiele die Box beim letzten Zug von 56dp auf nichts
+    // zusammen und schöbe die zentrierte Bildkarte daneben um ~27dp zur Seite. Ist
+    // `remaining == 0`, zeichnet `repeat` einfach nichts in die reservierte Fläche.
     Box(
         modifier = Modifier
-            .width(SoundFeederSizing.pileWidthDp(remaining).coerceAtLeast(1f).dp)
+            .width(SoundFeederSizing.pileWidthDp(1).dp)
             .height((SoundFeederSizing.PileCardHeightDp + 2 * SoundFeederSizing.PileJitterDp).dp)
             .testTag("feeder_pile"),
         contentAlignment = Alignment.Center,
