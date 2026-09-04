@@ -405,3 +405,29 @@ def test_a_question_is_never_a_bare_sentence():
     assert not reads_as_bare_sentence("Hörst du das M?")
     assert reads_as_bare_sentence("Tom singt.")
     assert reads_as_bare_sentence("Mama Maus!")
+
+
+def test_extra_strings_include_feeder_strings(content_dir):
+    from ttskit.paths import Paths
+    import json
+
+    extra = json.loads(Paths().extra_strings.read_text())
+    by_id = {i.id: i for i in extract_items(content_dir, extra_strings=extra)}
+    assert by_id["ui:feederPrompt"].text == "Füttere die Laut-Fresser."
+    assert profile_for_item(by_id["ui:feederPrompt"]) == "prompt"
+    assert by_id["ui:feederYuck"].text == "Bäh!"
+    assert by_id["ui:feederContent"].text == "Mmmmh!"
+    for key in ("ui:feederYuck", "ui:feederContent"):
+        assert by_id[key].field == "monsterTts"
+        assert profile_for_item(by_id[key]) == "monster"
+
+
+def test_monster_profile_exists_and_is_exportable():
+    import json
+    from ttskit.paths import Paths
+    from ttskit.export import PROFILE_PRIORITY
+
+    profiles = json.loads(Paths().profiles.read_text())["profiles"]
+    assert "monster" in profiles
+    assert profiles["monster"]["language"] == "german"
+    assert "monster" in PROFILE_PRIORITY

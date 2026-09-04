@@ -246,6 +246,12 @@ Bestehende `word:*`-Locks und Kandidaten-Ordner für Buchstaben/Silben einmalig
 umziehen: `tts migrate-locks` (siehe Ablauf oben). Clips mit Produktions-WAV aber
 ohne Lock (typisch nach Batch-`render`): `tts wire-locks`, danach `tts export`.
 
+Das Profil `monster` trägt nur die zwei Reaktionen des Laut-Fressers („Bäh!", „Mmmmh!",
+Feld `monsterTts` in `extra-strings.json`). Laute und Wörter des Trainers sind die
+normalen `phoneme`-/`word`-Clips — die Monster-Stimme entsteht in der App per Tonhöhe
+(`VoiceStyle`), damit die Artikulation sauber bleibt. Ein anderer Sprecher als sohee ist
+für `monster` erlaubt.
+
 ## Umfang
 
 `tts extract` liest aktuell 1174 Items — 1126 Strings aus dem Content-Pack plus 48

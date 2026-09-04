@@ -25,6 +25,10 @@ FIELD_TO_PROFILE: dict[str, str] = {
     "uiText": "ui",
     "spokenAnswerTts": "word",
     "articleTts": "article_word",
+    # Reaktionen der Laut-Fresser — die einzigen Strings, die nicht sauber
+    # artikuliert sein müssen; Laute und Wörter laufen in normaler Stimme und
+    # werden erst in der App per Tonhöhe zum Monster.
+    "monsterTts": "monster",
 }
 
 # Order matters: it decides the order of items within a round.
@@ -59,7 +63,7 @@ MATH_MARKER = "Wie viele"
 #: Rechenaufgabe niemals als erzählender Satz durchgeht.
 INSTRUCTION_MARKERS = (
     "Baue das Wort", "Ordne ", "Finde den", "Finde alle", "Finde die",
-    "Schiebe ", "Zeichne den", MATH_MARKER,
+    "Schiebe ", "Zeichne den", "Füttere ", MATH_MARKER,
 )
 
 

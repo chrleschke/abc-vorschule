@@ -495,6 +495,25 @@
       "seedPool": [],
       "trim": true,
       "normalize": true
+    },
+    "monster": {
+      "label": "Monster-Reaktion",
+      "speaker": "sohee",
+      "language": "german",
+      "instruct": "Sprich wie ein kleines, gutmütiges Monster, das gerade etwas gefressen hat: knurrig, tief, kurz, mit Freude. Kein echtes Wort, nur der Ausruf. Übertreibe die Stimme, bleibe aber deutlich. Innerhalb von 1 Sekunde. Niemals englische Aussprache.",
+      "sampling": {
+        "temperature": 1.2,
+        "top_k": 30,
+        "top_p": 0.9,
+        "repetition_penalty": 1.05,
+        "subtalker_temperature": 1.1,
+        "subtalker_top_k": 50,
+        "subtalker_top_p": 1,
+        "max_new_tokens": 63
+      },
+      "seedPool": [],
+      "trim": true,
+      "normalize": true
     }
   }
 }
