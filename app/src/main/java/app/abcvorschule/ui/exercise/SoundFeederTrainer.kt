@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -53,6 +56,7 @@ import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 /** Feste Farben je Seite — in jeder Lektion dieselben zwei Figuren (design doc §5).
@@ -108,6 +112,11 @@ fun SoundFeederTrainer(
     val density = LocalDensity.current
     val fontScale = density.fontScale
     val cardSize = SoundFeederSizing.cardSizeDp(fontScale)
+    // Ohne deutsche Stimme steht das Wort unter dem Emoji — und braucht eigene Höhe.
+    // cardSizeDp budgetiert nur das Bild; sonst schöbe der Rahmen das Wort heraus,
+    // ausgerechnet das, was ein Erwachsener dann vorlesen muss (PRODUCT_PRINCIPLES §7).
+    val showWord = !ttsAvailable
+    val cardHeight = SoundFeederSizing.cardHeightDp(fontScale, showWord)
     val cardSizePx = with(density) { cardSize.dp.toPx() }
     // Pro Karte ein frisches Animatable bei 0: die nächste Karte ist unsichtbar, bis
     // presentCard() sie aufploppt — die gefressene verschwindet damit im selben
@@ -120,6 +129,10 @@ fun SoundFeederTrainer(
     val currentCardPop = rememberUpdatedState(cardPop)
     val cardBounce = remember(roundKey) { Animatable(0f) }
     val enabled = phase == FeederPhase.Playing && !interactionLocked
+    // handleDrop wird aus einer Gesten-Closure gerufen, die beim Anfassen der Karte
+    // entstand — ein direkt eingefangenes `enabled` wäre dort immer der Wert von
+    // damals. Über den State liest der Drop den Stand von jetzt.
+    val currentEnabled = rememberUpdatedState(enabled)
     val interactionOpacity by animateFloatAsState(
         targetValue = if (interactionLocked) 0.5f else 1f,
         animationSpec = tween(200),
@@ -165,7 +178,7 @@ fun SoundFeederTrainer(
     }
 
     fun handleDrop(zoneKey: String?) {
-        if (!enabled) return
+        if (!currentEnabled.value) return
         val side = when (zoneKey) {
             ZoneLeft -> FeederSide.left
             ZoneRight -> FeederSide.right
@@ -188,9 +201,14 @@ fun SoundFeederTrainer(
                     if (result.outcome == SoundFeederDropOutcome.RoundComplete) {
                         phase = FeederPhase.Done
                         haptics.celebrate()
-                        val filling = launch { leftAnimator.fill(); rightAnimator.fill() }
+                        // Beide werden gleichzeitig satt (design doc §6) — nacheinander
+                        // sähe aus, als hätte einer mehr gefressen.
+                        val filling = listOf(
+                            launch { leftAnimator.fill() },
+                            launch { rightAnimator.fill() },
+                        )
                         if (ttsAvailable) onSpeakParts(SoundFeederSpeech.finishParts(round, pack))
-                        filling.join()
+                        filling.joinAll()
                         delay(HuntCelebration.HoldMs)
                         onResult(true, false, scoredIds)
                     } else {
@@ -243,7 +261,13 @@ fun SoundFeederTrainer(
                 ttsAvailable = ttsAvailable,
                 speaking = speaking,
                 onSpeakPrompt = {
-                    if (phase == FeederPhase.Playing) scope.launch { phase = FeederPhase.Intro; introduce(); phase = FeederPhase.Playing }
+                    // Phase noch im Klick setzen, nicht erst in der Coroutine: zwei
+                    // schnelle Tipps sähen sonst beide „Playing" und ließen zwei
+                    // Vorstellungen übereinander laufen.
+                    if (phase == FeederPhase.Playing) {
+                        phase = FeederPhase.Intro
+                        scope.launch { introduce(); phase = FeederPhase.Playing }
+                    }
                 },
             )
         },
@@ -251,7 +275,7 @@ fun SoundFeederTrainer(
             // Hält seine größte Höhe: nach der letzten Karte bleibt die Fläche stehen,
             // die Fresser rücken nicht nach oben (§9).
             Box(
-                modifier = Modifier.fillMaxWidth().height((cardSize + 24f).dp),
+                modifier = Modifier.fillMaxWidth().height((cardHeight + 24f).dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -274,13 +298,14 @@ fun SoundFeederTrainer(
                         ) {
                             FeederCard(
                                 emoji = pack.atom(card.atomId).emoji,
-                                wordText = if (ttsAvailable) null else pack.atom(card.atomId).display,
-                                sizeDp = cardSize,
+                                wordText = if (showWord) pack.atom(card.atomId).display else null,
+                                minWidthDp = cardSize,
+                                minHeightDp = cardHeight,
                                 fontScale = fontScale,
                             )
                         }
                     } else {
-                        Spacer(Modifier.size(cardSize.dp))
+                        Spacer(Modifier.size(cardSize.dp, cardHeight.dp))
                     }
                     Spacer(Modifier.width(18.dp))
                     FoodPile(remaining = (state.remaining - 1).coerceAtLeast(0))
@@ -298,6 +323,10 @@ fun SoundFeederTrainer(
                         Triple(FeederSide.left, ZoneLeft, leftLabel),
                         Triple(FeederSide.right, ZoneRight, rightLabel),
                     ).forEach { (side, zone, label) ->
+                        // Kein Tipp-zum-Setzen (bewusste Ausnahme von DragField R15):
+                        // ein Tipp auf den Fresser spricht seinen Laut, ein Tipp auf die
+                        // Karte ihr Wort — beides Hilfen, keine Antwort. Gefüttert wird
+                        // nur durch Ziehen; ein Tipp dürfte also nichts setzen.
                         DropZone(state = dragState, key = zone, enabled = enabled, onTap = {}) {
                             FeederCreature(
                                 label = label,
@@ -306,7 +335,11 @@ fun SoundFeederTrainer(
                                 hint = state.hintActive && state.current?.side == side,
                                 speaking = speaking,
                                 widthDp = creatureWidth,
-                                enabled = phase != FeederPhase.Intro,
+                                // Dieselbe Sperre wie für die Karte: ein Tipp während
+                                // Kauen/Spucken (Busy) oder während die Bühne gesperrt
+                                // ist, würde wiggle() auf dasselbe Animatable legen und
+                                // die laufende Fress-Animation abbrechen.
+                                enabled = enabled,
                                 onTap = {
                                     scope.launch { animatorFor(side).wiggle() }
                                     onSpeakFeedbackVoiced(SoundFeederSpeech.soundPart(round, side, pack))
@@ -321,12 +354,21 @@ fun SoundFeederTrainer(
     )
 }
 
-/** Die Bildkarte: Emoji im Rahmen der Satz-Versteher-Karten; ohne TTS steht das Wort darunter. */
+/**
+ * Die Bildkarte: Emoji im Rahmen der Satz-Versteher-Karten; ohne TTS steht das Wort
+ * darunter. [minWidthDp] und [minHeightDp] sind *Mindest*maße, keine festen: die
+ * Wortzeile darf die Karte wachsen lassen, statt aus ihr herausgedrängt zu werden.
+ * Höhe um genau eine Zeile (die budgetiert [SoundFeederSizing.cardHeightDp]), Breite
+ * nach Bedarf, damit auch „Taschenlampe" bei font_scale 1.3 in einer Zeile steht statt
+ * umzubrechen — ein Umbruch spränge über die budgetierte Höhe. Ohne Wort ist
+ * [minHeightDp] == [minWidthDp] und die Karte bleibt quadratisch.
+ */
 @Composable
-private fun FeederCard(emoji: String, wordText: String?, sizeDp: Float, fontScale: Float) {
+private fun FeederCard(emoji: String, wordText: String?, minWidthDp: Float, minHeightDp: Float, fontScale: Float) {
     Column(
         modifier = Modifier
-            .size(sizeDp.dp)
+            .widthIn(min = minWidthDp.dp)
+            .heightIn(min = minHeightDp.dp)
             .border(3.dp, WarmMuted.copy(alpha = 0.9f), RoundedCornerShape(22.dp))
             .testTag("feeder_card"),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -334,7 +376,15 @@ private fun FeederCard(emoji: String, wordText: String?, sizeDp: Float, fontScal
     ) {
         Text(text = emoji, fontSize = TaskPromptSizing.pictureSp(fontScale).sp, textAlign = TextAlign.Center)
         if (wordText != null) {
-            Text(text = wordText, style = MaterialTheme.typography.titleLarge, color = WarmInk)
+            Text(
+                text = wordText,
+                style = MaterialTheme.typography.titleLarge,
+                color = WarmInk,
+                maxLines = 1,
+                softWrap = false,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 10.dp),
+            )
         }
     }
 }

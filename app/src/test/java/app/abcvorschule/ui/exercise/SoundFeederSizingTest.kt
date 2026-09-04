@@ -55,6 +55,34 @@ class SoundFeederSizingTest {
     }
 
     @Test
+    fun theCardStaysSquareWithAVoiceAndGrowsByOneLineWithout() {
+        listOf(1f, 1.3f).forEach { scale ->
+            val square = SoundFeederSizing.cardHeightDp(scale, hasWord = false)
+            assertEquals("scale $scale", SoundFeederSizing.cardSizeDp(scale), square)
+        }
+    }
+
+    @Test
+    fun theWordUnderTheEmojiGetsItsOwnLineAtEverySystemFontScale() {
+        // Ohne deutsche Stimme ist das Wort das Einzige, was ein Erwachsener vorlesen
+        // kann — es darf bei 1.0 wie bei 1.3 nicht aus der Karte gedrückt werden.
+        listOf(1f, 1.3f, 2f).forEach { scale ->
+            val withWord = SoundFeederSizing.cardHeightDp(scale, hasWord = true)
+            val emojiBudget = SoundFeederSizing.cardSizeDp(scale)
+            val renderedLineDp = SoundFeederSizing.CardWordSp * scale * SoundFeederSizing.CardWordLineEm
+            assertTrue(
+                "scale $scale: ${withWord - emojiBudget} dp für eine ${renderedLineDp}dp-Zeile",
+                withWord - emojiBudget >= renderedLineDp,
+            )
+        }
+    }
+
+    @Test
+    fun theWordLineGrowsWithTheSystemFontScale() {
+        assertTrue(SoundFeederSizing.cardWordLineDp(1.3f) > SoundFeederSizing.cardWordLineDp(1f))
+    }
+
+    @Test
     fun thePileShrinksToNothing() {
         assertEquals(0f, SoundFeederSizing.pileWidthDp(0))
         assertEquals(SoundFeederSizing.PileCardWidthDp, SoundFeederSizing.pileWidthDp(1))
