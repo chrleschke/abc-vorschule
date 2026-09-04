@@ -120,7 +120,9 @@ gehört, nicht gelesen):
   automatisch kein `S`-Anlaut, `Pf` kein `P`.
 - **Vokalpaar:** der Laut ist irgendein Segment. `ie` zählt als `I`; `ei`/`eu`/`äu`/`au`
   zählen **nicht** als `e`, `i`, `u` oder `a`.
-- **Der Partnerlaut kommt nirgends im Wort vor.** Für `S` zählen auch `ß` und `ss`.
+- **Der Partnerlaut kommt nirgends im Wort vor.** Für `S` zählen auch `ß`, `ss` und ein
+  `st`/`sp`, das **nicht** am Wortanfang steht — dort ist es [ʃt] („Stern"), mitten im Wort
+  aber [st] („Zahnbürste"). `sch`, `pf`, `ch`, `ck` enthalten dagegen weder S noch P noch C.
   „Zahnbürste" fliegt aus S/Z, „Sonnenblume" aus W/B, „Lennard" aus L/R. Die Karte darf dem
   Kind den anderen Laut nicht mitten im Wort vorspielen.
 

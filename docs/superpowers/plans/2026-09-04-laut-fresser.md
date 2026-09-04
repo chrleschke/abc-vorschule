@@ -409,7 +409,11 @@ class SoundPairsTest {
         assertFalse(SoundPairs.contains("Eis", "I")) // ei ist kein i
         assertTrue(SoundPairs.contains("Biene", "I")) // ie ist ein i
         assertTrue(SoundPairs.contains("Kopfhörer", "Ö"))
-        assertFalse(SoundPairs.contains("Lampe", "L").not()) // Anlaut zählt auch als enthalten
+        assertTrue(SoundPairs.contains("Lampe", "L")) // Anlaut zählt auch als enthalten
+        assertFalse(SoundPairs.contains("Stern", "S")) // Anlaut-st ist [ʃt]
+        assertFalse(SoundPairs.contains("Spinne", "S"))
+        assertFalse(SoundPairs.contains("Schuh", "S")) // sch enthält kein s
+        assertFalse(SoundPairs.contains("Pferd", "P"))
     }
 
     @Test
@@ -561,17 +565,19 @@ object SoundPairs {
         segments(word).firstOrNull() == grapheme.lowercase()
 
     /**
-     * Kommt der Laut irgendwo im Wort vor? `S` schließt `ß` (und damit `ss`) ein,
-     * `I` das lange `ie`. Diphthonge sind eigene Segmente, also ist das `u` in
-     * „Feuer" kein U.
+     * Kommt der Laut irgendwo im Wort vor? `S` schließt `ß` (und damit `ss`) ein und
+     * ein `st`/`sp`, das **nicht** am Wortanfang steht — dort ist es [ʃt]/[ʃp]
+     * („Stern"), mitten im Wort aber [st] („Zahnbürste"). `I` schließt das lange `ie`
+     * ein. Diphthonge sind eigene Segmente, also ist das `u` in „Feuer" kein U, und
+     * `sch`/`pf`/`ch`/`ck` enthalten weder S noch P noch C.
      */
     fun contains(word: String, grapheme: String): Boolean {
-        val wanted = when (grapheme.lowercase()) {
-            "s" -> setOf("s", "ß")
-            "i" -> setOf("i", "ie")
-            else -> setOf(grapheme.lowercase())
+        val segs = segments(word)
+        return when (grapheme.lowercase()) {
+            "s" -> segs.any { it == "s" || it == "ß" } || segs.drop(1).any { it == "st" || it == "sp" }
+            "i" -> segs.any { it == "i" || it == "ie" }
+            else -> segs.contains(grapheme.lowercase())
         }
-        return segments(word).any { it in wanted }
     }
 
     /** Das Wort ohne sein Anlaut-Segment — gleicher Rest heißt Minimalpaar. */
