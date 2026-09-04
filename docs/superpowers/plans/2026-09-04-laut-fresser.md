@@ -1716,7 +1716,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 
 **Interfaces:**
 - Consumes: `TaskPromptSizing.pictureSp(fontScale)`.
-- Produces: `object SoundFeederSizing { const val StageContentDp = 396f; const val CreatureGapDp = 16f; const val MinCreatureDp = 120f; const val MaxCreatureDp = 176f; const val CreatureAspect = 1.1f; const val BellyWidthFraction = 0.78f; const val GlyphAdvanceEm = 0.62f; const val MaxBellyGlyphSp = 36f; const val MinBellyGlyphSp = 16f; const val MinCardDp = 120f; const val CardEmojiFactor = 1.5f; const val PileCardWidthDp = 22f; const val PileCardHeightDp = 30f; const val PileStepDp = 4f; fun creatureWidthDp(stageWidthDp): Float; fun creatureHeightDp(widthDp): Float; fun bellyGlyphSp(labelChars, creatureWidthDp, fontScale): Float; fun cardSizeDp(fontScale): Float; fun pileWidthDp(count): Float; fun labelChars(primary: String, alternate: String?): Int }`
+- Produces: `object SoundFeederSizing { const val StageContentDp = 396f; const val CreatureGapDp = 16f; const val MinCreatureDp = 120f; const val MaxCreatureDp = 176f; const val CreatureAspect = 1.1f; const val BellyWidthFraction = 0.78f; const val GlyphAdvanceEm = 0.62f; const val MaxBellyGlyphSp = 36f; const val MinBellyGlyphSp = 14f; const val MinCardDp = 120f; const val CardEmojiFactor = 1.5f; const val PileCardWidthDp = 22f; const val PileCardHeightDp = 30f; const val PileStepDp = 4f; fun creatureWidthDp(stageWidthDp): Float; fun creatureHeightDp(widthDp): Float; fun bellyGlyphSp(labelChars, creatureWidthDp, fontScale): Float; fun cardSizeDp(fontScale): Float; fun pileWidthDp(count): Float; fun labelChars(primary: String, alternate: String?): Int }`
 
 - [ ] **Step 1: Failing Test schreiben**
 
@@ -1816,7 +1816,14 @@ object SoundFeederSizing {
      * `SentencePictureCardSizing.EmojiAdvanceEm`). */
     const val GlyphAdvanceEm = 0.62f
     const val MaxBellyGlyphSp = 36f
-    const val MinBellyGlyphSp = 16f
+    /**
+     * 14, nicht 16: auf einer 296dp-Bühne (320dp-Gerät) trägt der Bauch bei font_scale
+     * 1.3 „Sch / sch" nur bei rund 15sp. Ein Glyph, der aus der Figur läuft, ist der
+     * schlimmere Fehler als ein kleiner — der Bauch-Glyph ist Aufgabe, kein Fließtext,
+     * und die Satz-Architekt-Regel „kein Glyph-Floor über die Erreichbarkeit" (§9)
+     * gilt hier sinngemäß.
+     */
+    const val MinBellyGlyphSp = 14f
     /** 1,5 × `AbcDimens.kidTouch` (80dp) — eine Karte, die ein Kind sicher greift. */
     const val MinCardDp = 120f
     const val CardEmojiFactor = 1.5f
