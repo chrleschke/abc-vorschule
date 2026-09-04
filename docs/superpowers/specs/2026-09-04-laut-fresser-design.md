@@ -134,9 +134,15 @@ gehört, nicht gelesen):
   und **direkt hintereinander** gelegt (Reihenfolge innerhalb des Paars gemischt). Der
   Fresser links kaut noch „Kanne", da kommt „Tanne" für rechts. Höchstens zwei Zwillingspaare
   pro Runde, damit die Runde nicht zur Reimübung wird.
-- **Deterministisch gemischt** aus der Lektions-ID. Eine wiederholte Lektion zeigt dieselben
-  Karten (ein Kind, das wiederholt, sieht dasselbe Spiel); L23 zeigt für S/Sch andere Karten
-  als L13.
+- **Rotation statt Zufall.** Der Vorrat jeder Seite ist alphabetisch sortiert; jeder Laut
+  führt über die Lektionen hinweg einen Zähler, wie oft er schon Karten gestellt hat, und die
+  nächste Runde beginnt im Vorrat dort, wo die letzte aufgehört hat. So wandert das `T` durch
+  P/T, F/T, S/T, D/T und K/T einmal durch alle 17 T-Wörter, und **jedes kartentaugliche Atom,
+  das zu einem gespielten Paar gehört, kommt irgendwann auf eine Karte** — die Bedingung, die
+  der bestehende Test „Kein Atom ohne Auftritt" (`LessonCoverageTest`) an die zehn neuen
+  Atome stellt. Nur die **Reihenfolge** der Karten in der Runde ist gemischt, deterministisch
+  aus der Lektions-ID. Eine wiederholte Lektion zeigt dieselben Karten (ein Kind, das
+  wiederholt, sieht dasselbe Spiel); L23 zeigt für S/Sch andere Karten als L13.
 - Keine Karte doppelt, keine Karte, deren Emoji ein anderes der Runde wiederholt (`Haus` 🏠
   und `Dach` 🏠 nie zusammen).
 
@@ -208,9 +214,14 @@ sonst keinen Leser — Rechnen und Satz-Versteher referenzieren sie nicht, das i
    „Hörst du S oder Sch?" und zeigt zugleich, wer wofür steht.
 3. Die erste Karte ploppt auf und spricht ihr Wort.
 
-Die Interaktion ist bis zum Ende der Vorstellung gesperrt (`interactionLocked`, wie in den
-anderen Trainern): ein Kind, das schon zieht, während die Fresser sich vorstellen, hätte die
-Zuordnung nie gehört.
+Die Interaktion ist bis zum Ende der Vorstellung gesperrt: ein Kind, das schon zieht,
+während die Fresser sich vorstellen, hätte die Zuordnung nie gehört. **Der Trainer spricht
+seine Ansage selbst**, nicht die Bühne (`TaskShell`): `currentPromptParts` liefert für den
+Fresser eine leere Liste, damit die Bühne sofort entsperrt und nichts doppelt spricht, und
+der Trainer hält eine eigene Sperre, bis Ansage, beide Vorstellungen und das erste Wort
+durch sind. Nur so lässt sich das Wackeln der Figur mit ihrem Laut synchronisieren, und nur
+so spielt ein Tipp auf den Speaker die **ganze** Vorstellung noch einmal, nicht nur den Satz.
+Die Jagd spricht ihre Tipps aus demselben Grund selbst.
 
 **Ohne deutsches TTS** steht das Wort als Text unter dem Emoji, damit ein Erwachsener
 vorlesen kann — der visuelle Fallback aus §7. Ein Hörspiel ohne Ton ist sonst unspielbar;
@@ -264,9 +275,11 @@ verzerrtes „sss" schlechter trifft als ein sauberes.
    `SpeechController.speak`/`speakAndAwait` bekommen dafür einen Parameter
    `voice: VoiceStyle = Normal` (`Normal`, `MonsterLow`, `MonsterHigh`); `TrainerCallbacks`
    reicht ihn durch. Das Wort nach dem Laut läuft **normal**.
-2. **Echte Monster-Sprache für die Reaktionen**, die nichts lehren müssen: „Mampf!",
-   „Mmmmh!", „Bäh!", „Rülps!". Diese Strings kommen in `tools/tts/extra-strings.json` mit
-   `"field": "monsterTts"`, und die Pipeline bekommt ein Profil **`monster`** in
+2. **Echte Monster-Sprache für die Reaktionen**, die nichts lehren müssen: „Bäh!" beim
+   Ausspucken und „Mmmmh!" nach dem letzten Rülpser. Mehr Reaktions-Strings gibt es bewusst
+   nicht — jede weitere Äußerung pro Karte verlängert die Runde, und das Rülpsen am Ende
+   **ist** der eigene Laut in Monster-Stimme, kein extra Text. Die beiden Strings kommen in
+   `tools/tts/extra-strings.json` mit `"field": "monsterTts"`, und die Pipeline bekommt ein Profil **`monster`** in
    `profiles.json` (eigene Sprechanweisung: knurrig, gutmütig, kurz; Sprecher offen — sohee
    soll ihre Tonlage als Lehrerin behalten, ein anderer Qwen-Sprecher ist für die Monster
    ausdrücklich erlaubt). Ob Qwen ein glaubwürdiges Monster liefert, entscheidet eine
@@ -333,7 +346,9 @@ Systemschriftgröße: Figur- und Kartenmaße rechnen mit `fontScale`; das Testge
 - Zwillinge liegen nebeneinander: L05 F/T enthält `Fisch`/`Tisch` benachbart; höchstens
   zwei Zwillingspaare
 - Deterministisch: zweimal ableiten ergibt dieselbe Runde; L13 und L23 (beide S/Sch) ergeben
-  verschiedene Kartenfolgen
+  verschiedene Kartenmengen
+- Jedes der zehn neuen Atome liegt in mindestens einer Lektion auf einer Karte (die
+  Rotation aus §4 garantiert das; `LessonCoverageTest` zählt die Fresser-Karten als Auftritt)
 - Vorrat-Guard: eine synthetische Tabelle mit einem Paar, das nur 1 Wort auf einer Seite
   hat, wird nie gewählt
 
@@ -356,7 +371,10 @@ Systemschriftgröße: Figur- und Kartenmaße rechnen mit `fontScale`; das Testge
 ein Fall prüft die Position: der Fresser steht nach der Buchstaben-Jagd und vor dem ersten
 `syllable_merge`.
 
-**`SpeechControllerTest`**: nach einer Monster-Äußerung steht die TTS-Tonhöhe wieder auf 1.0.
+**`VoiceStyleTest`**: die Monster-Tonhöhen liegen beidseits von 1.0, `Normal` ist genau 1.0.
+Die Tonhöhe wird **je Äußerung** gesetzt (Clip-Player pro Wiedergabe, TTS-Engine vor jedem
+`speak`), nie als Zustand zurückgesetzt — es gibt also keinen „vergessenen Reset", den ein
+Test fangen müsste; `SpeechController` selbst braucht Android und bleibt untestbar.
 
 **Instrumentiert:** `SoundFeederShotTest` rendert Bühne mit Karte, Haufen und beiden Fressern
 bei 320/360/411 dp Breite und `fontScale` 1.0 und 1.3 nach `filesDir/feedershots` (Weg A
