@@ -205,12 +205,12 @@ class SpeechController(
         blockedForBackground = false
     }
 
-    fun speak(text: String, channel: SpeechChannel = SpeechChannel.Primary) {
+    fun speak(text: String, channel: SpeechChannel = SpeechChannel.Primary, voice: VoiceStyle = VoiceStyle.Normal) {
         if (text.isBlank() || blockedForBackground) return
         if (channel == SpeechChannel.Primary) clearWaiters()
         stopOutput(channel)
-        if (playClip(text, channel, onComplete = {})) return
-        enqueueTts(text, channel, UUID.randomUUID().toString())
+        if (playClip(text, channel, voice, onComplete = {})) return
+        enqueueTts(text, channel, UUID.randomUUID().toString(), voice)
     }
 
     /** Speaks [text] and suspends until the utterance finishes (or times out). */
@@ -218,8 +218,9 @@ class SpeechController(
         text: String,
         channel: SpeechChannel = SpeechChannel.Primary,
         timeoutMs: Long = 10_000L,
+        voice: VoiceStyle = VoiceStyle.Normal,
     ) {
-        awaitSpeak(text, channel, timeoutMs)
+        awaitSpeak(text, channel, timeoutMs, voice)
     }
 
     /**
@@ -231,6 +232,7 @@ class SpeechController(
         text: String,
         channel: SpeechChannel,
         timeoutMs: Long,
+        voice: VoiceStyle,
     ): Long {
         if (text.isBlank() || blockedForBackground) return primaryGeneration.get()
         if (channel == SpeechChannel.Primary) clearWaiters()
@@ -238,13 +240,13 @@ class SpeechController(
         // Nach dem stopOutput lesen: dessen Hochzählen gehört zu DIESEM Aufruf.
         val generation = primaryGeneration.get()
         val deferred = CompletableDeferred<Unit>()
-        if (playClip(text, channel, onComplete = { deferred.complete(Unit) })) {
+        if (playClip(text, channel, voice, onComplete = { deferred.complete(Unit) })) {
             withTimeoutOrNull(timeoutMs) { deferred.await() }
             return generation
         }
         val id = UUID.randomUUID().toString()
         utteranceWaiters[id] = deferred
-        if (!enqueueTts(text, channel, id)) {
+        if (!enqueueTts(text, channel, id, voice)) {
             utteranceWaiters.remove(id)
             return generation
         }
@@ -267,9 +269,13 @@ class SpeechController(
      * dort ersetzt die zuletzt getippte Zahl die noch nicht gesprochene, statt
      * dass sich eine Kette hinter dem Finger aufstaut.
      */
-    private fun enqueueTts(text: String, channel: SpeechChannel, id: String): Boolean {
+    private fun enqueueTts(text: String, channel: SpeechChannel, id: String, voice: VoiceStyle): Boolean {
         val engine = tts ?: return false
         if (!languageOk) return false
+        // Je Äußerung gesetzt, nie zurückgesetzt: TextToSpeech kopiert die Tonhöhe
+        // beim speak()-Aufruf in die Anfrage, spätere Aufrufe setzen sie neu. So kann
+        // eine Monster-Ansage nie in die nächste normale Ansage „hineinlecken".
+        engine.setPitch(voice.pitch)
         when (channel) {
             SpeechChannel.Primary -> {
                 primaryUtteranceId = id
@@ -296,9 +302,27 @@ class SpeechController(
         texts: List<String>,
         timeoutMs: Long = 10_000L,
         onPartComplete: ((index: Int) -> Unit)? = null,
+    ) = speakAndAwaitSequence(texts.map { SpokenPart(it) }, timeoutMs, onPartComplete)
+
+    /**
+     * Wie oben, aber jeder Teil bringt seine Stimme mit (Laut-Fresser, design doc §7).
+     *
+     * [JvmName] ist Pflicht: `List<String>` und `List<SpokenPart>` sind auf Bytecode-
+     * Ebene beide nur `List` (Typlöschung) — ohne eigenen JVM-Namen kollidiert diese
+     * Überladung mit der obigen ("Platform declaration clash"), weil eine suspend fun
+     * zusätzlich eine Continuation nimmt und sich die beiden Signaturen dadurch NUR im
+     * (gelöschten) Listentyp unterscheiden. Aus Kotlin-Sicht bleibt es eine normale
+     * Überladung — das hier wirkt nur auf die Bytecode-Signatur, nicht auf die
+     * Aufrufauflösung im Quelltext.
+     */
+    @JvmName("speakAndAwaitVoicedSequence")
+    suspend fun speakAndAwaitSequence(
+        parts: List<SpokenPart>,
+        timeoutMs: Long = 10_000L,
+        onPartComplete: ((index: Int) -> Unit)? = null,
     ) {
-        texts.withIndex().filter { it.value.isNotBlank() }.forEach { (index, text) ->
-            val generation = awaitSpeak(text, SpeechChannel.Primary, timeoutMs)
+        parts.withIndex().filter { it.value.text.isNotBlank() }.forEach { (index, part) ->
+            val generation = awaitSpeak(part.text, SpeechChannel.Primary, timeoutMs, part.voice)
             // Ein neuer Primary-Start (zweiter Speaker-Tipp, nächste Runde) hat
             // diese Sequenz abgelöst — er hat unser Clip-onComplete gefeuert, wir
             // sind also nicht zu Ende gesprochen, sondern abgeschnitten. Weder
@@ -325,9 +349,9 @@ class SpeechController(
 
     /** Clip gefunden und gestartet? `speaking` bildet nur den Primary-Kanal ab — die
      * Rundenansage, nicht ein gleichzeitig laufendes Feedback-Echo (design doc). */
-    private fun playClip(text: String, channel: SpeechChannel, onComplete: () -> Unit): Boolean {
+    private fun playClip(text: String, channel: SpeechChannel, voice: VoiceStyle, onComplete: () -> Unit): Boolean {
         val entry = clips.lookup(text) ?: return false
-        val started = clipPlayers.getValue(channel).play(entry.file) {
+        val started = clipPlayers.getValue(channel).play(entry.file, voice.pitch) {
             if (channel == SpeechChannel.Primary) _speaking.value = false
             onComplete()
         }
@@ -365,7 +389,7 @@ class SpeechController(
             _speaking.value = false
         }
         countingQueue.onUtteranceFinished(utteranceId)?.let { next ->
-            enqueueTts(next, SpeechChannel.Counting, UUID.randomUUID().toString())
+            enqueueTts(next, SpeechChannel.Counting, UUID.randomUUID().toString(), VoiceStyle.Normal)
         }
         completeWaiter(utteranceId)
     }

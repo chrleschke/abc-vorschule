@@ -18,6 +18,7 @@ import app.abcvorschule.content.WordBuildRound
 import app.abcvorschule.progress.ProgressionEngine
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.session.ScheduledTrainer
+import app.abcvorschule.speech.SpokenPart
 
 /** Callbacks every trainer reports through, so the ViewModel owns all sequencing. */
 data class TrainerCallbacks(
@@ -32,6 +33,11 @@ data class TrainerCallbacks(
     val onSpeakCounting: (String) -> Unit,
     val onSpeakAndAwait: suspend (String) -> Unit,
     val onSpeakPrompt: () -> Unit,
+    /** Primär-Kanal, Sequenz mit Stimme je Teil — der Laut-Fresser spricht Ansage,
+     * Fressen und Spucken selbst (design doc §5/§7). */
+    val onSpeakParts: suspend (List<SpokenPart>) -> Unit = {},
+    /** Feedback-Kanal mit Stimme: Tipp auf einen Fresser. */
+    val onSpeakFeedbackVoiced: (SpokenPart) -> Unit = {},
 )
 
 /** Dispatches a scheduled trainer's current round to its screen. */

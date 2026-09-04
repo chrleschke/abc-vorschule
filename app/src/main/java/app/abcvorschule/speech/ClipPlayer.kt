@@ -3,6 +3,7 @@ package app.abcvorschule.speech
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.media.PlaybackParams
 
 /**
  * Spielt produzierte Clips aus assets/audio/. Ein Player zur Zeit —
@@ -33,7 +34,7 @@ class ClipPlayer(context: Context) {
      * [onComplete] wie ein Abbruch, statt den Aufrufer zurück auf TTS zu
      * schicken, das der Clip schon ersetzt hat.
      */
-    fun play(file: String, onComplete: () -> Unit): Boolean {
+    fun play(file: String, pitch: Float = 1f, onComplete: () -> Unit): Boolean {
         stop()
         return try {
             val mp = MediaPlayer()
@@ -59,7 +60,16 @@ class ClipPlayer(context: Context) {
             mp.setOnPreparedListener { prepared ->
                 // Zwischenzeitliches stop()/play() hat den Player abgelöst — ein
                 // nachlaufendes onPrepared darf dann nichts mehr anwerfen.
-                if (player === prepared) prepared.start()
+                if (player !== prepared) return@setOnPreparedListener
+                if (pitch != 1f) {
+                    // Erst im Prepared-Zustand erlaubt; setPlaybackParams startet die
+                    // Wiedergabe selbst, start() danach ist idempotent. Schlägt es
+                    // fehl (alter Codec), spielt der Clip eben in normaler Stimme.
+                    runCatching {
+                        prepared.playbackParams = PlaybackParams().setPitch(pitch).setSpeed(1f)
+                    }
+                }
+                prepared.start()
             }
             pendingOnComplete = onComplete
             mp.prepareAsync()

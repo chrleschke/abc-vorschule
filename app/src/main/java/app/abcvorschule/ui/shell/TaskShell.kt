@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
 import app.abcvorschule.content.ContentPack
+import app.abcvorschule.speech.SpokenPart
 import app.abcvorschule.session.AppScreen
 import app.abcvorschule.session.SessionUiState
 import app.abcvorschule.session.SessionViewModel
@@ -66,6 +67,8 @@ fun TaskShell(
     onSpeakAndAwait: suspend (String) -> Unit,
     onSpeakPromptSequence: suspend (List<String>) -> Unit,
     onSpeakIntroSequence: suspend (List<String>, onPartComplete: (Int) -> Unit) -> Unit,
+    onSpeakParts: suspend (List<SpokenPart>) -> Unit = {},
+    onSpeakFeedbackVoiced: (SpokenPart) -> Unit = {},
     onStopSpeak: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -177,6 +180,8 @@ fun TaskShell(
                 onSpeakAndAwait = onSpeakAndAwait,
                 onSpeakPromptSequence = onSpeakPromptSequence,
                 onSpeakIntroSequence = onSpeakIntroSequence,
+                onSpeakParts = onSpeakParts,
+                onSpeakFeedbackVoiced = onSpeakFeedbackVoiced,
                 onStopSpeak = onStopSpeak,
             )
         }
@@ -219,6 +224,8 @@ private fun PracticeBody(
     onSpeakAndAwait: suspend (String) -> Unit,
     onSpeakPromptSequence: suspend (List<String>) -> Unit,
     onSpeakIntroSequence: suspend (List<String>, onPartComplete: (Int) -> Unit) -> Unit,
+    onSpeakParts: suspend (List<SpokenPart>) -> Unit = {},
+    onSpeakFeedbackVoiced: (SpokenPart) -> Unit = {},
     onStopSpeak: () -> Unit,
 ) {
     val task = state.current
@@ -385,6 +392,8 @@ private fun PracticeBody(
                         onSpeakCounting = onSpeakCounting,
                         onSpeakAndAwait = onSpeakAndAwait,
                         onSpeakPrompt = speakPrompt,
+                        onSpeakParts = onSpeakParts,
+                        onSpeakFeedbackVoiced = onSpeakFeedbackVoiced,
                     ),
                     modifier = Modifier.fillMaxSize(),
                 )

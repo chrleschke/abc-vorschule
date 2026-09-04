@@ -27,6 +27,7 @@ import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.speech.ClipIndex
 import app.abcvorschule.speech.SpeechChannel
 import app.abcvorschule.speech.SpeechController
+import app.abcvorschule.speech.SpokenPart
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.rememberAbcHaptics
 import app.abcvorschule.ui.shell.TaskShell
@@ -136,10 +137,12 @@ fun AbcApp(onFinish: () -> Unit = {}) {
         onSpeakFeedback = { text -> speech.speak(text, channel = SpeechChannel.Feedback) },
         onSpeakCounting = { text -> speech.speak(text, channel = SpeechChannel.Counting) },
         onSpeakAndAwait = speech::speakAndAwait,
-        onSpeakPromptSequence = speech::speakAndAwaitSequence,
+        onSpeakPromptSequence = { texts -> speech.speakAndAwaitSequence(texts) },
         onSpeakIntroSequence = { texts, onPartComplete ->
             speech.speakAndAwaitSequence(texts, onPartComplete = onPartComplete)
         },
+        onSpeakParts = { parts -> speech.speakAndAwaitSequence(parts) },
+        onSpeakFeedbackVoiced = { part -> speech.speak(part.text, channel = SpeechChannel.Feedback, voice = part.voice) },
         onStopSpeak = speech::stop,
     )
 }
