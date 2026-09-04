@@ -13,7 +13,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
@@ -28,7 +27,6 @@ import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.speech.ClipIndex
 import app.abcvorschule.speech.SpeechChannel
 import app.abcvorschule.speech.SpeechController
-import app.abcvorschule.ui.debug.TtsDebugScreen
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.rememberAbcHaptics
 import app.abcvorschule.ui.shell.TaskShell
@@ -121,44 +119,27 @@ fun AbcApp(onFinish: () -> Unit = {}) {
     val state by viewModel.ui.collectAsStateWithLifecycle()
     val ttsAvailable by speech.available.collectAsStateWithLifecycle()
     val speaking by speech.speaking.collectAsStateWithLifecycle()
-    var showTtsDebug by remember { mutableStateOf(false) }
 
     BackHandler {
         if (viewModel.onBackPressed()) {
             onFinish()
         }
     }
-    BackHandler(enabled = showTtsDebug) {
-        showTtsDebug = false
-    }
-
     val pack = viewModel.contentPack()
-    if (BuildConfig.DEBUG && showTtsDebug && pack != null) {
-        TtsDebugScreen(
-            pack = pack,
-            repository = app.ttsDebugRepository,
-            ttsAvailable = ttsAvailable,
-            speaking = speaking,
-            onSpeak = speech::speak,
-            onClose = { showTtsDebug = false },
-        )
-    } else {
-        TaskShell(
-            state = state,
-            pack = pack,
-            viewModel = viewModel,
-            ttsAvailable = ttsAvailable,
-            speaking = speaking,
-            onSpeak = speech::speak,
-            onSpeakFeedback = { text -> speech.speak(text, channel = SpeechChannel.Feedback) },
-            onSpeakCounting = { text -> speech.speak(text, channel = SpeechChannel.Counting) },
-            onSpeakAndAwait = speech::speakAndAwait,
-            onSpeakPromptSequence = speech::speakAndAwaitSequence,
-            onSpeakIntroSequence = { texts, onPartComplete ->
-                speech.speakAndAwaitSequence(texts, onPartComplete = onPartComplete)
-            },
-            onStopSpeak = speech::stop,
-            onOpenTtsDebug = { showTtsDebug = true },
-        )
-    }
+    TaskShell(
+        state = state,
+        pack = pack,
+        viewModel = viewModel,
+        ttsAvailable = ttsAvailable,
+        speaking = speaking,
+        onSpeak = speech::speak,
+        onSpeakFeedback = { text -> speech.speak(text, channel = SpeechChannel.Feedback) },
+        onSpeakCounting = { text -> speech.speak(text, channel = SpeechChannel.Counting) },
+        onSpeakAndAwait = speech::speakAndAwait,
+        onSpeakPromptSequence = speech::speakAndAwaitSequence,
+        onSpeakIntroSequence = { texts, onPartComplete ->
+            speech.speakAndAwaitSequence(texts, onPartComplete = onPartComplete)
+        },
+        onStopSpeak = speech::stop,
+    )
 }

@@ -67,7 +67,6 @@ fun TaskShell(
     onSpeakPromptSequence: suspend (List<String>) -> Unit,
     onSpeakIntroSequence: suspend (List<String>, onPartComplete: (Int) -> Unit) -> Unit,
     onStopSpeak: () -> Unit,
-    onOpenTtsDebug: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalAbcHaptics.current
@@ -189,10 +188,6 @@ fun TaskShell(
                 onSelectMode = viewModel::setParentMode,
                 onToggleUnlockAll = viewModel::setUnlockAllLessons,
                 onDismiss = viewModel::dismissDifficultySheet,
-                onOpenTtsDebug = {
-                    viewModel.dismissDifficultySheet()
-                    onOpenTtsDebug()
-                },
             )
         }
 

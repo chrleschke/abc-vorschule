@@ -8,6 +8,13 @@ import app.abcvorschule.content.SymbolHuntDerivation
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.rounds
 
+/**
+ * Kein App-Screen liest das mehr — die TTS-Debug-Seite und ihr Eintrag im
+ * Eltern-Sheet sind entfernt. Die Enumeration bleibt als **Referenz für das
+ * ID-Schema** der Clip-Pipeline (`tools/tts`, siehe
+ * `docs/superpowers/plans/2026-08-02-qwen-tts-audio-pipeline.md`), das exakt
+ * hierauf abgestimmt ist; `TtsDebugEntryTest` hält sie ehrlich.
+ */
 enum class TtsDebugGroup { Atom, Sentence, Task }
 
 /** One content-authored string the app can pass to `SpeechController.speak`. */
