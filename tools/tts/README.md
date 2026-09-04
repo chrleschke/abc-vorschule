@@ -246,28 +246,26 @@ Bestehende `word:*`-Locks und Kandidaten-Ordner für Buchstaben/Silben einmalig
 umziehen: `tts migrate-locks` (siehe Ablauf oben). Clips mit Produktions-WAV aber
 ohne Lock (typisch nach Batch-`render`): `tts wire-locks`, danach `tts export`.
 
+Das Profil `monster` trägt nur die zwei Reaktionen des Laut-Fressers („Bäh!", „Mmmmh!",
+Feld `monsterTts` in `extra-strings.json`). Laute und Wörter des Trainers sind die
+normalen `phoneme`-/`word`-Clips — die Monster-Stimme entsteht in der App per Tonhöhe
+(`VoiceStyle`), damit die Artikulation sauber bleibt. Ein anderer Sprecher als sohee ist
+für `monster` erlaubt.
+
 ## Umfang
 
-`tts extract` liest aktuell 1174 Items — 1126 Strings aus dem Content-Pack plus 48
-Einträge aus `extra-strings.json` (davon 3 ohne eigenes `field`, die damit auf das
-Profil `ui` fallen) — und bündelt sie zu 926 Clips (identischer Text im selben Profil
-kollabiert in einen Clip):
+`tts extract` liest die Strings des Content-Packs plus die Einträge aus
+`extra-strings.json` (einige ohne eigenes `field` — die fallen auf das Profil `ui`) und
+bündelt sie zu Clips: identischer Text im selben Profil kollabiert in einen. **Stand:
+siehe `tts status`.** Hier stehen bewusst keine Zahlen mehr — jede neue Lektion, jedes
+neue Atom und jeder neue Trainer verschiebt sie, und eine Zahl in der README ist nach
+dem nächsten Content-Commit still falsch.
 
-| Profil | Clips |
-| --- | --- |
-| word | 244 |
-| prompt | 231 |
-| sentence | 98 |
-| reward | 86 |
-| article_word | 85 |
-| miss | 81 |
-| phoneme | 80 |
-| finale | 18 |
-| ui | 3 |
-| **gesamt** | **926** |
+Der Größe nach tragen `word`, `prompt`, `sentence`, `reward`, `article_word`, `miss`
+und `phoneme` den Löwenanteil; `finale`, `monster` und `ui` sind eine Handvoll Clips.
 
 Ein voller `render`-Lauf dauert ungefähr 25–40 Minuten — je nach Profilmix. Ein kurzer
-Satz braucht ~2,4 s, die 18 langen `finale`-Sätze im Schnitt ~3,2 s; die 244 einzelnen
+Satz braucht ~2,4 s, ein langer `finale`-Satz im Schnitt ~3,2 s; die einzelnen
 `word`-Clips sind deutlich schneller. Eine einzelne Zahl wäre hier irreführend.
 
 ## Seeds

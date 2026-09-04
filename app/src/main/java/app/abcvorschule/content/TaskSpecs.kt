@@ -34,6 +34,7 @@ enum class TrainerKind {
     count_add,
     symbol_hunt,
     symbol_in_word,
+    sound_feeder,
 }
 
 // --- Trainer 2: Visueller Spurensucher --------------------------------------
@@ -262,6 +263,57 @@ data class SymbolInWordRound(
     }
 }
 
+// --- Abgeleitet: Laut-Fresser ----------------------------------------------
+
+/** Welcher der beiden Fresser — links trägt [SoundFeederRound.leftAtomId]. */
+@Serializable
+enum class FeederSide { left, right }
+
+/** Eine Bildkarte der Runde: das Wort-Atom (Emoji + Lemma) und der Fresser, dem es gehört. */
+@Serializable
+data class SoundFeederCard(val atomId: String, val side: FeederSide)
+
+/**
+ * Never appears in authored JSON — SoundFeederInsertion derives instances at runtime
+ * from the pack (design doc §2). `@Serializable` for the same reason as
+ * [SymbolHuntSpec]: every member of the sealed hierarchy needs it to compile.
+ */
+@Serializable
+@SerialName("sound_feeder")
+data class SoundFeederSpec(
+    override val id: String,
+    val rounds: List<SoundFeederRound>,
+) : TaskSpec
+
+/**
+ * One feeding session: two sound atoms and up to seven picture cards, each already
+ * resolved to its side. The screen makes no decisions (design doc §4).
+ */
+@Serializable
+data class SoundFeederRound(
+    override val promptTts: String,
+    val leftAtomId: String,
+    val rightAtomId: String,
+    val cards: List<SoundFeederCard>,
+    /**
+     * Steht der Laut irgendwo im Wort (Vokalpaare) statt nur am Anfang? Der Bildschirm
+     * beschriftet die Fresser danach: Anlaut-Paare stehen immer am Wortanfang eines
+     * Substantivs, dort reicht die Großform („S", „Sch"); ein Vokal steckt klein im
+     * Wortinneren und braucht beide Formen („Ei / ei").
+     */
+    val anywhere: Boolean = false,
+) : TrainerRound {
+    init {
+        require(leftAtomId != rightAtomId) { "SoundFeederRound needs two different sounds" }
+        require(cards.count { it.side == FeederSide.left } >= 2) { "SoundFeederRound needs 2 left cards" }
+        require(cards.count { it.side == FeederSide.right } >= 2) { "SoundFeederRound needs 2 right cards" }
+        require(cards.map { it.atomId }.toSet().size == cards.size) { "SoundFeederRound has a duplicate card" }
+    }
+
+    fun atomIdFor(side: FeederSide): String =
+        if (side == FeederSide.left) leftAtomId else rightAtomId
+}
+
 @Serializable
 data class TasksFile(val tasks: List<TaskSpec>)
 
@@ -275,6 +327,7 @@ val TaskSpec.kind: TrainerKind
         is CountAddSpec -> TrainerKind.count_add
         is SymbolHuntSpec -> TrainerKind.symbol_hunt
         is SymbolInWordSpec -> TrainerKind.symbol_in_word
+        is SoundFeederSpec -> TrainerKind.sound_feeder
     }
 
 val TaskSpec.rounds: List<TrainerRound>
@@ -287,6 +340,7 @@ val TaskSpec.rounds: List<TrainerRound>
         is CountAddSpec -> rounds
         is SymbolHuntSpec -> rounds
         is SymbolInWordSpec -> rounds
+        is SoundFeederSpec -> rounds
     }
 
 val TaskSpec.roundCount: Int get() = rounds.size
@@ -318,4 +372,6 @@ fun TrainerRound.scoredAtomIds(): List<String> = when (this) {
     is CountAddRound -> emptyList()
     is SymbolHuntRound -> listOf(targetAtomId)
     is SymbolInWordRound -> listOf(targetAtomId)
+    // Beide Laute werden geübt — die Karten sind nur, wo sie sich verstecken.
+    is SoundFeederRound -> listOf(leftAtomId, rightAtomId)
 }

@@ -75,6 +75,10 @@ dependencies {
     // damit ein Versionssprung, der die Transitive fallen lässt, den Build
     // bricht statt still das Icon zu verlieren.
     implementation(libs.androidx.compose.material.icons.core)
+    // Die Material-Formen des Laut-Fressers (Geisterkörper). material3 1.4.0 hat
+    // `MaterialShapes` noch nicht (erst 1.5.0-alpha), und graphics-shapes kommt in
+    // dieser BOM auch nicht transitiv herein — also ausdrücklich, mit fester Version.
+    implementation(libs.androidx.graphics.shapes)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)

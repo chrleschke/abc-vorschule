@@ -455,6 +455,24 @@
       "id": "countingNumber30",
       "text": "dreißig",
       "note": "Zähl-Hilfe: mitgezählte Zahl je Tipp (SpeechChannel.Counting). Ausgeschrieben, weil '8.' im Deutschen die Ordinalzahl ist."
+    },
+    {
+      "id": "feederPrompt",
+      "text": "Füttere die Laut-Fresser.",
+      "field": "promptTts",
+      "note": "SoundFeederDerivation.Prompt — Ansage des Laut-Fressers"
+    },
+    {
+      "id": "feederYuck",
+      "text": "Bäh!",
+      "field": "monsterTts",
+      "note": "SoundFeederSpeech.Yuck — der falsche Fresser spuckt aus"
+    },
+    {
+      "id": "feederContent",
+      "text": "Mmmmh!",
+      "field": "monsterTts",
+      "note": "SoundFeederSpeech.Content — beide sind satt"
     }
   ],
   "templates": []

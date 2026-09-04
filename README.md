@@ -71,6 +71,7 @@ braucht, hängt also am Test:
 | `SentenceOrderPegShotTest` | `filesDir/pegshots` | `run-as` (A) |
 | `SentenceOrderMorphShotTest` | `filesDir/morphshots` | `run-as` (A) |
 | `WordBuildMorphShotTest` | `filesDir/wordbuildmorphshots` | `run-as` (A) |
+| `SoundFeederShotTest` | `filesDir/feedershots` | `run-as` (A) |
 | `SymbolHuntMorphShotTest` | `additionalTestOutputDir/huntmorphshots` | Gradle (B) |
 | `SymbolHuntBatteryShotTest` | `additionalTestOutputDir/huntbatteryshots` | Gradle (B) |
 

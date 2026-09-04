@@ -5355,6 +5355,106 @@
       "pluralHighlight": "e",
       "gender": "m",
       "nounClass": "thing"
+    },
+    {
+      "id": "turm",
+      "lemma": "Turm",
+      "display": "Turm",
+      "emoji": "🗼",
+      "kind": "other",
+      "pluralDisplay": "Türme",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "wurm",
+      "lemma": "Wurm",
+      "display": "Wurm",
+      "emoji": "🪱",
+      "kind": "other",
+      "pluralDisplay": "Würmer",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "kanne",
+      "lemma": "Kanne",
+      "display": "Kanne",
+      "emoji": "🫖",
+      "kind": "other",
+      "pluralDisplay": "Kannen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "tanne",
+      "lemma": "Tanne",
+      "display": "Tanne",
+      "emoji": "🌲",
+      "kind": "other",
+      "pluralDisplay": "Tannen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "wanne",
+      "lemma": "Wanne",
+      "display": "Wanne",
+      "emoji": "🛁",
+      "kind": "other",
+      "pluralDisplay": "Wannen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "moehre",
+      "lemma": "Möhre",
+      "display": "Möhre",
+      "emoji": "🥕",
+      "kind": "other",
+      "pluralDisplay": "Möhren",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "muetze",
+      "lemma": "Mütze",
+      "display": "Mütze",
+      "emoji": "🧢",
+      "kind": "other",
+      "pluralDisplay": "Mützen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "pfanne",
+      "lemma": "Pfanne",
+      "display": "Pfanne",
+      "emoji": "🍳",
+      "kind": "other",
+      "pluralDisplay": "Pfannen",
+      "gender": "f",
+      "nounClass": "thing"
+    },
+    {
+      "id": "pfeil",
+      "lemma": "Pfeil",
+      "display": "Pfeil",
+      "emoji": "🏹",
+      "kind": "other",
+      "pluralDisplay": "Pfeile",
+      "gender": "m",
+      "nounClass": "thing"
+    },
+    {
+      "id": "ziege",
+      "lemma": "Ziege",
+      "display": "Ziege",
+      "emoji": "🐐",
+      "kind": "other",
+      "pluralDisplay": "Ziegen",
+      "gender": "f",
+      "nounClass": "thing"
     }
   ]
 }

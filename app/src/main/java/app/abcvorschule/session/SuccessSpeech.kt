@@ -6,6 +6,7 @@ import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SentencePictureRound
+import app.abcvorschule.content.SoundFeederRound
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.content.SyllableMergeSpeech
 import app.abcvorschule.content.SymbolHuntRound
@@ -49,6 +50,8 @@ object SuccessSpeech {
             pack.atoms[round.wordAtomId]?.let { AtomArticleSpeech.forAtom(it) ?: it.display }
                 ?: round.promptTts.takeIf { it.isNotBlank() },
         )
+        // Die Fresser haben beim letzten Rülpsen schon gesprochen (design doc §6).
+        is SoundFeederRound -> emptyList()
         else -> emptyList()
     }
 }

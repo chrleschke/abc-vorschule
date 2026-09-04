@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isFinite
+import androidx.compose.ui.zIndex
 import app.abcvorschule.ui.theme.AbcDimens
 
 /** Wo der Antwortblock einer Übung sitzt. */
@@ -74,11 +75,20 @@ private const val PromptHeightFraction = 0.52f
  * 305dp im Spurensucher, 425dp im Silben-Verschmelzer). Als ungewichtetes
  * erstes Kind der Bühne sitzt er in jedem Trainer auf derselben Höhe, direkt
  * unter Fortschritt und Punktestand.
+ * @param promptAboveAnswers Zeichnet den Aufgabenblock über dem Antwortblock statt
+ * darunter. Named exception wie [answerAnchor]: `Column` zeichnet ihre Kinder in
+ * Deklarationsreihenfolge, der Aufgabenblock kommt zuerst und liegt damit normalerweise
+ * *unter* dem Antwortblock. Der Laut-Fresser zieht seine Karte aber nach **unten**, aus
+ * dem Aufgabenblock heraus auf die beiden Fresser im Antwortblock — ohne diesen Schalter
+ * verschwindet die Karte beim Ziehen hinter den Figuren. Vorbelegung bleibt `false`, weil
+ * Wort-Bauer und Satz-Architekt in die andere Richtung ziehen, von unten nach oben in den
+ * Aufgabenblock: mit `true` läge dort die Kachel dann hinter dem Aufgabenblock.
  */
 @Composable
 fun ExerciseStage(
     modifier: Modifier = Modifier,
     answerAnchor: AnswerAnchor = AnswerAnchor.Bottom,
+    promptAboveAnswers: Boolean = false,
     promptChrome: @Composable ColumnScope.() -> Unit = {},
     prompt: @Composable ColumnScope.() -> Unit,
     answers: @Composable ColumnScope.() -> Unit,
@@ -110,7 +120,8 @@ fun ExerciseStage(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .then(if (promptAboveAnswers) Modifier.zIndex(1f) else Modifier),
                 contentAlignment = Alignment.Center,
             ) {
                 Column(

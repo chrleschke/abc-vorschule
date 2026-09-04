@@ -46,7 +46,7 @@ from .plan import fingerprint, orphan_locks, status_of
 #: verdrängt werden. Die App kennt am Call-Site nur den Text — der Index
 #: muss eindeutig sein.
 PROFILE_PRIORITY = ("phoneme", "word", "article_word", "prompt", "miss", "reward",
-                    "sentence", "finale", "ui")
+                    "sentence", "finale", "ui", "monster")
 
 def _pedagogical_winner(text: str, prof_a: str, prof_b: str) -> str | None:
     """Preferred index profile when the same text appears in two profiles."""

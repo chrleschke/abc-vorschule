@@ -6,7 +6,7 @@ import app.abcvorschule.content.TaskSpec
 
 /**
  * Baut die Trainer-Liste einer Lektion: die autorierten Tasks in Reihenfolge, dann
- * die beiden zur Laufzeit abgeleiteten Einschübe (Jagd, Wort-Detektiv).
+ * die drei zur Laufzeit abgeleiteten Einschübe (Jagd, Laut-Fresser, Wort-Detektiv).
  *
  * Der Scheduler läuft **zum Schluss über die fertige Liste**, nicht vorher über die
  * autorierten Specs. Das ist der Unterschied, der zählt: ein synthetischer Trainer
@@ -32,7 +32,8 @@ object SessionTrainers {
     ): List<ScheduledTrainer> {
         val authored = pack.tasksOf(lesson).map { ScheduledTrainer(spec = it) }
         val withHunts = SymbolHuntInsertion.insertSymbolHunts(authored, pack, lesson.id, lesson.index)
-        val withDetective = SymbolInWordInsertion.insertSymbolInWord(withHunts, pack, lesson)
+        val withFeeder = SoundFeederInsertion.insertSoundFeeder(withHunts, pack, lesson)
+        val withDetective = SymbolInWordInsertion.insertSymbolInWord(withFeeder, pack, lesson)
         return withDetective.map { schedule(it.spec) }
     }
 }

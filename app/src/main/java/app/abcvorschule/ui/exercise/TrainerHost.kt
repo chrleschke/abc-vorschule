@@ -8,6 +8,7 @@ import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SentencePictureRound
+import app.abcvorschule.content.SoundFeederRound
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.content.SymbolInWordRound
 import app.abcvorschule.content.SyllableMergeRound
@@ -17,6 +18,7 @@ import app.abcvorschule.content.WordBuildRound
 import app.abcvorschule.progress.ProgressionEngine
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.session.ScheduledTrainer
+import app.abcvorschule.speech.SpokenPart
 
 /** Callbacks every trainer reports through, so the ViewModel owns all sequencing. */
 data class TrainerCallbacks(
@@ -31,6 +33,19 @@ data class TrainerCallbacks(
     val onSpeakCounting: (String) -> Unit,
     val onSpeakAndAwait: suspend (String) -> Unit,
     val onSpeakPrompt: () -> Unit,
+    /** Primär-Kanal, Sequenz mit Stimme je Teil — der Laut-Fresser spricht Ansage,
+     * Fressen und Spucken selbst (design doc §5/§7). */
+    val onSpeakParts: suspend (List<SpokenPart>) -> Unit = {},
+    /**
+     * Primär-Kanal wie [onSpeakParts], aber mit Rückmeldung nach jedem Teil: ruft
+     * `onPartComplete(index)` genau dann, wenn Teil `index` zu Ende gesprochen ist.
+     * Der Laut-Fresser startet damit das Wackeln einer Figur exakt in dem Moment, in
+     * dem ihr Laut anfängt — also wenn der vorige Teil fertig ist. Vorher waren es
+     * geratene `delay()`-Werte, die mit der echten Sprechdauer nicht zusammenfielen.
+     */
+    val onSpeakPartsSequenced: suspend (parts: List<SpokenPart>, onPartComplete: (Int) -> Unit) -> Unit = { _, _ -> },
+    /** Feedback-Kanal mit Stimme: Tipp auf einen Fresser. */
+    val onSpeakFeedbackVoiced: (SpokenPart) -> Unit = {},
 )
 
 /** Dispatches a scheduled trainer's current round to its screen. */
@@ -160,6 +175,20 @@ fun TrainerHost(
             onSpeakPrompt = callbacks.onSpeakPrompt,
             onSpeak = callbacks.onSpeak,
             onSpeakFeedback = callbacks.onSpeakFeedback,
+            onResult = callbacks.onResult,
+            modifier = modifier.fillMaxSize(),
+        )
+        is SoundFeederRound -> SoundFeederTrainer(
+            round = round,
+            roundIndex = roundIndex,
+            pack = pack,
+            ttsAvailable = ttsAvailable,
+            speaking = speaking,
+            interactionLocked = interactionLocked,
+            onSpeakParts = callbacks.onSpeakParts,
+            onSpeakPartsSequenced = callbacks.onSpeakPartsSequenced,
+            onSpeakFeedback = callbacks.onSpeakFeedback,
+            onSpeakFeedbackVoiced = callbacks.onSpeakFeedbackVoiced,
             onResult = callbacks.onResult,
             modifier = modifier.fillMaxSize(),
         )
