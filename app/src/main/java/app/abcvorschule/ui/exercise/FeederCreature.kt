@@ -122,6 +122,11 @@ fun FeederCreature(
     onTap: () -> Unit,
     testTag: String,
     modifier: Modifier = Modifier,
+    // Steuert allein den Icon-Kontrast. Getrennt von `enabled`, denn `enabled` wird
+    // auch während Busy (Kauen/Spucken) kurz false — ein Icon, das bei jedem Fressen
+    // aufblinkt, wäre eine Ablenkung ohne Bedeutung. Gedimmt zeigt nur den Zustand, den
+    // ein Kind auch sehen soll: die Bühne ist gesperrt (`interactionLocked`).
+    dimmed: Boolean = false,
 ) {
     val heightDp = SoundFeederSizing.creatureHeightDp(widthDp)
     val fontScale = LocalDensity.current.fontScale
@@ -205,7 +210,7 @@ fun FeederCreature(
             )
         }
         IconSpeaker(
-            tint = if (enabled) Cream else Cream.copy(alpha = 0.5f),
+            tint = if (dimmed) Cream.copy(alpha = 0.5f) else Cream,
             speaking = speaking,
             size = 22.dp,
             modifier = Modifier

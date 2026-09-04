@@ -255,6 +255,9 @@ fun SoundFeederTrainer(
 
     ExerciseStage(
         modifier = modifier.testTag("feeder_stage"),
+        // Die Karte wird nach unten in den Antwortblock gezogen — ohne diesen Schalter
+        // zeichnete er sie hinter die Fresser (siehe KDoc an ExerciseStage).
+        promptAboveAnswers = true,
         promptChrome = {
             TaskPromptChrome(
                 title = null,
@@ -340,6 +343,11 @@ fun SoundFeederTrainer(
                                 // ist, würde wiggle() auf dasselbe Animatable legen und
                                 // die laufende Fress-Animation abbrechen.
                                 enabled = enabled,
+                                // Nicht `enabled`: Busy (Kauen/Spucken) sperrt zwar den
+                                // Tipp, ist aber kein Zustand, den das Icon optisch zeigen
+                                // soll — sonst blinkt es bei jedem Fressen kurz dunkel.
+                                // Gedimmt wird nur, wenn die ganze Bühne gesperrt ist.
+                                dimmed = interactionLocked,
                                 onTap = {
                                     scope.launch { animatorFor(side).wiggle() }
                                     onSpeakFeedbackVoiced(SoundFeederSpeech.soundPart(round, side, pack))
