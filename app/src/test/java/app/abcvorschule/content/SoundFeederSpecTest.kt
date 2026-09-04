@@ -49,8 +49,12 @@ class SoundFeederSpecTest {
 
     @Test
     fun aRoundNeedsTwoCardsPerSide() {
+        // Beide Richtungen: eine Seite mit nur einer Karte ist abzählbar, egal welche.
         assertThrows(IllegalArgumentException::class.java) {
             round.copy(cards = cards.filter { it.side == FeederSide.left } + cards[2])
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            round.copy(cards = listOf(cards[0]) + cards.filter { it.side == FeederSide.right })
         }
     }
 

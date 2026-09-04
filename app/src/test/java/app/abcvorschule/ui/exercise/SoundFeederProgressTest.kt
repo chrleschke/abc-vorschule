@@ -36,8 +36,8 @@ class SoundFeederProgressTest {
         val result = SoundFeederProgress.drop(start, FeederSide.left)
         assertEquals(SoundFeederDropOutcome.Eaten, result.outcome)
         assertEquals("schuh", result.state.current?.atomId)
-        assertEquals(1, result.state.eatenOn(FeederSide.left))
-        assertEquals(0, result.state.eatenOn(FeederSide.right))
+        assertEquals(1, result.state.eaten)
+        assertEquals(3, result.state.remaining)
     }
 
     @Test
@@ -46,11 +46,13 @@ class SoundFeederProgressTest {
         assertEquals(SoundFeederDropOutcome.Miss, first.outcome)
         assertEquals("sonne", first.state.current?.atomId)
         assertEquals(FeederSide.right, first.state.wrongSide)
-        assertEquals(1, first.state.wrongNonce)
 
         val second = SoundFeederProgress.drop(first.state, FeederSide.right)
         assertEquals(SoundFeederDropOutcome.MissAlreadyReported, second.outcome)
-        assertEquals(2, second.state.wrongNonce)
+        // Auch beim zweiten Griff steht die falsche Seite im Zustand — daran hängt,
+        // welcher Fresser sich schüttelt.
+        assertEquals(FeederSide.right, second.state.wrongSide)
+        assertEquals(2, second.state.missesOnCard)
     }
 
     @Test
@@ -72,6 +74,7 @@ class SoundFeederProgressTest {
         val eaten = SoundFeederProgress.drop(twice, FeederSide.left).state
         assertFalse(eaten.hintActive)
         assertEquals(0, eaten.missesOnCard)
+        assertNull(eaten.wrongSide)
     }
 
     @Test

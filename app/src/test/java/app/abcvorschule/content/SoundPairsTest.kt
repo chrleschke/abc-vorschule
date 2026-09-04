@@ -32,7 +32,7 @@ class SoundPairsTest {
 
     @Test
     fun containsSeesEveryPosition() {
-        assertTrue(SoundPairs.contains("Zahnbürste", "S"))
+        assertTrue(SoundPairs.contains("Zahnbürste", "S")) // mittleres st ist [st]
         assertTrue(SoundPairs.contains("Fußball", "S")) // ß zählt als S
         assertTrue(SoundPairs.contains("Nuss", "S"))
         assertTrue(SoundPairs.contains("Sonnenblume", "B"))
@@ -40,12 +40,11 @@ class SoundPairsTest {
         assertFalse(SoundPairs.contains("Eis", "I")) // ei ist kein i
         assertTrue(SoundPairs.contains("Biene", "I")) // ie ist ein i
         assertTrue(SoundPairs.contains("Kopfhörer", "Ö"))
-        assertFalse(SoundPairs.contains("Lampe", "L").not()) // Anlaut zählt auch als enthalten
+        assertTrue(SoundPairs.contains("Lampe", "L")) // Anlaut zählt auch als enthalten
         assertFalse(SoundPairs.contains("Stern", "S")) // Anlaut-st ist [ʃt]
         assertFalse(SoundPairs.contains("Spinne", "S"))
         assertFalse(SoundPairs.contains("Schuh", "S")) // sch enthält kein s
         assertFalse(SoundPairs.contains("Pferd", "P"))
-        assertTrue(SoundPairs.contains("Zahnbürste", "S")) // mittleres st ist [st]
     }
 
     @Test

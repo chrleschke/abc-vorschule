@@ -14,16 +14,13 @@ data class SoundFeederState(
     val nextIndex: Int = 0,
     val missesOnCard: Int = 0,
     val reportedMissThisRound: Boolean = false,
-    /** Fresser, der zuletzt gespuckt hat — für die Schüttel-Animation. */
+    /** Fresser, der zuletzt gespuckt hat — der Trainer lässt genau den sich schütteln. */
     val wrongSide: FeederSide? = null,
-    /** Zählt jeden Fehlgriff, damit derselbe Fresser zweimal hintereinander schütteln kann. */
-    val wrongNonce: Int = 0,
 ) {
     val current: SoundFeederCard? get() = cards.getOrNull(nextIndex)
     val remaining: Int get() = cards.size - nextIndex
     val eaten: Int get() = nextIndex
     val hintActive: Boolean get() = missesOnCard >= SoundFeederProgress.HintAfterMisses
-    fun eatenOn(side: FeederSide): Int = cards.take(nextIndex).count { it.side == side }
 }
 
 enum class SoundFeederDropOutcome { Eaten, RoundComplete, Miss, MissAlreadyReported, Ignored }
@@ -55,7 +52,6 @@ object SoundFeederProgress {
             missesOnCard = state.missesOnCard + 1,
             reportedMissThisRound = true,
             wrongSide = side,
-            wrongNonce = state.wrongNonce + 1,
         )
         val outcome = if (alreadyReported) SoundFeederDropOutcome.MissAlreadyReported else SoundFeederDropOutcome.Miss
         return SoundFeederDropResult(next, outcome)

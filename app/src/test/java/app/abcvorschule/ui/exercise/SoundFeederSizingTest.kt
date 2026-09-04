@@ -7,10 +7,12 @@ import org.junit.Test
 class SoundFeederSizingTest {
     @Test
     fun twoCreaturesAndTheGapFitTheNarrowestStage() {
-        // 320dp-Gerät: ExerciseStage lässt 296dp, zwei Figuren plus 16dp Lücke.
-        val width = SoundFeederSizing.creatureWidthDp(296f)
-        assertTrue(2 * width + SoundFeederSizing.CreatureGapDp <= 296f)
-        assertTrue(width >= SoundFeederSizing.MinCreatureDp)
+        // 320dp-Gerät: TaskShell polstert 20dp je Seite, ExerciseStage noch einmal
+        // 12dp — der Bühne bleiben 256dp, nicht 296. Zwei Figuren plus 16dp Lücke.
+        assertEquals(256f, SoundFeederSizing.NarrowestStageDp)
+        val width = SoundFeederSizing.creatureWidthDp(SoundFeederSizing.NarrowestStageDp)
+        assertTrue(2 * width + SoundFeederSizing.CreatureGapDp <= SoundFeederSizing.NarrowestStageDp)
+        assertEquals(SoundFeederSizing.MinCreatureDp, width)
     }
 
     @Test
@@ -21,13 +23,24 @@ class SoundFeederSizingTest {
 
     @Test
     fun theBellyGlyphNeverLeavesTheBellyEvenForSchAtFontScaleOnePointThree() {
-        val width = SoundFeederSizing.creatureWidthDp(296f)
-        val chars = SoundFeederSizing.labelChars("Sch", "sch") // "Sch / sch"
-        listOf(1f, 1.3f).forEach { scale ->
-            val sp = SoundFeederSizing.bellyGlyphSp(chars, width, scale)
-            val renderedWidthDp = chars * SoundFeederSizing.GlyphAdvanceEm * sp * scale
-            assertTrue("scale $scale: $renderedWidthDp dp on ${width * SoundFeederSizing.BellyWidthFraction}", renderedWidthDp <= width * SoundFeederSizing.BellyWidthFraction + 0.01f)
-            assertTrue(sp >= SoundFeederSizing.MinBellyGlyphSp)
+        val width = SoundFeederSizing.creatureWidthDp(SoundFeederSizing.NarrowestStageDp)
+        // "Ei / ei" ist das längste Label, das heute überhaupt vorkommt: nur Vokalpaare
+        // zeigen beide Formen, Konsonantenpaare stehen als Großform allein auf dem Bauch.
+        // "Sch / sch" bleibt als Stresstest daneben stehen — der Bauch muss auch das
+        // tragen, falls je wieder ein Paar beide Formen zeigt.
+        listOf(
+            SoundFeederSizing.labelChars("Ei", "ei"),
+            SoundFeederSizing.labelChars("Sch", "sch"),
+        ).forEach { chars ->
+            listOf(1f, 1.3f).forEach { scale ->
+                val sp = SoundFeederSizing.bellyGlyphSp(chars, width, scale)
+                val renderedWidthDp = chars * SoundFeederSizing.GlyphAdvanceEm * sp * scale
+                assertTrue(
+                    "$chars Zeichen bei scale $scale: $renderedWidthDp dp auf ${width * SoundFeederSizing.BellyWidthFraction}",
+                    renderedWidthDp <= width * SoundFeederSizing.BellyWidthFraction + 0.01f,
+                )
+                assertTrue(sp >= SoundFeederSizing.MinBellyGlyphSp)
+            }
         }
     }
 

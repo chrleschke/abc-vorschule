@@ -268,6 +268,11 @@ class SpeechController(
      * Counting reiht ebenfalls ein, aber gedrosselt über [CountingSpeechQueue]:
      * dort ersetzt die zuletzt getippte Zahl die noch nicht gesprochene, statt
      * dass sich eine Kette hinter dem Finger aufstaut.
+     *
+     * Die Tonhöhe wird vor **jeder** Äußerung gesetzt; für [VoiceStyle.Normal] ist das
+     * `setPitch(1f)` — genau der Wert, mit dem eine frische TextToSpeech-Instanz
+     * ohnehin startet. Die Lehrerinnenstimme klingt also unverändert, der Aufruf
+     * schließt nur aus, dass eine vorangegangene Monster-Ansage in ihr hängen bleibt.
      */
     private fun enqueueTts(text: String, channel: SpeechChannel, id: String, voice: VoiceStyle): Boolean {
         val engine = tts ?: return false

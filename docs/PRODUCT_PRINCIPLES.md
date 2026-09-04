@@ -157,7 +157,9 @@ Silben stehen nur klein. Details und Beispiele:
 
 Dritter abgeleiteter Zusatz-Trainer: der **Laut-Fresser** direkt nach der Buchstaben-Jagd
 (ohne Jagd nach dem letzten Spurensucher), ab Lektion 3 — „Füttere die Laut-Fresser." Zwei
-Figuren tragen je einen Laut auf dem Bauch (`S / s`, `Sch / sch`), oben erscheinen
+Figuren tragen je einen Laut auf dem Bauch (`S`, `Sch` — nur die Großform, denn diese
+Laute stehen immer am Anfang eines Substantivs; allein die Vokalpaare, die `anywhere`
+im Wort suchen, zeigen beide Formen: `Ei / ei`), oben erscheinen
 nacheinander bis zu sieben Bildkarten; das Kind hört das Wort und zieht die Karte zu dem
 Fresser, dessen Laut es hört. Gefragt wird nur **welcher** Laut, nie **wo** im Wort — das
 Anfang/Mitte/Ende-Konzept hat den früheren Auditiven Finder gekostet. Welche Lektion

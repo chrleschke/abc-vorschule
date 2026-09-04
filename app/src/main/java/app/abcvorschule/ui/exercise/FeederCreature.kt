@@ -19,8 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -195,19 +195,22 @@ fun FeederCreature(
     val bodyMatrix = remember { Matrix() }
     // Der Hinweis pulsiert das Maul zwischen weit und ganz weit — nur solange er
     // aktiv ist, sonst tickt hier keine Endlos-Animation.
-    val hintMouth = if (hint) {
+    //
+    // Als `State` weitergereicht, nicht als Wert ausgelesen: gelesen wird erst im
+    // Zeichnen-Lambda unten. Ein `by` an dieser Stelle hängte jeden Frame der
+    // Maul-Animation an die *Komposition* der ganzen Figur — Glyph, Palette und
+    // Umriss würden 60-mal je Sekunde neu berechnet, obwohl sich nur ein Bogen ändert.
+    val hintMouth: State<Float>? = if (hint) {
         val transition = rememberInfiniteTransition(label = "feeder_hint")
-        val pulse by transition.animateFloat(
+        transition.animateFloat(
             initialValue = 0.6f,
             targetValue = 1f,
             animationSpec = infiniteRepeatable(tween(420, easing = LinearEasing), RepeatMode.Reverse),
             label = "feeder_hint_mouth",
         )
-        pulse
     } else {
         null
     }
-    val mouthOpen = hintMouth ?: animator.mouth.value
 
     Box(
         modifier = modifier
@@ -222,6 +225,9 @@ fun FeederCreature(
             .testTag(testTag),
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
+            // Erst hier gelesen: die Maul-Animation lädt damit nur das Zeichnen neu,
+            // nicht die Komposition der Figur (dasselbe Muster wie `graphicsLayer` oben).
+            val mouthOpen = hintMouth?.value ?: animator.mouth.value
             val w = size.width
             val h = size.height
             // Körper: die Geisterform, gefüllt mit einem Radialverlauf — das Licht

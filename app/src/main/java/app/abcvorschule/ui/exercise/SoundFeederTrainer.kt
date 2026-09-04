@@ -197,11 +197,12 @@ fun SoundFeederTrainer(
         phase = FeederPhase.Playing
     }
 
-    // Der Hinweis nach dem zweiten Fehlgriff: der richtige Fresser summt seinen Laut.
-    LaunchedEffect(roundKey, state.hintActive, state.nextIndex) {
-        val card = state.current ?: return@LaunchedEffect
-        if (state.hintActive && ttsAvailable) onSpeakFeedbackVoiced(SoundFeederSpeech.soundPart(round, card.side, pack))
-    }
+    // Der Hinweis nach dem zweiten Fehlgriff ist hier **nur sichtbar** (das Maul des
+    // richtigen Fressers pulsiert, siehe `hint` an FeederCreature). Das Summen hängt
+    // unten an der Miss-Sequenz: als eigener Effekt startete es im selben Moment, in
+    // dem „Bäh! … Sonne" auf dem Primär-Kanal lief, und legte sich als Feedback-Kanal
+    // darüber — zwei Stimmen gleichzeitig, ausgerechnet für das Kind, das gerade
+    // zweimal danebenlag.
 
     fun handleDrop(zoneKey: String?) {
         if (!currentEnabled.value) return
@@ -245,17 +246,29 @@ fun SoundFeederTrainer(
                 SoundFeederDropOutcome.Miss, SoundFeederDropOutcome.MissAlreadyReported -> {
                     haptics.nudge()
                     if (result.outcome == SoundFeederDropOutcome.Miss) onResult(false, false, scoredIds)
-                    val wrong = side ?: FeederSide.left
+                    // `drop` trägt die falsche Seite in den Zustand ein; der Fallback ist
+                    // unerreichbar (ohne Seite gäbe es kein Miss) und steht nur, weil das
+                    // Feld nullable ist.
+                    val wrong = result.state.wrongSide ?: FeederSide.left
                     val spitting = launch { animatorFor(wrong).spit() }
                     launch {
                         cardBounce.snapTo(1f)
                         cardBounce.animateTo(0f, spring(dampingRatio = 0.35f, stiffness = Spring.StiffnessMedium))
                     }
-                    if (ttsAvailable) onSpeakParts(SoundFeederSpeech.missParts(round, card, wrong, pack))
+                    if (ttsAvailable) {
+                        onSpeakParts(SoundFeederSpeech.missParts(round, card, wrong, pack))
+                        // Erst danach summt der richtige Fresser seinen Laut — nacheinander
+                        // auf demselben Kanal, nie übereinander (design doc §6/§7).
+                        if (result.state.hintActive) {
+                            onSpeakParts(listOf(SoundFeederSpeech.soundPart(round, card.side, pack)))
+                        }
+                    }
                     spitting.join()
                     phase = FeederPhase.Playing
                 }
-                SoundFeederDropOutcome.Ignored -> phase = FeederPhase.Playing
+                // `Ignored` ist oben schon herausgesprungen; der Zweig steht nur, weil
+                // Kotlin das `when` über die Enum-Klasse vollständig sehen will.
+                SoundFeederDropOutcome.Ignored -> Unit
             }
         }
     }

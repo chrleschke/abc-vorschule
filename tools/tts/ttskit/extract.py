@@ -63,7 +63,12 @@ MATH_MARKER = "Wie viele"
 #: Rechenaufgabe niemals als erzählender Satz durchgeht.
 INSTRUCTION_MARKERS = (
     "Baue das Wort", "Ordne ", "Finde den", "Finde alle", "Finde die",
-    "Schiebe ", "Zeichne den", "Füttere ", MATH_MARKER,
+    "Schiebe ", "Zeichne den",
+    # „Füttere die Laut-Fresser." — die Ansage des Laut-Fressers. Sie endet auf
+    # einen Punkt und liefe ohne diesen Marker als erzählender Satz durch; sie ist
+    # aber eine Aufforderung und braucht die Prompt-Melodie.
+    "Füttere ",
+    MATH_MARKER,
 )
 
 

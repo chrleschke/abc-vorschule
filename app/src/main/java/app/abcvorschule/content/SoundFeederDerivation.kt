@@ -92,7 +92,12 @@ object SoundFeederDerivation {
             } ?: return@forEach
 
             lastPlayed[pick] = lesson.index
-            val round = buildRound(pack, lesson, pick, supplies.getValue(pick), sidePlays)
+            // Bleibt nach der Kartenwahl eine Seite unter [MinPerSide] — der Vorrat
+            // reicht, aber die Emoji-Regel frisst ihn auf —, dann hat diese Lektion
+            // eben keinen Fresser. Stille Degradation wie beim Detektiv (design doc
+            // §3.4); früher warf `SoundFeederRound.init` hier und riss die ganze
+            // Ableitung mit.
+            val round = buildRound(pack, lesson, pick, supplies.getValue(pick), sidePlays) ?: return@forEach
             result[lesson.id] = Assignment(pick, replay) to round
         }
         return result
@@ -103,6 +108,9 @@ object SoundFeederDerivation {
      * alphabetischen Vorrat, wo dieser Laut zuletzt aufgehört hat — über alle Paare
      * hinweg, in denen er vorkommt. So kommt jedes T-Wort einmal dran, obwohl kein
      * einzelnes Paar den Vorrat ausschöpft (design doc §4).
+     *
+     * `null`, wenn am Ende eine Seite unter [MinPerSide] bleibt — dann spielt die
+     * Lektion keinen Fresser, statt dass `SoundFeederRound.init` wirft.
      */
     private fun buildRound(
         pack: ContentPack,
@@ -110,15 +118,17 @@ object SoundFeederDerivation {
         pair: SoundPair,
         supply: Supply,
         sidePlays: MutableMap<String, Int>,
-    ): SoundFeederRound {
+    ): SoundFeederRound? {
         val total = minOf(MaxCards, supply.total)
         val (leftCount, rightCount) = splitCounts(total, supply.left.size, supply.right.size)
         val usedEmojis = mutableSetOf<String>()
         val usedIds = mutableSetOf<String>()
         val units = mutableListOf<List<SoundFeederCard>>()
 
-        fun take(atom: Atom, side: FeederSide): SoundFeederCard? {
-            if (atom.id in usedIds || atom.emoji in usedEmojis) return null
+        // Prüfen und Nehmen getrennt: nur so lässt sich ein Zwillingspaar **als Paar**
+        // prüfen, bevor eine seiner Hälften den Vorrat blockiert.
+        fun free(atom: Atom) = atom.id !in usedIds && atom.emoji !in usedEmojis
+        fun take(atom: Atom, side: FeederSide): SoundFeederCard {
             usedIds += atom.id
             usedEmojis += atom.emoji
             return SoundFeederCard(atom.id, side)
@@ -129,10 +139,12 @@ object SoundFeederDerivation {
                 supply.right.filter { r -> SoundPairs.rest(l.display) == SoundPairs.rest(r.display) }.map { l to it }
             }
             for ((l, r) in twins.take(MaxTwinPairs)) {
-                if (l.id in usedIds || r.id in usedIds || l.emoji in usedEmojis || r.emoji in usedEmojis) continue
-                val a = take(l, FeederSide.left) ?: continue
-                val b = take(r, FeederSide.right) ?: continue
-                units += listOf(a, b)
+                // Beide Atome zusammen prüfen — `l.emoji == r.emoji` ausdrücklich, denn
+                // `free(r)` läuft noch vor `take(l)`. Ohne diesen Test landete der linke
+                // Zwilling allein in der Runde und sein Partner wäre für immer weg; ein
+                // halbes Zwillingspaar ist schlechter als gar keines (design doc §4).
+                if (!free(l) || !free(r) || l.emoji == r.emoji) continue
+                units += listOf(take(l, FeederSide.left), take(r, FeederSide.right))
             }
         }
 
@@ -144,14 +156,19 @@ object SoundFeederDerivation {
             while (have < count && step < words.size) {
                 val atom = words[(offset + step) % words.size]
                 step += 1
-                val card = take(atom, side) ?: continue
-                units += listOf(card)
+                if (!free(atom)) continue
+                units += listOf(take(atom, side))
                 have += 1
             }
             sidePlays[grapheme] = plays + 1
         }
         fill(supply.left, FeederSide.left, leftCount, pair.left)
         fill(supply.right, FeederSide.right, rightCount, pair.right)
+
+        // Der Vorrat reichte (`Supply.sufficient`), die Emoji-Regel kann ihn aber
+        // aufgezehrt haben: dann lieber keine Runde als eine mit einer einzelnen Karte
+        // auf einer Seite — abzählbar, und `SoundFeederRound` verböte sie ohnehin.
+        if (FeederSide.entries.any { s -> units.flatten().count { it.side == s } < MinPerSide }) return null
 
         // Nur die Reihenfolge ist zufällig — und die ist aus der Lektions-ID gesät,
         // damit ein Kind, das wiederholt, dasselbe Spiel sieht.

@@ -273,8 +273,11 @@ werden.
   einmal als Miss gemeldet (`onResult(false, false, …)`), weitere nicht — dasselbe
   `reportedMissThisRound`-Muster wie in der Jagd.
 - **Zweiter Fehlgriff bei derselben Karte:** Der richtige Fresser reißt das Maul weit auf,
-  pulsiert und summt seinen Laut. Ein „Zeig mir" gibt es nicht — bei zwei Zielen ist der
-  Hinweis bereits die Lösung. Der Hinweis bleibt, bis die Karte gefressen ist.
+  pulsiert und summt seinen Laut. Das Summen kommt **nach** der „Bäh!"-Sequenz, als
+  letzter Teil derselben Kette auf dem Primär-Kanal — nicht als eigener Effekt neben ihr,
+  sonst spräche das Summen in die Wortwiederholung hinein, ausgerechnet für das Kind, das
+  gerade zweimal danebenlag. Ein „Zeig mir" gibt es nicht — bei zwei Zielen ist der
+  Hinweis bereits die Lösung. Das Pulsieren bleibt, bis die Karte gefressen ist.
 - **Letzte Karte weg:** Beide Fresser werden kugelrund (Skalierung 1 → 1.15), rülpsen
   nacheinander je ihren Laut in Monster-Stimme, der Futterhaufen ist leer. Nach
   `HuntCelebration.HoldMs` meldet der Trainer `onResult(true, false, [lautA, lautB])` und
@@ -322,7 +325,8 @@ Pipeline-Lauf wie die Monster-Reaktionen.
 Kanäle: Ansage und Fress-Sequenz („Sss … Sonne") laufen auf `Primary` als Sequenz
 (`speakAndAwaitSequence`); Karten-Tipp und Fresser-Tipp auf `Feedback`, damit sie eine
 laufende Ansage nicht abwürgen. Der Miss-Ton „Bäh!" plus Wortwiederholung ebenfalls
-`Primary`, weil danach ohnehin nichts anderes spricht.
+`Primary`, weil danach ohnehin nichts anderes spricht — auch das Hinweis-Summen aus §6
+nicht: es hängt hinten an derselben Primary-Kette, statt als Feedback daneben zu laufen.
 
 ## 8. Technik
 

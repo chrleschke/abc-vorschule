@@ -417,17 +417,10 @@ object ContentValidator {
                     }
                 }
                 // Derived trainers are synthesized at runtime (SymbolHuntInsertion,
-                // SymbolInWordInsertion) and must never be authored — a spec of
-                // either kind inside the pack is itself the defect.
-                is SymbolHuntSpec ->
-                    issues += ValidationIssue(
-                        "task $id is a derived trainer (${spec.kind}) and must not appear in authored content",
-                    )
-                is SymbolInWordSpec ->
-                    issues += ValidationIssue(
-                        "task $id is a derived trainer (${spec.kind}) and must not appear in authored content",
-                    )
-                is SoundFeederSpec ->
+                // SymbolInWordInsertion, SoundFeederInsertion) and must never be
+                // authored — a spec of any of these kinds inside the pack is itself
+                // the defect. One message for all three; `spec.kind` names the culprit.
+                is SymbolHuntSpec, is SymbolInWordSpec, is SoundFeederSpec ->
                     issues += ValidationIssue(
                         "task $id is a derived trainer (${spec.kind}) and must not appear in authored content",
                     )

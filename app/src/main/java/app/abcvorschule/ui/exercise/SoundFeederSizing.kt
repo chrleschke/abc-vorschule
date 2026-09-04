@@ -7,8 +7,20 @@ package app.abcvorschule.ui.exercise
  * Figur laufen.
  */
 object SoundFeederSizing {
-    /** ExerciseStage deckelt auf 420dp und polstert 12dp je Seite. */
+    /**
+     * Obergrenze der Bühne: `ExerciseStage` deckelt auf 420dp und polstert 12dp je
+     * Seite. Die 20dp der `TaskShell` je Seite greifen auf breiten Geräten nicht mehr
+     * — dort schlägt der 420dp-Deckel zuerst zu.
+     */
     const val StageContentDp = 396f
+    /**
+     * Untergrenze der Bühne, und die Zahl, gegen die die Figuren gerechnet werden:
+     * 320 − 2 × 20 (`AbcDimens.screenHorizontal` in `TaskShell`) − 2 × 12
+     * (`ExerciseStage`) = **256dp**. Vorher stand hier 296 — die 20dp der Shell waren
+     * schlicht vergessen, und der Bauch-Glyph wurde gegen eine Bühne geprüft, die es
+     * auf einem 320dp-Gerät nie gibt.
+     */
+    const val NarrowestStageDp = 256f
     const val CreatureGapDp = 16f
     const val MinCreatureDp = 120f
     const val MaxCreatureDp = 176f
@@ -21,13 +33,20 @@ object SoundFeederSizing {
     const val GlyphAdvanceEm = 0.62f
     const val MaxBellyGlyphSp = 36f
     /**
-     * 14, nicht 16: auf einer 296dp-Bühne (320dp-Gerät) trägt der Bauch bei font_scale
-     * 1.3 „Sch / sch" nur bei rund 15sp. Ein Glyph, der aus der Figur läuft, ist der
+     * 12, nicht 14 oder 16: auf der schmalsten Bühne ([NarrowestStageDp]) ist eine
+     * Figur 120dp breit, der Bauch trägt also rund 94dp — „Sch / sch" bei font_scale
+     * 1.3 passt dort nur bis knapp 13sp. Ein Glyph, der aus der Figur läuft, ist der
      * schlimmere Fehler als ein kleiner — der Bauch-Glyph ist Aufgabe, kein Fließtext,
      * und die Satz-Architekt-Regel „kein Glyph-Floor über die Erreichbarkeit" (§9)
      * gilt hier sinngemäß.
+     *
+     * In der App **greift** dieser Boden nie: Konsonantenpaare zeigen nur die Großform
+     * („Sch", 3 Zeichen), das längste tatsächlich vorkommende Label ist „Ei / ei"
+     * (7 Zeichen) und kommt bei 1.3 noch auf ~16sp. „Sch / sch" bleibt als Stresstest
+     * im [SoundFeederSizingTest] stehen, damit der Boden nachweislich hält, falls je
+     * wieder ein Paar beide Formen zeigt.
      */
-    const val MinBellyGlyphSp = 14f
+    const val MinBellyGlyphSp = 12f
     /** 1,5 × `AbcDimens.kidTouch` (80dp) — eine Karte, die ein Kind sicher greift. */
     const val MinCardDp = 120f
     const val CardEmojiFactor = 1.5f

@@ -3,6 +3,7 @@ package app.abcvorschule.content
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -147,5 +148,23 @@ class SoundFeederDerivationTest {
         val zWords = pack.atoms.values.filter { SoundPairs.isCardWorthy(it) && SoundPairs.startsWith(it.display, "Z") }
         val thinned = pack.copy(atoms = pack.atoms - zWords.drop(1).map { it.id })
         assertTrue(SoundFeederDerivation.assignments(thinned).values.none { it.pair.toString() == "S/Z" })
+    }
+
+    @Test
+    fun aLessonWhoseCardsCollapseToOneEmojiPerSideGetsNoFeederInsteadOfAnException() {
+        // Der Vorrat zählt Wörter, die Runde zählt Emojis: hier tragen alle Sch-Wörter
+        // dieselbe Glyphe, S/Sch bleibt also „ausreichend", liefert aber nur eine
+        // einzige rechte Karte. Statt in SoundFeederRound.init zu werfen, lässt die
+        // Ableitung die betroffenen Lektionen still aus (design doc §3.4).
+        val schWords = pack.atoms.values.filter { SoundPairs.isCardWorthy(it) && SoundPairs.startsWith(it.display, "Sch") }
+        assertTrue("Vorrat zu klein für den Testaufbau", schWords.size >= 2)
+        val collapsed = pack.copy(
+            atoms = pack.atoms + schWords.associate { it.id to it.copy(emoji = "👟") },
+        )
+        val derived = SoundFeederDerivation.derive(collapsed)
+        // L13, L23 und L27 spielen S/Sch — genau die fallen weg, der Rest bleibt.
+        listOf("l13", "l23", "l27").forEach { assertNull("$it sollte ohne Fresser sein", derived[it]) }
+        assertNotNull(derived["l14"])
+        assertTrue(derived.values.all { round -> round.cards.count { it.side == FeederSide.right } >= 2 })
     }
 }
