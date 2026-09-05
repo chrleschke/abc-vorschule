@@ -5,9 +5,12 @@ import app.abcvorschule.speech.VoiceStyle
 
 /**
  * Was der Laut-Fresser wann sagt (design doc §5–§7). Wörter sind die kuratierten
- * Lemma-Clips, Laute die `soundTts`-Clips (Profil `sound`); nur die Stimme
- * wechselt — die Tonhöhe macht daraus das Monster. „Bäh!" und „Mmmmh!" sind die
- * einzigen Monster-eigenen Strings (extra-strings.json, Profil `monster`).
+ * Lemma-Clips; die Laute sind **dasselbe Lemma** („S", „Sch") in der Variante
+ * `monster` des Clip-Index — von Hand aufgenommene Laute
+ * (docs/superpowers/specs/2026-09-05-lautfresser-mikrofon-aufnahme-design.md).
+ * Die App wählt die Variante über die Stimme ([VoiceStyle.MonsterLow]/[MonsterHigh])
+ * und legt ihre Tonhöhe obendrauf. „Bäh!" und „Mmmmh!" sind die einzigen
+ * Monster-eigenen Strings (extra-strings.json, Profil `monster`).
  */
 object SoundFeederSpeech {
     const val Yuck = "Bäh!"
@@ -22,14 +25,13 @@ object SoundFeederSpeech {
             ?: atomId
 
     /**
-     * Der Laut, nicht der Buchstabenname: „sss" statt „Es". Kommt aus [Atom.soundTts]
-     * (Profil `sound`); ohne kuratierten Laut bleibt es beim Lemma-Clip.
+     * Der Laut des Graphems: das Lemma in Monster-Stimme. Der Clip-Index liefert
+     * dafür die Aufnahme aus `variants.monster`; ohne Aufnahme fällt es auf den
+     * Buchstabennamen-Clip bzw. Android-TTS zurück — „S" liest die TTS besser als
+     * eine Fake-Aussprache wie „sss".
      */
-    fun soundPart(round: SoundFeederRound, side: FeederSide, pack: ContentPack): SpokenPart {
-        val atomId = round.atomIdFor(side)
-        val sound = pack.atoms[atomId]?.soundTts?.takeIf { it.isNotBlank() }
-        return SpokenPart(sound ?: lemma(pack, atomId), voiceFor(side))
-    }
+    fun soundPart(round: SoundFeederRound, side: FeederSide, pack: ContentPack): SpokenPart =
+        SpokenPart(lemma(pack, round.atomIdFor(side)), voiceFor(side))
 
     fun wordPart(card: SoundFeederCard, pack: ContentPack): SpokenPart =
         SpokenPart(lemma(pack, card.atomId))

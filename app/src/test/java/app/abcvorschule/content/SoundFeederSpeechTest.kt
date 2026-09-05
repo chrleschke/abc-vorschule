@@ -15,8 +15,8 @@ class SoundFeederSpeechTest {
         assertEquals(
             listOf(
                 SpokenPart("Füttere die Laut-Fresser."),
-                SpokenPart("sss", VoiceStyle.MonsterLow),
-                SpokenPart("schhh", VoiceStyle.MonsterHigh),
+                SpokenPart("S", VoiceStyle.MonsterLow),
+                SpokenPart("Sch", VoiceStyle.MonsterHigh),
             ),
             SoundFeederSpeech.introParts(round, pack),
         )
@@ -26,7 +26,7 @@ class SoundFeederSpeechTest {
     fun eatingSpeaksTheSoundInMonsterVoiceThenTheBareWord() {
         // Ohne Artikel: „Sss … die Sonne" würde Laut und Wort trennen (design doc §6).
         assertEquals(
-            listOf(SpokenPart("sss", VoiceStyle.MonsterLow), SpokenPart("Sonne")),
+            listOf(SpokenPart("S", VoiceStyle.MonsterLow), SpokenPart("Sonne")),
             SoundFeederSpeech.eatParts(round, sonne, pack),
         )
     }
@@ -43,8 +43,8 @@ class SoundFeederSpeechTest {
     fun theFinishIsBothBurpsThenContentment() {
         assertEquals(
             listOf(
-                SpokenPart("sss", VoiceStyle.MonsterLow),
-                SpokenPart("schhh", VoiceStyle.MonsterHigh),
+                SpokenPart("S", VoiceStyle.MonsterLow),
+                SpokenPart("Sch", VoiceStyle.MonsterHigh),
                 SpokenPart("Mmmmh!", VoiceStyle.MonsterLow),
             ),
             SoundFeederSpeech.finishParts(round, pack),
