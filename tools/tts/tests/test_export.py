@@ -461,6 +461,44 @@ def test_monster_clips_go_to_the_variants_block_and_letters_stay_in_clips(tmp_pa
     assert index["variants"]["monster"]["M"]["file"] in files
 
 
+def test_fresh_checkout_keeps_a_retained_monster_variant(tmp_path, content_dir):
+    """Wie `test_fresh_checkout_keeps_existing_assets_when_local_state_missing`,
+    aber für einen Varianten-Clip: ein gelockter Monster-Clip ohne lokale WAV
+    muss `variants.monster` überleben, ohne in `clips` zu leaken, wenn der
+    gleiche Text schon als phoneme dort steht."""
+    paths = make_paths(tmp_path, content_dir)
+    extra = {"version": 1, "strings": [
+        {"id": "feederYuck", "text": "Bäh!", "field": "monsterTts"}]}
+    paths.extra_strings.write_text(json.dumps(extra), encoding="utf-8")
+    kt = tmp_path / "SoundPairs.kt"
+    kt.write_text('SoundPair("M", "A", SoundPairTier.Contrast),', encoding="utf-8")
+    paths.sound_pairs_kt = kt
+    shutil.copy(Paths().profiles, paths.profiles)
+    ctx = load_context(paths)
+    for clip in ctx.clips:
+        if clip.profile in ("monster", "phoneme") and clip.source_text in ("M", "Bäh!"):
+            lock_and_render(paths, clip.key)
+    export_to_app(paths)
+    index_before = json.loads((paths.app_audio_dir / "index.json").read_text())
+    monster_m_file = index_before["variants"]["monster"]["M"]["file"]
+    monster_bah_file = index_before["variants"]["monster"]["Bäh!"]["file"]
+
+    # Frischer Checkout: out/audio (WAV) ist weg, Lock und exportierte Assets
+    # bleiben.
+    shutil.rmtree(paths.audio)
+
+    report = export_to_app(paths)
+
+    assert report.removed == []
+    assert (paths.app_audio_dir / monster_m_file).exists()
+    assert (paths.app_audio_dir / monster_bah_file).exists()
+    index_after = json.loads((paths.app_audio_dir / "index.json").read_text())
+    assert index_after["variants"]["monster"]["M"] == index_before["variants"]["monster"]["M"]
+    assert index_after["variants"]["monster"]["Bäh!"] == index_before["variants"]["monster"]["Bäh!"]
+    assert index_after["clips"]["Bäh!"]["profile"] == "monster"
+    assert index_after["clips"]["M"]["profile"] == "phoneme"
+
+
 def test_microphone_fingerprint_drives_reencoding(tmp_path, content_dir):
     paths = make_paths(tmp_path, content_dir)
     ctx = load_context(paths)
