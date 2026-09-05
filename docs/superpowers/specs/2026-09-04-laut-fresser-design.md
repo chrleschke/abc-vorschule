@@ -292,6 +292,11 @@ werden.
 
 ## 7. Audio und Monster-Sprache
 
+> **Stand 2026-09-05:** Die Laute kommen nicht mehr aus `soundTts` per Qwen, sondern als
+> Mikrofon-Aufnahmen des Lemmas in der Index-Variante `monster` — siehe
+> `2026-09-05-lautfresser-mikrofon-aufnahme-design.md`. Die Laufzeit-Tonhöhe (0.75/1.3)
+> und „Bäh!"/„Mmmmh!" bleiben wie hier beschrieben.
+
 **Anforderung des Nutzers: Wir brauchen Monster-Sprache.** Umsetzung in zwei Schichten, weil
 die Aussprache der Engpass der App ist und ein Kind, das genau diesen Kontrast lernt, ein
 verzerrtes „sss" schlechter trifft als ein sauberes.
