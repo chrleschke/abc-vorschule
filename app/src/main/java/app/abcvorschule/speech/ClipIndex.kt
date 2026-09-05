@@ -28,6 +28,8 @@ class ClipIndex private constructor(
     private val variants: Map<String, Map<String, ClipEntry>>,
 ) {
 
+    /** Zählt nur `clips`, nicht `variants` — Varianten wie `monster` sind bewusst
+     *  ausgeschlossen, das speist [speechAvailable]. */
     val size: Int get() = clips.size
 
     /**

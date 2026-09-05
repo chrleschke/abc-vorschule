@@ -484,9 +484,11 @@ def test_extra_strings_include_feeder_strings(content_dir):
 def test_monster_profile_exists_and_is_exportable():
     import json
     from ttskit.paths import Paths
-    from ttskit.export import PROFILE_PRIORITY
+    from ttskit.export import VARIANT_PROFILES
 
     profiles = json.loads(Paths().profiles.read_text())["profiles"]
     assert "monster" in profiles
     assert profiles["monster"]["language"] == "german"
-    assert "monster" in PROFILE_PRIORITY
+    # monster ist eine Variante (siehe VARIANT_PROFILES) und steht deshalb
+    # nicht in PROFILE_PRIORITY — es erreicht _collision_winner nie.
+    assert "monster" in VARIANT_PROFILES

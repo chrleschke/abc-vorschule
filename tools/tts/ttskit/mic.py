@@ -159,7 +159,12 @@ def render(raw: np.ndarray, sr: int, edit: Edit,
     cut = np.asarray(raw[a:b], dtype=np.float32)
     semitones = edit.pitch_semitones + extra_semitones
     if abs(semitones) > 1e-6 and len(cut) > 0:
-        import librosa  # lokal: Import dauert, und ohne Pitch braucht es keiner
+        try:
+            import librosa  # lokal: Import dauert, und ohne Pitch braucht es keiner
+        except ImportError as exc:
+            raise RuntimeError(
+                "Tonhöhen-Verschiebung braucht librosa im Qwen-venv — fehlt es, "
+                "Pitch auf 0 lassen") from exc
 
         cut = librosa.effects.pitch_shift(cut, sr=sr, n_steps=float(semitones)).astype(np.float32)
     cut = _fade(cut, sr)

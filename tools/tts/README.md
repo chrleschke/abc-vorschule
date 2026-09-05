@@ -13,6 +13,9 @@ Alles läuft mit dem Interpreter aus dem Qwen-venv:
 alias tts="~/qwen-tts-test/.venv/bin/python $(git rev-parse --show-toplevel)/tools/tts/tts"
 ```
 
+Die Mikrofon-Aufnahme-Kette (Resampling, Auto-Trim, Tonhöhen-Verschiebung) braucht
+zusätzlich `scipy` und `librosa` im selben venv.
+
 ## Quickstart: Web-Interface
 
 ```bash
@@ -238,7 +241,9 @@ funktionieren unverändert. Ihr „Seed" ist ein Pseudo-Seed ≥ 1 900 000 000
 `fingerprint: "mic:<sha>"` der bearbeiteten Datei — nur der steuert das Re-Encoding im
 Export. ✂ in der Kandidaten-Zeile öffnet den Editor erneut; ist die Aufnahme gerade
 Produktion, zieht `out/audio/<key>.wav` mit. Auto-Trim rechnet relativ zum Rauschboden
-(`mic.auto_trim`), anders als `audio.trim_silence` für Qwen-Ausgaben.
+(`mic.auto_trim`), anders als `audio.trim_silence` für Qwen-Ausgaben. Wurde die
+`<seed>.raw.wav` von Hand gelöscht, meldet ✂ nur einen 404-Banner — es gibt kein eigenes
+Flag dafür (Design-Doc §7 „Rohaufnahme fehlt" wurde darauf vereinfacht).
 
 ## Profil-Zuordnung
 

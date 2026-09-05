@@ -46,8 +46,11 @@ from .render import production_fingerprint
 #: phoneme vor word, damit Buchstaben-/Silben-Laute nicht von Wort-Clips
 #: verdrängt werden. Die App kennt am Call-Site nur den Text — der Index
 #: muss eindeutig sein.
+#: `monster` steht bewusst nicht drin: es ist eine Variante (siehe
+#: VARIANT_PROFILES), landet unter `variants.monster` und erreicht
+#: `_collision_winner` nie.
 PROFILE_PRIORITY = ("phoneme", "word", "article_word", "prompt", "miss",
-                    "reward", "sentence", "finale", "ui", "monster")
+                    "reward", "sentence", "finale", "ui")
 
 #: Profile, deren Clips als *Variante* eines Textes gelten: die App sucht sie
 #: unter `variants.<name>.<text>` (ClipIndex.lookup(text, variant)). Sie

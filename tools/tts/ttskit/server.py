@@ -30,7 +30,7 @@ from .recordings import apply_edit, preview_bytes, recording_info, store_recordi
 from .render import (
     candidate_fingerprint, candidate_meta, candidate_seeds, clear_production,
     clip_audio_list, deletable_candidate_seeds, delete_candidate_wav,
-    production_fingerprint, render_batch_candidates, sample_candidates,
+    render_batch_candidates, sample_candidates,
     seeds_for_candidates, update_candidate_meta,
 )
 from .mic import APP_MONSTER_PITCH, PITCH_MIN, PITCH_MAX
@@ -592,6 +592,8 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
             raise HTTPException(status_code=404, detail=f"keine Rohaufnahme {seed} für {key!r}")
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except RuntimeError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
         return {"ok": "edited", "edit": meta["edit"], "fingerprint": meta["fingerprint"]}
 
     @app.post("/api/clips/{key}/recordings/{seed}/preview")
@@ -608,6 +610,8 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
             raise HTTPException(status_code=404, detail=f"keine Rohaufnahme {seed} für {key!r}")
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except RuntimeError as exc:
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
         return Response(content=data, media_type="audio/wav")
 
     @app.put("/api/clips/{key}/candidates/{seed}/rating")

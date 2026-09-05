@@ -24,7 +24,10 @@ SECONDS_PER_TOKEN = 0.08
 #: des Checkpoints. Mehr anzubieten wäre unbelegt.
 MAX_NEW_TOKENS_CEILING = 8192
 
-#: Obergrenze für Zufalls-Seeds — entspricht `secrets.randbelow(2**31)`.
+#: Obergrenze für `parse_seed`, nicht für die Ziehung selbst: bleibt bei 2**31,
+#: damit Mikrofon-Pseudo-Seeds (`mic.MIC_SEED_MIN` … `mic.MIC_SEED_MAX`, knapp
+#: unter 2**31) die Prüfung passieren. `render.random_seeds` zieht echte
+#: Zufalls-Seeds nur unterhalb von `mic.MIC_SEED_MIN`.
 MAX_RANDOM_SEED = 2 ** 31
 
 #: Woher die Aufnahmen eines Profils standardmäßig kommen: Qwen („tts") oder
