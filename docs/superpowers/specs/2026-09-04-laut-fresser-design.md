@@ -294,7 +294,7 @@ werden.
 
 > **Stand 2026-09-05:** Die Laute kommen nicht mehr aus `soundTts` per Qwen, sondern als
 > Mikrofon-Aufnahmen des Lemmas in der Index-Variante `monster` — siehe
-> `2026-09-05-lautfresser-mikrofon-aufnahme-design.md`. Die Laufzeit-Tonhöhe (0.75/1.3)
+> `2026-09-05-lautfresser-mikrofon-aufnahme-design.md`. Die Laufzeit-Tonhöhe (0.75/1.3; für die Aufnahmen selbst nur ±1 Halbstufe)
 > und „Bäh!"/„Mmmmh!" bleiben wie hier beschrieben.
 
 **Anforderung des Nutzers: Wir brauchen Monster-Sprache.** Umsetzung in zwei Schichten, weil

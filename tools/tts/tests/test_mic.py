@@ -112,7 +112,9 @@ def test_fingerprint_is_stable_and_changes_with_the_audio():
 def test_edit_from_dict_validates():
     edit = Edit.from_dict({"start": 0.1, "end": 0.5, "pitchSemitones": -4, "normalize": False}, duration=1.0)
     assert edit == Edit(0.1, 0.5, -4, False)
-    assert edit.to_dict() == {"start": 0.1, "end": 0.5, "pitchSemitones": -4, "normalize": False}
+    assert edit.to_dict() == {"start": 0.1, "end": 0.5, "pitchSemitones": -4, "normalize": False,
+                              "highpass": False}
+    assert Edit.from_dict({"start": 0.0, "end": 0.5, "highpass": True}, duration=1.0).highpass is True
     for bad in ({"start": 0.5, "end": 0.5}, {"start": 0.0, "end": 1.5},
                 {"start": -0.1, "end": 0.5}, {"start": 0.0, "end": 0.5, "pitchSemitones": 13},
                 {"start": 0.0, "end": 0.5, "pitchSemitones": 1.5}, {"start": "a", "end": 0.5}):
@@ -122,3 +124,29 @@ def test_edit_from_dict_validates():
 
 def test_edit_defaults_pitch_and_normalize():
     assert Edit.from_dict({"start": 0.0, "end": 0.5}, duration=1.0) == Edit(0.0, 0.5, 0, True)
+
+
+def test_highpass_removes_rumble_but_keeps_the_sound():
+    sr = 24000
+    rumble = _sine(60, 1.0, sr, amp=0.5)
+    hiss = _sine(6000, 1.0, sr, amp=0.2)
+
+    def peaks_at(wav):
+        spectrum = np.abs(np.fft.rfft(wav * np.hanning(len(wav))))
+        freqs = np.fft.rfftfreq(len(wav), 1 / sr)
+        return (spectrum[(freqs > 50) & (freqs < 70)].max(),
+                spectrum[(freqs > 5900) & (freqs < 6100)].max())
+
+    plain = mic.render(rumble + hiss, sr, Edit(0.0, 1.0, normalize=False))
+    out = mic.render(rumble + hiss, sr, Edit(0.0, 1.0, normalize=False, highpass=True))
+    low_before, high_before = peaks_at(plain)
+    low_after, high_after = peaks_at(out)
+    assert low_after < low_before / 3          # 60 Hz um mehr als 10 dB gedämpft (2. Ordnung, 1 Oktave)
+    assert abs(high_after - high_before) < 0.05 * high_before  # 6 kHz unangetastet
+    assert abs(len(out) - sr) <= 1             # Länge bleibt, kein Zeitversatz (filtfilt)
+    assert mic.fingerprint_of(plain) != mic.fingerprint_of(out)
+
+
+def test_app_monster_pitch_is_one_semitone_each_way():
+    assert mic.APP_MONSTER_PITCH["left"] == pytest.approx(2 ** (-1 / 12), abs=1e-4)
+    assert mic.APP_MONSTER_PITCH["right"] == pytest.approx(2 ** (1 / 12), abs=1e-4)

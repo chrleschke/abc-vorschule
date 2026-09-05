@@ -19,6 +19,14 @@ class VoiceStyleTest {
     }
 
     @Test
+    fun recordedVariantsMoveOnlyOneSemitone() {
+        // Die Aufnahme ist schon Monster; ×0.75 rückte ein S spektral bis ans Sch.
+        assertEquals(1f, VoiceStyle.Normal.variantPitch)
+        assertEquals(Math.pow(2.0, -1.0 / 12).toFloat(), VoiceStyle.MonsterLow.variantPitch, 0.001f)
+        assertEquals(Math.pow(2.0, 1.0 / 12).toFloat(), VoiceStyle.MonsterHigh.variantPitch, 0.001f)
+    }
+
+    @Test
     fun aSpokenPartDefaultsToTheNormalVoice() {
         assertEquals(VoiceStyle.Normal, SpokenPart("Sonne").voice)
     }

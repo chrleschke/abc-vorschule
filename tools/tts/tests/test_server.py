@@ -1437,7 +1437,7 @@ def test_recording_info_ships_peaks_and_edit(client):
     assert len(info["peaks"]) == 600
     assert info["sampleRate"] == 24000
     assert 1.5 <= info["duration"] <= 1.65
-    assert set(info["edit"]) == {"start", "end", "pitchSemitones", "normalize"}
+    assert set(info["edit"]) == {"start", "end", "pitchSemitones", "normalize", "highpass"}
     assert client.get(f"/api/clips/{key}/recordings/424242").status_code == 404
 
 
@@ -1495,7 +1495,9 @@ def test_deleting_a_recording_removes_the_raw_take_too(client):
 
 
 def test_state_ships_the_app_monster_pitch(client):
-    assert client.get("/api/state").json()["appMonsterPitch"] == {"left": 0.75, "right": 1.3}
+    from ttskit.mic import APP_MONSTER_PITCH
+    assert client.get("/api/state").json()["appMonsterPitch"] == APP_MONSTER_PITCH
+    assert 0.94 < APP_MONSTER_PITCH["left"] < 0.95 and 1.05 < APP_MONSTER_PITCH["right"] < 1.06
 
 
 def test_recorder_worklet_is_served(client):

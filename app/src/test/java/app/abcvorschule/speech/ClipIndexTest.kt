@@ -55,6 +55,14 @@ class ClipIndexTest {
     }
 
     @Test
+    fun `variantEntry liefert nur die Variante, nie den normalen Clip`() {
+        val index = ClipIndex.parse(withVariants)
+        assertEquals("monster_s.ogg", index.variantEntry("S", ClipIndex.MONSTER_VARIANT)?.file)
+        assertNull(index.variantEntry("Mama mag Mais.", ClipIndex.MONSTER_VARIANT))
+        assertNull(ClipIndex.parse(sample).variantEntry("M", ClipIndex.MONSTER_VARIANT))
+    }
+
+    @Test
     fun `entries enthalten auch die Varianten`() {
         assertEquals(4, ClipIndex.parse(withVariants).entries().size)
     }

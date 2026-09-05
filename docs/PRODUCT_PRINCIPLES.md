@@ -430,7 +430,9 @@ niemals mit einem stummen No-Op.
 - **Monster-Stimme (Laut-Fresser):** Wörter bleiben kuratierte, normale Clips — nur die
   Tonhöhe kippt zur Laufzeit (`VoiceStyle`: links tiefer 0.75, rechts höher 1.3), die
   Artikulation ist der Engpass der App und darf nicht leiden. Die *Laute* bekommen
-  dieselbe Laufzeit-Tonhöhe obendrauf, aber eine eigene Quelle: Der Fresser spricht das
+  nur eine Halbstufe Laufzeit-Tonhöhe obendrauf (`VoiceStyle.variantPitch`, ×0.944/×1.059 —
+  die Aufnahme ist schon Monster, und ×0.75 schob ein S spektral bis ans Sch), aber eine
+  eigene Quelle: Der Fresser spricht das
   Lemma des Graphems („S", „Sch") aus einer **von Hand aufgenommenen** Variante
   `monster` im Clip-Index (Mikrofon-Aufnahme im Qwen-Web-Interface, Spec
   `2026-09-05-lautfresser-mikrofon-aufnahme-design.md`), während Jagd, Wort-Detektiv und

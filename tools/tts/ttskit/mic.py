@@ -14,7 +14,7 @@ from typing import Any
 
 import numpy as np
 import soundfile as sf
-from scipy.signal import resample_poly
+from scipy.signal import butter, resample_poly, sosfiltfilt
 
 from .audio import normalize_peak
 
@@ -34,11 +34,18 @@ MAX_RECORDING_SECONDS = 30.0
 PITCH_MIN = -12
 PITCH_MAX = 12
 
-#: Laufzeit-Tonhöhe der App je Fresser — Spiegel von `VoiceStyle.MonsterLow`
-#: (0.75) und `VoiceStyle.MonsterHigh` (1.3) in
-#: app/src/main/java/app/abcvorschule/speech/VoiceStyle.kt. Wer dort ändert,
-#: ändert hier mit; der Editor legt diese Faktoren zum Abhören obendrauf.
-APP_MONSTER_PITCH: dict[str, float] = {"left": 0.75, "right": 1.3}
+#: Laufzeit-Tonhöhe der App je Fresser **für Aufnahmen aus `variants.monster`** —
+#: Spiegel von `VoiceStyle.VARIANT_DOWN`/`VARIANT_UP` (je eine Halbstufe, 2^(±1/12))
+#: in app/src/main/java/app/abcvorschule/speech/VoiceStyle.kt. Die volle Verschiebung
+#: 0.75/1.3 gilt dort nur noch für normale Clips und Android-TTS: eine Aufnahme ist
+#: schon Monster, und ein S bei ×0.75 rückte spektral bis ans Sch (2026-09-05).
+#: Wer dort ändert, ändert hier mit; der Editor legt diese Faktoren zum Abhören obendrauf.
+APP_MONSTER_PITCH: dict[str, float] = {"left": round(2 ** (-1 / 12), 4), "right": round(2 ** (1 / 12), 4)}
+
+#: Grenzfrequenz des optionalen Hochpasses im Editor. Nahbesprechung und Griffgeräusch
+#: liegen darunter, kein deutscher Laut (auch M/N nicht: Grundton ≥ ~90 Hz, aber
+#: 2. Ordnung bei 120 Hz nimmt ihnen nur etwas Bauch, keinen Charakter).
+HIGHPASS_HZ = 120.0
 
 #: Ein-/Ausblende gegen Klicks am Schnitt.
 FADE_MS = 5
@@ -55,6 +62,8 @@ class Edit:
     end: float
     pitch_semitones: int = 0
     normalize: bool = True
+    #: Hochpass bei HIGHPASS_HZ — gegen Brummen/Nahbesprechungs-Bass unter dem Laut.
+    highpass: bool = False
 
     @classmethod
     def from_dict(cls, raw: dict[str, Any], *, duration: float) -> "Edit":
@@ -76,11 +85,13 @@ class Edit:
         if not PITCH_MIN <= pitch <= PITCH_MAX:
             raise ValueError(f"edit: pitchSemitones muss zwischen {PITCH_MIN} und {PITCH_MAX} liegen")
         return cls(start=start, end=min(end, duration), pitch_semitones=pitch,
-                   normalize=bool(raw.get("normalize", True)))
+                   normalize=bool(raw.get("normalize", True)),
+                   highpass=bool(raw.get("highpass", False)))
 
     def to_dict(self) -> dict[str, Any]:
         return {"start": self.start, "end": self.end,
-                "pitchSemitones": self.pitch_semitones, "normalize": self.normalize}
+                "pitchSemitones": self.pitch_semitones, "normalize": self.normalize,
+                "highpass": self.highpass}
 
 
 def load_upload(data: bytes) -> tuple[np.ndarray, int]:
@@ -151,12 +162,22 @@ def _fade(wav: np.ndarray, sr: int) -> np.ndarray:
     return out
 
 
+def highpass(wav: np.ndarray, sr: int, cutoff_hz: float = HIGHPASS_HZ) -> np.ndarray:
+    """Butterworth 2. Ordnung, vor- und rückwärts (nullphasig, kein Zeitversatz)."""
+    if len(wav) < 16:
+        return wav
+    sos = butter(2, cutoff_hz, btype="highpass", fs=sr, output="sos")
+    return sosfiltfilt(sos, wav).astype(np.float32)
+
+
 def render(raw: np.ndarray, sr: int, edit: Edit,
            extra_semitones: float = 0.0) -> np.ndarray:
-    """Ausschnitt → Pitch (Tempo bleibt) → Fade → Normalisierung. float32."""
+    """Ausschnitt → Hochpass → Pitch (Tempo bleibt) → Fade → Normalisierung. float32."""
     a = int(round(edit.start * sr))
     b = int(round(edit.end * sr))
     cut = np.asarray(raw[a:b], dtype=np.float32)
+    if edit.highpass:
+        cut = highpass(cut, sr)
     semitones = edit.pitch_semitones + extra_semitones
     if abs(semitones) > 1e-6 and len(cut) > 0:
         try:

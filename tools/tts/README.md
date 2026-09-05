@@ -230,8 +230,8 @@ und öffnet den **Editor**: Wellenform der ganzen Aufnahme, weggeschnittene Rän
 der automatische Stille-Schnitt als gestrichelte Linien, zwei ziehbare Griffe,
 Tonhöhe in Halbtönen (Default `micPitchSemitones` des Profils, Tempo bleibt —
 `librosa.effects.pitch_shift`), Normalisieren auf −1 dBFS. „▶ Anhören" spielt die
-Bearbeitung; bei `monster` zusätzlich „▶ Laufzeit links/rechts" mit dem App-Pitch
-(`mic.APP_MONSTER_PITCH`, Spiegel von `VoiceStyle`). „Übernehmen" schreibt den Kandidaten.
+Bearbeitung; bei `monster` zusätzlich „▶ Laufzeit links/rechts" mit dem App-Pitch für Aufnahmen (je ±1 Halbstufe,
+`mic.APP_MONSTER_PITCH`, Spiegel von `VoiceStyle.variantPitch`). „Übernehmen" schreibt den Kandidaten.
 
 Eine Aufnahme **ist ein Kandidat**: Radio „Produktion", 👍/👎, „Alle löschen" und Export
 funktionieren unverändert. Ihr „Seed" ist ein Pseudo-Seed ≥ 1 900 000 000
@@ -262,7 +262,13 @@ September 2026 trugen die Buchstaben-Atome dafür eine Fake-Aussprache `soundTts
 („sss", „schhh"); weder Qwen noch die Android-TTS sprachen sie brauchbar, und die
 TTS liest „S" ohnehin besser als „sss". Im Index landen `monster`-Clips unter
 `variants.monster`; die App sucht dort, sobald sie mit Monster-Stimme spricht, und
-legt ihre Laufzeit-Tonhöhe (links 0.75, rechts 1.3) weiterhin obendrauf.
+legt für diese Aufnahmen nur noch **eine Halbstufe** Laufzeit-Tonhöhe obendrauf (links
+×0,944, rechts ×1,059, `VoiceStyle.variantPitch`); die volle Verschiebung 0.75/1.3 gilt
+weiter für normale Clips und Android-TTS. Grund (2026-09-05, gemessen): Pitch-Shift
+verschiebt bei Reibelauten das ganze Rauschspektrum — ein S bei −2 HS im Editor plus ×0.75
+landete mit dem Schwerpunkt (4,8 kHz) genau auf dem originalen Sch. Der Editor bietet dafür
+einen **Hochpass 120 Hz** (Butterworth 2. Ordnung, nullphasig) gegen Nahbesprechungs-Bass
+und Brummen unter dem Laut; er geht wie Schnitt und Pitch in den Fingerprint ein.
 
 Das Profil `article_word` trägt die Lösungswörter **mit Artikel** („das Haus"), die das
 Erfolgs-Vorsprechen nennt. Es ist bewusst nicht `word`: dessen `max_new_tokens: 25` (≈ 2,0 s)

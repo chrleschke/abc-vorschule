@@ -45,6 +45,9 @@ class ClipIndex private constructor(
     }
 
     /** Alle Einträge, für Konsistenz-Checks über den gesamten Index (Tests). */
+    /** Nur die Variante, ohne Rückfall auf `clips` — damit der Aufrufer weiß, was er spielt. */
+    fun variantEntry(text: String, variant: String): ClipEntry? = variants[variant]?.get(text.trim())
+
     fun entries(): Collection<ClipEntry> = clips.values + variants.values.flatMap { it.values }
 
     companion object {

@@ -24,7 +24,7 @@ const state = {
   // Task 8 — der füllt ihn, hier bleibt er nur ein Platzhalter.
   recorder: null, editor: null,
   // Fallback, bis /api/state die echten Werte liefert.
-  appMonsterPitch: { left: 0.75, right: 1.3 },
+  appMonsterPitch: { left: 0.9439, right: 1.0595 },
 };
 const el = (id) => document.getElementById(id);
 
@@ -1045,6 +1045,8 @@ function editorHtml(clip) {
           <select id="ed-pitch">${PITCH_OPTIONS.map((n) =>
             `<option value="${n}" ${n === ed.edit.pitchSemitones ? "selected" : ""}>${n > 0 ? "+" : ""}${n} Halbtöne</option>`).join("")}</select></label>
         <label class="inline"><input id="ed-norm" type="checkbox" ${ed.edit.normalize ? "checked" : ""} /> Normalisieren</label>
+        <label class="inline" title="Butterworth 2. Ordnung bei 120 Hz — nimmt Brummen und Nahbesprechungs-Bass unter dem Laut weg, den Laut selbst nicht">
+          <input id="ed-hp" type="checkbox" ${ed.edit.highpass ? "checked" : ""} /> Hochpass 120 Hz</label>
       </div>
       <div class="editor-controls">
         <button id="ed-play" data-app-pitch="">▶ Anhören</button>
@@ -1138,6 +1140,7 @@ function wireEditor(clip) {
   el("ed-auto").onclick = () => { ed.edit.start = ed.info.autoTrim.start; ed.edit.end = ed.info.autoTrim.end; sync("end"); };
   el("ed-pitch").onchange = (e) => { ed.edit.pitchSemitones = Number(e.target.value); };
   el("ed-norm").onchange = (e) => { ed.edit.normalize = e.target.checked; };
+  el("ed-hp").onchange = (e) => { ed.edit.highpass = e.target.checked; };
 
   el("detail").querySelectorAll("[data-app-pitch]").forEach((button) => {
     button.onclick = guard(async () => {

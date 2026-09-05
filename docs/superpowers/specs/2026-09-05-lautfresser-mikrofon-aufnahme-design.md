@@ -23,7 +23,7 @@ Text sprechen, der auf dem Bauch steht — das Lemma, keine Fake-Schreibweise.
 
 | Frage | Entscheidung |
 | --- | --- |
-| Laufzeit-Tonhöhe der App (links 0.75, rechts 1.3) | **bleibt.** Der Editor bekommt Abhörknöpfe „Laufzeit links/rechts", die den App-Pitch auf die Bearbeitung legen, plus einen eigenen Zusatz-Pitch (Halbtöne). |
+| Laufzeit-Tonhöhe der App (links 0.75, rechts 1.3) | **bleibt** für normale Clips und TTS. Der Editor bekommt Abhörknöpfe „Laufzeit links/rechts", die den App-Pitch auf die Bearbeitung legen, plus einen eigenen Zusatz-Pitch (Halbtöne). **Nachtrag 2026-09-05 abends:** für Aufnahmen aus `variants.monster` nur noch ±1 Halbstufe (`VoiceStyle.variantPitch`), weil ×0.75 ein S spektral auf das Sch schob; dazu ein optionaler Hochpass 120 Hz im Editor (`Edit.highpass`). |
 | Umfang der Monster-Clips | **nur Grapheme aus `SoundPairs`** (heute 26), nicht alle 40 Buchstaben-Atome. |
 | Wo wird gepitcht | **serverseitig** mit librosa (Tempo bleibt), gleiche Kette wie Qwen. |
 | „Bäh!" / „Mmmmh!" | bleiben unverändert im Profil `monster` mit ihren Locks und Audios. |
