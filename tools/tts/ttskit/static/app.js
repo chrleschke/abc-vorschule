@@ -185,7 +185,7 @@ function recorderPanelHtml(clip) {
         ? "Aufnahme läuft — Stopp lädt hoch und öffnet den Editor"
         : "Mono, ohne Rauschunterdrückung; automatischer Stopp nach 30 s"}</span>
     </div>
-    <div id="editor-slot"></div>`;
+    ${editorHtml(clip)}`;
 }
 
 //: Nur für die Beschriftung. Die Auswahl selbst trifft der Server
@@ -342,6 +342,8 @@ function renderList() {
     const generating = isClipGenerating(clip.key);
     const waiting = isClipWaitingForBatch(clip.key);
     const unseen = unseenCount(clip.key);
+    const micProduction = clip.status === "rendered"
+      && clip.candidates.some((c) => c.seed === clip.seed && c.mic);
     row.innerHTML = `
       <input type="checkbox" class="sel" ${state.selectedKeys.has(clip.key) ? "checked" : ""}
              title="Für den Batch-Lauf auswählen" />
@@ -360,7 +362,8 @@ function renderList() {
               ? `<span class="badge-unseen" title="Neue Aufnahmen zum Anhören">${unseen}</span>`
               : ""}
       </span>
-      <span class="chip ${clip.status}">${STATUS_LABELS[clip.status] || clip.status}</span>`;
+      <span class="chip ${clip.status}">${STATUS_LABELS[clip.status] || clip.status}</span>
+      ${micProduction ? '<span class="chip" title="Produktion ist eine Mikrofon-Aufnahme">🎙</span>' : ""}`;
     const checkbox = row.querySelector(".sel");
     checkbox.onclick = (event) => {
       event.stopPropagation();
@@ -793,10 +796,11 @@ function candidateRow(clip, cand, index) {
                 title="${clip.status === "rendered" && clip.seed === cand.seed
                   ? "Produktion kann nicht gelöscht werden — „Keine Produktion“ nutzen"
                   : "Klingt schlecht — Probeaufnahme löschen"}">${discardLabel}</button>`}
+        ${cand.mic ? `<button data-edit-recording="${cand.seed}" class="icon" title="Schnitt und Tonhöhe dieser Aufnahme bearbeiten">✂</button>` : ""}
       </td>
       <td class="mono nowrap">${cand.seed}</td>
       <td class="nowrap muted" title="Zeitpunkt der Erzeugung">${formatWhen(cand.createdAt)}</td>
-      <td class="nowrap">${cand.speaker ? escapeHtml(cand.speaker) : '<span class="muted">—</span>'}</td>
+      <td class="nowrap">${cand.mic ? '<span title="Mikrofon-Aufnahme">🎙</span>' : cand.speaker ? escapeHtml(cand.speaker) : '<span class="muted">—</span>'}</td>
       <td class="text-cell" title="${escapeHtml(cand.text || "")}">
         ${cand.text ? escapeHtml(cand.text) : '<span class="muted">—</span>'}
         ${cand.fresh === false
@@ -975,6 +979,7 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
               : "Alle löschen"}</button>
       </div>
       <div id="candidates-body">${candidatesTableHtml(clip)}</div>
+      ${clipSource(clip) === "tts" ? editorHtml(clip) : ""}
       ${hasProduction(clip) ? `
       <div class="candidates-footer">
         <button id="btn-clear-production"
@@ -990,10 +995,151 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
 
 // ------------------------------------------------------------ Mikrofon
 
-// Task 8 baut den Schnitt-Editor; bis dahin ist eine Aufnahme nach dem Upload
-// einfach fertig, ohne Schnitt-Schritt.
-async function openEditor() {}
-function wireEditor() {}
+async function openEditor(clipKey, seed) {
+  const info = await api(`/api/clips/${encodeURIComponent(clipKey)}/recordings/${seed}`);
+  state.editor = { clipKey, seed, info, edit: { ...info.edit }, drag: null, playing: null };
+  if (state.selected === clipKey) renderDetail(clipKey);
+}
+
+function closeEditor() {
+  state.editor = null;
+  if (state.selected) renderDetail(state.selected);
+}
+
+const PITCH_OPTIONS = Array.from({ length: 25 }, (_, i) => i - 12);
+
+function editorHtml(clip) {
+  const ed = state.editor;
+  if (!ed || ed.clipKey !== clip.key) return "";
+  const monster = clip.profile === "monster";
+  const pitch = state.appMonsterPitch;
+  return `
+    <div class="card editor-card" id="editor">
+      <h4 class="card-title">✂ Aufnahme ${ed.seed} schneiden</h4>
+      <canvas id="wave" width="900" height="160"></canvas>
+      <div class="editor-controls">
+        <label>Start <input id="ed-start" type="number" step="0.001" min="0"
+          max="${ed.info.duration}" value="${ed.edit.start.toFixed(3)}" /> s</label>
+        <label>Ende <input id="ed-end" type="number" step="0.001" min="0"
+          max="${ed.info.duration}" value="${ed.edit.end.toFixed(3)}" /> s</label>
+        <button id="ed-auto" title="Zurück auf den automatischen Stille-Schnitt">Automatisch</button>
+        <label>Tonhöhe
+          <select id="ed-pitch">${PITCH_OPTIONS.map((n) =>
+            `<option value="${n}" ${n === ed.edit.pitchSemitones ? "selected" : ""}>${n > 0 ? "+" : ""}${n} Halbtöne</option>`).join("")}</select></label>
+        <label class="inline"><input id="ed-norm" type="checkbox" ${ed.edit.normalize ? "checked" : ""} /> Normalisieren</label>
+      </div>
+      <div class="editor-controls">
+        <button id="ed-play" data-app-pitch="">▶ Anhören</button>
+        ${monster ? `
+        <button id="ed-play-left" data-app-pitch="${pitch.left}"
+          title="So klingt es in der App beim linken Fresser (×${pitch.left})">▶ Laufzeit links</button>
+        <button id="ed-play-right" data-app-pitch="${pitch.right}"
+          title="So klingt es in der App beim rechten Fresser (×${pitch.right})">▶ Laufzeit rechts</button>` : ""}
+        <span class="muted small" id="ed-status"></span>
+        <span class="editor-spacer"></span>
+        <button id="ed-discard" title="Editor schließen — die Aufnahme behält den zuletzt gespeicherten Schnitt">Verwerfen</button>
+        <button id="ed-save" class="primary">Übernehmen</button>
+      </div>
+      <p class="muted small">Grau ist weggeschnitten, die dünnen Linien zeigen den automatischen
+        Vorschlag. Griffe ziehen oder Zahlen tippen.</p>
+    </div>`;
+}
+
+function drawWaveform(canvas, info, edit) {
+  const ctx = canvas.getContext("2d");
+  const { width: W, height: H } = canvas;
+  const x = (s) => (s / info.duration) * W;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "#e9e3d8";
+  ctx.fillRect(0, 0, x(edit.start), H);
+  ctx.fillRect(x(edit.end), 0, W - x(edit.end), H);
+  ctx.strokeStyle = "#c4622d"; ctx.lineWidth = 1;
+  const n = info.peaks.length;
+  ctx.beginPath();
+  info.peaks.forEach((p, i) => {
+    const px = (i / n) * W, h = Math.max(1, p * (H / 2 - 4));
+    ctx.moveTo(px, H / 2 - h); ctx.lineTo(px, H / 2 + h);
+  });
+  ctx.stroke();
+  ctx.strokeStyle = "#857a6c"; ctx.setLineDash([3, 3]);
+  [info.autoTrim.start, info.autoTrim.end].forEach((s) => {
+    ctx.beginPath(); ctx.moveTo(x(s), 0); ctx.lineTo(x(s), H); ctx.stroke();
+  });
+  ctx.setLineDash([]);
+  ctx.fillStyle = "#2f2a24";
+  [edit.start, edit.end].forEach((s) => ctx.fillRect(x(s) - 2, 0, 4, H));
+}
+
+function wireEditor(clip) {
+  const ed = state.editor;
+  const canvas = el("wave");
+  if (!ed || !canvas) return;
+  const encoded = encodeURIComponent(clip.key);
+  const MIN_LEN = 0.02;
+  const clamp = () => {
+    ed.edit.start = Math.min(Math.max(0, ed.edit.start), ed.info.duration - MIN_LEN);
+    ed.edit.end = Math.max(Math.min(ed.info.duration, ed.edit.end), ed.edit.start + MIN_LEN);
+  };
+  const sync = () => {
+    clamp();
+    el("ed-start").value = ed.edit.start.toFixed(3);
+    el("ed-end").value = ed.edit.end.toFixed(3);
+    drawWaveform(canvas, ed.info, ed.edit);
+  };
+  sync();
+
+  const secondsAt = (event) => {
+    const rect = canvas.getBoundingClientRect();
+    return ((event.clientX - rect.left) / rect.width) * ed.info.duration;
+  };
+  canvas.onpointerdown = (event) => {
+    const s = secondsAt(event);
+    const tol = ed.info.duration * (8 / canvas.getBoundingClientRect().width);
+    ed.drag = Math.abs(s - ed.edit.start) <= tol ? "start"
+      : Math.abs(s - ed.edit.end) <= tol ? "end"
+      : (Math.abs(s - ed.edit.start) < Math.abs(s - ed.edit.end) ? "start" : "end");
+    canvas.setPointerCapture(event.pointerId);
+    ed.edit[ed.drag] = s; sync();
+  };
+  canvas.onpointermove = (event) => { if (ed.drag) { ed.edit[ed.drag] = secondsAt(event); sync(); } };
+  canvas.onpointerup = canvas.onpointercancel = () => { ed.drag = null; };
+
+  el("ed-start").onchange = (e) => { ed.edit.start = Number(e.target.value); sync(); };
+  el("ed-end").onchange = (e) => { ed.edit.end = Number(e.target.value); sync(); };
+  el("ed-auto").onclick = () => { ed.edit.start = ed.info.autoTrim.start; ed.edit.end = ed.info.autoTrim.end; sync(); };
+  el("ed-pitch").onchange = (e) => { ed.edit.pitchSemitones = Number(e.target.value); };
+  el("ed-norm").onchange = (e) => { ed.edit.normalize = e.target.checked; };
+
+  el("detail").querySelectorAll("[data-app-pitch]").forEach((button) => {
+    button.onclick = guard(async () => {
+      el("ed-status").textContent = "rendere Vorschau …";
+      const body = { edit: ed.edit };
+      if (button.dataset.appPitch) body.appPitch = Number(button.dataset.appPitch);
+      const response = await fetch(`/api/clips/${encoded}/recordings/${ed.seed}/preview`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+      });
+      if (!response.ok) throw new Error((await response.json()).detail || response.statusText);
+      const url = URL.createObjectURL(await response.blob());
+      if (ed.playing) { ed.playing.pause(); URL.revokeObjectURL(ed.playing.src); }
+      ed.playing = new Audio(url);
+      ed.playing.onended = () => { el("ed-status").textContent = ""; };
+      el("ed-status").textContent = button.dataset.appPitch
+        ? `spielt mit App-Pitch ×${button.dataset.appPitch}` : "spielt";
+      await ed.playing.play();
+    });
+  });
+  el("ed-discard").onclick = () => closeEditor();
+  el("ed-save").onclick = guard(async () => {
+    await put(`/api/clips/${encoded}/recordings/${ed.seed}`, ed.edit);
+    await refresh({ keepDetail: true });
+    // refresh() zeichnet die Detailsicht nur neu, wenn sich an clipSignature()
+    // etwas geändert hat — ein reiner Schnitt (Start/Ende/Tonhöhe) rührt daran
+    // nichts. Ohne dieses closeEditor() bliebe der Editor nach „Übernehmen“
+    // sichtbar, obwohl state.editor schon null ist.
+    closeEditor();
+    showBanner(`Schnitt gespeichert — Aufnahme ${ed.seed} ist als Kandidat aktuell.`, "ok");
+  });
+}
 
 function encodeWav(chunks, sampleRate) {
   const length = chunks.reduce((n, c) => n + c.length, 0);
@@ -1141,6 +1287,9 @@ function wireCandidateHandlers(clip) {
         throw error;
       }
     });
+  });
+  el("detail").querySelectorAll("[data-edit-recording]").forEach((button) => {
+    button.onclick = guard(() => openEditor(clip.key, Number(button.dataset.editRecording)));
   });
 }
 

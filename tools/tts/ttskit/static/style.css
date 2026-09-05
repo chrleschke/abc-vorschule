@@ -237,3 +237,10 @@ details.help ul { margin: 6px 0; padding-left: 20px; }
 .param span { font-size: 13px; color: var(--muted); min-width: 220px; }
 .param input { width: 90px; }
 .param-help { margin: 2px 0 0 228px; line-height: 1.4; }
+
+/* Wellenform-Editor (Schnitt, Tonhöhe, Normalisierung) */
+.editor-card { margin-top: 10px; }
+#wave { width: 100%; height: 160px; display: block; border: 1px solid var(--line); border-radius: 6px; background: #fff; cursor: col-resize; touch-action: none; }
+.editor-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
+.editor-controls input[type="number"] { width: 6.5em; }
+.editor-spacer { flex: 1; }
