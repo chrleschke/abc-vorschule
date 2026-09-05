@@ -1018,23 +1018,30 @@ async function startRecording(clip) {
   const stream = await navigator.mediaDevices.getUserMedia({ audio: {
     channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false,
   } });
-  const ctx = new AudioContext();
-  await ctx.audioWorklet.addModule("/recorder-worklet.js");
-  const source = ctx.createMediaStreamSource(stream);
-  const node = new AudioWorkletNode(ctx, "recorder", { numberOfInputs: 1, numberOfOutputs: 0 });
-  const rec = { clipKey: clip.key, stream, ctx, node, chunks: [], samples: 0 };
-  node.port.onmessage = (event) => {
-    rec.chunks.push(event.data);
-    rec.samples += event.data.length;
-    let peak = 0;
-    for (const s of event.data) peak = Math.max(peak, Math.abs(s));
-    const bar = el("rec-level-bar");
-    if (bar) bar.style.width = `${Math.min(100, Math.round(peak * 100))}%`;
-    if (rec.samples / ctx.sampleRate >= MAX_RECORDING_SECONDS) stopRecording().catch(showError);
-  };
-  source.connect(node);
-  state.recorder = rec;
-  redrawDetail();
+  let ctx;
+  try {
+    ctx = new AudioContext();
+    await ctx.audioWorklet.addModule("/recorder-worklet.js");
+    const source = ctx.createMediaStreamSource(stream);
+    const node = new AudioWorkletNode(ctx, "recorder", { numberOfInputs: 1, numberOfOutputs: 0 });
+    const rec = { clipKey: clip.key, stream, ctx, node, chunks: [], samples: 0 };
+    node.port.onmessage = (event) => {
+      rec.chunks.push(event.data);
+      rec.samples += event.data.length;
+      let peak = 0;
+      for (const s of event.data) peak = Math.max(peak, Math.abs(s));
+      const bar = el("rec-level-bar");
+      if (bar) bar.style.width = `${Math.min(100, Math.round(peak * 100))}%`;
+      if (rec.samples / ctx.sampleRate >= MAX_RECORDING_SECONDS) stopRecording().catch(showError);
+    };
+    source.connect(node);
+    state.recorder = rec;
+    redrawDetail();
+  } catch (error) {
+    stream.getTracks().forEach((t) => t.stop());
+    if (ctx) await ctx.close().catch(() => {});
+    throw error;
+  }
 }
 
 async function stopRecording() {
@@ -1348,7 +1355,9 @@ function renderDetail(key) {
     wireDurationField(form);
   }
 
-  // ---- Generate
+  // ---- Generate (nur im TTS-Modus vorhanden — im Mikrofon-Modus ersetzt
+  // recorderPanelHtml() diese Zeile, siehe candidatesCardHtml)
+  if (clipSource(clip) === "tts") {
   const btnGenerate = el("btn-candidates");
   btnGenerate.onclick = guard(async () => {
     if (candidateJobRunning(clip.key)) return;
@@ -1397,6 +1406,9 @@ function renderDetail(key) {
       writeLocal("ttsUseKnownSeeds", false);
     }
   };
+  wireFixedSeedAutosave(clip);
+  }
+
   el("clip-profile").onchange = guard(async (event) => {
     await post(`/api/clips/${encoded}/lock`,
                { seed: clip.seed, profile: event.target.value });
@@ -1405,7 +1417,6 @@ function renderDetail(key) {
   });
 
   wireTtsTextAutosave(clip);
-  wireFixedSeedAutosave(clip);
 
   el("clip-speaker").onchange = guard(async (event) => {
     const speaker = event.target.value;
