@@ -78,6 +78,25 @@ private const val CardKey = "feeder_card"
 private enum class FeederPhase { Intro, Playing, Busy, Done }
 
 /**
+ * Untergrenze für die Skalierung der Bildkarte, solange sie noch nicht aufgeploppt ist.
+ *
+ * Exakt 0 wäre fatal: Die Karte bleibt zwischen Fressen und Aufploppen (~3 s Kauen
+ * plus Laut und Wort) komponiert und hit-testbar, nur auf Größe 0 skaliert. Eine
+ * Ebene mit Skalierung 0 hat keine invertierbare Matrix. Berührt das Kind in dieser
+ * Zeit *irgendetwas* auf dem Bildschirm — den Fresser, die Karte, den Speaker, den
+ * leeren Rand —, rechnet der Hit-Test die Inverse aus, scheitert und merkt sich das
+ * (`GraphicsLayerOwnerLayer.getInverseMatrix`, Compose UI 1.10: NaN-Marker im Cache).
+ * Ploppt die Karte danach auf exakt 1 auf, greift dort die Identitäts-Abkürzung, die
+ * den Marker nie löscht — ab dann kommen alle Zeiger-Positionen an der Karte als
+ * `Offset.Infinite` an: kein Ziehen, kein Tipp, bis zur nächsten Runde. Genau das war
+ * „die aktive Karte ist blockiert". Reproduziert im Emulator: Drop, Tipp irgendwohin
+ * während des Kauens, nächste Karte tot; ohne den Tipp funktioniert alles.
+ *
+ * 0.01 ist unsichtbar (die Karte misst dann unter einem Pixel), aber invertierbar.
+ */
+private const val MinCardScale = 0.01f
+
+/**
  * Laut-Fresser (design doc §5/§6): eine Bildkarte oben, zwei Fresser unten. Alle
  * Entscheidungen fallen in [SoundFeederProgress]; dieser Screen zeichnet, bewegt
  * und spricht — und zwar selbst, samt Ansage, damit Wackeln und Laut zusammenfallen.
@@ -341,7 +360,13 @@ fun SoundFeederTrainer(
                             onDropped = ::handleDrop,
                             modifier = Modifier
                                 .graphicsLayer {
-                                    val pop = cardPop.value
+                                    // Nie exakt 0 (siehe MinCardScale): Vor dem Aufploppen
+                                    // steht die Karte ~3 s unsichtbar im Baum, während der
+                                    // Fresser kaut — mit Skalierung 0 wäre ihre Ebene nicht
+                                    // invertierbar, und eine beliebige Berührung in dieser
+                                    // Zeit ließe Compose die Karte dauerhaft für Eingaben
+                                    // verlieren.
+                                    val pop = cardPop.value.coerceAtLeast(MinCardScale)
                                     scaleX = pop
                                     scaleY = pop
                                     translationX = cardBounce.value * 14f
