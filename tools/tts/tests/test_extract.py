@@ -67,13 +67,43 @@ def test_every_field_has_a_profile(content_dir):
         assert item.field in FIELD_TO_PROFILE, f"no profile for field {item.field}"
 
 
-def test_the_feeder_sound_has_its_own_profile():
-    """„sss" statt „Es": der Laut-Fresser bekommt eigene Clips, im Monster-Profil."""
-    by_id = {i.id: i for i in extract_items(CONTENT_DIR)}
-    item = by_id["atom:letter-s:soundTts"]
-    assert item.text == "sss"
+def test_sound_pair_graphemes_are_parsed_from_the_kotlin_table():
+    from ttskit.extract import sound_pair_graphemes
+    from ttskit.paths import Paths
+
+    graphemes = sound_pair_graphemes(Paths().sound_pairs_kt)
+    assert len(graphemes) >= 20
+    assert {"S", "Sch", "St", "Sp", "Ei", "Ö"} <= graphemes
+    displays = {a["display"] for a in json.loads((CONTENT_DIR / "atoms.json").read_text())["atoms"]
+                if a.get("kind") == "letter"}
+    assert graphemes <= displays, graphemes - displays
+
+
+def test_sound_pair_graphemes_reject_an_unparseable_file(tmp_path):
+    import pytest
+    from ttskit.extract import sound_pair_graphemes
+
+    broken = tmp_path / "SoundPairs.kt"
+    broken.write_text("object SoundPairs {}", encoding="utf-8")
+    with pytest.raises(ValueError, match="SoundPair"):
+        sound_pair_graphemes(broken)
+
+
+def test_monster_items_carry_the_lemma_for_sound_pair_graphemes_only(content_dir):
+    from ttskit.extract import FIELD_TO_PROFILE, profile_for_item
+
+    by_id = {i.id: i for i in extract_items(content_dir, monster_graphemes={"M"})}
+    item = by_id["atom:letter-m:monsterSound"]
+    assert item.text == "M"
+    assert item.field == "monsterSoundTts"
+    assert item.label == "M (Monster-Laut)"
     assert profile_for_item(item) == "monster"
-    assert FIELD_TO_PROFILE["soundTts"] == "monster"
+    assert FIELD_TO_PROFILE["monsterSoundTts"] == "monster"
+    assert "soundTts" not in FIELD_TO_PROFILE
+    # Ohne Grapheme kein Monster-Item — und Wort-Atome nie.
+    assert "atom:letter-m:monsterSound" not in {i.id for i in extract_items(content_dir)}
+    assert "atom:maus:monsterSound" not in {
+        i.id for i in extract_items(content_dir, monster_graphemes={"M", "Maus"})}
 
 
 def test_stretch_and_phoneme_share_the_phoneme_profile():
@@ -392,17 +422,21 @@ def test_no_text_is_rendered_under_two_profiles_by_accident():
     """Ein Text, zwei Profile heißt: doppelt rendern, doppelt kuratieren, einer fliegt raus.
 
     Erlaubt bleibt genau eine Paarung: der Laut `Ei` und das Wort „Ei" klingen
-    gleich, ein Clip trägt beide. Die `soundTts`-Texte („sss", „schhh") kollidieren
-    per Konstruktion mit nichts — kein Lemma und kein Display sieht so aus.
+    gleich, ein Clip trägt beide. `monster` ist eine gewollte *Variante* desselben
+    Textes (der Fresser spricht das Lemma in eigener Aufnahme) und landet im
+    Index unter `variants.monster` — es zählt hier nicht als Kollision.
     """
     from collections import defaultdict
 
-    from ttskit.extract import profile_for_item
+    from ttskit.extract import profile_for_item, sound_pair_graphemes
+    from ttskit.paths import Paths
 
     profiles_by_text = defaultdict(set)
-    for item in extract_items(CONTENT_DIR):
+    graphemes = sound_pair_graphemes(Paths().sound_pairs_kt)
+    for item in extract_items(CONTENT_DIR, monster_graphemes=graphemes):
         profiles_by_text[item.text].add(profile_for_item(item))
-    collisions = {t: sorted(p) for t, p in profiles_by_text.items() if len(p) > 1}
+    collisions = {t: sorted(p - {"monster"}) for t, p in profiles_by_text.items()
+                  if len(p - {"monster"}) > 1}
     assert collisions == {"Ei": ["phoneme", "word"]}, collisions
 
 

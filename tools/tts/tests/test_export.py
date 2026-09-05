@@ -13,7 +13,8 @@ from ttskit.plan import clip_key, fingerprint
 
 def make_paths(tmp_path: Path, content_dir: Path) -> Paths:
     return Paths(root=tmp_path, content_dir=content_dir,
-                 app_audio_dir=tmp_path / "app-audio")
+                 app_audio_dir=tmp_path / "app-audio",
+                 sound_pairs_kt=tmp_path / "SoundPairs.kt")
 
 
 def write_wav(path: Path, seconds: float = 0.2, sr: int = 24000) -> None:

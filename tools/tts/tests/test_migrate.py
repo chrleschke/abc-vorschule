@@ -20,7 +20,8 @@ def write_wav(path, seconds: float = 0.2, sr: int = 24000) -> None:
 
 def test_migrate_moves_orphan_word_lock_to_phoneme(tmp_path, content_dir):
     paths = Paths(root=tmp_path, content_dir=content_dir,
-                  app_audio_dir=tmp_path / "app-audio")
+                  app_audio_dir=tmp_path / "app-audio",
+                  sound_pairs_kt=tmp_path / "SoundPairs.kt")
     paths.locks.parent.mkdir(parents=True, exist_ok=True)
     word_key = clip_key("word", "M")
     locks = Locks()
@@ -41,7 +42,8 @@ def test_migrate_moves_orphan_word_lock_to_phoneme(tmp_path, content_dir):
 
 def test_migrate_prefers_index_committed_word_audio(tmp_path, content_dir):
     paths = Paths(root=tmp_path, content_dir=content_dir,
-                  app_audio_dir=tmp_path / "app-audio")
+                  app_audio_dir=tmp_path / "app-audio",
+                  sound_pairs_kt=tmp_path / "SoundPairs.kt")
     paths.locks.parent.mkdir(parents=True, exist_ok=True)
     paths.audio.mkdir(parents=True)
     paths.app_audio_dir.mkdir(parents=True)
@@ -68,7 +70,8 @@ def test_migrate_prefers_index_committed_word_audio(tmp_path, content_dir):
 
 def test_wire_locks_rendered_clip_without_lock(tmp_path, content_dir):
     paths = Paths(root=tmp_path, content_dir=content_dir,
-                  app_audio_dir=tmp_path / "app-audio")
+                  app_audio_dir=tmp_path / "app-audio",
+                  sound_pairs_kt=tmp_path / "SoundPairs.kt")
     paths.locks.parent.mkdir(parents=True, exist_ok=True)
     paths.audio.mkdir(parents=True)
 

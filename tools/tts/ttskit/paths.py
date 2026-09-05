@@ -14,6 +14,10 @@ class Paths:
     root: Path = TOOL_ROOT
     content_dir: Path = REPO_ROOT / "app" / "src" / "main" / "assets" / "content"
     app_audio_dir: Path = REPO_ROOT / "app" / "src" / "main" / "assets" / "audio"
+    #: Die Paar-Tabelle des Laut-Fressers liegt im Kotlin-Code — kuratiertes
+    #: Wissen, bewusst nicht im Content-Pack. Der Extractor liest sie mit.
+    sound_pairs_kt: Path = (REPO_ROOT / "app" / "src" / "main" / "java" / "app"
+                            / "abcvorschule" / "content" / "SoundPairs.kt")
 
     @property
     def profiles(self) -> Path:

@@ -39,7 +39,8 @@ def client(tmp_path, content_dir):
     (root / "extra-strings.json").write_text(
         json.dumps({"version": 1, "strings": [], "templates": []}), encoding="utf-8")
     paths = Paths(root=root, content_dir=root / "content",
-                  app_audio_dir=tmp_path / "app-audio")
+                  app_audio_dir=tmp_path / "app-audio",
+                  sound_pairs_kt=tmp_path / "SoundPairs.kt")
     app = create_app(paths, engine=FakeEngine())
     with TestClient(app) as c:
         c.paths = paths
@@ -738,7 +739,8 @@ def test_a_render_where_everything_fails_does_not_report_success(tmp_path, conte
     (root / "content").mkdir(parents=True)
     for f in content_dir.iterdir():
         _shutil.copy(f, root / "content" / f.name)
-    paths = _Paths(root=root, content_dir=root / "content")
+    paths = _Paths(root=root, content_dir=root / "content",
+                   sound_pairs_kt=tmp_path / "SoundPairs.kt")
     app = _create_app(paths, engine=BrokenEngine())
 
     with TestClient(app) as c:
