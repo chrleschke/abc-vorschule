@@ -520,6 +520,16 @@
       "seed": 490982172,
       "sourceText": "Acht Igel laufen im Garten. Drei verstecken sich. Wie viele Igel bleiben?"
     },
+    "monster:64f570f6b0e3": {
+      "seed": 1326941598,
+      "sourceText": "Bäh!"
+    },
+    "monster:c7497ed84146": {
+      "seed": 1400730555,
+      "speaker": "uncle_fu",
+      "sourceText": "Mmmmh!",
+      "generateSeed": 605562727
+    },
     "phoneme:07af03fb0629": {
       "seed": 1229924031,
       "sourceText": "Sch"
