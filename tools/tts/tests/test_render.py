@@ -650,3 +650,10 @@ def test_candidates_use_the_clip_voice_too(tmp_path):
     engine = VoiceRecordingEngine()
     sample_candidates(clip, profiles.profiles["phoneme"], engine, paths, [1, 2])
     assert engine.speakers == ["ryan", "ryan"]
+
+
+def test_random_seeds_never_enter_the_microphone_range():
+    from ttskit.mic import MIC_SEED_MIN
+    from ttskit.render import random_seeds
+    seeds = random_seeds(2000)
+    assert all(0 <= s < MIC_SEED_MIN for s in seeds)

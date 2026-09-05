@@ -32,8 +32,9 @@ from .render import (
     render_batch_candidates, sample_candidates, seeds_for_candidates,
     update_candidate_meta,
 )
+from .mic import PITCH_MIN, PITCH_MAX
 from .store import (
-    SAMPLING_PARAMS, SAMPLING_SPEC, SECONDS_PER_TOKEN,
+    PROFILE_SOURCES, SAMPLING_PARAMS, SAMPLING_SPEC, SECONDS_PER_TOKEN,
     Lock, Locks, Profiles, parse_seed,
 )
 
@@ -348,6 +349,22 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
                     profile.sampling[param] = int(value)
                 else:
                     profile.sampling[param] = value
+        if "source" in body:
+            if body["source"] not in PROFILE_SOURCES:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"unbekannte Quelle {body['source']!r}. Erlaubt: "
+                           f"{', '.join(PROFILE_SOURCES)}")
+            profile.source = body["source"]
+        if "micPitchSemitones" in body:
+            value = body["micPitchSemitones"]
+            if isinstance(value, bool) or not isinstance(value, (int, float)) \
+                    or float(value) != int(value) or not PITCH_MIN <= int(value) <= PITCH_MAX:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"micPitchSemitones muss eine Ganzzahl zwischen {PITCH_MIN} "
+                           f"und {PITCH_MAX} sein, nicht {value!r}")
+            profile.mic_pitch_semitones = int(value)
         if "trim" in body:
             profile.trim = bool(body["trim"])
         if "normalize" in body:

@@ -1363,3 +1363,14 @@ def test_one_bad_value_persists_nothing_at_all(client):
     })
     assert response.status_code == 422
     assert not client.paths.profiles.exists(), "nichts darf geschrieben worden sein"
+
+
+def test_profile_source_and_pitch_are_editable_and_validated(client):
+    assert client.put("/api/profiles/phoneme", json={"source": "mic", "micPitchSemitones": -3}).status_code == 200
+    raw = json.loads(client.paths.profiles.read_text(encoding="utf-8"))
+    assert raw["profiles"]["phoneme"]["source"] == "mic"
+    assert raw["profiles"]["phoneme"]["micPitchSemitones"] == -3
+    assert client.put("/api/profiles/phoneme", json={"source": "tape"}).status_code == 422
+    assert client.put("/api/profiles/phoneme", json={"micPitchSemitones": 20}).status_code == 422
+    state = client.get("/api/state").json()
+    assert state["profiles"]["phoneme"]["source"] == "mic"

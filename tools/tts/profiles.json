@@ -521,7 +521,9 @@
       },
       "seedPool": [],
       "trim": true,
-      "normalize": true
+      "normalize": true,
+      "source": "mic",
+      "micPitchSemitones": -4
     }
   }
 }

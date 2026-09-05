@@ -478,3 +478,33 @@ def test_every_shipped_value_is_inside_its_declared_range():
             assert spec.minimum <= value <= spec.maximum, f"{name}.{key} = {value}"
             if spec.integer:
                 assert float(value) == int(value), f"{name}.{key} = {value}"
+
+
+def test_profile_source_defaults_to_tts_and_roundtrips(tmp_path):
+    from ttskit.store import Profile
+    p = Profile.from_dict({"label": "x", "speaker": "sohee", "language": "german", "instruct": ""})
+    assert p.source == "tts" and p.mic_pitch_semitones == 0
+    d = p.to_dict()
+    assert d["source"] == "tts" and d["micPitchSemitones"] == 0
+    q = Profile.from_dict({**d, "source": "mic", "micPitchSemitones": -4})
+    assert q.source == "mic" and q.mic_pitch_semitones == -4
+
+
+def test_profile_source_and_pitch_are_validated_at_load():
+    import pytest
+    from ttskit.store import Profile
+    base = {"label": "x", "speaker": "sohee", "language": "german", "instruct": ""}
+    with pytest.raises(ValueError, match="source"):
+        Profile.from_dict({**base, "source": "tape"}, name="p")
+    with pytest.raises(ValueError, match="micPitchSemitones"):
+        Profile.from_dict({**base, "micPitchSemitones": 13}, name="p")
+    with pytest.raises(ValueError, match="micPitchSemitones"):
+        Profile.from_dict({**base, "micPitchSemitones": 1.5}, name="p")
+
+
+def test_shipped_monster_profile_records_by_microphone():
+    import json
+    from ttskit.paths import Paths
+    monster = json.loads(Paths().profiles.read_text())["profiles"]["monster"]
+    assert monster["source"] == "mic"
+    assert monster["micPitchSemitones"] == -4

@@ -238,10 +238,14 @@ def seeds_for_candidates(
 
 
 def random_seeds(n: int, exclude: set[int] | None = None) -> list[int]:
+    # Der Bereich ab MIC_SEED_MIN gehört den Mikrofon-Aufnahmen (mic.py) —
+    # ein Qwen-Kandidat darf nie mit einer Aufnahme kollidieren.
+    from .mic import MIC_SEED_MIN
+
     blocked = set(exclude or ())
     out: list[int] = []
     while len(out) < n:
-        candidate = secrets.randbelow(2 ** 31)
+        candidate = secrets.randbelow(MIC_SEED_MIN)
         if candidate in blocked:
             continue
         blocked.add(candidate)
