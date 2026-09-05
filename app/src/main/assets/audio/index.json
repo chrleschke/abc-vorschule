@@ -910,6 +910,11 @@
       "fingerprint": "3426ad957f3058be",
       "profile": "word"
     },
+    "Bäh!": {
+      "file": "monster_64f570f6b0e3.ogg",
+      "fingerprint": "ce585c95152fc113",
+      "profile": "monster"
+    },
     "Bär": {
       "file": "word_f00b1e56865e.ogg",
       "fingerprint": "fdc7ec2220ae3344",
@@ -2264,6 +2269,11 @@
       "file": "word_80619cbf258a.ogg",
       "fingerprint": "74857b4680cc8261",
       "profile": "word"
+    },
+    "Mmmmh!": {
+      "file": "monster_c7497ed84146.ogg",
+      "fingerprint": "bef176dd436645da",
+      "profile": "monster"
     },
     "Mond": {
       "file": "word_d658cc20598b.ogg",
@@ -4720,6 +4730,11 @@
       "fingerprint": "41966e15a80e84a6",
       "profile": "phoneme"
     },
+    "tt": {
+      "file": "monster_0e07cf830957.ogg",
+      "fingerprint": "1360fc1bd1cd507c",
+      "profile": "monster"
+    },
     "und": {
       "file": "word_856cc99d8734.ogg",
       "fingerprint": "81c376f6c2257e7d",
@@ -4849,6 +4864,11 @@
       "file": "reward_f28a4debbc30.ogg",
       "fingerprint": "248ddc22f47077f8",
       "profile": "reward"
+    },
+    "äää": {
+      "file": "monster_1cf0cca6ed0c.ogg",
+      "fingerprint": "a074a1e05e6527a6",
+      "profile": "monster"
     }
   },
   "version": 1

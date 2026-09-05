@@ -506,20 +506,23 @@
     },
     "monster": {
       "label": "Monster (Laute und Reaktionen)",
-      "speaker": "uncle_fu",
+      "speaker": "aiden",
       "language": "german",
-      "instruct": "Du bist ein kleines, gutmütiges Monster mit tiefer, knurriger Stimme. Sprich genau das, was da steht, als Laut — nicht als Buchstabenname, nicht als Wort: Reibelaute und Vokale gedehnt (sss, mmm, aaa), Verschlusslaute kurz und ohne angehängten Vokal (kk, tt, pp). Ausrufe wie „Bäh!“ und „Mmmmh!“ mit Freude. Deutlich artikuliert trotz Monsterstimme, deutsche Aussprache, höchstens 1,5 Sekunden.",
+      "instruct": "tiefe, knurriger Stimme. ",
       "sampling": {
-        "temperature": 1.2,
-        "top_k": 30,
-        "top_p": 0.9,
-        "repetition_penalty": 1.05,
-        "subtalker_temperature": 1.1,
-        "subtalker_top_k": 50,
-        "subtalker_top_p": 1,
-        "max_new_tokens": 63
+        "temperature": 0.6,
+        "top_k": 50,
+        "top_p": 1,
+        "repetition_penalty": 1.03,
+        "subtalker_temperature": 0.2,
+        "subtalker_top_k": 20,
+        "subtalker_top_p": 0.5,
+        "max_new_tokens": 25
       },
-      "seedPool": [],
+      "seedPool": [
+        257794307,
+        1852236395
+      ],
       "trim": true,
       "normalize": true
     }

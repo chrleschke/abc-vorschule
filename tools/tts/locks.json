@@ -520,6 +520,47 @@
       "seed": 490982172,
       "sourceText": "Acht Igel laufen im Garten. Drei verstecken sich. Wie viele Igel bleiben?"
     },
+    "monster:0e07cf830957": {
+      "seed": 1852236395,
+      "speaker": "ryan",
+      "textOverride": "TÈ..",
+      "sourceText": "tt",
+      "generateSeed": 1852236395
+    },
+    "monster:103c54b6c5b1": {
+      "seed": 1626936643,
+      "speaker": "aiden",
+      "textOverride": "-ke...",
+      "sourceText": "kw"
+    },
+    "monster:12b0f0dcaefb": {
+      "seed": 827188907,
+      "speaker": "ryan",
+      "textOverride": "Rrr...",
+      "sourceText": "rrr"
+    },
+    "monster:1cf0cca6ed0c": {
+      "seed": 73126452,
+      "textOverride": "Ä.",
+      "sourceText": "äää"
+    },
+    "monster:64f570f6b0e3": {
+      "seed": 1326941598,
+      "sourceText": "Bäh!"
+    },
+    "monster:a871c47a7f48": {
+      "seed": 257794307,
+      "profile": "monster",
+      "speaker": "uncle_fu",
+      "textOverride": "die Biene macht sss wie sum..",
+      "sourceText": "sss"
+    },
+    "monster:c7497ed84146": {
+      "seed": 1400730555,
+      "speaker": "uncle_fu",
+      "sourceText": "Mmmmh!",
+      "generateSeed": 605562727
+    },
     "phoneme:07af03fb0629": {
       "seed": 1229924031,
       "sourceText": "Sch"
