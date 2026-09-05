@@ -17,22 +17,23 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Callable
 
-from fastapi import Body, FastAPI, HTTPException
+from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.responses import (
-    FileResponse, HTMLResponse, JSONResponse, StreamingResponse,
+    FileResponse, HTMLResponse, JSONResponse, Response, StreamingResponse,
 )
 
 from . import voices
 from .cli import load_context
 from .paths import Paths
 from .plan import fingerprint, orphan_locks, status_of, top_seeds
+from .recordings import apply_edit, preview_bytes, recording_info, store_recording
 from .render import (
     candidate_fingerprint, candidate_meta, candidate_seeds, clear_production,
     clip_audio_list, deletable_candidate_seeds, delete_candidate_wav,
-    render_batch_candidates, sample_candidates, seeds_for_candidates,
-    update_candidate_meta,
+    production_fingerprint, render_batch_candidates, sample_candidates,
+    seeds_for_candidates, update_candidate_meta,
 )
-from .mic import PITCH_MIN, PITCH_MAX
+from .mic import APP_MONSTER_PITCH, PITCH_MIN, PITCH_MAX
 from .store import (
     PROFILE_SOURCES, SAMPLING_PARAMS, SAMPLING_SPEC, SECONDS_PER_TOKEN,
     Lock, Locks, Profiles, parse_seed,
@@ -253,6 +254,7 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
                        for v in voices.VOICES],
             "languages": list(voices.LANGUAGES),
             "limits": {"maxCandidates": MAX_CANDIDATES},
+            "appMonsterPitch": dict(APP_MONSTER_PITCH),
             # Das ⚙️-Panel rendert aus dieser Deklaration statt aus den
             # Schlüsseln, die ein Profil zufällig schon besitzt.
             "samplingSpec": [p.to_dict() for p in SAMPLING_SPEC],
@@ -546,13 +548,63 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
         # durch ein späteres Profil-Update invalidiert (siehe plan.status_of).
         if source.exists():
             profile = ctx.profiles.profiles[clip.profile]
-            target = fingerprint(replace(clip, seed=seed), profile)
-            verified = candidate_fingerprint(paths, key, seed) == target
+            meta = candidate_meta(paths, key, seed)
+            if meta.get("source") == "mic":
+                # Eine Aufnahme hängt an keiner Profil-Einstellung — nichts zu prüfen.
+                verified = True
+            else:
+                target = fingerprint(replace(clip, seed=seed), profile)
+                verified = candidate_fingerprint(paths, key, seed) == target
         else:
             # Nachbau-Eintrag ohne Sidecar — es gibt nichts, wogegen sich das
             # verifizieren ließe.
             verified = False
         return {"ok": "promoted", "verified": verified}
+
+    @app.post("/api/clips/{key}/recordings", status_code=201)
+    async def api_upload_recording(key: str, request: Request) -> dict[str, Any]:
+        """Mikrofon-Aufnahme aus dem Browser — WAV-Bytes im Body, kein Modell nötig."""
+        ctx, clip = clip_by_key(key)
+        data = await request.body()
+        try:
+            return store_recording(paths, clip, ctx.profiles.profiles[clip.profile], data)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    @app.get("/api/clips/{key}/recordings/{seed}")
+    def api_recording_info(key: str, seed: int) -> dict[str, Any]:
+        clip_by_key(key)
+        try:
+            return recording_info(paths, key, seed)
+        except FileNotFoundError:
+            raise HTTPException(status_code=404, detail=f"keine Rohaufnahme {seed} für {key!r}")
+
+    @app.put("/api/clips/{key}/recordings/{seed}")
+    def api_edit_recording(key: str, seed: int, body: dict = Body(...)) -> dict[str, Any]:
+        ctx, clip = clip_by_key(key)
+        try:
+            meta = apply_edit(paths, clip, seed, body)
+        except FileNotFoundError:
+            raise HTTPException(status_code=404, detail=f"keine Rohaufnahme {seed} für {key!r}")
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return {"ok": "edited", "edit": meta["edit"], "fingerprint": meta["fingerprint"]}
+
+    @app.post("/api/clips/{key}/recordings/{seed}/preview")
+    def api_preview_recording(key: str, seed: int, body: dict = Body(...)) -> Response:
+        clip_by_key(key)
+        app_pitch = body.get("appPitch")
+        if app_pitch is not None and (isinstance(app_pitch, bool)
+                                      or not isinstance(app_pitch, (int, float))
+                                      or not 0.25 <= app_pitch <= 4.0):
+            raise HTTPException(status_code=422, detail="appPitch muss ein Faktor 0,25–4 sein")
+        try:
+            data = preview_bytes(paths, key, seed, body.get("edit") or {}, app_pitch)
+        except FileNotFoundError:
+            raise HTTPException(status_code=404, detail=f"keine Rohaufnahme {seed} für {key!r}")
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return Response(content=data, media_type="audio/wav")
 
     @app.put("/api/clips/{key}/candidates/{seed}/rating")
     def api_rate_candidate(key: str, seed: int, body: dict = Body(...)) -> dict[str, Any]:

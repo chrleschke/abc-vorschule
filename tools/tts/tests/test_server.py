@@ -1376,3 +1376,123 @@ def test_profile_source_and_pitch_are_editable_and_validated(client):
     assert client.put("/api/profiles/phoneme", json={"micPitchSemitones": 20}).status_code == 422
     state = client.get("/api/state").json()
     assert state["profiles"]["phoneme"]["source"] == "mic"
+
+
+def _upload_wav(seconds=1.0, sr=48000, freq=330.0):
+    import io
+    import soundfile as sf
+    t = np.arange(int(seconds * sr)) / sr
+    tone = (0.4 * np.sin(2 * np.pi * freq * t)).astype(np.float32)
+    pad = np.zeros(int(0.3 * sr), dtype=np.float32)
+    buf = io.BytesIO()
+    sf.write(buf, np.concatenate([pad, tone, pad]), sr, format="WAV", subtype="FLOAT")
+    return buf.getvalue()
+
+
+def _first_key(client):
+    return client.get("/api/state").json()["clips"][0]["key"]
+
+
+def _upload(client, key, **kw):
+    r = client.post(f"/api/clips/{key}/recordings", content=_upload_wav(**kw),
+                    headers={"Content-Type": "audio/wav"})
+    assert r.status_code == 201, r.text
+    return r.json()
+
+
+def test_uploading_a_recording_creates_a_microphone_candidate(client):
+    from ttskit.mic import MIC_SEED_MIN
+    key = _first_key(client)
+    body = _upload(client, key)
+    seed = body["seed"]
+    assert seed >= MIC_SEED_MIN
+    folder = client.paths.candidates / key
+    assert (folder / f"{seed}.raw.wav").exists()
+    assert (folder / f"{seed}.wav").exists()
+    meta = json.loads((folder / f"{seed}.json").read_text())
+    assert meta["source"] == "mic" and meta["speaker"] == "mic"
+    assert meta["fingerprint"].startswith("mic:")
+    assert 0.2 <= meta["edit"]["start"] <= 0.3
+    assert meta["edit"]["normalize"] is True
+    assert meta["autoTrim"] == {"start": meta["edit"]["start"], "end": meta["edit"]["end"]}
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    cand = next(c for c in clip["candidates"] if c["seed"] == seed)
+    assert cand["mic"] is True and cand["fresh"] is True and cand["speaker"] == "mic"
+    assert client.get(f"/candidates/{key}/{seed}.wav").status_code == 200
+
+
+def test_recording_default_pitch_comes_from_the_profile(client):
+    key = _first_key(client)
+    profile = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)["profile"]
+    client.put(f"/api/profiles/{profile}", json={"micPitchSemitones": -4})
+    seed = _upload(client, key)["seed"]
+    meta = json.loads((client.paths.candidates / key / f"{seed}.json").read_text())
+    assert meta["edit"]["pitchSemitones"] == -4
+
+
+def test_recording_info_ships_peaks_and_edit(client):
+    key = _first_key(client)
+    seed = _upload(client, key)["seed"]
+    info = client.get(f"/api/clips/{key}/recordings/{seed}").json()
+    assert len(info["peaks"]) == 600
+    assert info["sampleRate"] == 24000
+    assert 1.5 <= info["duration"] <= 1.65
+    assert set(info["edit"]) == {"start", "end", "pitchSemitones", "normalize"}
+    assert client.get(f"/api/clips/{key}/recordings/424242").status_code == 404
+
+
+def test_editing_a_recording_rerenders_and_follows_into_production(client):
+    import soundfile as sf
+    key = _first_key(client)
+    seed = _upload(client, key)["seed"]
+    folder = client.paths.candidates / key
+    before = json.loads((folder / f"{seed}.json").read_text())["fingerprint"]
+    assert client.post(f"/api/clips/{key}/promote", json={"seed": seed}).json()["verified"] is True
+    r = client.put(f"/api/clips/{key}/recordings/{seed}",
+                   json={"start": 0.3, "end": 0.8, "pitchSemitones": 0, "normalize": False})
+    assert r.status_code == 200, r.text
+    meta = json.loads((folder / f"{seed}.json").read_text())
+    assert meta["edit"]["end"] == 0.8 and meta["fingerprint"] != before
+    data, sr = sf.read(folder / f"{seed}.wav")
+    assert abs(len(data) / sr - 0.5) < 0.02
+    prod, _ = sf.read(client.paths.audio / f"{key}.wav")
+    assert len(prod) == len(data)
+
+
+def test_invalid_edits_are_422(client):
+    key = _first_key(client)
+    seed = _upload(client, key)["seed"]
+    for bad in ({"start": 0.9, "end": 0.2}, {"start": 0.0, "end": 99.0},
+                {"start": 0.0, "end": 0.5, "pitchSemitones": 13}):
+        assert client.put(f"/api/clips/{key}/recordings/{seed}", json=bad).status_code == 422
+
+
+def test_preview_returns_wav_and_persists_nothing(client):
+    key = _first_key(client)
+    seed = _upload(client, key)["seed"]
+    folder = client.paths.candidates / key
+    before = (folder / f"{seed}.json").read_text()
+    r = client.post(f"/api/clips/{key}/recordings/{seed}/preview",
+                    json={"edit": {"start": 0.3, "end": 0.6}, "appPitch": 0.75})
+    assert r.status_code == 200 and r.content[:4] == b"RIFF"
+    assert (folder / f"{seed}.json").read_text() == before
+
+
+def test_bad_uploads_are_422(client):
+    key = _first_key(client)
+    r = client.post(f"/api/clips/{key}/recordings", content=b"kein wav",
+                    headers={"Content-Type": "audio/wav"})
+    assert r.status_code == 422
+
+
+def test_deleting_a_recording_removes_the_raw_take_too(client):
+    key = _first_key(client)
+    seed = _upload(client, key)["seed"]
+    assert client.delete(f"/api/clips/{key}/candidates/{seed}").status_code == 200
+    folder = client.paths.candidates / key
+    assert not (folder / f"{seed}.raw.wav").exists()
+    assert not (folder / f"{seed}.json").exists()
+
+
+def test_state_ships_the_app_monster_pitch(client):
+    assert client.get("/api/state").json()["appMonsterPitch"] == {"left": 0.75, "right": 1.3}

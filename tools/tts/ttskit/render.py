@@ -337,6 +337,19 @@ def candidate_fingerprint(paths: Paths, clip_key: str, seed: int) -> str | None:
     return value if isinstance(value, str) else None
 
 
+def production_fingerprint(paths: Paths, clip: Clip, profile: Profile) -> str:
+    """Fingerprint der Produktion für Export und Promote.
+
+    Für Qwen-Clips `plan.fingerprint`; für eine Mikrofon-Aufnahme der Hash der
+    bearbeiteten Audiodatei aus dem Sidecar — nur der ändert sich, wenn jemand
+    neu schneidet oder pitcht, und nur dann soll der Export neu encodieren.
+    """
+    meta = candidate_meta(paths, clip.key, clip.seed)
+    if meta.get("source") == "mic" and isinstance(meta.get("fingerprint"), str):
+        return meta["fingerprint"]
+    return fingerprint(clip, profile)
+
+
 def update_candidate_meta(paths: Paths, clip_key: str, seed: int,
                           **changes: Any) -> dict[str, Any]:
     """Einzelne Sidecar-Felder setzen (None löscht ein Feld ausdrücklich).
@@ -383,13 +396,17 @@ def candidate_infos(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
         recorded = meta.get("fingerprint")
         recorded = recorded if isinstance(recorded, str) else None
         current = fingerprint(replace(clip, seed=seed), profile)
+        is_mic = meta.get("source") == "mic"
         infos.append({
             "seed": seed,
-            "fresh": None if recorded is None else recorded == current,
+            # Eine Aufnahme kann nicht „veraltet" sein — sie hängt an keiner
+            # Profil-Einstellung. Immer frisch, damit kein „⚠️ alt" erscheint.
+            "fresh": True if is_mic else (None if recorded is None else recorded == current),
             "createdAt": meta.get("createdAt"),
             "speaker": meta.get("speaker"),
             "text": meta.get("text"),
             "good": meta.get("rating") == "good",
+            "mic": is_mic,
         })
     infos.sort(key=lambda info: (info["createdAt"] or "", info["seed"]), reverse=True)
     return infos
@@ -426,6 +443,7 @@ def clip_audio_list(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
         "text": clip.text,
         "good": False,
         "isProductionOnly": True,
+        "mic": False,
     })
     infos.sort(key=lambda info: (info["createdAt"] or "", info["seed"]), reverse=True)
     return infos
@@ -467,6 +485,7 @@ def delete_candidate_wav(paths: Paths, clip: Clip, seed: int) -> None:
 
     wav.unlink()
     (paths.candidates / clip.key / f"{seed}.json").unlink(missing_ok=True)
+    (paths.candidates / clip.key / f"{seed}.raw.wav").unlink(missing_ok=True)
 
     production = paths.audio / f"{clip.key}.wav"
     if clip.seed == seed and production.exists():

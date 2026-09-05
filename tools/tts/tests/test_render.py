@@ -657,3 +657,19 @@ def test_random_seeds_never_enter_the_microphone_range():
     from ttskit.render import random_seeds
     seeds = random_seeds(2000)
     assert all(0 <= s < MIC_SEED_MIN for s in seeds)
+
+
+def test_production_fingerprint_prefers_the_microphone_sidecar(setup):
+    import json
+    from dataclasses import replace
+    from ttskit.plan import fingerprint
+    from ttskit.render import production_fingerprint
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    assert production_fingerprint(paths, clip, profile) == fingerprint(clip, profile)
+    folder = paths.candidates / clip.key
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / f"{clip.seed}.json").write_text(json.dumps(
+        {"source": "mic", "fingerprint": "mic:abc"}), encoding="utf-8")
+    assert production_fingerprint(paths, clip, profile) == "mic:abc"
