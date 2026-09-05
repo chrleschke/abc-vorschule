@@ -380,6 +380,9 @@ function renderList() {
 }
 
 function select(key) {
+  // Sonst liefe eine Aufnahme für den bisherigen Clip im Hintergrund weiter
+  // und ginge beim nächsten Wechsel oder Reload stillschweigend verloren.
+  if (state.recorder) stopRecording().catch(showError);
   state.selected = key;
   acknowledgeClip(key);
   persistViewState();
@@ -997,6 +1000,10 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
 
 async function openEditor(clipKey, seed) {
   const info = await api(`/api/clips/${encodeURIComponent(clipKey)}/recordings/${seed}`);
+  // Ohne diesen Stopp liefe eine laufende Vorschau des vorherigen Editors
+  // weiter, während state.editor schon überschrieben ist — ihr Play-Button
+  // wäre dann unerreichbar und die Object-URL bliebe unrevoked.
+  stopPreview(state.editor);
   state.editor = { clipKey, seed, info, edit: { ...info.edit }, drag: null, playing: null };
   if (state.selected === clipKey) renderDetail(clipKey);
 }
@@ -1144,7 +1151,14 @@ function wireEditor(clip) {
       const url = URL.createObjectURL(await response.blob());
       stopPreview(ed);
       ed.playing = new Audio(url);
-      ed.playing.onended = () => { el("ed-status").textContent = ""; };
+      const playing = ed.playing;
+      ed.playing.onended = () => {
+        // Läuft die Vorschau bis zum Ende durch, ruft niemand stopPreview() —
+        // ohne das hier hielte jede abgehörte Bearbeitung ihre Blob-URL fest.
+        URL.revokeObjectURL(playing.src);
+        if (ed.playing === playing) ed.playing = null;
+        el("ed-status").textContent = "";
+      };
       el("ed-status").textContent = button.dataset.appPitch
         ? `spielt mit App-Pitch ×${button.dataset.appPitch}` : "spielt";
       await ed.playing.play();
@@ -1221,17 +1235,39 @@ async function stopRecording() {
   rec.node.disconnect();
   rec.stream.getTracks().forEach((t) => t.stop());
   await rec.ctx.close();
-  const blob = encodeWav(rec.chunks, rec.ctx.sampleRate);
+  // Der Worklet-Callback prüft die 30-s-Grenze erst NACH jedem Chunk — der
+  // Chunk, der sie überschreitet, ist schon eingesammelt. Ohne diese Kappung
+  // würde der Upload MAX_RECORDING_SECONDS überschreiten und der Server
+  // antwortet mit 422 — die ganze Aufnahme wäre verloren.
+  const maxSamples = Math.floor(MAX_RECORDING_SECONDS * rec.ctx.sampleRate);
+  const chunks = [];
+  let total = 0;
+  for (const chunk of rec.chunks) {
+    if (total >= maxSamples) break;
+    const remaining = maxSamples - total;
+    if (chunk.length <= remaining) {
+      chunks.push(chunk);
+      total += chunk.length;
+    } else {
+      chunks.push(chunk.subarray(0, remaining));
+      total += remaining;
+      break;
+    }
+  }
+  const blob = encodeWav(chunks, rec.ctx.sampleRate);
   const response = await fetch(`/api/clips/${encodeURIComponent(rec.clipKey)}/recordings`, {
     method: "POST", headers: { "Content-Type": "audio/wav" }, body: blob,
   });
   if (!response.ok) {
     const detail = (await response.json().catch(() => ({}))).detail;
+    redrawDetail();   // sonst bleibt der Knopf bei „■ Stopp“, obwohl nichts läuft
     throw new Error(detail || `${response.status} ${response.statusText}`);
   }
   const result = await response.json();
   await refresh({ keepDetail: true });
-  await openEditor(rec.clipKey, result.seed);   // Task 8
+  if (state.selected === rec.clipKey) {
+    await openEditor(rec.clipKey, result.seed);   // Task 8
+  }
   showBanner(`Aufnahme gespeichert (Seed ${result.seed}) — jetzt schneiden, dann „Übernehmen“.`, "ok");
 }
 
@@ -1609,8 +1645,15 @@ function renderDetail(key) {
   const recordButton = el("btn-record");
   if (recordButton) {
     recordButton.onclick = guard(async () => {
-      if (state.recorder) await stopRecording();
-      else await startRecording(clip);
+      // state.recorder ist global — läuft schon eine Aufnahme für einen
+      // ANDEREN Clip, muss die erst gestoppt (und für ihren eigenen Clip
+      // hochgeladen) werden, bevor hier eine neue beginnt.
+      if (state.recorder && state.recorder.clipKey === clip.key) {
+        await stopRecording();
+      } else {
+        if (state.recorder) await stopRecording();
+        await startRecording(clip);
+      }
     });
   }
   if (state.editor && state.editor.clipKey === clip.key) wireEditor(clip);  // Task 8
