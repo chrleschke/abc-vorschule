@@ -650,3 +650,26 @@ def test_candidates_use_the_clip_voice_too(tmp_path):
     engine = VoiceRecordingEngine()
     sample_candidates(clip, profiles.profiles["phoneme"], engine, paths, [1, 2])
     assert engine.speakers == ["ryan", "ryan"]
+
+
+def test_random_seeds_never_enter_the_microphone_range():
+    from ttskit.mic import MIC_SEED_MIN
+    from ttskit.render import random_seeds
+    seeds = random_seeds(2000)
+    assert all(0 <= s < MIC_SEED_MIN for s in seeds)
+
+
+def test_production_fingerprint_prefers_the_microphone_sidecar(setup):
+    import json
+    from dataclasses import replace
+    from ttskit.plan import fingerprint
+    from ttskit.render import production_fingerprint
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    assert production_fingerprint(paths, clip, profile) == fingerprint(clip, profile)
+    folder = paths.candidates / clip.key
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / f"{clip.seed}.json").write_text(json.dumps(
+        {"source": "mic", "fingerprint": "mic:abc"}), encoding="utf-8")
+    assert production_fingerprint(paths, clip, profile) == "mic:abc"

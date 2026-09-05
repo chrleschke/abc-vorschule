@@ -427,12 +427,18 @@ niemals mit einem stummen No-Op.
 - Wenn kein deutsches TTS: visuelle Fallbacks, Aufgabe bleibt spielbar.
 - Wort-Bauer (Trainer 4): Prompt „Baue das Wort ….“ (ohne Tray-Instruktion); Silben-/Buchstabenklötze in Schablonen tragen die Aufgabe, keine zusätzliche Lese-Titelzeile.
 - Satz-Architekt (Trainer 5): Mehrwort-Prompt = Satztext ohne „Ordne die Wörter…“; Einwort-Bild-Zuordnung behält „Ordne das Wort … dem Bild zu.“
-- **Monster-Stimme (Laut-Fresser):** Laute und Wörter bleiben kuratierte Clips, nur die
-  Tonhöhe kippt zur Laufzeit (`VoiceStyle`: links tiefer, rechts höher) — die Artikulation
-  ist der Engpass der App und darf nicht leiden. Echte Monster-Sprache gibt es nur für
-  „Bäh!" und „Mmmmh!" (TTS-Profil `monster`). Der Fresser spricht dabei den *Laut*
-  (`soundTts`, Profil `monster`: „sss" statt „Es"), während Jagd, Wort-Detektiv und
-  Spurensucher beim Buchstaben-Clip bleiben. Der Trainer spricht seine Ansage und
+- **Monster-Stimme (Laut-Fresser):** Wörter bleiben kuratierte, normale Clips — nur die
+  Tonhöhe kippt zur Laufzeit (`VoiceStyle`: links tiefer 0.75, rechts höher 1.3), die
+  Artikulation ist der Engpass der App und darf nicht leiden. Die *Laute* bekommen
+  dieselbe Laufzeit-Tonhöhe obendrauf, aber eine eigene Quelle: Der Fresser spricht das
+  Lemma des Graphems („S", „Sch") aus einer **von Hand aufgenommenen** Variante
+  `monster` im Clip-Index (Mikrofon-Aufnahme im Qwen-Web-Interface, Spec
+  `2026-09-05-lautfresser-mikrofon-aufnahme-design.md`), während Jagd, Wort-Detektiv und
+  Spurensucher beim Buchstabennamen-Clip bleiben. „Bäh!" und „Mmmmh!" bleiben Qwen-Clips
+  im TTS-Profil `monster` (Stimme `uncle_fu`) und werden ebenfalls mit der Laufzeit-
+  Tonhöhe der jeweiligen Seite gesprochen. Ohne Aufnahme fällt der Laut auf denselben
+  Buchstabennamen-Clip bzw. Android-TTS mit dem Lemma zurück — keine Fake-Aussprache
+  mehr (`soundTts` entfiel im September 2026). Der Trainer spricht seine Ansage und
   Vorstellung selbst (`currentPromptParts` ist für ihn leer), damit Wackeln und Laut
   zusammenfallen. Ohne deutsches TTS steht das Wort als Text unter dem Emoji — ein
   Hörspiel ist sonst unspielbar.

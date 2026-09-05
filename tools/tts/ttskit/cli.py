@@ -9,7 +9,7 @@ from pathlib import Path
 import time
 from dataclasses import dataclass, field
 
-from .extract import extract_items
+from .extract import extract_items, sound_pair_graphemes
 from .models import Clip, Item
 from .paths import Paths
 from .plan import build_clips, orphan_locks, status_of
@@ -33,7 +33,9 @@ class Context:
 def load_context(paths: Paths) -> Context:
     extra = read_json(paths.extra_strings)
     blanks: list[str] = []
-    items = extract_items(paths.content_dir, extra_strings=extra, blanks=blanks)
+    graphemes = sound_pair_graphemes(paths.sound_pairs_kt) if paths.sound_pairs_kt.exists() else ()
+    items = extract_items(paths.content_dir, extra_strings=extra, blanks=blanks,
+                          monster_graphemes=graphemes)
     profiles = Profiles.load(paths.profiles)
     locks = Locks.load(paths.locks)
     return Context(

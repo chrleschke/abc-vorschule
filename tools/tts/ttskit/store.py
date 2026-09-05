@@ -24,8 +24,15 @@ SECONDS_PER_TOKEN = 0.08
 #: des Checkpoints. Mehr anzubieten wäre unbelegt.
 MAX_NEW_TOKENS_CEILING = 8192
 
-#: Obergrenze für Zufalls-Seeds — entspricht `secrets.randbelow(2**31)`.
+#: Obergrenze für `parse_seed`, nicht für die Ziehung selbst: bleibt bei 2**31,
+#: damit Mikrofon-Pseudo-Seeds (`mic.MIC_SEED_MIN` … `mic.MIC_SEED_MAX`, knapp
+#: unter 2**31) die Prüfung passieren. `render.random_seeds` zieht echte
+#: Zufalls-Seeds nur unterhalb von `mic.MIC_SEED_MIN`.
 MAX_RANDOM_SEED = 2 ** 31
+
+#: Woher die Aufnahmen eines Profils standardmäßig kommen: Qwen („tts") oder
+#: Mikrofon („mic"). Der Umschalter im UI ist damit nur vorbelegt, nicht festgelegt.
+PROFILE_SOURCES = ("tts", "mic")
 
 
 def parse_seed(value: Any) -> int:
@@ -166,6 +173,8 @@ def _profile(label: str, instruct: str, max_tokens: int) -> dict[str, Any]:
         "seedPool": [],
         "trim": True,
         "normalize": True,
+        "source": "tts",
+        "micPitchSemitones": 0,
     }
 
 
@@ -341,6 +350,11 @@ class Profile:
     seed_pool: list[int]
     trim: bool = True
     normalize: bool = True
+    #: Default-Quelle neuer Kandidaten (siehe PROFILE_SOURCES). Nicht Teil des
+    #: Fingerprints — Mikrofon-Aufnahmen tragen ihren eigenen (mic.fingerprint_of).
+    source: str = "tts"
+    #: Default-Tonhöhe des Aufnahme-Editors in Halbtönen (mic.PITCH_MIN…PITCH_MAX).
+    mic_pitch_semitones: int = 0
 
     @classmethod
     def from_dict(cls, raw: dict[str, Any], *, name: str = "?",
@@ -358,6 +372,15 @@ class Profile:
                              f"object, got {type(raw_sampling).__name__}")
         sampling = dict(raw_sampling)
         validate_sampling_values(sampling, name=name, path=path)
+        source = raw.get("source", "tts")
+        if source not in PROFILE_SOURCES:
+            raise ValueError(f"{where}profile {name!r} has unknown source {source!r} "
+                             f"— allowed: {', '.join(PROFILE_SOURCES)}")
+        pitch_raw = raw.get("micPitchSemitones", 0)
+        if isinstance(pitch_raw, bool) or not isinstance(pitch_raw, (int, float)) \
+                or float(pitch_raw) != int(pitch_raw) or not -12 <= int(pitch_raw) <= 12:
+            raise ValueError(f"{where}profile {name!r} has invalid micPitchSemitones "
+                             f"{pitch_raw!r} — allowed: whole numbers from -12 to 12")
         return cls(
             label=raw["label"],
             speaker=raw["speaker"],
@@ -367,6 +390,8 @@ class Profile:
             seed_pool=list(raw.get("seedPool", [])),
             trim=bool(raw.get("trim", True)),
             normalize=bool(raw.get("normalize", True)),
+            source=source,
+            mic_pitch_semitones=int(pitch_raw),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -379,6 +404,8 @@ class Profile:
             "seedPool": self.seed_pool,
             "trim": self.trim,
             "normalize": self.normalize,
+            "source": self.source,
+            "micPitchSemitones": self.mic_pitch_semitones,
         }
 
 

@@ -355,7 +355,10 @@ class SpeechController(
     /** Clip gefunden und gestartet? `speaking` bildet nur den Primary-Kanal ab — die
      * Rundenansage, nicht ein gleichzeitig laufendes Feedback-Echo (design doc). */
     private fun playClip(text: String, channel: SpeechChannel, voice: VoiceStyle, onComplete: () -> Unit): Boolean {
-        val entry = clips.lookup(text) ?: return false
+        // Monster-Stimme: zuerst die eigene Aufnahme des Fressers, sonst der normale
+        // Clip — und in beiden Fällen die Laufzeit-Tonhöhe obendrauf (design doc §7).
+        val variant = if (voice == VoiceStyle.Normal) null else ClipIndex.MONSTER_VARIANT
+        val entry = clips.lookup(text, variant) ?: return false
         val started = clipPlayers.getValue(channel).play(entry.file, voice.pitch) {
             if (channel == SpeechChannel.Primary) _speaking.value = false
             onComplete()

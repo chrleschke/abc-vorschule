@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
+from typing import Iterable
 
 from .models import Item
 from .store import read_json
@@ -16,10 +18,11 @@ FIELD_TO_PROFILE: dict[str, str] = {
     # strict subset of phonemeTts. Same treatment, same profile — otherwise
     # the same 20 sounds get rendered and curated twice.
     "stretchTts": "phoneme",
-    # Laute und Reaktionen des Laut-Fressers sind eine Stimme — die der
-    # Monster. Die App legt die Stereo-Verteilung (links/rechts) je
-    # VoiceStyle trotzdem selbst zur Laufzeit fest.
-    "soundTts": "monster",
+    # Der Laut eines Graphems in der Stimme des Laut-Fressers — Text ist das
+    # Lemma („S", „Sch"), aufgenommen per Mikrofon (Profil monster, source mic).
+    # Bis September 2026 stand hier `soundTts` mit Fake-Aussprachen („sss"),
+    # die weder Qwen noch Android-TTS brauchbar sprachen.
+    "monsterSoundTts": "monster",
     "promptTts": "prompt",
     "instructionTts": "prompt",
     "missTts": "miss",
@@ -104,6 +107,23 @@ def reads_as_bare_sentence(text: str) -> bool:
 def reads_as_math_task(text: str) -> bool:
     """Trägt dieser Text eine Rechenaufgabe? Siehe [MATH_MARKER]."""
     return MATH_MARKER in text
+
+
+_SOUND_PAIR_RE = re.compile(r'SoundPair\(\s*"([^"]+)"\s*,\s*"([^"]+)"')
+
+
+def sound_pair_graphemes(path: Path) -> frozenset[str]:
+    """Grapheme der Paar-Tabelle aus `SoundPairs.kt` (`SoundPair("S", "Sch", …)`).
+
+    Regex statt Kotlin-Parser: die Tabelle ist eine Liste von Konstruktoraufrufen
+    und soll es bleiben. Findet der Ausdruck nichts, hat sich das Format geändert
+    — dann lieber laut scheitern, als still ohne Monster-Clips weiterzulaufen.
+    """
+    text = Path(path).read_text(encoding="utf-8")
+    pairs = _SOUND_PAIR_RE.findall(text)
+    if not pairs:
+        raise ValueError(f"{path}: kein SoundPair(\"…\", \"…\") gefunden — Tabellenformat geändert?")
+    return frozenset(g for pair in pairs for g in pair)
 
 
 def profile_for_item(item: Item) -> str:
@@ -212,7 +232,8 @@ def _speech_reachable_atom_ids(tasks: list[dict]) -> set[str]:
 
 
 def extract_items(content_dir: Path, extra_strings: dict | None = None,
-                  blanks: list[str] | None = None) -> list[Item]:
+                  blanks: list[str] | None = None,
+                  monster_graphemes: Iterable[str] | None = None) -> list[Item]:
     """Collect every authored TTS string from the content pack.
 
     Blank strings are skipped — they would produce empty audio. Pass a list as
@@ -220,6 +241,7 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
     instead of silently swallowing an authoring mistake.
     """
     content_dir = Path(content_dir)
+    graphemes = frozenset(monster_graphemes or ())
     atoms = _load(content_dir, "atoms.json", "atoms")
     sentences = _load(content_dir, "sentences.json", "sentences")
     finales = _load(content_dir, "finales.json", "finales")
@@ -247,9 +269,9 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
             "atoms.json", None, f"{atom.get('display', atom['id'])} ({atom.get('kind', '?')})",
             atom_kind=atom.get("kind"))
 
-        if atom.get("soundTts"):
-            add(f"atom:{atom['id']}:soundTts", atom["soundTts"], "soundTts",
-                "atoms.json", None, f"{atom.get('display', atom['id'])} (Laut)")
+        if atom.get("kind") == "letter" and atom.get("display") in graphemes:
+            add(f"atom:{atom['id']}:monsterSound", atom.get("lemma", ""), "monsterSoundTts",
+                "atoms.json", None, f"{atom.get('display', atom['id'])} (Monster-Laut)")
 
         if atom["id"] not in reachable:
             continue

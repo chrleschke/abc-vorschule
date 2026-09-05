@@ -13,7 +13,8 @@ def make_root(tmp_path: Path, content_dir: Path) -> Paths:
         shutil.copy(f, root / "content" / f.name)
     (root / "extra-strings.json").write_text(
         json.dumps({"version": 1, "strings": [], "templates": []}), encoding="utf-8")
-    return Paths(root=root, content_dir=root / "content")
+    return Paths(root=root, content_dir=root / "content",
+                 sound_pairs_kt=tmp_path / "SoundPairs.kt")
 
 
 def test_extract_writes_a_manifest(tmp_path, content_dir):

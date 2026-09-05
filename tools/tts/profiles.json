@@ -524,7 +524,9 @@
         1852236395
       ],
       "trim": true,
-      "normalize": true
+      "normalize": true,
+      "source": "mic",
+      "micPitchSemitones": -4
     }
   }
 }

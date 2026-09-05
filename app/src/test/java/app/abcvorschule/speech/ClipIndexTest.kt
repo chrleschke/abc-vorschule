@@ -18,6 +18,47 @@ class ClipIndexTest {
         }
     """.trimIndent()
 
+    private val withVariants = """
+        {
+          "version": 1,
+          "clips": {
+            "S": { "file": "phoneme_s.ogg", "profile": "phoneme" },
+            "Bäh!": { "file": "monster_baeh.ogg", "profile": "monster" }
+          },
+          "variants": {
+            "monster": {
+              "S": { "file": "monster_s.ogg", "profile": "monster" },
+              "Bäh!": { "file": "monster_baeh.ogg", "profile": "monster" }
+            }
+          }
+        }
+    """.trimIndent()
+
+    @Test
+    fun `Variante monster liefert die Aufnahme des Fressers`() {
+        val index = ClipIndex.parse(withVariants)
+        assertEquals("monster_s.ogg", index.lookup("S", ClipIndex.MONSTER_VARIANT)?.file)
+        assertEquals("phoneme_s.ogg", index.lookup("S")?.file)
+    }
+
+    @Test
+    fun `ohne Variante faellt der Lookup auf den normalen Clip zurueck`() {
+        val index = ClipIndex.parse(withVariants)
+        assertEquals("phoneme_s.ogg", index.lookup("S", "geist")?.file)
+        assertEquals("monster_baeh.ogg", index.lookup("Bäh!", ClipIndex.MONSTER_VARIANT)?.file)
+        assertNull(index.lookup("X", ClipIndex.MONSTER_VARIANT))
+    }
+
+    @Test
+    fun `Index ohne variants-Block bleibt lesbar`() {
+        assertEquals("word_1a2b3c4d5e6f.ogg", ClipIndex.parse(sample).lookup("M", ClipIndex.MONSTER_VARIANT)?.file)
+    }
+
+    @Test
+    fun `entries enthalten auch die Varianten`() {
+        assertEquals(4, ClipIndex.parse(withVariants).entries().size)
+    }
+
     @Test
     fun `findet Clip per exaktem Text`() {
         val index = ClipIndex.parse(sample)

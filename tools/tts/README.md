@@ -13,6 +13,9 @@ Alles läuft mit dem Interpreter aus dem Qwen-venv:
 alias tts="~/qwen-tts-test/.venv/bin/python $(git rev-parse --show-toplevel)/tools/tts/tts"
 ```
 
+Die Mikrofon-Aufnahme-Kette (Resampling, Auto-Trim, Tonhöhen-Verschiebung) braucht
+zusätzlich `scipy` und `librosa` im selben venv.
+
 ## Quickstart: Web-Interface
 
 ```bash
@@ -30,6 +33,11 @@ Beenden mit **Ctrl-C** im Terminal; offene Browser-Tabs blockieren den Exit nich
 `audio/index.json` schlüsselt nach **Text**, nicht nach Fundstelle. Zwei Stellen mit
 demselben Wortlaut teilen sich also automatisch eine Aufnahme — die 34 Lektionen mit
 „Ordne das richtige Bild zu." brauchen genau einen Clip.
+
+Daneben trägt `index.json` einen Block `variants`: Aufnahmen desselben Textes in einer
+anderen Stimme, adressiert über `ClipIndex.lookup(text, variant)` statt über den
+normalen Text-Schlüssel. `monster`-Clips landen unter `variants.monster` — und
+zusätzlich unter `clips`, wenn kein anderes Profil denselben Text schon dort belegt.
 
 Der Haken war das **Profil**: derselbe Text unter zwei Profilen sind zwei Renders, zwei
 Kuratierungen — und in der App gewinnt nur einer (`export._collision_winner`). Der
@@ -212,6 +220,31 @@ Modell-Config im HF-Cache abgeglichen, damit sie nicht auseinanderläuft. Ein St
 pro Profil gilt für neue Kandidaten aller seiner Clips; ein Wechsel pro Clip trifft nur
 diesen einen.
 
+## Mikrofon-Aufnahmen
+
+Jeder Clip kann statt aus Qwen aus dem **Mikrofon** kommen: Umschalter „Quelle:
+🎲 TTS | 🎙 Mikrofon" in der Detailsicht, vorbelegt aus `source` im Profil (`monster`
+steht auf `mic`), pro Clip im Browser gemerkt. „● Aufnehmen" nimmt mono ohne
+Rauschunterdrückung auf (AudioWorklet, max. 30 s); „■ Stopp" lädt die Aufnahme hoch
+und öffnet den **Editor**: Wellenform der ganzen Aufnahme, weggeschnittene Ränder grau,
+der automatische Stille-Schnitt als gestrichelte Linien, zwei ziehbare Griffe,
+Tonhöhe in Halbtönen (Default `micPitchSemitones` des Profils, Tempo bleibt —
+`librosa.effects.pitch_shift`), Normalisieren auf −1 dBFS. „▶ Anhören" spielt die
+Bearbeitung; bei `monster` zusätzlich „▶ Laufzeit links/rechts" mit dem App-Pitch
+(`mic.APP_MONSTER_PITCH`, Spiegel von `VoiceStyle`). „Übernehmen" schreibt den Kandidaten.
+
+Eine Aufnahme **ist ein Kandidat**: Radio „Produktion", 👍/👎, „Alle löschen" und Export
+funktionieren unverändert. Ihr „Seed" ist ein Pseudo-Seed ≥ 1 900 000 000
+(`mic.MIC_SEED_MIN`; Qwen-Zufalls-Seeds bleiben darunter). Dateien unter
+`out/candidates/<key>/`: `<seed>.raw.wav` (Rohaufnahme, 24 kHz mono, bleibt),
+`<seed>.wav` (bearbeitet), `<seed>.json` mit `source: "mic"`, `edit`, `autoTrim` und
+`fingerprint: "mic:<sha>"` der bearbeiteten Datei — nur der steuert das Re-Encoding im
+Export. ✂ in der Kandidaten-Zeile öffnet den Editor erneut; ist die Aufnahme gerade
+Produktion, zieht `out/audio/<key>.wav` mit. Auto-Trim rechnet relativ zum Rauschboden
+(`mic.auto_trim`), anders als `audio.trim_silence` für Qwen-Ausgaben. Wurde die
+`<seed>.raw.wav` von Hand gelöscht, meldet ✂ nur einen 404-Banner — es gibt kein eigenes
+Flag dafür (Design-Doc §7 „Rohaufnahme fehlt" wurde darauf vereinfacht).
+
 ## Profil-Zuordnung
 
 `FIELD_TO_PROFILE` in `ttskit/extract.py` mappt logische Felder auf Synthese-Profile.
@@ -220,19 +253,16 @@ Profil `phoneme` (Lautwert), alle anderen Lemmata im Profil `word`. Damit kollid
 Buchstaben wie `M` und Silben wie `ma` nicht doppelt mit `phonemeTts`/`stretchTts` —
 identischer Text im selben Profil wird zu einem Clip zusammengefasst.
 
-Das Profil `monster` ist die Stimme des Laut-Fressers: sowohl die *Laute* selbst
-(„sss", „schhh", aus dem optionalen `soundTts` an den Buchstaben-Atomen) als auch seine
-zwei Reaktionen („Bäh!", „Mmmmh!", Feld `monsterTts` in `extra-strings.json`) — eine
-Stimme für beides, weil beides derselbe Charakter ist. `phoneme` liest ausdrücklich
-Buchstaben*namen* vor („Es", „Ka"), und genau die sollen die Monster nicht rülpsen;
-Jagd, Wort-Detektiv und Spurensucher bleiben beim Lemma-Clip. Gleiche Laut-Texte teilen
-sich einen Clip (ß/S, V/F, ck/K, C/Z sprechen sich gleich), und kein `soundTts` sieht
-aus wie ein Lemma oder Display — sonst zöge der Index still den Buchstabennamen-Clip.
-Sprecher ist `uncle_fu` (tief, männlich) statt sohee — eigens für die Monster, nicht
-sohees Stimme mit Tonhöhen-Trick; die Oberfläche warnt hier bewusst per `accent_risk`
-(eine nicht-europäische Stimme spricht deutschen Text), das ist für die Monster-Laute
-akzeptiert. Die App verteilt links/rechts weiterhin selbst per `VoiceStyle`, das ändert
-an der Aufnahme nichts. 40 Laut-Clips plus 2 Reaktionen — nur der Fresser nutzt sie.
+Das Profil `monster` ist die Stimme des Laut-Fressers. Seine zwei Reaktionen („Bäh!",
+„Mmmmh!", Feld `monsterTts` in `extra-strings.json`) sind Qwen-Clips mit `uncle_fu`.
+Die *Laute* dagegen — ein Clip pro Graphem der `SoundPairs`-Tabelle
+(`app/…/content/SoundPairs.kt`, per Regex gelesen) mit dem **Lemma** als Text („S",
+„Sch") — werden **per Mikrofon aufgenommen** (siehe „Mikrofon-Aufnahmen"). Bis
+September 2026 trugen die Buchstaben-Atome dafür eine Fake-Aussprache `soundTts`
+(„sss", „schhh"); weder Qwen noch die Android-TTS sprachen sie brauchbar, und die
+TTS liest „S" ohnehin besser als „sss". Im Index landen `monster`-Clips unter
+`variants.monster`; die App sucht dort, sobald sie mit Monster-Stimme spricht, und
+legt ihre Laufzeit-Tonhöhe (links 0.75, rechts 1.3) weiterhin obendrauf.
 
 Das Profil `article_word` trägt die Lösungswörter **mit Artikel** („das Haus"), die das
 Erfolgs-Vorsprechen nennt. Es ist bewusst nicht `word`: dessen `max_new_tokens: 25` (≈ 2,0 s)
@@ -270,7 +300,9 @@ neue Atom und jeder neue Trainer verschiebt sie, und eine Zahl in der README ist
 dem nächsten Content-Commit still falsch.
 
 Der Größe nach tragen `word`, `prompt`, `sentence`, `reward`, `article_word`, `miss`
-und `phoneme` den Löwenanteil; `finale`, `monster` und `ui` sind eine Handvoll Clips.
+und `phoneme` den Löwenanteil; `finale` und `ui` sind eine Handvoll Clips. `monster`
+liegt bei 26 Laut-Clips (ein Graphem je `SoundPairs`-Eintrag) plus 2 Reaktionen — mehr
+als „eine Handvoll", aber weiterhin klein gegen die Text-Profile.
 
 Ein voller `render`-Lauf dauert ungefähr 25–40 Minuten — je nach Profilmix. Ein kurzer
 Satz braucht ~2,4 s, ein langer `finale`-Satz im Schnitt ~3,2 s; die einzelnen

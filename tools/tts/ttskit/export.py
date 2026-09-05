@@ -38,15 +38,25 @@ import soundfile as sf
 
 from .extract import reads_as_bare_sentence
 from .paths import Paths
-from .plan import fingerprint, orphan_locks, status_of
+from .plan import orphan_locks, status_of
+from .render import production_fingerprint
 
 #: Bei gleichem Quelltext in mehreren Profilen gewinnt das frühere Profil —
 #: nach verified-Audio (Fingerprint stimmt mit dem letzten Export überein).
 #: phoneme vor word, damit Buchstaben-/Silben-Laute nicht von Wort-Clips
 #: verdrängt werden. Die App kennt am Call-Site nur den Text — der Index
 #: muss eindeutig sein.
+#: `monster` steht bewusst nicht drin: es ist eine Variante (siehe
+#: VARIANT_PROFILES), landet unter `variants.monster` und erreicht
+#: `_collision_winner` nie.
 PROFILE_PRIORITY = ("phoneme", "word", "article_word", "prompt", "miss",
-                    "reward", "sentence", "finale", "ui", "monster")
+                    "reward", "sentence", "finale", "ui")
+
+#: Profile, deren Clips als *Variante* eines Textes gelten: die App sucht sie
+#: unter `variants.<name>.<text>` (ClipIndex.lookup(text, variant)). Sie
+#: kollidieren nicht mit dem normalen Clip desselben Textes — „S" darf als
+#: phoneme in `clips` und als monster in `variants.monster` stehen.
+VARIANT_PROFILES: dict[str, str] = {"monster": "monster"}
 
 def _pedagogical_winner(text: str, prof_a: str, prof_b: str) -> str | None:
     """Preferred index profile when the same text appears in two profiles."""
@@ -126,6 +136,10 @@ def _previous_index(index_path: Path) -> dict[str, tuple[str, dict]]:
     Fehlt die Datei oder ist sie kaputt, ist das kein Fehler — dann wird
     einfach alles neu encodiert, wie beim allerersten Export, und nichts kann
     für einen gelockten, aber lokal nicht gerenderten Clip erhalten werden.
+
+    Liest `clips` und `variants` gleichermaßen — ein zurückbehaltener
+    Monster-Clip (lokal nicht gerendert, aber schon committet) muss die
+    Variante genauso überleben wie ein normaler Clip.
     """
     if not index_path.exists():
         return {}
@@ -133,16 +147,28 @@ def _previous_index(index_path: Path) -> dict[str, tuple[str, dict]]:
         payload = json.loads(index_path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return {}
-    clips = payload.get("clips") if isinstance(payload, dict) else None
-    if not isinstance(clips, dict):
+    if not isinstance(payload, dict):
         return {}
     result: dict[str, tuple[str, dict]] = {}
-    for text, entry in clips.items():
-        if not isinstance(text, str) or not isinstance(entry, dict):
-            continue
-        file = entry.get("file")
-        if isinstance(file, str):
-            result[file] = (text, entry)
+    clips = payload.get("clips")
+    if isinstance(clips, dict):
+        for text, entry in clips.items():
+            if not isinstance(text, str) or not isinstance(entry, dict):
+                continue
+            file = entry.get("file")
+            if isinstance(file, str):
+                result[file] = (text, entry)
+    variants = payload.get("variants")
+    if isinstance(variants, dict):
+        for by_text in variants.values():
+            if not isinstance(by_text, dict):
+                continue
+            for text, entry in by_text.items():
+                if not isinstance(text, str) or not isinstance(entry, dict):
+                    continue
+                file = entry.get("file")
+                if isinstance(file, str):
+                    result[file] = (text, entry)
     return result
 
 
@@ -165,6 +191,9 @@ def export_to_app(paths: Paths) -> ExportReport:
     #: Clips, die lokal nicht (mehr) rendered sind, deren Datei aber schon aus
     #: einem früheren Export existiert. Sie bleiben liegen, bis der Lock fällt.
     retained_entries: dict[str, dict] = {}
+    #: Dasselbe für Varianten-Clips (z. B. monster) — separat, weil sie unter
+    #: `variants.<name>.<text>` stehen, nicht unter `clips.<text>`.
+    retained_variants: dict[str, dict[str, dict]] = {}
     retained_files: set[str] = set()
     for clip in ctx.clips:
         if not clip.locked:
@@ -181,7 +210,11 @@ def export_to_app(paths: Paths) -> ExportReport:
                 prev = previous.get(name)
                 if prev is not None:
                     prev_text, prev_entry = prev
-                    retained_entries[prev_text] = prev_entry
+                    variant = VARIANT_PROFILES.get(prev_entry.get("profile"))
+                    if variant is not None:
+                        retained_variants.setdefault(variant, {})[prev_text] = prev_entry
+                    else:
+                        retained_entries[prev_text] = prev_entry
             else:
                 report.skipped.append((clip.key, f"Lokal nicht gerendert (status {status})"))
             continue
@@ -194,14 +227,20 @@ def export_to_app(paths: Paths) -> ExportReport:
     planned = []
     for clip in sorted(exportable, key=lambda c: c.key):
         profile = ctx.profiles.profiles[clip.profile]
-        planned.append((clip, asset_name(clip.key), fingerprint(clip, profile)))
+        planned.append((clip, asset_name(clip.key), production_fingerprint(paths, clip, profile)))
 
     index: dict[str, dict] = {}
+    variants: dict[str, dict[str, dict]] = {}
     for clip, name, fp in planned:
         text = clip.source_text.strip()
+        entry = {"file": name, "profile": clip.profile, "fingerprint": fp}
+        variant = VARIANT_PROFILES.get(clip.profile)
+        if variant is not None:
+            variants.setdefault(variant, {})[text] = entry
+            continue
         existing = index.get(text)
         if existing is None:
-            index[text] = {"file": name, "profile": clip.profile, "fingerprint": fp}
+            index[text] = entry
             continue
         winner_entry = _collision_winner(
             text, existing, existing["file"], clip.profile, name, fp, previous)
@@ -218,8 +257,19 @@ def export_to_app(paths: Paths) -> ExportReport:
     # Einträge nie überschreiben — bei gleichem Text gewinnt der frische.
     for text, entry in retained_entries.items():
         index.setdefault(text, entry)
+    for variant, by_text in retained_variants.items():
+        for text, entry in by_text.items():
+            variants.setdefault(variant, {}).setdefault(text, entry)
 
-    indexed_files = {entry["file"] for entry in index.values()}
+    # Varianten-Clips stehen zusätzlich in `clips`, wenn dort kein anderes
+    # Profil den Text trägt — „Bäh!" muss auch für eine Ansage in
+    # Normalstimme auffindbar sein. Ein phoneme-„S" gewinnt dagegen immer.
+    for by_text in variants.values():
+        for text, entry in by_text.items():
+            index.setdefault(text, entry)
+
+    indexed_files = {e["file"] for e in index.values()} | {
+        e["file"] for by_text in variants.values() for e in by_text.values()}
 
     for clip, name, fp in planned:
         if name not in indexed_files:
@@ -254,7 +304,9 @@ def export_to_app(paths: Paths) -> ExportReport:
             "die App kann diesen Clip nicht abspielen")
 
     payload = {"version": 1,
-               "clips": {t: index[t] for t in sorted(index)}}
+               "clips": {t: index[t] for t in sorted(index)},
+               "variants": {v: {t: by_text[t] for t in sorted(by_text)}
+                            for v, by_text in sorted(variants.items())}}
     (target / "index.json").write_text(
         json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8")

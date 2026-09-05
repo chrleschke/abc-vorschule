@@ -185,7 +185,8 @@ def _production_seed(paths: Paths, clip, profiles: Profiles,
     cand_dir = paths.candidates / clip.key
     if cand_dir.is_dir():
         for wav in cand_dir.glob("*.wav"):
-            if _production_wav_hash(wav) == digest:
+            # `<seed>.raw.wav` matcht auch — sein Stem ist "<seed>.raw", kein int().
+            if wav.stem.isdigit() and _production_wav_hash(wav) == digest:
                 return int(wav.stem)
     return resolve_seed(clip.key, clip.profile, profiles, locks)
 

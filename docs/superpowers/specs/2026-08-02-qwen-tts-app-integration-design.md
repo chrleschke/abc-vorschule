@@ -40,9 +40,15 @@ riskant und auf Windows verboten). `.ogg` steht in AAPTs Default-noCompress-List
   "version": 1,
   "clips": {
     "<sourceText>": { "file": "sentence_0620b64d3955.ogg", "profile": "sentence" }
+  },
+  "variants": {
+    "monster": { "<sourceText>": { "file": "monster_….ogg", "profile": "monster" } }
   }
 }
 ```
+
+Varianten sind Aufnahmen desselben Textes in anderer Stimme; `ClipIndex.lookup(text, variant)`
+adressiert sie statt des normalen `clips`-Schlüssels.
 
 Schlüssel ist der **Quelltext** (nicht der TextOverride): die App-Call-Sites
 übergeben genau diesen String, und der clipKey ist aus ihm gehasht. Ein
