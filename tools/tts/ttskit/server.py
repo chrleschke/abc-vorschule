@@ -218,6 +218,10 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
     def style_css() -> FileResponse:
         return FileResponse(STATIC / "style.css", media_type="text/css")
 
+    @app.get("/recorder-worklet.js")
+    def recorder_worklet() -> FileResponse:
+        return FileResponse(STATIC / "recorder-worklet.js", media_type="application/javascript")
+
     @app.get("/api/state")
     def api_state() -> dict[str, Any]:
         ctx = context()

@@ -1496,3 +1496,9 @@ def test_deleting_a_recording_removes_the_raw_take_too(client):
 
 def test_state_ships_the_app_monster_pitch(client):
     assert client.get("/api/state").json()["appMonsterPitch"] == {"left": 0.75, "right": 1.3}
+
+
+def test_recorder_worklet_is_served(client):
+    r = client.get("/recorder-worklet.js")
+    assert r.status_code == 200
+    assert "registerProcessor" in r.text

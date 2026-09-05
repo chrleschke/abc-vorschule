@@ -48,6 +48,13 @@ textarea.tts-text-input {
   margin: 10px 0 8px; padding: 10px 12px; border-radius: 8px;
   background: #faf5ec; border: 1px solid var(--line);
 }
+.source-switch { margin: 8px 0 0; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.recorder-row #btn-record.recording { background: #b23b2a; }
+.rec-level {
+  display: inline-block; width: 140px; height: 10px; border: 1px solid var(--line);
+  border-radius: 5px; overflow: hidden; background: #fff;
+}
+.rec-level span { display: block; height: 100%; width: 0; background: var(--ok); transition: width 60ms linear; }
 .candidates-toolbar {
   display: flex; justify-content: flex-end; margin: 8px 0 4px;
 }

@@ -20,6 +20,11 @@ const state = {
   // anzuhören und sein Generate blockiert war.
   batchActiveKey: null,
   batchPendingKeys: new Set(),
+  // Laufende Mikrofon-Aufnahme (null, solange keine läuft) und der Editor aus
+  // Task 8 — der füllt ihn, hier bleibt er nur ein Platzhalter.
+  recorder: null, editor: null,
+  // Fallback, bis /api/state die echten Werte liefert.
+  appMonsterPitch: { left: 0.75, right: 1.3 },
 };
 const el = (id) => document.getElementById(id);
 
@@ -149,6 +154,40 @@ function candidateCount() {
 const useKnownSeeds = () => readLocal("ttsUseKnownSeeds", false) === true;
 const useTopSeeds = () => readLocal("ttsUseTopSeeds", false) === true;
 
+// Quelle neuer Kandidaten: Qwen („tts") oder Mikrofon („mic"). Vorbelegt aus
+// dem Profil, pro Clip im Browser umschaltbar und gemerkt.
+const clipSource = (clip) =>
+  readLocal(`ttsSource:${clip.key}`, null) || state.profiles[clip.profile].source || "tts";
+const setClipSource = (clip, source) => writeLocal(`ttsSource:${clip.key}`, source);
+
+function sourceSwitchHtml(clip) {
+  const source = clipSource(clip);
+  return `
+    <p class="source-switch">Quelle:
+      <label class="inline"><input type="radio" name="source" value="tts"
+        ${source === "tts" ? "checked" : ""} /> 🎲 TTS</label>
+      <label class="inline"><input type="radio" name="source" value="mic"
+        ${source === "mic" ? "checked" : ""} /> 🎙 Mikrofon</label>
+      <span class="muted small">(Profil „${escapeHtml(clip.profile)}“ steht auf
+        ${state.profiles[clip.profile].source === "mic" ? "Mikrofon" : "TTS"})</span>
+    </p>`;
+}
+
+function recorderPanelHtml(clip) {
+  const rec = state.recorder;
+  const active = rec && rec.clipKey === clip.key;
+  return `
+    <div class="generate-row recorder-row">
+      <button id="btn-record" class="primary ${active ? "recording" : ""}">
+        ${active ? "■ Stopp" : "● Aufnehmen"}</button>
+      <span id="rec-level" class="rec-level"><span id="rec-level-bar"></span></span>
+      <span id="rec-status" class="muted small">${active
+        ? "Aufnahme läuft — Stopp lädt hoch und öffnet den Editor"
+        : "Mono, ohne Rauschunterdrückung; automatischer Stopp nach 30 s"}</span>
+    </div>
+    <div id="editor-slot"></div>`;
+}
+
 //: Nur für die Beschriftung. Die Auswahl selbst trifft der Server
 //: (plan.TOP_SEED_LIMIT) — hier steht die Zahl, die dort steht.
 const TOP_SEED_LIMIT = 10;
@@ -191,6 +230,7 @@ async function refresh({ keepDetail = false } = {}) {
   const before = keepDetail && state.selected ? clipSignature(state.selected) : null;
   const data = await api("/api/state");
   Object.assign(state, data);
+  state.appMonsterPitch = data.appMonsterPitch || state.appMonsterPitch;
 
   const select = el("filter-profile");
   if (select.options.length <= 1) {
@@ -835,7 +875,8 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
         </select>
         · Stimme
         <select id="clip-speaker"
-                title="Stimme nur für diesen Clip — überschreibt die des Profils">
+                ${clipSource(clip) === "mic" ? 'disabled title="Für Aufnahmen bedeutungslos"' :
+                  'title="Stimme nur für diesen Clip — überschreibt die des Profils"'}>
           ${voiceOptions(clip.speaker)}
         </select>
         ${ownVoice
@@ -847,6 +888,8 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
       <p class="muted small">Seed <span class="mono">${clip.seed}</span>
         <span>(${seedOrigin(clip, profile)})</span>
         · Sprache ${escapeHtml(profile.language)} (aus dem Profil)</p>
+      ${sourceSwitchHtml(clip)}
+      ${clipSource(clip) === "tts" ? `
       <div class="generate-row">
         <button id="btn-candidates" class="primary ${generating ? "pending" : ""}"
                 ${generating ? "disabled" : ""}
@@ -903,7 +946,7 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
           genRunning ? "Erzeuge Probeaufnahmen …"
             : genQueued ? "eingereiht — wartet auf den laufenden Job …"
               : waitingForBatch ? "steht noch im Batch-Lauf" : ""}</span>
-      </div>
+      </div>` : recorderPanelHtml(clip)}
       <details class="help">
         <summary>Was bedeuten die Spalten?</summary>
         <ul class="small">
@@ -943,6 +986,77 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
             : "Keine Produktion"}</button>
       </div>` : ""}
     </div>`;
+}
+
+// ------------------------------------------------------------ Mikrofon
+
+// Task 8 baut den Schnitt-Editor; bis dahin ist eine Aufnahme nach dem Upload
+// einfach fertig, ohne Schnitt-Schritt.
+async function openEditor() {}
+function wireEditor() {}
+
+function encodeWav(chunks, sampleRate) {
+  const length = chunks.reduce((n, c) => n + c.length, 0);
+  const buffer = new ArrayBuffer(44 + length * 4);
+  const view = new DataView(buffer);
+  const ascii = (offset, text) => [...text].forEach((ch, i) => view.setUint8(offset + i, ch.charCodeAt(0)));
+  ascii(0, "RIFF"); view.setUint32(4, 36 + length * 4, true); ascii(8, "WAVE");
+  ascii(12, "fmt "); view.setUint32(16, 16, true); view.setUint16(20, 3, true); // IEEE float
+  view.setUint16(22, 1, true); view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 4, true); view.setUint16(32, 4, true); view.setUint16(34, 32, true);
+  ascii(36, "data"); view.setUint32(40, length * 4, true);
+  let offset = 44;
+  for (const chunk of chunks) {
+    for (const sample of chunk) { view.setFloat32(offset, sample, true); offset += 4; }
+  }
+  return new Blob([buffer], { type: "audio/wav" });
+}
+
+const MAX_RECORDING_SECONDS = 30;
+
+async function startRecording(clip) {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: {
+    channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false,
+  } });
+  const ctx = new AudioContext();
+  await ctx.audioWorklet.addModule("/recorder-worklet.js");
+  const source = ctx.createMediaStreamSource(stream);
+  const node = new AudioWorkletNode(ctx, "recorder", { numberOfInputs: 1, numberOfOutputs: 0 });
+  const rec = { clipKey: clip.key, stream, ctx, node, chunks: [], samples: 0 };
+  node.port.onmessage = (event) => {
+    rec.chunks.push(event.data);
+    rec.samples += event.data.length;
+    let peak = 0;
+    for (const s of event.data) peak = Math.max(peak, Math.abs(s));
+    const bar = el("rec-level-bar");
+    if (bar) bar.style.width = `${Math.min(100, Math.round(peak * 100))}%`;
+    if (rec.samples / ctx.sampleRate >= MAX_RECORDING_SECONDS) stopRecording().catch(showError);
+  };
+  source.connect(node);
+  state.recorder = rec;
+  redrawDetail();
+}
+
+async function stopRecording() {
+  const rec = state.recorder;
+  if (!rec) return;
+  state.recorder = null;
+  rec.node.port.onmessage = null;
+  rec.node.disconnect();
+  rec.stream.getTracks().forEach((t) => t.stop());
+  await rec.ctx.close();
+  const blob = encodeWav(rec.chunks, rec.ctx.sampleRate);
+  const response = await fetch(`/api/clips/${encodeURIComponent(rec.clipKey)}/recordings`, {
+    method: "POST", headers: { "Content-Type": "audio/wav" }, body: blob,
+  });
+  if (!response.ok) {
+    const detail = (await response.json().catch(() => ({}))).detail;
+    throw new Error(detail || `${response.status} ${response.statusText}`);
+  }
+  const result = await response.json();
+  await refresh({ keepDetail: true });
+  await openEditor(rec.clipKey, result.seed);   // Task 8
+  showBanner(`Aufnahme gespeichert (Seed ${result.seed}) — jetzt schneiden, dann „Übernehmen“.`, "ok");
 }
 
 function syncCandidatesBody(clip) {
@@ -1305,6 +1419,18 @@ function renderDetail(key) {
   wireCandidateHandlers(clip);
   wireDeleteAllCandidates(clip);
   wireClearProduction(clip);
+
+  el("detail").querySelectorAll('input[name="source"]').forEach((radio) => {
+    radio.onchange = () => { setClipSource(clip, radio.value); renderDetail(clip.key); };
+  });
+  const recordButton = el("btn-record");
+  if (recordButton) {
+    recordButton.onclick = guard(async () => {
+      if (state.recorder) await stopRecording();
+      else await startRecording(clip);
+    });
+  }
+  if (state.editor && state.editor.clipKey === clip.key) wireEditor(clip);  // Task 8
 }
 
 // --------------------------------------------------------- Parameter-Panel
