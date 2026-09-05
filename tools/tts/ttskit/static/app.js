@@ -1001,7 +1001,18 @@ async function openEditor(clipKey, seed) {
   if (state.selected === clipKey) renderDetail(clipKey);
 }
 
+function stopPreview(ed) {
+  if (ed && ed.playing) {
+    ed.playing.pause();
+    URL.revokeObjectURL(ed.playing.src);
+    ed.playing = null;
+  }
+  const status = el("ed-status");
+  if (status) status.textContent = "";
+}
+
 function closeEditor() {
+  stopPreview(state.editor);
   state.editor = null;
   if (state.selected) renderDetail(state.selected);
 }
@@ -1076,12 +1087,15 @@ function wireEditor(clip) {
   if (!ed || !canvas) return;
   const encoded = encodeURIComponent(clip.key);
   const MIN_LEN = 0.02;
-  const clamp = () => {
-    ed.edit.start = Math.min(Math.max(0, ed.edit.start), ed.info.duration - MIN_LEN);
-    ed.edit.end = Math.max(Math.min(ed.info.duration, ed.edit.end), ed.edit.start + MIN_LEN);
+  const clamp = (which) => {
+    if (which === "end") {
+      ed.edit.end = Math.max(Math.min(ed.info.duration, ed.edit.end), ed.edit.start + MIN_LEN);
+    } else {
+      ed.edit.start = Math.min(Math.max(0, ed.edit.start), ed.edit.end - MIN_LEN);
+    }
   };
-  const sync = () => {
-    clamp();
+  const sync = (which) => {
+    clamp(which || "start");
     el("ed-start").value = ed.edit.start.toFixed(3);
     el("ed-end").value = ed.edit.end.toFixed(3);
     drawWaveform(canvas, ed.info, ed.edit);
@@ -1099,14 +1113,22 @@ function wireEditor(clip) {
       : Math.abs(s - ed.edit.end) <= tol ? "end"
       : (Math.abs(s - ed.edit.start) < Math.abs(s - ed.edit.end) ? "start" : "end");
     canvas.setPointerCapture(event.pointerId);
-    ed.edit[ed.drag] = s; sync();
+    ed.edit[ed.drag] = s; sync(ed.drag);
   };
-  canvas.onpointermove = (event) => { if (ed.drag) { ed.edit[ed.drag] = secondsAt(event); sync(); } };
+  canvas.onpointermove = (event) => { if (ed.drag) { ed.edit[ed.drag] = secondsAt(event); sync(ed.drag); } };
   canvas.onpointerup = canvas.onpointercancel = () => { ed.drag = null; };
 
-  el("ed-start").onchange = (e) => { ed.edit.start = Number(e.target.value); sync(); };
-  el("ed-end").onchange = (e) => { ed.edit.end = Number(e.target.value); sync(); };
-  el("ed-auto").onclick = () => { ed.edit.start = ed.info.autoTrim.start; ed.edit.end = ed.info.autoTrim.end; sync(); };
+  el("ed-start").onchange = (e) => {
+    const v = Number(e.target.value);
+    if (e.target.value === "" || Number.isNaN(v)) { sync("start"); return; }
+    ed.edit.start = v; sync("start");
+  };
+  el("ed-end").onchange = (e) => {
+    const v = Number(e.target.value);
+    if (e.target.value === "" || Number.isNaN(v)) { sync("end"); return; }
+    ed.edit.end = v; sync("end");
+  };
+  el("ed-auto").onclick = () => { ed.edit.start = ed.info.autoTrim.start; ed.edit.end = ed.info.autoTrim.end; sync("end"); };
   el("ed-pitch").onchange = (e) => { ed.edit.pitchSemitones = Number(e.target.value); };
   el("ed-norm").onchange = (e) => { ed.edit.normalize = e.target.checked; };
 
@@ -1120,7 +1142,7 @@ function wireEditor(clip) {
       });
       if (!response.ok) throw new Error((await response.json()).detail || response.statusText);
       const url = URL.createObjectURL(await response.blob());
-      if (ed.playing) { ed.playing.pause(); URL.revokeObjectURL(ed.playing.src); }
+      stopPreview(ed);
       ed.playing = new Audio(url);
       ed.playing.onended = () => { el("ed-status").textContent = ""; };
       el("ed-status").textContent = button.dataset.appPitch
@@ -1130,6 +1152,7 @@ function wireEditor(clip) {
   });
   el("ed-discard").onclick = () => closeEditor();
   el("ed-save").onclick = guard(async () => {
+    stopPreview(ed);
     await put(`/api/clips/${encoded}/recordings/${ed.seed}`, ed.edit);
     await refresh({ keepDetail: true });
     // refresh() zeichnet die Detailsicht nur neu, wenn sich an clipSignature()
