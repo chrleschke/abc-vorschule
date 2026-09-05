@@ -11,6 +11,8 @@ data class ClipEntry(val file: String, val profile: String)
 private data class ClipIndexFile(
     val version: Int = 1,
     val clips: Map<String, ClipEntry> = emptyMap(),
+    /** Variante → Text → Clip; heute nur `monster` (Laut-Fresser, eigene Aufnahmen). */
+    val variants: Map<String, Map<String, ClipEntry>> = emptyMap(),
 )
 
 /**
@@ -23,28 +25,37 @@ private data class ClipIndexFile(
 class ClipIndex private constructor(
     private val clips: Map<String, ClipEntry>,
     private val caseInsensitive: Map<String, String>,
+    private val variants: Map<String, Map<String, ClipEntry>>,
 ) {
 
     val size: Int get() = clips.size
 
-    fun lookup(text: String): ClipEntry? {
+    /**
+     * [variant] zuerst (exakter Text), sonst der normale Clip. Eine unbekannte
+     * Variante ist kein Fehler — dann spricht der normale Clip.
+     */
+    fun lookup(text: String, variant: String? = null): ClipEntry? {
         val trimmed = text.trim()
+        if (variant != null) variants[variant]?.get(trimmed)?.let { return it }
         clips[trimmed]?.let { return it }
         val canonical = caseInsensitive[trimmed.lowercase()] ?: return null
         return clips[canonical]
     }
 
     /** Alle Einträge, für Konsistenz-Checks über den gesamten Index (Tests). */
-    fun entries(): Collection<ClipEntry> = clips.values
+    fun entries(): Collection<ClipEntry> = clips.values + variants.values.flatMap { it.values }
 
     companion object {
+        /** Aufnahmen des Laut-Fressers; Name = Profil in tools/tts (export.VARIANT_PROFILES). */
+        const val MONSTER_VARIANT = "monster"
+
         private val json = Json { ignoreUnknownKeys = true }
 
-        fun empty(): ClipIndex = ClipIndex(emptyMap(), emptyMap())
+        fun empty(): ClipIndex = ClipIndex(emptyMap(), emptyMap(), emptyMap())
 
         fun parse(raw: String): ClipIndex {
-            val clips = json.decodeFromString<ClipIndexFile>(raw).clips
-            return ClipIndex(clips, buildCaseInsensitive(clips))
+            val file = json.decodeFromString<ClipIndexFile>(raw)
+            return ClipIndex(file.clips, buildCaseInsensitive(file.clips), file.variants)
         }
 
         /**
