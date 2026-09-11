@@ -3307,7 +3307,7 @@
           "leftDisplay": "s",
           "rightAtomId": "letter-t",
           "rightDisplay": "t",
-          "resultAtomId": "st",
+          "resultAtomId": "letter-st",
           "resultDisplay": "st",
           "stretchTts": "S"
         }
@@ -3323,7 +3323,7 @@
           "leftDisplay": "s",
           "rightAtomId": "letter-p",
           "rightDisplay": "p",
-          "resultAtomId": "sp",
+          "resultAtomId": "letter-sp",
           "resultDisplay": "sp",
           "stretchTts": "S"
         }

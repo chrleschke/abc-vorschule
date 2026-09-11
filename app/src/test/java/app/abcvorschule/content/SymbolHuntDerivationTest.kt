@@ -134,6 +134,8 @@ class SymbolHuntDerivationTest {
         assertEquals(72, letterRoundsChecked)
         assertEquals(72, letterHuntsBuilt)
         assertEquals(55, syllableRoundsChecked)
-        assertEquals(37, syllableHuntsBuilt)
+        // 35, nicht 37: l24 verschmilzt zu den Graphemen St und Sp, nicht zu Silben —
+        // seine beiden Runden zeigen auf letter-st/letter-sp und bauen keine Jagd.
+        assertEquals(35, syllableHuntsBuilt)
     }
 }

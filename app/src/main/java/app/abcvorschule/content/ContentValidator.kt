@@ -98,6 +98,26 @@ object ContentValidator {
             }
         }
 
+        // Ein Graphem gehört genau einem Atom. Lag dasselbe Zeichen zusätzlich als
+        // Silbe im Pack (`st` neben `letter-st`), jagte die Lektion es zweimal: die
+        // Laut-Jagd zog ihr Ziel aus letter_trace, die Silben-Jagd aus dem
+        // Verschmelzer-Ergebnis — zwei Runden, dieselben Kacheln, einmal "Finde alle
+        // Laute - St", einmal "Finde alle Silben - st". Verschmilzt eine Runde zu
+        // einem Graphem (s + t = St, wie Sch und ck), zeigt ihr resultAtomId auf das
+        // Buchstaben-Atom; eine Silbe ist es davon nicht.
+        val letterDisplays: Map<String, String> = pack.atoms.values
+            .filter { it.kind == AtomKind.letter }
+            .associate { it.display.lowercase() to it.id }
+        pack.atoms.values
+            .filter { it.kind == AtomKind.syllable }
+            .forEach { atom ->
+                val letterId = letterDisplays[atom.display.lowercase()] ?: return@forEach
+                issues += ValidationIssue(
+                    "atom ${atom.id} duplicates grapheme atom $letterId — " +
+                        "a grapheme is not a syllable",
+                )
+            }
+
         // Plural-Atome ("Häuser") nehmen im Deutschen "die", unabhängig vom Genus des
         // Singulars; die Ableitung kann das nicht wissen und braucht einen Override.
         // Selbst-Plurale ("Eimer" → "Eimer") sind keine eigenen Plural-Atome.

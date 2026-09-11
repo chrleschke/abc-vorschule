@@ -16,6 +16,23 @@ class ContentValidatorTest {
     }
 
     @Test
+    fun syllableAtomDuplicatingAGraphemeIsRejected() {
+        val graphem = pack.atoms.values.first { it.kind == AtomKind.letter && it.display.length > 1 }
+        val doppel = Atom(
+            id = "doppel",
+            lemma = graphem.display.lowercase(),
+            display = graphem.display.lowercase(),
+            emoji = "",
+            kind = AtomKind.syllable,
+        )
+        val issues = issuesOf { it.copy(atoms = it.atoms + (doppel.id to doppel)) }
+        assertTrue(
+            issues.toString(),
+            issues.any { it.contains("atom doppel duplicates grapheme atom ${graphem.id}") },
+        )
+    }
+
+    @Test
     fun sentencePictureRanksBetweenSentenceOrderAndCountAdd() {
         assertEquals(
             listOf(
