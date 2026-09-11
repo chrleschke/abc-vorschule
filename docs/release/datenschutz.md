@@ -3,7 +3,7 @@
 Stand: 11. September 2026
 
 Diese Datenschutzerklärung gilt für die Android-App „Silbo" (Store-Titel „Silbo – ABC Vorschule",
-Paketname `app.abcvorschule`), die über Google Play vertrieben wird. Sie ist unter einer
+Paketname `app.silbo.abcvorschule`), die über Google Play vertrieben wird. Sie ist unter einer
 öffentlichen Adresse abrufbar, weil Google Play für Apps, die sich an Kinder richten, eine
 Datenschutzerklärung verlangt, auch wenn die App keine Daten erhebt.
 
@@ -11,10 +11,10 @@ Datenschutzerklärung verlangt, auch wenn die App keine Daten erhebt.
 
 Verantwortlich im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:
 
-[Vorname Nachname]
-[Straße Hausnummer, PLZ Ort]
-[Land]
-E-Mail: [E-Mail-Adresse]
+Christian Leschke
+Schieritzstr. 12, 10409 Berlin
+Deutschland
+E-Mail: chr.leschke@gmail.com
 
 Der Verantwortliche ist eine Privatperson. Ein Datenschutzbeauftragter ist nicht bestellt, weil die
 gesetzlichen Voraussetzungen dafür nicht vorliegen.
@@ -143,7 +143,7 @@ den Stand.
 
 ## Privacy Policy (English summary)
 
-Silbo – ABC Vorschule (package `app.abcvorschule`) is a free, ad-free German literacy and
+Silbo – ABC Vorschule (package `app.silbo.abcvorschule`) is a free, ad-free German literacy and
 arithmetic app for children aged about 4 to 7, developed by a private individual (see section 1
 for name and contact).
 The app does not collect, store or transmit any personal data. It does not request the Internet
@@ -155,5 +155,5 @@ under the user's own device settings.
 Speech output uses bundled audio clips and, as a fallback, the device's own Android text-to-speech
 engine; nothing is recorded and no microphone permission exists. The only permission is VIBRATE.
 Downloading the app through Google Play is subject to Google's privacy policy
-(https://policies.google.com/privacy). For questions, contact [E-Mail-Adresse]. Last updated:
+(https://policies.google.com/privacy). For questions, contact chr.leschke@gmail.com. Last updated:
 2026-09-11.

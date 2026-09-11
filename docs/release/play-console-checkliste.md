@@ -10,7 +10,7 @@ Werte, die überall gleich sind:
 |---|---|
 | App-Name (Store) | Silbo – ABC Vorschule |
 | Name unter dem Icon | Silbo |
-| Package / applicationId | `app.abcvorschule` (nicht mehr änderbar, wäre eine neue App) |
+| Package / applicationId | `app.silbo.abcvorschule` (nach dem ersten Upload nicht mehr änderbar, wäre eine neue App) |
 | versionCode / versionName | 1 / 1.0.0 (`app/build.gradle.kts`; versionCode muss bei jedem Upload steigen) |
 | minSdk / targetSdk | 26 / 36 |
 | Berechtigungen | nur `VIBRATE` |
