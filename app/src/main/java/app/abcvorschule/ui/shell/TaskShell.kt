@@ -129,7 +129,7 @@ fun TaskShell(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text("ABC-Vorschul App", style = MaterialTheme.typography.headlineMedium)
+                    Text("Silbo", style = MaterialTheme.typography.headlineMedium)
                     Spacer(Modifier.height(8.dp))
                     Text("...", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }

@@ -1,4 +1,4 @@
-# Agent Guide — ABC-Vorschul App
+# Agent Guide — Silbo (ABC Vorschule)
 
 Dieses Repo wird mit Compound-Engineering-Workflows und Cursor-Agents bearbeitet.
 Lies zuerst `[docs/PRODUCT_PRINCIPLES.md](docs/PRODUCT_PRINCIPLES.md)`.
