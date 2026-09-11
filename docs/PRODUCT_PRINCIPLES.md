@@ -1,4 +1,4 @@
-# ABC-Vorschul App — Produktprinzipien
+# Silbo (ABC Vorschule) — Produktprinzipien
 
 Dieses Dokument ist die verbindliche Quelle für Produkt- und UX-Grundsätze.
 Bei Konflikten mit Implementierungsdetails oder älteren Planabschnitten gelten diese Prinzipien
@@ -740,6 +740,17 @@ niemals mit einem stummen No-Op.
   zeigt einen Ladezustand, keinen Preis, und Grün ist app-weit „richtig". Maße, Töne und
   Blitzform in `HuntBatteryDesign`, Zustandsbild zum Beurteilen in
   `SymbolHuntBatteryShotTest`.
+- **Name: „Silbo", Store-Titel „Silbo – ABC Vorschule".** Ein Kunstname aus der Silbe, weil
+  die Silbe die Mechanik ist, die das Kind in den Lektionen erlebt (Verschmelzer, Jagd,
+  Wort-Bauer) — Pfad und Hügel sind nur Start-Screen-Motive und taugen deshalb nicht als
+  Namensquelle. Unter dem Icon steht nur „Silbo" (`app_name`): kurz genug für jede
+  Schriftskalierung. Der beschreibende Teil „ABC Vorschule" lebt ausschließlich im Store-Titel
+  (Play Console, Gedankenstrich, Leerzeichen statt Bindestrich, damit „ABC" und „Vorschule" als
+  eigene Suchbegriffe zählen) und passt zum „ABC" auf dem Schild des Icons. Verworfen:
+  beschreibende Namen („ABC Vorschule" allein: generisch, nicht schützbar, deckelt die App auf
+  Vorschule, obwohl L30+ Erstklässler-Stoff ist), Landschaftsnamen (Lesehügel, Buchstabenpfad),
+  lateinische Diminutive (Literula, Vokula). Gleichnamige Apps anderer Branchen existieren
+  (Geldtransfer, Klinik-SaaS) — keine im Kinder- oder Lernbereich.
 - **Launcher-Icon = der Pfad, verkleinert.** Ein Adaptive Icon aus drei Vektor-Ebenen
   (`res/drawable/ic_launcher_*.xml`): hinten die Taglandschaft des Pfad-Screens (Himmel,
   Sonne, Hügel, Baum aus den `PathBackground`-Farben), vorn das Holzschild aus

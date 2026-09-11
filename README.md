@@ -1,4 +1,10 @@
-# ABC-Vorschul App
+# Silbo – ABC Vorschule
+
+**Name.** Die App heißt **Silbo** (Kunstname nach der Silbe, dem Kern der Lese-Mechanik).
+Unter dem Icon und in den Systemeinstellungen steht nur „Silbo" (`app_name`); der Store-Titel
+lautet „Silbo – ABC Vorschule" (Gedankenstrich, 21 Zeichen) und wird in der Play Console gepflegt.
+Package-ID `app.abcvorschule`, Repo-Slug `abc-vorschul-app` und Gradle-Projektname bleiben — ein
+Wechsel der Package-ID wäre eine neue App im Store.
 
 Kostenlose, werbefreie Android-Vorschul-App (ca. 4–7 Jahre) für Lesen und Rechnen auf Deutsch.
 Helles, warmes Cream-UI, offline nach Installation. Ein Fibel-Pfad aus 34 Lektionen; jede Lektion

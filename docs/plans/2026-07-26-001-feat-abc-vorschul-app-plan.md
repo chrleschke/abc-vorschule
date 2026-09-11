@@ -14,7 +14,7 @@ execution: code
 ## Goal Capsule
 
 - **Objective:** Ship a free, ad-free Android preschool app that mixes reading, speaking, and math exercises over a shared German content graph, with eye-friendly dark UI and soft feedback.
-- **Product authority:** This Product Contract. Product name: ABC-Vorschul App.
+- **Product authority:** This Product Contract. Product name: Silbo (store title „Silbo – ABC Vorschule"; renamed 2026-09-11 from the working title ABC-Vorschul App, see PRODUCT_PRINCIPLES §10).
 - **Open blockers:** None.
 - **Execution profile:** Greenfield Android (Kotlin + Jetpack Compose), offline content pack, local progress.
 
@@ -38,7 +38,7 @@ Existing language apps often rely on wrong-answer distractors and English-first 
 
 ### Key Decisions
 
-- **Product name ABC-Vorschul App; repo `abc-vorschul-app`.** Display name may use spaces; filesystem slug is kebab-case.
+- **Product name Silbo (working title was ABC-Vorschul App); repo `abc-vorschul-app`, package `app.abcvorschule`.** Launcher label is the bare name; the store title carries the descriptive suffix. Filesystem slug and package stay kebab-/lowercase and do not follow the rename.
 - **Freeware, no ads, no monetization in identity.** `(session-settled: user-directed — chosen over commercial/freemium framing: meaningful phone use for the child)`
 - **Android, dark-mode-only eye-friendly UI.** `(session-settled: user-directed — chosen over light/system themes: explicit eckdaten)`
 - **German-only v1; localization later.** `(session-settled: user-directed — chosen over multi-language v1: confirmed at synthesis)`

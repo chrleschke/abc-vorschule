@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ABC-Vorschul App</string>
+    <!--
+        Nur der Eigenname: er steht unter dem Icon, in den Einstellungen und in der
+        App-Übersicht. Der volle Store-Titel „Silbo – ABC Vorschule" wird in der
+        Play Console gepflegt, nicht hier — unter dem Icon würde er abgeschnitten.
+    -->
+    <string name="app_name">Silbo</string>
     <string name="continue_label">Weiter</string>
     <string name="reward_title">Super gemacht!</string>
     <string name="parent_title">Eltern</string>
