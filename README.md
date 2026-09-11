@@ -116,6 +116,55 @@ Kommt der Lauf ohne das AGP-Argument (etwa per `adb shell am instrument`), falle
 Tests auf `getExternalFilesDir(null)` zurück — den sieht die adb-Shell wegen Scoped
 Storage aber nicht zuverlässig, also besser über Gradle laufen lassen.
 
+## Release-Signierung und Play-Store-Upload
+
+Der Store bekommt ein **Android App Bundle** (`.aab`), signiert mit einem **Upload-Schlüssel**.
+Den eigentlichen App-Signaturschlüssel erzeugt und verwahrt Google (Play App Signing); der
+Upload-Schlüssel ist nur die Eintrittskarte in die Play Console und lässt sich bei Verlust dort
+zurücksetzen. Der Schlüssel liegt **nie im Repo** (`.gitignore`: `keystore.properties`, `*.jks`).
+
+1. **Upload-Schlüssel einmalig erzeugen** — außerhalb des Repos, mit eigenem Passwort
+   (die Abfragen beantwortet man selbst, nichts davon gehört in eine Datei im Projekt):
+
+   ```bash
+   keytool -genkeypair -v -keystore ~/silbo-upload.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000
+   ```
+
+   Die `.jks` und das Passwort sichern (Passwort-Manager, zweiter Ort). Ohne beides kann man
+   den Upload-Schlüssel nur noch über den Play-Support zurücksetzen lassen.
+
+2. **`keystore.properties` im Projektstamm anlegen** (wird von `app/build.gradle.kts` gelesen,
+   ist per `.gitignore` ausgeschlossen):
+
+   ```
+   storeFile=/Users/<name>/silbo-upload.jks
+   storePassword=<Passwort>
+   keyAlias=upload
+   keyPassword=<Passwort>
+   ```
+
+3. **Bundle bauen** — landet in `app/build/outputs/bundle/release/app-release.aab`:
+
+   ```bash
+   ./gradlew :app:bundleRelease
+   ```
+
+   (in einem Worktree mit `ANDROID_HOME=~/Library/Android/sdk` davor.)
+
+4. **Release vor dem Upload durchspielen**: `./gradlew :app:assembleRelease` baut zusätzlich eine
+   installierbare Release-APK; ohne `keystore.properties` wird sie mit dem Debug-Schlüssel
+   signiert, mit dem Upload-Schlüssel sonst. Mindestens prüfen: Pfad lädt, eine Lektion läuft
+   durch, Fortschritt bleibt nach Neustart. Minification ist bewusst aus
+   (`app/proguard-rules.pro` erklärt, was beim Einschalten zu prüfen wäre).
+
+5. **Bei jedem weiteren Upload** `versionCode` in `app/build.gradle.kts` um eins erhöhen
+   (die Play Console lehnt gleiche oder kleinere Werte ab) und `versionName` sichtbar
+   anpassen (`1.0.1`, `1.1.0`, …).
+
+Die Texte für den Store-Eintrag, die Datenschutzerklärung (Pflicht-URL, auch ohne Datenerhebung)
+und die Schritt-für-Schritt-Liste für die Play Console liegen unter `docs/release/`, die
+Grafiken (Icon 512×512, Feature-Grafik 1024×500, Screenshots) unter `docs/release/store/`.
+
 ## Content-Pack (Schema v2)
 
 `app/src/main/assets/content/`

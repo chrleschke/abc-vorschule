@@ -1,8 +1,31 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+}
+
+// Upload-Schlüssel für den Play Store. Die Datei `keystore.properties` liegt im
+// Projektstamm, ist per .gitignore ausgeschlossen und hat vier Zeilen:
+//   storeFile=/absoluter/pfad/silbo-upload.jks
+//   storePassword=...
+//   keyAlias=upload
+//   keyPassword=...
+// Fehlt sie, bleibt `release` unsigniert — `bundleRelease` baut dann trotzdem
+// (die Play Console lehnt das Bundle ab, aber der Build selbst ist prüfbar),
+// und `assembleRelease` fällt auf den Debug-Schlüssel zurück, damit sich das
+// Release auf einem Gerät installieren und durchspielen lässt. Erzeugen des
+// Schlüssels und Ablauf: README → „Release-Signierung".
+//
+// Bewusst außerhalb von `android { }`: dort ist `java` die Gradle-Erweiterung,
+// und `java.util.Properties` löst sich nicht mehr auf.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val hasUploadKey = keystorePropertiesFile.exists()
+val keystoreProperties = Properties().apply {
+    if (hasUploadKey) FileInputStream(keystorePropertiesFile).use { load(it) }
 }
 
 android {
@@ -13,9 +36,24 @@ android {
         applicationId = "app.abcvorschule"
         minSdk = 26
         targetSdk = 36
+        // versionCode muss bei jedem Upload in die Play Console steigen (ganzzahlig,
+        // monoton); versionName ist der sichtbare Text im Store und in den
+        // App-Infos. Play App Signing verwaltet den App-Signaturschlüssel, lokal
+        // wird nur mit dem Upload-Schlüssel signiert (siehe signingConfigs unten).
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        if (hasUploadKey) {
+            create("upload") {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
     }
 
     // Unit tests read the *shipped* content pack from src/main/assets instead of a
@@ -30,7 +68,14 @@ android {
 
     buildTypes {
         release {
+            // Bewusst aus, Begründung und Keep-Regeln für den Tag des Einschaltens
+            // stehen in proguard-rules.pro.
             isMinifyEnabled = false
+            signingConfig = if (hasUploadKey) {
+                signingConfigs.getByName("upload")
+            } else {
+                signingConfigs.getByName("debug")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",

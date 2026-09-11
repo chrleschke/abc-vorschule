@@ -11,6 +11,11 @@
 *.apk
 *.ap_
 *.aab
+
+# Upload-Schlüssel für den Play Store — nie ins Repo (README → Release-Signierung)
+/keystore.properties
+*.jks
+*.keystore
 *.dex
 *.class
 bin/
