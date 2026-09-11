@@ -3,8 +3,11 @@
 **Name.** Die App heißt **Silbo** (Kunstname nach der Silbe, dem Kern der Lese-Mechanik).
 Unter dem Icon und in den Systemeinstellungen steht nur „Silbo" (`app_name`); der Store-Titel
 lautet „Silbo – ABC Vorschule" (Gedankenstrich, 21 Zeichen) und wird in der Play Console gepflegt.
-Package-ID `app.abcvorschule`, Repo-Slug `abc-vorschul-app` und Gradle-Projektname bleiben — ein
-Wechsel der Package-ID wäre eine neue App im Store.
+Package-ID (`applicationId`) ist `app.silbo.abcvorschule` — die Store-Identität, nach dem ersten
+Upload unveränderlich; bewusst ohne Personen- oder Kontonamen. Der Kotlin-Namespace
+`app.abcvorschule`, Repo-Slug `abc-vorschul-app` und Gradle-Projektname bleiben davon unberührt.
+Für `adb` heißt das: `run-as`/`dumpsys package` mit `app.silbo.abcvorschule`, Klassennamen weiter
+`app.abcvorschule.…`, Test-Paket `app.silbo.abcvorschule.test`.
 
 Kostenlose, werbefreie Android-Vorschul-App (ca. 4–7 Jahre) für Lesen und Rechnen auf Deutsch.
 Helles, warmes Cream-UI, offline nach Installation. Ein Fibel-Pfad aus 34 Lektionen; jede Lektion
@@ -90,11 +93,11 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk && adb install -r app/b
 ```
 
 ```bash
-adb shell am instrument -w -e class app.abcvorschule.ui.exercise.SentenceOrderPegShotTest app.abcvorschule.test/androidx.test.runner.AndroidJUnitRunner
+adb shell am instrument -w -e class app.abcvorschule.ui.exercise.SentenceOrderPegShotTest app.silbo.abcvorschule.test/androidx.test.runner.AndroidJUnitRunner
 ```
 
 ```bash
-for f in $(adb shell run-as app.abcvorschule ls files/pegshots | tr -d '\r'); do adb exec-out run-as app.abcvorschule cat "files/pegshots/$f" > "$f"; done
+for f in $(adb shell run-as app.silbo.abcvorschule ls files/pegshots | tr -d '\r'); do adb exec-out run-as app.silbo.abcvorschule cat "files/pegshots/$f" > "$f"; done
 ```
 
 `run-as` funktioniert nur auf debuggable Builds und **nicht auf einem nicht gerooteten

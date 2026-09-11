@@ -1,7 +1,7 @@
 # Store-Eintrag: Silbo – ABC Vorschule
 
 Texte und Formularantworten zum Einfügen in die Google Play Console. Stand: 2026-09-11.
-Package: `app.abcvorschule`, Version 1.0.0 (versionCode 1). Alle Zeichenzahlen mit `wc -m` gezählt,
+Package: `app.silbo.abcvorschule`, Version 1.0.0 (versionCode 1). Alle Zeichenzahlen mit `wc -m` gezählt,
 ohne abschließenden Zeilenumbruch.
 
 ## App-Name (max. 30 Zeichen)

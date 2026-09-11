@@ -38,7 +38,7 @@ Existing language apps often rely on wrong-answer distractors and English-first 
 
 ### Key Decisions
 
-- **Product name Silbo (working title was ABC-Vorschul App); repo `abc-vorschul-app`, package `app.abcvorschule`.** Launcher label is the bare name; the store title carries the descriptive suffix. Filesystem slug and package stay kebab-/lowercase and do not follow the rename.
+- **Product name Silbo (working title was ABC-Vorschul App); repo `abc-vorschul-app`, applicationId `app.silbo.abcvorschule` (Kotlin namespace stays `app.abcvorschule`).** Launcher label is the bare name; the store title carries the descriptive suffix. Filesystem slug and Kotlin namespace stay kebab-/lowercase and do not follow the rename.
 - **Freeware, no ads, no monetization in identity.** `(session-settled: user-directed — chosen over commercial/freemium framing: meaningful phone use for the child)`
 - **Android, dark-mode-only eye-friendly UI.** `(session-settled: user-directed — chosen over light/system themes: explicit eckdaten)`
 - **German-only v1; localization later.** `(session-settled: user-directed — chosen over multi-language v1: confirmed at synthesis)`

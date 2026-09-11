@@ -120,7 +120,9 @@ adb -s emulator-5554 logcat -d | grep "TestRunner: started" | tail -5
 ```
 
 Testklassen, die es im eigenen Worktree nicht gibt, oder ein `lastUpdateTime`
-(`adb -s emulator-5554 shell dumpsys package app.abcvorschule | grep lastUpdateTime`),
+(`adb -s emulator-5554 shell dumpsys package app.silbo.abcvorschule | grep lastUpdateTime`;
+Builds von Branches vor dem 2026-09-11 heißen auf dem Gerät noch `app.abcvorschule` und liegen
+als zweite App daneben),
 das ohne eigenes Zutun weiterspringt, heißen: da arbeitet jemand anders.
 
 **Maßnahmen, in dieser Reihenfolge:**

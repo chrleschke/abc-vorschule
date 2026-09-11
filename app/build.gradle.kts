@@ -33,7 +33,13 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "app.abcvorschule"
+        // Die Store-Identität der App: nach dem ersten Upload in die Play Console
+        // unveränderlich. Bewusst nur App-Name plus Store-Zusatz, keine Person,
+        // kein GitHub-Konto; die Konvention „umgekehrte Domain" ist damit nicht
+        // erfüllt (silbo.app gehört jemand anderem), Play verlangt sie aber nicht —
+        // dort zählt nur die Eindeutigkeit. Der Kotlin-Namespace bleibt
+        // `app.abcvorschule`; die beiden müssen nicht übereinstimmen.
+        applicationId = "app.silbo.abcvorschule"
         minSdk = 26
         targetSdk = 36
         // versionCode muss bei jedem Upload in die Play Console steigen (ganzzahlig,
