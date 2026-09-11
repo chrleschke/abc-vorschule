@@ -740,6 +740,16 @@ niemals mit einem stummen No-Op.
   zeigt einen Ladezustand, keinen Preis, und Grün ist app-weit „richtig". Maße, Töne und
   Blitzform in `HuntBatteryDesign`, Zustandsbild zum Beurteilen in
   `SymbolHuntBatteryShotTest`.
+- **Launcher-Icon = der Pfad, verkleinert.** Ein Adaptive Icon aus drei Vektor-Ebenen
+  (`res/drawable/ic_launcher_*.xml`): hinten die Taglandschaft des Pfad-Screens (Himmel,
+  Sonne, Hügel, Baum aus den `PathBackground`-Farben), vorn das Holzschild aus
+  `PathSignNode` mit „ABC" in SoftSand auf WoodMid, hand-genagelt schräg, Stern der
+  geschafften Lektion an der Ecke; dazu eine Monochrom-Ebene für Themed Icons (Brett und
+  Pfosten, Buchstaben ausgestanzt). Kein eigenes Marken-Motiv, keine Fremdfarben: das
+  Icon zeigt genau das, was das Kind nach dem Tippen sieht. Die Buchstaben sind Baloo 2
+  ExtraBold (OFL) als Pfade; Erzeugung im Kommentar des Vordergrund-Drawables. Verworfen:
+  ein „A mit Schallwellen" (austauschbar) und drei bunte Jagd-Kugeln A/B/C (bricht die
+  Farbrollen, zerfällt bei 48 dp).
 
 
 
