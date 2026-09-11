@@ -49,6 +49,28 @@ class SymbolHuntInsertionTest {
         ids.forEach { assertTrue(it.startsWith("l01:symbol_hunt:")) }
     }
 
+    /**
+     * L24 verschmilzt s + t zum Graphem St, nicht zu einer Silbe. Solange dafür ein
+     * eigenes Silben-Atom `st` neben `letter-st` stand, jagte die Lektion dasselbe
+     * Zeichen zweimal — "Finde alle Laute - St" und vier Schritte später "Finde alle
+     * Silben - st".
+     */
+    @Test
+    fun noLessonHuntsTheSameSymbolAsLautAndAsSilbe() {
+        pack.authoredLessons.forEach { lesson ->
+            val trainers = scheduledTrainersFor(lesson.id)
+            val result = SymbolHuntInsertion.insertSymbolHunts(trainers, pack, lesson.id, lesson.index)
+            val displays = { suffix: String ->
+                result.filter { it.spec is SymbolHuntSpec && it.spec.id.endsWith(suffix) }
+                    .flatMap { (it.spec as SymbolHuntSpec).rounds }
+                    .mapNotNull { pack.atoms[it.targetAtomId]?.display?.lowercase() }
+                    .toSet()
+            }
+            val both = displays(":letter") intersect displays(":syllable")
+            assertTrue("lesson ${lesson.id} hunts $both as both Laut and Silbe", both.isEmpty())
+        }
+    }
+
     @Test
     fun lessonWithoutSyllableMergeGetsNoSyllableHunt() {
         val withoutSyllableMerge = pack.authoredLessons.firstOrNull { lesson ->
@@ -106,8 +128,8 @@ class SymbolHuntInsertionTest {
     // there'd be nothing to iterate over. These counts were computed directly from
     // the real 26-lesson pack: review lessons (l19-l26) can have syllable_merge if
     // needed. Only l01 (degenerate "ma" pool), l12 and l16 (no syllable_merge
-    // trainer) lack a syllable-hunt. l25, l26 are now review lessons with
-    // syllable_merge.
+    // trainer) and l24 (verschmilzt zu den Graphemen St/Sp, nicht zu Silben) lack a
+    // syllable-hunt. l25, l26 are now review lessons with syllable_merge.
     @Test
     fun theWholePackProducesTheExpectedNumberOfLetterAndSyllableHunts() {
         assertEquals(34, pack.authoredLessons.size)
@@ -123,10 +145,11 @@ class SymbolHuntInsertionTest {
         }
         assertEquals("expected every authored lesson to get a letter-hunt", 34, letterHuntLessons)
         assertEquals(
-            "expected all but l01 (degenerate pool), l12 and l16 (no syllable_merge) " +
-                "and the eight Phase-8 lessons (their merges join whole words, not " +
-                "syllables) to get a syllable-hunt",
-            23,
+            "expected all but l01 (degenerate pool), l12 and l16 (no syllable_merge), " +
+                "l24 (merges to the graphemes St/Sp, not to syllables) and the eight " +
+                "Phase-8 lessons (their merges join whole words, not syllables) to " +
+                "get a syllable-hunt",
+            22,
             syllableHuntLessons,
         )
     }

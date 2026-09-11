@@ -24,8 +24,15 @@ class SpeechClipTextTest {
         assertEquals("Sch", SpeechClipText.forSegment(pack, round, schIndex))
     }
 
+    /**
+     * Sp gibt es nur einmal im Pack. Solange ein zweites Atom `sp` daneben stand
+     * (Verschmelzer-Ergebnis von l24, fälschlich als Silbe geführt), sprach dasselbe
+     * Graphem je nach Schreibung der Kachel zwei verschiedene Aufnahmen — und die
+     * Lektion jagte es zweimal, als Laut und als Silbe. Jetzt trägt jede Schreibung
+     * das Lemma des einen Graphem-Atoms.
+     */
     @Test
-    fun segmentSpeechPrefersExactDisplayForSpPairs() {
+    fun segmentSpeechResolvesBothSpCasingsToTheGraphemeLemma() {
         val round = SymbolInWordRound(
             promptTts = "Finde den Buchstaben - n - im Wort - Spinne.",
             wordAtomId = "spinne",
@@ -34,7 +41,7 @@ class SpeechClipTextTest {
             segments = listOf("sp", "i", "n", "n", "e"),
             targetIndices = listOf(2, 3),
         )
-        assertEquals("sp", SpeechClipText.forSegment(pack, round, 0))
+        assertEquals("Sp", SpeechClipText.forSegment(pack, round, 0))
         assertEquals(
             "Sp",
             SpeechClipText.forSegment(
