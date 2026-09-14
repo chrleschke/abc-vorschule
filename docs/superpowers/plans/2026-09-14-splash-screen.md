@@ -491,7 +491,7 @@ ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:installDebug
 ```bash
 $ADB -s $DEV shell cmd uimode night yes
 $ADB -s $DEV shell am force-stop app.silbo.abcvorschule
-$ADB -s $DEV shell am start -n app.silbo.abcvorschule/.MainActivity
+$ADB -s $DEV shell am start -n app.silbo.abcvorschule/app.abcvorschule.MainActivity
 $ADB -s $DEV exec-out screencap -p > /tmp/splash-dark.png
 ```
 
@@ -502,7 +502,7 @@ Den Screencap sofort nach dem Start absetzen, damit er den Splash trifft. Erwart
 ```bash
 $ADB -s $DEV shell cmd uimode night no
 $ADB -s $DEV shell am force-stop app.silbo.abcvorschule
-$ADB -s $DEV shell am start -n app.silbo.abcvorschule/.MainActivity
+$ADB -s $DEV shell am start -n app.silbo.abcvorschule/app.abcvorschule.MainActivity
 $ADB -s $DEV exec-out screencap -p > /tmp/splash-light.png
 ```
 
@@ -514,7 +514,7 @@ Erwartet: Papiergrund mit demselben Icon.
 $ADB -s $DEV shell am force-stop app.silbo.abcvorschule
 $ADB -s $DEV shell screenrecord --time-limit 6 /sdcard/start.mp4 &
 sleep 1
-$ADB -s $DEV shell am start -n app.silbo.abcvorschule/.MainActivity
+$ADB -s $DEV shell am start -n app.silbo.abcvorschule/app.abcvorschule.MainActivity
 sleep 6
 $ADB -s $DEV pull /sdcard/start.mp4 /tmp/start.mp4
 ```
@@ -530,7 +530,7 @@ cp app/src/main/assets/content/pack.manifest.json /tmp/pack.manifest.json.bak
 printf '{' > app/src/main/assets/content/pack.manifest.json
 ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:installDebug
 $ADB -s $DEV shell am force-stop app.silbo.abcvorschule
-$ADB -s $DEV shell am start -n app.silbo.abcvorschule/.MainActivity
+$ADB -s $DEV shell am start -n app.silbo.abcvorschule/app.abcvorschule.MainActivity
 ```
 
 Erwartet: Der Splash gibt frei und die Fehlermeldung aus dem `error`-Zweig steht auf dem Papiergrund. **Nicht** erwartet: ein stehender Splash.
