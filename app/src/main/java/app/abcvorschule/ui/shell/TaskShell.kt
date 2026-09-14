@@ -122,17 +122,13 @@ fun TaskShell(
                 }
             }
             !state.ready || pack == null -> {
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .windowInsetsPadding(WindowInsets.safeDrawing),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text("Silbo", style = MaterialTheme.typography.headlineMedium)
-                    Spacer(Modifier.height(8.dp))
-                    Text("...", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+                // Absichtlich leer. Über dieser Fläche liegt noch der Splash —
+                // MainActivity hält ihn, bis Pack oder Fehlermeldung stehen, und
+                // beides führt in einen anderen Zweig. Sichtbar würde hier also
+                // nur der Papiergrund des umschließenden Box, und der ist
+                // derselbe Ton wie der Splash-Grund im Hellen. Ein Platzhalter
+                // („Silbo …", bis 2026-09) konnte nur noch als Aufblitzen
+                // erscheinen.
             }
             state.screen == AppScreen.RewardSummary -> {
                 RewardSummaryScreen(
