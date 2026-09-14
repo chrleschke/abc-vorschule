@@ -140,3 +140,17 @@ data class SessionUiState(
     val canGoNext: Boolean =
         SessionProgression.next(trainerIndex, roundIndex, roundCounts) != null
 }
+
+/**
+ * Steht etwas Zeigbares — darf der Splash also abtreten?
+ *
+ * Spiegelt die Verzweigung in `TaskShell`: ein Fehler führt dort in den
+ * Meldungszweig, alles andere braucht sowohl [SessionUiState.ready] als auch ein
+ * geladenes Pack. Der Fehlerfall muss mit hinein, weil `ready` bei einem
+ * Ladefehler dauerhaft `false` bleibt — ein reiner `ready`-Test ließe den Splash
+ * für immer stehen, und die Meldung erschiene nie.
+ *
+ * @param packLoaded ob `SessionViewModel.contentPack()` schon ein Pack liefert.
+ */
+fun SessionUiState.hasShowableContent(packLoaded: Boolean): Boolean =
+    error != null || (ready && packLoaded)
