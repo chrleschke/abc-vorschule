@@ -67,7 +67,15 @@ helle Grund dort heute schon hat.
 ### Haltebedingung
 
 ```
-setKeepOnScreenCondition { state.error == null && !state.ready }
+setKeepOnScreenCondition { !contentReady }
+```
+
+`contentReady` wird von der Composition gesetzt, sobald
+`state.hasShowableContent(packLoaded = pack != null)` erstmals `true` liefert:
+
+```
+fun SessionUiState.hasShowableContent(packLoaded: Boolean): Boolean =
+    error != null || (ready && packLoaded)
 ```
 
 Der Splash bleibt stehen, bis das Content-Pack geladen ist. Damit entfällt der
@@ -76,16 +84,30 @@ sichtbar.
 
 Die Fehlerbedingung ist bewusst **kein Timeout**: schlägt das Laden fehl, bleibt
 `ready` dauerhaft `false`, und ein reiner `!ready`-Test hinge für immer im
-Splash. Mit `state.error == null` gibt der Splash in genau dem Moment frei, in
-dem der bestehende `error`-Zweig in `TaskShell` etwas anzuzeigen hat.
+Splash. Mit `error != null` gibt der Splash in genau dem Moment frei, in dem
+der bestehende `error`-Zweig in `TaskShell` etwas anzuzeigen hat.
+
+`packLoaded` gehört mit hinein, weil `ready` allein nicht die Bedingung ist,
+unter der `TaskShell` etwas anderes als die leere Papierfläche zeichnet — das
+ist dort `state.ready && pack != null`. Ein reiner `!ready`-Test gäbe den
+Splash frei, sobald `ready` kippt, unabhängig davon, ob `pack` zu diesem
+Zeitpunkt schon gesetzt ist; genau das räumt dieser Branch aber ab. Die
+Haltebedingung muss die Sichtbarkeits-Bedingung von `TaskShell` exakt spiegeln,
+sonst öffnet sich zwischen beiden ein Fenster, in dem der Splash schon weg ist
+und `TaskShell` noch die leere Fläche zeichnet — die leere Papierfläche wäre
+dann nur verschoben, nicht beseitigt.
 
 ### Austritt
 
-`setOnExitAnimationListener` blendet die Splash-Ebene in 300 ms aus.
+`setOnExitAnimationListener` blendet die Splash-Ebene in 300 ms aus. Die Blende
+fährt auf `alpha(0f)` und trifft damit die ganze Splash-View — auch das
+zentrierte Launcher-Icon, nicht nur den Grund.
 
-- Hell: unsichtbar, weil darunter dieselbe Farbe liegt.
-- Dunkel: der Nachthimmel blendet in den Papiergrund über, statt hart
-  umzuschlagen.
+- Hell: die Blende löst das Icon auf, statt es hart wegspringen zu lassen; der
+  Grund selbst ist zwar hex-identisch mit `PaperCenter`, aber ohne die Blende
+  spränge das Icon sichtbar weg.
+- Dunkel: zusätzlich blendet der Nachthimmel in den Papiergrund über, statt
+  hart umzuschlagen.
 
 ### Style-Aufbau
 
