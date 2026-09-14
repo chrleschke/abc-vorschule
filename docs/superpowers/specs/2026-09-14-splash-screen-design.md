@@ -49,7 +49,7 @@ Wahrheit, die beim nächsten Icon-Wechsel auseinanderläuft.
 | Modus | Ressource | Grund | Herkunft |
 | --- | --- | --- | --- |
 | Hell | `values/themes.xml` | `#F8F9F8` | `PaperCenter` — der Ton, in dem der radiale Papiergrund der App startet |
-| Dunkel | `values-night/themes.xml` | `#16222F` | neuer `NightSky`, abgedunkelte Verwandtschaft von `DaySkyTop #9CCAEE` |
+| Dunkel | `values-night/themes.xml` | `#16222F` | Nachtfassung von `DaySkyTop #9CCAEE` |
 
 Im Hellen ist der Splash-Grund **hex-identisch** mit dem App-Grund in der Mitte.
 Splash und erste App-Fläche sind dieselbe Farbe; der Übergang ist nicht
@@ -57,6 +57,12 @@ wahrnehmbar, die Experience wächst aus dem Splash heraus.
 
 Im Dunkeln steht das helle Icon auf Nachthimmel. Dafür braucht es den Übergang
 unten.
+
+Der Nachtton bekommt **kein** Kotlin-Pendant in `Color.kt`. Er hat außerhalb des
+Themes keinen Aufrufer, und genau solche unreferenzierten Nachtkonstanten hat
+`Color.kt` schon einmal abgeräumt. Stattdessen steht der Hex-Wert in der
+`themes.xml` mit einem Kommentar zur Herkunft — dieselbe Handhabung, die der
+helle Grund dort heute schon hat.
 
 ### Haltebedingung
 
@@ -125,7 +131,6 @@ Zweig), rendert aber nur noch den leeren Papiergrund ohne Text.
 - `app/src/main/AndroidManifest.xml` — Activity startet mit dem Splash-Theme.
 - `app/src/main/java/app/abcvorschule/MainActivity.kt` — `installSplashScreen()`
   vor `super.onCreate()`, Haltebedingung, Austritts-Animation.
-- `app/src/main/java/app/abcvorschule/ui/theme/Color.kt` — `NightSky`.
 - `app/src/main/java/app/abcvorschule/ui/shell/TaskShell.kt` — Ladezweig ohne
   Text.
 
