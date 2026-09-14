@@ -55,11 +55,10 @@ class MainActivity : ComponentActivity() {
         // ließe den Splash für immer stehen. hasShowableContent nimmt den
         // Fehlerzweig deshalb mit.
         splashScreen.setKeepOnScreenCondition { !contentReady }
-        // In der Bildmitte ist dieser Crossfade unsichtbar — dort liegt
-        // dieselbe Farbe (PaperCenter). Zu den Rändern hin geht er sichtbar in
-        // den dunkleren Rand des Papierverlaufs über. Er ist für den Dark Mode
-        // da: dort blendet der Nachthimmel auf den Papiergrund über, statt
-        // hart umzuschlagen.
+        // Auf alpha(0f) fährt die ganze Splash-View — samt dem zentrierten
+        // Launcher-Icon. Die Blende löst genau dieses Icon auf, statt es hart
+        // wegspringen zu lassen; das gilt in beiden Modi. Im Dark Mode trägt sie
+        // zusätzlich den Helligkeitssprung vom Nachthimmel auf den Papiergrund.
         splashScreen.setOnExitAnimationListener { splashProvider ->
             splashProvider.view.animate()
                 .alpha(0f)
@@ -67,8 +66,9 @@ class MainActivity : ComponentActivity() {
                 // Nicht withEndAction: das läuft nur bei normalem Ende der
                 // Animation, nach einem cancel() nicht. Seit wir einen
                 // Exit-Listener setzen, räumt das System den Splash aber nicht
-                // mehr selbst weg — bliebe remove() aus, läge die Splash-View
-                // dauerhaft über der App und schluckte jede Eingabe.
+                // mehr selbst weg — bliebe remove() aus, läge die Splash-View mit
+                // eingefrorenem, womöglich halb sichtbarem Alpha dauerhaft über
+                // der App und wäre geleakt.
                 // onAnimationEnd feuert auch nach Abbruch.
                 .setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
