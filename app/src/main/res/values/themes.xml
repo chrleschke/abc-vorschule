@@ -23,4 +23,36 @@
     </style>
 
     <style name="Theme.AbcVorschule" parent="Base.Theme.AbcVorschule" />
+
+    <!--
+      Splash. Bis hierher malte das System selbst, weil nichts vorgegeben war —
+      auf einem Motorola edge 60 pro im Dark Mode schwarz. Der Grund ist jetzt
+      festgelegt, und zwar auf PaperCenter (#F8F9F8): denselben Ton, in dem der
+      radiale Papiergrund der App startet und den auch android:windowBackground
+      oben trägt. Splash und erste App-Fläche sind damit hex-gleich, der Übergang
+      ist nicht wahrnehmbar. Weicht einer der drei Werte ab, blitzt beim Start
+      eine fremde Fläche auf.
+
+      Das Icon ist bewusst das Launcher-Icon selbst und keine eigene Zeichnung:
+      es zeigt genau das Symbol, das eben angetippt wurde, und läuft beim
+      nächsten Icon-Wechsel nicht davon.
+
+      Warum eine Basis und nicht ein einzelner Style: values-night/ überschreibt
+      den Grund, und ein gleichnamiger Style in einem Qualifier-Ordner ersetzt
+      den aus values/ vollständig — Item für Item wird nichts gemischt, dieselbe
+      Falle wie beim v29-Aufsatz. Ohne Basis müsste der Nacht-Aufsatz Icon und
+      postSplashScreenTheme wiederholen.
+
+      Das ausdrückliche parent ist Pflicht: bei einem gepunkteten Namen leitet
+      Android den Elternstyle sonst aus dem Präfix ab, und
+      Base.Theme.AbcVorschule.Splash erbte dann von Base.Theme.AbcVorschule
+      statt von Theme.SplashScreen.
+    -->
+    <style name="Base.Theme.AbcVorschule.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#FFF8F9F8</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.AbcVorschule</item>
+    </style>
+
+    <style name="Theme.AbcVorschule.Splash" parent="Base.Theme.AbcVorschule.Splash" />
 </resources>
