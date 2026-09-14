@@ -523,17 +523,27 @@ Aufnahme durchsehen. Erwartet: Splash, Blende, Pfad-Screen. **Nicht** erwartet: 
 
 - [ ] **Step 5: Fehlerfall — der Splash muss freigeben**
 
-Nachstellen, indem das Content-Asset im Build unbrauchbar gemacht wird. Erst den Pfad finden:
+Nachstellen, indem das erste Asset unbrauchbar gemacht wird, das `ContentRepository` liest — `content/pack.manifest.json` (siehe `ContentRepository.kt:30`). Das Original liegt danach wieder zurück, deshalb außerhalb des Repos sichern:
 
 ```bash
-grep -rn "assets.open\|fromClasspath\|\.json" app/src/main/java/app/abcvorschule/content/ContentRepository.kt | head
+cp app/src/main/assets/content/pack.manifest.json /tmp/pack.manifest.json.bak
+printf '{' > app/src/main/assets/content/pack.manifest.json
+ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:installDebug
+$ADB -s $DEV shell am force-stop app.silbo.abcvorschule
+$ADB -s $DEV shell am start -n app.silbo.abcvorschule/.MainActivity
 ```
-
-Die dort geladene Datei unter `app/src/main/assets/` temporär durch `{` ersetzen (Original vorher an einen Ort außerhalb des Repos kopieren), neu bauen und installieren, dann starten.
 
 Erwartet: Der Splash gibt frei und die Fehlermeldung aus dem `error`-Zweig steht auf dem Papiergrund. **Nicht** erwartet: ein stehender Splash.
 
-Danach das Original zurückspielen und mit `git status` prüfen, dass der Baum sauber ist.
+Danach zwingend zurückbauen — ein kaputtes Asset darf nicht im Baum bleiben:
+
+```bash
+cp /tmp/pack.manifest.json.bak app/src/main/assets/content/pack.manifest.json
+git status --short app/src/main/assets/
+ANDROID_HOME=$HOME/Library/Android/sdk ./gradlew :app:installDebug
+```
+
+Erwartet: `git status --short` gibt nichts aus.
 
 - [ ] **Step 6: Ergebnis festhalten**
 
