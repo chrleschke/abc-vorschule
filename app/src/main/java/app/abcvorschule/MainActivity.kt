@@ -1,5 +1,7 @@
 package app.abcvorschule
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.graphics.Color as AndroidColor
 import android.media.AudioManager
 import android.os.Bundle
@@ -53,14 +55,26 @@ class MainActivity : ComponentActivity() {
         // ließe den Splash für immer stehen. hasShowableContent nimmt den
         // Fehlerzweig deshalb mit.
         splashScreen.setKeepOnScreenCondition { !contentReady }
-        // Im Hellen ist dieser Crossfade unsichtbar — darunter liegt dieselbe
-        // Farbe. Er ist für den Dark Mode da: dort blendet der Nachthimmel auf
-        // den Papiergrund über, statt hart umzuschlagen.
+        // In der Bildmitte ist dieser Crossfade unsichtbar — dort liegt
+        // dieselbe Farbe (PaperCenter). Zu den Rändern hin geht er sichtbar in
+        // den dunkleren Rand des Papierverlaufs über. Er ist für den Dark Mode
+        // da: dort blendet der Nachthimmel auf den Papiergrund über, statt
+        // hart umzuschlagen.
         splashScreen.setOnExitAnimationListener { splashProvider ->
             splashProvider.view.animate()
                 .alpha(0f)
                 .setDuration(SPLASH_FADE_MILLIS)
-                .withEndAction { splashProvider.remove() }
+                // Nicht withEndAction: das läuft nur bei normalem Ende der
+                // Animation, nach einem cancel() nicht. Seit wir einen
+                // Exit-Listener setzen, räumt das System den Splash aber nicht
+                // mehr selbst weg — bliebe remove() aus, läge die Splash-View
+                // dauerhaft über der App und schluckte jede Eingabe.
+                // onAnimationEnd feuert auch nach Abbruch.
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        splashProvider.remove()
+                    }
+                })
                 .start()
         }
         super.onCreate(savedInstanceState)

@@ -151,6 +151,13 @@ data class SessionUiState(
  * für immer stehen, und die Meldung erschiene nie.
  *
  * @param packLoaded ob `SessionViewModel.contentPack()` schon ein Pack liefert.
+ *
+ * Setzt voraus, dass `pack` bereits gesetzt ist, bevor `ready` auf `true`
+ * wechselt: `contentPack()` ist kein Snapshot-State-Read und löst selbst keine
+ * Recomposition aus. Käme `ready` zuerst, gäbe es keine Recomposition, die
+ * `packLoaded` nachträglich auf `true` holt, und der Splash bliebe stehen.
+ * `SessionViewModel.bootstrap()` weist `pack` heute vor jeder `_ui`-Emission
+ * zu — diese Reihenfolge einhalten, wenn dort etwas geändert wird.
  */
 fun SessionUiState.hasShowableContent(packLoaded: Boolean): Boolean =
     error != null || (ready && packLoaded)
