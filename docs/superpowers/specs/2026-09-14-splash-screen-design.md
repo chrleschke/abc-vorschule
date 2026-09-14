@@ -81,6 +81,29 @@ dem der bestehende `error`-Zweig in `TaskShell` etwas anzuzeigen hat.
 - Dunkel: der Nachthimmel blendet in den Papiergrund über, statt hart
   umzuschlagen.
 
+### Style-Aufbau
+
+Der dunkle Grund kann **nicht** einfach als gleichnamiger Style in
+`values-night/` stehen: ein Style in einem Qualifier-Ordner ersetzt den
+gleichnamigen aus `values/` vollständig, Item für Item wird nichts gemischt.
+Ohne Basis müsste der Nacht-Aufsatz Icon, `postSplashScreenTheme` und alles
+Weitere wiederholen — und liefe beim nächsten Zusatz auseinander.
+
+Deshalb dieselbe Zweiteilung, die `themes.xml` für den API-29-Aufsatz schon
+verwendet und dort auch begründet:
+
+- `Base.Theme.AbcVorschule.Splash` in `values/`, explizites
+  `parent="Theme.SplashScreen"` — trägt Icon, `postSplashScreenTheme` und den
+  hellen Grund.
+- `Theme.AbcVorschule.Splash` in `values/` — leer, erbt alles.
+- `Theme.AbcVorschule.Splash` in `values-night/` — erbt von der Basis und
+  überschreibt allein `windowSplashScreenBackground`.
+
+Das explizite `parent` an der Basis ist Pflicht: bei einem gepunkteten Namen
+leitet Android den Elternstyle sonst aus dem Namenspräfix ab, und
+`Base.Theme.AbcVorschule.Splash` erbte damit vom App-Theme statt von
+`Theme.SplashScreen`.
+
 ### Was sich nicht ändert
 
 `Theme.AbcVorschule` bleibt hell, auch unter Nacht-Qualifier. Nur das
@@ -97,7 +120,8 @@ Zweig), rendert aber nur noch den leeren Papiergrund ohne Text.
   `androidx.core:core-splashscreen`.
 - `app/src/main/res/values/themes.xml` — `Theme.AbcVorschule.Splash` mit hellem
   Grund, Icon und `postSplashScreenTheme`.
-- `app/src/main/res/values-night/themes.xml` (neu) — nur der dunkle Grund.
+- `app/src/main/res/values-night/themes.xml` (neu) — allein der dunkle Grund,
+  geerbt von der Basis (siehe Style-Aufbau).
 - `app/src/main/AndroidManifest.xml` — Activity startet mit dem Splash-Theme.
 - `app/src/main/java/app/abcvorschule/MainActivity.kt` — `installSplashScreen()`
   vor `super.onCreate()`, Haltebedingung, Austritts-Animation.
