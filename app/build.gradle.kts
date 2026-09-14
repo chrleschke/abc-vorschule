@@ -74,9 +74,12 @@ android {
 
     buildTypes {
         release {
-            // Bewusst aus, Begründung und Keep-Regeln für den Tag des Einschaltens
-            // stehen in proguard-rules.pro.
-            isMinifyEnabled = false
+            // R8 an: ohne ihn liegen rund 23 MB DEX im Release, fast alles
+            // ungenutzter Compose-, Lifecycle- und Coroutines-Code. Mit Shrinking
+            // bleiben davon 2,6 MB, das APK fällt von 16,0 auf 8,9 MB. Was beim
+            // Anfassen dieser Zeile zu prüfen ist, steht in proguard-rules.pro.
+            isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = if (hasUploadKey) {
                 signingConfigs.getByName("upload")
             } else {

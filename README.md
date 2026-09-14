@@ -156,9 +156,10 @@ zurücksetzen. Der Schlüssel liegt **nie im Repo** (`.gitignore`: `keystore.pro
 
 4. **Release vor dem Upload durchspielen**: `./gradlew :app:assembleRelease` baut zusätzlich eine
    installierbare Release-APK; ohne `keystore.properties` wird sie mit dem Debug-Schlüssel
-   signiert, mit dem Upload-Schlüssel sonst. Mindestens prüfen: Pfad lädt, eine Lektion läuft
-   durch, Fortschritt bleibt nach Neustart. Minification ist bewusst aus
-   (`app/proguard-rules.pro` erklärt, was beim Einschalten zu prüfen wäre).
+   signiert, mit dem Upload-Schlüssel sonst. R8 läuft in diesem Buildtyp — Serialisierung
+   bricht unter ihm still, deshalb ist das Durchspielen kein Nice-to-have: Pfad lädt mit
+   Lektionsschildern, eine Lektion läuft durch, Fortschritt bleibt nach Neustart, Sprachausgabe
+   kommt aus den Clips. `app/proguard-rules.pro` führt die drei Prüfungen einzeln auf.
 
 5. **Bei jedem weiteren Upload** `versionCode` in `app/build.gradle.kts` um eins erhöhen
    (die Play Console lehnt gleiche oder kleinere Werte ab) und `versionName` sichtbar

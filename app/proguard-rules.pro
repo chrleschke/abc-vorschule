@@ -1,59 +1,37 @@
-# --- Warum diese Datei überhaupt existiert -----------------------------------
+# --- Warum diese Datei (fast) leer ist ---------------------------------------
 #
-# `isMinifyEnabled = false` (app/build.gradle.kts, Buildtyp `release`): R8 läuft
-# derzeit **nicht**, keine dieser Regeln wird also heute angewendet. Die App ist
-# klein, offline und ohne Netz-Permission — der Shrinker bringt zu wenig, um das
-# Risiko einer stillen Laufzeit-Panne wert zu sein.
+# `isMinifyEnabled = true` (app/build.gradle.kts, Buildtyp `release`): R8 läuft,
+# und er braucht für diese App keine einzige eigene Keep-Regel.
 #
-# Die Regeln stehen trotzdem hier, statt nur eine Notiz „Minification ist aus":
-# der gefährliche Moment ist der Tag, an dem jemand `isMinifyEnabled = true`
-# setzt. Ohne Keep-Regeln wirft R8 dann die von kotlinx.serialization erzeugten
-# `$$serializer`-Klassen und die `Companion.serializer()`-Methoden weg. Der Build
-# bleibt grün, die Unit-Tests bleiben grün (die laufen ohne R8), und erst das
-# installierte Release stirbt beim Laden des Content-Packs — genau die Falle, die
-# ein „ist ja sowieso aus" hinterlassen würde.
+# Hier standen früher sechs Regeln für kotlinx.serialization — die generierten
+# `$$serializer`, die `Companion.serializer()`-Methoden, das `INSTANCE`-Feld
+# serialisierbarer `object`s und `-keepattributes *Annotation*`. Alle sechs waren
+# redundant: `kotlinx-serialization-core` bringt sie seit 1.6 selbst mit, in
+# `META-INF/com.android.tools/r8/` der eigenen JAR, und zwar auf `class **` statt
+# auf ein Package eingegrenzt — die Bibliotheksregel ist also die weitere von
+# beiden. Die Attribut-Regel deckt schon `proguard-android-optimize.txt` ab
+# (`AnnotationDefault, InnerClasses, RuntimeVisibleAnnotations, …`).
 #
-# Wer Minification einschaltet, prüft danach mindestens: Pack lädt
-# (ContentRepository), Fortschritt lädt und schreibt (ProgressRepository),
-# Sprach-Clips werden gefunden (ClipIndex).
-
-# --- kotlinx.serialization ---------------------------------------------------
+# Die eigene `-keep,includedescriptorclasses ... $$serializer { *; }` war dabei
+# nicht nur überflüssig, sondern die wirkungsstärkste Keep-Regel im gesamten
+# Build: 76 Klassen, 108 Felder und 288 Methoden hat sie festgehalten, mehr als
+# jede Regel aller Bibliotheken zusammen. `includedescriptorclasses` zieht dabei
+# jede Modellklasse mit hinein, die in einer Serializer-Signatur vorkommt.
+# Nachzurechnen mit `./gradlew :app:analyzeReleaseR8Config`.
 #
-# Annotationen sind der Träger von @SerialName und dem `trainer`-Diskriminator
-# der TaskSpec-Hierarchie; ohne sie zerfällt die polymorphe Deserialisierung.
--keepattributes *Annotation*, InnerClasses
--dontnote kotlinx.serialization.AnnotationsKt
-
-# Die generierten Serializer der eigenen Modelle — content/**, progress/**,
-# speech/** (ClipIndex) und debug/**. `includedescriptorclasses`, damit die in
-# den Signaturen referenzierten Modellklassen ihre Namen behalten.
--keep,includedescriptorclasses class app.abcvorschule.**$$serializer { *; }
-
-# Die folgenden drei Blöcke sind die offiziellen Regeln aus der
-# kotlinx.serialization-Doku, auf das eigene Package eingegrenzt. Sie hängen an
-# der @Serializable-Annotation, nicht an Package-Namen: ein neues serialisierbares
-# Modell in einem neuen Package ist damit automatisch mit abgedeckt, statt beim
-# nächsten Refactoring durchs Raster zu fallen.
-
-# Companion-Feld serialisierbarer Klassen.
--if @kotlinx.serialization.Serializable class app.abcvorschule.**
--keepclassmembers class <1> {
-    static <1>$Companion Companion;
-}
-
-# `serializer()` auf dem Companion serialisierbarer Klassen.
--if @kotlinx.serialization.Serializable class app.abcvorschule.** {
-    static **$* *;
-}
--keepclassmembers class <2>$<3> {
-    kotlinx.serialization.KSerializer serializer(...);
-}
-
-# `INSTANCE.serializer()` serialisierbarer `object`s.
--if @kotlinx.serialization.Serializable class app.abcvorschule.** {
-    public static ** INSTANCE;
-}
--keepclassmembers class <1> {
-    public static <1> INSTANCE;
-    kotlinx.serialization.KSerializer serializer(...);
-}
+# --- Der gefährliche Moment --------------------------------------------------
+#
+# Serialisierung bricht unter R8 still: Build grün, Unit-Tests grün (die laufen
+# ohne R8), und erst das installierte Release stirbt oder zeigt eine leere App.
+# Wer hier etwas ändert — oder eine Bibliothek hebt, die ihre eigenen Regeln
+# mitbringt —, prüft deshalb im *Release*-Build auf einem Gerät, nicht im Debug:
+#
+#   1. Pfad-Screen zeigt die Lektionsschilder mit Emojis  (ContentRepository,
+#      inkl. polymorpher TaskSpec-Hierarchie über den `trainer`-Diskriminator)
+#   2. Lektion öffnen, App per `am force-stop` killen, neu starten: sie muss in
+#      die Lektion zurückkehren                            (ProgressRepository)
+#   3. Sprachausgabe kommt aus den Clips, nicht aus Android-TTS — im logcat an
+#      `MediaPlayer` unter der eigenen PID erkennbar        (ClipIndex)
+#
+# Erst wenn eine dieser drei Prüfungen fehlschlägt, gehört hier wieder eine
+# Regel hin — und dann die engste, die das Problem behebt, nicht `**`.
