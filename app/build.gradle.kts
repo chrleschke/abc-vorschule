@@ -133,6 +133,11 @@ dependencies {
     // `MaterialShapes` noch nicht (erst 1.5.0-alpha), und graphics-shapes kommt in
     // dieser BOM auch nicht transitiv herein — also ausdrücklich, mit fester Version.
     implementation(libs.androidx.graphics.shapes)
+    // Backportet den Android-12-Splash bis API 21 herunter und macht ihn
+    // überhaupt erst steuerbar: ohne definierten Splash malt jedes System
+    // selbst, was auf einem Motorola edge 60 pro im Dark Mode ein schwarzer
+    // Screen war.
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
