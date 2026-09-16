@@ -14,11 +14,17 @@ plugins {
 //   storePassword=...
 //   keyAlias=upload
 //   keyPassword=...
-// Fehlt sie, bleibt `release` unsigniert — `bundleRelease` baut dann trotzdem
-// (die Play Console lehnt das Bundle ab, aber der Build selbst ist prüfbar),
-// und `assembleRelease` fällt auf den Debug-Schlüssel zurück, damit sich das
-// Release auf einem Gerät installieren und durchspielen lässt. Erzeugen des
-// Schlüssels und Ablauf: README → „Release-Signierung".
+// Fehlt sie, fällt der ganze Buildtyp auf den **Debug-Schlüssel** zurück
+// (`signingConfig` unten steht am Buildtyp, gilt also für APK *und* Bundle).
+// Gewollt ist das nur für `assembleRelease`: so lässt sich das Release auf einem
+// Gerät installieren und durchspielen. Ein so gebautes `.aab` ist dagegen
+// wertlos für den Store — die Play Console lehnt Debug-Signaturen ab. Der Build
+// bricht deshalb nicht ab (er bleibt prüfbar), aber wer hochladen will, braucht
+// `keystore.properties`; ein Blick in die Datei sagt, was drin ist:
+//   unzip -p app/build/outputs/bundle/release/app-release.aab META-INF/*.RSA \
+//     | keytool -printcert | head -2
+// „CN=Android Debug" heißt: nicht hochladen. Erzeugen des Schlüssels und
+// Ablauf: README → „Release-Signierung".
 //
 // Bewusst außerhalb von `android { }`: dort ist `java` die Gradle-Erweiterung,
 // und `java.util.Properties` löst sich nicht mehr auf.

@@ -152,7 +152,20 @@ zurücksetzen. Der Schlüssel liegt **nie im Repo** (`.gitignore`: `keystore.pro
    ./gradlew :app:bundleRelease
    ```
 
-   (in einem Worktree mit `ANDROID_HOME=~/Library/Android/sdk` davor.)
+   (in einem Worktree mit `ANDROID_HOME=~/Library/Android/sdk` davor.) Ohne
+   `keystore.properties` bricht der Build **nicht** ab, sondern signiert das Bundle
+   mit dem Debug-Schlüssel — die Play Console lehnt es dann beim Upload ab. Vor dem
+   Hochladen also nachsehen, wer signiert hat:
+
+   ```bash
+   unzip -p app/build/outputs/bundle/release/app-release.aab 'META-INF/*.RSA' | keytool -printcert | head -2
+   ```
+
+   `CN=Android Debug` heißt: nicht hochladen, erst Schritt 2 nachholen.
+
+   Und: aus einem **sauberen** Baum bauen. `app/src/main/assets/audio/` gehört zum
+   Bundle; ein Checkout mit laufender TTS-Kuratierung lädt halbfertige Clips in den
+   Store hoch.
 
 4. **Release vor dem Upload durchspielen**: `./gradlew :app:assembleRelease` baut zusätzlich eine
    installierbare Release-APK; ohne `keystore.properties` wird sie mit dem Debug-Schlüssel
