@@ -46,8 +46,8 @@ android {
         // monoton); versionName ist der sichtbare Text im Store und in den
         // App-Infos. Play App Signing verwaltet den App-Signaturschlüssel, lokal
         // wird nur mit dem Upload-Schlüssel signiert (siehe signingConfigs unten).
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
