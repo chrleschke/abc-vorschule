@@ -225,9 +225,10 @@ fun SymbolHuntTrainer(
     // success phase, which must not talk over the celebration.
     // Längere Pause: die Muschel lugt halb auf, damit das Kind sieht, wie viele Perlen
     // es schon hat (Nutzer-Wunsch, §10). Jeder Tipp setzt die Uhr zurück.
-    LaunchedEffect(roundKey, lastTouch, batteryFull, resolved) {
+    LaunchedEffect(roundKey, lastTouch, batteryFull, resolved, interactionLocked) {
         // Bei „Bewegung reduzieren" lugt sie nicht — die Welt steht dann still (§10).
-        if (batteryFull || resolved || reduceMotion) return@LaunchedEffect
+        // Und nicht, solange die Ansage noch läuft: die Pause zählt erst ab der Freigabe.
+        if (batteryFull || resolved || reduceMotion || interactionLocked) return@LaunchedEffect
         try {
             var wait = PearlFlight.PeekAfterIdleMs
             while (true) {
@@ -288,6 +289,8 @@ fun SymbolHuntTrainer(
                 openness = openness.asState(),
                 celebrate = batteryFull,
                 anchor = cockle,
+                // Gehört zum Feld: solange die Ansage läuft, ruht sie mit ihm.
+                modifier = Modifier.alpha(interactionOpacity),
             )
             if (SymbolHuntProgress.resolveAvailable(state) && !resolved && !batteryFull) {
                 AbcResolveButton(

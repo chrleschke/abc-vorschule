@@ -252,7 +252,8 @@ fun DrawScope.drawPearl(center: Offset, radius: Float, tint: Color) {
         radius = radius,
         center = center,
     )
-    drawCircle(PearlGlow.copy(alpha = 0.35f), radius = radius * 1.18f, center = center, style = Stroke(width = radius * 0.16f))
+    // Nur ein Hauch Schimmer am Rand — ein breiter Halo ließ die Perle wie eine Lampe wirken.
+    drawCircle(PearlGlow.copy(alpha = 0.12f), radius = radius * 1.08f, center = center, style = Stroke(width = radius * 0.08f))
 }
 
 /** Perlmutt und Schale — warme Sand- und Rosatöne, bewusst weit weg von Gold (Belohnung) und Grün (richtig). */
