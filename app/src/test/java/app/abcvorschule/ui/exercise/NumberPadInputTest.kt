@@ -94,4 +94,42 @@ class NumberPadInputTest {
                 NumberPadInput.fieldWidthDp(displayLargeSp, 1.3f) - 0.01f,
         )
     }
+
+    @Test
+    fun keysAppendDigitsUpToTheMaximum() {
+        assertEquals("1", NumberPadInput.append("", 1))
+        assertEquals("12", NumberPadInput.append("1", 2))
+        assertEquals("123", NumberPadInput.append("12", 3))
+        assertEquals("123", NumberPadInput.append("123", 4))
+    }
+
+    /** „07" ist keine Zahl, die ein Kind schreiben soll. */
+    @Test
+    fun aLeadingZeroIsReplacedNotPrepended() {
+        assertEquals("0", NumberPadInput.append("", 0))
+        assertEquals("7", NumberPadInput.append("0", 7))
+        assertEquals("10", NumberPadInput.append("1", 0))
+    }
+
+    @Test
+    fun backspaceRemovesTheLastDigitAndStopsAtEmpty() {
+        assertEquals("1", NumberPadInput.backspace("12"))
+        assertEquals("", NumberPadInput.backspace("1"))
+        assertEquals("", NumberPadInput.backspace(""))
+    }
+
+    @Test
+    fun theKeyRowsHoldEveryDigitOnceInTwoRowsOfFive() {
+        assertEquals((0..9).toSet(), NumberPadInput.KeyRows.flatten().toSet())
+        assertEquals(listOf(5, 5), NumberPadInput.KeyRows.map { it.size })
+    }
+
+    /** Fünf Tasten passen auf ein 320-dp-Telefon, ohne unter den Kinder-Boden zu fallen. */
+    @Test
+    fun fiveKeysFitANarrowPhoneAndStayTappable() {
+        val narrow = NumberPadInput.keySizeDp(320f)
+        assertTrue(narrow >= NumberPadInput.MinKeyDp)
+        assertTrue(5 * narrow + 4 * NumberPadInput.KeyGapDp <= 320f + 0.01f)
+        assertEquals(NumberPadInput.MaxKeyDp, NumberPadInput.keySizeDp(900f), 0f)
+    }
 }

@@ -199,6 +199,7 @@ fun MathExercise(
                     enabled = !interactionLocked,
                     countedValue = counting.counted,
                     countingOpen = countingOpen,
+                    onSpeakValue = onSpeakCounting,
                 )
                 if (misses >= MathHinting.ResolveFromMissesTyped && !locked) {
                     AbcResolveButton(onClick = ::resolve)
