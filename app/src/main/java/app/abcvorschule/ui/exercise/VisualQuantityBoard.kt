@@ -1,7 +1,5 @@
 package app.abcvorschule.ui.exercise
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -70,11 +68,8 @@ fun VisualQuantityBoard(
     speaking: Boolean = false,
     onSpeakPrompt: () -> Unit = {},
 ) {
-    val answerOpacity by animateFloatAsState(
-        targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
-        label = "math_choice_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val answerOpacity = rememberRestOpacity()
     // Die Kacheln müssen ihre Größe aus der Bühne beziehen, nicht aus einer festen
     // Zahl: drei 28sp-Kacheln passen auf einem 360dp-Telefon nicht nebeneinander,
     // und was umbricht, verdoppelt den Antwortblock und drückt den Aufgabenblock

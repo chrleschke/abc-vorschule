@@ -1,5 +1,11 @@
 package app.abcvorschule.ui.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,17 +25,27 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
+import app.abcvorschule.ui.exercise.LocalPromptNudge
+import app.abcvorschule.ui.exercise.LocalSpeakerBounds
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.world.LocalChromeColors
@@ -113,18 +129,47 @@ fun AbcSpeakerButton(
 ) {
     val desc = stringResource(R.string.speaker)
     val chrome = LocalChromeColors.current
+    // Solange er spricht, atmet der Knopf sanft mit; tippt das Kind während der
+    // Ansage auf die Aufgabe, leuchtet er einmal auf — „hör zu" (PromptRest).
+    val speakingPulse = if (speaking) {
+        rememberInfiniteTransition(label = "speaker_pulse").animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(tween(AbcMotion.BreathMs), RepeatMode.Reverse),
+            label = "speaker_pulse_value",
+        )
+    } else {
+        remember { mutableFloatStateOf(0f) }
+    }
+    val nudge = LocalPromptNudge.current
+    val speakerBounds = LocalSpeakerBounds.current
+    val flash = remember { Animatable(0f) }
+    val seenNudge = remember { intArrayOf(nudge) }
+    LaunchedEffect(nudge) {
+        if (nudge == seenNudge[0]) return@LaunchedEffect
+        seenNudge[0] = nudge
+        flash.snapTo(1f)
+        flash.animateTo(0f, tween(AbcMotion.LongMs, easing = AbcMotion.Exit))
+    }
     FilledTonalIconButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier
             .defaultMinSize(minWidth = 56.dp, minHeight = 56.dp)
+            .onGloballyPositioned { coords -> speakerBounds?.rect = coords.boundsInRoot() }
+            .graphicsLayer {
+                val s = 1f + 0.05f * speakingPulse.value + 0.12f * flash.value
+                scaleX = s
+                scaleY = s
+            }
             // Auf der Nacht ein Leuchtring: der Knopf „Nochmal hören" soll der
             // hellste Punkt der Seite sein, nicht der unauffälligste (§10).
             .drawBehind {
                 if (chrome.speakerGlow.alpha > 0f) {
+                    val boost = 1f + 0.6f * speakingPulse.value + 1.6f * flash.value
                     drawCircle(
                         brush = Brush.radialGradient(
-                            0.55f to chrome.speakerGlow,
+                            0.55f to chrome.speakerGlow.copy(alpha = (chrome.speakerGlow.alpha * boost).coerceAtMost(1f)),
                             1f to Color.Transparent,
                             center = center,
                             radius = size.minDimension * 0.85f,

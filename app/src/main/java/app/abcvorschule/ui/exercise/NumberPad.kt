@@ -1,7 +1,6 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -89,11 +88,8 @@ fun NumberPad(
     var value by remember(resetToken) { mutableStateOf("") }
     var keysOpen by remember(resetToken, countingOpen) { mutableStateOf(!countingOpen) }
     val haptics = LocalAbcHaptics.current
-    val opacity by animateFloatAsState(
-        targetValue = if (enabled) 1f else 0.5f,
-        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
-        label = "number_pad_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val opacity = rememberRestOpacity()
     val interactive = enabled && !solved
 
     fun submit() {

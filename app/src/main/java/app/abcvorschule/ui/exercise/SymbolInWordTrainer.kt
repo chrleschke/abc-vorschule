@@ -145,11 +145,8 @@ fun SymbolInWordTrainer(
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var complete by remember(roundKey) { mutableStateOf(false) }
     val haptics = LocalAbcHaptics.current
-    val interactionOpacity by animateFloatAsState(
-        targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
-        label = "detective_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val interactionOpacity = rememberRestOpacity()
 
     val target = pack.atoms[round.targetAtomId]
     val label = target?.let { SymbolInWordDerivation.targetLabel(it, round.mode) }

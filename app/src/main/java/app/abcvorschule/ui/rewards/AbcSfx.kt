@@ -47,6 +47,9 @@ enum class Sfx(val asset: String) {
 
     /** Etwas geht (noch) nicht: gesperrtes Schild, Fehltipp ohne deutsche Stimme. */
     Blocked("blocked"),
+
+    /** Ein Tipp, während die Ansage noch läuft: „hör erst zu" — leise gespielt. */
+    Blubb("blubb"),
 }
 
 /**

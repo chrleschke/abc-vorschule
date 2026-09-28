@@ -1,8 +1,6 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -174,11 +172,8 @@ fun SoundFeederTrainer(
     // entstand — ein direkt eingefangenes `enabled` wäre dort immer der Wert von
     // damals. Über den State liest der Drop den Stand von jetzt.
     val currentEnabled = rememberUpdatedState(enabled)
-    val interactionOpacity by animateFloatAsState(
-        targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(AbcMotion.QuickMs),
-        label = "feeder_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val interactionOpacity = rememberRestOpacity()
 
     fun animatorFor(side: FeederSide) = if (side == FeederSide.left) leftAnimator else rightAnimator
 

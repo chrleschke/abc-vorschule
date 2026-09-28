@@ -143,6 +143,19 @@ fun SymbolHuntTrainer(
     // Herzmuschel statt Batterie: jede eingefangene Blase fliegt als Perle in ihrer
     // Ringfarbe hinein (CockleShell). Gelandete Perlen zählen, fliegende noch nicht.
     val cockle = remember(roundKey) { CockleAnchor() }
+    // Mittelpunkte der Blasen im Root: für die Perle beim Treffer und für den frühen
+    // Tipp während der Ansage, auf den die getroffene Blase mit einem Wackeln antwortet.
+    val tileCenters = remember(roundKey) { mutableMapOf<Int, Offset>() }
+    var wobble by remember(roundKey) { mutableStateOf<Pair<Int, Long>?>(null) }
+    val earlyTaps = LocalEarlyTaps.current
+    LaunchedEffect(roundKey, earlyTaps) {
+        earlyTaps?.collect { at ->
+            val hit = tileCenters.minByOrNull { (_, c) -> (c - at).getDistance() }
+            if (hit != null && (hit.value - at).getDistance() < EarlyTapReachPx) {
+                wobble = hit.key to System.nanoTime()
+            }
+        }
+    }
     val openness = rememberCockleOpenness(roundKey)
     val landed = remember(roundKey) { mutableStateListOf<Color>() }
     val flights = remember(roundKey) { mutableStateListOf<PearlFlight>() }
@@ -213,11 +226,8 @@ fun SymbolHuntTrainer(
         animationSpec = tween(durationMillis = AbcMotion.LongMs),
         label = "hunt_field_fade",
     )
-    val interactionOpacity by animateFloatAsState(
-        targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
-        label = "hunt_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val interactionOpacity = rememberRestOpacity()
 
     // Auto-proceed: the battery filling up IS the success signal, so a "Weiter"
     // tap only added a dead end for a child who cannot read the button. The delay
@@ -254,6 +264,7 @@ fun SymbolHuntTrainer(
         onResult(true, false, listOf(round.targetAtomId))
     }
 
+    val restValue = LocalPromptRest.current
     val overlay = remember(roundKey) { OverlayOrigin() }
     Box(modifier = modifier.onGloballyPositioned { overlay.topLeft = it.positionInRoot() }) {
     ExerciseStage(
@@ -275,7 +286,18 @@ fun SymbolHuntTrainer(
                     pack = pack,
                     enabled = !batteryFull && !interactionLocked && !shuffling,
                     onTap = { id, from -> handleTap(id, from) },
-                    modifier = Modifier.fillMaxSize().alpha(fieldAlpha * interactionOpacity),
+                    tileCenters = tileCenters,
+                    wobble = wobble,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .alpha(fieldAlpha * interactionOpacity)
+                        // Ruhend liegt das ganze Feld wie in der Ferne: kleiner, und
+                        // die Blasen verblassen ins Meer. Beim Aufwachen kommt es heran.
+                        .graphicsLayer {
+                            val s = 1f - HuntRestShrink * restValue.value
+                            scaleX = s
+                            scaleY = s
+                        },
                 )
             }
         },
@@ -329,6 +351,8 @@ private fun SymbolHuntField(
     pack: ContentPack,
     enabled: Boolean = true,
     onTap: (Int, Offset) -> Unit,
+    tileCenters: MutableMap<Int, Offset> = mutableMapOf(),
+    wobble: Pair<Int, Long>? = null,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -371,6 +395,8 @@ private fun SymbolHuntField(
                     present = tile.instanceId in presentIds,
                     enabled = enabled,
                     onTap = { center -> onTap(tile.instanceId, center) },
+                    onCenter = { tileCenters[tile.instanceId] = it },
+                    wobbleKey = wobble?.takeIf { it.first == tile.instanceId }?.second ?: 0L,
                     modifier = Modifier.testTag("hunt_tile_${tile.instanceId}"),
                 )
             }
@@ -433,9 +459,22 @@ private fun HuntTile(
     present: Boolean,
     enabled: Boolean,
     onTap: (centerInRoot: Offset) -> Unit,
+    onCenter: (Offset) -> Unit = {},
+    /** Wechselt bei jedem frühen Tipp auf diese Blase — dann wackelt sie einmal. */
+    wobbleKey: Long = 0L,
     modifier: Modifier = Modifier,
 ) {
     val centerInRoot = remember { TileCenter() }
+    // Ruht die Aufgabe (Ansage läuft), trägt die Blase noch keinen Buchstaben und kein
+    // Leuchten: beides kommt erst beim Aufwachen, wenn das Symbol genannt ist —
+    // vorher gäbe es nichts zu suchen, nur zu raten (PromptRest).
+    val rest = LocalPromptRest.current
+    val shake = remember { Animatable(0f) }
+    LaunchedEffect(wobbleKey) {
+        if (wobbleKey == 0L) return@LaunchedEffect
+        shake.snapTo(1f)
+        shake.animateTo(0f, AbcMotion.Wobble.spec())
+    }
     val inflate = remember { Animatable(0f) }
     val exit = remember { Animatable(0f) }
     val interactionSource = remember { MutableInteractionSource() }
@@ -539,26 +578,36 @@ private fun HuntTile(
                 )
             }
             .size(tileDp)
-            .onGloballyPositioned { centerInRoot.value = it.boundsInRoot().center }
+            .onGloballyPositioned {
+                centerInRoot.value = it.boundsInRoot().center
+                onCenter(centerInRoot.value)
+            }
             .graphicsLayer {
                 val growth = flight.scale(if (flight.pending) 0f else hop.value) / position.scale
                 val factor = HuntTileMorph.scale(inflate.value, exit.value) * growth
                 scaleX = factor
                 scaleY = factor
-                alpha = HuntTileMorph.alpha(exit.value)
+                // Ruhend blass, als lägen die Blasen weit hinten im Meer.
+                alpha = HuntTileMorph.alpha(exit.value) * (1f - HuntRestFade * rest.value.coerceIn(0f, 1f))
+                // Kurzes Kopfschütteln der Blase: ein früher Tipp wird gesehen.
+                rotationZ = ShakeDegrees * shake.value
             }
             // Der Clip hält die Verläufe im Kreis — der Glanzpunkt sitzt
             // außermittig und ragte sonst an der Kante heraus — und deckelt
             // weiter den Glyphen (siehe Größenrechnung unten).
             // Leuchten ums Wasser herum, vor dem Clip: es darf über den Kreis hinaus.
             .drawBehind {
+                // Weich auslaufend, ohne Kante: der Verlauf beginnt im Blasenrand und
+                // fällt über fast einen Blasenradius gleichmäßig ab (vorher ein Band).
+                val awake = (1f - rest.value).coerceIn(0f, 1f)
                 drawCircle(
                     brush = Brush.radialGradient(
-                        0.62f to BubbleGlow,
+                        0.5f to BubbleGlow.copy(alpha = BubbleGlow.alpha * awake),
+                        0.68f to BubbleGlow.copy(alpha = BubbleGlow.alpha * 0.35f * awake),
                         1f to Color.Transparent,
-                        radius = size.minDimension * 0.72f,
+                        radius = size.minDimension * 0.95f,
                     ),
-                    radius = size.minDimension * 0.72f,
+                    radius = size.minDimension * 0.95f,
                 )
             }
             .clip(CircleShape)
@@ -612,7 +661,8 @@ private fun HuntTile(
                     center = lightCenter,
                 )
             }
-            .border(width = 3.dp, color = color, shape = CircleShape)
+            // Der Ring kommt erst beim Aufwachen: ruhend sind es ferne, leere Blasen.
+            .border(width = 3.dp, color = color.copy(alpha = (1f - rest.value).coerceIn(0f, 1f)), shape = CircleShape)
             .clickable(
                 interactionSource = interactionSource,
                 // Keine Ripple mehr: der Morph *ist* die Druckantwort, zwei
@@ -637,6 +687,7 @@ private fun HuntTile(
             text = glyph,
             fontSize = glyphSp.sp,
             color = WarmInk,
+            modifier = Modifier.graphicsLayer { alpha = (1f - rest.value).coerceIn(0f, 1f) },
         )
     }
 }
@@ -650,4 +701,12 @@ private class OverlayOrigin { var topLeft: Offset = Offset.Zero }
 private val BubbleCore = Color(0xFFFFFDF6)
 private val BubbleMid = Color(0xFFF2F0E8)
 private val BubbleEdge = Color(0xFFECF2F0)
-private val BubbleGlow = Color(0x59A0DCEB)
+private val BubbleGlow = Color(0x40A0DCEB)
+
+/** Ruhend: das Feld 12 % kleiner, die Blasen zu 45 % ins Meer verblasst. */
+private const val HuntRestShrink = 0.12f
+private const val HuntRestFade = 0.45f
+
+/** Wie weit ein früher Tipp von einer Blasenmitte liegen darf, um sie wackeln zu lassen. */
+private const val EarlyTapReachPx = 160f
+private const val ShakeDegrees = 9f

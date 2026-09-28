@@ -176,6 +176,15 @@ def blocked():
     return tone(175.0, 0.2, 0.06, amp=0.9, partials=SOFT, attack=0.006)
 
 
+def blubb():
+    # Tipp während der Ansage: ein kleines, tiefes Blubbern — zwei weiche Bläschen,
+    # kurz und dumpf, damit es die Stimme nicht übertönt (gespielt mit 0,35).
+    return mix(
+        tone(240, 0.07, 0.022, amp=0.9, partials=SOFT, attack=0.003, sweep_to=430),
+        at(0.05, tone(300, 0.06, 0.018, amp=0.55, partials=SOFT, attack=0.003, sweep_to=480)),
+    )
+
+
 SOUNDS = {
     "pop": pop,
     "snap": snap,
@@ -188,6 +197,7 @@ SOUNDS = {
     "blip": blip,
     "shuffle": shuffle,
     "blocked": blocked,
+    "blubb": blubb,
 }
 
 PEAK_DBFS = -8.0

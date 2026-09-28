@@ -75,11 +75,8 @@ fun SentencePictureTrainer(
     val correctOnLeft = remember(roundKey) {
         SentencePictureSides.correctOnLeft(round.promptTts.hashCode())
     }
-    val interactionOpacity by animateFloatAsState(
-        targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
-        label = "sentence_picture_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val interactionOpacity = rememberRestOpacity()
 
     fun choose(correct: Boolean, tappedLeft: Boolean) {
         if (resolved || solvedCorrect) return

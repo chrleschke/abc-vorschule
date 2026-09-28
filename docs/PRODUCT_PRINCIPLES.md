@@ -460,6 +460,21 @@ niemals mit einem stummen No-Op.
   zusammenfallen. Ohne deutsches TTS steht das Wort als Text unter dem Emoji — ein
   Hörspiel ist sonst unspielbar.
 - Feedback bei Fehlern (besonders Rechnen): **vorsprechen**, nicht als Fehler-Satz anzeigen.
+- **Ansage-Sperre: ruhen statt dimmen** (`PromptRest`, seit September 2026). Solange die
+  Rundenansage ihren Freigabe-Punkt nicht erreicht hat, nimmt die Aufgabe keine Tipps an —
+  der gesuchte Buchstabe steckt nur in der Stimme, jeder Tipp davor wäre Raten. Sie ist dabei
+  aber nicht mehr auf 50 % gedimmt (das sah kaputt aus), sondern **ruht**: kaum gedämpft
+  (10 %), 3 % abgesunken. In der Jagd liegt das ganze Feld wie in der Ferne — 12 % kleiner,
+  Blasen zu 45 % ins Meer verblasst, **ohne Ring, ohne Leuchten und ohne Buchstaben**. Beim
+  Freigabe-Punkt **wacht** sie auf (Feder `Bouncy`): das Feld kommt heran, Ringe, Leuchten und
+  Buchstaben erscheinen. Beim Sperren springt der Wert sofort auf „ruht", damit die Buchstaben
+  der neuen Runde keinen Frame lang sichtbar sind.
+  **Ein Tipp in der Ruhe bekommt eine Antwort**: ein kleiner heller Ring an der Tippstelle, ein
+  leises „Blubb" (`Sfx.Blubb`, mit 0,35 gespielt, damit es die Ansage nicht übertönt), der
+  Lautsprecher leuchtet einmal auf, und in der Jagd wackelt die getippte Blase — höchstens alle
+  220 ms, kein Fehler, kein Mischen. Ausgenommen ist der Lautsprecher selbst (über seine Lage,
+  `LocalSpeakerBounds`): er spielt die Ansage auch während der Sperre ab. Während er spricht,
+  atmet er sanft mit. Die Herzmuschel ruht mit dem Feld und lugt erst nach der Freigabe.
 - **Geräusche (`AbcSfx`, `assets/sfx/`).** Elf kurze, synthetisierte Klänge, erzeugt von
   `tools/sfx/generate_sfx.py` (keine Aufnahmen, keine Fremdlizenz; Ogg/Opus wie die Clips,
   zusammen ~35 KB, Spitze −8 dBFS und mit 0,7 gespielt — leiser als die Stimme). **Eine Tat,

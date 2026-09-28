@@ -123,11 +123,8 @@ fun SyllableMergeTrainer(
         listOf(round.leftAtomId, round.rightAtomId, round.resultAtomId).distinct()
     }
     val haptics = LocalAbcHaptics.current
-    val interactionOpacity by animateFloatAsState(
-        targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
-        label = "syllable_merge_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val interactionOpacity = rememberRestOpacity()
 
     fun commit() {
         if (merged) return

@@ -1,7 +1,6 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -156,11 +155,8 @@ fun WordBuildTrainer(
         completed = true
         onResult(true, false, scoredIds)
     }
-    val interactionOpacity by animateFloatAsState(
-        targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
-        label = "word_build_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val interactionOpacity = rememberRestOpacity()
     // Die Bühne zentriert den Aufgabenblock in dem, was der Antwortblock übrig
     // lässt (ExerciseStage), also verschiebt jede Höhenänderung unten das Wort in
     // der Mitte. Im Lauf einer Runde passiert das zweimal: der Tray läuft leer,
