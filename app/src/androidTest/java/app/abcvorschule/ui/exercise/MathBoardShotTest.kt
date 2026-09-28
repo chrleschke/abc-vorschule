@@ -66,7 +66,6 @@ class MathBoardShotTest {
                             .testTag("math_stage"),
                     ) {
                         VisualQuantityBoard(
-                            emoji = "🐜",
                             left = case.left,
                             right = case.right,
                             operation = MathOperation.Add,

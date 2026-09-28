@@ -81,17 +81,11 @@ class MathBoardBoundsTest {
                             .testTag("math_stage"),
                     ) {
                         VisualQuantityBoard(
-                            emoji = "🐜",
                             left = round.first,
                             right = round.second,
                             operation = MathOperation.Add,
                             choices = round.third,
                             onChoose = {},
-                            // Nach zwei Fehlversuchen kommt der Auflösen-Knopf dazu —
-                            // der Fall, für den [MathBoardSizing.ResolveReserveDp] von
-                            // Anfang an Platz hält (§9: der Aufgabenblock steht still).
-                            missCount = 2,
-                            onResolve = {},
                             ttsAvailable = true,
                         )
                     }

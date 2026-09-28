@@ -43,7 +43,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import app.abcvorschule.speech.GermanNumberWord
 import app.abcvorschule.ui.exercise.MathAttempt
-import app.abcvorschule.ui.exercise.MathOperation
 
 class SessionViewModel(
     private val contentRepository: ContentRepository,
@@ -483,18 +482,8 @@ class SessionViewModel(
                 correct = correct && !resolved,
                 resolved = resolved,
                 missHint = !correct && !resolved,
-                // Mit der Zähl-Hilfe gelöst heißt erarbeitet, nicht gewusst — dafür
-                // gibt es kein Lob. Dieselbe Unterscheidung, die das Auflösen schon
-                // trifft. Punkte bleiben: sie wegzunehmen wäre eine Strafe (§8).
                 praise = MathHinting.praises(attempt),
-                speakOverride = if (resolved || correct) {
-                    null
-                } else {
-                    MathHinting.missSpeech(
-                        attempt,
-                        MathOperation.fromWireName(round.operation) ?: MathOperation.Add,
-                    )
-                },
+                speakOverride = if (resolved || correct) null else MathHinting.missSpeech(attempt),
             )
         }
     }

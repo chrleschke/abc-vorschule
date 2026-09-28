@@ -545,7 +545,6 @@ niemals mit einem stummen No-Op.
   `word_build` o. ä. nutzte die ID). Ersatzlos entfernt statt „repariert".
 
 ## 8. Mathematik-Visuals
-
 - **Zahlentürme (seit September 2026, `NumberTowers`).** Die Aufgabe steht nicht mehr als
   Emoji-Gruppen da (bei 9 − 6 fünfzehn Hüte in Zweierpaaren — unruhig, und ab etwa fünf
   Dingen zählen Vorschulkinder einzeln ab), sondern als **Figuren aus Blöcken**, nach dem
@@ -564,56 +563,39 @@ niemals mit einem stummen No-Op.
     wird Honig (Plus), Geister und Weggenommenes gehen (Minus), die Türme rücken zusammen
     (Mal) — und die fertige Figur bekommt ein **großes Gesicht** über ihr größtes voll
     gefülltes Rechteck (`NumberTowerGeometry.faceRect`). Ohne vorherigen Tipp läuft erst der
-    Sprung, dann das Verschmelzen; Auflösen zeigt den Sprung ohne Feier.
+    Sprung, dann das Verschmelzen.
   - **Malnehmen:** „3 mal 4" sind drei gleiche Vierertürme, jeder mit eigenem kleinen Gesicht,
     die nacheinander hereinfallen; nach der Antwort rücken sie zusammen, und aus den kleinen
     Gesichtern wird ein großes.
   - **Antwortkacheln zeigen nur die Zahl** — kleine Türme darin machten es zu leicht,
     brachten eine dritte Farbe und mehr Unruhe. Die Platte unter den Türmen trägt die Aufgabe
     als Ziffern (`4 + 3`); eine zweite Ziffernzeile gibt es nicht mehr.
-  - Die Zähl-Hilfe nach zwei Fehlversuchen (Tipp-Modus) bleibt, wie sie unten beschrieben ist.
-  Die Regeln unten zu Emoji-Gruppen, Symbol ab 11 und Matrix gelten nur noch für die Zähl-Hilfe.
+  - **Kein Auflösen, keine Zähl-Hilfe** (entfernt September 2026): die Türme lassen sich
+    jederzeit antippen und springen — das ist die Hilfe, und sie ist immer da.
+  - **Nur Zahlen, keine Sachaufgaben:** Da keine Bilder mehr zu sehen sind, fragt die Ansage
+    nur die Rechnung („Wie viel ist vier plus drei?"), Rechenrunden tragen kein `iconAtomId`
+    mehr. Rechnen läuft in **jeder** Lektion.
 
-- Mengen bis 10 als Bilder/Emojis, sinnvoll gruppiert (Subitizing: Paare + Rest, z. B. 5 = 2+2+1). Ab 11 steht ein einzelnes Bildsymbol mit der Zahl für die Menge.
-- **Ein Bildwort muss verdient sein — `iconAtomId` ist optional.** Genau bis 10 zeigt der
-  Trainer echte Stückzahlen; ab 11 bleibt ein einzelnes Symbol neben der Ziffer übrig, das
-  nichts mehr zählbar macht und stattdessen eine Szene behauptet („dreißig Mülltonnen
-  stehen am Weg"). Solche Runden tragen **kein** `iconAtomId`: der Aufgabenblock zeigt nur
-  Ziffern, der Prompt nur Zahlen („Zwanzig und zehn. Wie viele sind das."), und das
-  Erfolgs-Vorsprechen sagt schlicht „dreißig". Ein Bild also nur, wo ein Kind sich die
-  Menge wirklich hinstellen kann — `LessonCoverageTest.aPictureIsOnlyPromisedWhereAChildCanPictureIt`
-  hält die Grenze bei 10. Wo die **Form** die Didaktik trägt und trotzdem kein Bildwort da
-  ist (Multiplikations-Matrix, Zähl-Hilfe), zeichnet der Trainer ein neutrales
-  Zählplättchen (`NeutralCountingToken`, ein Punkt) — zählbar, ohne etwas zu behaupten.
-- Zahl unter der Bildgruppe anzeigen.
-- Aufgabe oben, Antwortwahl unten; Bilder in der Aufgabe ausreichend groß.
-- Visuelle Mengenaufgaben: genau **3** Antwortoptionen; gleiche Dimensionen der buttons. Situationen bleiben gesprochen, konkret und kindernah.
-- **Die drei Kacheln stehen in *einer* Reihe, und die Aufgabe bleibt lesbar.** Verbindliche Rangfolge in `MathBoardSizing`: (1) die Reihe bricht nie um, (2) jede Kachel bleibt tippbar (`AbcDimens.kidTouch`; wird es eng, gibt der Kachelabstand nach, nicht die Trefferfläche), (3) Aufgabe und Antwort teilen sich die Bühne — der Antwortblock nimmt höchstens die Hälfte, den Auflösen-Knopf schon eingerechnet, damit der Aufgabenblock nach zwei Fehlversuchen nicht hochrückt (§9), (4) der Aufgabenblock nimmt, was übrig bleibt, (5) die Emojis nehmen den Rest. Reicht es nicht mehr für eine abzählbare Menge, fällt die **ganze** Runde auf die symbolische Darstellung von oben zurück — Kacheln *und* Aufgabe, nie gemischt.
-  Der Anlass: mit fest verdrahteten 28sp in einer `FlowRow` brauchten drei Kacheln rund 350dp und brachen auf jedem 360dp-Telefon (280dp Bühne) in zwei Zeilen um. Weil `ExerciseStage` den Antwortblock ungewichtet gegen die volle Höhe misst, blieb dem Aufgabenblock nichts übrig: „4 + 3" aus Lektion 1 war auf halber Höhe abgeschnitten, schon bei `font_scale 1.0`. Geprüft von `MathBoardSizingTest` (Rechnung), `MathBoardBoundsTest` (gerendertes Layout) und `MathBoardShotTest` (Bild).
-  **Gerechnet wird in gerenderten dp, nicht in sp mal `fontScale`:** Androids Schriftskalierung ist seit API 34 nichtlinear — kleine Größen werden angehoben, große gestaucht —, die Umrechnung kennt nur `Density`. Die Mengenbilder sind deshalb in **dp** gedeckelt (sie sind Bilder, keine Schrift); die Ziffer unter der Gruppe skaliert weiter mit. Ein Emoji belegt `MathBoardSizing.EmojiAspect` mal seine Schriftgröße (gemessen, `EmojiAspectTest`) und trägt seine **eigene** Zeilenhöhe: ohne sie erbt es die 28sp aus `bodyLarge` und eine Emoji-Zeile spart beim Schrumpfen keine Höhe.
+- Rechenaufgaben im Kachel-Modus: genau **3** Antwortoptionen, gleich groß, nur die Zahl. Die
+  drei Kacheln stehen in **einer** Reihe und behalten ihre volle Trefferfläche; wird es eng,
+  gibt der Abstand nach (`MathBoardSizing`). Die Türme nehmen gut zwei Fünftel der Bühne,
+  im Ziffernblock-Modus gut ein Drittel. Geprüft von `MathBoardBoundsTest` (gerendertes
+  Layout auf drei Breiten, drei Höhen, drei Schriftgrößen) und `NumberTowerGeometryTest`
+  (jede Aufgabe bis 30 passt auf die schmalste Bühne).
 - **Progression (bewusst steil):** Zahlenraum 10 schon in Lektion 1, Wegnehmen ab Lektion 2, Zahlenraum 20 ab Lektion 3, Malnehmen ab Lektion 6, Zahlenraum **30** ab Lektion 9. Der Validator deckelt Operanden und Ergebnis bei 30 (`MaxMathQuantity`). Schwierigkeitsbänder: easy ≤5, medium ≤10, hard ≤20, expert ≤30.
-- **Multiplikations-Matrix:** „4 mal 5" wird als Matrix gezeichnet — `left` Reihen × `right` Spalten. Nur die **erste Reihe** zeigt die echten Objekte („je 5"), alle weiteren Reihen zeigen geisterhafte Platzhalter (gleiches Emoji, stark transparent). So lernen Kinder Multiplikation als zweidimensionale Fläche, nicht als Additionskette. Prompts sprechen die Struktur mit („Vier Reihen mit je fünf …"). Grid-Deckel für Lesbarkeit: max. 5 Reihen × 6 Spalten (validator-geprüft, `MultiplicationMatrix`).
-  - **Über** der Matrix steht die Rechenaufgabe als Ziffern-Zeile („3 × 4", `headlineMedium`), **links vor jeder Reihe** ihre Zeilennummer (1…n, `labelLarge`, `WarmMuted`, feste Gutter-Breite). Ziffern darf das Kind sehen — sie sind selbst Lerninhalt und stehen ohnehin unter jeder Mengengruppe. Die Zeilennummern behalten volle Deckkraft, auch neben Geisterreihen: sie sind die Zählhilfe, kein Teil des Platzhalters.
-  - Weil die Matrix ihre Aufgabe selbst beschriftet, unterdrückt die Zahlen-Eingabe ihre symbolische Zeile („5 × 6 = ?") bei Multiplikation — sonst stünde dieselbe Aufgabe zweimal im Aufgabenblock (§9).
-- **Plausibilität der Malaufgaben (Content-Regel):** Ein Malnehmen-Objekt muss ein **einzeln zählbares Ding** sein, das in echten, gleich großen Reihen vorkommt — Eier im Karton, Dosen im Regal, Fenster am Haus, Taxis am Flughafen, Omas im Chor. Nicht erlaubt: Abstrakta ohne Stückzahl („vier Reihen mit je vier **Wegen**"), abgetrennte Körperteile („achtzehn **Füße**"), Dinge, die es nie in Reihen gibt („neun **Tore**"), und Massen von angstbesetzten Tieren („dreißig **Spinnen**"). Prüffrage wie bei den Finale-Bildern: Würde dieses Bild in einem Kinderbuch stehen? Der gesprochene Prompt nennt zusätzlich den **Ort** der Reihen („… stehen im Regal") — er macht die Anordnung erst glaubhaft. Das Bildwort wird **pro Runde** gewählt, nicht pro Lektion (bis August 2026 erzwang ein Test ein Icon je Lektion — das zwang eine Kuh-Lektion, auch ihre Dreißiger-Aufgabe mit Kühen zu rechnen). Gleiches Icon **und** gleiches Raster darf sich über den Lehrplan nicht wortgleich wiederholen.
 - Korrekte Antwort bestätigt sich **grün** (Kachel bzw. Zahlenfeld), solange sie vorgesprochen wird.
-  Falsche Antwort wird **nicht** rot markiert — Miss bleibt gesprochenes Feedback. Auflösen ist nicht grün.
+  Falsche Antwort wird **nicht** rot markiert — Miss bleibt gesprochenes Feedback.
 - **Eingabeart:** Zahlen-Eingabe bei fortgeschrittenem Scaffold **oder** sobald das Ergebnis über 10 liegt (Band `hard`/`expert`) — außer die Eltern haben ausdrücklich „Mit Hilfe“ (`ParentMode.Beginner`) gewählt, dann bleiben überall die drei Kacheln. Die Regel prüft den Eltern-Modus, nicht das abgeleitete Scaffold: im Default `Auto` startet ein frisches Kind auf `Beginner`, gegen das Scaffold geprüft liefe sie beim Normalnutzer ins Leere. Grund: drei Kacheln mit Nachbar-Distraktoren machen Raten zur billigsten Strategie. Regel in `MathHinting.inputFor`.
 - **Kinder-Ziffernblock statt System-Tastatur** (`NumberPad`, seit September 2026; revidiert
   die frühere Regel „System-Tastatur im Zahlenmodus, kein Custom-Nummernblock"). Oben das
   Antwortfeld (blasses „?", solange leer) zwischen Löschen (Icon) und Absenden (SunCoral,
-  Pfeil-Icon), darunter zwei Fünferreihen Ziffern 1–5 / 6–0 — dieselbe Gliederung wie das
-  Fünfer-Feld der Zähl-Hilfe. Tasten 56–72 dp (`NumberPadInput.keySizeDp`: fünf je Reihe
+  Pfeil-Icon), darunter zwei Fünferreihen Ziffern 1–5 / 6–0 — dieselbe Gliederung wie die
+  Fünfersäulen der Zahlentürme. Tasten 56–72 dp (`NumberPadInput.keySizeDp`: fünf je Reihe
   passen auf 320 dp), federn beim Drücken ein, geben `tick` und **sprechen die Zahl, die jetzt
   im Feld steht** („eins", dann „zwölf") auf dem Zählkanal. Eine führende Null wird ersetzt,
   mehr als drei Ziffern gibt es nicht. Grund: die System-Tastatur kam in fast der Hälfte der
   Rechenrunden, war Erwachsenen-UI (Komma, Minus, „Fertig"), klappte von selbst auf und
   verdeckte die Aufgabe.
-- **Zähl-Hilfe (nur Tipp-Modus):** nach 2 Fehlversuchen wird der Aufgabenbereich antippbar und **ersetzt** die Aufgabenvisualisierung (§9: Aufgabe nie zweimal). Beide Operanden teilen sich **ein** Fünfer-Feld, darüber die Aufgabe als Ziffernzeile (»15 − 6 = ?«). Der **Rahmen um die letzten `right` Objekte** markiert überall die zweite Zahl; was mit ihr passiert, entscheidet die Rechenart — bei Minus geht sie weg und **nur sie ist antippbar** (Zähler läuft rückwärts), bei Plus kommt sie dazu und alles ist antippbar. **Malnehmen zählt reihenweise**: ein Tipp macht eine ganze Geisterreihe echt und der Zähler springt in Schritten (5, 10, 15, 20) — Objekte einzeln anzutippen wäre Zählen in Einerschritten, also gerade nicht Multiplikation. Die Matrix ist dabei größer als im Prompt, weil sie den Aufgabenblock für sich hat. Die **nächste offene Einheit pulsiert** und führt durch die Aufgabe (bei Minus von hinten, weil rückwärts gezählt wird); erledigte gerahmte Zellen bekommen einen helleren Rahmen. Jeder Tipp spricht die erreichte Zahl mit, auf dem eigenen Kanal `SpeechChannel.Counting`, der eine laufende Ansage überlagern darf statt sie abzuwürgen. **Gesprochene Zahlen stehen als Wort, nie als Ziffer mit Punkt** — „8." ist im Deutschen die Ordinalzahl und wird „achte" gelesen (`GermanNumberWord`); wo ein Satzende nötig ist, trennt ein Komma — der Puls ist die Anleitung, der gesprochene Cue nur die Verstärkung, weil eine Ansage ohne Stimme oder Clip nicht ankommt. Der Zähler wird ab dem ersten Tipp ins Antwortfeld gespiegelt; die Ziffernreihen des Kinder-Ziffernblocks klappen ein, solange die Hilfe offen ist (ein Tipp aufs Antwortfeld holt sie zurück). **In der Zähl-Hilfe werden Mengen ab 11 ausgeschrieben** (Fünferzeilen) — die einzige Ausnahme zur Symbol-ab-11-Regel oben, und sie gilt nie im Aufgaben-Prompt. Der „Auflösen“-Knopf erscheint im Tipp-Modus erst nach 4 Fehlversuchen (Kachel-Modus unverändert 2). Der Fehlversuch, der die Hilfe aufklappt, spricht **nur die Zählanweisung** — „probier es noch mal“ wäre dort die falsche Auskunft. Und eine mit der Zähl-Hilfe erreichte Antwort wird **bestätigt, aber nicht gelobt** (wie beim Auflösen); Punkte gibt es weiterhin, denn ein Punktabzug wäre eine Strafe.
-- Rechnen läuft in **jeder** Lektion. Wo eine Runde ein Bild trägt, kommt es aus dem
-  Wortschatz derselben Lektion (kontextnah, aber nicht zwingend — Kinder erkennen die Icons
-  ohnehin). Bewährte Form: die kleine Runde mit Bild und echter Szene als Auftakt, die
-  größere ohne Bild als reine Zahlenarbeit.
 
 
 
@@ -913,7 +895,7 @@ niemals mit einem stummen No-Op.
     Ebene und wird an den Kanten des Bauteils eckig abgeschnitten.
   - **Nacht am Waldrand** (Rechnen, gezeichnet): kein Mond (eine helle Scheibe neben dem
     Lautsprecher las sich wie ein zweiter Knopf), Sterne (wenige
-    funkeln mit 8–14 s), Hügel und Bäume unten. Aufgabe und Zähl-Hilfe liegen auf einer Karte,
+    funkeln mit 8–14 s), Hügel und Bäume unten. Die Zahlentürme stehen auf ihrer hellen Platte,
     Antwortkacheln und Ziffernblock sind ohnehin hell.
   - **Dachboden** (Wort-Detektiv, gezeichnet): Dachbalken, rundes Fenster, Mondstrahl mit
     langsam treibendem Staub (17–31 s). Das Wort liegt im Lichtfleck, das Zielpaar („P / p")

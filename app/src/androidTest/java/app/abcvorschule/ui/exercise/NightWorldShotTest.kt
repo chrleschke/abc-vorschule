@@ -191,7 +191,6 @@ class NightWorldShotTest {
         rule.setContent {
             InWorld(TrainerWorld.ForestNight) {
                 VisualQuantityBoard(
-                    emoji = "",
                     left = left,
                     right = right,
                     operation = op,
