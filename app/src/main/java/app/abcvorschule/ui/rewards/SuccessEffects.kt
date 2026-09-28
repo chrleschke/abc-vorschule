@@ -77,7 +77,9 @@ fun SuccessBurst(
         if (landing != null && starCenter != null) {
             // Hinauf in den Punktestand (StarFlight): beschleunigend, wie angesaugt,
             // und dabei auf die Größe des kleinen Sterns schrumpfend.
+            AbcSfx.play(Sfx.Whoosh)
             flight.animateTo(1f, tween(AbcMotion.StandardMs, easing = AbcMotion.Exit))
+            AbcSfx.play(Sfx.Ding)
             onLanded()
             alpha.animateTo(0f, tween(AbcMotion.MicroMs))
         } else {
@@ -149,12 +151,14 @@ private const val SampleRate = 44100
 
 /** Short ascending major arpeggio (C-E-G-C) — a cheerful "ta-da" chime, synthesized on-device. */
 fun playSuccessChime() {
+    if (AbcSfx.play(Sfx.Chime)) return
     val notes = listOf(523.25, 659.25, 783.99, 1046.50)
     playTone(notes, noteMs = 90)
 }
 
 /** One rising scale step per collected trace star (C major, wrapping after an octave). */
 fun playStarBlip(step: Int) {
+    if (AbcSfx.play(Sfx.Blip, rate = AbcSfx.blipRate(step))) return
     val scale = listOf(523.25, 587.33, 659.25, 698.46, 783.99, 880.0, 987.77, 1046.50)
     val freq = scale[step.coerceAtLeast(0) % scale.size]
     playTone(listOf(freq), noteMs = 70, gapMs = 0)
@@ -165,6 +169,7 @@ fun playStarBlip(step: Int) {
  * without German TTS is never a silent no-op.
  */
 fun playBlockedBlip() {
+    if (AbcSfx.play(Sfx.Blocked)) return
     playTone(listOf(220.0), noteMs = 120)
 }
 

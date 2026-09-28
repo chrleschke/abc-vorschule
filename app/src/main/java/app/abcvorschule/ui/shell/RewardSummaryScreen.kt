@@ -47,8 +47,10 @@ import app.abcvorschule.content.LessonFinale
 import app.abcvorschule.ui.components.AbcContinueButton
 import app.abcvorschule.ui.components.AbcSpeakerButton
 import app.abcvorschule.ui.components.IconStar
+import app.abcvorschule.ui.rewards.AbcSfx
 import app.abcvorschule.ui.rewards.ConfettiGeometry
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreen
@@ -145,6 +147,7 @@ fun RewardSummaryScreen(
     LaunchedEffect(Unit) {
         popped = true
         haptics.celebrate()
+        AbcSfx.play(Sfx.Fanfare)
     }
     // Absichtlich nicht `by`: der Wert wird erst im graphicsLayer-Block von
     // [BackgroundStar] gelesen, also in der Zeichenphase. Hier oben gelesen hätte
@@ -161,6 +164,9 @@ fun RewardSummaryScreen(
     // Den Satz einmal beim Erscheinen sprechen, wie die Prompt-Ansage in der Übung.
     LaunchedEffect(finale?.id, ttsAvailable) {
         val text = finale?.tts ?: return@LaunchedEffect
+        // Erst die Fanfare, dann der Satz: ihre drei Anlauftöne liegen sonst genau
+        // über den ersten Wörtern. Der gehaltene Schlusston klingt leise darunter aus.
+        delay(FanfareLeadMs)
         if (ttsAvailable) onSpeak(text)
     }
 
@@ -445,3 +451,6 @@ private fun FinaleBody(
         )
     }
 }
+
+/** Wie lange die Fanfare allein spielt, bevor der Finale-Satz beginnt. */
+private const val FanfareLeadMs = 700L

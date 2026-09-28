@@ -450,6 +450,17 @@ niemals mit einem stummen No-Op.
   zusammenfallen. Ohne deutsches TTS steht das Wort als Text unter dem Emoji — ein
   Hörspiel ist sonst unspielbar.
 - Feedback bei Fehlern (besonders Rechnen): **vorsprechen**, nicht als Fehler-Satz anzeigen.
+- **Geräusche (`AbcSfx`, `assets/sfx/`).** Elf kurze, synthetisierte Klänge, erzeugt von
+  `tools/sfx/generate_sfx.py` (keine Aufnahmen, keine Fremdlizenz; Ogg/Opus wie die Clips,
+  zusammen ~35 KB, Spitze −8 dBFS und mit 0,7 gespielt — leiser als die Stimme). **Eine Tat,
+  ein Klang**, wie beim Haptik-Vokabular: `pop` Jagd-Kugel eingesammelt · `snap` Einrasten
+  (Wort-Bauer, Satz-Architekt, Silben-Verschmelzer) · `boing` Karte federt zurück · `whoosh`/
+  `ding` Erfolgs-Stern fliegt los/landet im Punktestand · `chime` Runde geschafft · `fanfare`
+  Lektion geschafft (der Finale-Satz beginnt 0,7 s danach) · `tap` Ziffernblock · `blip`
+  Spurensucher-Stern (Tonleiter über die Abspielrate) · `shuffle` Jagd mischt · `blocked`
+  gesperrt. Kein Klang klingt nach „falsch" — auch `boing` und `blocked` sind weich. **Keine
+  Musik, keine Dauergeräusche** (Cognitive Load). Ist ein Clip nicht ladbar, fallen `chime`,
+  `blip` und `blocked` auf die frühere Sinus-Synthese zurück, damit ein Tipp nie stumm bleibt.
 
 ### TTS-Grenzen und Autorierungs-Konventionen
 

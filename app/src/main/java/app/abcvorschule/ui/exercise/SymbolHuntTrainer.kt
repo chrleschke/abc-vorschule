@@ -40,7 +40,9 @@ import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.ui.components.AbcResolveButton
+import app.abcvorschule.ui.rewards.AbcSfx
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreen
@@ -147,7 +149,10 @@ fun SymbolHuntTrainer(
         val tapped = state.tiles.firstOrNull { it.instanceId == instanceId } ?: return
         onSpeak(pack.atoms[tapped.atomId]?.lemma ?: tapped.atomId)
         val result = SymbolHuntProgress.tap(state, instanceId)
-        if (result.state.seed != state.seed) shuffling = true
+        if (result.state.seed != state.seed) {
+            shuffling = true
+            AbcSfx.play(Sfx.Shuffle)
+        }
         state = result.state
         when (result.outcome) {
             SymbolHuntTapOutcome.Miss -> {
@@ -160,8 +165,12 @@ fun SymbolHuntTrainer(
             }
             SymbolHuntTapOutcome.MissAlreadyReported ->
                 haptics.nudge()
-            SymbolHuntTapOutcome.Collected -> haptics.tick()
+            SymbolHuntTapOutcome.Collected -> {
+                haptics.tick()
+                AbcSfx.play(Sfx.Pop)
+            }
             SymbolHuntTapOutcome.RoundComplete -> {
+                AbcSfx.play(Sfx.Pop)
                 batteryFull = true
                 haptics.celebrate()
             }

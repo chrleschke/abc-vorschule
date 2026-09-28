@@ -38,7 +38,9 @@ import androidx.compose.ui.unit.dp
 import app.abcvorschule.speech.GermanNumberWord
 import app.abcvorschule.ui.components.IconBackspace
 import app.abcvorschule.ui.components.IconChevronRight
+import app.abcvorschule.ui.rewards.AbcSfx
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
@@ -107,6 +109,7 @@ fun NumberPad(
         }
         value = next
         haptics.tick()
+        AbcSfx.play(Sfx.Tap)
         next.toIntOrNull()?.let { onSpeakValue(GermanNumberWord.of(it)) }
     }
 
@@ -141,6 +144,7 @@ fun NumberPad(
                     color = CreamElevated,
                     onClick = {
                         haptics.tick()
+                        AbcSfx.play(Sfx.Tap)
                         value = NumberPadInput.backspace(value)
                     },
                     modifier = Modifier.testTag("number_erase").semantics { contentDescription = "Löschen" },

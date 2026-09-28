@@ -25,6 +25,8 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
+import app.abcvorschule.ui.rewards.AbcSfx
+import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcMotion
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineStart
@@ -130,6 +132,9 @@ private fun Rect.toDragRect() = DragRect(left, top, right, bottom)
 fun rememberDragFieldState(vararg keys: Any?): DragFieldState =
     remember(*keys) { DragFieldState() }
 
+/** Ab dieser Strecke ist ein Rückflug zu sehen und bekommt seinen Klang; ein Zittern nicht. */
+private const val AudibleReturnPx = 24f
+
 /** Slight enlargement while a tile is airborne, so it reads as lifted off the board. */
 private const val DragLiftScale = 1.08f
 
@@ -230,6 +235,12 @@ fun DragCard(
                                     // unsichtbar), ein falscher Slot lässt sie liegen —
                                     // dann soll sie sichtbar zurück, nicht teleportieren.
                                     releaseFrom(releasedAt)
+                                    // Nirgends gelandet: hörbar zurückfedern. Einen
+                                    // falschen Slot vertont der Trainer selbst, er
+                                    // allein weiß, ob der Slot falsch war.
+                                    if (zone == null && releasedAt.getDistance() > AudibleReturnPx) {
+                                        AbcSfx.play(Sfx.Boing)
+                                    }
                                     onDropped(zone)
                                 }
                                 owns = false

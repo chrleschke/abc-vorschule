@@ -5,6 +5,8 @@ import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import app.abcvorschule.ui.rewards.AbcSfx
+import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcMotion
 
 /**
@@ -89,6 +91,8 @@ fun rememberSlotFillSettle(
     val settle = remember { Animatable(SlotFillMorph.AtRest) }
     LaunchedEffect(filled, morphOnFill) {
         if (filled && morphOnFill) {
+            // Klang und Feder gehören zusammen: dieselbe Tat, dieselbe Antwort.
+            AbcSfx.play(Sfx.Snap)
             settle.snapTo(0f)
             settle.animateTo(
                 targetValue = SlotFillMorph.AtRest,

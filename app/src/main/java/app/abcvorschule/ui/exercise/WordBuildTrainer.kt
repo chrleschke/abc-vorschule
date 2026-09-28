@@ -56,7 +56,9 @@ import app.abcvorschule.ui.exercise.drag.DragCard
 import app.abcvorschule.ui.exercise.drag.DragFieldState
 import app.abcvorschule.ui.exercise.drag.DropZone
 import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
+import app.abcvorschule.ui.rewards.AbcSfx
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
@@ -183,6 +185,7 @@ fun WordBuildTrainer(
             // Wie jeder andere Trainer: ein Fehlgriff ist spürbar, nicht nur hörbar —
             // die Karte fliegt dazu federnd in den Tray zurück (DragCard).
             haptics.nudge()
+            AbcSfx.play(Sfx.Boing)
             // Score against the slot being practiced, not the tile the child grabbed —
             // misplacing a distractor must not downgrade the distractor's own scaffold.
             onResult(false, false, listOf(round.blocks[index].atomId))

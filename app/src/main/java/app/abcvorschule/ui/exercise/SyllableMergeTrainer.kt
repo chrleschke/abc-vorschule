@@ -43,7 +43,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.SyllableMergeRound
+import app.abcvorschule.ui.rewards.AbcSfx
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.CreamElevated
@@ -134,6 +136,7 @@ fun SyllableMergeTrainer(
         // Sammel-Erfolg, kein eigener Trainer-Abschluss — der große Stern am Ende
         // kommt bewusst ohne Haptik dazu.
         haptics.tick()
+        AbcSfx.play(Sfx.Snap)
         onResult(true, false, scoredIds)
     }
 
