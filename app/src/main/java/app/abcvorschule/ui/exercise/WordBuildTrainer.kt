@@ -73,15 +73,24 @@ object WordBuildTray {
     /** Preschoolers must be able to scan the whole tray at a glance. */
     const val MaxTrayTiles = 5
 
-    fun tiles(round: WordBuildRound, placedDisplays: List<String>, seed: Int): List<WordBlock> {
+    fun tiles(round: WordBuildRound, placedDisplays: List<String>, seed: Int): List<WordBlock> =
+        slottedTiles(round, placedDisplays, seed).map { it.value }
+
+    /**
+     * Wie [tiles], aber jede Kachel mit ihrem Platz im **vollen** Tray. Der Platz ist
+     * ihre feste Identität: rückt nach einem Treffer die Nachbarkachel nach, darf sie
+     * weder Schlüssel noch Animationszustand (Lift, Rückflug) der eingesetzten erben —
+     * bei „Hallo" flog sonst das zweite l sichtbar aus dem Rahmen zurück in den Tray.
+     */
+    fun slottedTiles(round: WordBuildRound, placedDisplays: List<String>, seed: Int): List<IndexedValue<WordBlock>> {
         val capped = (round.blocks + round.distractors).take(MaxTrayTiles)
         val arranged = TrayOrder.arrange(capped, seed) { it.display }
-        val remaining = arranged.toMutableList()
+        val remaining = arranged.withIndex().toMutableList()
         placedDisplays.forEach { display ->
-            val hit = remaining.indexOfFirst { it.display == display }
+            val hit = remaining.indexOfFirst { it.value.display == display }
             if (hit >= 0) remaining.removeAt(hit)
         }
-        return if (remaining.none { block -> round.blocks.any { it.display == block.display } }) {
+        return if (remaining.none { (_, block) -> round.blocks.any { it.display == block.display } }) {
             emptyList()
         } else {
             remaining
@@ -133,7 +142,7 @@ fun WordBuildTrainer(
     val scoredIds = remember(roundKey) {
         (round.blocks.map { it.atomId } + round.targetAtomId).distinct()
     }
-    val tiles = WordBuildTray.tiles(round, placed.values.toList(), seed = round.targetAtomId.hashCode())
+    val tiles = WordBuildTray.slottedTiles(round, placed.values.toList(), seed = round.targetAtomId.hashCode())
     val haptics = LocalAbcHaptics.current
     // Der letzte Baustein spricht erst zu Ende, dann kommt der Erfolg. Das läuft
     // in einem LaunchedEffect mit roundKey statt in scope.launch: ein Chevron-Tap
@@ -278,7 +287,7 @@ fun WordBuildTrainer(
                                         morphOnFill = !resolved,
                                         onTap = {
                                             val selected = field.selectedKey
-                                            tiles.withIndex()
+                                            tiles
                                                 .firstOrNull { (i, block) ->
                                                     WordBuildTray.tileKey(i, block) == selected
                                                 }
@@ -316,7 +325,7 @@ fun WordBuildTrainer(
                     .testTag("word_tray"),
             ) {
                 if (!resolved && !completed) {
-                    tiles.forEachIndexed { index, block ->
+                    tiles.forEach { (index, block) ->
                         val key = WordBuildTray.tileKey(index, block)
                         DragCard(
                             state = field,

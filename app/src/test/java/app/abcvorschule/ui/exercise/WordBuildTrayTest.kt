@@ -115,4 +115,27 @@ class WordBuildTrayTest {
             WordBuildTray.tileKey(2, hallo),
         )
     }
+
+    /**
+     * „Hallo" hat zwei gleiche l. Setzt das Kind das erste ein, behält das zweite
+     * seinen eigenen Platz und damit seinen eigenen Schlüssel — sonst erbt es den
+     * Rückflug der eingesetzten Kachel und fliegt sichtbar aus dem Rahmen zurück.
+     */
+    @Test
+    fun aRemainingDuplicateKeepsItsOwnSlotAndKey() {
+        val hallo = WordBuildRound(
+            promptTts = "Baue Hallo.",
+            targetAtomId = "hallo",
+            blocks = listOf(WordBlock("ha", "Ha"), WordBlock("letter-l", "l"), WordBlock("letter-l", "l"), WordBlock("letter-o", "o")),
+        )
+        val seed = hallo.targetAtomId.hashCode()
+        val before = WordBuildTray.slottedTiles(hallo, emptyList(), seed)
+        val after = WordBuildTray.slottedTiles(hallo, listOf("l"), seed)
+        val keysBefore = before.map { (slot, block) -> WordBuildTray.tileKey(slot, block) }
+        val keysAfter = after.map { (slot, block) -> WordBuildTray.tileKey(slot, block) }
+
+        assertEquals(before.size - 1, after.size)
+        assertTrue("jeder verbliebene Schlüssel war schon vorher genau diese Kachel", keysBefore.containsAll(keysAfter))
+        assertEquals("genau ein Schlüssel ist weg", 1, (keysBefore - keysAfter.toSet()).size)
+    }
 }

@@ -161,6 +161,23 @@ fun DragCard(
     enabled: Boolean = true,
     content: @Composable BoxScope.() -> Unit,
 ) {
+    // Gekeyt auf die Karte: rückt an diese Stelle der Reihe eine andere Karte, beginnt
+    // sie ohne Lift und ohne Rückflug der vorigen (Tray-Nachrücken nach einem Treffer).
+    androidx.compose.runtime.key(state, key) {
+        DragCardBody(state, key, onTap, onDropped, modifier, enabled, content)
+    }
+}
+
+@Composable
+private fun DragCardBody(
+    state: DragFieldState,
+    key: String,
+    onTap: () -> Unit,
+    onDropped: (zoneKey: String?) -> Unit,
+    modifier: Modifier,
+    enabled: Boolean,
+    content: @Composable BoxScope.() -> Unit,
+) {
     val dragging = state.draggingKey == key
     // Der Rückflug: eine losgelassene Karte springt nicht an ihren Platz, sie
     // fliegt federnd dorthin zurück (PRODUCT_PRINCIPLES §2, Snap-back). Gekeyt auf

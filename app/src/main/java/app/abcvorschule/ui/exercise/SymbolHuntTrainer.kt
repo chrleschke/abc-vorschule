@@ -315,6 +315,12 @@ private class HuntFlight(position: HuntTilePosition, var seed: Long) {
     var from = position
     var to = position
 
+    /**
+     * Neu gemischt, aber der Flug-Effekt lief noch nicht an: bis dahin steht die
+     * Kugel am Startpunkt, sonst blitzte sie einen Frame lang schon am Ziel auf.
+     */
+    var pending = false
+
     fun x(t: Float) = HuntShuffleHop.x(from.x, to.x, t)
     fun scale(t: Float) = HuntShuffleHop.scale(from.scale, to.scale, t)
 
@@ -362,19 +368,22 @@ private fun HuntTile(
     // 1 = gelandet. Startet gelandet: eine Runde, die geladen wird, animiert nichts.
     val hop = remember { Animatable(1f) }
     val flight = remember { HuntFlight(position, shuffleSeed) }
-    LaunchedEffect(shuffleSeed, position) {
-        if (shuffleSeed == flight.seed) {
-            // Gleiche Mischung, anderer Platz: das Feld hat seine Größe geändert
-            // (Drehen, Tastatur). Das ist kein Mischen und fliegt nicht.
-            flight.from = position
-            flight.to = position
-            hop.snapTo(1f)
-            return@LaunchedEffect
-        }
-        flight.from = flight.at(hop.value, hopPx)
-        flight.to = position
+    // In der Komposition, nicht im Effekt: ändert das Feld nur seine Größe (erste
+    // Messung, Drehen), muss die Kugel im selben Layout-Durchgang am neuen Platz
+    // stehen. Stand das hier im Effekt, blieb sie am zuerst gemessenen Platz liegen —
+    // der Effekt läuft nach dem Layout, und danach stieß nichts ein neues an
+    // (SymbolHuntTileBoundsTest: Kugel 10 dp über den Rand).
+    if (shuffleSeed != flight.seed) {
+        // Neu gemischt: Start ist, wo die Kugel gerade ist — auch mitten im Flug.
+        flight.from = flight.at(if (flight.pending) 0f else hop.value, hopPx)
         flight.seed = shuffleSeed
+        flight.pending = true
+    }
+    flight.to = position
+    LaunchedEffect(shuffleSeed) {
+        if (!flight.pending) return@LaunchedEffect
         hop.snapTo(0f)
+        flight.pending = false
         delay(HuntShuffleHop.staggerMs(instanceId).toLong())
         hop.animateTo(1f, tween(HuntShuffleHop.FlightMs, easing = AbcMotion.Enter))
     }
@@ -444,7 +453,7 @@ private fun HuntTile(
             // Gelegt wird in der Größe des Ziels, geflogen in der Layout-Phase: der
             // Bogen liest den Hüpf-Fortschritt, ohne 450 ms lang zu rekomponieren.
             .offset {
-                val t = hop.value
+                val t = if (flight.pending) 0f else hop.value
                 IntOffset(
                     x = (flight.x(t) - tilePx / 2).roundToInt(),
                     y = (HuntShuffleHop.y(flight.from.y, flight.to.y, t, hopPx) - tilePx / 2).roundToInt(),
@@ -452,7 +461,7 @@ private fun HuntTile(
             }
             .size(tileDp)
             .graphicsLayer {
-                val growth = flight.scale(hop.value) / position.scale
+                val growth = flight.scale(if (flight.pending) 0f else hop.value) / position.scale
                 val factor = HuntTileMorph.scale(inflate.value, exit.value) * growth
                 scaleX = factor
                 scaleY = factor

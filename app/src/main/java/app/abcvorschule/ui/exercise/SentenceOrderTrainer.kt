@@ -71,18 +71,27 @@ object SentenceOrderTray {
         distractors: List<WordBlock>,
         placedDisplays: List<String>,
         seed: Int,
-    ): List<WordBlock> {
+    ): List<WordBlock> = slottedCards(words, atomIds, distractors, placedDisplays, seed).map { it.value }
+
+    /** Wie [cards], mit festem Platz im vollen Tray — Begründung bei `WordBuildTray.slottedTiles`. */
+    fun slottedCards(
+        words: List<String>,
+        atomIds: List<String>,
+        distractors: List<WordBlock>,
+        placedDisplays: List<String>,
+        seed: Int,
+    ): List<IndexedValue<WordBlock>> {
         val solution = words.mapIndexed { index, word ->
             WordBlock(atomId = atomIds.getOrElse(index) { word }, display = word)
         }
         val capped = (solution + distractors).take(MaxTrayTiles)
         val arranged = TrayOrder.arrange(capped, seed) { it.display }
-        val remaining = arranged.toMutableList()
+        val remaining = arranged.withIndex().toMutableList()
         placedDisplays.forEach { display ->
-            val hit = remaining.indexOfFirst { it.display == display }
+            val hit = remaining.indexOfFirst { it.value.display == display }
             if (hit >= 0) remaining.removeAt(hit)
         }
-        return if (remaining.none { card -> words.any { it == card.display } }) {
+        return if (remaining.none { (_, card) -> words.any { it == card.display } }) {
             emptyList()
         } else {
             remaining
@@ -124,7 +133,7 @@ fun SentenceOrderTrainer(
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var completed by remember(roundKey) { mutableStateOf(false) }
     val scoredIds = remember(roundKey) { atomIds.distinct() }
-    val cards = SentenceOrderTray.cards(
+    val cards = SentenceOrderTray.slottedCards(
         words,
         atomIds,
         round.distractors,
@@ -250,7 +259,7 @@ fun SentenceOrderTrainer(
                                         morphOnFill = !resolved,
                                         onTap = {
                                             val selected = field.selectedKey
-                                            val card = cards.withIndex()
+                                            val card = cards
                                                 .firstOrNull { (i, c) -> cardKey(i, c) == selected }
                                                 ?.value
                                             if (card != null) place(index, card)
@@ -276,7 +285,7 @@ fun SentenceOrderTrainer(
                 modifier = Modifier.testTag("sentence_tray"),
             ) {
                 if (!resolved && !completed) {
-                    cards.forEachIndexed { cardIndex, card ->
+                    cards.forEach { (cardIndex, card) ->
                         val key = cardKey(cardIndex, card)
                         DragCard(
                             state = field,
@@ -330,7 +339,7 @@ fun SentenceOrderTrainer(
     )
 }
 
-// Mit Tray-Index wie WordBuildTray.tileKey: zwei Karten mit gleichem Wort teilen
+// Mit festem Tray-Platz (slottedCards) wie WordBuildTray.tileKey: zwei Karten mit gleichem Wort teilen
 // sich sonst selectedKey/draggingKey/Bounds — "dragging one moves both".
 private fun cardKey(index: Int, card: WordBlock): String =
     "card-$index-${card.atomId}-${card.display}"
