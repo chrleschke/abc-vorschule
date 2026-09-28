@@ -696,6 +696,13 @@ niemals mit einem stummen No-Op.
   (Kau-/Spuck-Rhythmus der Fresser, Halte-Kurve des Jagd-Druckmorphs) darf eigene Dauern
   tragen und begründet sie dort. Bewegung bleibt Antwort auf eine Tat — die Palette ist
   keine Einladung, Bühnen beim Laden aufzubauen oder dauerhaft zu animieren.
+- **Der Erfolgs-Stern fliegt in den Punktestand** (`StarFlight`). Nach dem Aufpoppen
+  steht er kurz (450 ms), fliegt dann in leichtem Bogen hinauf und schrumpft dabei auf die
+  Größe des kleinen Sterns; erst beim Einschlag springt die Zahl in der Kopfzeile und der
+  Zähler hüpft (×1,35, Feder `Bouncy`). Bis dahin zeigt die Kopfzeile den alten Stand,
+  obwohl der Punkt schon verbucht ist — ein Kind, das nicht zählt, sieht so, *wohin* sein
+  Stern geht. Ohne gelegten Punktestand (letzte Runde vor dem End-Screen) schrumpft der
+  Stern wie früher an Ort und Stelle.
 - Erfolgsmomente: SuccessBurst (Gold-Stern + Funken, ohne Haptik), Gold-Puls an der
   Segmentgrenze je Trainer, Konfetti auf dem End-Screen.
 - **Shape-Morph beim Einrasten (Squish-Settle).** Rastet ein Wort in einen Peg des

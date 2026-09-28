@@ -13,11 +13,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.theme.AbcMotion
@@ -35,11 +40,17 @@ fun SuccessBurst(
     trigger: Boolean,
     onFinished: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Wohin der Stern fliegt (Punktestand). Ohne Ziel schrumpft er an Ort und Stelle. */
+    target: StarCounterAnchor? = null,
+    /** Der Stern ist im Punktestand eingeschlagen — jetzt darf die Zahl springen. */
+    onLanded: () -> Unit = {},
 ) {
     if (!trigger) return
     val scale = remember(trigger) { Animatable(0.4f) }
     val alpha = remember(trigger) { Animatable(0f) }
     val burst = remember(trigger) { Animatable(0f) }
+    val flight = remember(trigger) { Animatable(0f) }
+    var starCenter by remember(trigger) { mutableStateOf<Offset?>(null) }
 
     LaunchedEffect(trigger) {
         // Bewusst ohne Haptik: der große Stern am Trainer-Ende kommt oft direkt
@@ -61,12 +72,22 @@ fun SuccessBurst(
             }
             launch { alpha.animateTo(1f, tween(AbcMotion.QuickMs)) }
         }
-        delay(550)
-        // Wait for the exit animation to fully finish before the caller advances —
-        // otherwise the composable is torn down mid-shrink and the star just vanishes.
-        coroutineScope {
-            launch { scale.animateTo(0.7f, tween(AbcMotion.StandardMs)) }
-            launch { alpha.animateTo(0f, tween(AbcMotion.StandardMs)) }
+        delay(StarFlight.HoldMs)
+        val landing = target?.centerInRoot
+        if (landing != null && starCenter != null) {
+            // Hinauf in den Punktestand (StarFlight): beschleunigend, wie angesaugt,
+            // und dabei auf die Größe des kleinen Sterns schrumpfend.
+            flight.animateTo(1f, tween(AbcMotion.StandardMs, easing = AbcMotion.Exit))
+            onLanded()
+            alpha.animateTo(0f, tween(AbcMotion.MicroMs))
+        } else {
+            // Wait for the exit animation to fully finish before the caller advances —
+            // otherwise the composable is torn down mid-shrink and the star just vanishes.
+            coroutineScope {
+                launch { scale.animateTo(0.7f, tween(AbcMotion.StandardMs)) }
+                launch { alpha.animateTo(0f, tween(AbcMotion.StandardMs)) }
+            }
+            onLanded()
         }
         onFinished()
     }
@@ -99,8 +120,26 @@ fun SuccessBurst(
                 tint = StarGold,
                 size = 84.dp,
                 modifier = Modifier
-                    .scale(scale.value)
-                    .alpha(alpha.value),
+                    // Vor dem graphicsLayer gemessen: die Ruheposition, nicht die
+                    // fliegende — sonst liefe das Ziel beim Fliegen mit.
+                    .onGloballyPositioned { starCenter = it.boundsInRoot().center }
+                    .graphicsLayer {
+                        val from = starCenter
+                        val to = target?.centerInRoot
+                        val t = flight.value
+                        if (from != null && to != null && t > 0f) {
+                            val o = StarFlight.offset(from, to, t)
+                            translationX = o.x
+                            translationY = o.y
+                            val s = StarFlight.scale(from = scale.value, t = t)
+                            scaleX = s
+                            scaleY = s
+                        } else {
+                            scaleX = scale.value
+                            scaleY = scale.value
+                        }
+                        this.alpha = alpha.value
+                    },
             )
         }
     }
