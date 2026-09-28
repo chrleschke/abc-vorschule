@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.components.IconChevronRight
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.SkyBlue
@@ -72,7 +73,7 @@ fun NumberPad(
     val keyboardController = LocalSoftwareKeyboardController.current
     val opacity by animateFloatAsState(
         targetValue = if (enabled) 1f else 0.5f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
         label = "number_pad_lock_opacity",
     )
 

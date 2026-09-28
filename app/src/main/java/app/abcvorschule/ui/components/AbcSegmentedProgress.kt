@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -17,6 +17,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.WarmMuted
@@ -72,7 +73,7 @@ fun AbcSegmentedProgress(
             animatedIndex = index
             fill.snapTo(target)
         } else {
-            fill.animateTo(target, animationSpec = tween(450))
+            fill.animateTo(target, animationSpec = tween(AbcMotion.LongMs))
         }
     }
 
@@ -85,7 +86,7 @@ fun AbcSegmentedProgress(
     LaunchedEffect(index) {
         if (index > pulsedIndex) {
             pulse.snapTo(1f)
-            pulse.animateTo(0f, animationSpec = tween(500))
+            pulse.animateTo(0f, animationSpec = tween(AbcMotion.PulseMs))
         }
         pulsedIndex = index
     }

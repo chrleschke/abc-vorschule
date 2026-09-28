@@ -3,9 +3,7 @@ package app.abcvorschule.ui.exercise
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,6 +41,7 @@ import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.SoftSand
@@ -161,12 +160,12 @@ fun SymbolHuntTrainer(
 
     val fieldAlpha by animateFloatAsState(
         targetValue = if (batteryFull) 0f else 1f,
-        animationSpec = tween(durationMillis = 400),
+        animationSpec = tween(durationMillis = AbcMotion.LongMs),
         label = "hunt_field_fade",
     )
     val interactionOpacity by animateFloatAsState(
         targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
         label = "hunt_lock_opacity",
     )
 
@@ -319,7 +318,7 @@ private fun HuntTile(
             // Anfassen: kurze Feder auf +6 %, mit leichtem Nachwippen.
             inflate.animateTo(
                 targetValue = HuntTileMorph.PressPuff,
-                animationSpec = spring(dampingRatio = 0.55f, stiffness = Spring.StiffnessMedium),
+                animationSpec = AbcMotion.Bouncy.spec(),
             )
             // Halten: verzögert weiter bis zum Deckel +10 % und dort stillstehen.
             inflate.animateTo(
@@ -341,7 +340,7 @@ private fun HuntTile(
             // … dann das Plopp zurück in Form.
             inflate.animateTo(
                 targetValue = 0f,
-                animationSpec = spring(dampingRatio = 0.38f, stiffness = Spring.StiffnessHigh),
+                animationSpec = AbcMotion.Pop.spec(),
             )
         }
     }

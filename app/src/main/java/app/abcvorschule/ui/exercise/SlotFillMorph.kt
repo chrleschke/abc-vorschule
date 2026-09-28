@@ -2,11 +2,10 @@ package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import app.abcvorschule.ui.theme.AbcMotion
 
 /**
  * Squish-Settle beim Einrasten — der Shape-Morph, den Material 3 Expressive für
@@ -48,7 +47,7 @@ object SlotFillMorph {
     const val StretchY = 0.05f
 
     /** Dämpfung der Feder; darunter wackelt es zu lange nach. */
-    const val Damping = 0.42f
+    val Damping = AbcMotion.Settle.dampingRatio
 
     /** Zuschlag auf den Eckradius im Moment des Einrastens. */
     const val CornerGainDp = 8f
@@ -93,10 +92,7 @@ fun rememberSlotFillSettle(
             settle.snapTo(0f)
             settle.animateTo(
                 targetValue = SlotFillMorph.AtRest,
-                animationSpec = spring(
-                    dampingRatio = SlotFillMorph.Damping,
-                    stiffness = Spring.StiffnessMediumLow,
-                ),
+                animationSpec = AbcMotion.Settle.spec(),
             )
         } else {
             settle.snapTo(SlotFillMorph.AtRest)

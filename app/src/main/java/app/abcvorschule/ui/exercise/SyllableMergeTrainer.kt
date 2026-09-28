@@ -2,12 +2,10 @@ package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
@@ -47,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.SyllableMergeRound
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.SkyBlue
@@ -124,7 +123,7 @@ fun SyllableMergeTrainer(
     val haptics = LocalAbcHaptics.current
     val interactionOpacity by animateFloatAsState(
         targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
         label = "syllable_merge_lock_opacity",
     )
 
@@ -154,7 +153,7 @@ fun SyllableMergeTrainer(
     LaunchedEffect(roundKey, attractRequest) {
         if (attractRequest == 0) return@LaunchedEffect
         idleNudge.snapTo(0f)
-        fraction.animateTo(1f, spring(stiffness = Spring.StiffnessMedium))
+        fraction.animateTo(1f, AbcMotion.Snap.spec())
         // Nur verbuchen, wenn die Feder wirklich durchgelaufen ist: ein
         // abgebrochener Schnapp ist keine verschmolzene Runde.
         if (MergeProgress.isContact(fraction.value)) commit()
@@ -171,7 +170,7 @@ fun SyllableMergeTrainer(
                 // No penalty: a short pull just glides back.
                 fraction.animateTo(
                     0f,
-                    spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+                    AbcMotion.Glide.spec(),
                 )
             }
         }
@@ -195,7 +194,7 @@ fun SyllableMergeTrainer(
                 idleNudge.snapTo(0f)
                 fraction.animateTo(
                     target,
-                    spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                    AbcMotion.Bouncy.spec(),
                 )
             }
         }
@@ -238,10 +237,10 @@ fun SyllableMergeTrainer(
         if (merged || dragging) return@LaunchedEffect
         while (true) {
             delay(IdleNudgeDelayMs)
-            idleNudge.animateTo(1f, spring(stiffness = Spring.StiffnessLow))
+            idleNudge.animateTo(1f, AbcMotion.Glide.spec())
             idleNudge.animateTo(
                 0f,
-                spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+                AbcMotion.Glide.spec(),
             )
         }
     }
@@ -249,7 +248,7 @@ fun SyllableMergeTrainer(
     val resultScale = remember(roundKey) { Animatable(0.6f) }
     LaunchedEffect(merged) {
         if (merged) {
-            resultScale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
+            resultScale.animateTo(1f, AbcMotion.Bouncy.spec())
         }
     }
 

@@ -9,7 +9,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -51,6 +50,7 @@ import app.abcvorschule.ui.exercise.drag.DropZone
 import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
@@ -131,7 +131,7 @@ fun SentenceOrderTrainer(
     val haptics = LocalAbcHaptics.current
     val interactionOpacity by animateFloatAsState(
         targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
         label = "sentence_order_lock_opacity",
     )
 
@@ -183,7 +183,7 @@ fun SentenceOrderTrainer(
             key(roundKey) {
                 AnimatedContent(
                     targetState = completed,
-                    transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(140)) },
+                    transitionSpec = { fadeIn(tween(AbcMotion.ShortMs)) togetherWith fadeOut(tween(AbcMotion.QuickMs)) },
                     label = "sentence_complete",
                 ) { isComplete ->
                     // Die Bühne wird gemessen, nicht geraten: die Peg-Reihe bricht nie um

@@ -1,9 +1,7 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -57,6 +55,7 @@ import app.abcvorschule.ui.exercise.drag.DragCard
 import app.abcvorschule.ui.exercise.drag.DropZone
 import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.SunCoral
@@ -175,7 +174,7 @@ fun SoundFeederTrainer(
     val currentEnabled = rememberUpdatedState(enabled)
     val interactionOpacity by animateFloatAsState(
         targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(200),
+        animationSpec = tween(AbcMotion.QuickMs),
         label = "feeder_lock_opacity",
     )
 
@@ -214,7 +213,7 @@ fun SoundFeederTrainer(
         // keine zu sehen war. Die erste Karte zählt nicht mit, sie liegt beim
         // Startwert schon nicht mehr auf dem Haufen.
         if (fromPile) pileShown = (pileShown - 1).coerceAtLeast(0)
-        pop.animateTo(1f, spring(dampingRatio = 0.5f, stiffness = Spring.StiffnessMediumLow))
+        pop.animateTo(1f, AbcMotion.Soft.spec())
         val card = state.current ?: return
         if (ttsAvailable) onSpeakParts(listOf(SoundFeederSpeech.wordPart(card, pack)))
     }
@@ -282,7 +281,7 @@ fun SoundFeederTrainer(
                     val spitting = launch { animatorFor(wrong).spit() }
                     launch {
                         cardBounce.snapTo(1f)
-                        cardBounce.animateTo(0f, spring(dampingRatio = 0.35f, stiffness = Spring.StiffnessMedium))
+                        cardBounce.animateTo(0f, AbcMotion.Wobble.spec())
                     }
                     if (ttsAvailable) {
                         onSpeakParts(SoundFeederSpeech.missParts(round, card, wrong, pack))

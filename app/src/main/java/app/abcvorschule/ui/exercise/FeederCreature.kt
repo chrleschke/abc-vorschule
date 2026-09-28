@@ -4,11 +4,9 @@ import android.graphics.Matrix
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
@@ -39,6 +37,7 @@ import androidx.graphics.shapes.CornerRounding
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.toPath
 import app.abcvorschule.content.SymbolInWordDerivation
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.WarmInk
 import kotlin.math.PI
@@ -50,6 +49,10 @@ import kotlinx.coroutines.delay
  * Bewegungszustand eines Fressers. Drei Animatables statt animateFloatAsState:
  * Kauen und Schütteln sind Sequenzen, die bei jedem Auslöser von vorn laufen
  * müssen, auch wenn die vorige noch läuft.
+ *
+ * Die kurzen Tweens (60–150 ms) sind Figurenspiel — der Rhythmus von Kauen,
+ * Spucken und Wackeln — und tragen deshalb eigene Zahlen statt der Stufen aus
+ * [AbcMotion] (dort Regel 3). Nur das Anschwellen nutzt die gemeinsame Feder.
  */
 class FeederCreatureAnimator {
     val mouth = Animatable(IdleMouth)
@@ -91,7 +94,7 @@ class FeederCreatureAnimator {
 
     /** Satt: kugelrund, leicht federnd. */
     suspend fun fill() {
-        scale.animateTo(FullScale, spring(dampingRatio = 0.45f, stiffness = Spring.StiffnessMediumLow))
+        scale.animateTo(FullScale, AbcMotion.Settle.spec())
         mouth.animateTo(0.15f, tween(200))
     }
 

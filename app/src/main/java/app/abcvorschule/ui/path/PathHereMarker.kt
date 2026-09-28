@@ -1,6 +1,5 @@
 package app.abcvorschule.ui.path
 
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -22,6 +21,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.SunCoral
 import kotlin.math.PI
@@ -114,7 +114,7 @@ internal fun PathHereMarker(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            tween(1100, easing = FastOutSlowInEasing),
+            tween(AbcMotion.BobMs, easing = AbcMotion.Enter),
             RepeatMode.Reverse,
         ),
         label = "here_marker_bob",

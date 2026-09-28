@@ -1,7 +1,6 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
@@ -38,6 +37,7 @@ import app.abcvorschule.content.SentencePictureRound
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
@@ -76,7 +76,7 @@ fun SentencePictureTrainer(
     }
     val interactionOpacity by animateFloatAsState(
         targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
         label = "sentence_picture_lock_opacity",
     )
 
@@ -148,7 +148,7 @@ fun SentencePictureTrainer(
                 val celebrateProgress by key(roundKey) {
                     animateFloatAsState(
                         targetValue = if (solvedCorrect) 1f else 0f,
-                        animationSpec = tween(durationMillis = 360, easing = FastOutSlowInEasing),
+                        animationSpec = tween(durationMillis = AbcMotion.StandardMs, easing = AbcMotion.Enter),
                         label = "sentence_picture_celebrate",
                     )
                 }

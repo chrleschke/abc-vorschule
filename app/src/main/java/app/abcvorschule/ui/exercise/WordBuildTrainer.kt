@@ -1,5 +1,11 @@
 package app.abcvorschule.ui.exercise
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,20 +20,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -58,6 +58,7 @@ import app.abcvorschule.ui.exercise.drag.DropZone
 import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
@@ -145,7 +146,7 @@ fun WordBuildTrainer(
     }
     val interactionOpacity by animateFloatAsState(
         targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
         label = "word_build_lock_opacity",
     )
     // Die Bühne zentriert den Aufgabenblock in dem, was der Antwortblock übrig
@@ -235,7 +236,7 @@ fun WordBuildTrainer(
                     key(roundKey) {
                         AnimatedContent(
                             targetState = completed,
-                            transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(140)) },
+                            transitionSpec = { fadeIn(tween(AbcMotion.ShortMs)) togetherWith fadeOut(tween(AbcMotion.QuickMs)) },
                             contentAlignment = Alignment.Center,
                             label = "word_complete",
                         ) { isComplete ->

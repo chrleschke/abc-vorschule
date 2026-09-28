@@ -4,9 +4,6 @@ import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -23,14 +20,15 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.components.IconStar
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.SunCoral
+import kotlin.math.PI
+import kotlin.math.sin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.PI
-import kotlin.math.sin
 
 @Composable
 fun SuccessBurst(
@@ -53,25 +51,22 @@ fun SuccessBurst(
         // 600ms burst there would stretch the whole entry phase to 600ms and push
         // back delay(550)/exit/onFinished. The burst is only ever read via
         // `burst.value` in the Canvas below, so it never needs to be joined.
-        launch { burst.animateTo(1f, tween(600, easing = FastOutSlowInEasing)) }
+        launch { burst.animateTo(1f, tween(AbcMotion.CelebrateMs, easing = AbcMotion.Enter)) }
         coroutineScope {
             launch {
                 scale.animateTo(
                     targetValue = 1.3f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium,
-                    ),
+                    animationSpec = AbcMotion.Bouncy.spec(),
                 )
             }
-            launch { alpha.animateTo(1f, tween(180)) }
+            launch { alpha.animateTo(1f, tween(AbcMotion.QuickMs)) }
         }
         delay(550)
         // Wait for the exit animation to fully finish before the caller advances —
         // otherwise the composable is torn down mid-shrink and the star just vanishes.
         coroutineScope {
-            launch { scale.animateTo(0.7f, tween(320)) }
-            launch { alpha.animateTo(0f, tween(320)) }
+            launch { scale.animateTo(0.7f, tween(AbcMotion.StandardMs)) }
+            launch { alpha.animateTo(0f, tween(AbcMotion.StandardMs)) }
         }
         onFinished()
     }

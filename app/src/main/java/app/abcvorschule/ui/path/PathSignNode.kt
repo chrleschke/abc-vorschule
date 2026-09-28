@@ -39,6 +39,7 @@ import app.abcvorschule.R
 import app.abcvorschule.progress.LessonState
 import app.abcvorschule.ui.components.IconLock
 import app.abcvorschule.ui.components.IconStar
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreenLight
 import app.abcvorschule.ui.theme.SkyBlueLight
 import app.abcvorschule.ui.theme.SoftSand
@@ -296,7 +297,7 @@ fun PathSignNode(
                 val pulse = transition.animateFloat(
                     initialValue = 0.45f,
                     targetValue = 1f,
-                    animationSpec = infiniteRepeatable(tween(900), RepeatMode.Reverse),
+                    animationSpec = infiniteRepeatable(tween(AbcMotion.BreathMs), RepeatMode.Reverse),
                     label = "node_pulse_alpha",
                 )
                 Box(

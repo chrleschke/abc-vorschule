@@ -687,6 +687,15 @@ niemals mit einem stummen No-Op.
   Der `SuccessBurst` am Trainer-Ende vibriert **nicht**: er folgt oft direkt auf den
   Trainer-eigenen Puls, und zwei Vibrationen hintereinander sind zu viel — dort trägt
   der Chime allein.
+- **Motion-Tokens (`AbcMotion` in `ui/theme/Motion.kt`).** Jede Animation wählt ihre
+  Dauer, Easing und Feder aus einer festen Palette: sechs Dauerstufen (90 · 170 · 260 ·
+  360 · 450 · 600 ms, Faktor ~1,4), drei Schleifen-Perioden (Puls, Atmen, Wippen), vier
+  Easings (Enter/Exit/Linger/Fill) und sieben benannte Federn (Settle, Soft, Bouncy,
+  Glide, Pop, Wobble, Snap). Federn für alles, was das Kind anfasst, Tweens für alles,
+  was nur passiert. Eine neue Feder am Aufrufort bricht `AbcMotionTest`; Figurenspiel
+  (Kau-/Spuck-Rhythmus der Fresser, Halte-Kurve des Jagd-Druckmorphs) darf eigene Dauern
+  tragen und begründet sie dort. Bewegung bleibt Antwort auf eine Tat — die Palette ist
+  keine Einladung, Bühnen beim Laden aufzubauen oder dauerhaft zu animieren.
 - Erfolgsmomente: SuccessBurst (Gold-Stern + Funken, ohne Haptik), Gold-Puls an der
   Segmentgrenze je Trainer, Konfetti auf dem End-Screen.
 - **Shape-Morph beim Einrasten (Squish-Settle).** Rastet ein Wort in einen Peg des

@@ -1,7 +1,6 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -54,6 +53,7 @@ import app.abcvorschule.speech.SpeechClipText
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGoldDeep
@@ -82,12 +82,12 @@ private const val CollectedSegmentAlpha = 0.45f
 private const val SilhouetteAlpha = 0.15f
 
 /** How long a wrong segment spins around its own centre. */
-private const val SpinMs = 450
+private const val SpinMs = AbcMotion.LongMs
 
 /** How long a collected glyph travels from the word down onto its slot. The flight
  * is the causal link for a child who cannot read: "I tapped that, and that moved
  * there." */
-private const val FlightMs = 350
+private const val FlightMs = AbcMotion.StandardMs
 
 /** ExerciseStage caps its content at 420dp and pads 12dp per side; used only as an
  * upper bound, the real width is measured so a narrow phone shrinks correctly. */
@@ -147,7 +147,7 @@ fun SymbolInWordTrainer(
     val haptics = LocalAbcHaptics.current
     val interactionOpacity by animateFloatAsState(
         targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
         label = "detective_lock_opacity",
     )
 
@@ -231,7 +231,7 @@ fun SymbolInWordTrainer(
         if (flight == null) return@LaunchedEffect
         // No snapTo first: flightProgress is remembered on the same key, so it is a
         // brand-new Animatable sitting at 0f whenever this effect starts.
-        flightProgress.animateTo(1f, tween(durationMillis = FlightMs, easing = FastOutSlowInEasing))
+        flightProgress.animateTo(1f, tween(durationMillis = FlightMs, easing = AbcMotion.Enter))
         // Clearing the flight is what fills the stroke, so the hand-off from the
         // flying copy to the resting glyph happens in one frame.
         flight = null
@@ -590,7 +590,7 @@ private fun SlotRow(
             initialValue = 0.5f,
             targetValue = 1f,
             animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 500, easing = LinearEasing),
+                animation = tween(durationMillis = AbcMotion.PulseMs, easing = LinearEasing),
                 repeatMode = RepeatMode.Reverse,
             ),
             label = "detective_slot_glow_value",

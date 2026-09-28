@@ -50,10 +50,11 @@ import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.rewards.ConfettiGeometry
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
-import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.SunCoral
 import kotlinx.coroutines.delay
 
@@ -152,7 +153,7 @@ fun RewardSummaryScreen(
     // Animationen (PathSignNode, PathHereMarker, PathScreen).
     val starScale = animateFloatAsState(
         targetValue = if (popped) 1f else 0.7f,
-        animationSpec = tween(500),
+        animationSpec = tween(AbcMotion.LongMs),
         label = "reward-scale",
     )
     val fontScale = LocalDensity.current.fontScale
@@ -395,7 +396,7 @@ private fun FinaleBody(
                     }
                     AnimatedVisibility(
                         visible = shown,
-                        enter = fadeIn(tween(260)) + scaleIn(tween(260), initialScale = 0.6f),
+                        enter = fadeIn(tween(AbcMotion.ShortMs)) + scaleIn(tween(AbcMotion.ShortMs), initialScale = 0.6f),
                     ) {
                         // Die Trefferfläche ist die Box, nicht das Glyph: ein Emoji
                         // ist kleiner als der Finger, der es trifft. Siehe
