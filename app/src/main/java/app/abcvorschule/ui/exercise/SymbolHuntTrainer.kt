@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.ContentPack
@@ -48,6 +49,7 @@ import app.abcvorschule.ui.theme.SoftSand
 import app.abcvorschule.ui.theme.StarGoldDeep
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
+import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 
 // Matches AbcDimens.kidTouch (the app-wide minimum touch target for 4-6-year-olds)
@@ -130,13 +132,22 @@ fun SymbolHuntTrainer(
     // des Satz-Architekten nach dem Auflösen still fallen (PRODUCT_PRINCIPLES §10).
     var earnedBeforeResolve by remember(roundKey) { mutableStateOf<Int?>(null) }
     var batteryFull by remember(roundKey) { mutableStateOf(false) }
+    // Solange die Kugeln nach einem Fehltipp an ihre neuen Plätze hüpfen, nimmt das
+    // Feld keine Tipps an (HuntShuffleHop) — Bremse gegen Durchtippen, keine Strafe.
+    var shuffling by remember(roundKey) { mutableStateOf(false) }
+    LaunchedEffect(roundKey, state.seed) {
+        if (!shuffling) return@LaunchedEffect
+        delay(HuntShuffleHop.LockMs.toLong())
+        shuffling = false
+    }
     val haptics = LocalAbcHaptics.current
 
     fun handleTap(instanceId: Int) {
-        if (resolved || batteryFull) return
+        if (resolved || batteryFull || shuffling) return
         val tapped = state.tiles.firstOrNull { it.instanceId == instanceId } ?: return
         onSpeak(pack.atoms[tapped.atomId]?.lemma ?: tapped.atomId)
         val result = SymbolHuntProgress.tap(state, instanceId)
+        if (result.state.seed != state.seed) shuffling = true
         state = result.state
         when (result.outcome) {
             SymbolHuntTapOutcome.Miss -> {
@@ -196,7 +207,7 @@ fun SymbolHuntTrainer(
                     state = state,
                     initialTiles = initialTiles,
                     pack = pack,
-                    enabled = !batteryFull && !interactionLocked,
+                    enabled = !batteryFull && !interactionLocked && !shuffling,
                     onTap = ::handleTap,
                     modifier = Modifier.fillMaxSize().alpha(fieldAlpha * interactionOpacity),
                 )
@@ -267,6 +278,8 @@ private fun SymbolHuntField(
                 HuntTile(
                     glyph = pack.atoms[tile.atomId]?.display ?: tile.atomId,
                     position = position,
+                    shuffleSeed = state.seed,
+                    instanceId = tile.instanceId,
                     color = TilePalette[tile.instanceId % TilePalette.size],
                     present = tile.instanceId in presentIds,
                     enabled = enabled,
@@ -285,6 +298,27 @@ private fun SymbolHuntField(
 private class HuntPressLatch { var touched = false }
 
 /**
+ * Woher und wohin eine Kugel beim Neu-Mischen hüpft. Wie [HuntPressLatch] bewusst
+ * kein State: gelesen wird nur in der Layout- und Zeichenphase, getrieben vom
+ * Animatable daneben.
+ */
+private class HuntFlight(position: HuntTilePosition, var seed: Long) {
+    var from = position
+    var to = position
+
+    fun x(t: Float) = HuntShuffleHop.x(from.x, to.x, t)
+    fun scale(t: Float) = HuntShuffleHop.scale(from.scale, to.scale, t)
+
+    /** Wo die Kugel bei [t] steht, als Startpunkt für einen Flug, der sie im Flug erwischt. */
+    fun at(t: Float, hopPx: Float) = HuntTilePosition(
+        x = x(t),
+        y = HuntShuffleHop.y(from.y, to.y, t, hopPx),
+        scale = scale(t),
+        colorIndex = to.colorIndex,
+    )
+}
+
+/**
  * Eine Kachel im Streufeld, samt Druck-Morph — Kurven, Grenzen und Begründung
  * stehen in [HuntTileMorph].
  *
@@ -299,6 +333,9 @@ private class HuntPressLatch { var touched = false }
 private fun HuntTile(
     glyph: String,
     position: HuntTilePosition,
+    /** Wechselt bei jedem Fehltipp — dann hüpft die Kugel an [position]. */
+    shuffleSeed: Long,
+    instanceId: Int,
     color: Color,
     present: Boolean,
     enabled: Boolean,
@@ -311,6 +348,27 @@ private fun HuntTile(
     val pressed by interactionSource.collectIsPressedAsState()
     val latch = remember { HuntPressLatch() }
     var poppedAway by remember { mutableStateOf(false) }
+    val density = LocalDensity.current
+    val hopPx = with(density) { (TileSize * HuntShuffleHop.HopHeightFraction).toPx() }
+    // 1 = gelandet. Startet gelandet: eine Runde, die geladen wird, animiert nichts.
+    val hop = remember { Animatable(1f) }
+    val flight = remember { HuntFlight(position, shuffleSeed) }
+    LaunchedEffect(shuffleSeed, position) {
+        if (shuffleSeed == flight.seed) {
+            // Gleiche Mischung, anderer Platz: das Feld hat seine Größe geändert
+            // (Drehen, Tastatur). Das ist kein Mischen und fliegt nicht.
+            flight.from = position
+            flight.to = position
+            hop.snapTo(1f)
+            return@LaunchedEffect
+        }
+        flight.from = flight.at(hop.value, hopPx)
+        flight.to = position
+        flight.seed = shuffleSeed
+        hop.snapTo(0f)
+        delay(HuntShuffleHop.staggerMs(instanceId).toLong())
+        hop.animateTo(1f, tween(HuntShuffleHop.FlightMs, easing = AbcMotion.Enter))
+    }
 
     LaunchedEffect(pressed) {
         if (pressed) {
@@ -370,16 +428,23 @@ private fun HuntTile(
     // TalkBack läse eingesammelte Buchstaben weiter vor.
     if (poppedAway) return
 
-    val density = LocalDensity.current
     val tileDp = TileSize * position.scale
-    val offsetX = with(density) { position.x.toDp() } - tileDp / 2
-    val offsetY = with(density) { position.y.toDp() } - tileDp / 2
+    val tilePx = with(density) { tileDp.toPx() }
     Box(
         modifier = modifier
-            .offset(x = offsetX, y = offsetY)
+            // Gelegt wird in der Größe des Ziels, geflogen in der Layout-Phase: der
+            // Bogen liest den Hüpf-Fortschritt, ohne 450 ms lang zu rekomponieren.
+            .offset {
+                val t = hop.value
+                IntOffset(
+                    x = (flight.x(t) - tilePx / 2).roundToInt(),
+                    y = (HuntShuffleHop.y(flight.from.y, flight.to.y, t, hopPx) - tilePx / 2).roundToInt(),
+                )
+            }
             .size(tileDp)
             .graphicsLayer {
-                val factor = HuntTileMorph.scale(inflate.value, exit.value)
+                val growth = flight.scale(hop.value) / position.scale
+                val factor = HuntTileMorph.scale(inflate.value, exit.value) * growth
                 scaleX = factor
                 scaleY = factor
                 alpha = HuntTileMorph.alpha(exit.value)

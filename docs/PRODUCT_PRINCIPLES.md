@@ -142,7 +142,7 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
   - **Nur der Finale-Satz darf Quatsch sein** (Abschnitt 12) — und dann muss er lustig
     sein. Alles andere, was das Kind hört, beschreibt eine Welt, die es wiedererkennt.
 
-Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Treffer füllen eine Batterie, Fehltipp mischt neu ohne Batterieverlust.
+Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Treffer füllen eine Batterie, Fehltipp mischt neu ohne Batterieverlust. Das Mischen ist **Absicht gegen Raten** (ohne es tippen Kinder alle Kugeln der Reihe nach an) und bleibt; seit September 2026 **hüpfen** die Kugeln dabei in kleinen, versetzten Bögen an ihre neuen Plätze statt zu teleportieren, und das Feld nimmt keine Tipps an, bis die letzte gelandet ist (~650 ms, `HuntShuffleHop`). Die Bewegung bremst Durchtippen zusätzlich, ohne zu strafen.
 
 Ebenfalls abgeleitet und nicht autoriert: der **Wort-Detektiv** direkt nach dem letzten
 Wort-Bauer — „Finde den Buchstaben / den Laut / die Silbe im Wort". Eine Runde pro eingeführtem Wort,
