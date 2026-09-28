@@ -2,21 +2,23 @@ package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,27 +28,44 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import app.abcvorschule.speech.GermanNumberWord
+import app.abcvorschule.ui.components.IconBackspace
 import app.abcvorschule.ui.components.IconChevronRight
-import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.rewards.AbcSfx
+import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.Sfx
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
+import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.theme.WarmMuted
 
 /**
- * Numeric answer field backed by the device's own keyboard (number mode) —
- * more reliable for kids than a custom on-screen keypad, and it just works
- * with whatever input method/accessibility tooling is installed.
+ * Der Kinder-Ziffernblock (PRODUCT_PRINCIPLES §8). Bis September 2026 tippte das Kind
+ * seine Rechenantwort in die System-Zahlentastatur — Erwachsenen-UI mit Komma, Minus,
+ * Leertaste und „Fertig", die von selbst aufklappte, die Aufgabe verdeckte und auf
+ * jedem Gerät anders aussah. Sie kam in fast der Hälfte aller Rechenrunden (Ergebnis
+ * ab 11).
+ *
+ * Jetzt gehört der Block der App: oben das Antwortfeld zwischen Löschen und Absenden,
+ * darunter zwei Fünferreihen Ziffern (1–5, 6–0) — dieselbe Fünfer-Gliederung wie das
+ * Zählfeld und zwei Hände. Jede Taste federt beim Drücken ein, gibt `tick`-Haptik und
+ * **spricht die Zahl, die jetzt im Feld steht** („eins", dann „zwölf"): ein Kind, das
+ * zweistellige Ziffern noch nicht liest, hört so, was es getippt hat.
+ *
+ * Solange die Zähl-Hilfe offen ist, klappen die Ziffernreihen ein — das Kind zählt
+ * dann mit dem Finger im Aufgabenblock, und das Feld spiegelt den Zähler. Ein Tipp
+ * aufs Feld holt die Ziffern zurück.
  */
 @Composable
 fun NumberPad(
@@ -56,48 +75,44 @@ fun NumberPad(
     modifier: Modifier = Modifier,
     /** True once the typed number turned out to be the answer — the field confirms in green. */
     solved: Boolean = false,
-    /** False during the audio lock — field and submit button are non-interactive
-     * and dimmed, and focus/keyboard are deferred until this turns true. */
+    /** False during the audio lock — the whole block is non-interactive and dimmed. */
     enabled: Boolean = true,
     /** Von der Zähl-Hilfe hochgezählter Wert; `null` heißt „nichts (mehr)
      * angetippt". Wirkt nur bei [countingOpen]. */
     countedValue: Int? = null,
-    /** True, solange die Zähl-Hilfe offen ist. Zwei Folgen, eine Wahrheit: die
-     * System-Tastatur würde das Zählfeld verdecken, bleibt also zu, bis das Kind
-     * das Feld antippt — und das Feld spiegelt, was die Hilfe zählt. */
+    /** True, solange die Zähl-Hilfe offen ist: Ziffernreihen eingeklappt, das Feld
+     * spiegelt, was die Hilfe zählt. */
     countingOpen: Boolean = false,
+    /** Spricht die Zahl im Feld nach jedem Tastendruck (Zählkanal). */
+    onSpeakValue: (String) -> Unit = {},
 ) {
     var value by remember(resetToken) { mutableStateOf("") }
-    val focusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
+    var keysOpen by remember(resetToken, countingOpen) { mutableStateOf(!countingOpen) }
+    val haptics = LocalAbcHaptics.current
     val opacity by animateFloatAsState(
         targetValue = if (enabled) 1f else 0.5f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
         label = "number_pad_lock_opacity",
     )
+    val interactive = enabled && !solved
 
     fun submit() {
         value.toIntOrNull()?.let(onSubmit)
     }
 
-    LaunchedEffect(enabled, countingOpen) {
-        // Deferred rather than Unit-keyed: while locked the keyboard must not pop
-        // up before the child is allowed to type (design doc). Und solange die
-        // Zähl-Hilfe offen ist, verdeckt die Tastatur genau das Feld, auf dem das
-        // Kind zählen soll — ein Tipp ins Eingabefeld holt sie zurück.
-        if (!enabled) return@LaunchedEffect
-        if (countingOpen) {
-            keyboardController?.hide()
-            return@LaunchedEffect
+    fun type(digit: Int) {
+        val next = NumberPadInput.append(value, digit)
+        if (next == value) {
+            // Schon drei Ziffern: spürbar „voll", kein Fehler.
+            haptics.nudge()
+            return
         }
-        focusRequester.requestFocus()
-        keyboardController?.show()
+        value = next
+        haptics.tick()
+        AbcSfx.play(Sfx.Tap)
+        next.toIntOrNull()?.let { onSpeakValue(GermanNumberWord.of(it)) }
     }
-    LaunchedEffect(solved) {
-        // Without closing the IME the green confirmation sits behind the keyboard —
-        // exactly the thing it is supposed to show.
-        if (solved) keyboardController?.hide()
-    }
+
     LaunchedEffect(countedValue, resetToken, countingOpen) {
         // Auch auf resetToken gekeyed: der Token wechselt bei jedem Fehlversuch und
         // leert das Feld. Ohne dieses Re-Spiegeln stünde das Feld nach einem Miss
@@ -112,58 +127,147 @@ fun NumberPad(
         value = NumberPadInput.mirroredValue(countedValue)
     }
 
-    Row(
-        modifier = modifier.fillMaxWidth().alpha(opacity),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        // Breite aus der effektiven Textgröße statt fester 140dp: bei großer
-        // System-Schriftskalierung passte die Antwort sonst nicht mehr ins Feld
-        // (Rechnung in NumberPadInput.fieldWidthDp).
-        val fieldWidth = NumberPadInput.fieldWidthDp(
-            textSp = MaterialTheme.typography.displayLarge.fontSize.value,
-            fontScale = LocalDensity.current.fontScale,
-        )
-        OutlinedTextField(
-            value = value,
-            onValueChange = { input -> value = NumberPadInput.sanitize(input) },
-            modifier = Modifier
-                .width(fieldWidth.dp)
-                .focusRequester(focusRequester)
-                .testTag("number_input"),
-            textStyle = MaterialTheme.typography.displayLarge.copy(textAlign = TextAlign.Center),
-            singleLine = true,
-            enabled = enabled,
-            readOnly = solved,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { submit() }),
-            // Neutral while typing so that green means one thing only: correct.
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = if (solved) LeafGreen else SkyBlue,
-                unfocusedBorderColor = if (solved) LeafGreen else SkyBlue.copy(alpha = 0.5f),
-                focusedTextColor = WarmInk,
-                unfocusedTextColor = WarmInk,
-                // Explicit, matching the unfocused/enabled colours above: M3's own
-                // disabled-state alpha would otherwise stack on top of the outer
-                // `.alpha(opacity)` during the lock, compounding into an almost
-                // invisible field instead of one cleanly dimmed by a single signal.
-                disabledBorderColor = SkyBlue.copy(alpha = 0.5f),
-                disabledTextColor = WarmInk,
-            ),
-        )
-        Spacer(Modifier.width(16.dp))
-        Surface(
-            onClick = { submit() },
-            enabled = enabled,
-            shape = RoundedCornerShape(20.dp),
-            color = SunCoral,
-            modifier = Modifier
-                .size(AbcDimens.kidTouch - 8.dp)
-                .testTag("number_submit"),
+    BoxWithConstraints(modifier = modifier.fillMaxWidth().alpha(opacity), contentAlignment = Alignment.Center) {
+        val key = NumberPadInput.keySizeDp(maxWidth.value).dp
+        val gap = NumberPadInput.KeyGapDp.dp
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(gap + 4.dp),
         ) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                IconChevronRight(tint = Cream, size = 28.dp)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(gap + 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                PadKey(
+                    size = key,
+                    enabled = interactive && value.isNotEmpty(),
+                    color = CreamElevated,
+                    onClick = {
+                        haptics.tick()
+                        AbcSfx.play(Sfx.Tap)
+                        value = NumberPadInput.backspace(value)
+                    },
+                    modifier = Modifier.testTag("number_erase").semantics { contentDescription = "Löschen" },
+                ) {
+                    IconBackspace(tint = WarmMuted, size = key * 0.5f)
+                }
+                AnswerField(
+                    value = value,
+                    solved = solved,
+                    height = key,
+                    onTap = { if (interactive) keysOpen = true },
+                )
+                PadKey(
+                    size = key,
+                    enabled = interactive && value.isNotEmpty(),
+                    color = SunCoral,
+                    onClick = ::submit,
+                    modifier = Modifier.testTag("number_submit"),
+                ) {
+                    IconChevronRight(tint = Cream, size = key * 0.45f)
+                }
+            }
+            if (keysOpen) {
+                NumberPadInput.KeyRows.forEach { row ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+                        row.forEach { digit ->
+                            PadKey(
+                                size = key,
+                                enabled = interactive,
+                                color = CreamElevated,
+                                onClick = { type(digit) },
+                                modifier = Modifier.testTag("number_key_$digit"),
+                            ) {
+                                Text(
+                                    text = "$digit",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = WarmInk,
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
+
+/** Das Antwortfeld: zeigt, was getippt ist, oder ein blasses „?" — die Aufgabe fragt ja. */
+@Composable
+private fun AnswerField(
+    value: String,
+    solved: Boolean,
+    height: Dp,
+    onTap: () -> Unit,
+) {
+    // Breite aus der effektiven Textgröße statt fest: bei großer System-Schrift
+    // passte die Antwort sonst nicht mehr ins Feld (NumberPadInput.fieldWidthDp).
+    val width = NumberPadInput.fieldWidthDp(
+        textSp = MaterialTheme.typography.displayLarge.fontSize.value,
+        fontScale = LocalDensity.current.fontScale,
+    ).dp
+    // Grün heißt nur eins: richtig (§8). Während des Tippens neutral im Aktiv-Blau.
+    val borderColor = if (solved) LeafGreen else SkyBlue
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = Cream,
+        border = BorderStroke(3.dp, borderColor),
+        modifier = Modifier
+            .width(width)
+            .height(height)
+            .clickable(onClick = onTap)
+            .testTag("number_input"),
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = value.ifEmpty { "?" },
+                style = MaterialTheme.typography.displayLarge,
+                color = if (value.isEmpty()) WarmMuted.copy(alpha = 0.5f) else WarmInk,
+            )
+        }
+    }
+}
+
+/**
+ * Eine Taste. Federt beim Drücken ein und wieder heraus (Squash wie die Jagd-Kugeln,
+ * Feder `Bouncy`) — eine Taste, die sich nicht bewegt, fühlt sich für Kinder kaputt an.
+ */
+@Composable
+private fun PadKey(
+    size: Dp,
+    enabled: Boolean,
+    color: androidx.compose.ui.graphics.Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val squash by animateFloatAsState(
+        targetValue = if (pressed) KeyPressedScale else 1f,
+        animationSpec = AbcMotion.Bouncy.spec(),
+        label = "pad_key_squash",
+    )
+    Surface(
+        shape = RoundedCornerShape(18.dp),
+        color = color,
+        modifier = modifier
+            .size(size)
+            .graphicsLayer {
+                scaleX = squash
+                scaleY = squash
+                alpha = if (enabled) 1f else DisabledKeyAlpha
+            }
+            .clickable(
+                interactionSource = interaction,
+                indication = null,
+                enabled = enabled,
+                onClick = onClick,
+            ),
+    ) {
+        Box(contentAlignment = Alignment.Center) { content() }
+    }
+}
+
+private const val KeyPressedScale = 0.88f
+private const val DisabledKeyAlpha = 0.4f

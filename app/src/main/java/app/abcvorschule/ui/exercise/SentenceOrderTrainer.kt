@@ -9,7 +9,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -49,11 +48,15 @@ import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.exercise.drag.DragCard
 import app.abcvorschule.ui.exercise.drag.DropZone
 import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
+import app.abcvorschule.ui.rewards.AbcSfx
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
@@ -68,18 +71,27 @@ object SentenceOrderTray {
         distractors: List<WordBlock>,
         placedDisplays: List<String>,
         seed: Int,
-    ): List<WordBlock> {
+    ): List<WordBlock> = slottedCards(words, atomIds, distractors, placedDisplays, seed).map { it.value }
+
+    /** Wie [cards], mit festem Platz im vollen Tray — Begründung bei `WordBuildTray.slottedTiles`. */
+    fun slottedCards(
+        words: List<String>,
+        atomIds: List<String>,
+        distractors: List<WordBlock>,
+        placedDisplays: List<String>,
+        seed: Int,
+    ): List<IndexedValue<WordBlock>> {
         val solution = words.mapIndexed { index, word ->
             WordBlock(atomId = atomIds.getOrElse(index) { word }, display = word)
         }
         val capped = (solution + distractors).take(MaxTrayTiles)
         val arranged = TrayOrder.arrange(capped, seed) { it.display }
-        val remaining = arranged.toMutableList()
+        val remaining = arranged.withIndex().toMutableList()
         placedDisplays.forEach { display ->
-            val hit = remaining.indexOfFirst { it.display == display }
+            val hit = remaining.indexOfFirst { it.value.display == display }
             if (hit >= 0) remaining.removeAt(hit)
         }
-        return if (remaining.none { card -> words.any { it == card.display } }) {
+        return if (remaining.none { (_, card) -> words.any { it == card.display } }) {
             emptyList()
         } else {
             remaining
@@ -121,7 +133,7 @@ fun SentenceOrderTrainer(
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var completed by remember(roundKey) { mutableStateOf(false) }
     val scoredIds = remember(roundKey) { atomIds.distinct() }
-    val cards = SentenceOrderTray.cards(
+    val cards = SentenceOrderTray.slottedCards(
         words,
         atomIds,
         round.distractors,
@@ -131,7 +143,7 @@ fun SentenceOrderTrainer(
     val haptics = LocalAbcHaptics.current
     val interactionOpacity by animateFloatAsState(
         targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
         label = "sentence_order_lock_opacity",
     )
 
@@ -148,6 +160,10 @@ fun SentenceOrderTrainer(
             }
         } else {
             misses += 1
+            // Wie jeder andere Trainer: ein Fehlgriff ist spürbar, nicht nur hörbar —
+            // die Karte fliegt dazu federnd in den Tray zurück (DragCard).
+            haptics.nudge()
+            AbcSfx.play(Sfx.Boing)
             // Score against the peg being practiced, not the card the child grabbed —
             // misplacing a distractor must not downgrade the distractor's own scaffold.
             onResult(false, false, listOf(atomIds.getOrElse(index) { card.atomId }))
@@ -168,6 +184,7 @@ fun SentenceOrderTrainer(
             if (!illustrationEmoji.isNullOrBlank()) {
                 Text(
                     text = illustrationEmoji,
+                    fontFamily = SilboEmoji,
                     fontSize = TaskPromptSizing.pictureSp(LocalDensity.current.fontScale).sp,
                 )
             }
@@ -183,7 +200,7 @@ fun SentenceOrderTrainer(
             key(roundKey) {
                 AnimatedContent(
                     targetState = completed,
-                    transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(140)) },
+                    transitionSpec = { fadeIn(tween(AbcMotion.ShortMs)) togetherWith fadeOut(tween(AbcMotion.QuickMs)) },
                     label = "sentence_complete",
                 ) { isComplete ->
                     // Die Bühne wird gemessen, nicht geraten: die Peg-Reihe bricht nie um
@@ -242,7 +259,7 @@ fun SentenceOrderTrainer(
                                         morphOnFill = !resolved,
                                         onTap = {
                                             val selected = field.selectedKey
-                                            val card = cards.withIndex()
+                                            val card = cards
                                                 .firstOrNull { (i, c) -> cardKey(i, c) == selected }
                                                 ?.value
                                             if (card != null) place(index, card)
@@ -268,7 +285,7 @@ fun SentenceOrderTrainer(
                 modifier = Modifier.testTag("sentence_tray"),
             ) {
                 if (!resolved && !completed) {
-                    cards.forEachIndexed { cardIndex, card ->
+                    cards.forEach { (cardIndex, card) ->
                         val key = cardKey(cardIndex, card)
                         DragCard(
                             state = field,
@@ -322,7 +339,7 @@ fun SentenceOrderTrainer(
     )
 }
 
-// Mit Tray-Index wie WordBuildTray.tileKey: zwei Karten mit gleichem Wort teilen
+// Mit festem Tray-Platz (slottedCards) wie WordBuildTray.tileKey: zwei Karten mit gleichem Wort teilen
 // sich sonst selectedKey/draggingKey/Bounds — "dragging one moves both".
 private fun cardKey(index: Int, card: WordBlock): String =
     "card-$index-${card.atomId}-${card.display}"

@@ -4,9 +4,6 @@ import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -16,32 +13,44 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.components.IconStar
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.SunCoral
+import kotlin.math.PI
+import kotlin.math.sin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.PI
-import kotlin.math.sin
 
 @Composable
 fun SuccessBurst(
     trigger: Boolean,
     onFinished: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Wohin der Stern fliegt (Punktestand). Ohne Ziel schrumpft er an Ort und Stelle. */
+    target: StarCounterAnchor? = null,
+    /** Der Stern ist im Punktestand eingeschlagen — jetzt darf die Zahl springen. */
+    onLanded: () -> Unit = {},
 ) {
     if (!trigger) return
     val scale = remember(trigger) { Animatable(0.4f) }
     val alpha = remember(trigger) { Animatable(0f) }
     val burst = remember(trigger) { Animatable(0f) }
+    val flight = remember(trigger) { Animatable(0f) }
+    var starCenter by remember(trigger) { mutableStateOf<Offset?>(null) }
 
     LaunchedEffect(trigger) {
         // Bewusst ohne Haptik: der große Stern am Trainer-Ende kommt oft direkt
@@ -53,25 +62,34 @@ fun SuccessBurst(
         // 600ms burst there would stretch the whole entry phase to 600ms and push
         // back delay(550)/exit/onFinished. The burst is only ever read via
         // `burst.value` in the Canvas below, so it never needs to be joined.
-        launch { burst.animateTo(1f, tween(600, easing = FastOutSlowInEasing)) }
+        launch { burst.animateTo(1f, tween(AbcMotion.CelebrateMs, easing = AbcMotion.Enter)) }
         coroutineScope {
             launch {
                 scale.animateTo(
                     targetValue = 1.3f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium,
-                    ),
+                    animationSpec = AbcMotion.Bouncy.spec(),
                 )
             }
-            launch { alpha.animateTo(1f, tween(180)) }
+            launch { alpha.animateTo(1f, tween(AbcMotion.QuickMs)) }
         }
-        delay(550)
-        // Wait for the exit animation to fully finish before the caller advances —
-        // otherwise the composable is torn down mid-shrink and the star just vanishes.
-        coroutineScope {
-            launch { scale.animateTo(0.7f, tween(320)) }
-            launch { alpha.animateTo(0f, tween(320)) }
+        delay(StarFlight.HoldMs)
+        val landing = target?.centerInRoot
+        if (landing != null && starCenter != null) {
+            // Hinauf in den Punktestand (StarFlight): beschleunigend, wie angesaugt,
+            // und dabei auf die Größe des kleinen Sterns schrumpfend.
+            AbcSfx.play(Sfx.Whoosh)
+            flight.animateTo(1f, tween(AbcMotion.StandardMs, easing = AbcMotion.Exit))
+            AbcSfx.play(Sfx.Ding)
+            onLanded()
+            alpha.animateTo(0f, tween(AbcMotion.MicroMs))
+        } else {
+            // Wait for the exit animation to fully finish before the caller advances —
+            // otherwise the composable is torn down mid-shrink and the star just vanishes.
+            coroutineScope {
+                launch { scale.animateTo(0.7f, tween(AbcMotion.StandardMs)) }
+                launch { alpha.animateTo(0f, tween(AbcMotion.StandardMs)) }
+            }
+            onLanded()
         }
         onFinished()
     }
@@ -104,8 +122,26 @@ fun SuccessBurst(
                 tint = StarGold,
                 size = 84.dp,
                 modifier = Modifier
-                    .scale(scale.value)
-                    .alpha(alpha.value),
+                    // Vor dem graphicsLayer gemessen: die Ruheposition, nicht die
+                    // fliegende — sonst liefe das Ziel beim Fliegen mit.
+                    .onGloballyPositioned { starCenter = it.boundsInRoot().center }
+                    .graphicsLayer {
+                        val from = starCenter
+                        val to = target?.centerInRoot
+                        val t = flight.value
+                        if (from != null && to != null && t > 0f) {
+                            val o = StarFlight.offset(from, to, t)
+                            translationX = o.x
+                            translationY = o.y
+                            val s = StarFlight.scale(from = scale.value, t = t)
+                            scaleX = s
+                            scaleY = s
+                        } else {
+                            scaleX = scale.value
+                            scaleY = scale.value
+                        }
+                        this.alpha = alpha.value
+                    },
             )
         }
     }
@@ -115,12 +151,14 @@ private const val SampleRate = 44100
 
 /** Short ascending major arpeggio (C-E-G-C) — a cheerful "ta-da" chime, synthesized on-device. */
 fun playSuccessChime() {
+    if (AbcSfx.play(Sfx.Chime)) return
     val notes = listOf(523.25, 659.25, 783.99, 1046.50)
     playTone(notes, noteMs = 90)
 }
 
 /** One rising scale step per collected trace star (C major, wrapping after an octave). */
 fun playStarBlip(step: Int) {
+    if (AbcSfx.play(Sfx.Blip, rate = AbcSfx.blipRate(step))) return
     val scale = listOf(523.25, 587.33, 659.25, 698.46, 783.99, 880.0, 987.77, 1046.50)
     val freq = scale[step.coerceAtLeast(0) % scale.size]
     playTone(listOf(freq), noteMs = 70, gapMs = 0)
@@ -131,6 +169,7 @@ fun playStarBlip(step: Int) {
  * without German TTS is never a silent no-op.
  */
 fun playBlockedBlip() {
+    if (AbcSfx.play(Sfx.Blocked)) return
     playTone(listOf(220.0), noteMs = 120)
 }
 

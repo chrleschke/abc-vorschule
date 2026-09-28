@@ -3,6 +3,7 @@ package app.abcvorschule
 import android.app.Application
 import app.abcvorschule.content.ContentRepository
 import app.abcvorschule.progress.ProgressRepository
+import app.abcvorschule.ui.rewards.AbcSfx
 
 class AbcApplication : Application() {
     lateinit var contentRepository: ContentRepository
@@ -14,5 +15,6 @@ class AbcApplication : Application() {
         super.onCreate()
         contentRepository = ContentRepository.fromContext(this)
         progressRepository = ProgressRepository.fromContext(this)
+        AbcSfx.init(this)
     }
 }

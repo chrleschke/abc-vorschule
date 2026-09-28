@@ -1,44 +1,45 @@
 package app.abcvorschule.ui.shell
 
 import androidx.compose.foundation.background
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
 import app.abcvorschule.content.ContentPack
-import app.abcvorschule.speech.SpokenPart
 import app.abcvorschule.session.AppScreen
 import app.abcvorschule.session.SessionUiState
 import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.session.SuccessPhase
+import app.abcvorschule.speech.SpokenPart
 import app.abcvorschule.ui.components.AbcNavChevron
 import app.abcvorschule.ui.components.AbcSegmentedProgress
 import app.abcvorschule.ui.components.abcStarCountHeight
@@ -46,6 +47,7 @@ import app.abcvorschule.ui.exercise.TrainerCallbacks
 import app.abcvorschule.ui.exercise.TrainerHost
 import app.abcvorschule.ui.path.PathScreen
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.StarCounterAnchor
 import app.abcvorschule.ui.rewards.SuccessBurst
 import app.abcvorschule.ui.rewards.playBlockedBlip
 import app.abcvorschule.ui.theme.AbcDimens
@@ -74,6 +76,16 @@ fun TaskShell(
     modifier: Modifier = Modifier,
 ) {
     val haptics = LocalAbcHaptics.current
+    // Der Erfolgs-Stern fliegt in den Punktestand (StarFlight); die Zahl dort springt
+    // erst beim Einschlag. Bis dahin zeigt die Kopfzeile den alten Stand, obwohl der
+    // Punkt schon verbucht ist — sonst wäre er da, bevor der Stern ankommt.
+    val counterAnchor = remember { StarCounterAnchor() }
+    var shownPoints by remember { mutableIntStateOf(state.points) }
+    LaunchedEffect(state.points, state.successPhase) {
+        val starUnderway = state.successPhase == SuccessPhase.SpeakAnswer ||
+            state.successPhase == SuccessPhase.ShowBurst
+        if (!starUnderway) shownPoints = state.points
+    }
     // Wer die Lektion verlässt, verlässt auch ihre Stimme. Die Sprech-Effekte
     // hängen an der Übungs-Composition und werden beim Wechsel zwar gecancelt,
     // der bereits laufende Clip lief aber weiter — die Antwort der verlassenen
@@ -122,17 +134,15 @@ fun TaskShell(
                 }
             }
             !state.ready || pack == null -> {
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .windowInsetsPadding(WindowInsets.safeDrawing),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text("Silbo", style = MaterialTheme.typography.headlineMedium)
-                    Spacer(Modifier.height(8.dp))
-                    Text("...", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+                // Absichtlich leer. Über dieser Fläche liegt noch der Splash —
+                // MainActivity hält ihn, bis Pack oder Fehlermeldung stehen, und
+                // beides führt in einen anderen Zweig. Sichtbar würde hier also
+                // nur der Papierverlauf der umschließenden Box — PaperCenter am
+                // Lichtpunkt (42 % Höhe) bis PaperEdge (#C5CDC9) an den Rändern.
+                // Hex-gleich mit dem Splash-Grund im Hellen ist nur der
+                // Lichtpunkt selbst, nicht die Fläche. Ein Platzhalter
+                // („Silbo …", bis 2026-09) konnte nur noch als Aufblitzen
+                // erscheinen.
             }
             state.screen == AppScreen.RewardSummary -> {
                 RewardSummaryScreen(
@@ -185,6 +195,8 @@ fun TaskShell(
                 onSpeakPartsSequenced = onSpeakPartsSequenced,
                 onSpeakFeedbackVoiced = onSpeakFeedbackVoiced,
                 onStopSpeak = onStopSpeak,
+                shownPoints = shownPoints,
+                counterAnchor = counterAnchor,
             )
         }
 
@@ -201,6 +213,8 @@ fun TaskShell(
         SuccessBurst(
             trigger = state.successPhase == SuccessPhase.ShowBurst,
             onFinished = viewModel::onSuccessBurstFinished,
+            target = counterAnchor.takeIf { state.screen == AppScreen.Practice },
+            onLanded = { shownPoints = state.points },
         )
     }
 }
@@ -230,6 +244,8 @@ private fun PracticeBody(
     onSpeakPartsSequenced: suspend (List<SpokenPart>, onPartComplete: (Int) -> Unit) -> Unit = { _, _ -> },
     onSpeakFeedbackVoiced: (SpokenPart) -> Unit = {},
     onStopSpeak: () -> Unit,
+    shownPoints: Int = state.points,
+    counterAnchor: StarCounterAnchor? = null,
 ) {
     val task = state.current
     val round = state.currentRound
@@ -310,9 +326,10 @@ private fun PracticeBody(
         // Ende des Trainers der große Stern hochkommt (`SuccessBurst`), nur eine
         // Etage höher: in der Kopfzeile statt unter dem Fortschritt.
         AbcTopBar(
-            points = state.points,
+            points = shownPoints,
             centerPoints = true,
             onBack = viewModel::exitLesson,
+            counterAnchor = counterAnchor,
         )
 
         // Fortschritt und die beiden Rückfall-Chevrons teilen sich eine Zeile

@@ -1,5 +1,11 @@
 package app.abcvorschule.ui.exercise
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,20 +20,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -56,11 +56,15 @@ import app.abcvorschule.ui.exercise.drag.DragCard
 import app.abcvorschule.ui.exercise.drag.DragFieldState
 import app.abcvorschule.ui.exercise.drag.DropZone
 import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
+import app.abcvorschule.ui.rewards.AbcSfx
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
@@ -69,15 +73,24 @@ object WordBuildTray {
     /** Preschoolers must be able to scan the whole tray at a glance. */
     const val MaxTrayTiles = 5
 
-    fun tiles(round: WordBuildRound, placedDisplays: List<String>, seed: Int): List<WordBlock> {
+    fun tiles(round: WordBuildRound, placedDisplays: List<String>, seed: Int): List<WordBlock> =
+        slottedTiles(round, placedDisplays, seed).map { it.value }
+
+    /**
+     * Wie [tiles], aber jede Kachel mit ihrem Platz im **vollen** Tray. Der Platz ist
+     * ihre feste Identität: rückt nach einem Treffer die Nachbarkachel nach, darf sie
+     * weder Schlüssel noch Animationszustand (Lift, Rückflug) der eingesetzten erben —
+     * bei „Hallo" flog sonst das zweite l sichtbar aus dem Rahmen zurück in den Tray.
+     */
+    fun slottedTiles(round: WordBuildRound, placedDisplays: List<String>, seed: Int): List<IndexedValue<WordBlock>> {
         val capped = (round.blocks + round.distractors).take(MaxTrayTiles)
         val arranged = TrayOrder.arrange(capped, seed) { it.display }
-        val remaining = arranged.toMutableList()
+        val remaining = arranged.withIndex().toMutableList()
         placedDisplays.forEach { display ->
-            val hit = remaining.indexOfFirst { it.display == display }
+            val hit = remaining.indexOfFirst { it.value.display == display }
             if (hit >= 0) remaining.removeAt(hit)
         }
-        return if (remaining.none { block -> round.blocks.any { it.display == block.display } }) {
+        return if (remaining.none { (_, block) -> round.blocks.any { it.display == block.display } }) {
             emptyList()
         } else {
             remaining
@@ -129,7 +142,7 @@ fun WordBuildTrainer(
     val scoredIds = remember(roundKey) {
         (round.blocks.map { it.atomId } + round.targetAtomId).distinct()
     }
-    val tiles = WordBuildTray.tiles(round, placed.values.toList(), seed = round.targetAtomId.hashCode())
+    val tiles = WordBuildTray.slottedTiles(round, placed.values.toList(), seed = round.targetAtomId.hashCode())
     val haptics = LocalAbcHaptics.current
     // Der letzte Baustein spricht erst zu Ende, dann kommt der Erfolg. Das läuft
     // in einem LaunchedEffect mit roundKey statt in scope.launch: ein Chevron-Tap
@@ -145,7 +158,7 @@ fun WordBuildTrainer(
     }
     val interactionOpacity by animateFloatAsState(
         targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
         label = "word_build_lock_opacity",
     )
     // Die Bühne zentriert den Aufgabenblock in dem, was der Antwortblock übrig
@@ -179,6 +192,10 @@ fun WordBuildTrainer(
             }
         } else {
             misses += 1
+            // Wie jeder andere Trainer: ein Fehlgriff ist spürbar, nicht nur hörbar —
+            // die Karte fliegt dazu federnd in den Tray zurück (DragCard).
+            haptics.nudge()
+            AbcSfx.play(Sfx.Boing)
             // Score against the slot being practiced, not the tile the child grabbed —
             // misplacing a distractor must not downgrade the distractor's own scaffold.
             onResult(false, false, listOf(round.blocks[index].atomId))
@@ -198,6 +215,7 @@ fun WordBuildTrainer(
         prompt = {
             Text(
                 text = target.emoji,
+                fontFamily = SilboEmoji,
                 fontSize = TaskPromptSizing.pictureSp(LocalDensity.current.fontScale).sp,
                 modifier = Modifier.testTag("word_picture"),
             )
@@ -235,7 +253,7 @@ fun WordBuildTrainer(
                     key(roundKey) {
                         AnimatedContent(
                             targetState = completed,
-                            transitionSpec = { fadeIn(tween(260)) togetherWith fadeOut(tween(140)) },
+                            transitionSpec = { fadeIn(tween(AbcMotion.ShortMs)) togetherWith fadeOut(tween(AbcMotion.QuickMs)) },
                             contentAlignment = Alignment.Center,
                             label = "word_complete",
                         ) { isComplete ->
@@ -269,7 +287,7 @@ fun WordBuildTrainer(
                                         morphOnFill = !resolved,
                                         onTap = {
                                             val selected = field.selectedKey
-                                            tiles.withIndex()
+                                            tiles
                                                 .firstOrNull { (i, block) ->
                                                     WordBuildTray.tileKey(i, block) == selected
                                                 }
@@ -307,7 +325,7 @@ fun WordBuildTrainer(
                     .testTag("word_tray"),
             ) {
                 if (!resolved && !completed) {
-                    tiles.forEachIndexed { index, block ->
+                    tiles.forEach { (index, block) ->
                         val key = WordBuildTray.tileKey(index, block)
                         DragCard(
                             state = field,

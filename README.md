@@ -152,13 +152,27 @@ zurücksetzen. Der Schlüssel liegt **nie im Repo** (`.gitignore`: `keystore.pro
    ./gradlew :app:bundleRelease
    ```
 
-   (in einem Worktree mit `ANDROID_HOME=~/Library/Android/sdk` davor.)
+   (in einem Worktree mit `ANDROID_HOME=~/Library/Android/sdk` davor.) Ohne
+   `keystore.properties` bricht der Build **nicht** ab, sondern signiert das Bundle
+   mit dem Debug-Schlüssel — die Play Console lehnt es dann beim Upload ab. Vor dem
+   Hochladen also nachsehen, wer signiert hat:
+
+   ```bash
+   unzip -p app/build/outputs/bundle/release/app-release.aab 'META-INF/*.RSA' | keytool -printcert | head -2
+   ```
+
+   `CN=Android Debug` heißt: nicht hochladen, erst Schritt 2 nachholen.
+
+   Und: aus einem **sauberen** Baum bauen. `app/src/main/assets/audio/` gehört zum
+   Bundle; ein Checkout mit laufender TTS-Kuratierung lädt halbfertige Clips in den
+   Store hoch.
 
 4. **Release vor dem Upload durchspielen**: `./gradlew :app:assembleRelease` baut zusätzlich eine
    installierbare Release-APK; ohne `keystore.properties` wird sie mit dem Debug-Schlüssel
-   signiert, mit dem Upload-Schlüssel sonst. Mindestens prüfen: Pfad lädt, eine Lektion läuft
-   durch, Fortschritt bleibt nach Neustart. Minification ist bewusst aus
-   (`app/proguard-rules.pro` erklärt, was beim Einschalten zu prüfen wäre).
+   signiert, mit dem Upload-Schlüssel sonst. R8 läuft in diesem Buildtyp — Serialisierung
+   bricht unter ihm still, deshalb ist das Durchspielen kein Nice-to-have: Pfad lädt mit
+   Lektionsschildern, eine Lektion läuft durch, Fortschritt bleibt nach Neustart, Sprachausgabe
+   kommt aus den Clips. `app/proguard-rules.pro` führt die drei Prüfungen einzeln auf.
 
 5. **Bei jedem weiteren Upload** `versionCode` in `app/build.gradle.kts` um eins erhöhen
    (die Play Console lehnt gleiche oder kleinere Werte ab) und `versionName` sichtbar
@@ -198,6 +212,18 @@ und ausgelassene Typen sind erlaubt, ein Rücksprung nicht. Abgelehnt wird ein P
 eine autorierte Lektion einen abgeleiteten Trainer enthält, Kachelfolgen das Zielwort nicht
 buchstabieren, eine Summe nicht stimmt, Strichdaten fehlen oder Referenzen ins Leere zeigen.
 
+## Schriften und Geräusche
+
+Beides wird aus Werkzeugen im Repo erzeugt und als fertige Datei eingecheckt — die
+Quellen liegen nicht im Repo:
+
+- `tools/fonts/build_fonts.py` baut `res/font/silbo_fibel_*.ttf`, `baloo2.ttf` und
+  `silbo_emoji.ttf` (Quell-URLs und Aufruf im Skriptkopf, braucht `fonttools`). Neu
+  bauen, sobald ein neues Emoji in den Content kommt — `EmojiFontCoverageTest` meldet es.
+  Lizenztexte (SIL OFL) liegen unter `assets/licenses/`.
+- `tools/sfx/generate_sfx.py` erzeugt die elf Geräusche unter `assets/sfx/` (nur
+  Python-Standardbibliothek plus `ffmpeg` mit libopus).
+
 ## Offline-Smoke-Skript (manuell)
 
 1. `./gradlew :app:installDebug`, Gerät in den Flugmodus.
@@ -217,8 +243,9 @@ buchstabieren, eine Summe nicht stimmt, Strichdaten fehlen oder Referenzen ins L
 5. Bei jeder richtigen Antwort: Antwort wird vorgesprochen → Stern oben → dann nächste Runde.
 6. Eine Rechenaufgabe zweimal falsch beantworten → gesprochener Hinweis, danach **Auflösen** nutzen:
    keine Punkte, Session läuft weiter.
-7. Langer Druck auf ⋯ → Hilfestufe **Ohne Hilfe** erzwingen → nächste Rechenrunde zeigt die
-   System-Zahlentastatur; **Mit Hilfe** → drei visuelle Antworten.
+7. Langer Druck auf ⋯ → Hilfestufe **Ohne Hilfe** erzwingen → nächste Rechenrunde zeigt den
+   Kinder-Ziffernblock (zwei Fünferreihen, Löschen, Absenden; getippte Zahl wird vorgesprochen);
+   **Mit Hilfe** → drei visuelle Antworten.
 8. Mitten in der Lektion App killen und neu öffnen → dieselbe Lektion, dieselbe Runde.
 9. Lektion beenden → Belohnungszusammenfassung → Weiter → zurück auf dem Pfad, Lektion 1
    als gemeistert markiert, Lektion 2 freigeschaltet. Der Marker hüpft dabei von Schild 1 zu

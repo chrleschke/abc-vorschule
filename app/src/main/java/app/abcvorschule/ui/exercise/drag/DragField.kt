@@ -1,5 +1,8 @@
 package app.abcvorschule.ui.exercise.drag
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -10,6 +13,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +25,12 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
+import app.abcvorschule.ui.rewards.AbcSfx
+import app.abcvorschule.ui.rewards.Sfx
+import app.abcvorschule.ui.theme.AbcMotion
 import kotlin.math.roundToInt
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
 
 /**
  * Drag/tap state for one exercise board. Bounds live in plain maps because they
@@ -69,11 +78,11 @@ class DragFieldState {
      * Drag nicht übernehmen — sonst überschreibt er draggingKey/dragOffset, die
      * erste Karte springt zurück und beide Finger addieren in denselben Offset.
      */
-    fun startDrag(key: String): Boolean {
+    fun startDrag(key: String, from: Offset = Offset.Zero): Boolean {
         if (draggingKey != null && draggingKey != key) return false
         draggingKey = key
         selectedKey = key
-        dragOffset = Offset.Zero
+        dragOffset = from
         return true
     }
 
@@ -123,8 +132,18 @@ private fun Rect.toDragRect() = DragRect(left, top, right, bottom)
 fun rememberDragFieldState(vararg keys: Any?): DragFieldState =
     remember(*keys) { DragFieldState() }
 
+/** Ab dieser Strecke ist ein Rückflug zu sehen und bekommt seinen Klang; ein Zittern nicht. */
+private const val AudibleReturnPx = 24f
+
 /** Slight enlargement while a tile is airborne, so it reads as lifted off the board. */
 private const val DragLiftScale = 1.08f
+
+/**
+ * Wo die Karte gerade gezeichnet wird: unter dem Finger der Drag-Versatz, danach der
+ * Rückflug. Reine Funktion, damit die Übergabe zwischen beiden ohne Compose testbar ist.
+ */
+internal fun DragFieldState.renderOffset(key: String, flyBack: Offset): Offset =
+    if (draggingKey == key) dragOffset else flyBack
 
 /**
  * A draggable answer tile with a mandatory tap-to-place alternative (R15).
@@ -142,7 +161,44 @@ fun DragCard(
     enabled: Boolean = true,
     content: @Composable BoxScope.() -> Unit,
 ) {
+    // Gekeyt auf die Karte: rückt an diese Stelle der Reihe eine andere Karte, beginnt
+    // sie ohne Lift und ohne Rückflug der vorigen (Tray-Nachrücken nach einem Treffer).
+    androidx.compose.runtime.key(state, key) {
+        DragCardBody(state, key, onTap, onDropped, modifier, enabled, content)
+    }
+}
+
+@Composable
+private fun DragCardBody(
+    state: DragFieldState,
+    key: String,
+    onTap: () -> Unit,
+    onDropped: (zoneKey: String?) -> Unit,
+    modifier: Modifier,
+    enabled: Boolean,
+    content: @Composable BoxScope.() -> Unit,
+) {
     val dragging = state.draggingKey == key
+    // Der Rückflug: eine losgelassene Karte springt nicht an ihren Platz, sie
+    // fliegt federnd dorthin zurück (PRODUCT_PRINCIPLES §2, Snap-back). Gekeyt auf
+    // state UND key — rückt nach einem Treffer eine andere Karte an diese Stelle der
+    // Reihe, darf sie den Flug der eingesetzten nicht erben.
+    val flyBack = remember(state, key) { Animatable(Offset.Zero, Offset.VectorConverter) }
+    val scope = rememberCoroutineScope()
+    val lift by animateFloatAsState(
+        targetValue = if (dragging) DragLiftScale else 1f,
+        animationSpec = AbcMotion.Bouncy.spec(),
+        label = "drag_card_lift",
+    )
+    fun releaseFrom(offset: Offset) {
+        // UNDISPATCHED: der Startwert muss sitzen, bevor der nächste Frame die
+        // Karte ohne Drag-Versatz zeichnet — sonst blitzt sie einen Frame lang an
+        // ihrem Platz auf und fliegt dann erst los.
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            flyBack.snapTo(offset)
+            flyBack.animateTo(Offset.Zero, AbcMotion.Soft.spec(visibilityThreshold = Offset(0.5f, 0.5f)))
+        }
+    }
     // Auch auf `state` gekeyt: liefert rememberDragFieldState nach einem
     // Rundenwechsel eine neue Instanz bei gleichem Karten-Key, würde ein nur
     // key-gekeyter Effect/Gesture-Block sonst im verwaisten Alt-State schreiben.
@@ -155,15 +211,16 @@ fun DragCard(
         // border painted at the tile's resting position — which made the dragged
         // tile look like bare (near-black) text floating over the board.
         modifier = Modifier
-            .zIndex(if (dragging) 1f else 0f)
+            // Auch im Rückflug oben: die Karte fliegt über ihre Nachbarn heim,
+            // nicht unter ihnen hindurch.
+            .zIndex(if (dragging || flyBack.isRunning) 1f else 0f)
             .offset {
-                val o = if (dragging) state.dragOffset else Offset.Zero
+                val o = state.renderOffset(key, flyBack.value)
                 IntOffset(o.x.roundToInt(), o.y.roundToInt())
             }
             .graphicsLayer {
-                val scale = if (dragging) DragLiftScale else 1f
-                scaleX = scale
-                scaleY = scale
+                scaleX = lift
+                scaleY = lift
             }
             .then(modifier)
             .onGloballyPositioned { state.putCard(key, it.boundsInRoot()) }
@@ -175,19 +232,42 @@ fun DragCard(
                         // den laufenden Drag der ersten Karte beenden.
                         var owns = false
                         detectDragGestures(
-                            onDragStart = { owns = state.startDrag(key) },
+                            onDragStart = {
+                                // Greift das Kind die Karte im Flug, übernimmt der
+                                // Finger sie dort, wo sie gerade ist.
+                                val airborne = flyBack.value
+                                owns = state.startDrag(key, from = airborne)
+                                if (owns) scope.launch { flyBack.snapTo(Offset.Zero) }
+                            },
                             onDrag = { change, amount ->
                                 change.consume()
                                 if (owns) state.drag(key, amount)
                             },
                             onDragEnd = {
-                                if (owns) onDropped(state.endDrag(key))
+                                if (owns) {
+                                    val releasedAt = state.dragOffset
+                                    val zone = state.endDrag(key)
+                                    // Immer vom Loslass-Punkt heim fliegen: ein Treffer
+                                    // entfernt die Karte aus dem Tray (dann ist der Flug
+                                    // unsichtbar), ein falscher Slot lässt sie liegen —
+                                    // dann soll sie sichtbar zurück, nicht teleportieren.
+                                    releaseFrom(releasedAt)
+                                    // Nirgends gelandet: hörbar zurückfedern. Einen
+                                    // falschen Slot vertont der Trainer selbst, er
+                                    // allein weiß, ob der Slot falsch war.
+                                    if (zone == null && releasedAt.getDistance() > AudibleReturnPx) {
+                                        AbcSfx.play(Sfx.Boing)
+                                    }
+                                    onDropped(zone)
+                                }
                                 owns = false
                             },
                             onDragCancel = {
                                 // Snap-back ohne Zonen-Auflösung — ein Cancel ist kein Drop.
                                 if (owns) {
+                                    val releasedAt = state.dragOffset
                                     state.cancelDrag(key)
+                                    releaseFrom(releasedAt)
                                     onDropped(null)
                                 }
                                 owns = false

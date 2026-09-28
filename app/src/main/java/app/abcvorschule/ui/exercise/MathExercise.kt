@@ -14,7 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.session.ScheduledTrainer
 import app.abcvorschule.speech.GermanNumberWord
@@ -176,7 +178,16 @@ fun MathExercise(
                         horizontalArrangement = Arrangement.spacedBy(20.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        MathQuantityPrompt(icon, round.left, round.right, operation, emojiSizeSp = 40)
+                        // Der Tipp-Modus teilt den Aufgabenblock mit der Tastatur statt
+                        // mit Kacheln; die Bühnen-Rechnung der Mengenwahl gilt hier nicht.
+                        // Gerenderte Größe wie dort ([MathBoardSizing]): sp durch die
+                        // nichtlineare Skalierung von `Density`, nicht mal `fontScale`.
+                        val promptEmojiSize = with(LocalDensity.current) { 40.sp.toDp() } *
+                            MathBoardSizing.EmojiAspect
+                        MathQuantityPrompt(
+                            icon, round.left, round.right, operation,
+                            emojiSize = promptEmojiSize,
+                        )
                     }
                 }
             },
@@ -188,6 +199,7 @@ fun MathExercise(
                     enabled = !interactionLocked,
                     countedValue = counting.counted,
                     countingOpen = countingOpen,
+                    onSpeakValue = onSpeakCounting,
                 )
                 if (misses >= MathHinting.ResolveFromMissesTyped && !locked) {
                     AbcResolveButton(onClick = ::resolve)

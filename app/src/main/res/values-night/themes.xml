@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Im Dark Mode ist allein der Grund ein anderer; Icon und
+      postSplashScreenTheme kommen unverändert aus der Basis in values/.
+
+      #16222F ist die Nachtfassung von DaySkyTop (#9CCAEE, Color.kt) — derselbe
+      Blauton, auf die Helligkeit eines Nachthimmels gezogen. Bewusst kein reines
+      Schwarz: das helle Landschafts-Icon soll auf einer Fläche stehen, die zur
+      App gehört, nicht auf der Abwesenheit einer Farbe.
+
+      Kein Kotlin-Pendant in Color.kt. Die Farbe hat außerhalb dieses Themes
+      keinen Aufrufer, und genau solche unreferenzierten Nachtkonstanten hat
+      Color.kt schon einmal abgeräumt (siehe Kommentar bei SoftSand).
+
+      Theme.AbcVorschule wird hier absichtlich NICHT überschrieben: die App
+      selbst kennt keinen Dark Mode, ihre Kontraste sind alle gegen den
+      Papiergrund gerechnet. Den Helligkeitssprung beim Eintritt nimmt der
+      300-ms-Crossfade in MainActivity auf.
+    -->
+    <style name="Theme.AbcVorschule.Splash" parent="Base.Theme.AbcVorschule.Splash">
+        <item name="windowSplashScreenBackground">#FF16222F</item>
+    </style>
+</resources>

@@ -14,11 +14,17 @@ plugins {
 //   storePassword=...
 //   keyAlias=upload
 //   keyPassword=...
-// Fehlt sie, bleibt `release` unsigniert — `bundleRelease` baut dann trotzdem
-// (die Play Console lehnt das Bundle ab, aber der Build selbst ist prüfbar),
-// und `assembleRelease` fällt auf den Debug-Schlüssel zurück, damit sich das
-// Release auf einem Gerät installieren und durchspielen lässt. Erzeugen des
-// Schlüssels und Ablauf: README → „Release-Signierung".
+// Fehlt sie, fällt der ganze Buildtyp auf den **Debug-Schlüssel** zurück
+// (`signingConfig` unten steht am Buildtyp, gilt also für APK *und* Bundle).
+// Gewollt ist das nur für `assembleRelease`: so lässt sich das Release auf einem
+// Gerät installieren und durchspielen. Ein so gebautes `.aab` ist dagegen
+// wertlos für den Store — die Play Console lehnt Debug-Signaturen ab. Der Build
+// bricht deshalb nicht ab (er bleibt prüfbar), aber wer hochladen will, braucht
+// `keystore.properties`; ein Blick in die Datei sagt, was drin ist:
+//   unzip -p app/build/outputs/bundle/release/app-release.aab META-INF/*.RSA \
+//     | keytool -printcert | head -2
+// „CN=Android Debug" heißt: nicht hochladen. Erzeugen des Schlüssels und
+// Ablauf: README → „Release-Signierung".
 //
 // Bewusst außerhalb von `android { }`: dort ist `java` die Gradle-Erweiterung,
 // und `java.util.Properties` löst sich nicht mehr auf.
@@ -46,8 +52,8 @@ android {
         // monoton); versionName ist der sichtbare Text im Store und in den
         // App-Infos. Play App Signing verwaltet den App-Signaturschlüssel, lokal
         // wird nur mit dem Upload-Schlüssel signiert (siehe signingConfigs unten).
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -74,9 +80,12 @@ android {
 
     buildTypes {
         release {
-            // Bewusst aus, Begründung und Keep-Regeln für den Tag des Einschaltens
-            // stehen in proguard-rules.pro.
-            isMinifyEnabled = false
+            // R8 an: ohne ihn liegen rund 23 MB DEX im Release, fast alles
+            // ungenutzter Compose-, Lifecycle- und Coroutines-Code. Mit Shrinking
+            // bleiben davon 2,6 MB, das APK fällt von 16,0 auf 8,9 MB. Was beim
+            // Anfassen dieser Zeile zu prüfen ist, steht in proguard-rules.pro.
+            isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = if (hasUploadKey) {
                 signingConfigs.getByName("upload")
             } else {
@@ -130,6 +139,11 @@ dependencies {
     // `MaterialShapes` noch nicht (erst 1.5.0-alpha), und graphics-shapes kommt in
     // dieser BOM auch nicht transitiv herein — also ausdrücklich, mit fester Version.
     implementation(libs.androidx.graphics.shapes)
+    // Backportet den Android-12-Splash bis API 21 herunter und macht ihn
+    // überhaupt erst steuerbar: ohne definierten Splash malt jedes System
+    // selbst, was auf einem Motorola edge 60 pro im Dark Mode ein schwarzer
+    // Screen war.
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)

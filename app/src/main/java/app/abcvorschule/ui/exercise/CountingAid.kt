@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.ui.theme.CreamElevated
+import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 
@@ -171,6 +172,7 @@ private fun CountingCell(
         // zur Kompositionszeit eingesetzt.
         Text(
             text = emoji,
+            fontFamily = SilboEmoji,
             fontSize = sizeSp.sp,
             modifier = Modifier.graphicsLayer {
                 alpha = if (pulsing) pulse.value else restingAlpha

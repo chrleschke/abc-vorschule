@@ -29,10 +29,11 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.ChargeHigh
 import app.abcvorschule.ui.theme.CloudWhite
-import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.Cream
+import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 
@@ -69,7 +70,7 @@ fun SymbolHuntBattery(
             initialValue = 0.35f,
             targetValue = 1f,
             animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 500, easing = LinearEasing),
+                animation = tween(durationMillis = AbcMotion.PulseMs, easing = LinearEasing),
                 repeatMode = RepeatMode.Reverse,
             ),
             label = "battery_glow_value",

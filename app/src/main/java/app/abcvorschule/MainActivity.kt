@@ -1,5 +1,7 @@
 package app.abcvorschule
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.graphics.Color as AndroidColor
 import android.media.AudioManager
 import android.os.Bundle
@@ -19,10 +21,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.abcvorschule.speech.observeBackgroundSpeechStop
 import androidx.lifecycle.viewmodel.compose.viewModel
+import app.abcvorschule.session.hasShowableContent
 import app.abcvorschule.session.SessionViewModel
 import app.abcvorschule.speech.ClipIndex
 import app.abcvorschule.speech.SpeechChannel
@@ -36,7 +40,43 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
+    /**
+     * Vom Compose-Baum gesetzt, sobald etwas Zeigbares steht — bis dahin bleibt
+     * der Splash über der App. Ein einfaches `var` genügt: gelesen wird es im
+     * Pre-Draw-Listener des Main-Threads, geschrieben aus der Composition, die
+     * ebenfalls dort läuft.
+     */
+    private var contentReady = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        // Nicht „bis geladen", sondern „bis es etwas zu zeigen gibt": bei einem
+        // Ladefehler bleibt `ready` dauerhaft false, und ein reiner ready-Test
+        // ließe den Splash für immer stehen. hasShowableContent nimmt den
+        // Fehlerzweig deshalb mit.
+        splashScreen.setKeepOnScreenCondition { !contentReady }
+        // Auf alpha(0f) fährt die ganze Splash-View — samt dem zentrierten
+        // Launcher-Icon. Die Blende löst genau dieses Icon auf, statt es hart
+        // wegspringen zu lassen; das gilt in beiden Modi. Im Dark Mode trägt sie
+        // zusätzlich den Helligkeitssprung vom Nachthimmel auf den Papiergrund.
+        splashScreen.setOnExitAnimationListener { splashProvider ->
+            splashProvider.view.animate()
+                .alpha(0f)
+                .setDuration(SPLASH_FADE_MILLIS)
+                // Nicht withEndAction: das läuft nur bei normalem Ende der
+                // Animation, nach einem cancel() nicht. Seit wir einen
+                // Exit-Listener setzen, räumt das System den Splash aber nicht
+                // mehr selbst weg — bliebe remove() aus, läge die Splash-View mit
+                // eingefrorenem, womöglich halb sichtbarem Alpha dauerhaft über
+                // der App und wäre geleakt.
+                // onAnimationEnd feuert auch nach Abbruch.
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        splashProvider.remove()
+                    }
+                })
+                .start()
+        }
         super.onCreate(savedInstanceState)
         // Alles, was die App hörbar macht — Sprachclips, TTS und die synthetisierten
         // Blips — liegt auf der Medienspur. Ohne das regeln die Lautstärketasten die
@@ -58,7 +98,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             AbcTheme {
                 CompositionLocalProvider(LocalAbcHaptics provides rememberAbcHaptics()) {
-                    AbcApp(onFinish = { finish() })
+                    AbcApp(
+                        onFinish = { finish() },
+                        onContentReady = { contentReady = true },
+                    )
                 }
             }
         }
@@ -91,8 +134,15 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Dauer des Übergangs vom Splash in die App. Lang genug, dass der Sprung vom
+ * Nachthimmel auf den Papiergrund im Dark Mode als Blende gelesen wird und nicht
+ * als Umschalten; kurz genug, dass niemand darauf wartet.
+ */
+private const val SPLASH_FADE_MILLIS = 300L
+
 @Composable
-fun AbcApp(onFinish: () -> Unit = {}) {
+fun AbcApp(onFinish: () -> Unit = {}, onContentReady: () -> Unit = {}) {
     val context = LocalContext.current
     val app = context.applicationContext as AbcApplication
     val speech = remember { SpeechController(context) }
@@ -127,6 +177,13 @@ fun AbcApp(onFinish: () -> Unit = {}) {
         }
     }
     val pack = viewModel.contentPack()
+    // Freigabe für den Splash, sobald TaskShell etwas anderes als den leeren
+    // Grund zeichnen würde. Die Bedingung spiegelt dessen Verzweigung — sie
+    // liegt in SessionModels.kt, damit sie ohne Gerät prüfbar ist.
+    val showable = state.hasShowableContent(packLoaded = pack != null)
+    LaunchedEffect(showable) {
+        if (showable) onContentReady()
+    }
     TaskShell(
         state = state,
         pack = pack,
