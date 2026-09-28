@@ -36,6 +36,8 @@ data class ChromeColors(
     val speakerIcon: Color,
     /** Leuchtring um den Lautsprecher, nur auf dunklem Grund. */
     val speakerGlow: Color,
+    /** „Zeig mir": gedämpft, aber über 3:1 auf dem jeweiligen Grund. */
+    val resolve: Color,
 )
 
 /** Die bisherigen Werte auf dem Papiergrund, unverändert übernommen. */
@@ -48,6 +50,7 @@ val PaperChrome = ChromeColors(
     speakerContainer = CreamElevated,
     speakerIcon = WarmInk,
     speakerGlow = Color.Transparent,
+    resolve = WarmMuted,
 )
 
 /**
@@ -64,6 +67,8 @@ val NightChrome = ChromeColors(
     speakerContainer = Cream,
     speakerIcon = WarmInk,
     speakerGlow = Cream.copy(alpha = 0.28f),
+    // WarmMuted fiel auf dem Meer auf 2.5–3.1:1; Creme mit 0.8 liegt über 9:1.
+    resolve = Cream.copy(alpha = 0.8f),
 )
 
 val LocalChromeColors = staticCompositionLocalOf { PaperChrome }

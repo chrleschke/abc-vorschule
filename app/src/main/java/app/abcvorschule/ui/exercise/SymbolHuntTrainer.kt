@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,6 +62,7 @@ import app.abcvorschule.ui.theme.SoftSand
 import app.abcvorschule.ui.theme.StarGoldDeep
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.world.rememberReduceMotion
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -146,20 +148,26 @@ fun SymbolHuntTrainer(
     val flights = remember(roundKey) { mutableStateListOf<PearlFlight>() }
     var lastTouch by remember(roundKey) { mutableLongStateOf(0L) }
     val scope = rememberCoroutineScope()
+    val currentRound = rememberUpdatedState(roundKey)
+    val reduceMotion = rememberReduceMotion()
 
     fun launchPearl(from: Offset, color: Color, full: Boolean) {
-        val flight = PearlFlight(from = from, slot = landed.size + flights.size, color = color)
+        val flight = PearlFlight(from = from, slot = landed.size + flights.size, color = color, round = roundKey)
         flights += flight
         scope.launch {
             launch { openness.animateTo(1f, tween(AbcMotion.ShortMs, easing = AbcMotion.Enter)) }
             flight.progress.animateTo(1f, tween(PearlFlight.FlightMs, easing = AbcMotion.Enter))
+            // Runde inzwischen gewechselt (Chevron): kein Klang in die neue Runde hinein.
+            if (currentRound.value != flight.round) return@launch
             flights.remove(flight)
             landed += flight.color
             AbcSfx.play(Sfx.Snap)
             if (full) return@launch
             // Offen lassen, solange noch eine Perle unterwegs ist; dann federnd zu.
             delay(PearlFlight.CloseAfterMs)
-            if (flights.isEmpty()) openness.animateTo(0f, AbcMotion.Settle.spec())
+            // Nicht zuklappen, wenn die Muschel inzwischen voll ist: zwei schnelle Treffer,
+            // und der erste klappte sonst die volle Muschel während der Feier zu.
+            if (flights.isEmpty() && !batteryFull) openness.animateTo(0f, AbcMotion.Settle.spec())
         }
     }
 
@@ -218,7 +226,8 @@ fun SymbolHuntTrainer(
     // Längere Pause: die Muschel lugt halb auf, damit das Kind sieht, wie viele Perlen
     // es schon hat (Nutzer-Wunsch, §10). Jeder Tipp setzt die Uhr zurück.
     LaunchedEffect(roundKey, lastTouch, batteryFull, resolved) {
-        if (batteryFull || resolved) return@LaunchedEffect
+        // Bei „Bewegung reduzieren" lugt sie nicht — die Welt steht dann still (§10).
+        if (batteryFull || resolved || reduceMotion) return@LaunchedEffect
         try {
             var wait = PearlFlight.PeekAfterIdleMs
             while (true) {

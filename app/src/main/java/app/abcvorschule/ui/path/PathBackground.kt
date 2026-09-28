@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.DuskHorizon
@@ -99,7 +100,8 @@ fun PathBackground(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
         }
 
         // Himmelslaternen: nur in der Zeichenphase gelesen, ein Frame rekomponiert nichts.
-        Canvas(Modifier.fillMaxSize()) {
+        // Eigene Ebene, sonst zeichnete jeder Frame Himmel, Hügel und Kopfzeile mit neu.
+        Canvas(Modifier.fillMaxSize().graphicsLayer()) {
             SkyLanterns.at(seconds).forEach { drawLantern(it) }
         }
 

@@ -14,7 +14,7 @@ import app.abcvorschule.ui.theme.AbcMotion
  * zur Perle wird, und wohin sie geht. Die Muschel klappt dabei auf, fängt sie und klappt
  * kurz danach wieder zu; ist sie voll, bleibt sie offen und leuchtet.
  */
-class PearlFlight(val from: Offset, val slot: Int, val color: Color) {
+class PearlFlight(val from: Offset, val slot: Int, val color: Color, val round: String) {
     val progress: Animatable<Float, AnimationVector1D> = Animatable(0f)
 
     companion object {

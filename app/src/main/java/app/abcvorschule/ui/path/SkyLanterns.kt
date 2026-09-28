@@ -68,8 +68,11 @@ object SkyLanterns {
                 y = StartY + (EndY - StartY) * progress,
                 width = width,
                 rotationDeg = sway * (3f + depth * 5f),
-                // Oben blenden sie aus, statt am Rand abgeschnitten zu werden.
-                alpha = (0.45f + depth * 0.55f) * ((1f - progress) / 0.15f).coerceAtMost(1f),
+                // Hinter dem Hügel blenden sie ein (ihr Leuchten ragte sonst schlagartig
+                // über den Kamm), oben blenden sie aus, statt am Rand abgeschnitten zu werden.
+                alpha = (0.45f + depth * 0.55f) *
+                    (progress / 0.08f).coerceAtMost(1f) *
+                    ((1f - progress) / 0.15f).coerceAtMost(1f),
                 depth = depth,
             )
         }.sortedBy { it.depth }

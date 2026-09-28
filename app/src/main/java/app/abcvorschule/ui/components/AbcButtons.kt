@@ -32,7 +32,6 @@ import app.abcvorschule.R
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.SunCoral
-import app.abcvorschule.ui.theme.WarmMuted
 import app.abcvorschule.ui.world.LocalChromeColors
 
 /**
@@ -97,9 +96,9 @@ fun AbcResolveButton(
     TextButton(
         onClick = onClick,
         modifier = modifier.defaultMinSize(minHeight = 56.dp),
-        colors = ButtonDefaults.textButtonColors(contentColor = WarmMuted),
+        colors = ButtonDefaults.textButtonColors(contentColor = LocalChromeColors.current.resolve),
     ) {
-        IconUnlock(tint = WarmMuted, size = 22.dp)
+        IconUnlock(tint = LocalChromeColors.current.resolve, size = 22.dp)
         Spacer(Modifier.width(8.dp))
         Text(label, style = MaterialTheme.typography.titleLarge)
     }

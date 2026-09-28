@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
@@ -24,7 +26,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.withFrameMillis
 import app.abcvorschule.R
 
 /** Die Welt hinter einem Trainer. [TrainerWorld.Paper] zeichnet nichts — dort bleibt der Papiergrund. */
@@ -101,6 +102,10 @@ private fun DeepSeaBackground(modifier: Modifier) {
                     // Oberkante nach unten, quer mit wanderndem Lichtkern gefüllt …
                     val left = origin.x - spread
                     val right = origin.x + spread
+                    // Jeder Strahl in seiner eigenen Ebene: das Ausblenden unten (DstIn)
+                    // darf nur ihn treffen — in einer geteilten Ebene schnitte es auch
+                    // den Nachbarstrahl ab und hinterließe harte Kanten.
+                    drawContext.canvas.saveLayer(Rect(left, origin.y, right, origin.y + length), Paint())
                     val core = ray.core
                     val light = RayLight.copy(alpha = ray.alpha)
                     val path = androidx.compose.ui.graphics.Path().apply {
@@ -135,6 +140,7 @@ private fun DeepSeaBackground(modifier: Modifier) {
                         size = androidx.compose.ui.geometry.Size(right - left, length),
                         blendMode = BlendMode.DstIn,
                     )
+                    drawContext.canvas.restore()
                 }
             }
             val stroke = Stroke(width = 1.dp.toPx())
