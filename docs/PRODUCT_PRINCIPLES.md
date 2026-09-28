@@ -798,7 +798,7 @@ niemals mit einem stummen No-Op.
   aus den Spurdaten des Buchstabens (vereinfacht, Ecken bleiben, gemeinsame Enden werden ein
   Stern). Bilder und Satz liegen auf einer hellen Karte, die Bilder hüpfen einmal, während der
   Satz gesprochen wird. Nach dem Aufbau funkeln die Sterne leise weiter (Größe ±8 %, Drehung
-  ±10°, ab und zu ein Glanzlicht); ein angetippter Stern springt größer und schaukelt aus.
+  ±10°, ab und zu ein Glanzlicht); ein angetippter Stern springt größer und schaukelt aus — auch beim Nachzeichnen des Buchstabens mit dem Finger, dann mit aufsteigenden Tönen wie die Sterne im Spurensucher.
   Unten stehen Lautsprecher und ein großer runder grüner Pfeil (88 dp, `AbcContinueButton`)
   nebeneinander. „Super gemacht!" steht oben, für den Erwachsenen.
   **Kein Konfetti** mehr: die Quadrate in vier Rollenfarben verwässerten Grün und Gold.

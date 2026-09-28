@@ -8,7 +8,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,6 +59,7 @@ import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.rewards.drawGlint
 import app.abcvorschule.ui.rewards.drawGlowStar
+import app.abcvorschule.ui.rewards.playStarBlip
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
@@ -242,13 +244,31 @@ private fun ConstellationSky(constellation: FinaleConstellation.Constellation?, 
         modifier.pointerInput(constellation, still) {
             val c = constellation ?: return@pointerInput
             if (still) return@pointerInput
-            detectTapGestures { tap ->
-                val w = size.width.toFloat()
-                val h = size.height.toFloat()
-                val hit = c.stars.indices
-                    .minByOrNull { (starAt(c, it, w, h) - tap).getDistance() }
-                    ?.takeIf { (starAt(c, it, w, h) - tap).getDistance() <= touchRadius }
-                if (hit != null) tapped[hit] = idle.value
+            // Tippen oder Nachzeichnen: jeder Stern, über den der Finger kommt, springt —
+            // beim Nachzeichnen mit aufsteigenden Tönen wie die Sterne im Spurensucher.
+            awaitEachGesture {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                var step = 0
+                fun touch(at: Offset) {
+                    val w = size.width.toFloat()
+                    val h = size.height.toFloat()
+                    val hit = c.stars.indices
+                        .minByOrNull { (starAt(c, it, w, h) - at).getDistance() }
+                        ?.takeIf { (starAt(c, it, w, h) - at).getDistance() <= touchRadius }
+                        ?: return
+                    val last = tapped[hit]
+                    if (last != null && idle.value - last < RetouchS) return
+                    tapped[hit] = idle.value
+                    playStarBlip(step++)
+                }
+                touch(down.position)
+                while (true) {
+                    val event = awaitPointerEvent()
+                    val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                    if (!change.pressed) break
+                    touch(change.position)
+                    change.consume()
+                }
             }
         },
     ) {
@@ -399,6 +419,9 @@ private const val HopStaggerMs = 260L
 private val HopHeight = 12.dp
 private val StarTouchRadius = 32.dp
 private const val TapBounceS = 1.4f
+
+/** So lange springt derselbe Stern nicht noch einmal, wenn der Finger auf ihm bleibt. */
+private const val RetouchS = 0.6f
 
 /** Wo Stern [i] im Himmel der Größe [w] × [h] steht: das Einheitsquadrat des Buchstabens, mittig. */
 private fun starAt(c: FinaleConstellation.Constellation, i: Int, w: Float, h: Float): Offset {
