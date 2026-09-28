@@ -61,6 +61,18 @@ val SilboUi = FontFamily(
 )
 
 /**
+ * Die Bildschrift: Noto Color Emoji, gekürzt auf genau die Emojis des Packs
+ * (`tools/fonts/build_fonts.py`, ~750 KB). Jedes Bild der App kommt damit aus
+ * derselben Schrift statt aus der des Geräts — gleich auf jedem Telefon, und ein
+ * Emoji, das jünger ist als das Gerät, ist trotzdem zu sehen (PRODUCT_PRINCIPLES §3,
+ * „Emoji-Alter"). CBDT-Bitmaps, die ab API 26 überall rendern. Fehlt ein Glyph (ein
+ * neues Emoji ohne Neubau), fällt Android von selbst auf die Systemschrift zurück.
+ *
+ * Jeder `Text`, der ein Emoji zeigt, setzt `fontFamily = SilboEmoji`.
+ */
+val SilboEmoji = FontFamily(Font(R.font.silbo_emoji))
+
+/**
  * Rollen: `display*`, `headline*` und `body*` tragen Lerninhalt und nutzen [SilboFibel];
  * `title*` und `label*` sind UI und nutzen [SilboUi]. Wer Lerninhalt in einer Titel-Rolle
  * setzt (Pfad-Schilder), überschreibt die Familie dort ausdrücklich.

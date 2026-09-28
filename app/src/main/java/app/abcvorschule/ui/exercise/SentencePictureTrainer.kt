@@ -39,6 +39,7 @@ import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 
@@ -296,6 +297,7 @@ private fun PictureCard(
         ) {
             Text(
                 text = emojis,
+                fontFamily = SilboEmoji,
                 fontSize = emojiSp.sp,
                 textAlign = TextAlign.Center,
                 maxLines = 1,

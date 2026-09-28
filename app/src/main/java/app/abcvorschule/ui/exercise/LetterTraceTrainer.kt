@@ -54,6 +54,7 @@ import app.abcvorschule.ui.rewards.playStarBlip
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
@@ -296,7 +297,7 @@ private fun TraceRewardCard(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text(text = round.rewardEmoji, fontSize = 96.sp)
+        Text(text = round.rewardEmoji, fontSize = 96.sp, fontFamily = SilboEmoji)
         Text(
             text = buildAnnotatedString {
                 if (word == null) {

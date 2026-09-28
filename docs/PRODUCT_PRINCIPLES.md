@@ -253,13 +253,17 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
   die vermeintlich fehlten. Der Stand ist seither **null**, und
   `LessonCoverageTest.noAtomSitsInThePackWithoutEverBeingShown` hält ihn dort. Ein
   neues Atom kommt also zusammen mit der Runde, die es zeigt, nicht auf Vorrat.
-- **Emoji-Alter prüfen.** Die App bündelt keinen Emoji-Font (`androidx.emoji2` ist
-  keine Abhängigkeit) und `minSdk` ist 26 — jedes Bild kommt aus dem System-Font des
-  Geräts. Ein Glyph, der jünger ist als das Gerät, rendert als leeres Kästchen. 🫜
-  (Unicode 15.1, 2023) war deshalb im August 2026 unter Android 15 unsichtbar und ist
-  raus. Was noch am Rand steht: 🪼 Qualle (15.0), 🪺 Nest/Vogelnest (14.0), 🪶 Feder
-  (14.0) — alles darunter ist ab Android 12 sicher. Im Zweifel den älteren Glyphen
-  nehmen; ein Bild, das ein Kind nicht sieht, ist kein Bild.
+- **Emojis kommen aus der App, nicht vom Gerät** (seit September 2026). Jeder `Text`, der ein
+  Bild zeigt, setzt `fontFamily = SilboEmoji` (`res/font/silbo_emoji.ttf`): Noto Color Emoji
+  2.057 (OFL, CBDT — rendert ab API 26; die COLRv1-Fassung erst ab Android 13), gekürzt auf
+  genau die Emojis des Packs samt Hautton- und ZWJ-Ligaturen, ~750 KB. Damit sieht jedes Bild
+  auf jedem Telefon gleich aus, und ein Glyph, der jünger ist als das Gerät, ist trotzdem zu
+  sehen — bis dahin rendert 🫜 (Unicode 15.1) unter Android 15 als leeres Kästchen, und die
+  Regel war „im Zweifel den älteren Glyphen nehmen". Die Grenze liegt jetzt bei der
+  gebündelten Noto-Version, nicht beim Gerät. **Ein neues Emoji im Pack verlangt einen
+  Neubau** (`tools/fonts/build_fonts.py`); ohne ihn fällt Android auf die Systemschrift
+  zurück, und `EmojiFontCoverageTest` wird rot. Kein `androidx.emoji2`: dessen Metadaten
+  überleben das Kürzen der Schrift nicht.
 - **Emoji-Doppelgänger sind keine zwei Karten.** Zwei Atome mit demselben Glyphen
   (Uhu/Eule 🦉, Wespe/Biene 🐝, Rad/Fahrrad 🚲, Pflanze/Gras 🌱) sehen für ein Kind
   gleich aus; das zweite wurde gelöscht statt platziert. Die Regel gilt für Dinge und

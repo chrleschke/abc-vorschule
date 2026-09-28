@@ -54,6 +54,7 @@ import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SilboUi
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
@@ -421,7 +422,7 @@ private fun FinaleBody(
                                 },
                             contentAlignment = Alignment.Center,
                         ) {
-                            Text(text = picture.emoji, fontSize = pictureSp)
+                            Text(text = picture.emoji, fontSize = pictureSp, fontFamily = SilboEmoji)
                         }
                     }
                 }

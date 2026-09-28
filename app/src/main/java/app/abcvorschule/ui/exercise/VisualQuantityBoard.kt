@@ -39,6 +39,7 @@ import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SilboFibel
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
@@ -304,6 +305,7 @@ internal fun EmojiGlyph(emoji: String, size: Dp, modifier: Modifier = Modifier) 
     val fontSize = with(LocalDensity.current) { (size / MathBoardSizing.EmojiAspect).toSp() }
     Text(
         text = emoji,
+        fontFamily = SilboEmoji,
         fontSize = fontSize,
         lineHeight = fontSize,
         style = LocalTextStyle.current.copy(
@@ -438,6 +440,7 @@ fun MultiplicationMatrixGrid(
                 repeat(columns) {
                     Text(
                         text = emoji,
+                        fontFamily = SilboEmoji,
                         fontSize = sizeSp.sp,
                         // Derselbe Layer, den `Modifier.alpha(…)` aufmacht — nur
                         // wird der Puls hier in der Zeichenphase gelesen.

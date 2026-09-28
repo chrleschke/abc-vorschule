@@ -56,6 +56,7 @@ import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
@@ -174,6 +175,7 @@ fun SentenceOrderTrainer(
             if (!illustrationEmoji.isNullOrBlank()) {
                 Text(
                     text = illustrationEmoji,
+                    fontFamily = SilboEmoji,
                     fontSize = TaskPromptSizing.pictureSp(LocalDensity.current.fontScale).sp,
                 )
             }

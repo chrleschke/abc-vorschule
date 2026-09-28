@@ -41,6 +41,7 @@ import app.abcvorschule.ui.components.IconLock
 import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreenLight
+import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SilboFibel
 import app.abcvorschule.ui.theme.SkyBlueLight
 import app.abcvorschule.ui.theme.SoftSand
@@ -385,6 +386,7 @@ fun PathSignNode(
                     emojis.forEach { emoji ->
                         Text(
                             text = emoji,
+                            fontFamily = SilboEmoji,
                             fontSize = PathSignLabel.emojiFontSp(fontScale).sp,
                             color = Color.Unspecified,
                             modifier = Modifier.graphicsLayer {

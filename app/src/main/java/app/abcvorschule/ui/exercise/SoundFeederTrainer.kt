@@ -57,6 +57,7 @@ import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
+import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SilboFibel
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.SunCoral
@@ -456,7 +457,12 @@ private fun FeederCard(emoji: String, wordText: String?, minWidthDp: Float, minH
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(text = emoji, fontSize = TaskPromptSizing.pictureSp(fontScale).sp, textAlign = TextAlign.Center)
+        Text(
+            text = emoji,
+            fontSize = TaskPromptSizing.pictureSp(fontScale).sp,
+            fontFamily = SilboEmoji,
+            textAlign = TextAlign.Center,
+        )
         if (wordText != null) {
             Text(
                 text = wordText,
