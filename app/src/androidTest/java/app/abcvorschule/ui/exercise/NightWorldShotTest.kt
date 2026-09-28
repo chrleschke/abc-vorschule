@@ -156,4 +156,31 @@ class NightWorldShotTest {
     @Test
     fun longSentenceOnTheLine() =
         sentence(listOf("der", "Schneemann", "ist", "groß"), "⛄", place = 2, name = "garden-long")
+
+    /** Der End-Screen der ersten Lektion: Sternbild „M" über dem Finale-Satz. */
+    @Test
+    fun endScreenWithConstellation() {
+        val real = app.abcvorschule.content.ContentRepository
+            .fromContext(InstrumentationRegistry.getInstrumentation().targetContext).load()
+        val lesson = real.lessons.first { it.id == "l01" }
+        rule.setContent {
+            AbcTheme {
+                Box(Modifier.fillMaxSize().testTag("shot")) {
+                    app.abcvorschule.ui.shell.RewardSummaryScreen(
+                        finale = real.finales.getValue(lesson.finaleId!!),
+                        lesson = lesson,
+                        pack = real,
+                        ttsAvailable = true,
+                        speaking = false,
+                        onSpeak = {},
+                        onContinue = {},
+                    )
+                }
+            }
+        }
+        rule.mainClock.advanceTimeBy(1_600)
+        save("end-flying.png")
+        rule.mainClock.advanceTimeBy(5_000)
+        save("end-done.png")
+    }
 }

@@ -68,7 +68,17 @@ private val LanternRim = Color(0xFFB8612F)
  * **zwischen** Himmel und Hügeln — sie tauchen hinter den Bergen auf.
  */
 @Composable
-fun PathBackground(scrollOffset: () -> Int, loops: LanternLoops, modifier: Modifier = Modifier) {
+fun PathBackground(
+    scrollOffset: () -> Int,
+    loops: LanternLoops,
+    modifier: Modifier = Modifier,
+    /**
+     * Sonne und Laternen: auf dem Pfad Stimmung, auf dem End-Screen ausgeblendet — dort
+     * gehört der Himmel dem Sternbild, und eine helle Scheibe neben dem Lautsprecher läse
+     * sich wie ein Knopf (wie vorher der Mond beim Rechnen).
+     */
+    sunAndLanterns: Boolean = true,
+) {
     val still = rememberReduceMotion()
     val seconds by rememberWorldSeconds(still)
     Box(modifier.fillMaxSize()) {
@@ -96,12 +106,12 @@ fun PathBackground(scrollOffset: () -> Int, loops: LanternLoops, modifier: Modif
                 radius = haloRadius,
                 center = sunCenter,
             )
-            drawCircle(color = DuskSun, radius = SunRadius.toPx(), center = sunCenter)
+            if (sunAndLanterns) drawCircle(color = DuskSun, radius = SunRadius.toPx(), center = sunCenter)
         }
 
         // Himmelslaternen: nur in der Zeichenphase gelesen, ein Frame rekomponiert nichts.
         // Eigene Ebene, sonst zeichnete jeder Frame Himmel, Hügel und Kopfzeile mit neu.
-        Canvas(Modifier.fillMaxSize().graphicsLayer()) {
+        if (sunAndLanterns) Canvas(Modifier.fillMaxSize().graphicsLayer()) {
             loops.now = seconds
             loops.still = still
             SkyLanterns.at(seconds).forEach { lantern ->

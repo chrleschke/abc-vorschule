@@ -769,15 +769,32 @@ niemals mit einem stummen No-Op.
   (Kau-/Spuck-Rhythmus der Fresser, Halte-Kurve des Jagd-Druckmorphs) darf eigene Dauern
   tragen und begründet sie dort. Bewegung bleibt Antwort auf eine Tat — die Palette ist
   keine Einladung, Bühnen beim Laden aufzubauen oder dauerhaft zu animieren.
-- **Der Erfolgs-Stern fliegt in den Punktestand** (`StarFlight`). Nach dem Aufpoppen
-  steht er kurz (450 ms), fliegt dann in leichtem Bogen hinauf und schrumpft dabei auf die
-  Größe des kleinen Sterns; erst beim Einschlag springt die Zahl in der Kopfzeile und der
-  Zähler hüpft (×1,35, Feder `Bouncy`). Bis dahin zeigt die Kopfzeile den alten Stand,
+- **Der Erfolgs-Stern fliegt in den Punktestand** (`StarFlight`, `SuccessBurst`, gezeichnet
+  mit `drawGlowStar`). Seit September 2026 ein Stern mit Licht statt eines flachen Sterns
+  mit dunkler Kontur: gerundete Spitzen, innen hell und außen bernstein, Glanzpunkt, weicher
+  Schein. Er steigt unter dem Lautsprecher leicht gedreht auf und federt ein (`Settle`), ein
+  Lichtring läuft aus, vier Glanzfunken blitzen versetzt (statt acht bunter Punkte), ein
+  Glanzstreifen zieht über ihn. Nach dem Stehen (450 ms) fliegt er im Bogen mit Funkenspur
+  hinauf, dreht sich einmal und schrumpft auf die Größe des kleinen Sterns; erst beim
+  Einschlag springt die Zahl in der Kopfzeile, der Zähler wird gestaucht (breiter und
+  flacher, Feder `Bouncy`) und es funkelt kurz um ihn. Bis dahin zeigt die Kopfzeile den alten Stand,
   obwohl der Punkt schon verbucht ist — ein Kind, das nicht zählt, sieht so, *wohin* sein
   Stern geht. Ohne gelegten Punktestand (letzte Runde vor dem End-Screen) schrumpft der
   Stern wie früher an Ort und Stelle.
-- Erfolgsmomente: SuccessBurst (Gold-Stern + Funken, ohne Haptik), Gold-Puls an der
-  Segmentgrenze je Trainer, Konfetti auf dem End-Screen.
+- Erfolgsmomente: SuccessBurst (leuchtender Stern + Glanzfunken, ohne Haptik), Gold-Puls an
+  der Segmentgrenze je Trainer, das Sternbild auf dem End-Screen.
+- **Lektions-Ende: das Sternbild** (`RewardSummaryScreen`, `FinaleConstellation`). Der
+  End-Screen spielt am Abendhimmel des Pfads (ohne Sonne und Laternen — dort gehört der Himmel
+  dem Sternbild, und eine helle Scheibe neben dem Lautsprecher läse sich wie ein Knopf). Die
+  Sterne fliegen einzeln von oben an ihren Platz und bilden einen **Buchstaben**, Linien
+  zeichnen ihn in Schreibrichtung nach, dann leuchtet er einmal auf. Der Buchstabe passt zum
+  Finale-Satz **und** wurde in der Lektion geübt: der erste Anfangsbuchstabe eines Satzworts,
+  der ein geübter Einzelbuchstabe ist, sonst ein geübter Buchstabe, der im Satz vorkommt,
+  sonst der Anfangsbuchstabe des ersten Bild-Nomens (Nutzerentscheidung). Die Sterne kommen
+  aus den Spurdaten des Buchstabens (vereinfacht, Ecken bleiben, gemeinsame Enden werden ein
+  Stern). Bilder und Satz liegen auf einer hellen Karte, die Bilder hüpfen einmal, während der
+  Satz gesprochen wird. „Super gemacht!" steht nur noch klein oben, für den Erwachsenen.
+  **Kein Konfetti** mehr: die Quadrate in vier Rollenfarben verwässerten Grün und Gold.
 - **Shape-Morph beim Einrasten (Squish-Settle).** Rastet ein Wort in einen Peg des
   Satz-Architekten **oder ein Baustein in einen Rahmen des Wort-Bauers**, quetscht
   das Bauteil horizontal und federt in Form zurück: `scaleX`

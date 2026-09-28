@@ -86,8 +86,10 @@ fun AbcStarCount(
     }
     Row(
         modifier = modifier.graphicsLayer {
+            // Gestaucht statt nur größer: breiter und flacher beim Einschlag, dann federt
+            // er zurück — der Stern „landet" im Zähler.
             scaleX = bump.value
-            scaleY = bump.value
+            scaleY = 1f - (bump.value - 1f) * 0.7f
         },
         verticalAlignment = Alignment.CenterVertically,
     ) {

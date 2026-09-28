@@ -177,15 +177,15 @@ fun TaskShell(
             state.screen == AppScreen.RewardSummary -> {
                 RewardSummaryScreen(
                     finale = state.completedFinaleId?.let { pack.finales[it] },
+                    lesson = state.completedFinaleId?.let { id -> pack.lessons.firstOrNull { it.finaleId == id } },
                     pack = pack,
                     ttsAvailable = ttsAvailable,
                     speaking = speaking,
                     onSpeak = onSpeak,
                     onContinue = viewModel::continueAfterSummary,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .windowInsetsPadding(WindowInsets.safeDrawing)
-                        .padding(bottom = AbcDimens.screenBottomExtra),
+                    // Randlos: der Abendhimmel läuft unter die Systemleisten, die Insets
+                    // hält der Screen für seinen Inhalt selbst frei.
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
             state.screen == AppScreen.Path -> {
