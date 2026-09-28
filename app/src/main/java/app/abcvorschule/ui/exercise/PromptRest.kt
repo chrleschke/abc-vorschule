@@ -1,6 +1,7 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -27,7 +28,7 @@ import kotlinx.coroutines.flow.SharedFlow
  * Jetzt **ruht** sie: voll hell bis auf einen Hauch ([Dim]), leicht abgesunken
  * ([Scale]), und in der Jagd noch ohne Buchstaben auf den Blasen. In dem Moment, in dem
  * die Ansage ihren Freigabe-Punkt erreicht (das Symbol ist genannt), **wacht** sie auf:
- * federt mit Überschwinger auf volle Größe, und die Buchstaben erscheinen.
+ * sie gleitet in [WakeMs] heran, und die Buchstaben erscheinen.
  *
  * Ein Wert für alle Trainer: 1 = ruht, 0 = wach. Verteilt über [LocalPromptRest].
  */
@@ -37,6 +38,12 @@ object PromptRest {
 
     /** Wie weit sie gedämpft ist — kaum, sie soll nicht deaktiviert aussehen. */
     const val Dim = 0.1f
+
+    /**
+     * Das Aufwachen: ein ruhiges Heranschwimmen mit Ease, keine Feder — die Blasen sollen
+     * aus der Tiefe nach vorn gleiten, nicht aufspringen.
+     */
+    const val WakeMs = 1_100
 }
 
 /** 1 = die Aufgabe ruht (Ansage läuft), 0 = wach. Außerhalb einer Übung immer wach. */
@@ -64,15 +71,14 @@ val LocalPromptNudge = compositionLocalOf { 0 }
 /**
  * Der Ruhe-Wert zur Sperre. **Beim Sperren sofort 1**, noch in derselben Komposition —
  * sonst stünden die Buchstaben der neuen Runde einen Frame lang sichtbar da. Beim
- * Freigeben federt er mit der `Bouncy`-Feder auf 0 und etwas darüber hinaus: das
- * Aufwachen.
+ * Freigeben gleitet er in [PromptRest.WakeMs] auf 0: das Aufwachen.
  */
 @Composable
 fun rememberPromptRest(locked: Boolean): State<Float> {
     val anim = remember { Animatable(if (locked) 1f else 0f) }
     val lockedNow = rememberUpdatedState(locked)
     LaunchedEffect(locked) {
-        if (locked) anim.snapTo(1f) else anim.animateTo(0f, AbcMotion.Bouncy.spec())
+        if (locked) anim.snapTo(1f) else anim.animateTo(0f, tween(PromptRest.WakeMs, easing = AbcMotion.Enter))
     }
     return remember { derivedStateOf { if (lockedNow.value) 1f else anim.value } }
 }

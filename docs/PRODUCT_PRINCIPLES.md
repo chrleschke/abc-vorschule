@@ -465,13 +465,13 @@ niemals mit einem stummen No-Op.
   der gesuchte Buchstabe steckt nur in der Stimme, jeder Tipp davor wäre Raten. Sie ist dabei
   aber nicht mehr auf 50 % gedimmt (das sah kaputt aus), sondern **ruht**: kaum gedämpft
   (10 %), 3 % abgesunken. In der Jagd liegt das ganze Feld wie in der Ferne — 12 % kleiner,
-  Blasen zu 45 % ins Meer verblasst, **ohne Ring, ohne Leuchten und ohne Buchstaben**. Beim
-  Freigabe-Punkt **wacht** sie auf (Feder `Bouncy`): das Feld kommt heran, Ringe, Leuchten und
+  jede Blase noch einmal 25 % kleiner und zu 45 % ins Meer verblasst, **ohne Ring, ohne Leuchten und ohne Buchstaben**. Beim
+  Freigabe-Punkt **wacht** sie auf: ein ruhiges Heranschwimmen über 1,1 s mit Ease, keine Feder — das Feld kommt heran, Ringe, Leuchten und
   Buchstaben erscheinen. Beim Sperren springt der Wert sofort auf „ruht", damit die Buchstaben
   der neuen Runde keinen Frame lang sichtbar sind.
   **Ein Tipp in der Ruhe bekommt eine Antwort**: ein kleiner heller Ring an der Tippstelle, ein
-  leises „Blubb" (`Sfx.Blubb`, mit 0,35 gespielt, damit es die Ansage nicht übertönt), der
-  Lautsprecher leuchtet einmal auf, und in der Jagd wackelt die getippte Blase — höchstens alle
+  leises „Blubb" (`Sfx.Blubb`, 520–1000 Hz — tiefer geben Handy-Lautsprecher nichts wieder —, mit 0,6 gespielt, damit es die Ansage nicht übertönt), der
+  Lautsprecher leuchtet einmal auf, und in der Jagd bläht sich die gedrückte Blase wie gewohnt und wackelt dann (einsammeln lässt sie sich erst wach) — höchstens alle
   220 ms, kein Fehler, kein Mischen. Ausgenommen ist der Lautsprecher selbst (über seine Lage,
   `LocalSpeakerBounds`): er spielt die Ansage auch während der Sperre ab. Während er spricht,
   atmet er sanft mit. Die Herzmuschel ruht mit dem Feld und lugt erst nach der Freigabe.

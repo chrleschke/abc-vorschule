@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +37,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -287,6 +289,7 @@ fun SymbolHuntTrainer(
                     enabled = !batteryFull && !interactionLocked && !shuffling,
                     onTap = { id, from -> handleTap(id, from) },
                     tileCenters = tileCenters,
+                    resting = interactionLocked && !batteryFull,
                     wobble = wobble,
                     modifier = Modifier
                         .fillMaxSize()
@@ -352,6 +355,7 @@ private fun SymbolHuntField(
     enabled: Boolean = true,
     onTap: (Int, Offset) -> Unit,
     tileCenters: MutableMap<Int, Offset> = mutableMapOf(),
+    resting: Boolean = false,
     wobble: Pair<Int, Long>? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -397,6 +401,7 @@ private fun SymbolHuntField(
                     onTap = { center -> onTap(tile.instanceId, center) },
                     onCenter = { tileCenters[tile.instanceId] = it },
                     wobbleKey = wobble?.takeIf { it.first == tile.instanceId }?.second ?: 0L,
+                    resting = resting,
                     modifier = Modifier.testTag("hunt_tile_${tile.instanceId}"),
                 )
             }
@@ -462,6 +467,8 @@ private fun HuntTile(
     onCenter: (Offset) -> Unit = {},
     /** Wechselt bei jedem frühen Tipp auf diese Blase — dann wackelt sie einmal. */
     wobbleKey: Long = 0L,
+    /** Die Aufgabe ruht (Ansage läuft): drücken ja, einsammeln nein. */
+    resting: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val centerInRoot = remember { TileCenter() }
@@ -470,6 +477,12 @@ private fun HuntTile(
     // vorher gäbe es nichts zu suchen, nur zu raten (PromptRest).
     val rest = LocalPromptRest.current
     val shake = remember { Animatable(0f) }
+    var restWobble by remember { mutableIntStateOf(0) }
+    LaunchedEffect(restWobble) {
+        if (restWobble == 0) return@LaunchedEffect
+        shake.snapTo(1f)
+        shake.animateTo(0f, AbcMotion.Wobble.spec())
+    }
     LaunchedEffect(wobbleKey) {
         if (wobbleKey == 0L) return@LaunchedEffect
         shake.snapTo(1f)
@@ -584,13 +597,19 @@ private fun HuntTile(
             }
             .graphicsLayer {
                 val growth = flight.scale(if (flight.pending) 0f else hop.value) / position.scale
-                val factor = HuntTileMorph.scale(inflate.value, exit.value) * growth
+                // Ruhend zusätzlich einzeln kleiner: ferne Blasen, die beim Aufwachen
+                // nach vorn schwimmen (zusammen mit dem Feld rund zwei Drittel groß).
+                val far = 1f - HuntRestTileShrink * rest.value.coerceIn(0f, 1f)
+                val factor = HuntTileMorph.scale(inflate.value, exit.value) * growth * far
                 scaleX = factor
                 scaleY = factor
                 // Ruhend blass, als lägen die Blasen weit hinten im Meer.
                 alpha = HuntTileMorph.alpha(exit.value) * (1f - HuntRestFade * rest.value.coerceIn(0f, 1f))
                 // Kurzes Kopfschütteln der Blase: ein früher Tipp wird gesehen.
                 rotationZ = ShakeDegrees * shake.value
+                // Deckkraft modulieren statt eine eigene Ebene aufmachen: sonst schnitte
+                // die Ebene das Leuchten beim Heranschwimmen eckig ab.
+                compositingStrategy = CompositingStrategy.ModulateAlpha
             }
             // Der Clip hält die Verläufe im Kreis — der Glanzpunkt sitzt
             // außermittig und ragte sonst an der Kante heraus — und deckelt
@@ -669,8 +688,16 @@ private fun HuntTile(
                 // gleichzeitige Druck-Rückmeldungen im selben Kreis lesen als
                 // Doppelbild.
                 indication = null,
-                enabled = enabled && present,
-                onClick = { onTap(centerInRoot.value) },
+                // Auch in der Ruhe drückbar: die Blase bläht sich wie gewohnt und
+                // antwortet mit einem Wackeln — einsammeln lässt sie sich erst wach.
+                enabled = (enabled || resting) && present,
+                onClick = {
+                    if (resting) {
+                        restWobble++
+                    } else {
+                        onTap(centerInRoot.value)
+                    }
+                },
             ),
         contentAlignment = Alignment.Center,
     ) {
@@ -705,6 +732,7 @@ private val BubbleGlow = Color(0x40A0DCEB)
 
 /** Ruhend: das Feld 12 % kleiner, die Blasen zu 45 % ins Meer verblasst. */
 private const val HuntRestShrink = 0.12f
+private const val HuntRestTileShrink = 0.25f
 private const val HuntRestFade = 0.45f
 
 /** Wie weit ein früher Tipp von einer Blasenmitte liegen darf, um sie wackeln zu lassen. */

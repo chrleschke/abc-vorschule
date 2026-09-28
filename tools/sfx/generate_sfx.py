@@ -177,11 +177,12 @@ def blocked():
 
 
 def blubb():
-    # Tipp während der Ansage: ein kleines, tiefes Blubbern — zwei weiche Bläschen,
-    # kurz und dumpf, damit es die Stimme nicht übertönt (gespielt mit 0,35).
+    # Tipp während der Ansage: zwei weiche Bläschen, kurz. Grundton 520–1000 Hz — tiefer
+    # geben Handy-Lautsprecher praktisch nichts wieder (die erste Fassung bei 240–480 Hz
+    # war auf dem Gerät nicht zu hören), und unter der Heller-Grenze bleibt es trotzdem.
     return mix(
-        tone(240, 0.07, 0.022, amp=0.9, partials=SOFT, attack=0.003, sweep_to=430),
-        at(0.05, tone(300, 0.06, 0.018, amp=0.55, partials=SOFT, attack=0.003, sweep_to=480)),
+        tone(520, 0.08, 0.026, amp=0.9, partials=SOFT, attack=0.003, sweep_to=880),
+        at(0.06, tone(640, 0.07, 0.022, amp=0.6, partials=SOFT, attack=0.003, sweep_to=1000)),
     )
 
 
@@ -240,8 +241,13 @@ def write_wav(path, samples):
 def main():
     os.makedirs(OUT, exist_ok=True)
     too_bright = []
+    # Mit Namen als Argumente nur diese Klänge neu bauen: Opus kodiert nicht bitgenau
+    # reproduzierbar, ein Komplettlauf änderte sonst alle Dateien ohne hörbaren Grund.
+    only = set(sys.argv[1:])
     with tempfile.TemporaryDirectory() as tmp:
         for name, make in SOUNDS.items():
+            if only and name not in only:
+                continue
             wav = os.path.join(tmp, name + ".wav")
             write_wav(wav, normalize(make()))
             ogg = os.path.join(OUT, name + ".ogg")

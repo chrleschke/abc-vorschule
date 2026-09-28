@@ -540,5 +540,5 @@ private fun EarlyTapRings(rings: SnapshotStateList<EarlyTapRing>, modifier: Modi
 /** Frühe Tipps antworten höchstens so oft — ein Trommeln bleibt ein leises Blubbern. */
 private const val EarlyTapCooldownMs = 220L
 private const val SpeakerSlopPx = 24f
-private const val EarlyTapVolume = 0.35f
+private const val EarlyTapVolume = 0.6f
 private const val EarlyTapRingMs = 600
