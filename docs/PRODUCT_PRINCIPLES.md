@@ -874,7 +874,12 @@ niemals mit einem stummen No-Op.
     mit einer kleinen, weichen Bewegung — nie mit Stern oder Ton, und nie so, dass es die Aufgabe
     stört: Himmelslaternen auf dem Pfad fliegen einen Looping (`LanternLoops`, 2,8 s, Drehung um
     die eigene Mitte), Karten auf der Wäscheleine schaukeln an ihrer Klammer, die Laut-Fresser
-    stauchen sich und schaukeln aus.
+    stauchen sich und schaukeln aus. Tipps auf die Welt selbst (`WorldTaps`: was kein Bauteil der
+    Aufgabe verbraucht hat und kein Ziehen war) beantwortet der Hintergrund: in der Tiefsee
+    steigen Bläschen vom Finger auf, auf der Lichtung weichen Glühwürmchen aus und kehren zurück,
+    im Theater bauscht sich der Vorhang auf der Seite des Tipps, auf dem Dachboden wirbelt Staub,
+    in der Werkstatt schwingt die Lampe, in der Pilzhöhle flammt der nächste Leuchtpilz auf und
+    stößt Sporen aus. Alles klingt in 2–5 s aus; bei „Bewegung reduzieren" passiert nichts.
   - **Garten in der blauen Stunde** (Satz-Architekt, gezeichnet): Sterne, ein warmer
     Horizontstreifen, Hügel mit runden Baumgruppen. Oben steht das Bild auf einem Teller,
     darunter spannt sich eine **Wäscheleine** über die ganze Breite zwischen zwei Pfosten
@@ -910,7 +915,10 @@ niemals mit einem stummen No-Op.
   - **Dschungel** (Spurensucher): `world_jungle.webp` aus dem Capybara-Experiment des Nutzers.
     Der Weg ist hell (`RoadLight`, fertig `RoadDone`) mit dunklem Schattensaum gegen das Bild; das
     Fahrzeug ist ein **Leuchtkäfer** (Glühwürmchen sind Käfer und leben im Regenwald), der zum
-    nächsten Stern schaut. Die **Sterne bleiben** — „Punkte" wären schwerer zu erklären. Die
+    nächsten Stern schaut: von oben gezeichnet mit sechs Beinen, orangefarbenem Halsschild mit
+    dunklem Fleck, hell gerandeten Flügeldecken und leuchtendem Hinterleib — ohne Beine las er
+    sich auf dem Kopf stehend wie ein Mensch von hinten. Im Stand tasten die Fühler, die Beine
+    treten leicht, der Hinterleib glimmt; fährt er, laufen die Beine im Dreifußgang mit. Die **Sterne bleiben** — „Punkte" wären schwerer zu erklären. Die
     Belohnung („M wie Mond") steht auf einer hellen Karte.
 - **Name: „Silbo", Store-Titel „Silbo – ABC Vorschule".** Ein Kunstname aus der Silbe, weil
   die Silbe die Mechanik ist, die das Kind in den Lektionen erlebt (Verschmelzer, Jagd,

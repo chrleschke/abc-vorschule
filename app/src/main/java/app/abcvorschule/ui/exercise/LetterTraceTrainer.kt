@@ -64,8 +64,11 @@ import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
 import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.world.rememberReduceMotion
+import app.abcvorschule.ui.world.rememberWorldSeconds
 import kotlin.math.PI
 import kotlin.math.atan2
+import kotlin.math.sin
 import kotlinx.coroutines.delay
 
 /** Obergrenze für den Glyph-Kasten; enger wird er, wenn Kasten plus Straßenband
@@ -391,6 +394,10 @@ private fun TraceCanvas(
     // One animation for the whole glyph instead of one per stroke: animating the
     // stroke *index* keeps the number of animation calls independent of how many
     // strokes a letter has, and each bar's fill is the animated index passing it.
+    // Der Käfer lebt im Stand leise weiter (Fühler, Beine, Leuchten); gelesen wird die
+    // Uhr erst im Zeichnen. Bei „Bewegung reduzieren" steht sie.
+    val beetleClock = rememberWorldSeconds(rememberReduceMotion())
+    val gait = remember { BeetleGait() }
     val filled by animateFloatAsState(
         targetValue = state.strokeIndex.toFloat(),
         animationSpec = tween(durationMillis = AbcMotion.StandardMs, easing = AbcMotion.Fill),
@@ -533,6 +540,8 @@ private fun TraceCanvas(
                 center = Offset(car.x, car.y),
                 size = layout.boxSize * 0.055f * chromeScale,
                 headingDeg = heading,
+                seconds = beetleClock.value,
+                gait = gait,
             )
         }
     }
@@ -612,48 +621,107 @@ private fun DrawScope.drawStar(
  * dasselbe Licht wie die Spur. [size] ist der frühere Radius des Punkts, der Käfer ist
  * rund dreimal so lang.
  */
-private fun DrawScope.drawFirefly(center: Offset, size: Float, headingDeg: Float) {
+/**
+ * Gangzustand des Leuchtkäfers, nur im Zeichnen fortgeschrieben (kein State): wie weit
+ * er seit dem letzten Bild gefahren ist, treibt seine Beine an.
+ */
+private class BeetleGait {
+    var last: Offset? = null
+    var phase = 0f
+}
+
+/**
+ * Der Leuchtkäfer, von oben (PRODUCT_PRINCIPLES §10, Dschungel): sechs Beine mit Knie,
+ * ein orangefarbener Halsschild mit dunklem Fleck, zwei Flügeldecken mit hellem Rand,
+ * lange Fühler und ein leuchtender Hinterleib, der hinten herausschaut. Vorher fehlten
+ * Beine und Halsschild; auf dem Kopf stehend las sich die Figur wie ein Mensch von hinten.
+ *
+ * Im Stand lebt er leise: die Fühler tasten, die Beine treten ein wenig, der Hinterleib
+ * glimmt (Perioden 1,8–3 s). Fährt er, laufen die Beine im Dreifußgang mit der Strecke.
+ */
+private fun DrawScope.drawFirefly(center: Offset, size: Float, headingDeg: Float, seconds: Float, gait: BeetleGait) {
+    val s = size
+    gait.last?.let { gait.phase += (center - it).getDistance() / (s * 1.6f) }
+    gait.last = center
+    val walk = gait.phase * 2f * PI.toFloat()
+    val idle = seconds * 2f * PI.toFloat()
+    val glowPulse = 0.85f + 0.15f * sin(idle / 3f)
     rotate(degrees = headingDeg, pivot = center) {
-        val s = size
+        fun at(x: Float, y: Float) = center + Offset(x * s, y * s)
         // Leuchten um den Hinterleib.
+        val tail = at(0f, 1.2f)
         drawCircle(
             brush = Brush.radialGradient(
-                0f to FireflyLight,
-                0.45f to FireflyLight.copy(alpha = 0.55f),
+                0f to FireflyLight.copy(alpha = glowPulse),
+                0.45f to FireflyLight.copy(alpha = 0.5f * glowPulse),
                 1f to FireflyLight.copy(alpha = 0f),
-                center = center + Offset(0f, s * 0.9f),
-                radius = s * 2.4f,
+                center = tail,
+                radius = s * 2.3f,
             ),
-            radius = s * 2.4f,
-            center = center + Offset(0f, s * 0.9f),
+            radius = s * 2.3f,
+            center = tail,
         )
-        // Leuchtender Hinterleib.
-        drawOval(FireflyGlow, topLeft = center + Offset(-s * 0.6f, s * 0.5f), size = Size(s * 1.2f, s * 1.55f))
-        // Flügeldecken, in der Mitte geteilt.
-        val wings = Path().apply {
-            moveTo(center.x, center.y - s * 1.05f)
-            cubicTo(center.x + s * 0.95f, center.y - s * 1.05f, center.x + s * 1.0f, center.y + s * 0.1f, center.x + s * 0.5f, center.y + s * 0.62f)
-            lineTo(center.x - s * 0.5f, center.y + s * 0.62f)
-            cubicTo(center.x - s * 1.0f, center.y + s * 0.1f, center.x - s * 0.95f, center.y - s * 1.05f, center.x, center.y - s * 1.05f)
-            close()
+        // Sechs Beine, je zwei Glieder mit Knie. Dreifußgang: vorn links, Mitte rechts,
+        // hinten links schwingen gemeinsam, die anderen drei gegengleich.
+        val leg = Stroke(width = s * 0.16f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        listOf(-1f, 1f).forEach { side ->
+            listOf(
+                Triple(-0.38f, -55f, 0),
+                Triple(-0.02f, -5f, 1),
+                Triple(0.34f, 40f, 2),
+            ).forEach { (y, baseDeg, index) ->
+                val group = if ((index % 2 == 0) == (side < 0f)) 0f else PI.toFloat()
+                val swing = 16f * sin(walk + group) + 3f * sin(idle / 1.8f + index + side)
+                val a = (baseDeg + swing) * PI.toFloat() / 180f
+                val hip = at(side * 0.42f, y)
+                val knee = hip + Offset(side * kotlin.math.cos(a) * s * 0.5f, kotlin.math.sin(a) * s * 0.5f)
+                val bend = a + (if (index == 0) -0.7f else if (index == 2) 0.7f else 0.35f)
+                val foot = knee + Offset(side * kotlin.math.cos(bend) * s * 0.4f, kotlin.math.sin(bend) * s * 0.4f)
+                drawPath(Path().apply { moveTo(hip.x, hip.y); lineTo(knee.x, knee.y); lineTo(foot.x, foot.y) }, FireflyDark, style = leg)
+            }
         }
-        drawPath(wings, FireflyWing)
-        drawLine(FireflyDark, center + Offset(0f, -s * 1.0f), center + Offset(0f, s * 0.6f), strokeWidth = s * 0.12f)
-        // Kopf mit Fühlern und hellen Augen.
-        drawOval(FireflyDark, topLeft = center + Offset(-s * 0.45f, -s * 1.55f), size = Size(s * 0.9f, s * 0.7f))
-        val antennae = Stroke(width = s * 0.12f, cap = StrokeCap.Round)
-        drawPath(
-            Path().apply {
-                moveTo(center.x - s * 0.2f, center.y - s * 1.45f)
-                quadraticTo(center.x - s * 0.55f, center.y - s * 2.1f, center.x - s * 0.95f, center.y - s * 2.15f)
-                moveTo(center.x + s * 0.2f, center.y - s * 1.45f)
-                quadraticTo(center.x + s * 0.55f, center.y - s * 2.1f, center.x + s * 0.95f, center.y - s * 2.15f)
-            },
-            FireflyDark,
-            style = antennae,
-        )
-        drawCircle(Color.White, radius = s * 0.13f, center = center + Offset(-s * 0.2f, -s * 1.28f))
-        drawCircle(Color.White, radius = s * 0.13f, center = center + Offset(s * 0.2f, -s * 1.28f))
+        // Leuchtender Hinterleib, hinten unter den Flügeldecken hervor.
+        drawOval(FireflyGlow, topLeft = at(-0.4f, 0.6f), size = Size(s * 0.8f, s * 0.98f))
+        drawOval(FireflyGlowEdge, topLeft = at(-0.4f, 0.6f), size = Size(s * 0.8f, s * 0.98f), style = Stroke(width = s * 0.07f))
+        // Flügeldecken: zwei Hälften, dunkelbraun mit hellem Rand, in der Mitte geteilt.
+        listOf(-1f, 1f).forEach { side ->
+            val half = Path().apply {
+                moveTo(center.x, center.y - s * 0.5f)
+                cubicTo(
+                    center.x + side * s * 0.62f, center.y - s * 0.52f,
+                    center.x + side * s * 0.66f, center.y + s * 0.35f,
+                    center.x + side * s * 0.26f, center.y + s * 0.86f,
+                )
+                lineTo(center.x, center.y + s * 0.8f)
+                close()
+            }
+            drawPath(half, FireflyWing)
+            drawPath(half, FireflyWingRim, style = Stroke(width = s * 0.09f))
+        }
+        drawLine(FireflyDark, at(0f, -0.5f), at(0f, 0.82f), strokeWidth = s * 0.07f)
+        // Halsschild: orange mit dunklem Fleck — das Kennzeichen des Leuchtkäfers, und
+        // was den Kopf klar vom Körper trennt.
+        drawOval(FireflyShield, topLeft = at(-0.52f, -0.98f), size = Size(s * 1.04f, s * 0.58f))
+        drawOval(FireflyDark, topLeft = at(-0.2f, -0.86f), size = Size(s * 0.4f, s * 0.32f))
+        // Kopf mit hellen Augen, darüber die tastenden Fühler.
+        drawOval(FireflyDark, topLeft = at(-0.3f, -1.28f), size = Size(s * 0.6f, s * 0.42f))
+        drawCircle(Color.White, radius = s * 0.09f, center = at(-0.2f, -1.1f))
+        drawCircle(Color.White, radius = s * 0.09f, center = at(0.2f, -1.1f))
+        val antenna = Stroke(width = s * 0.09f, cap = StrokeCap.Round)
+        listOf(-1f, 1f).forEach { side ->
+            val twitch = 0.12f * sin(idle / 2.2f + side * 1.3f)
+            drawPath(
+                Path().apply {
+                    moveTo(center.x + side * s * 0.14f, center.y - s * 1.24f)
+                    quadraticTo(
+                        center.x + side * s * (0.3f + twitch), center.y - s * 1.9f,
+                        center.x + side * s * (0.78f + twitch), center.y - s * (2.15f - twitch),
+                    )
+                },
+                FireflyDark,
+                style = antenna,
+            )
+        }
     }
 }
 
@@ -664,4 +732,7 @@ private val RoadShade = Color(0xFF060A08)
 private val FireflyLight = Color(0xFFE8FB8A)
 private val FireflyGlow = Color(0xFFEAFB9A)
 private val FireflyWing = Color(0xFF3A2A1C)
+private val FireflyWingRim = Color(0xFFB59A6E)
+private val FireflyShield = Color(0xFFE0874E)
+private val FireflyGlowEdge = Color(0xFFB9C94A)
 private val FireflyDark = Color(0xFF241A12)

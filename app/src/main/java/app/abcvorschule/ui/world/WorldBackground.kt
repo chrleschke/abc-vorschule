@@ -31,21 +31,21 @@ import app.abcvorschule.R
 
 /** Die Welt hinter einem Trainer. [TrainerWorld.Paper] zeichnet nichts — dort bleibt der Papiergrund. */
 @Composable
-fun WorldBackground(world: TrainerWorld, modifier: Modifier = Modifier) {
+fun WorldBackground(world: TrainerWorld, modifier: Modifier = Modifier, taps: WorldTaps? = null) {
     when (world) {
         TrainerWorld.Paper -> Unit
-        TrainerWorld.DeepSea -> DeepSeaBackground(modifier)
+        TrainerWorld.DeepSea -> DeepSeaBackground(modifier, taps)
         TrainerWorld.Jungle -> PaintedBackground(R.drawable.world_jungle, JungleFallback, modifier)
         TrainerWorld.ForestNight -> ForestNightBackground(modifier)
-        TrainerWorld.Attic -> AtticBackground(modifier)
-        TrainerWorld.Workshop -> WorkshopBackground(modifier)
+        TrainerWorld.Attic -> AtticBackground(modifier, taps)
+        TrainerWorld.Workshop -> WorkshopBackground(modifier, taps)
         TrainerWorld.Garden -> GardenBackground(modifier)
-        TrainerWorld.Theater -> TheaterBackground(modifier)
+        TrainerWorld.Theater -> TheaterBackground(modifier, taps)
         TrainerWorld.Cave -> Box(modifier) {
             PaintedBackground(R.drawable.world_cave, CaveFallback, Modifier.fillMaxSize())
-            CaveGlowMotes(Modifier.fillMaxSize())
+            CaveGlowMotes(Modifier.fillMaxSize(), taps)
         }
-        TrainerWorld.Clearing -> ClearingBackground(modifier)
+        TrainerWorld.Clearing -> ClearingBackground(modifier, taps)
     }
 }
 
@@ -82,7 +82,7 @@ fun rememberWorldSeconds(still: Boolean): androidx.compose.runtime.State<Float> 
 
 /** Tiefes Meer, gezeichnet statt als Bild: Verlauf, wandernde Lichtstrahlen, langsame Blasen. */
 @Composable
-private fun DeepSeaBackground(modifier: Modifier) {
+private fun DeepSeaBackground(modifier: Modifier, taps: WorldTaps?) {
     val still = rememberReduceMotion()
     val seconds by rememberWorldSeconds(still)
     Box(
@@ -165,7 +165,40 @@ private fun DeepSeaBackground(modifier: Modifier) {
                     style = stroke,
                 )
             }
+            // Angetipptes Wasser: ein kleiner Ring und eine Handvoll Bläschen, die vom
+            // Finger aufsteigen und oben verblassen.
+            taps?.let { tt ->
+                tt.now = t
+                tt.still = still
+                tt.forEachRecent(t, TapBubbleS) { tap, age -> drawTapBubbles(tap, age, stroke) }
+            }
         }
+    }
+}
+
+private const val TapBubbleS = 3f
+
+private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawTapBubbles(tap: WorldTap, age: Float, stroke: Stroke) {
+    if (age < 0.45f) {
+        val p = age / 0.45f
+        drawCircle(
+            color = TapRing.copy(alpha = 0.55f * (1f - p)),
+            radius = (6 + 26 * p).dp.toPx(),
+            center = tap.at,
+            style = Stroke(width = 1.5.dp.toPx()),
+        )
+    }
+    for (k in 0 until 5) {
+        val a = age - k * 0.12f
+        if (a <= 0f) continue
+        val p = a / (TapBubbleS - k * 0.12f)
+        if (p >= 1f) continue
+        val speed = (30 + 22 * tapNoise(tap.seed, k)).dp.toPx()
+        val x0 = (tapNoise(tap.seed, k + 10) - 0.5f) * 26.dp.toPx()
+        val wobble = kotlin.math.sin(a * 5f + k) * 4.dp.toPx()
+        val c = tap.at + Offset(x0 + wobble, -speed * a)
+        val r = (2.5f + 2.5f * tapNoise(tap.seed, k + 20)).dp.toPx()
+        drawCircle(TapRing.copy(alpha = 0.6f * (1f - p)), radius = r, center = c, style = stroke)
     }
 }
 
@@ -198,6 +231,7 @@ private val SeaLower = Color(0xFF072838)
 private val SeaFloor = Color(0xFF041A26)
 private val RayLight = Color(0xFFBEEBF5)
 private val BubbleRim = Color(0x47C8EBF5)
+private val TapRing = Color(0xFFD6F2F8)
 private val JungleFallback = Color(0xFF0A1410)
 private val CaveFallback = Color(0xFF071A1D)
 private val HeadShade = Color(0x8C060812)

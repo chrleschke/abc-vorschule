@@ -81,6 +81,7 @@ import app.abcvorschule.ui.theme.PaperEdge
 import app.abcvorschule.ui.world.LocalChromeColors
 import app.abcvorschule.ui.world.TrainerWorld
 import app.abcvorschule.ui.world.WorldBackground
+import app.abcvorschule.ui.world.WorldTaps
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -360,8 +361,23 @@ private fun PracticeBody(
     // die Jagd, Dschungel für den Spurensucher, sonst der Papiergrund darunter. Die
     // Kopfzeile nimmt die passenden Farben über LocalChromeColors mit.
     val world = TrainerWorld.of(round)
-    Box(modifier = Modifier.fillMaxSize()) {
-    WorldBackground(world = world, modifier = Modifier.matchParentSize())
+    val worldTaps = remember { WorldTaps() }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            // Tipps auf die Welt (§10, „Antippen macht Freude"): was kein Bauteil der
+            // Aufgabe verbraucht hat und kein Ziehen war, bekommt der Hintergrund.
+            .pointerInput(worldTaps) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Final)
+                    val up = waitForUpOrCancellation(pass = PointerEventPass.Final) ?: return@awaitEachGesture
+                    if (down.isConsumed || up.isConsumed) return@awaitEachGesture
+                    if ((up.position - down.position).getDistance() > viewConfiguration.touchSlop) return@awaitEachGesture
+                    worldTaps.add(up.position)
+                }
+            },
+    ) {
+    WorldBackground(world = world, modifier = Modifier.matchParentSize(), taps = worldTaps)
     CompositionLocalProvider(LocalChromeColors provides world.chrome) {
     Column(modifier = Modifier.fillMaxSize()) {
         // Zurück-Pfeil links, Punktestand mittig — kein Lektionstitel

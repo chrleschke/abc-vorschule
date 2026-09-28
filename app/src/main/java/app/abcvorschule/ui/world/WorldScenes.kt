@@ -70,7 +70,7 @@ internal fun ForestNightBackground(modifier: Modifier) {
  * liegt in einem hellen Lichtfleck ([lightPool]) — die Taschenlampe findet es.
  */
 @Composable
-internal fun AtticBackground(modifier: Modifier) {
+internal fun AtticBackground(modifier: Modifier, taps: WorldTaps?) {
     val still = rememberReduceMotion()
     val seconds by rememberWorldSeconds(still)
     Canvas(modifier.graphicsLayer()) {
@@ -105,8 +105,27 @@ internal fun AtticBackground(modifier: Modifier) {
             val a = 0.45f * sin(PI.toFloat() * p)
             drawCircle(BeamLight, alpha = a, radius = r.dp.toPx(), center = pos)
         }
+        // Angetippt wirbelt Staub auf: eine Handvoll Körner dreht sich spiralförmig vom
+        // Finger weg, steigt ein wenig und sinkt verblassend wieder ab.
+        taps?.let { tt ->
+            tt.now = seconds
+            tt.still = still
+            tt.forEachRecent(seconds, DustSwirlS) { tap, age ->
+                val p = age / DustSwirlS
+                val turn = if (tap.seed % 2 == 0) 1f else -1f
+                for (k in 0 until 14) {
+                    val angle = k / 14f * 2f * PI.toFloat() + turn * age * 1.6f
+                    val reach = (8 + 56 * (1f - (1f - p) * (1f - p)) * (0.6f + 0.4f * tapNoise(tap.seed, k))).dp.toPx()
+                    val lift = -18.dp.toPx() * sin(PI.toFloat() * p)
+                    val c = tap.at + Offset(kotlin.math.cos(angle) * reach, sin(angle) * reach * 0.6f + lift)
+                    drawCircle(BeamLight, alpha = 0.55f * (1f - p), radius = (0.9f + tapNoise(tap.seed, k + 30)).dp.toPx(), center = c)
+                }
+            }
+        }
     }
 }
+
+private const val DustSwirlS = 2.6f
 
 private fun DrawScope.drawBeam(from: Offset, to: Offset) {
     drawLine(AtticBeam, from, to, strokeWidth = 26.dp.toPx())
@@ -117,7 +136,7 @@ private fun DrawScope.drawBeam(from: Offset, to: Offset) {
  * Lichtkegel einer Lampe, der ganz langsam atmet (9 s).
  */
 @Composable
-internal fun WorkshopBackground(modifier: Modifier) {
+internal fun WorkshopBackground(modifier: Modifier, taps: WorldTaps?) {
     val still = rememberReduceMotion()
     val seconds by rememberWorldSeconds(still)
     Box(modifier.background(Brush.verticalGradient(0f to WoodTop, 0.6f to WoodMid, 1f to WoodLow))) {
@@ -140,7 +159,18 @@ internal fun WorkshopBackground(modifier: Modifier) {
                 i++
             }
             val breath = 1f + 0.05f * sin(seconds / 9f * 2f * PI.toFloat())
-            val lamp = Offset(size.width * 0.5f, size.height * 0.34f)
+            // Angetippt schwingt die Lampe: ihr Lichtkegel pendelt zur Seite des Tipps
+            // hin und klingt aus.
+            var swing = 0f
+            taps?.let { tt ->
+                tt.now = seconds
+                tt.still = still
+                tt.forEachRecent(seconds, LampSwingS) { tap, age ->
+                    val side = if (tap.at.x < size.width / 2f) -1f else 1f
+                    swing += side * 30.dp.toPx() * sin(age / 2f * 2f * PI.toFloat()) * kotlin.math.exp(-age / 1.6f)
+                }
+            }
+            val lamp = Offset(size.width * 0.5f + swing, size.height * 0.34f)
             val lr = size.width * 0.75f * breath
             drawCircle(
                 Brush.radialGradient(0f to LampLight.copy(alpha = 0.42f), 0.6f to LampLight.copy(alpha = 0.12f), 1f to Color.Transparent, center = lamp, radius = lr),
@@ -152,6 +182,8 @@ internal fun WorkshopBackground(modifier: Modifier) {
         }
     }
 }
+
+private const val LampSwingS = 5f
 
 private val NightTop = Color(0xFF1B2452)
 private val NightMid = Color(0xFF141C40)
