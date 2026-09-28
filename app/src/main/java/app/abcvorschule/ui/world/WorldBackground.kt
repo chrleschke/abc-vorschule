@@ -35,6 +35,9 @@ fun WorldBackground(world: TrainerWorld, modifier: Modifier = Modifier) {
         TrainerWorld.Paper -> Unit
         TrainerWorld.DeepSea -> DeepSeaBackground(modifier)
         TrainerWorld.Jungle -> JungleBackground(modifier)
+        TrainerWorld.ForestNight -> ForestNightBackground(modifier)
+        TrainerWorld.Attic -> AtticBackground(modifier)
+        TrainerWorld.Workshop -> WorkshopBackground(modifier)
     }
 }
 

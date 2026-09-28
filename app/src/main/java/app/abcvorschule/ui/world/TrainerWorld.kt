@@ -1,6 +1,9 @@
 package app.abcvorschule.ui.world
 
+import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.LetterTraceRound
+import app.abcvorschule.content.SymbolInWordRound
+import app.abcvorschule.content.WordBuildRound
 import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.content.TrainerRound
 
@@ -20,6 +23,15 @@ enum class TrainerWorld(val night: Boolean) {
 
     /** Spurensucher: abgedunkeltes Dschungelbild (`world_jungle.webp`). */
     Jungle(night = true),
+
+    /** Rechnen: Wiese am Waldrand bei Nacht, gezeichnet. */
+    ForestNight(night = true),
+
+    /** Wort-Detektiv: Dachboden mit Mondstrahl, gezeichnet. */
+    Attic(night = true),
+
+    /** Wort-Bauer: Werkbank im Lampenlicht, gezeichnet. */
+    Workshop(night = true),
     ;
 
     val chrome: ChromeColors get() = if (night) NightChrome else PaperChrome
@@ -28,6 +40,9 @@ enum class TrainerWorld(val night: Boolean) {
         fun of(round: TrainerRound?): TrainerWorld = when (round) {
             is SymbolHuntRound -> DeepSea
             is LetterTraceRound -> Jungle
+            is CountAddRound -> ForestNight
+            is SymbolInWordRound -> Attic
+            is WordBuildRound -> Workshop
             else -> Paper
         }
     }

@@ -33,10 +33,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
@@ -67,6 +70,8 @@ import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
+import app.abcvorschule.ui.world.lightIsland
+import app.abcvorschule.ui.world.lightPlate
 
 object WordBuildTray {
     /** Preschoolers must be able to scan the whole tray at a glance. */
@@ -213,7 +218,8 @@ fun WordBuildTrainer(
                 text = target.emoji,
                 fontFamily = SilboEmoji,
                 fontSize = TaskPromptSizing.pictureSp(LocalDensity.current.fontScale).sp,
-                modifier = Modifier.testTag("word_picture"),
+                // In der Werkstatt steht das Bild auf einem hellen Teller (§10).
+                modifier = Modifier.testTag("word_picture").lightPlate(),
             )
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                 val fontScale = LocalDensity.current.fontScale
@@ -259,7 +265,7 @@ fun WordBuildTrainer(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.fillMaxWidth(),
                                 ) {
-                                    Text(solution.joinToString(""), fontSize = glyphSp.sp, color = WarmInk, modifier = Modifier.testTag("completed_word"))
+                                    Text(solution.joinToString(""), fontSize = glyphSp.sp, color = WarmInk, modifier = Modifier.testTag("completed_word").lightIsland())
                                 }
                             } else Row(
                                 horizontalArrangement = Arrangement.spacedBy(gap.dp, Alignment.CenterHorizontally),
@@ -340,12 +346,15 @@ fun WordBuildTrainer(
                                     minHeight = AbcDimens.kidTouch,
                                 )
                                 .alpha(interactionOpacity)
+                                // Ein heller Holzklotz auf der Werkbank: Ahorn mit Kante und
+                                // Schatten, damit er auf dem dunklen Holz liegt statt klebt.
+                                .shadow(elevation = 6.dp, shape = RoundedCornerShape(22.dp))
                                 .background(
                                     // SkyBlue, nicht LeafGreen: die Auswahl ist ein
                                     // unvalidierter Aktiv-Zustand, kein "richtig" —
                                     // Grün ist für erledigte Slots reserviert (§10:
                                     // eine Bedeutung pro Farbe).
-                                    color = if (field.selectedKey == key) SkyBlue else CreamElevated,
+                                    brush = if (field.selectedKey == key) SolidColor(SkyBlue) else MapleBlock,
                                     shape = RoundedCornerShape(22.dp),
                                 )
                                 .padding(horizontal = 18.dp, vertical = 12.dp)
@@ -506,3 +515,6 @@ private fun Frame(
         }
     }
 }
+
+/** Ahorn: hell genug für Tinte (≈ 9:1), warm genug, um Holz zu sein. */
+private val MapleBlock = Brush.verticalGradient(listOf(Color(0xFFF7E7C4), Color(0xFFE2C58F)))

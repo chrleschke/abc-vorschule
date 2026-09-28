@@ -823,8 +823,10 @@ niemals mit einem stummen No-Op.
 
 - **Nachtwelten (seit September 2026).** Jeder Trainer bekommt eine eigene, **dunkle** Welt,
   immer dieselbe — das Kind erkennt die Aufgabe am Ort, bevor es die Ansage hört
-  (`TrainerWorld`). Bisher: Jagd → **Tiefsee**, Spurensucher → **Dschungel bei Nacht**, alle
-  übrigen bleiben auf dem Papiergrund, bis sie eine Welt bekommen. Regeln:
+  (`TrainerWorld`). Bisher: Jagd → **Tiefsee**, Spurensucher → **Dschungel bei Nacht**,
+  Rechnen → **Nacht am Waldrand**, Wort-Detektiv → **Dachboden**, Wort-Bauer → **Werkstatt**;
+  Silben-Verschmelzer, Satz-Architekt, Satz-Versteher und Laut-Fresser bleiben auf dem
+  Papiergrund, bis sie eine Welt bekommen. Regeln:
   1. **Lerninhalt nur auf Licht.** Buchstaben, Silben, Wörter und Ziffern stehen in Tinte auf
      einer hellen Fläche — Blase, Weg, Karte, Klotz (≥ 7:1). Der Hintergrund trägt nie
      Lerninhalt; die Kontrastrechnungen der Lernschrift gelten deshalb unverändert.
@@ -851,6 +853,21 @@ niemals mit einem stummen No-Op.
     10 s — damit das Kind sieht, wie viele Perlen es hat. Voll: sie bleibt offen und leuchtet,
     dann geht es automatisch weiter. Nach „Zeig mir" zeigt sie nur die selbst gefangenen Perlen.
     Muschel und Perlmutt tragen Sand- und Rosatöne — weder Gold (Stern) noch Grün (richtig).
+  - **Licht-Inseln** (`ui/world/LightIsland.kt`): `lightIsland` (Karte), `lightPlate` (Teller
+    unter einem Bild), `lightPool` (weicher Lichtfleck). Sie werden **um** das Bauteil gezeichnet,
+    nicht als Hülle — Layout und Größenrechnungen der Trainer bleiben unberührt. Eine Insel
+    steht in der Modifier-Kette **vor** jeder Deckkraft (`alpha`), sonst zeichnet sie in deren
+    Ebene und wird an den Kanten des Bauteils eckig abgeschnitten.
+  - **Nacht am Waldrand** (Rechnen, gezeichnet): Mond unter der Kopfzeile, Sterne (wenige
+    funkeln mit 8–14 s), Hügel und Bäume unten. Aufgabe und Zähl-Hilfe liegen auf einer Karte,
+    Antwortkacheln und Ziffernblock sind ohnehin hell.
+  - **Dachboden** (Wort-Detektiv, gezeichnet): Dachbalken, rundes Fenster, Mondstrahl mit
+    langsam treibendem Staub (17–31 s). Das Wort liegt im Lichtfleck, das Zielpaar („P / p")
+    auf einer hellen Pille; gefundene Buchstaben fliegen und landen in `StarGold` (auf Dunkel
+    ≈ 8:1), die Quittungs-Striche sind Creme.
+  - **Werkstatt** (Wort-Bauer, gezeichnet): dunkles Holz mit Maserung, warmer Lampenkegel, der
+    ganz langsam atmet (9 s). Das Bild steht auf einem Teller, die Bausteine sind Ahorn-Klötze
+    mit Schatten, das fertige Wort liegt auf einer Karte.
   - **Dschungel** (Spurensucher): `world_jungle.webp` aus dem Capybara-Experiment des Nutzers.
     Der Weg ist hell (`RoadLight`, fertig `RoadDone`) mit dunklem Schattensaum gegen das Bild; das
     Fahrzeug ist ein **Leuchtkäfer** (Glühwürmchen sind Käfer und leben im Regenwald), der zum

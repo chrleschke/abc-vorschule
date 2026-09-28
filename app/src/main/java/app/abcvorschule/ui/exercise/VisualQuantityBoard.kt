@@ -41,6 +41,7 @@ import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SilboFibel
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
+import app.abcvorschule.ui.world.lightIsland
 
 /** Deckkraft eines bereits gezählten Objekts. Deutlich sichtbarer als ein
  * Geister-Platzhalter ([MultiplicationMatrix.GhostAlpha]) — „schon gezählt" darf
@@ -149,7 +150,8 @@ fun VisualQuantityBoard(
                 )
             },
             prompt = {
-                Box(modifier = Modifier.testTag("math_prompt")) {
+                // Nacht am Waldrand: die Aufgabe liegt auf einer Licht-Insel (§10).
+                Box(modifier = Modifier.testTag("math_prompt").lightIsland()) {
                     MathQuantityPrompt(
                         emoji, left, right, operation,
                         emojiSize = promptEmojiDp.dp,

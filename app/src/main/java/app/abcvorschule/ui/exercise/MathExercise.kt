@@ -1,6 +1,7 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +23,9 @@ import app.abcvorschule.session.ScheduledTrainer
 import app.abcvorschule.speech.GermanNumberWord
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.world.lightIsland
 
 /**
  * Trainer 7 — Rechnen. Pure quantity arithmetic: emoji groups and numerals only,
@@ -136,59 +139,67 @@ fun MathExercise(
                 )
             },
             prompt = {
-                // The multiplication matrix writes "3 × 4" above itself, and the
-                // counting aid writes its own equation line — a second symbolic line
-                // here would show the same task twice (Layout §9).
-                if (showSymbolPrompt && !countingOpen && operation != MathOperation.Multiply) {
-                    Text(
-                        text = "${round.left} ${operation.symbol} ${round.right} = ?",
-                        style = MaterialTheme.typography.displayLarge,
-                        color = WarmInk,
-                    )
-                }
-                if (countingOpen) {
-                    CountingAid(
-                        emoji = icon,
-                        left = round.left,
-                        right = round.right,
-                        operation = operation,
-                        state = counting,
-                        onTap = { index ->
-                            if (locked) return@CountingAid
-                            val next = counting.tap(index)
-                            if (next == counting) {
-                                // Deckel der Weg-Zone erreicht: kein Fehler, keine
-                                // Meldung, nur ein spürbares "das war's".
-                                haptics.nudge()
-                            } else {
-                                haptics.tick()
-                                counting = next
-                                // Mitzählen bei jedem Tipp — auf dem eigenen
-                                // Zählkanal, damit die Zahl eine laufende Ansage
-                                // überlagert, statt sie abzuwürgen oder von ihr
-                                // abgewürgt zu werden. Als Wort, nicht als Ziffer:
-                                // "8." ist im Deutschen die Ordinalzahl und würde
-                                // "achte" gelesen (GermanNumberWord).
-                                next.counted?.let { onSpeakCounting(GermanNumberWord.of(it)) }
-                            }
-                        },
-                    )
-                } else {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(20.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        // Der Tipp-Modus teilt den Aufgabenblock mit der Tastatur statt
-                        // mit Kacheln; die Bühnen-Rechnung der Mengenwahl gilt hier nicht.
-                        // Gerenderte Größe wie dort ([MathBoardSizing]): sp durch die
-                        // nichtlineare Skalierung von `Density`, nicht mal `fontScale`.
-                        val promptEmojiSize = with(LocalDensity.current) { 40.sp.toDp() } *
-                            MathBoardSizing.EmojiAspect
-                        MathQuantityPrompt(
-                            icon, round.left, round.right, operation,
-                            emojiSize = promptEmojiSize,
+                // Nacht am Waldrand: Aufgabe und Zähl-Hilfe liegen auf einer Licht-Insel (§10).
+                Column(
+                    modifier = Modifier.lightIsland(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(AbcDimens.blockGap),
+                ) {
+                    // The multiplication matrix writes "3 × 4" above itself, and the
+                    // counting aid writes its own equation line — a second symbolic line
+                    // here would show the same task twice (Layout §9).
+                    if (showSymbolPrompt && !countingOpen && operation != MathOperation.Multiply) {
+                        Text(
+                            text = "${round.left} ${operation.symbol} ${round.right} = ?",
+                            style = MaterialTheme.typography.displayLarge,
+                            color = WarmInk,
                         )
                     }
+                    if (countingOpen) {
+                        CountingAid(
+                            emoji = icon,
+                            left = round.left,
+                            right = round.right,
+                            operation = operation,
+                            state = counting,
+                            onTap = { index ->
+                                if (locked) return@CountingAid
+                                val next = counting.tap(index)
+                                if (next == counting) {
+                                    // Deckel der Weg-Zone erreicht: kein Fehler, keine
+                                    // Meldung, nur ein spürbares "das war's".
+                                    haptics.nudge()
+                                } else {
+                                    haptics.tick()
+                                    counting = next
+                                    // Mitzählen bei jedem Tipp — auf dem eigenen
+                                    // Zählkanal, damit die Zahl eine laufende Ansage
+                                    // überlagert, statt sie abzuwürgen oder von ihr
+                                    // abgewürgt zu werden. Als Wort, nicht als Ziffer:
+                                    // "8." ist im Deutschen die Ordinalzahl und würde
+                                    // "achte" gelesen (GermanNumberWord).
+                                    next.counted?.let { onSpeakCounting(GermanNumberWord.of(it)) }
+                                }
+                            },
+                        )
+                    } else {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(20.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            // Der Tipp-Modus teilt den Aufgabenblock mit der Tastatur statt
+                            // mit Kacheln; die Bühnen-Rechnung der Mengenwahl gilt hier nicht.
+                            // Gerenderte Größe wie dort ([MathBoardSizing]): sp durch die
+                            // nichtlineare Skalierung von `Density`, nicht mal `fontScale`.
+                            val promptEmojiSize = with(LocalDensity.current) { 40.sp.toDp() } *
+                                MathBoardSizing.EmojiAspect
+                            MathQuantityPrompt(
+                                icon, round.left, round.right, operation,
+                                emojiSize = promptEmojiSize,
+                            )
+                        }
+                    }
+            
                 }
             },
             answers = {
