@@ -22,7 +22,7 @@ Bei Konflikten mit Implementierungsdetails oder älteren Planabschnitten gelten 
 - Helles, warmes, ruhiges UI (Creme statt Weiß — augenfreundlich); weiches Feedback statt Strafe oder Drucksprache.
 - Distraktoren nur aus **echten, bereits geübten Atomen** (max. 2 pro Aufgabe, Tray ≤ 5 Kacheln) — nie erfundene „Fake-Antworten“. Falsche Kachel oder falsche Platzierung ist einfach falsch (gesprochenes Feedback). Die erste Begegnung mit neuem Stoff bleibt distraktorfrei.
 - Ausnahme Buchstaben-/Silben-Jagd: Streufeld statt Distraktor-Budget (bis zu 6 Distraktor-Kacheln, teils wiederholt) — die Übung braucht mehr Ablenker als eine autorierte Tray-Aufgabe.
-- Drag & Drop committet nur bei echtem Slot-Treffer (Hit-Testing); daneben losgelassene Kacheln schnappen ohne Strafe zurück.
+- Drag & Drop committet nur bei echtem Slot-Treffer (Hit-Testing); daneben oder in den falschen Slot losgelassene Kacheln fliegen ohne Strafe **federnd** an ihren Platz zurück (`DragCard`, Feder `AbcMotion.Soft`) — ein Teleport zurück liest sich wie ein Fehler der App, ein Rückflug wie „noch mal". Aufheben und Absetzen federn ebenfalls (Lift 1,08). Ein Fehlgriff gibt in jedem Trainer `nudge`-Haptik.
 - Safe-Area: Inhalt unter Status-/Nav-Leisten und über Home-Indikator halten; unten extra Abstand.
 
 

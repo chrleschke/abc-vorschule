@@ -148,6 +148,9 @@ fun SentenceOrderTrainer(
             }
         } else {
             misses += 1
+            // Wie jeder andere Trainer: ein Fehlgriff ist spürbar, nicht nur hörbar —
+            // die Karte fliegt dazu federnd in den Tray zurück (DragCard).
+            haptics.nudge()
             // Score against the peg being practiced, not the card the child grabbed —
             // misplacing a distractor must not downgrade the distractor's own scaffold.
             onResult(false, false, listOf(atomIds.getOrElse(index) { card.atomId }))

@@ -180,6 +180,9 @@ fun WordBuildTrainer(
             }
         } else {
             misses += 1
+            // Wie jeder andere Trainer: ein Fehlgriff ist spürbar, nicht nur hörbar —
+            // die Karte fliegt dazu federnd in den Tray zurück (DragCard).
+            haptics.nudge()
             // Score against the slot being practiced, not the tile the child grabbed —
             // misplacing a distractor must not downgrade the distractor's own scaffold.
             onResult(false, false, listOf(round.blocks[index].atomId))
