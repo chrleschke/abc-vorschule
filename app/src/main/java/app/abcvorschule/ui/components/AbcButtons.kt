@@ -21,6 +21,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -30,6 +33,7 @@ import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmMuted
+import app.abcvorschule.ui.world.LocalChromeColors
 
 /**
  * Primary action aligned to the trailing edge.
@@ -109,22 +113,34 @@ fun AbcSpeakerButton(
     modifier: Modifier = Modifier,
 ) {
     val desc = stringResource(R.string.speaker)
+    val chrome = LocalChromeColors.current
     FilledTonalIconButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier
             .defaultMinSize(minWidth = 56.dp, minHeight = 56.dp)
+            // Auf der Nacht ein Leuchtring: der Knopf „Nochmal hören" soll der
+            // hellste Punkt der Seite sein, nicht der unauffälligste (§10).
+            .drawBehind {
+                if (chrome.speakerGlow.alpha > 0f) {
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            0.55f to chrome.speakerGlow,
+                            1f to Color.Transparent,
+                            center = center,
+                            radius = size.minDimension * 0.85f,
+                        ),
+                        radius = size.minDimension * 0.85f,
+                    )
+                }
+            }
             .semantics { contentDescription = desc },
         colors = IconButtonDefaults.filledTonalIconButtonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = chrome.speakerContainer,
         ),
     ) {
         IconSpeaker(
-            tint = if (enabled) {
-                MaterialTheme.colorScheme.onSurface
-            } else {
-                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f)
-            },
+            tint = if (enabled) chrome.speakerIcon else chrome.speakerIcon.copy(alpha = 0.35f),
             speaking = speaking,
             size = 26.dp,
         )
@@ -158,7 +174,8 @@ fun AbcNavChevron(
         // Der Aus-Zustand bleibt bei 0.2 (#E2D9C8, 1.27:1): deaktivierte Bauteile
         // nimmt WCAG 1.4.11 ausdrücklich aus, und ein Rückfallweg, der gerade
         // nirgendwohin führt, soll auch nicht danach aussehen.
-        val tint = WarmMuted.copy(alpha = if (enabled) 0.8f else 0.2f)
+        val chevron = LocalChromeColors.current.chevron
+        val tint = if (enabled) chevron else chevron.copy(alpha = 0.2f)
         if (forward) {
             IconChevronRight(tint = tint)
         } else {

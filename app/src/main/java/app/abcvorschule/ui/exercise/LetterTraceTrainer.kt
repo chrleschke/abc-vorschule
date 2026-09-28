@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +13,9 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,12 +30,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
@@ -52,15 +58,14 @@ import app.abcvorschule.ui.rewards.BurstGeometry
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.playStarBlip
 import app.abcvorschule.ui.theme.AbcMotion
+import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
-import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.SilboEmoji
-import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
-import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
-import app.abcvorschule.ui.theme.WarmMuted
+import kotlin.math.PI
+import kotlin.math.atan2
 import kotlinx.coroutines.delay
 
 /** Obergrenze für den Glyph-Kasten; enger wird er, wenn Kasten plus Straßenband
@@ -292,8 +297,13 @@ private fun TraceRewardCard(
     modifier: Modifier = Modifier,
 ) {
     val word = TraceReward.wordOf(round.rewardTts)
+    // Auf einer hellen Karte: im Dschungel ist der Grund dunkel, und Bild und Wort sind
+    // Lerninhalt — der steht immer auf einer Licht-Insel (§10, „Nachtwelten").
     Column(
-        modifier = modifier.testTag("trace_reward_${round.atomId}"),
+        modifier = modifier
+            .testTag("trace_reward_${round.atomId}")
+            .background(Cream.copy(alpha = 0.95f), RoundedCornerShape(28.dp))
+            .padding(horizontal = 32.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -447,7 +457,6 @@ private fun TraceCanvas(
             }
             val active = index == state.strokeIndex
             val fill = (filled - index).coerceIn(0f, 1f)
-            val outer = if (fill > 0f) SkyBlue else WarmMuted
             // Umlaut ticks and other diacritics are tiny; the full road width with round
             // caps turns them into overlapping blobs that collide with the letter body.
             val widthScale = if (
@@ -460,25 +469,25 @@ private fun TraceCanvas(
             } else {
                 1f
             }
-            // Hollow road: a wide band with a dark inner lane. On the cream background
-            // the band needs more opacity than the old dark-theme calibration to stay
-            // legible, hence the higher alphas below.
+            // Ein heller Weg durch den nächtlichen Dschungel (PRODUCT_PRINCIPLES §10,
+            // „Nachtwelten"): außen ein dunkler Schattensaum, der den Weg vom
+            // unruhigen Bild trennt, innen die Licht-Insel, auf der die Sterne liegen.
             drawPath(
                 path = path,
-                color = outer.copy(alpha = if (active) 0.45f else 0.22f),
+                color = RoadShade.copy(alpha = if (active) 0.6f else 0.4f),
                 style = Stroke(
-                    width = corridor * 2f * widthScale,
+                    width = corridor * 2.0f * widthScale,
                     cap = StrokeCap.Round,
                     join = StrokeJoin.Round,
                 ),
             )
-            // A finished bar's lane eases from the elevated cream to the fill colour, so
-            // completion reads as "this one is done" without any text.
+            // Ein fertiger Balken wird vom hellen Weg zu hellem Grün — „das ist
+            // geschafft", ohne Text. Noch nicht dran: etwas gedämpft.
             drawPath(
                 path = path,
-                color = lerp(CreamElevated, LeafGreen, fill),
+                color = lerp(RoadLight, RoadDone, fill).copy(alpha = if (active || fill > 0f) 1f else 0.72f),
                 style = Stroke(
-                    width = corridor * 1.25f * widthScale,
+                    width = corridor * 1.45f * widthScale,
                     cap = StrokeCap.Round,
                     join = StrokeJoin.Round,
                 ),
@@ -512,10 +521,18 @@ private fun TraceCanvas(
         }
         val car = vehicle ?: layout.strokes.firstOrNull()?.firstOrNull()
         if (car != null) {
-            drawCircle(
-                color = SunCoral,
-                radius = layout.boxSize * 0.055f * chromeScale,
+            // Der Leuchtkäfer schaut zum nächsten Stern — so zeigt er ohne Pfeil,
+            // in welche Richtung es weitergeht.
+            val target = layout.stars.getOrNull(state.strokeIndex)?.getOrNull(state.starIndex)
+            val heading = if (target != null && (target.x != car.x || target.y != car.y)) {
+                atan2(target.y - car.y, target.x - car.x) * 180f / PI.toFloat() + 90f
+            } else {
+                0f
+            }
+            drawFirefly(
                 center = Offset(car.x, car.y),
+                size = layout.boxSize * 0.055f * chromeScale,
+                headingDeg = heading,
             )
         }
     }
@@ -588,3 +605,63 @@ private fun DrawScope.drawStar(
         style = Stroke(width = strokeWidth, join = StrokeJoin.Round),
     )
 }
+
+/**
+ * Das Fahrzeug des Spurensuchers: ein Leuchtkäfer (Glühwürmchen sind Käfer und leben im
+ * Regenwald). Von oben gesehen, Kopf in Fahrtrichtung, der Hinterleib leuchtet —
+ * dasselbe Licht wie die Spur. [size] ist der frühere Radius des Punkts, der Käfer ist
+ * rund dreimal so lang.
+ */
+private fun DrawScope.drawFirefly(center: Offset, size: Float, headingDeg: Float) {
+    rotate(degrees = headingDeg, pivot = center) {
+        val s = size
+        // Leuchten um den Hinterleib.
+        drawCircle(
+            brush = Brush.radialGradient(
+                0f to FireflyLight,
+                0.45f to FireflyLight.copy(alpha = 0.55f),
+                1f to FireflyLight.copy(alpha = 0f),
+                center = center + Offset(0f, s * 0.9f),
+                radius = s * 2.4f,
+            ),
+            radius = s * 2.4f,
+            center = center + Offset(0f, s * 0.9f),
+        )
+        // Leuchtender Hinterleib.
+        drawOval(FireflyGlow, topLeft = center + Offset(-s * 0.6f, s * 0.5f), size = Size(s * 1.2f, s * 1.55f))
+        // Flügeldecken, in der Mitte geteilt.
+        val wings = Path().apply {
+            moveTo(center.x, center.y - s * 1.05f)
+            cubicTo(center.x + s * 0.95f, center.y - s * 1.05f, center.x + s * 1.0f, center.y + s * 0.1f, center.x + s * 0.5f, center.y + s * 0.62f)
+            lineTo(center.x - s * 0.5f, center.y + s * 0.62f)
+            cubicTo(center.x - s * 1.0f, center.y + s * 0.1f, center.x - s * 0.95f, center.y - s * 1.05f, center.x, center.y - s * 1.05f)
+            close()
+        }
+        drawPath(wings, FireflyWing)
+        drawLine(FireflyDark, center + Offset(0f, -s * 1.0f), center + Offset(0f, s * 0.6f), strokeWidth = s * 0.12f)
+        // Kopf mit Fühlern und hellen Augen.
+        drawOval(FireflyDark, topLeft = center + Offset(-s * 0.45f, -s * 1.55f), size = Size(s * 0.9f, s * 0.7f))
+        val antennae = Stroke(width = s * 0.12f, cap = StrokeCap.Round)
+        drawPath(
+            Path().apply {
+                moveTo(center.x - s * 0.2f, center.y - s * 1.45f)
+                quadraticTo(center.x - s * 0.55f, center.y - s * 2.1f, center.x - s * 0.95f, center.y - s * 2.15f)
+                moveTo(center.x + s * 0.2f, center.y - s * 1.45f)
+                quadraticTo(center.x + s * 0.55f, center.y - s * 2.1f, center.x + s * 0.95f, center.y - s * 2.15f)
+            },
+            FireflyDark,
+            style = antennae,
+        )
+        drawCircle(Color.White, radius = s * 0.13f, center = center + Offset(-s * 0.2f, -s * 1.28f))
+        drawCircle(Color.White, radius = s * 0.13f, center = center + Offset(s * 0.2f, -s * 1.28f))
+    }
+}
+
+/** Heller Weg (Licht-Insel), fertiger Weg und der Schattensaum gegen das Dschungelbild. */
+private val RoadLight = Color(0xFFF3ECDB)
+private val RoadDone = Color(0xFFBFE6C9)
+private val RoadShade = Color(0xFF060A08)
+private val FireflyLight = Color(0xFFE8FB8A)
+private val FireflyGlow = Color(0xFFEAFB9A)
+private val FireflyWing = Color(0xFF3A2A1C)
+private val FireflyDark = Color(0xFF241A12)

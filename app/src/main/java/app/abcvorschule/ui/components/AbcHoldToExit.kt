@@ -16,10 +16,10 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -27,6 +27,7 @@ import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.world.LocalChromeColors
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -117,7 +118,7 @@ fun AbcHoldToExitButton(
             )
         }
         IconArrowBack(
-            tint = WarmInk,
+            tint = LocalChromeColors.current.content,
             size = 24.dp,
             modifier = Modifier.graphicsLayer {
                 // Wackeln seitwärts, nicht drehen: ein Pfeil, der sich dreht, zeigt woanders hin.

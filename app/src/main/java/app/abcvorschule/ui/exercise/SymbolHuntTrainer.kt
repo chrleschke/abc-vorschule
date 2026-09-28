@@ -5,6 +5,7 @@ import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,8 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +36,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.IntOffset
@@ -43,16 +50,20 @@ import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.AbcSfx
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.Sfx
+import app.abcvorschule.ui.rewards.StarFlight
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.LeafGreenLight
 import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.SkyBlueLight
 import app.abcvorschule.ui.theme.SoftSand
 import app.abcvorschule.ui.theme.StarGoldDeep
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 // Matches AbcDimens.kidTouch (the app-wide minimum touch target for 4-6-year-olds)
 // so that even the smallest scattered tile (scale 0.8, see SymbolHuntLayout) renders
@@ -64,35 +75,18 @@ private val TileSize = AbcDimens.kidTouch
  * Mehrzeichen-Symbole („Sch") und große Schriftskalierungen schrumpfen darunter. */
 private const val MaxTileGlyphSp = 28f
 
-// Vier Ringe, nicht fünf: die fünfte Farbe der alten Nachtpalette (SoftSand, fast weiß)
-// trug auf dunklem Feld, würde auf dem hellen Papiergrund aber in der Seite verschwinden.
-//
-// Diese vier sind **abgedunkelte** Fassungen der App-Akzente SunCoral / SkyBlue /
-// StarGoldDeep / LeafGreen — rund 11 % dunkler. Grund ist der Papiergrund: die
-// Originaltöne sind gegen das alte flache Cream kalibriert und liegen dort selbst nur bei
-// 3.29–3.88:1. Auf dem Papierverlauf fiel der schwächste von ihnen auf 2.24:1, deutlich
-// unter die 3:1, die der Ring als Abgrenzung der Kachel (UI-Bauteil) braucht — die
-// Füllung trägt diese Grenze nicht, sie ist halbtransparent und liegt gegen jeden Grund
-// bei rund 1.2:1.
-//
-// Gemessen am gerenderten Pixel, jede Kachel gegen den Grund **an ihrer Stelle** (bei
-// einem Verlauf ist nur das die ehrliche Zahl): der schwächste Ring liegt bei 3.83:1.
-// Gegen den dunkelsten Punkt des Verlaufs, PaperEdge, sind es 3.04–3.07:1 — das ist die
-// Grenze, die PaperEdge festnagelt (siehe Color.kt).
-//
-// Die Originaltöne, falls der Grund je auf das flache Cream zurückgeht — dann gehören
-// diese vier Zeilen ersetzt durch `listOf(SunCoral, SkyBlue, StarGoldDeep, LeafGreen)`:
-//   SunCoral     #D25B2D   (Cream 3.61:1)
-//   SkyBlue      #3F7FB5   (Cream 3.88:1)
-//   StarGoldDeep #B07D0A   (Cream 3.29:1)
-//   LeafGreen    #43904F   (Cream 3.57:1)
-// Für die verworfene paper-blue-Fassung (siehe Color.kt) bleiben genau die vier Werte
-// unten gültig: blue trägt bis `500`, dort liegt der schwächste Ring bei 3.89:1.
-private val TilePalette = listOf(
-    Color(0xFFBA5028), // SunCoral, abgedunkelt
-    Color(0xFF3974A6), // SkyBlue, abgedunkelt
-    Color(0xFF936808), // StarGoldDeep, abgedunkelt
-    Color(0xFF3A7E45), // LeafGreen, abgedunkelt
+// Die Ringe der Blasen in der Tiefsee (PRODUCT_PRINCIPLES §10, „Nachtwelten"). Auf dem
+// dunklen Meer tragen die **hellen** Stufen die 3:1 für UI-Bauteile, nicht mehr die
+// abgedunkelten des Papiergrunds: gegen das Meer an der hellsten Stelle (#0F5068) liegt
+// der schwächste Ring noch bei 3.9:1, weiter unten deutlich darüber. Die Farben haben
+// jetzt eine Aufgabe: jede eingefangene Blase wird zu einer Perle in ihrer Ringfarbe
+// und fliegt in die Herzmuschel. Gold ist bewusst ein gedämpftes Sandgold, nicht
+// StarGold — Gold bleibt die Sternbelohnung.
+internal val TilePalette = listOf(
+    Color(0xFFF0A58A), // Koralle, hell
+    SkyBlueLight,
+    Color(0xFFE6C46A), // Sandgold
+    LeafGreenLight,
 )
 
 /**
@@ -144,8 +138,34 @@ fun SymbolHuntTrainer(
     }
     val haptics = LocalAbcHaptics.current
 
-    fun handleTap(instanceId: Int) {
+    // Herzmuschel statt Batterie: jede eingefangene Blase fliegt als Perle in ihrer
+    // Ringfarbe hinein (CockleShell). Gelandete Perlen zählen, fliegende noch nicht.
+    val cockle = remember(roundKey) { CockleAnchor() }
+    val openness = rememberCockleOpenness(roundKey)
+    val landed = remember(roundKey) { mutableStateListOf<Color>() }
+    val flights = remember(roundKey) { mutableStateListOf<PearlFlight>() }
+    var lastTouch by remember(roundKey) { mutableLongStateOf(0L) }
+    val scope = rememberCoroutineScope()
+
+    fun launchPearl(from: Offset, color: Color, full: Boolean) {
+        val flight = PearlFlight(from = from, slot = landed.size + flights.size, color = color)
+        flights += flight
+        scope.launch {
+            launch { openness.animateTo(1f, tween(AbcMotion.ShortMs, easing = AbcMotion.Enter)) }
+            flight.progress.animateTo(1f, tween(PearlFlight.FlightMs, easing = AbcMotion.Enter))
+            flights.remove(flight)
+            landed += flight.color
+            AbcSfx.play(Sfx.Snap)
+            if (full) return@launch
+            // Offen lassen, solange noch eine Perle unterwegs ist; dann federnd zu.
+            delay(PearlFlight.CloseAfterMs)
+            if (flights.isEmpty()) openness.animateTo(0f, AbcMotion.Settle.spec())
+        }
+    }
+
+    fun handleTap(instanceId: Int, from: Offset) {
         if (resolved || batteryFull || shuffling) return
+        lastTouch = System.nanoTime()
         val tapped = state.tiles.firstOrNull { it.instanceId == instanceId } ?: return
         onSpeak(pack.atoms[tapped.atomId]?.lemma ?: tapped.atomId)
         val result = SymbolHuntProgress.tap(state, instanceId)
@@ -168,9 +188,11 @@ fun SymbolHuntTrainer(
             SymbolHuntTapOutcome.Collected -> {
                 haptics.tick()
                 AbcSfx.play(Sfx.Pop)
+                launchPearl(from, TilePalette[instanceId % TilePalette.size], full = false)
             }
             SymbolHuntTapOutcome.RoundComplete -> {
                 AbcSfx.play(Sfx.Pop)
+                launchPearl(from, TilePalette[instanceId % TilePalette.size], full = true)
                 batteryFull = true
                 haptics.celebrate()
             }
@@ -193,14 +215,39 @@ fun SymbolHuntTrainer(
     // tap only added a dead end for a child who cannot read the button. The delay
     // sits in front of onResult because reporting the result starts the spoken
     // success phase, which must not talk over the celebration.
+    // Längere Pause: die Muschel lugt halb auf, damit das Kind sieht, wie viele Perlen
+    // es schon hat (Nutzer-Wunsch, §10). Jeder Tipp setzt die Uhr zurück.
+    LaunchedEffect(roundKey, lastTouch, batteryFull, resolved) {
+        if (batteryFull || resolved) return@LaunchedEffect
+        try {
+            var wait = PearlFlight.PeekAfterIdleMs
+            while (true) {
+                delay(wait)
+                wait = PearlFlight.PeekRepeatMs
+                if (flights.isNotEmpty() || openness.value > 0.01f) continue
+                openness.animateTo(CockleGeometry.PeekOpenness, tween(PearlFlight.PeekOpenMs, easing = AbcMotion.Linger))
+                delay(PearlFlight.PeekHoldMs)
+                openness.animateTo(0f, tween(PearlFlight.PeekCloseMs, easing = AbcMotion.Exit))
+            }
+        } finally {
+            // Ein Tipp mitten im Lugen: zuklappen — außer eine Perle fliegt gerade,
+            // dann gehört die Öffnung ihr.
+            if (flights.isEmpty() && !batteryFull && openness.value in 0.01f..0.5f) {
+                scope.launch { openness.animateTo(0f, tween(PearlFlight.PeekCloseMs, easing = AbcMotion.Exit)) }
+            }
+        }
+    }
+
     LaunchedEffect(batteryFull) {
         if (!batteryFull) return@LaunchedEffect
         delay(HuntCelebration.HoldMs)
         onResult(true, false, listOf(round.targetAtomId))
     }
 
+    val overlay = remember(roundKey) { OverlayOrigin() }
+    Box(modifier = modifier.onGloballyPositioned { overlay.topLeft = it.positionInRoot() }) {
     ExerciseStage(
-        modifier = modifier,
+        modifier = Modifier.fillMaxSize(),
         promptChrome = {
             TaskPromptChrome(
                 title = null,
@@ -217,16 +264,21 @@ fun SymbolHuntTrainer(
                     initialTiles = initialTiles,
                     pack = pack,
                     enabled = !batteryFull && !interactionLocked && !shuffling,
-                    onTap = ::handleTap,
+                    onTap = { id, from -> handleTap(id, from) },
                     modifier = Modifier.fillMaxSize().alpha(fieldAlpha * interactionOpacity),
                 )
             }
         },
         answers = {
-            SymbolHuntBattery(
-                collected = earnedBeforeResolve ?: state.collected,
+            // Die Muschel zeigt nur gelandete Perlen: nach „Zeig mir" bleibt der echte
+            // Stand stehen (eine volle Muschel wäre eine Feier für etwas, das das Kind
+            // nicht geschafft hat — dieselbe Regel wie früher bei der Batterie).
+            CockleShell(
                 total = state.targetHitCount,
+                pearls = landed,
+                openness = openness.asState(),
                 celebrate = batteryFull,
+                anchor = cockle,
             )
             if (SymbolHuntProgress.resolveAvailable(state) && !resolved && !batteryFull) {
                 AbcResolveButton(
@@ -240,6 +292,20 @@ fun SymbolHuntTrainer(
             }
         },
     )
+    // Die fliegenden Perlen, über der ganzen Bühne: vom getippten Buchstaben in die Muschel.
+    Canvas(Modifier.matchParentSize()) {
+        val total = state.targetHitCount
+        flights.forEach { f ->
+            val to = cockle.slotInRoot(f.slot, total)
+            val p = f.progress.value
+            val at = f.from + StarFlight.offset(f.from, to, p) - overlay.topLeft
+            val endRadius = CockleGeometry.slotRadius(total) * cockle.widthPx
+            val startRadius = PearlFlight.StartRadius.toPx()
+            val radius = startRadius + (endRadius - startRadius) * p
+            drawPearl(at, radius, f.color)
+        }
+    }
+    }
 }
 
 @Composable
@@ -250,7 +316,7 @@ private fun SymbolHuntField(
     initialTiles: List<SymbolHuntTile>,
     pack: ContentPack,
     enabled: Boolean = true,
-    onTap: (Int) -> Unit,
+    onTap: (Int, Offset) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier) {
@@ -292,7 +358,7 @@ private fun SymbolHuntField(
                     color = TilePalette[tile.instanceId % TilePalette.size],
                     present = tile.instanceId in presentIds,
                     enabled = enabled,
-                    onTap = { onTap(tile.instanceId) },
+                    onTap = { center -> onTap(tile.instanceId, center) },
                     modifier = Modifier.testTag("hunt_tile_${tile.instanceId}"),
                 )
             }
@@ -354,9 +420,10 @@ private fun HuntTile(
     color: Color,
     present: Boolean,
     enabled: Boolean,
-    onTap: () -> Unit,
+    onTap: (centerInRoot: Offset) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val centerInRoot = remember { TileCenter() }
     val inflate = remember { Animatable(0f) }
     val exit = remember { Animatable(0f) }
     val interactionSource = remember { MutableInteractionSource() }
@@ -460,6 +527,7 @@ private fun HuntTile(
                 )
             }
             .size(tileDp)
+            .onGloballyPositioned { centerInRoot.value = it.boundsInRoot().center }
             .graphicsLayer {
                 val growth = flight.scale(if (flight.pending) 0f else hop.value) / position.scale
                 val factor = HuntTileMorph.scale(inflate.value, exit.value) * growth
@@ -470,6 +538,17 @@ private fun HuntTile(
             // Der Clip hält die Verläufe im Kreis — der Glanzpunkt sitzt
             // außermittig und ragte sonst an der Kante heraus — und deckelt
             // weiter den Glyphen (siehe Größenrechnung unten).
+            // Leuchten ums Wasser herum, vor dem Clip: es darf über den Kreis hinaus.
+            .drawBehind {
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        0.62f to BubbleGlow,
+                        1f to Color.Transparent,
+                        radius = size.minDimension * 0.72f,
+                    ),
+                    radius = size.minDimension * 0.72f,
+                )
+            }
             .clip(CircleShape)
             .drawBehind {
                 val press = HuntTileMorph.pressProgress(inflate.value)
@@ -479,14 +558,15 @@ private fun HuntTile(
                     x = size.width * HuntTileMorph.GlossCenterX,
                     y = size.height * HuntTileMorph.GlossCenterY,
                 )
-                // Grundwäsche mit Tiefe statt flacher Fläche: heller Kern oben
-                // links, satter Rand. Im Mittel die bisherigen 0,22 Deckkraft.
+                // Eine Luftblase im Meer: heller, fast weißer Kern — die Licht-Insel,
+                // auf der der Buchstabe in Tinte steht (≥ 10:1) — und ein Rand, durch
+                // den das Meer schimmert. Der Druck macht den Rand etwas satter.
                 drawCircle(
                     brush = Brush.radialGradient(
-                        colors = listOf(
-                            color.copy(alpha = HuntTileMorph.coreAlpha(press)),
-                            color.copy(alpha = HuntTileMorph.rimAlpha(press)),
-                        ),
+                        0f to BubbleCore,
+                        0.45f to BubbleMid,
+                        0.78f to BubbleEdge.copy(alpha = 0.84f - 0.08f * press),
+                        1f to BubbleEdge.copy(alpha = 0.62f),
                         center = lightCenter,
                         radius = radius * HuntTileMorph.WashRadiusFactor,
                     ),
@@ -528,7 +608,7 @@ private fun HuntTile(
                 // Doppelbild.
                 indication = null,
                 enabled = enabled && present,
-                onClick = onTap,
+                onClick = { onTap(centerInRoot.value) },
             ),
         contentAlignment = Alignment.Center,
     ) {
@@ -548,3 +628,14 @@ private fun HuntTile(
         )
     }
 }
+
+/** Root-Mittelpunkt einer Blase, gesetzt beim Layout, gelesen beim Tipp. Kein State. */
+private class TileCenter { var value: Offset = Offset.Zero }
+
+/** Wo das Flug-Overlay im Root liegt. Kein State: gelesen nur in der Zeichenphase. */
+private class OverlayOrigin { var topLeft: Offset = Offset.Zero }
+
+private val BubbleCore = Color(0xFFFFFDF6)
+private val BubbleMid = Color(0xFFF2F0E8)
+private val BubbleEdge = Color(0xFFECF2F0)
+private val BubbleGlow = Color(0x59A0DCEB)

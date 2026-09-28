@@ -24,6 +24,7 @@ import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
 import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.world.LocalChromeColors
 
 /** Kantenlänge des Sterns neben der Zahl. */
 private val StarGlyphSize = 22.dp
@@ -104,7 +105,7 @@ fun AbcStarCount(
         Text(
             text = "$points",
             style = MaterialTheme.typography.titleLarge,
-            color = WarmInk,
+            color = LocalChromeColors.current.content,
         )
     }
 }

@@ -20,12 +20,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
-import app.abcvorschule.ui.components.AbcStarCount
 import app.abcvorschule.ui.components.AbcHoldToExitButton
+import app.abcvorschule.ui.components.AbcStarCount
 import app.abcvorschule.ui.rewards.StarCounterAnchor
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.StarGoldDeep
 import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.world.LocalChromeColors
 
 /**
  * Höhe einer kleinen M3-Top-App-Bar (`TopAppBarSmallTokens.ContainerHeight`),
@@ -109,8 +110,8 @@ fun AbcTopBar(
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.Transparent,
                 scrolledContainerColor = Color.Transparent,
-                titleContentColor = WarmInk,
-                navigationIconContentColor = WarmInk,
+                titleContentColor = LocalChromeColors.current.content,
+                navigationIconContentColor = LocalChromeColors.current.content,
             ),
             navigationIcon = {
                 if (onBack != null) {

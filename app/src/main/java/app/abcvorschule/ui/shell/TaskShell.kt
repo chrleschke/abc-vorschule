@@ -19,6 +19,7 @@ import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -53,6 +54,9 @@ import app.abcvorschule.ui.rewards.playBlockedBlip
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.PaperCenter
 import app.abcvorschule.ui.theme.PaperEdge
+import app.abcvorschule.ui.world.LocalChromeColors
+import app.abcvorschule.ui.world.TrainerWorld
+import app.abcvorschule.ui.world.WorldBackground
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -319,6 +323,13 @@ private fun PracticeBody(
         viewModel.onRevealFinished()
     }
 
+    // Die Welt hinter dem Trainer (PRODUCT_PRINCIPLES §10, „Nachtwelten"): Tiefsee für
+    // die Jagd, Dschungel für den Spurensucher, sonst der Papiergrund darunter. Die
+    // Kopfzeile nimmt die passenden Farben über LocalChromeColors mit.
+    val world = TrainerWorld.of(round)
+    Box(modifier = Modifier.fillMaxSize()) {
+    WorldBackground(world = world, modifier = Modifier.matchParentSize())
+    CompositionLocalProvider(LocalChromeColors provides world.chrome) {
     Column(modifier = Modifier.fillMaxSize()) {
         // Zurück-Pfeil links, Punktestand mittig — kein Lektionstitel
         // (Elterntext an der Stelle, an der das Kind zuerst hinsieht). Der Stern
@@ -330,6 +341,7 @@ private fun PracticeBody(
             centerPoints = true,
             onBack = viewModel::exitLesson,
             counterAnchor = counterAnchor,
+            starOutline = LocalChromeColors.current.starOutline,
         )
 
         // Fortschritt und die beiden Rückfall-Chevrons teilen sich eine Zeile
@@ -420,5 +432,7 @@ private fun PracticeBody(
                 )
             }
         }
+    }
+}
     }
 }
