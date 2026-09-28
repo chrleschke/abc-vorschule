@@ -462,7 +462,12 @@ niemals mit einem stummen No-Op.
   `ding` Erfolgs-Stern fliegt los/landet im Punktestand · `chime` Runde geschafft · `fanfare`
   Lektion geschafft (der Finale-Satz beginnt 0,7 s danach) · `tap` Ziffernblock · `blip`
   Spurensucher-Stern (Tonleiter über die Abspielrate) · `shuffle` Jagd mischt · `blocked`
-  gesperrt. Kein Klang klingt nach „falsch" — auch `boing` und `blocked` sind weich. **Keine
+  gesperrt. Kein Klang klingt nach „falsch" — auch `boing` und `blocked` sind weich.
+  **Tief und warm, nicht hell:** Grundtöne 150–800 Hz, reine Sinus-Töne mit höchstens einer
+  leisen Oktave, keine Glocken-Obertöne, Tiefpass 3 kHz; der Generator bricht ab, wenn ein
+  Klang im Mittel über 1,1 kHz liegt. Die erste Fassung (Glöckchen bis 2,7 kHz) war laut
+  Nutzer „schnell nervig für die Eltern". `chime` ist deshalb wieder genau das frühere
+  Sinus-Arpeggio C5–E5–G5–C6. **Keine
   Musik, keine Dauergeräusche** (Cognitive Load). Ist ein Clip nicht ladbar, fallen `chime`,
   `blip` und `blocked` auf die frühere Sinus-Synthese zurück, damit ein Tipp nie stumm bleibt.
 
