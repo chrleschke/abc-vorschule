@@ -95,6 +95,9 @@ private enum class FeederPhase { Intro, Playing, Busy, Done }
  */
 private const val MinCardScale = 0.01f
 
+/** Über die ersten 15 % des Aufploppens blendet die Karte ein. */
+private const val CardFadeInPop = 0.15f
+
 /** Wie weit die Fresser über dem unteren Bühnenrand stehen. */
 private const val CreatureLiftDp = 40f
 
@@ -368,6 +371,11 @@ fun SoundFeederTrainer(
                                     val pop = cardPop.value.coerceAtLeast(MinCardScale)
                                     scaleX = pop
                                     scaleY = pop
+                                    // Auf 1 % geschrumpft blieb die Karte als 1-px-Punkt mit
+                                    // Rand und Schatten sichtbar, vor und nach jeder Karte.
+                                    // Deckkraft statt Skalierung 0: sie ändert die Matrix nicht,
+                                    // die Karte bleibt also invertierbar (siehe MinCardScale).
+                                    alpha = ((cardPop.value - MinCardScale) / CardFadeInPop).coerceIn(0f, 1f)
                                     translationX = cardBounce.value * 14f
                                 }
                                 .alpha(interactionOpacity),
