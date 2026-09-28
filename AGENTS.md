@@ -81,6 +81,14 @@ Kernpunkte (Kurzfassung):
 - Kotlin + Jetpack Compose, heller Papiergrund aus dem Babbel GDS (`paper green`, radialer
   Verlauf statt Fläche — Farbrollen, Kontrastgrenzen und Haptik-Vokabular siehe
   PRODUCT_PRINCIPLES §10; verworfene Alternativen als Kommentar in `Color.kt`)
+- **Motion-Tokens** in `ui/theme/Motion.kt` (`AbcMotion`): Dauern, Easings, Federn aus einer
+  Palette; eine Feder am Aufrufort bricht `AbcMotionTest` (PRODUCT_PRINCIPLES §10).
+- **Schriften** gebündelt unter `res/font/`: Lernschrift *Silbo Fibel* (Andika-Ableitung),
+  UI-Schrift *Baloo 2*, Bildschrift *SilboEmoji* (Noto Color Emoji, auf den Pack gekürzt).
+  Neubau mit `tools/fonts/build_fonts.py` — Pflicht, sobald ein neues Emoji in den Content
+  kommt (`EmojiFontCoverageTest`). Keine Systemschrift, kein EmojiCompat.
+- **Geräusche** unter `assets/sfx/`, synthetisiert von `tools/sfx/generate_sfx.py`, gespielt
+  über `AbcSfx` (SoundPool). Eine Tat, ein Klang; keine Musik (PRODUCT_PRINCIPLES §7).
 - Content: versioniertes JSON unter `app/src/main/assets/content/`
 - Progress: DataStore
 - Content-Schema v2: ein polymorpher `TaskSpec` pro Trainer (`trainer`-Diskriminator), Lektionen in `lessons.json`

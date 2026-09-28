@@ -212,6 +212,18 @@ und ausgelassene Typen sind erlaubt, ein Rücksprung nicht. Abgelehnt wird ein P
 eine autorierte Lektion einen abgeleiteten Trainer enthält, Kachelfolgen das Zielwort nicht
 buchstabieren, eine Summe nicht stimmt, Strichdaten fehlen oder Referenzen ins Leere zeigen.
 
+## Schriften und Geräusche
+
+Beides wird aus Werkzeugen im Repo erzeugt und als fertige Datei eingecheckt — die
+Quellen liegen nicht im Repo:
+
+- `tools/fonts/build_fonts.py` baut `res/font/silbo_fibel_*.ttf`, `baloo2.ttf` und
+  `silbo_emoji.ttf` (Quell-URLs und Aufruf im Skriptkopf, braucht `fonttools`). Neu
+  bauen, sobald ein neues Emoji in den Content kommt — `EmojiFontCoverageTest` meldet es.
+  Lizenztexte (SIL OFL) liegen unter `assets/licenses/`.
+- `tools/sfx/generate_sfx.py` erzeugt die elf Geräusche unter `assets/sfx/` (nur
+  Python-Standardbibliothek plus `ffmpeg` mit libopus).
+
 ## Offline-Smoke-Skript (manuell)
 
 1. `./gradlew :app:installDebug`, Gerät in den Flugmodus.
