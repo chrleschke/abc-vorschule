@@ -142,7 +142,7 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
   - **Nur der Finale-Satz darf Quatsch sein** (Abschnitt 12) — und dann muss er lustig
     sein. Alles andere, was das Kind hört, beschreibt eine Welt, die es wiedererkennt.
 
-Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Treffer füllen eine Batterie, Fehltipp mischt neu ohne Batterieverlust. Das Mischen ist **Absicht gegen Raten** (ohne es tippen Kinder alle Kugeln der Reihe nach an) und bleibt; seit September 2026 **hüpfen** die Kugeln dabei in kleinen, versetzten Bögen an ihre neuen Plätze statt zu teleportieren, und das Feld nimmt keine Tipps an, bis die letzte gelandet ist (~650 ms, `HuntShuffleHop`). Die Bewegung bremst Durchtippen zusätzlich, ohne zu strafen.
+Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Jeder Treffer fliegt als Perle in die Herzmuschel am Boden der Tiefsee (siehe §10, „Nachtwelten"), ein Fehltipp mischt neu, ohne dass eine Perle verloren geht. Das Mischen ist **Absicht gegen Raten** (ohne es tippen Kinder alle Kugeln der Reihe nach an) und bleibt; seit September 2026 **hüpfen** die Kugeln dabei in kleinen, versetzten Bögen an ihre neuen Plätze statt zu teleportieren, und das Feld nimmt keine Tipps an, bis die letzte gelandet ist (~650 ms, `HuntShuffleHop`). Die Bewegung bremst Durchtippen zusätzlich, ohne zu strafen.
 
 Ebenfalls abgeleitet und nicht autoriert: der **Wort-Detektiv** direkt nach dem letzten
 Wort-Bauer — „Finde den Buchstaben / den Laut / die Silbe im Wort". Eine Runde pro eingeführtem Wort,
@@ -330,8 +330,14 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
 
 ## 5. Session-Modell
 
-- **Pfad-Screen ist der Einstieg**: ein gepunkteter Trittspuren-Weg durch eine Taglandschaft
-  (Himmelsverlauf, Sonne und Wolken, grüne Hügel mit Parallaxe — helles Warmer-Tag-Theme). Ein Wegweiser-Schild pro
+- **Pfad-Screen ist der Einstieg**: ein gepunkteter Trittspuren-Weg durch eine **Abendlandschaft**
+  (Himmel von Nachtblau über Pflaume zu warmem Orange, tief stehende Sonne hinter den Hügeln,
+  Sterne, drei dunkle Hügelbänder mit Bäumen als Silhouetten und Parallaxe; bis September 2026
+  ein heller Tag). Hinter den Hügeln steigen **ständig Himmelslaternen** auf (`SkyLanterns`):
+  im Mittel alle 10 s eine, jede braucht 90–150 s bis über den oberen Rand und pendelt dabei
+  leicht; ferne sind kleiner, langsamer und blasser. Sie sind reine Stimmung, ohne Aufgabe, und
+  stehen bei „Bewegung reduzieren" still — der Himmel ist dann trotzdem voll. Erreichbare
+  Schilder leuchten warm, Stern und Punktestand stehen hell auf dem Himmel. Ein Wegweiser-Schild pro
   Lektion, Label = Graphem, darunter drei Emojis aus dem Bildwortschatz der Lektion.
   Der bereits zurückgelegte Teil des Weges ist wärmer gezeichnet als der Rest.
   Gesperrte Schilder zeigen ihre Emojis nur als Silhouette.
@@ -632,7 +638,7 @@ niemals mit einem stummen No-Op.
   Systemschriftgröße kennt die Geometrie nicht). Das Kind soll die Lösung im Blick
   behalten, nicht dem Wort nachsehen.
 - Keine doppelte Aufgabe+Vorschau desselben Tokens.
-- Ausnahme Buchstaben-/Silben-Jagd: Kacheln verstreuen sich über den gesamten Aufgabenbereich statt in einer geordneten Antwortliste; die Batterie bleibt im Antwortbereich unten.
+- Ausnahme Buchstaben-/Silben-Jagd: Kacheln verstreuen sich über den gesamten Aufgabenbereich statt in einer geordneten Antwortliste; die Herzmuschel liegt im Antwortbereich unten.
 - Ausnahme Wort-Detektiv: der Antwortbereich trägt **Quittungs-Striche statt Wahloptionen**.
   Sie sind bloße Grundstriche ohne Rahmen und ohne Tray — die einzige Symbolquelle ist das
   Wort im Aufgabenblock. Damit sind sie von den Schablonen des Wort-Bauers unterscheidbar.
@@ -735,7 +741,7 @@ niemals mit einem stummen No-Op.
   Fremdfarben.
 - Haptik-Vokabular `AbcHaptics` (tick/success/celebrate/nudge): tick = kleiner Sammel-Erfolg
   (Trace-Stern, Jagd-Treffer, Einrasten), success = Aufgabe richtig, celebrate = Lektions-/
-  Batterie-Feier, nudge = sanfte Korrektur. Haptik ergänzt Ton, ersetzt ihn nie.
+  Muschel-Feier, nudge = sanfte Korrektur. Haptik ergänzt Ton, ersetzt ihn nie.
   Der `SuccessBurst` am Trainer-Ende vibriert **nicht**: er folgt oft direkt auf den
   Trainer-eigenen Puls, und zwei Vibrationen hintereinander sind zu viel — dort trägt
   der Chime allein.
@@ -800,17 +806,41 @@ niemals mit einem stummen No-Op.
   Morph *ist* die Druckantwort. Werte und Begründung in `HuntTileMorph`, Filmstreifen zum
   Beurteilen in `SymbolHuntMorphShotTest`.
 
-- **Die Jagd-Batterie ist ein Gegenstand, keine Balkenreihe.** Gehäuse mit Pluspol,
-  Lichtkante und Glasglanz, darin eine dunkle Wanne mit drei bzw. fünf Ladebalken; leere
-  Plätze sind Vertiefungen in der Wanne, keine hellen Kästchen. Jeder gefüllte Balken hat
-  seinen **eigenen Grünton**, von links tief nach rechts hell (`ChargeLow` → `ChargeMid` →
-  `ChargeHigh`), plus Lichtsaum in die Wanne — Laden liest sich damit über Helligkeit und
-  nicht nur über Anzahl. **Voll ist grün, nicht gold**: alle Balken springen auf
-  `ChargeHigh`, ein Blitz erscheint in der Mitte und ein pulsierender Lichtsaum umgibt das
-  Gehäuse. Gold bleibt der Sternbelohnung vorbehalten (Farbrollen oben) — die Batterie
-  zeigt einen Ladezustand, keinen Preis, und Grün ist app-weit „richtig". Maße, Töne und
-  Blitzform in `HuntBatteryDesign`, Zustandsbild zum Beurteilen in
-  `SymbolHuntBatteryShotTest`.
+- **Nachtwelten (seit September 2026).** Jeder Trainer bekommt eine eigene, **dunkle** Welt,
+  immer dieselbe — das Kind erkennt die Aufgabe am Ort, bevor es die Ansage hört
+  (`TrainerWorld`). Bisher: Jagd → **Tiefsee**, Spurensucher → **Dschungel bei Nacht**, alle
+  übrigen bleiben auf dem Papiergrund, bis sie eine Welt bekommen. Regeln:
+  1. **Lerninhalt nur auf Licht.** Buchstaben, Silben, Wörter und Ziffern stehen in Tinte auf
+     einer hellen Fläche — Blase, Weg, Karte, Klotz (≥ 7:1). Der Hintergrund trägt nie
+     Lerninhalt; die Kontrastrechnungen der Lernschrift gelten deshalb unverändert.
+  2. **Ruhige Mitte durch Tiefe**, nicht durch Leere: Bilder sind asymmetrisch, die Mitte liegt
+     weit weg im Dunkel oder Nebel. Bilddateien kommen abgedunkelt und mit beruhigter Mitte
+     eingebacken als WebP (Dschungel: 57 KB statt 1,9 MB PNG).
+  3. **Kopfzeile in Creme** (`ChromeColors`/`NightChrome` über `LocalChromeColors`): Pfeil und
+     Zahl Creme, Fortschritt `SkyBlueLight`, Chevrons Creme 60 %, der Lautsprecher wird ein
+     heller Knopf mit Leuchtring — auf Papier bleibt alles wie bisher (`PaperChrome`).
+  4. **Die Welt atmet, der Inhalt steht.** Umgebungsbewegung ist erlaubt, wenn sie sehr langsam
+     ist (Zyklen ab ~8 s), kontrastarm und nie auf den Licht-Inseln; bei „Bewegung reduzieren"
+     (`ANIMATOR_DURATION_SCALE` 0) steht alles still.
+  - **Tiefsee** (Jagd): ohne Bilddatei gezeichnet (`DeepSeaLight`, `WorldBackground`) — Verlauf,
+    sieben Lichtstrahlen, deren Winkel, Breite, Länge, Helligkeit und **Lichtkern** (die hellste
+    Stelle im Querschnitt) an eigenen Sinuswellen mit 19–47 s Periode hängen, wie Licht unter
+    einer leicht bewegten Wasseroberfläche; Blasen steigen 0,4–1 % der Höhe pro Sekunde. Die
+    Jagd-Kugeln sind **helle Luftblasen** mit farbigem Ring (`TilePalette`, helle Stufen, auf dem
+    Meer ≥ 3,9:1) und Leuchten.
+  - **Herzmuschel statt Batterie** (`CockleShell`, `PearlFlight`): von oben gesehen, gerippt.
+    Jeder Treffer fliegt **im selben Frame** als Perle in der Farbe seines Blasenrings in die
+    Muschel, die dafür aufklappt (Deckel nach hinten über das Scharnier, innen Perlmutt mit
+    einer Mulde je gesuchtem Symbol), und federt danach zu. Die Ringfarben haben damit eine
+    Aufgabe: „das ist deine Perle". Nach 6 s ohne Tipp lugt die Muschel halb auf, danach alle
+    10 s — damit das Kind sieht, wie viele Perlen es hat. Voll: sie bleibt offen und leuchtet,
+    dann geht es automatisch weiter. Nach „Zeig mir" zeigt sie nur die selbst gefangenen Perlen.
+    Muschel und Perlmutt tragen Sand- und Rosatöne — weder Gold (Stern) noch Grün (richtig).
+  - **Dschungel** (Spurensucher): `world_jungle.webp` aus dem Capybara-Experiment des Nutzers.
+    Der Weg ist hell (`RoadLight`, fertig `RoadDone`) mit dunklem Schattensaum gegen das Bild; das
+    Fahrzeug ist ein **Leuchtkäfer** (Glühwürmchen sind Käfer und leben im Regenwald), der zum
+    nächsten Stern schaut. Die **Sterne bleiben** — „Punkte" wären schwerer zu erklären. Die
+    Belohnung („M wie Mond") steht auf einer hellen Karte.
 - **Name: „Silbo", Store-Titel „Silbo – ABC Vorschule".** Ein Kunstname aus der Silbe, weil
   die Silbe die Mechanik ist, die das Kind in den Lektionen erlebt (Verschmelzer, Jagd,
   Wort-Bauer) — Pfad und Hügel sind nur Start-Screen-Motive und taugen deshalb nicht als

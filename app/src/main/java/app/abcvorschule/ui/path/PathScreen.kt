@@ -8,22 +8,23 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,12 +42,14 @@ import app.abcvorschule.progress.LessonGating
 import app.abcvorschule.progress.LessonState
 import app.abcvorschule.ui.shell.AbcTopBar
 import app.abcvorschule.ui.shell.ParentGateButton
-import app.abcvorschule.ui.shell.TopBarFloatingActionTop
 import app.abcvorschule.ui.shell.TopBarExtraTop
+import app.abcvorschule.ui.shell.TopBarFloatingActionTop
 import app.abcvorschule.ui.shell.TopBarHeight
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.StarGold
-import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.world.LocalChromeColors
+import app.abcvorschule.ui.world.NightChrome
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 
@@ -212,7 +215,9 @@ fun PathScreen(
                                 color = if (dot.nodeProgress <= head) {
                                     StarGold.copy(alpha = 0.8f)
                                 } else {
-                                    WarmInk.copy(alpha = 0.18f)
+                                    // Noch nicht gegangen: helle Punkte auf dem
+                                    // Abendhimmel, leise, aber sichtbar.
+                                    Cream.copy(alpha = 0.32f)
                                 },
                                 radius = dot.radius,
                                 center = Offset(dot.x, dot.y),
@@ -244,15 +249,15 @@ fun PathScreen(
 
         // Über dem Scroll-Inhalt, nicht darüber gestapelt: die Leiste ist
         // durchsichtig, die Schilder wandern unter ihr hindurch.
-        AbcTopBar(
-            // Der Stern bekommt hier als einziger Ort der App eine WarmInk-Kontur:
-            // er steht über dem Himmel, nicht über Cream, und StarGoldDeep fällt
-            // dort auf 2.07:1 — WarmInk gibt ihm 6.97:1, die Tinte, in der auch die
-            // Zahl daneben steht.
-            points = points,
-            starOutline = WarmInk,
-            modifier = Modifier.align(Alignment.TopStart),
-        )
+        // Der Abendhimmel ist dunkel: Stern und Zahl stehen hell auf ihm, wie in
+        // den Nachtwelten der Trainer (NightChrome). Gold braucht dort keine Kontur.
+        CompositionLocalProvider(LocalChromeColors provides NightChrome) {
+            AbcTopBar(
+                points = points,
+                starOutline = StarGold,
+                modifier = Modifier.align(Alignment.TopStart),
+            )
+        }
 
         // Schwebt über der Kopfzeile statt in ihr: die drei Punkte sind kein
         // Bar-Element, sondern die Elterntür. Sie sitzen auf der Mittelachse der

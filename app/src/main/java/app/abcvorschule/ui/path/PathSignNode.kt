@@ -24,6 +24,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
@@ -283,6 +285,23 @@ fun PathSignNode(
             modifier = Modifier
                 .width(PathSignDimens.BoardWidth)
                 .height(PathSignDimens.BoardHeight)
+                // Am Abendhimmel: erreichbare Schilder leuchten warm, als hinge eine
+                // Laterne daneben — sonst verschwände das dunkle Brett im Dunkel.
+                .drawBehind {
+                    if (!dimmed) {
+                        val r = size.maxDimension * 0.8f
+                        drawCircle(
+                            brush = Brush.radialGradient(
+                                0.35f to SignGlow.copy(alpha = if (highlighted) 0.55f else 0.38f),
+                                1f to Color.Transparent,
+                                center = center,
+                                radius = r,
+                            ),
+                            radius = r,
+                            center = center,
+                        )
+                    }
+                }
                 .background(board, BoardShape)
                 // A steady ring is a plain border here; the pulsing one is drawn by
                 // the overlay below instead, so a pulse frame cannot recompose the
@@ -420,3 +439,6 @@ fun PathSignNode(
 private fun Nail(shade: Color, modifier: Modifier = Modifier) {
     Box(modifier.size(6.dp).background(shade, CircleShape))
 }
+
+/** Warmes Laternenlicht hinter erreichbaren Schildern. */
+private val SignGlow = Color(0xFFFFC878)

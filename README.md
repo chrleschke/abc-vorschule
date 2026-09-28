@@ -232,7 +232,7 @@ Quellen liegen nicht im Repo:
 3. Gesperrten Knoten antippen → gesprochener Hinweis, kein stummes No-Op.
 4. Lektion 1 öffnen und die Trainer der Reihenfolge nach durchspielen:
    Visueller Spurensucher (Buchstaben nachspuren, zweimal) ·
-   optional Buchstaben-Jagd (Batterie voll → Feier, automatisch weiter, kein Weiter-Button) ·
+   optional Buchstaben-Jagd in der Tiefsee (jeder Treffer fliegt als Perle in die Herzmuschel; voll → Feier, automatisch weiter, kein Weiter-Button) ·
    Silben-Verschmelzer · optional Silben-Jagd ·
    Wort-Bauer (Mama bauen) · Wort-Detektiv (Buchstabe im Wort antippen) ·
    Satz-Architekt (Wortschild aufhängen) · Satz-Versteher (Satz hören, Bildkarte tippen) ·

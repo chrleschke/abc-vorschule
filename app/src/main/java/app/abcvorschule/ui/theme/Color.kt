@@ -126,41 +126,37 @@ val SunCoral = Color(0xFFD25B2D)
 val ClayRed = Color(0xFFB0402C)
 
 /**
- * Die Taglandschaft des Pfad-Screens. Keine UI-Rollen, sondern Landschafts-
- * flächen — deshalb ein eigener Block und keine Aufnahme ins ColorScheme.
+ * Die Abendlandschaft des Pfad-Screens (PRODUCT_PRINCIPLES §5/§10, „Nachtwelten"). Keine
+ * UI-Rollen, sondern Landschaftsflächen — deshalb ein eigener Block und keine Aufnahme
+ * ins ColorScheme.
  *
- * Tiefe kommt hier aus Tonwerten statt aus Transparenz: die drei Hügelbänder
- * werden mit Alpha 1f gezeichnet und trennen sich über ihre relative Luminanz
- * (HillFar 0.566, HillMid 0.445, HillNear 0.322 — Nachbarkontraste 1.24:1 und
- * 1.33:1, eine sichtbare Stufe ohne harte Kante). Über dem dunklen Nachthimmel
- * war Alpha nötig, um Bänder auseinanderzuhalten; auf hellem Grund würde es sie
- * nur ausbleichen.
+ * Bis September 2026 war der Pfad ein heller Tag. Mit den Nachtwelten der Trainer
+ * dämmert es auch hier: der Himmel läuft von Nachtblau über Pflaume in ein warmes
+ * Orange am Horizont, dort, wo die Hügel beginnen und die Laternen aufsteigen.
  *
- * Die Landschaft trägt weder Text noch UI-Komponente, ist also dekorativ im
- * Sinne von WCAG 1.4.11. Der eine Kontrast, der die Silhouette trägt, ist die
- * Baumkrone gegen den Himmel, in den sie ragt: TreeCrown auf DayHorizon =
- * 3.49:1. Der Stammstumpf auf HillNear liegt bei 2.69:1 — als reine Deko
- * ausreichend und deutlich über der 1.23:1-Silhouette der Nachtfassung.
+ * Tiefe kommt weiter aus Tonwerten statt aus Transparenz: die drei Hügelbänder werden
+ * mit Alpha 1f gezeichnet und werden nach vorn dunkler (relative Luminanz 0.046 → 0.028
+ * → 0.016, Nachbarstufen 1.25:1 und 1.3:1). Die Landschaft trägt weder Text noch
+ * UI-Komponente — Schilder, Trittspuren und Kopfzeile tragen ihre Kontraste selbst.
+ * Das Launcher-Icon zeigt weiter den Tag; es ist ein eigenes Motiv mit eigenen Hexwerten
+ * (`ic_launcher_background.xml`).
  */
-val DaySkyTop = Color(0xFF9CCAEE)
-val DaySkyMid = Color(0xFFBFDDF2)
+val DuskSkyTop = Color(0xFF1C1A42)
+val DuskSkyUpper = Color(0xFF342A60)
+val DuskSkyGlow = Color(0xFF7A4670)
+val DuskHorizon = Color(0xFFD98A5C)
+val DuskHorizonLight = Color(0xFFF0B073)
 
-/** Warmes Licht am Horizont — dort, wo die Hügel den Himmel treffen. */
-val DayHorizon = Color(0xFFF7E7C3)
+val HillFar = Color(0xFF2B3F4F)
+val HillMid = Color(0xFF1D3035)
+val HillNear = Color(0xFF132327)
 
-val HillFar = Color(0xFFB5CF9F)
-val HillMid = Color(0xFF93BE7E)
-val HillNear = Color(0xFF6FA85E)
+/** Bäume als dunkle Silhouetten, je eine Stufe dunkler als ihr Hügel. */
+val TreeCrown = Color(0xFF0E1B1F)
+val TreeTrunk = Color(0xFF0B1518)
 
-val TreeCrown = Color(0xFF4E8747)
-
-/** Bewusst der WoodWarm-Ton: Stamm und warmes Schildbrett sind dasselbe Holz. */
-val TreeTrunk = Color(0xFF6B4E34)
-
-/** Wolken — fast-weißes Creme und bewusst die hellste Fläche der App. */
-val CloudWhite = Color(0xFFFDF9EF)
-
-val SunGlow = Color(0xFFF7CE73)
+/** Die tief stehende Abendsonne hinter den Hügeln. */
+val DuskSun = Color(0xFFF7A864)
 
 /**
  * Last hold-over from the retired night palette — kept solely because it still

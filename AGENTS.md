@@ -62,7 +62,7 @@ Plan nur anfassen, wenn der Contract selbst falsch oder unvollständig ist.
 Kernpunkte (Kurzfassung):
 
 - **Sechs autorierte Trainer-Typen** pro Lektion in fester Rangfolge (Visueller Spurensucher → … → Satz-Versteher → Rechnen). Reihenfolge fällt nicht zurück; `ContentValidator` erzwingt Struktur. Zur Laufzeit können sich abgeleitete Zusatz-Trainer (Jagd, Wort-Detektiv, Laut-Fresser, siehe unten) dazwischenschieben — sie sind keine siebten/achten autorierten Typen.
-- **Buchstaben-/Silben-Jagd**: Optional bis zu 2× pro Lektion, keine separaten Autorierungen — wird zur Laufzeit aus letter_trace/syllable_merge abgeleitet (`SymbolHuntInsertion`). Batterie voll → kurze Feier, dann automatisch weiter — kein „Weiter"-Button, das Kind kann ihn nicht lesen. Kacheln sind weiche Kugeln: Drücken bläht sie verzögert bis +10 % auf, Loslassen kollabiert und ploppt, ein Treffer ploppt aus dem Feld (`HuntTileMorph`, PRODUCT_PRINCIPLES §10).
+- **Buchstaben-/Silben-Jagd**: Optional bis zu 2× pro Lektion, keine separaten Autorierungen — wird zur Laufzeit aus letter_trace/syllable_merge abgeleitet (`SymbolHuntInsertion`). Herzmuschel voll → kurze Feier, dann automatisch weiter (jeder Treffer fliegt als Perle hinein, Tiefsee-Welt) — kein „Weiter"-Button, das Kind kann ihn nicht lesen. Kacheln sind weiche Kugeln: Drücken bläht sie verzögert bis +10 % auf, Loslassen kollabiert und ploppt, ein Treffer ploppt aus dem Feld (`HuntTileMorph`, PRODUCT_PRINCIPLES §10).
 - **Wort-Detektiv**: „Finde den Buchstaben / den Laut / die Silbe im Wort", ebenfalls abgeleitet (`SymbolInWordInsertion`), eine Runde pro eingeführtem `word_build`-Wort, direkt nach dem letzten Wort-Bauer. Mehrzeichen-Grapheme (`Sch`, `ei`, …) heißen „Laut", nicht „Buchstabe". Grapheme kommen aus `WordGraphemes` — pack-abgeleitet und auf bereits eingeführte Lektionen beschränkt, sonst würde „Nest" in L07 zu `N·e·st` verschmelzen und das gesuchte `S` unantippbar machen.
 - **Laut-Fresser**: „Füttere die Laut-Fresser" — dritter abgeleiteter Trainer (`SoundFeederInsertion`), direkt nach der Buchstaben-Jagd, ab L03. Zwei Monster mit je einem Laut, Bildkarten per Drag zum richtigen; Paar-Tabelle in `SoundPairs` (Kontrast/Aufwärmen/Vokal), Zuordnung und Karten in `SoundFeederDerivation` (deterministisch, Snapshot-Test). Fragt „welcher Laut", nie „wo". Monster-Stimme = Tonhöhe (`VoiceStyle`), Reaktionen im TTS-Profil `monster`; Laute sind das Lemma in der Index-Variante `monster` (Mikrofon-Aufnahmen, kein `soundTts`).
 - **Distraktoren**: Im autorieren Content (Tray ≤ 5–6), oder verstreut im Hunt-Feld (bis 6, mit Wiederholungen).
@@ -87,6 +87,9 @@ Kernpunkte (Kurzfassung):
   UI-Schrift *Baloo 2*, Bildschrift *SilboEmoji* (Noto Color Emoji, auf den Pack gekürzt).
   Neubau mit `tools/fonts/build_fonts.py` — Pflicht, sobald ein neues Emoji in den Content
   kommt (`EmojiFontCoverageTest`). Keine Systemschrift, kein EmojiCompat.
+- **Nachtwelten** unter `ui/world/`: `TrainerWorld` ordnet jedem Trainer seine Welt zu (Jagd → Tiefsee,
+  nativ gezeichnet; Spurensucher → Dschungel, `res/drawable-nodpi/world_jungle.webp`), `ChromeColors`
+  schaltet die Kopfzeile auf hell. Lerninhalt steht immer auf einer hellen Fläche (PRODUCT_PRINCIPLES §10).
 - **Geräusche** unter `assets/sfx/`, synthetisiert von `tools/sfx/generate_sfx.py`, gespielt
   über `AbcSfx` (SoundPool). Eine Tat, ein Klang; keine Musik (PRODUCT_PRINCIPLES §7).
 - Content: versioniertes JSON unter `app/src/main/assets/content/`
