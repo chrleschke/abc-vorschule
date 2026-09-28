@@ -115,6 +115,25 @@ object SentencePegSizing {
     }
 
     /**
+     * Wie weit die Reihe auf der Wäscheleine höchstens über die Bühne hinausragen darf,
+     * je Seite: die Leine spannt sich über den ganzen Bildschirm, und ein langer Satz
+     * darf über die Pfosten hinaus hängen (Nutzerentscheidung). 24dp = die 20dp der
+     * `TaskShell` plus 12dp der `ExerciseStage`, minus 8dp Luft zum Bildschirmrand.
+     */
+    const val LineOverhangDp = 24f
+
+    /**
+     * Die Reihe auf der Wäscheleine: kurze Sätze bleiben auf der Bühne ([solve]). Nur
+     * wenn der Glyph dort unter [ComfortGlyphDp] fiele, darf die Reihe [LineOverhangDp]
+     * je Seite breiter werden — „der Schneemann ist groß" kommt auf einem 360dp-Gerät
+     * damit auf rund 18dp statt 15dp.
+     */
+    fun solveOnLine(availableDp: Float, words: List<String>): Row {
+        val onStage = solve(availableDp, words)
+        return if (onStage.glyphDp >= ComfortGlyphDp) onStage else solve(availableDp + 2 * LineOverhangDp, words)
+    }
+
+    /**
      * Größe des fertigen Satzes, wenn er nach dem letzten Peg als eine Zeile Text
      * erscheint. Derselbe Deckel wie die Pegs, nur gegen den ganzen Satz gelöst
      * (Wörter plus Leerzeichen), damit auch dieser Text nicht über den Rand läuft —

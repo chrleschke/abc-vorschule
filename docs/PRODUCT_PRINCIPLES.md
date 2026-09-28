@@ -823,10 +823,10 @@ niemals mit einem stummen No-Op.
 
 - **Nachtwelten (seit September 2026).** Jeder Trainer bekommt eine eigene, **dunkle** Welt,
   immer dieselbe — das Kind erkennt die Aufgabe am Ort, bevor es die Ansage hört
-  (`TrainerWorld`). Bisher: Jagd → **Tiefsee**, Spurensucher → **Dschungel bei Nacht**,
-  Rechnen → **Nacht am Waldrand**, Wort-Detektiv → **Dachboden**, Wort-Bauer → **Werkstatt**;
-  Silben-Verschmelzer, Satz-Architekt, Satz-Versteher und Laut-Fresser bleiben auf dem
-  Papiergrund, bis sie eine Welt bekommen. Regeln:
+  (`TrainerWorld`): Jagd → **Tiefsee**, Spurensucher → **Dschungel bei Nacht**,
+  Rechnen → **Nacht am Waldrand**, Wort-Detektiv → **Dachboden**, Wort-Bauer → **Werkstatt**,
+  Satz-Architekt → **Garten**, Satz-Versteher → **Puppentheater**, Laut-Fresser → **Pilzhöhle**,
+  Silben-Verschmelzer → **Waldlichtung**. Regeln:
   1. **Lerninhalt nur auf Licht.** Buchstaben, Silben, Wörter und Ziffern stehen in Tinte auf
      einer hellen Fläche — Blase, Weg, Karte, Klotz (≥ 7:1). Der Hintergrund trägt nie
      Lerninhalt; die Kontrastrechnungen der Lernschrift gelten deshalb unverändert.
@@ -838,7 +838,8 @@ niemals mit einem stummen No-Op.
      heller Knopf mit Leuchtring — auf Papier bleibt alles wie bisher (`PaperChrome`).
   4. **Die Welt atmet, der Inhalt steht.** Umgebungsbewegung ist erlaubt, wenn sie sehr langsam
      ist (Zyklen ab ~8 s), kontrastarm und nie auf den Licht-Inseln; bei „Bewegung reduzieren"
-     (`ANIMATOR_DURATION_SCALE` 0) steht alles still.
+     (`ANIMATOR_DURATION_SCALE` 0) steht alles still. Die Weltuhr (`rememberWorldSeconds`)
+     läuft über `withInfiniteAnimationFrameMillis`, damit Compose-Tests nicht auf Ruhe warten.
   - **Tiefsee** (Jagd): ohne Bilddatei gezeichnet (`DeepSeaLight`, `WorldBackground`) — Verlauf,
     sieben Lichtstrahlen, deren Winkel, Breite, Länge, Helligkeit und **Lichtkern** (die hellste
     Stelle im Querschnitt) an eigenen Sinuswellen mit 19–47 s Periode hängen, wie Licht unter
@@ -868,6 +869,34 @@ niemals mit einem stummen No-Op.
   - **Werkstatt** (Wort-Bauer, gezeichnet): dunkles Holz mit Maserung, warmer Lampenkegel, der
     ganz langsam atmet (9 s). Das Bild steht auf einem Teller, die Bausteine sind Ahorn-Klötze
     mit Schatten, das fertige Wort liegt auf einer Karte.
+  - **Garten in der blauen Stunde** (Satz-Architekt, gezeichnet): Sterne, ein warmer
+    Horizontstreifen, Hügel mit runden Baumgruppen. Oben steht das Bild auf einem Teller,
+    darunter spannt sich eine **Wäscheleine** über die ganze Breite zwischen zwei Pfosten
+    (`ClothesLine`); jeder Peg hängt mit einer Holzklammer an seinem Punkt der durchhängenden
+    Leine, leere Plätze sind gestrichelte, fast durchsichtige Umrisse. Eine frisch aufgehängte
+    Karte schwingt kurz nach, höchstens 4° — bei langen Sätzen liegen die Pegs nur 4 dp
+    auseinander. Lange Sätze dürfen über die Pfosten hinaus bis 8 dp vor den Bildschirmrand
+    hängen (`SentencePegSizing.solveOnLine`): nur wenn der Glyph auf der Bühne unter 20 dp
+    fiele, sonst bleibt die Reihe auf der Bühne. „der Schneemann ist groß" kommt so auf einem
+    360-dp-Gerät auf rund 18 statt 15 dp.
+  - **Puppentheater** (Satz-Versteher, gezeichnet): dunkler Bühnenraum, roter Samtvorhang
+    links und rechts, der ganz leicht atmet (7 s), ein schmaler Lambrequin unter dem
+    Lautsprecher, darüber eine Lichterkette, deren Birnen langsam glimmen (6 s). Die zwei
+    Bildkarten sind **gerahmte Bilder** (helle Fläche, Holzrahmen, richtig = `LeafGreen`) und
+    stehen auf Bühnenbrettern, die der Trainer unter die Kartenreihe zeichnet.
+  - **Pilzhöhle** (Laut-Fresser): `world_cave.webp` (30 KB), vom Nutzer generiert, abgedunkelt
+    und mit beruhigter Mitte eingebacken. Die zwei Fresser sind **neu gezeichnet**
+    (`FeederCreature`, `FeederShape`): **Pilli** (links, blau) rund mit zwei Öhrchen, **Kora**
+    (rechts, koralle) tropfenförmig mit Blattspross — zwei Silhouetten, die ein Kind auch ohne
+    Farbe unterscheidet. Volumen durch Licht oben links und Lichtkante, Augen mit zwei
+    Glanzpunkten, die zur Karte hinaufschauen und zeitversetzt blinzeln (5,5 / 6,7 s), Wangen,
+    ein Maul mit Zunge, Füße und Ärmchen; die Figuren atmen leicht (3,6 s). Der Bauchfleck ist
+    schmaler als beim alten Geisterkörper (62 % der Breite, Glyph-Boden 10 sp).
+  - **Waldlichtung** (Silben-Verschmelzer, gezeichnet): Glühwürmchen treiben auf Bahnen von
+    20–40 s und glimmen langsam, unten Gras als Silhouette. Die Silben sind die **zwei hellsten
+    Lichter**: heller Kern, weicher Hof, der mit dem Zieh-Fortschritt heller wird (trägt die
+    Verstärkung, die das TTS nicht kann); die Spur dazwischen sind wandernde Funken. Das
+    verschmolzene Licht bekommt den grünen Rand „richtig".
   - **Dschungel** (Spurensucher): `world_jungle.webp` aus dem Capybara-Experiment des Nutzers.
     Der Weg ist hell (`RoadLight`, fertig `RoadDone`) mit dunklem Schattensaum gegen das Bild; das
     Fahrzeug ist ein **Leuchtkäfer** (Glühwürmchen sind Käfer und leben im Regenwald), der zum

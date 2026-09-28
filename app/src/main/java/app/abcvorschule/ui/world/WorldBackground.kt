@@ -1,6 +1,8 @@
 package app.abcvorschule.ui.world
 
 import android.provider.Settings
+import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.withInfiniteAnimationFrameMillis
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -34,10 +35,14 @@ fun WorldBackground(world: TrainerWorld, modifier: Modifier = Modifier) {
     when (world) {
         TrainerWorld.Paper -> Unit
         TrainerWorld.DeepSea -> DeepSeaBackground(modifier)
-        TrainerWorld.Jungle -> JungleBackground(modifier)
+        TrainerWorld.Jungle -> PaintedBackground(R.drawable.world_jungle, JungleFallback, modifier)
         TrainerWorld.ForestNight -> ForestNightBackground(modifier)
         TrainerWorld.Attic -> AtticBackground(modifier)
         TrainerWorld.Workshop -> WorkshopBackground(modifier)
+        TrainerWorld.Garden -> GardenBackground(modifier)
+        TrainerWorld.Theater -> TheaterBackground(modifier)
+        TrainerWorld.Cave -> PaintedBackground(R.drawable.world_cave, CaveFallback, modifier)
+        TrainerWorld.Clearing -> ClearingBackground(modifier)
     }
 }
 
@@ -63,7 +68,9 @@ fun rememberWorldSeconds(still: Boolean): androidx.compose.runtime.State<Float> 
         if (still) return@produceState
         var start = -1L
         while (true) {
-            withFrameMillis { now ->
+            // Die Endlos-Variante: sie meldet Compose eine Daueranimation, damit Tests
+            // (InfiniteAnimationPolicy) nicht ewig auf Ruhe warten.
+            withInfiniteAnimationFrameMillis { now ->
                 if (start < 0) start = now
                 value = (now - start) / 1000f
             }
@@ -159,12 +166,15 @@ private fun DeepSeaBackground(modifier: Modifier) {
     }
 }
 
-/** Dschungel bei Nacht: dein Bild, abgedunkelt und mit beruhigter Mitte eingebacken (WebP, 57 KB). */
+/**
+ * Eine gemalte Welt: Dschungel (WebP, 57 KB) oder Pilzhöhle (WebP, 30 KB), beide
+ * abgedunkelt und mit beruhigter Mitte eingebacken.
+ */
 @Composable
-private fun JungleBackground(modifier: Modifier) {
-    Box(modifier = modifier.background(JungleFallback)) {
+private fun PaintedBackground(@DrawableRes image: Int, fallback: Color, modifier: Modifier) {
+    Box(modifier = modifier.background(fallback)) {
         Image(
-            painter = painterResource(R.drawable.world_jungle),
+            painter = painterResource(image),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
@@ -186,4 +196,5 @@ private val SeaFloor = Color(0xFF041A26)
 private val RayLight = Color(0xFFBEEBF5)
 private val BubbleRim = Color(0x47C8EBF5)
 private val JungleFallback = Color(0xFF0A1410)
+private val CaveFallback = Color(0xFF071A1D)
 private val HeadShade = Color(0x8C060812)

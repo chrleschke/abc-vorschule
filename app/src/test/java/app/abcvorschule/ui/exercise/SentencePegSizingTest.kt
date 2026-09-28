@@ -175,4 +175,51 @@ class SentencePegSizingTest {
             }
         }
     }
+
+    // --- Wäscheleine: lange Sätze dürfen über die Bühne hinaus ---------------
+
+    @Test
+    fun shortSentencesStayOnTheStage() {
+        val words = listOf("Oma", "ist", "da")
+        assertEquals(SentencePegSizing.solve(narrowPhone, words), SentencePegSizing.solveOnLine(narrowPhone, words))
+    }
+
+    @Test
+    fun longSentencesUseTheOverhangAndGainGlyphSize() {
+        val words = listOf("der", "Schneemann", "ist", "groß")
+        val onStage = SentencePegSizing.solve(narrowPhone, words)
+        val onLine = SentencePegSizing.solveOnLine(narrowPhone, words)
+        assertTrue("${onLine.glyphDp} > ${onStage.glyphDp}", onLine.glyphDp > onStage.glyphDp)
+        assertTrue(onLine.widthDp <= narrowPhone + 2 * SentencePegSizing.LineOverhangDp + 0.01f)
+    }
+
+    @Test
+    fun everyAuthoredSentenceStaysInsideTheOverhang() {
+        authoredSentences().forEach { (id, words) ->
+            widths().forEach { available ->
+                val row = SentencePegSizing.solveOnLine(available, words)
+                assertTrue(
+                    "$id braucht ${row.widthDp}dp von ${available}dp + Überhang",
+                    row.widthDp <= available + 2 * SentencePegSizing.LineOverhangDp + 0.01f,
+                )
+            }
+        }
+    }
+
+    @Test
+    fun theLineSagsMostInTheMiddleAndNotAtThePoles() {
+        val screen = 400f
+        val inset = 10f
+        val sag = 14f
+        assertEquals(0f, ClothesLineGeometry.sagAt(inset, screen, inset, sag), 0.001f)
+        assertEquals(0f, ClothesLineGeometry.sagAt(screen - inset, screen, inset, sag), 0.001f)
+        assertEquals(sag, ClothesLineGeometry.sagAt(screen / 2f, screen, inset, sag), 0.001f)
+        assertEquals(
+            ClothesLineGeometry.sagAt(120f, screen, inset, sag),
+            ClothesLineGeometry.sagAt(screen - 120f, screen, inset, sag),
+            0.001f,
+        )
+        // Über die Pfosten hinaus hängt nichts tiefer als am Pfosten.
+        assertEquals(0f, ClothesLineGeometry.sagAt(0f, screen, inset, sag), 0.001f)
+    }
 }

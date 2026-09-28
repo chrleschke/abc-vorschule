@@ -404,6 +404,7 @@ fun SoundFeederTrainer(
                             FeederCreature(
                                 label = label,
                                 color = if (side == FeederSide.left) LeftCreatureColor else RightCreatureColor,
+                                shape = if (side == FeederSide.left) FeederShape.Pilli else FeederShape.Kora,
                                 animator = animatorFor(side),
                                 hint = state.hintActive && state.current?.side == side,
                                 widthDp = creatureWidth,

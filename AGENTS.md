@@ -87,9 +87,12 @@ Kernpunkte (Kurzfassung):
   UI-Schrift *Baloo 2*, Bildschrift *SilboEmoji* (Noto Color Emoji, auf den Pack gekürzt).
   Neubau mit `tools/fonts/build_fonts.py` — Pflicht, sobald ein neues Emoji in den Content
   kommt (`EmojiFontCoverageTest`). Keine Systemschrift, kein EmojiCompat.
-- **Nachtwelten** unter `ui/world/`: `TrainerWorld` ordnet jedem Trainer seine Welt zu (Jagd → Tiefsee,
-  nativ gezeichnet; Spurensucher → Dschungel, `res/drawable-nodpi/world_jungle.webp`), `ChromeColors`
+- **Nachtwelten** unter `ui/world/`: `TrainerWorld` ordnet jedem Trainer seine Welt zu. Gemalt sind nur
+  Dschungel (Spurensucher, `world_jungle.webp`) und Pilzhöhle (Laut-Fresser, `world_cave.webp`), alle
+  anderen sind gezeichnet (`WorldBackground`, `WorldScenes`, `WorldScenesLanguage`). `ChromeColors`
   schaltet die Kopfzeile auf hell. Lerninhalt steht immer auf einer hellen Fläche (PRODUCT_PRINCIPLES §10).
+  Standbilder in der Welt: `NightWorldShotTest`; auf dem eigenen Gerät per `adb shell am instrument`
+  starten statt `connectedAndroidTest`, weil Gradle danach die App samt Spielstand deinstalliert.
 - **Geräusche** unter `assets/sfx/`, synthetisiert von `tools/sfx/generate_sfx.py`, gespielt
   über `AbcSfx` (SoundPool). Eine Tat, ein Klang; keine Musik (PRODUCT_PRINCIPLES §7).
 - Content: versioniertes JSON unter `app/src/main/assets/content/`
