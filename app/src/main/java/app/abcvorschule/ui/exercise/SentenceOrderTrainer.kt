@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
@@ -49,6 +50,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.SentenceOrderRound
@@ -73,6 +75,7 @@ import app.abcvorschule.ui.theme.WarmMuted
 import app.abcvorschule.ui.world.lightIsland
 import app.abcvorschule.ui.world.lightPlate
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 object SentenceOrderTray {
     /** A sentence can need more cards than a word, but the tray stays scannable. */
@@ -427,7 +430,7 @@ private fun Peg(
     registerWith: app.abcvorschule.ui.exercise.drag.DragFieldState,
     pegWidthDp: Float,
     glyphSp: Float,
-    /** Durchhang der Leine an diesem Peg, in px — nur in der Zeichenphase gelesen. */
+    /** Durchhang der Leine an diesem Peg, in px — nur beim Platzieren gelesen, nie in der Komposition. */
     hang: () -> Float,
 ) {
     // Bewusst nicht `by`: der Wert wird ausschließlich in graphicsLayer und
@@ -464,6 +467,11 @@ private fun Peg(
     val borderColor = if (filled != null) PegBorderGreen else Cream.copy(alpha = 0.6f)
     val dashed = filled == null
 
+    // Der Durchhang ist ein Versatz beim Platzieren, außen um die DropZone: sie meldet
+    // ihre Bounds und nimmt Tipps am äußeren Knoten an, vor dem übergebenen Modifier.
+    // Als translationY im graphicsLayer hing die Karte bis zu 14dp tiefer,
+    // als sie Tipps und Karten annahm — der untere Rand eines mittleren Pegs war taub.
+    Box(Modifier.offset { IntOffset(0, hang().roundToInt()) }) {
     DropZone(
         state = registerWith,
         key = SentenceOrderTray.pegKey(index),
@@ -480,7 +488,6 @@ private fun Peg(
                 scaleX = SlotFillMorph.scaleX(settle.value)
                 scaleY = SlotFillMorph.scaleY(settle.value)
                 alpha = opacity
-                translationY = hang()
                 rotationZ = swing.value
                 // An der Klammer aufgehängt: der Drehpunkt sitzt oben in der Mitte.
                 transformOrigin = TransformOrigin(0.5f, 0f)
@@ -539,5 +546,6 @@ private fun Peg(
                 maxLines = 1,
             )
         }
+    }
     }
 }

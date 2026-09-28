@@ -32,8 +32,23 @@ class FinaleConstellationTest {
             val inSentence = finale.text.contains(letter, ignoreCase = true)
             val nounInitial = finale.pictureAtomIds.firstNotNullOfOrNull { pack.atoms[it] }
                 ?.display?.firstOrNull()?.uppercase() == letter
-            assertTrue("${lesson.id}: „$letter“ passt nicht zu „${finale.text}“", (practiced && inSentence) || nounInitial || practiced)
+            assertTrue("${lesson.id}: „$letter“ passt nicht zu „${finale.text}“", (practiced && inSentence) || nounInitial)
         }
+    }
+
+    /**
+     * Acht Finales gehören zwei Lektionen (f-l18: l18 mit C/Y/X/Qu, l26 mit Qu/X). Der
+     * End-Screen sucht die Lektion über ihre ID; über die Finale-ID gesucht hätte l26 das
+     * „C" aus „sich" bekommen, einen Buchstaben, den diese Lektion nie geübt hat.
+     */
+    @Test
+    fun sharedFinalesTakeTheLetterOfTheLessonJustPlayed() {
+        val l26 = pack.lessons.first { it.id == "l26" }
+        val finale = pack.finales.getValue(l26.finaleId!!)
+        assertEquals("X", FinaleConstellation.letterFor(l26, finale, pack)?.display)
+        val firstOwner = pack.lessons.first { it.finaleId == l26.finaleId }
+        assertEquals("l18", firstOwner.id)
+        assertEquals("C", FinaleConstellation.letterFor(firstOwner, finale, pack)?.display)
     }
 
     @Test

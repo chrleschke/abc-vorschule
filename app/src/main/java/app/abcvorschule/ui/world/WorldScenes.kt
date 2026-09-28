@@ -140,6 +140,9 @@ internal fun WorkshopBackground(modifier: Modifier, taps: WorldTaps?) {
     val still = rememberReduceMotion()
     val seconds by rememberWorldSeconds(still)
     Box(modifier.background(Brush.verticalGradient(0f to WoodTop, 0.6f to WoodMid, 1f to WoodLow))) {
+        // Maserung in einer eigenen Ebene: sie liest `seconds` nicht, wird also nur bei
+        // einer neuen Größe neu gezeichnet. In der Lampen-Ebene entstanden sonst jeden
+        // Frame rund 27 neue Paths mit je ~100 Punkten, für ein Bild, das stillsteht.
         Canvas(Modifier.fillMaxSize().graphicsLayer()) {
             // Maserung: feine, leicht wellige Linien in Längsrichtung.
             val step = 15.dp.toPx()
@@ -158,6 +161,8 @@ internal fun WorkshopBackground(modifier: Modifier, taps: WorldTaps?) {
                 x += step * (0.8f + (i % 4) * 0.2f)
                 i++
             }
+        }
+        Canvas(Modifier.fillMaxSize().graphicsLayer()) {
             val breath = 1f + 0.05f * sin(seconds / 9f * 2f * PI.toFloat())
             // Angetippt schwingt die Lampe: ihr Lichtkegel pendelt zur Seite des Tipps
             // hin und klingt aus.

@@ -9,6 +9,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -410,10 +411,15 @@ private fun SymbolHuntField(
 }
 
 /** Merker „diese Kachel war schon einmal unter dem Finger". Bewusst kein
- * `mutableStateOf`: er wird nur im Druck-Effekt gelesen und geschrieben, eine
- * Recomposition dafür wäre umsonst. Ohne ihn liefe der Loslassen-Zweig schon
+ * `mutableStateOf`: er wird nur in den Druck-Effekten und im Klick gelesen und
+ * geschrieben, eine Recomposition dafür wäre umsonst. Ohne ihn liefe der Loslassen-Zweig schon
  * beim ersten Komponieren mit und das ganze Feld wackelte beim Rundenstart. */
-private class HuntPressLatch { var touched = false }
+private class HuntPressLatch {
+    var touched = false
+
+    /** Ruhte die Aufgabe, als der Finger aufsetzte? Entscheidet beim Loslassen. */
+    var pressedResting = false
+}
 
 /**
  * Woher und wohin eine Kugel beim Neu-Mischen hüpft. Wie [HuntPressLatch] bewusst
@@ -493,6 +499,18 @@ private fun HuntTile(
     val interactionSource = remember { MutableInteractionSource() }
     val pressed by interactionSource.collectIsPressedAsState()
     val latch = remember { HuntPressLatch() }
+    // Ob eine Blase eingesammelt wird, entscheidet der Moment des Aufsetzens, nicht der
+    // des Loslassens: wer in der Ruhe drückt und erst nach der Freigabe loslässt, hat auf
+    // eine leere Blase gedrückt — das zählte sonst als echter Tipp (Fehltipp, neu mischen).
+    val restingNow by rememberUpdatedState(resting)
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect { interaction ->
+            when (interaction) {
+                is PressInteraction.Press -> latch.pressedResting = restingNow
+                is PressInteraction.Cancel -> latch.pressedResting = false
+            }
+        }
+    }
     var poppedAway by remember { mutableStateOf(false) }
     val density = LocalDensity.current
     val hopPx = with(density) { (TileSize * HuntShuffleHop.HopHeightFraction).toPx() }
@@ -692,7 +710,8 @@ private fun HuntTile(
                 // antwortet mit einem Wackeln — einsammeln lässt sie sich erst wach.
                 enabled = (enabled || resting) && present,
                 onClick = {
-                    if (resting) {
+                    if (resting || latch.pressedResting) {
+                        latch.pressedResting = false
                         restWobble++
                     } else {
                         onTap(centerInRoot.value)

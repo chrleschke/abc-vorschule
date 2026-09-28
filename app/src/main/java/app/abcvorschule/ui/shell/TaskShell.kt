@@ -177,7 +177,10 @@ fun TaskShell(
             state.screen == AppScreen.RewardSummary -> {
                 RewardSummaryScreen(
                     finale = state.completedFinaleId?.let { pack.finales[it] },
-                    lesson = state.completedFinaleId?.let { id -> pack.lessons.firstOrNull { it.finaleId == id } },
+                    // Über die Lektions-ID, nicht über die Finale-ID: acht Finales teilen sich
+                    // zwei Lektionen (f-l18 gehört l18 und l26), und die erste gefundene hätte
+                    // dem Sternbild fremde Buchstaben gegeben (nach l26 ein „C").
+                    lesson = state.lessonId?.let { id -> pack.lessons.firstOrNull { it.id == id } },
                     pack = pack,
                     ttsAvailable = ttsAvailable,
                     speaking = speaking,
@@ -361,7 +364,10 @@ private fun PracticeBody(
     // die Jagd, Dschungel für den Spurensucher, sonst der Papiergrund darunter. Die
     // Kopfzeile nimmt die passenden Farben über LocalChromeColors mit.
     val world = TrainerWorld.of(round)
-    val worldTaps = remember { WorldTaps() }
+    // Je Welt ein eigener Speicher: jeder Hintergrund hat seine eigene Uhr, die bei 0
+    // beginnt. Ein geteilter hätte die Tipps der alten Welt mit deren Zeitstempeln
+    // behalten, und die wären Minuten später ohne Berührung aufgeblüht.
+    val worldTaps = remember(world) { WorldTaps() }
     Box(
         modifier = Modifier
             .fillMaxSize()

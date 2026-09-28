@@ -472,7 +472,9 @@ niemals mit einem stummen No-Op.
   **Ein Tipp in der Ruhe bekommt eine Antwort**: ein kleiner heller Ring an der Tippstelle, ein
   leises „Blubb" (`Sfx.Blubb`, 520–1000 Hz — tiefer geben Handy-Lautsprecher nichts wieder —, mit 0,6 gespielt, damit es die Ansage nicht übertönt), der
   Lautsprecher leuchtet einmal auf, und in der Jagd bläht sich die gedrückte Blase wie gewohnt und wackelt dann (einsammeln lässt sie sich erst wach) — höchstens alle
-  220 ms, kein Fehler, kein Mischen. Ausgenommen ist der Lautsprecher selbst (über seine Lage,
+  220 ms, kein Fehler, kein Mischen. Maßgeblich ist das Aufsetzen des Fingers: eine in der Ruhe
+  gedrückte Blase wackelt auch dann nur, wenn erst nach der Freigabe losgelassen wird
+  (`HuntPressLatch.pressedResting`). Ausgenommen ist der Lautsprecher selbst (über seine Lage,
   `LocalSpeakerBounds`): er spielt die Ansage auch während der Sperre ab. Während er spricht,
   atmet er sanft mit. Die Herzmuschel ruht mit dem Feld und lugt erst nach der Freigabe.
 - **Geräusche (`AbcSfx`, `assets/sfx/`).** Elf kurze, synthetisierte Klänge, erzeugt von
@@ -790,7 +792,9 @@ niemals mit einem stummen No-Op.
   zeichnen ihn in Schreibrichtung nach, dann leuchtet er einmal auf. Der Buchstabe passt zum
   Finale-Satz **und** wurde in der Lektion geübt: der erste Anfangsbuchstabe eines Satzworts,
   der ein geübter Einzelbuchstabe ist, sonst ein geübter Buchstabe, der im Satz vorkommt,
-  sonst der Anfangsbuchstabe des ersten Bild-Nomens (Nutzerentscheidung). Die Sterne kommen
+  sonst der Anfangsbuchstabe des ersten Bild-Nomens (Nutzerentscheidung). „Geübt" heißt: in
+  der gerade gespielten Lektion, gesucht über ihre ID — acht Finales gehören zwei Lektionen
+  (f-l18: l18 und l26), die erste Lektion zum Finale wäre die falsche. Die Sterne kommen
   aus den Spurdaten des Buchstabens (vereinfacht, Ecken bleiben, gemeinsame Enden werden ein
   Stern). Bilder und Satz liegen auf einer hellen Karte, die Bilder hüpfen einmal, während der
   Satz gesprochen wird. „Super gemacht!" steht nur noch klein oben, für den Erwachsenen.
@@ -901,7 +905,9 @@ niemals mit einem stummen No-Op.
     Horizontstreifen, Hügel mit runden Baumgruppen. Oben steht das Bild auf einem Teller,
     darunter spannt sich eine **Wäscheleine** über die ganze Breite zwischen zwei Pfosten
     (`ClothesLine`); jeder Peg hängt mit einer Holzklammer an seinem Punkt der durchhängenden
-    Leine, leere Plätze sind gestrichelte, fast durchsichtige Umrisse. Eine frisch aufgehängte
+    Leine, leere Plätze sind gestrichelte, fast durchsichtige Umrisse. Der Durchhang verschiebt
+    den ganzen Peg samt Tipp- und Ablagefläche (Versatz beim Platzieren, nicht im
+    `graphicsLayer`), sonst nähme ein mittlerer Peg Tipps bis 14 dp über seinem Bild an. Eine frisch aufgehängte
     Karte schwingt kurz nach, höchstens 4° — bei langen Sätzen liegen die Pegs nur 4 dp
     auseinander. Lange Sätze dürfen über die Pfosten hinaus bis 8 dp vor den Bildschirmrand
     hängen (`SentencePegSizing.solveOnLine`): nur wenn der Glyph auf der Bühne unter 20 dp
