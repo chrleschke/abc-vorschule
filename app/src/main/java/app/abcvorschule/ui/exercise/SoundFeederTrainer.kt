@@ -95,6 +95,9 @@ private enum class FeederPhase { Intro, Playing, Busy, Done }
  */
 private const val MinCardScale = 0.01f
 
+/** Wie weit die Fresser über dem unteren Bühnenrand stehen. */
+private const val CreatureLiftDp = 40f
+
 /**
  * Laut-Fresser (design doc §5/§6): eine Bildkarte oben, zwei Fresser unten. Alle
  * Entscheidungen fallen in [SoundFeederProgress]; dieser Screen zeichnet, bewegt
@@ -386,7 +389,8 @@ fun SoundFeederTrainer(
             }
         },
         answers = {
-            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            // Etwas Luft unter den Fressern: sie stehen auf dem Höhlenboden, nicht an der Kante.
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth().padding(bottom = CreatureLiftDp.dp)) {
                 val creatureWidth = SoundFeederSizing.creatureWidthDp(maxWidth.value)
                 Row(
                     modifier = Modifier.fillMaxWidth(),

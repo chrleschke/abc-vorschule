@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,6 +72,7 @@ import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 import app.abcvorschule.ui.world.lightIsland
 import app.abcvorschule.ui.world.lightPlate
+import kotlinx.coroutines.launch
 
 object SentenceOrderTray {
     /** A sentence can need more cards than a word, but the tray stays scannable. */
@@ -408,6 +410,9 @@ private val PegBorderWidth = 3.dp
 /** Ausschlag des Nachschwingens — mehr, und lange Sätze stoßen aneinander. */
 private const val PegSwingDegrees = 4f
 
+/** Anstoß beim Antippen, in Grad pro Sekunde — ergibt rund 3° Ausschlag. */
+private const val PegTapKick = 120f
+
 @Composable
 private fun Peg(
     index: Int,
@@ -431,6 +436,7 @@ private fun Peg(
     // Frisch aufgehängt schwingt die Karte kurz an ihrer Klammer nach. Höchstens
     // PegSwingDegrees: bei langen Sätzen liegen die Pegs nur 4dp auseinander.
     val swing = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
     LaunchedEffect(filled != null) {
         if (filled != null && morphOnFill) {
             swing.snapTo(PegSwingDegrees)
@@ -461,7 +467,11 @@ private fun Peg(
     DropZone(
         state = registerWith,
         key = SentenceOrderTray.pegKey(index),
-        onTap = onTap,
+        // Jeder Tipp stupst die Karte an der Leine an: sie schaukelt kurz, voll wie leer.
+        onTap = {
+            scope.launch { swing.animateTo(0f, AbcMotion.Wobble.spec(), initialVelocity = PegTapKick) }
+            onTap()
+        },
         enabled = enabled,
         modifier = Modifier
             .width(pegWidthDp.dp)

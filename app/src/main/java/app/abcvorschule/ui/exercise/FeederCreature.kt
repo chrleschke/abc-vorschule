@@ -44,7 +44,9 @@ import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.SymbolInWordDerivation
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.world.rememberReduceMotion
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Bewegungszustand eines Fressers. Drei Animatables statt animateFloatAsState:
@@ -60,13 +62,20 @@ class FeederCreatureAnimator {
     val wobble = Animatable(0f)
     val scale = Animatable(1f)
 
-    /** Vorstellen und Antippen: dreimal hin und her, ±6°. */
-    suspend fun wiggle() {
-        repeat(3) {
-            wobble.animateTo(6f, tween(75))
-            wobble.animateTo(-6f, tween(75))
+    /** Stauchen beim Antippen: 0 = Ruhe; positiv = breiter und niedriger. */
+    val squash = Animatable(0f)
+
+    /**
+     * Vorstellen und Antippen: die Figur wird kurz gestaucht und federt dann schaukelnd
+     * aus, gedreht um die Füße. Eine gedämpfte Feder mit Anstoß statt harter Tween-
+     * Stufen: früher dreimal ±6° in 75 ms, das wirkte ruckig.
+     */
+    suspend fun wiggle() = coroutineScope {
+        launch {
+            squash.animateTo(SquashDepth, tween(90, easing = FastOutSlowInEasing))
+            squash.animateTo(0f, AbcMotion.Soft.spec())
         }
-        wobble.animateTo(0f, tween(60))
+        wobble.animateTo(0f, AbcMotion.Soft.spec(), initialVelocity = WiggleKick)
     }
 
     /** Fressen: Maul weit auf, zweimal zu und auf, dann Ruhe. Der Bauch wackelt mit. */
@@ -81,14 +90,10 @@ class FeederCreatureAnimator {
         mouth.animateTo(IdleMouth, tween(150))
     }
 
-    /** Spucken: Maul zu, schütteln, Maul wieder auf. */
+    /** Spucken: Maul zu, ein schnelles Kopfschütteln, das ausfedert, Maul wieder auf. */
     suspend fun spit() {
         mouth.animateTo(0f, tween(90))
-        repeat(2) {
-            wobble.animateTo(-8f, tween(60))
-            wobble.animateTo(8f, tween(60))
-        }
-        wobble.animateTo(0f, tween(60))
+        wobble.animateTo(0f, AbcMotion.Wobble.spec(), initialVelocity = SpitKick)
         delay(120)
         mouth.animateTo(IdleMouth, tween(200))
     }
@@ -107,6 +112,13 @@ class FeederCreatureAnimator {
         const val IdleMouth = 0.35f
         const val HoverMouth = 0.8f
         const val FullScale = 1.15f
+        const val SquashDepth = 0.08f
+
+        /** Anstoß in Grad pro Sekunde: auf der weichen Feder rund 6° Ausschlag. */
+        const val WiggleKick = 120f
+
+        /** Kräftiger und auf der schnelleren Feder: ein deutliches „nein". */
+        const val SpitKick = -320f
     }
 }
 
@@ -255,8 +267,8 @@ fun FeederCreature(
             .height(heightDp.dp)
             .graphicsLayer {
                 rotationZ = animator.wobble.value
-                scaleX = animator.scale.value
-                scaleY = animator.scale.value
+                scaleX = animator.scale.value * (1f + animator.squash.value)
+                scaleY = animator.scale.value * (1f - animator.squash.value)
                 // Unten verankert: die Figur wächst beim Atmen nach oben, die Füße bleiben stehen.
                 transformOrigin = TransformOrigin(0.5f, 0.92f)
             }

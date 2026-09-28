@@ -68,7 +68,7 @@ private val LanternRim = Color(0xFFB8612F)
  * **zwischen** Himmel und Hügeln — sie tauchen hinter den Bergen auf.
  */
 @Composable
-fun PathBackground(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
+fun PathBackground(scrollOffset: () -> Int, loops: LanternLoops, modifier: Modifier = Modifier) {
     val still = rememberReduceMotion()
     val seconds by rememberWorldSeconds(still)
     Box(modifier.fillMaxSize()) {
@@ -102,7 +102,13 @@ fun PathBackground(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
         // Himmelslaternen: nur in der Zeichenphase gelesen, ein Frame rekomponiert nichts.
         // Eigene Ebene, sonst zeichnete jeder Frame Himmel, Hügel und Kopfzeile mit neu.
         Canvas(Modifier.fillMaxSize().graphicsLayer()) {
-            SkyLanterns.at(seconds).forEach { drawLantern(it) }
+            loops.now = seconds
+            loops.still = still
+            SkyLanterns.at(seconds).forEach { lantern ->
+                val start = loops.starts[lantern.id]
+                val progress = if (start == null) -1f else (seconds - start) / SkyLanterns.LoopS
+                drawLantern(lantern, loop = progress.takeIf { it in 0f..1f })
+            }
         }
 
         HillBand(color = HillFar, baseFraction = 0.72f, amplitude = 34f, parallax = 0.05f, scrollOffset = scrollOffset)
@@ -111,12 +117,24 @@ fun PathBackground(scrollOffset: () -> Int, modifier: Modifier = Modifier) {
     }
 }
 
+/** Schleifenradius als Vielfaches der Laternenbreite: nahe Laternen fliegen größere Loopings. */
+private const val LoopRadiusFactor = 2.2f
+
 /** Eine Papierlaterne: oben schmal, unten rund, innen hell — und ein Leuchten drumherum. */
-private fun DrawScope.drawLantern(l: SkyLanterns.Lantern) {
+private fun DrawScope.drawLantern(l: SkyLanterns.Lantern, loop: Float?) {
     val w = size.width * l.width
     val h = w * 1.33f
-    val x = size.width * l.x
-    val y = size.height * l.y
+    // Beim Looping: Versatz auf der Schleife und eine volle Drehung um die Mitte.
+    val (loopX, loopY, loopTurn) = loop?.let { SkyLanterns.loop(it) } ?: Triple(0f, 0f, 0f)
+    val radius = w * LoopRadiusFactor
+    val x = size.width * l.x + loopX * radius
+    val y = size.height * l.y + loopY * radius
+    rotate(degrees = loopTurn, pivot = Offset(x, y + h * 0.45f)) {
+        drawLanternBody(l, x, y, w, h)
+    }
+}
+
+private fun DrawScope.drawLanternBody(l: SkyLanterns.Lantern, x: Float, y: Float, w: Float, h: Float) {
     val glowRadius = w * (1.2f + l.depth * 0.9f)
     drawCircle(
         brush = Brush.radialGradient(

@@ -31,7 +31,12 @@ object SkyLanterns {
     const val StartY = 0.72f
     const val EndY = -0.08f
 
+    /** Dauer eines Loopings nach einem Tipp — langsam, eine ruhige Schleife. */
+    const val LoopS = 2.8f
+
     data class Lantern(
+        /** Laufende Nummer: bleibt über den ganzen Aufstieg dieselbe (für den Looping). */
+        val id: Int,
         val x: Float,
         val y: Float,
         /** Breite als Anteil der Bildschirmbreite. */
@@ -64,6 +69,7 @@ object SkyLanterns {
             val sway = sin(t / swayPeriod * 2f * PI.toFloat() + hash(i, 4) * 6.28f)
             val width = 0.03f + depth * 0.065f
             Lantern(
+                id = i,
                 x = 0.06f + hash(i, 5) * 0.88f + sway * width * 0.4f,
                 y = StartY + (EndY - StartY) * progress,
                 width = width,
@@ -76,5 +82,18 @@ object SkyLanterns {
                 depth = depth,
             )
         }.sortedBy { it.depth }
+    }
+
+    /**
+     * Ein Looping, [progress] 0…1: die Laterne fliegt eine senkrechte Schleife nach oben
+     * und zurück an ihren Platz und dreht sich dabei einmal um sich selbst. Liefert
+     * (dx, dy) als Vielfaches des Schleifenradius und die zusätzliche Drehung in Grad.
+     * Weich ein- und ausgeleitet (Smoothstep), damit Start und Ende nicht rucken.
+     */
+    fun loop(progress: Float): Triple<Float, Float, Float> {
+        val p = progress.coerceIn(0f, 1f)
+        val e = p * p * (3f - 2f * p)
+        val a = e * 2f * PI.toFloat()
+        return Triple(sin(a), -(1f - kotlin.math.cos(a)), e * 360f)
     }
 }

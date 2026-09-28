@@ -225,6 +225,61 @@ internal fun ClearingBackground(modifier: Modifier) {
     }
 }
 
+/**
+ * Laut-Fresser: Leuchtpunkte, die langsam durch die Pilzhöhle schweben — Sporen der
+ * Leuchtpilze, türkis und wenige bernsteinfarben. Jeder zieht auf einer eigenen weiten
+ * Bahn (Perioden 28–52 s) und glimmt langsam auf und ab; die meisten bleiben an den
+ * Rändern und unten bei den Pilzen, die Mitte mit der Karte bleibt ruhig.
+ */
+@Composable
+internal fun CaveGlowMotes(modifier: Modifier) {
+    val still = rememberReduceMotion()
+    val seconds by rememberWorldSeconds(still)
+    Canvas(modifier.graphicsLayer()) {
+        val w = size.width
+        val h = size.height
+        CaveMotes.forEach { m ->
+            // Sechs Werte: Arrays kennen nur component1…5, also von Hand ausgepackt.
+            val (fx, fy, period, phase, r) = m
+            val warm = m[5]
+            val a = seconds / period * Tau + phase
+            val pos = Offset(
+                w * (fx + 0.12f * sin(a) + 0.04f * sin(a * 2.7f + 1f)),
+                h * (fy + 0.07f * cos(a * 0.9f) - 0.02f * sin(a * 1.9f)),
+            )
+            val pulse = 0.4f + 0.6f * (0.5f + 0.5f * sin(seconds / (period * 0.22f) * Tau + phase * 2f))
+            val color = if (warm > 0.5f) MoteWarm else MoteCool
+            val gr = r.dp.toPx() * 8f
+            drawCircle(Brush.radialGradient(0f to color.copy(alpha = 0.6f * pulse), 0.35f to color.copy(alpha = 0.22f * pulse), 1f to Color.Transparent, center = pos, radius = gr), radius = gr, center = pos)
+            drawCircle(MoteCore, alpha = 0.85f * pulse, radius = r.dp.toPx(), center = pos)
+        }
+    }
+}
+
+private val MoteCool = Color(0xFF6FF0D8)
+private val MoteWarm = Color(0xFFF0B35A)
+private val MoteCore = Color(0xFFE8FFF8)
+
+/** (x, y, Periode s, Phase, Radius dp, warm > 0,5) */
+private val CaveMotes: List<FloatArray> = run {
+    val rnd = java.util.Random(37)
+    List(18) {
+        val side = it % 3
+        floatArrayOf(
+            when (side) {
+                0 -> 0.06f + rnd.nextFloat() * 0.22f
+                1 -> 0.72f + rnd.nextFloat() * 0.22f
+                else -> 0.2f + rnd.nextFloat() * 0.6f
+            },
+            if (side == 2) 0.62f + rnd.nextFloat() * 0.2f else 0.28f + rnd.nextFloat() * 0.5f,
+            28f + rnd.nextFloat() * 24f,
+            rnd.nextFloat() * Tau,
+            1.5f + rnd.nextFloat() * 1.5f,
+            if (it % 6 == 0) 1f else 0f,
+        )
+    }
+}
+
 private val DuskTop = Color(0xFF1C2757)
 private val DuskUpper = Color(0xFF2C3874)
 private val DuskViolet = Color(0xFF5B4F86)

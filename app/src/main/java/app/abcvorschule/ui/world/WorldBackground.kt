@@ -41,7 +41,10 @@ fun WorldBackground(world: TrainerWorld, modifier: Modifier = Modifier) {
         TrainerWorld.Workshop -> WorkshopBackground(modifier)
         TrainerWorld.Garden -> GardenBackground(modifier)
         TrainerWorld.Theater -> TheaterBackground(modifier)
-        TrainerWorld.Cave -> PaintedBackground(R.drawable.world_cave, CaveFallback, modifier)
+        TrainerWorld.Cave -> Box(modifier) {
+            PaintedBackground(R.drawable.world_cave, CaveFallback, Modifier.fillMaxSize())
+            CaveGlowMotes(Modifier.fillMaxSize())
+        }
         TrainerWorld.Clearing -> ClearingBackground(modifier)
     }
 }

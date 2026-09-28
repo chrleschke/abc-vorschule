@@ -5,6 +5,8 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -34,6 +36,9 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -80,9 +85,37 @@ fun PathScreen(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
+    val lanternLoops = remember { LanternLoops() }
 
-    Box(modifier.fillMaxSize()) {
-        PathBackground(scrollOffset = { scrollState.value })
+    Box(
+        modifier
+            .fillMaxSize()
+            // Laternen antippen: sie liegen hinter dem Scroll-Bereich, also hört der
+            // Eltern-Knoten mit (Final-Pass). Ein Tipp, den ein Schild schon verbraucht
+            // hat, und jedes Ziehen (Scrollen) zählen nicht.
+            .pointerInput(lanternLoops) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Final)
+                    var moved = false
+                    while (true) {
+                        val event = awaitPointerEvent(PointerEventPass.Final)
+                        val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                        if ((change.position - down.position).getDistance() > viewConfiguration.touchSlop) moved = true
+                        if (!change.pressed) {
+                            if (!moved && !change.isConsumed) {
+                                lanternLoops.tap(
+                                    at = change.position,
+                                    size = Size(size.width.toFloat(), size.height.toFloat()),
+                                    minRadiusPx = LanternTouchRadius.toPx(),
+                                )
+                            }
+                            break
+                        }
+                    }
+                }
+            },
+    ) {
+        PathBackground(scrollOffset = { scrollState.value }, loops = lanternLoops)
 
         val density = LocalDensity.current
         val safeDrawingTop = WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding()
@@ -392,3 +425,6 @@ private fun PathSigns(
         )
     }
 }
+
+/** Trefferradius für ferne, kleine Laternen — ein Kinderfinger trifft keine 12dp. */
+private val LanternTouchRadius = 28.dp

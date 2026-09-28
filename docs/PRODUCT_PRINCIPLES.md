@@ -859,7 +859,8 @@ niemals mit einem stummen No-Op.
     nicht als Hülle — Layout und Größenrechnungen der Trainer bleiben unberührt. Eine Insel
     steht in der Modifier-Kette **vor** jeder Deckkraft (`alpha`), sonst zeichnet sie in deren
     Ebene und wird an den Kanten des Bauteils eckig abgeschnitten.
-  - **Nacht am Waldrand** (Rechnen, gezeichnet): Mond unter der Kopfzeile, Sterne (wenige
+  - **Nacht am Waldrand** (Rechnen, gezeichnet): kein Mond (eine helle Scheibe neben dem
+    Lautsprecher las sich wie ein zweiter Knopf), Sterne (wenige
     funkeln mit 8–14 s), Hügel und Bäume unten. Aufgabe und Zähl-Hilfe liegen auf einer Karte,
     Antwortkacheln und Ziffernblock sind ohnehin hell.
   - **Dachboden** (Wort-Detektiv, gezeichnet): Dachbalken, rundes Fenster, Mondstrahl mit
@@ -869,6 +870,11 @@ niemals mit einem stummen No-Op.
   - **Werkstatt** (Wort-Bauer, gezeichnet): dunkles Holz mit Maserung, warmer Lampenkegel, der
     ganz langsam atmet (9 s). Das Bild steht auf einem Teller, die Bausteine sind Ahorn-Klötze
     mit Schatten, das fertige Wort liegt auf einer Karte.
+  - **Antippen macht Freude, auch ohne Aufgabe.** Was ein Kind in einer Welt anfasst, antwortet
+    mit einer kleinen, weichen Bewegung — nie mit Stern oder Ton, und nie so, dass es die Aufgabe
+    stört: Himmelslaternen auf dem Pfad fliegen einen Looping (`LanternLoops`, 2,8 s, Drehung um
+    die eigene Mitte), Karten auf der Wäscheleine schaukeln an ihrer Klammer, die Laut-Fresser
+    stauchen sich und schaukeln aus.
   - **Garten in der blauen Stunde** (Satz-Architekt, gezeichnet): Sterne, ein warmer
     Horizontstreifen, Hügel mit runden Baumgruppen. Oben steht das Bild auf einem Teller,
     darunter spannt sich eine **Wäscheleine** über die ganze Breite zwischen zwei Pfosten
@@ -890,7 +896,11 @@ niemals mit einem stummen No-Op.
     (rechts, koralle) tropfenförmig mit Blattspross — zwei Silhouetten, die ein Kind auch ohne
     Farbe unterscheidet. Volumen durch Licht oben links und Lichtkante, Augen mit zwei
     Glanzpunkten, die zur Karte hinaufschauen und zeitversetzt blinzeln (5,5 / 6,7 s), Wangen,
-    ein Maul mit Zunge, Füße und Ärmchen; die Figuren atmen leicht (3,6 s). Der Bauchfleck ist
+    ein Maul mit Zunge, Füße und Ärmchen; die Figuren atmen leicht (3,6 s). Beim Antippen
+    stauchen sie sich kurz und schaukeln auf einer weichen Feder um die Füße aus (kein
+    Tween-Zickzack), beim Spucken schütteln sie den Kopf auf einer schnelleren Feder. Sie
+    stehen 40 dp über dem unteren Bühnenrand; durch die Höhle schweben langsam Leuchtsporen
+    (türkis, wenige bernstein, Bahnen 28–52 s), vor allem an den Rändern und unten. Der Bauchfleck ist
     schmaler als beim alten Geisterkörper (62 % der Breite, Glyph-Boden 10 sp).
   - **Waldlichtung** (Silben-Verschmelzer, gezeichnet): Glühwürmchen treiben auf Bahnen von
     20–40 s und glimmen langsam, unten Gras als Silhouette. Die Silben sind die **zwei hellsten

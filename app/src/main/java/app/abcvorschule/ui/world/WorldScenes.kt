@@ -26,19 +26,15 @@ import kotlin.math.sin
  * steht alles.
  */
 
-/** Rechnen: eine Wiese am Waldrand bei Nacht — Mond, Sterne, Baumsilhouetten unten. */
+/** Rechnen: eine Wiese am Waldrand bei Nacht — Sterne, Baumsilhouetten unten. */
 @Composable
 internal fun ForestNightBackground(modifier: Modifier) {
     val still = rememberReduceMotion()
     val seconds by rememberWorldSeconds(still)
     Canvas(modifier.graphicsLayer()) {
         drawRect(Brush.verticalGradient(0f to NightTop, 0.55f to NightMid, 1f to NightLow))
-        // Mond oben rechts mit Hof.
-        // Unter der Kopfzeile, nicht hinter Fortschritt und Chevrons.
-        val moon = Offset(size.width * 0.8f, size.height * 0.24f)
-        val mr = 22.dp.toPx()
-        drawCircle(Brush.radialGradient(0f to MoonGlow.copy(alpha = 0.35f), 1f to Color.Transparent, center = moon, radius = mr * 5f), radius = mr * 5f, center = moon)
-        drawCircle(MoonLight, radius = mr, center = moon)
+        // Kein Mond: eine helle Scheibe neben dem Lautsprecher las sich wie ein zweiter
+        // Knopf (Nutzer-Feedback). Der Himmel trägt die Nacht allein mit Sternen.
         // Sterne: wenige funkeln ganz langsam (8–14 s), die meisten stehen still.
         NightStars.forEach { (fx, fy, r, a, period) ->
             val twinkle = if (period > 0f) 0.75f + 0.25f * sin(seconds / period * 2f * PI.toFloat() + fx * 20f) else 1f
@@ -160,8 +156,6 @@ internal fun WorkshopBackground(modifier: Modifier) {
 private val NightTop = Color(0xFF1B2452)
 private val NightMid = Color(0xFF141C40)
 private val NightLow = Color(0xFF0B1028)
-private val MoonLight = Color(0xFFF5EFD9)
-private val MoonGlow = Color(0xFFF5EFD9)
 private val Star = Color(0xFFF7F1E3)
 private val TreeDark = Color(0xFF070B1A)
 private val HillDark = Color(0xFF0A0F22)
