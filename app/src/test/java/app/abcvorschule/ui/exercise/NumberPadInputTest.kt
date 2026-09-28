@@ -66,11 +66,14 @@ class NumberPadInputTest {
     private val displayLargeSp = 40f
 
     @Test
-    fun theFieldKeepsItsShippedWidthUpToTheTestDeviceScale() {
-        // Nothing may shift at 1.0 or on the font_scale-1.3 test device: the
-        // derived minimum only overtakes the 140dp floor once it actually must.
+    fun theFieldKeepsItsShippedWidthAtNormalScaleAndGrowsOnlyALittleOnTheTestDevice() {
+        // Bei 1.0 verschiebt sich nichts. Auf dem font_scale-1.3-Testgerät wächst das
+        // Feld seit der Lernschrift um wenige dp: ihre fetten Ziffern sind breiter als
+        // die früheren Serif-Ziffern (NumberPadInput.DigitAspect), und drei davon müssen
+        // hineinpassen.
         assertEquals(140f, NumberPadInput.fieldWidthDp(displayLargeSp, 1f), 0.01f)
-        assertEquals(140f, NumberPadInput.fieldWidthDp(displayLargeSp, 1.3f), 0.01f)
+        val onTestDevice = NumberPadInput.fieldWidthDp(displayLargeSp, 1.3f)
+        assertTrue("1.3: $onTestDevice", onTestDevice in 140f..150f)
     }
 
     @Test

@@ -54,6 +54,7 @@ import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SilboUi
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
@@ -187,7 +188,8 @@ fun RewardSummaryScreen(
         ) {
             Text(
                 text = stringResource(R.string.reward_title),
-                style = MaterialTheme.typography.headlineMedium,
+                // Jubel für den Erwachsenen daneben, kein Lerninhalt: UI-Schrift wie das Icon.
+                style = MaterialTheme.typography.headlineMedium.copy(fontFamily = SilboUi),
                 color = MaterialTheme.colorScheme.onBackground,
                 // Ungedeckelt würde der Header bei großer Schriftskalierung nicht nur
                 // wachsen, sondern (ohne maxLines) auf zwei Zeilen umbrechen und den

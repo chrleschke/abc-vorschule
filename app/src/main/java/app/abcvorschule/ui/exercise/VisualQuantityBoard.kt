@@ -39,6 +39,7 @@ import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SilboFibel
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 
@@ -423,7 +424,8 @@ fun MultiplicationMatrixGrid(
                 // counting aid, so they must not fade along with the placeholders.
                 Text(
                     text = MultiplicationMatrix.rowLabel(row),
-                    style = MaterialTheme.typography.labelLarge,
+                    // Zeilennummern sind Ziffern, also Lerninhalt (§8): Lernschrift.
+                    style = MaterialTheme.typography.labelLarge.copy(fontFamily = SilboFibel),
                     color = WarmMuted,
                     textAlign = TextAlign.End,
                     modifier = Modifier

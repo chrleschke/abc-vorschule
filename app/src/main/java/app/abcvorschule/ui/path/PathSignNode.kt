@@ -41,6 +41,7 @@ import app.abcvorschule.ui.components.IconLock
 import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreenLight
+import app.abcvorschule.ui.theme.SilboFibel
 import app.abcvorschule.ui.theme.SkyBlueLight
 import app.abcvorschule.ui.theme.SoftSand
 import app.abcvorschule.ui.theme.StarGold
@@ -353,7 +354,8 @@ fun PathSignNode(
             ) {
                 Text(
                     text = label,
-                    style = MaterialTheme.typography.titleLarge,
+                    // Grapheme sind Lerninhalt: Lernschrift, nicht die UI-Schrift der Titel-Rolle.
+                    style = MaterialTheme.typography.titleLarge.copy(fontFamily = SilboFibel),
                     // Labels run up to 8 characters ("C y x qu", "Sch ch+"). At a
                     // large font scale a wrapped second line spills past the board's
                     // rounded corner, which is not clipped — hence maxLines=1, and

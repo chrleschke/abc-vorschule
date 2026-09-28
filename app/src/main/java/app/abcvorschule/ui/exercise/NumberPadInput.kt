@@ -14,10 +14,11 @@ object NumberPadInput {
      * `fontScale <= 1.3` (dort reicht sie rechnerisch) kein Pixel verschiebt. */
     const val BaseFieldWidthDp = 140f
 
-    /** Vorschub einer Ziffer als Anteil der Schriftgröße. Serif-Bold-Ziffern
-     * (displayLarge) liegen um ~0.5 em; 0.6 hat denselben Sicherheits-Headroom
-     * wie [WordFrameSizing.GlyphAspect] gegenüber seiner Schätzbasis. */
-    const val DigitAspect = 0.6f
+    /** Vorschub einer Ziffer als Anteil der Schriftgröße. Die fetten Ziffern der
+     * Lernschrift (Silbo Fibel Bold, displayLarge) liegen bei ~0.61 em; 0.72 hat
+     * denselben Sicherheits-Headroom wie [WordFrameSizing.GlyphAspect]. Die frühere
+     * 0.6 war auf Serif-Ziffern (~0.5 em) gerechnet. */
+    const val DigitAspect = 0.72f
 
     /** OutlinedTextField-Innenabstand: M3-Default 16dp je Seite. */
     const val FieldPaddingDp = 32f

@@ -666,6 +666,24 @@ niemals mit einem stummen No-Op.
 ## 10. Design-System
 
 - Gemeinsame Komponenten unter `ui/components/` (`AbcContinueButton`, `AbcSpeakerButton`, `AbcNavChevron`, `AbcSegmentedProgress`, Vektor-Icons inkl. `IconStar`) und `ui/shell/AbcTopBar`.
+- **Schrift (verbindlich).** Zwei gebündelte Schriften, erzeugt von `tools/fonts/build_fonts.py`
+  (Quellen und Befehl im Skriptkopf), Lizenztexte unter `assets/licenses/`:
+  - **Silbo Fibel** (`SilboFibel`, `res/font/silbo_fibel_*.ttf`) für alles, was Lerninhalt ist —
+    Buchstaben, Silben, Wörter, Ziffern, Rechenzeichen. Abgeleitet von Andika (SIL OFL), auf Latin
+    gekürzt und **umbenannt**, weil Andika „Andika" und „SIL" als Reserved Font Names führt.
+    Einstöckiges a und g wie in der Schule, l mit Bogen am Fuß, und das große **I** ist ein
+    schlichter Strich wie in der Fibel und im Spurensucher (Andikas I hat Querstriche). So ist ein
+    I nie mit einem l zu verwechseln — das Pfad-Schild „I o" las sich in Roboto als „lo". Die
+    Zeilenmaße sind auf die Latin-Glyphen zusammengezogen (1,25 em statt Andikas 1,61 em mit
+    Platz für vietnamesische Doppelakzente), sonst wäre jeder Text ein Drittel höher geworden.
+  - **Baloo 2** (`SilboUi`, `res/font/baloo2.ttf`, variabel) für UI-Beschriftung: Punktestand,
+    Knöpfe, Eltern-Bereich, Jubel-Titel — dieselbe runde Schrift wie Store-Grafik und Icon.
+  - Rollen: `display*`/`headline*`/`body*` = Silbo Fibel, `title*`/`label*` = Baloo 2. Wer
+    Lerninhalt in eine Titel-Rolle setzt (Pfad-Schild, Fresser-Fallbackwort, Zeilennummern der
+    Malmatrix), überschreibt die Familie dort ausdrücklich. Keine Systemschrift mehr: bis
+    September 2026 lief alles in Roboto (doppelstöckiges a/g, I = l) und System-Serif.
+  - Die Strichdaten des Spurensuchers sind gegen Silbo Fibel geprüft und decken sich mit den
+    Großbuchstaben; ein neues Graphem wird gegen die Schrift gezeichnet, nicht gegen Roboto.
 - Buttons: keine Emojis — nur ASCII oder Canvas/SVG-Vektoren. Punkte-/Erfolgs-Symbol ist der Vektor-Stern `IconStar`, kein Text-Asterisk. Icons zeichnet die App selbst (`ui/components/AbcIcons.kt`); die eine Ausnahme ist das **native Overflow-Icon** der Elterntür (`Icons.Rounded.MoreVert` aus `material-icons-core`, ausdrücklich im Version-Catalog deklariert) — an ihm sollen Erwachsene ein Menü erkennen, und das leistet nur das Systemzeichen.
 - Übungen nutzen `ExerciseStage` für klare Trennung Speaker-Kopfzeile / Aufgabenblock /
   Antwortblock. Der Speaker geht in den Slot `promptChrome`, nie in `prompt` — nur der
