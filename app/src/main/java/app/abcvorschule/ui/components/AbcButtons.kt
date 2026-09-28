@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,7 +48,7 @@ import app.abcvorschule.ui.exercise.LocalSpeakerBounds
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
-import app.abcvorschule.ui.theme.SunCoral
+import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.world.LocalChromeColors
 
 /**
@@ -63,32 +64,33 @@ fun AbcContinueButton(
     centered: Boolean = false,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         horizontalArrangement = if (centered) Arrangement.Center else Arrangement.End,
     ) {
+        // Ein großer runder Knopf mit Pfeil, ohne Text: das Kind liest „Weiter" nicht,
+        // es erkennt den Pfeil (§2). Grün, weil es nach dem Geschafften weitergeht.
+        // Das Wort bleibt als Beschreibung für TalkBack.
         Button(
             onClick = onClick,
             enabled = enabled,
-            shape = RoundedCornerShape(18.dp),
-            contentPadding = PaddingValues(horizontal = 22.dp, vertical = 14.dp),
-            // Voller kidTouch statt kidTouch - 8dp: das Kind tippt diesen Knopf, und
-            // 72dp waren eine Ausnahme ohne Begründung — §9 nimmt nur die Chevrons
-            // (48dp) aus. Der einzige Aufrufer ist der End-Screen, dessen mittlerer
-            // Block `weight(1f)` trägt: die 8dp gehen dort von einem Block ab, der
-            // bei font_scale 1.3 selbst im ungünstigsten Fall (360×640dp, vier
-            // Bilder, vierzeiliger Satz) über 100dp Luft behält.
-            modifier = Modifier.defaultMinSize(minHeight = AbcDimens.kidTouch),
+            shape = CircleShape,
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier
+                .size(ContinueButtonSize)
+                .semantics { contentDescription = label },
             colors = ButtonDefaults.buttonColors(
-                containerColor = SunCoral,
+                containerColor = LeafGreen,
                 contentColor = Cream,
             ),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
         ) {
-            Text(text = label, style = MaterialTheme.typography.titleLarge)
-            Spacer(Modifier.width(10.dp))
-            IconChevronRight(tint = Cream, size = 22.dp)
+            IconArrowForward(tint = Cream, size = 40.dp)
         }
     }
 }
+
+/** Größer als [AbcDimens.kidTouch]: der wichtigste Knopf des End-Screens. */
+private val ContinueButtonSize = 88.dp
 
 @Composable
 fun AbcResolveButton(

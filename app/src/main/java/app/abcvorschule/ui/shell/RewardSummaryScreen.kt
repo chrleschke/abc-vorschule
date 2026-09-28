@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,6 +36,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -65,6 +68,7 @@ import app.abcvorschule.ui.world.LocalChromeColors
 import app.abcvorschule.ui.world.NightChrome
 import app.abcvorschule.ui.world.lightIsland
 import app.abcvorschule.ui.world.rememberReduceMotion
+import app.abcvorschule.ui.world.rememberWorldSeconds
 import kotlin.math.PI
 import kotlin.math.sin
 import kotlinx.coroutines.delay
@@ -185,16 +189,25 @@ fun RewardSummaryScreen(
                             finale = finale,
                             pack = pack,
                             ttsAvailable = ttsAvailable,
-                            speaking = speaking,
                             onSpeak = onSpeak,
                             fontScale = fontScale,
                         )
                     }
                 }
-                AbcContinueButton(
-                    onClick = onContinue,
-                    centered = true,
-                )
+                // Unten nebeneinander: Satz noch einmal hören, und der große grüne Pfeil.
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(32.dp),
+                ) {
+                    if (finale != null) {
+                        AbcSpeakerButton(
+                            enabled = ttsAvailable,
+                            speaking = speaking,
+                            onClick = { onSpeak(finale.tts) },
+                        )
+                    }
+                    AbcContinueButton(onClick = onContinue)
+                }
             }
         }
     }
@@ -219,12 +232,30 @@ private fun ConstellationSky(constellation: FinaleConstellation.Constellation?, 
         if (constellation == null) return@LaunchedEffect
         if (still) clock.snapTo(total) else clock.animateTo(total, tween((total * 1000).toInt(), easing = LinearEasing))
     }
-    Canvas(modifier) {
+    // Nach dem Aufbau lebt das Sternbild weiter: jeder Stern funkelt und dreht sich leicht,
+    // und ein angetippter Stern springt kurz größer und schaukelt aus. Uhr und Tipps werden
+    // nur im Zeichnen gelesen.
+    val idle = rememberWorldSeconds(still)
+    val tapped = remember(constellation) { mutableStateMapOf<Int, Float>() }
+    val touchRadius = with(LocalDensity.current) { StarTouchRadius.toPx() }
+    Canvas(
+        modifier.pointerInput(constellation, still) {
+            val c = constellation ?: return@pointerInput
+            if (still) return@pointerInput
+            detectTapGestures { tap ->
+                val w = size.width.toFloat()
+                val h = size.height.toFloat()
+                val hit = c.stars.indices
+                    .minByOrNull { (starAt(c, it, w, h) - tap).getDistance() }
+                    ?.takeIf { (starAt(c, it, w, h) - tap).getDistance() <= touchRadius }
+                if (hit != null) tapped[hit] = idle.value
+            }
+        },
+    ) {
         val c = constellation ?: return@Canvas
         val t = clock.value
-        val side = minOf(size.width * 0.62f, size.height * 0.86f)
-        val origin = Offset((size.width - side) / 2f, (size.height - side) / 2f)
-        fun at(i: Int) = origin + Offset(c.stars[i].first * side, c.stars[i].second * side)
+        val now = idle.value
+        fun at(i: Int) = starAt(c, i, size.width, size.height)
         val from = Offset(size.width / 2f, -24.dp.toPx())
         // Linien: in der Reihenfolge, in der der Buchstabe geschrieben wird.
         val drawn = ((t - flyEnd) / LinesS).coerceIn(0f, 1f) * c.lines.size
@@ -237,7 +268,6 @@ private fun ConstellationSky(constellation: FinaleConstellation.Constellation?, 
             drawLine(LineLight, start, end, strokeWidth = 2.dp.toPx(), cap = StrokeCap.Round, alpha = 0.8f)
         }
         val flash = if (t > linesEnd) kotlin.math.exp(-(t - linesEnd) * 2.2f) else 0f
-        val twinkleBase = t * 2f * PI.toFloat()
         c.stars.indices.forEach { i ->
             val start = SkyStartS + i * StarGapS
             val f = ((t - start) / StarFlyS).coerceIn(0f, 1f)
@@ -247,9 +277,21 @@ private fun ConstellationSky(constellation: FinaleConstellation.Constellation?, 
             val ctrl = Offset((from.x + to.x) / 2f + (if (i % 2 == 0) -40 else 40).dp.toPx(), from.y + 60.dp.toPx())
             val pos = from * ((1 - e) * (1 - e)) + ctrl * (2 * (1 - e) * e) + to * (e * e)
             val arrived = if (f >= 1f) kotlin.math.exp(-(t - start - StarFlyS) * 4f) else 0f
-            val rest = if (f >= 1f) 0.06f * sin(twinkleBase * 0.3f + i) else 0f
-            val radius = (8f + 4f * arrived + 3f * flash).dp.toPx() * (1f + rest)
-            drawGlowStar(pos, radius, rotationDeg = e * 360f, halo = 0.8f)
+            // Angekommen: leises Funkeln (Größe ±8 %) und eine leichte Drehung (±10°),
+            // jeder Stern mit eigenem Takt; ab und zu blitzt ein Glanzlicht auf.
+            val settled = f >= 1f
+            val period = 2.4f + (i % 3) * 0.5f
+            val twinkle = if (settled) 0.08f * sin(now / period * 2f * PI.toFloat() + i) else 0f
+            val sway = if (settled) 10f * sin(now / 5f * 2f * PI.toFloat() + i * 1.3f) else 0f
+            val sparkle = if (settled) sin(now / 7f * 2f * PI.toFloat() + i * 2.1f).coerceAtLeast(0f).let { it * it * it * it * it * it * it * it } else 0f
+            // Angetippt: größer, dann federnd zurück, mit einem Schaukeln.
+            val tapAge = tapped[i]?.let { now - it }?.takeIf { it in 0f..TapBounceS }
+            val bounce = tapAge?.let { a -> 0.55f * kotlin.math.exp(-a * 3.2f) * kotlin.math.cos(a * 9f) } ?: 0f
+            val tapSpin = tapAge?.let { a -> 30f * kotlin.math.exp(-a * 3f) * sin(a * 12f) } ?: 0f
+            val radius = (8f + 4f * arrived + 3f * flash).dp.toPx() * (1f + twinkle + bounce)
+            drawGlowStar(pos, radius, rotationDeg = e * 360f + sway + tapSpin, halo = 0.8f + bounce)
+            if (sparkle > 0.05f) drawGlint(pos + Offset(radius * 0.7f, -radius * 0.7f), 8.dp.toPx() * sparkle, 0.8f * sparkle)
+            if (tapAge != null && tapAge < 0.6f) drawGlint(pos, 18.dp.toPx() * (1f - tapAge / 0.6f), 1f - tapAge / 0.6f)
             if (arrived > 0.05f) drawGlint(pos, 12.dp.toPx() * arrived, arrived)
         }
     }
@@ -260,7 +302,6 @@ private fun FinaleBody(
     finale: LessonFinale,
     pack: ContentPack,
     ttsAvailable: Boolean,
-    speaking: Boolean,
     onSpeak: (String) -> Unit,
     fontScale: Float,
 ) {
@@ -270,13 +311,12 @@ private fun FinaleBody(
     val sentenceSp = FinaleLayout.sentenceSizeSp(fontScale)
     val sentenceLineHeightSp = FinaleLayout.sentenceLineHeightSp(fontScale)
 
+    // Bilder und Satz auf einer hellen Karte (Licht-Insel, §10): Lerninhalt nur auf Licht.
+    // Etwas eingerückt, damit die Karte nicht bis an den Rand reicht.
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(30.dp),
-    ) {
-        // Bilder und Satz auf einer hellen Karte (Licht-Insel, §10): Lerninhalt nur auf Licht.
-        Column(
-            modifier = Modifier.lightIsland(padH = 16.dp, padV = 16.dp),
+        modifier = Modifier
+            .padding(horizontal = CardInset)
+            .lightIsland(padH = 16.dp, padV = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -340,13 +380,6 @@ private fun FinaleBody(
                 lineHeight = sentenceLineHeightSp.sp,
                 modifier = Modifier.padding(horizontal = SentenceExtraHorizontalPadding),
             )
-        }
-
-        AbcSpeakerButton(
-            enabled = ttsAvailable,
-            speaking = speaking,
-            onClick = { onSpeak(finale.tts) },
-        )
     }
 }
 
@@ -354,7 +387,7 @@ private fun FinaleBody(
 private const val FanfareLeadMs = 700L
 
 /** Der Jubel-Titel steht nur noch klein oben (für den Erwachsenen). */
-private const val TitleShrink = 0.62f
+private const val TitleShrink = 0.85f
 
 private const val SkyStartS = 0.4f
 private const val StarGapS = 0.22f
@@ -364,5 +397,15 @@ private const val FlashS = 1.4f
 private const val HopDelayMs = 400L
 private const val HopStaggerMs = 260L
 private val HopHeight = 12.dp
+private val StarTouchRadius = 32.dp
+private const val TapBounceS = 1.4f
+
+/** Wo Stern [i] im Himmel der Größe [w] × [h] steht: das Einheitsquadrat des Buchstabens, mittig. */
+private fun starAt(c: FinaleConstellation.Constellation, i: Int, w: Float, h: Float): Offset {
+    val side = minOf(w * 0.62f, h * 0.86f)
+    val origin = Offset((w - side) / 2f, (h - side) / 2f)
+    return origin + Offset(c.stars[i].first * side, c.stars[i].second * side)
+}
+private val CardInset = 14.dp
 private val LineLight = Color(0xFFFFECBE)
 private val LineGlow = Color(0xFFFFD678)

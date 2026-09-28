@@ -410,11 +410,15 @@ private val PegBorderGreen = Color(0xFF3A7A44)
 private val PegCornerRadius = 16.dp
 private val PegBorderWidth = 3.dp
 
-/** Ausschlag des Nachschwingens — mehr, und lange Sätze stoßen aneinander. */
-private const val PegSwingDegrees = 4f
+/**
+ * Ausschlag des Nachschwingens. 8° statt anfangs 4° auf der schnellen `Wobble`-Feder:
+ * das las sich wie Zittern, nicht wie eine Karte an der Leine (Nutzer-Feedback). Bei
+ * langen Sätzen berühren sich Nachbarn dabei kurz; das ist an der Leine erlaubt.
+ */
+private const val PegSwingDegrees = 8f
 
-/** Anstoß beim Antippen, in Grad pro Sekunde — ergibt rund 3° Ausschlag. */
-private const val PegTapKick = 120f
+/** Anstoß beim Antippen, in Grad pro Sekunde — auf der `Glide`-Feder rund 7° Ausschlag. */
+private const val PegTapKick = 160f
 
 @Composable
 private fun Peg(
@@ -436,14 +440,14 @@ private fun Peg(
     // Bewusst nicht `by`: der Wert wird ausschließlich in graphicsLayer und
     // drawBehind gelesen, also in der Zeichenphase.
     val settle = rememberSlotFillSettle(filled = filled != null, morphOnFill = morphOnFill)
-    // Frisch aufgehängt schwingt die Karte kurz an ihrer Klammer nach. Höchstens
-    // PegSwingDegrees: bei langen Sätzen liegen die Pegs nur 4dp auseinander.
+    // Frisch aufgehängt schwingt die Karte an ihrer Klammer nach wie ein Pendel:
+    // die langsame `Glide`-Feder, nicht das schnelle `Wobble`.
     val swing = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
     LaunchedEffect(filled != null) {
         if (filled != null && morphOnFill) {
             swing.snapTo(PegSwingDegrees)
-            swing.animateTo(0f, AbcMotion.Wobble.spec())
+            swing.animateTo(0f, AbcMotion.Glide.spec())
         }
     }
 
@@ -477,7 +481,7 @@ private fun Peg(
         key = SentenceOrderTray.pegKey(index),
         // Jeder Tipp stupst die Karte an der Leine an: sie schaukelt kurz, voll wie leer.
         onTap = {
-            scope.launch { swing.animateTo(0f, AbcMotion.Wobble.spec(), initialVelocity = PegTapKick) }
+            scope.launch { swing.animateTo(0f, AbcMotion.Glide.spec(), initialVelocity = PegTapKick) }
             onTap()
         },
         enabled = enabled,

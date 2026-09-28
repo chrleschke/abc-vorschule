@@ -331,6 +331,55 @@ private fun cavePoint(f: Offset, w: Float, h: Float): Offset {
 private const val CaveImageW = 768f
 private const val CaveImageH = 1376f
 
+/**
+ * Spurensucher: Glühwürmchen im Dschungelbild. Sie treiben langsam (Bahnen 26–46 s) und
+ * blinken, wie echte Glühwürmchen: kurz hell, dann lange dunkel, jedes in eigenem Takt.
+ * Sie bleiben in den Randstreifen und unten im Blattwerk — die Mitte gehört dem Weg des
+ * Buchstabens.
+ */
+@Composable
+internal fun JungleFireflies(modifier: Modifier) {
+    val still = rememberReduceMotion()
+    val seconds by rememberWorldSeconds(still)
+    Canvas(modifier.graphicsLayer()) {
+        val w = size.width
+        val h = size.height
+        JungleFlies.forEach { (fx, fy, period, phase, r) ->
+            val a = seconds / period * Tau + phase
+            val pos = Offset(
+                w * (fx + 0.05f * sin(a) + 0.02f * sin(a * 2.3f + 1f)),
+                h * (fy + 0.04f * cos(a * 0.8f)),
+            )
+            // Blinken: nur der obere Teil der Sinuswelle leuchtet, und der kurz.
+            val wave = (0.5f + 0.5f * sin(seconds / (3.5f + phase) * Tau + phase * 5f))
+            val blink = if (still) 0.6f else wave * wave * wave * wave
+            if (blink < 0.02f) return@forEach
+            val gr = r.dp.toPx() * 7f
+            drawCircle(Brush.radialGradient(0f to FireflyLight.copy(alpha = 0.6f * blink), 1f to Color.Transparent, center = pos, radius = gr), radius = gr, center = pos)
+            drawCircle(FireflyCore, alpha = blink, radius = r.dp.toPx(), center = pos)
+        }
+    }
+}
+
+/** (x, y, Periode s, Phase, Radius dp) — links, rechts und unten, nie auf dem Weg. */
+private val JungleFlies: List<FloatArray> = run {
+    val rnd = java.util.Random(61)
+    List(16) {
+        val band = it % 4
+        floatArrayOf(
+            when (band) {
+                0 -> 0.04f + rnd.nextFloat() * 0.16f
+                1 -> 0.8f + rnd.nextFloat() * 0.16f
+                else -> 0.08f + rnd.nextFloat() * 0.84f
+            },
+            if (band >= 2) 0.78f + rnd.nextFloat() * 0.16f else 0.3f + rnd.nextFloat() * 0.45f,
+            26f + rnd.nextFloat() * 20f,
+            rnd.nextFloat() * Tau,
+            1.3f + rnd.nextFloat() * 1.2f,
+        )
+    }
+}
+
 private val MoteCool = Color(0xFF6FF0D8)
 private val MoteWarm = Color(0xFFF0B35A)
 private val MoteCore = Color(0xFFE8FFF8)

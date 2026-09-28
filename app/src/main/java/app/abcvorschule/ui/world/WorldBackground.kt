@@ -35,7 +35,10 @@ fun WorldBackground(world: TrainerWorld, modifier: Modifier = Modifier, taps: Wo
     when (world) {
         TrainerWorld.Paper -> Unit
         TrainerWorld.DeepSea -> DeepSeaBackground(modifier, taps)
-        TrainerWorld.Jungle -> PaintedBackground(R.drawable.world_jungle, JungleFallback, modifier)
+        TrainerWorld.Jungle -> Box(modifier) {
+            PaintedBackground(R.drawable.world_jungle, JungleFallback, Modifier.fillMaxSize())
+            JungleFireflies(Modifier.fillMaxSize())
+        }
         TrainerWorld.ForestNight -> ForestNightBackground(modifier)
         TrainerWorld.Attic -> AtticBackground(modifier, taps)
         TrainerWorld.Workshop -> WorkshopBackground(modifier, taps)

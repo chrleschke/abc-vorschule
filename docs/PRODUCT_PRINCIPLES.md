@@ -797,7 +797,10 @@ niemals mit einem stummen No-Op.
   (f-l18: l18 und l26), die erste Lektion zum Finale wäre die falsche. Die Sterne kommen
   aus den Spurdaten des Buchstabens (vereinfacht, Ecken bleiben, gemeinsame Enden werden ein
   Stern). Bilder und Satz liegen auf einer hellen Karte, die Bilder hüpfen einmal, während der
-  Satz gesprochen wird. „Super gemacht!" steht nur noch klein oben, für den Erwachsenen.
+  Satz gesprochen wird. Nach dem Aufbau funkeln die Sterne leise weiter (Größe ±8 %, Drehung
+  ±10°, ab und zu ein Glanzlicht); ein angetippter Stern springt größer und schaukelt aus.
+  Unten stehen Lautsprecher und ein großer runder grüner Pfeil (88 dp, `AbcContinueButton`)
+  nebeneinander. „Super gemacht!" steht oben, für den Erwachsenen.
   **Kein Konfetti** mehr: die Quadrate in vier Rollenfarben verwässerten Grün und Gold.
 - **Shape-Morph beim Einrasten (Squish-Settle).** Rastet ein Wort in einen Peg des
   Satz-Architekten **oder ein Baustein in einen Rahmen des Wort-Bauers**, quetscht
@@ -908,8 +911,9 @@ niemals mit einem stummen No-Op.
     Leine, leere Plätze sind gestrichelte, fast durchsichtige Umrisse. Der Durchhang verschiebt
     den ganzen Peg samt Tipp- und Ablagefläche (Versatz beim Platzieren, nicht im
     `graphicsLayer`), sonst nähme ein mittlerer Peg Tipps bis 14 dp über seinem Bild an. Eine frisch aufgehängte
-    Karte schwingt kurz nach, höchstens 4° — bei langen Sätzen liegen die Pegs nur 4 dp
-    auseinander. Lange Sätze dürfen über die Pfosten hinaus bis 8 dp vor den Bildschirmrand
+    Karte schwingt wie ein Pendel nach (8°, langsame Feder `Glide`; 4° auf `Wobble` las sich
+    wie Zittern), jeder Tipp stößt sie erneut an. Bei langen Sätzen berühren sich Nachbarn
+    dabei kurz, das ist an der Leine erlaubt. Lange Sätze dürfen über die Pfosten hinaus bis 8 dp vor den Bildschirmrand
     hängen (`SentencePegSizing.solveOnLine`): nur wenn der Glyph auf der Bühne unter 20 dp
     fiele, sonst bleibt die Reihe auf der Bühne. „der Schneemann ist groß" kommt so auf einem
     360-dp-Gerät auf rund 18 statt 15 dp.
@@ -938,7 +942,8 @@ niemals mit einem stummen No-Op.
   - **Dschungel** (Spurensucher): `world_jungle.webp` aus dem Capybara-Experiment des Nutzers.
     Der Weg ist hell (`RoadLight`, fertig `RoadDone`) mit dunklem Schattensaum gegen das Bild; das
     Fahrzeug ist ein **Leuchtkäfer** (Glühwürmchen sind Käfer und leben im Regenwald), der zum
-    nächsten Stern schaut: von oben gezeichnet mit sechs Beinen, orangefarbenem Halsschild mit
+    nächsten Stern schaut. Im Bild treiben blinkende Glühwürmchen (kurz hell, lange dunkel,
+    Bahnen 26–46 s), nur am Rand und unten, nie über dem Weg. Der Käfer ist von oben gezeichnet mit sechs Beinen, orangefarbenem Halsschild mit
     dunklem Fleck, hell gerandeten Flügeldecken und leuchtendem Hinterleib — ohne Beine las er
     sich auf dem Kopf stehend wie ein Mensch von hinten. Im Stand tasten die Fühler, die Beine
     treten leicht, der Hinterleib glimmt; fährt er, laufen die Beine im Dreifußgang mit. Die **Sterne bleiben** — „Punkte" wären schwerer zu erklären. Die
