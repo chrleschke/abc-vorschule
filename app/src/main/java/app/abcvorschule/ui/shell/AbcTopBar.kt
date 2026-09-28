@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -18,13 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
 import app.abcvorschule.ui.components.AbcStarCount
-import app.abcvorschule.ui.components.IconArrowBack
+import app.abcvorschule.ui.components.AbcHoldToExitButton
 import app.abcvorschule.ui.rewards.StarCounterAnchor
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.StarGoldDeep
@@ -121,13 +118,13 @@ fun AbcTopBar(
                     // verlässt, kein Dialog, den man schließt — und bewusst ohne
                     // Gehäuse, das Navigations-Icon einer M3-Bar ist ein nackter
                     // IconButton.
-                    val description = stringResource(R.string.back_to_path)
-                    IconButton(
-                        onClick = onBack,
-                        modifier = Modifier.semantics { contentDescription = description },
-                    ) {
-                        IconArrowBack(tint = WarmInk, size = 24.dp)
-                    }
+                    // Seit September 2026 per Gedrückthalten (AbcHoldToExitButton): ein
+                    // Tipp an der Stelle, an der die Hand aufliegt, beendete sonst die
+                    // Lektion ohne Rückfrage.
+                    AbcHoldToExitButton(
+                        onExit = onBack,
+                        contentDescription = stringResource(R.string.back_to_path),
+                    )
                 }
             },
             title = {

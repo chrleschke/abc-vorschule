@@ -366,8 +366,13 @@ niemals mit einem stummen No-Op.
 - Kein Domänen-Mix, keine Zufallsrotation: die Trainer-Reihenfolge ist didaktisch fix.
 - Vor/Zurück zwischen Runden ist **immer** möglich, unabhängig von Punkten/Fortschritt.
 - Fortschritt speichern nach jeder Antwort; unfertige Lektion wird beim Öffnen fortgesetzt.
-- Back in der Übung und der Schließen-Button verlassen die Lektion **direkt** zum Pfad, ohne
-  End-Screen — unabhängig von den Punkten.
+- Back in der Übung und der Zurück-Pfeil verlassen die Lektion **direkt** zum Pfad, ohne
+  End-Screen — unabhängig von den Punkten. Der Zurück-Pfeil oben links verlangt dafür
+  **Gedrückthalten** (0,8 s, `AbcHoldToExitButton`): ein Ring in `SunCoral` füllt sich,
+  ein kurzer Tipp lässt den Pfeil nur wackeln. Er sitzt dort, wo die Hand beim Halten des
+  Telefons aufliegt, und eine Rückfrage-Box kann ein Vorschulkind nicht lesen. TalkBack
+  behält die direkte Aktion; die System-Zurück-Geste bleibt unverändert (sie ist im
+  Vollbild ohnehin Elternweg).
 - **Der End-Screen erscheint nur beim echten Lektionsabschluss**, mit Finale (Bildreihe + Satz
   + Speaker, Abschnitt 12). Der Satz belohnt damit Durchhalten und nutzt sich nicht ab.
 - Der End-Screen kennt zusätzlich eine **schlanke Variante** ohne Bildreihe und Satz. Sie ist
