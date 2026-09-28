@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
@@ -68,6 +69,8 @@ fun VisualQuantityBoard(
     ttsAvailable: Boolean = false,
     speaking: Boolean = false,
     onSpeakPrompt: () -> Unit = {},
+    /** Ein angetippter Turm sagt seine Zahl. */
+    onSpeakNumber: (Int) -> Unit = {},
 ) {
     // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
     val answerOpacity = rememberRestOpacity()
@@ -77,67 +80,12 @@ fun VisualQuantityBoard(
     // auf null ([MathBoardSizing]). `BoxWithConstraints` liegt außen um die Bühne,
     // weil `ExerciseStage` seinem Antwortslot keine Maße mitgibt.
     BoxWithConstraints(modifier = modifier) {
-        val density = LocalDensity.current
         val stageWidthDp = maxWidth.value
         val stageHeightDp = maxHeight.value
         val tileGap = MathBoardSizing.tileGapDp(stageWidthDp).dp
-        // Gerendert gemessen statt aus sp und `fontScale` gerechnet: Androids
-        // Schriftskalierung ist nichtlinear, die Umrechnung kennt nur `Density`
-        // ([MathBoardSizing], „Warum dp und nicht sp").
-        val numeralLineDp = with(density) {
-            MaterialTheme.typography.headlineMedium.lineHeight.toDp().value
-        }
-        val operatorWidthDp = with(density) {
-            MaterialTheme.typography.displayMedium.fontSize.toDp().value
-        } * WordFrameSizing.GlyphAspect
-        // §8: gleiche Dimensionen der Buttons. Shorter clusters pad up to the
-        // tallest choice with invisible ghost rows, so tile size never hints at
-        // the answer and the numerals share one baseline. Damit zahlt jede Kachel
-        // die Höhe der größten Menge — genau die Zeilenzahl, gegen die gerechnet wird.
-        val tallestCluster = choices.maxOf { QuantityGrouping.clusters(it).size }
-        val choiceLayout = MathBoardSizing.solveChoices(
-            stageWidthDp = stageWidthDp,
-            stageHeightDp = stageHeightDp,
-            rows = tallestCluster,
-            numeralLineDp = numeralLineDp,
-        )
-        // Solutions must match the prompt's representation: once either operand or
-        // any choice is symbolic, every answer tile shows a single icon too, never
-        // a mix of "one icon" and "nine icons" for the same round. Dasselbe gilt,
-        // wenn erst die Bühne die Kacheln symbolisch macht — dann geht die Aufgabe
-        // mit, sonst stünde eine Mengengruppe neben einem einzelnen Symbol.
-        val forceSymbolic = QuantityRepresentation.forceSymbolicForChoices(left, right, choices) ||
-            choiceLayout.symbolic
-        val equalRows = if (forceSymbolic) 0 else tallestCluster
-        // Der Aufgabenblock bekommt, was der Antwortblock übrig lässt — und der ist
-        // in `ExerciseStage` das ungewichtete Kind, also derjenige, der zuerst nimmt.
-        val promptRows = if (forceSymbolic) {
-            1
-        } else {
-            maxOf(QuantityGrouping.clusters(left).size, QuantityGrouping.clusters(right).size)
-        }
-        val promptCells = if (forceSymbolic) {
-            2
-        } else {
-            minOf(left, 2) + minOf(right, 2)
-        }
-        val promptBaseDp = with(density) {
-            QuantityGrouping.promptEmojiSizeSp(44, left, right).sp.toDp().value
-        } * MathBoardSizing.EmojiAspect
-        val promptEmojiDp = MathBoardSizing.solvePromptEmojiDp(
-            baseDp = promptBaseDp,
-            stageWidthDp = stageWidthDp,
-            stageHeightDp = stageHeightDp,
-            rows = promptRows,
-            cells = promptCells,
-            answersHeightDp = MathBoardSizing.answersHeightDp(
-                layout = choiceLayout,
-                rows = tallestCluster,
-                numeralLineDp = numeralLineDp,
-            ),
-            operatorWidthDp = operatorWidthDp,
-            numeralLineDp = numeralLineDp,
-        )
+        // Die Zahlentürme nehmen gut zwei Fünftel der Bühne; der Rest bleibt für den
+        // Lautsprecher, die Kacheln und den Auflösen-Knopf (§9: nichts rückt nach).
+        val towersHeight = (stageHeightDp * TowersShareOfStage).coerceIn(MinTowersDp, MaxTowersDp).dp
 
         ExerciseStage(
             modifier = Modifier.fillMaxSize(),
@@ -150,20 +98,24 @@ fun VisualQuantityBoard(
                 )
             },
             prompt = {
-                // Nacht am Waldrand: die Aufgabe liegt auf einer Licht-Insel (§10).
-                Box(modifier = Modifier.testTag("math_prompt").lightIsland()) {
-                    MathQuantityPrompt(
-                        emoji, left, right, operation,
-                        emojiSize = promptEmojiDp.dp,
-                        forceSymbolic = forceSymbolic,
+                // Die Aufgabe als Zahlentürme (§8); die Platte mit den Zahlen ist die
+                // Licht-Insel der Aufgabe.
+                Box(modifier = Modifier.testTag("math_prompt")) {
+                    NumberTowers(
+                        left = left,
+                        right = right,
+                        operation = operation,
+                        solved = solved != null,
+                        revealed = locked,
+                        enabled = !interactionLocked,
+                        onSpeakNumber = onSpeakNumber,
+                        height = towersHeight,
                     )
                 }
             },
             answers = {
                 // `Row`, nicht `FlowRow`: drei Optionen sind Produktregel (§8), und ein
-                // Umbruch ist hier nie die richtige Antwort — er macht aus einer Reihe
-                // gleicher Kacheln zwei ungleiche Zeilen. Passt es nicht, schrumpfen
-                // die Emojis (oben gelöst), nicht die Reihe.
+                // Umbruch ist hier nie die richtige Antwort.
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(
                         tileGap,
@@ -179,27 +131,26 @@ fun VisualQuantityBoard(
                         // answer was right while it is being spoken. A wrong pick is never
                         // marked red — misses stay spoken-only feedback.
                         val correct = solved == value
-                        Column(
+                        // Nur die Zahl: kleine Türme in den Kacheln machten es zu leicht,
+                        // brachten eine dritte Farbe und mehr Unruhe (Nutzerentscheidung).
+                        Box(
                             modifier = Modifier
+                                .shadow(6.dp, RoundedCornerShape(18.dp))
                                 .background(
                                     color = if (correct) LeafGreen else CreamElevated,
                                     shape = RoundedCornerShape(18.dp),
                                 )
                                 .clickable(enabled = !interactionLocked) { onChoose(value) }
                                 .defaultMinSize(minWidth = AbcDimens.kidTouch, minHeight = AbcDimens.kidTouch)
-                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
                                 .testTag("math_choice_$value"),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
+                            contentAlignment = Alignment.Center,
                         ) {
-                            QuantityCluster(
-                                emoji = emoji,
-                                count = value,
-                                emojiSize = choiceLayout.emojiDp.dp,
-                                showNumber = true,
-                                numberColor = if (correct) Cream else WarmInk,
-                                forceSymbolic = forceSymbolic,
-                                minClusterRows = equalRows,
+                            Text(
+                                text = value.toString(),
+                                style = MaterialTheme.typography.displaySmall,
+                                color = if (correct) Cream else WarmInk,
+                                maxLines = 1,
                             )
                         }
                     }
@@ -212,82 +163,10 @@ fun VisualQuantityBoard(
     }
 }
 
-@Composable
-fun QuantityCluster(
-    emoji: String,
-    count: Int,
-    /** Gerenderte Kantenlänge eines Emojis — dp, nicht sp ([MathBoardSizing]). */
-    emojiSize: Dp,
-    modifier: Modifier = Modifier,
-    showNumber: Boolean = true,
-    numberColor: Color = WarmInk,
-    /** Set when the other number in this round is already symbolic, so both
-     * sides of the equation stay visually consistent. */
-    forceSymbolic: Boolean = false,
-    /** Pad up to this many emoji rows with invisible pair rows, so sibling
-     * tiles keep equal height and width regardless of their count (§8). */
-    minClusterRows: Int = 0,
-) {
-    // Ohne Bildwort zeigt die Menge nur ihre Ziffer. Ein Emoji hier wäre bei den
-    // Zahlen, um die es dann geht, ohnehin ein einzelnes Symbol neben der Zahl —
-    // also Dekoration, die eine Szene behauptet, die es nicht gibt.
-    if (emoji.isBlank()) {
-        Column(
-            modifier = modifier,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Text(
-                text = count.toString(),
-                style = MaterialTheme.typography.displaySmall,
-                color = numberColor,
-            )
-        }
-        return
-    }
-    if (forceSymbolic || QuantityRepresentation.isSymbolic(count)) {
-        Column(
-            modifier = modifier,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            EmojiGlyph(emoji = emoji, size = emojiSize)
-            if (showNumber) Text(text = count.toString(), style = MaterialTheme.typography.headlineMedium, color = numberColor)
-        }
-        return
-    }
-    val clusters = QuantityGrouping.clusters(count)
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        clusters.forEach { size ->
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                repeat(size) {
-                    EmojiGlyph(emoji = emoji, size = emojiSize)
-                }
-            }
-        }
-        // Ghost rows between the emojis and the numeral: sizes with fewer rows
-        // grow to match their tallest sibling, and all numerals line up.
-        repeat((minClusterRows - clusters.size).coerceAtLeast(0)) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.alpha(0f),
-            ) {
-                repeat(2) { EmojiGlyph(emoji = emoji, size = emojiSize) }
-            }
-        }
-        if (showNumber) {
-            Text(
-                text = count.toString(),
-                style = MaterialTheme.typography.headlineMedium,
-                color = numberColor,
-            )
-        }
-    }
-}
+/** Anteil der Bühnenhöhe für die Zahlentürme, mit Boden und Deckel in dp. */
+private const val TowersShareOfStage = 0.42f
+private const val MinTowersDp = 150f
+private const val MaxTowersDp = 340f
 
 /**
  * Ein Emoji in gerenderter Größe — mit **eigener** Zeilenhöhe. Ohne sie erbt der
@@ -313,40 +192,6 @@ internal fun EmojiGlyph(emoji: String, size: Dp, modifier: Modifier = Modifier) 
         ),
         modifier = modifier,
     )
-}
-
-/**
- * One visual equation. Multiplication shows the two-dimensional matrix — "left
- * Reihen mit je right Stück" — instead of a symbol row, so both factors stay
- * visible as rows × columns.
- */
-@Composable
-fun MathQuantityPrompt(
-    emoji: String,
-    left: Int,
-    right: Int,
-    operation: MathOperation,
-    /** Gerenderte Kantenlänge eines Emojis — dp, nicht sp ([MathBoardSizing]). */
-    emojiSize: Dp,
-    /** Von außen erzwungen, wenn schon die Antwort-Kacheln symbolisch sind: eine
-     * Mengengruppe neben einem einzelnen Symbol ist die verwirrende Mischung, die
-     * [QuantityRepresentation.forceSymbolicForChoices] gerade verhindern soll. */
-    forceSymbolic: Boolean = false,
-) {
-    if (operation == MathOperation.Multiply) {
-        // Die Matrix lebt von der Fläche — ohne Bildwort tut es das Zählplättchen.
-        MultiplicationMatrixGrid(emoji = emoji.ifBlank { NeutralCountingToken }, rows = left, columns = right)
-        return
-    }
-    val symbolic = forceSymbolic || QuantityRepresentation.forceSymbolicFor(left, right)
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(MathBoardSizing.PromptGapDp.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        QuantityCluster(emoji = emoji, count = left, emojiSize = emojiSize, forceSymbolic = symbolic)
-        Text(operation.symbol, style = MaterialTheme.typography.displayMedium, color = WarmInk)
-        QuantityCluster(emoji = emoji, count = right, emojiSize = emojiSize, forceSymbolic = symbolic)
-    }
 }
 
 /**

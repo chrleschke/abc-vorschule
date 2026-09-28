@@ -38,7 +38,6 @@ fun MathExercise(
     roundIndex: Int,
     icon: String,
     input: MathInputMode,
-    showSymbolPrompt: Boolean,
     ttsAvailable: Boolean,
     speaking: Boolean,
     interactionLocked: Boolean = false,
@@ -148,13 +147,8 @@ fun MathExercise(
                     // The multiplication matrix writes "3 × 4" above itself, and the
                     // counting aid writes its own equation line — a second symbolic line
                     // here would show the same task twice (Layout §9).
-                    if (showSymbolPrompt && !countingOpen && operation != MathOperation.Multiply) {
-                        Text(
-                            text = "${round.left} ${operation.symbol} ${round.right} = ?",
-                            style = MaterialTheme.typography.displayLarge,
-                            color = WarmInk,
-                        )
-                    }
+                    // Die Zahlentürme tragen die Aufgabe selbst als Zahlen auf ihrer
+                    // Platte; eine zweite Ziffernzeile („4 + 3 = ?") stünde doppelt da (§9).
                     if (countingOpen) {
                         CountingAid(
                             emoji = icon,
@@ -183,21 +177,16 @@ fun MathExercise(
                             },
                         )
                     } else {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(20.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            // Der Tipp-Modus teilt den Aufgabenblock mit der Tastatur statt
-                            // mit Kacheln; die Bühnen-Rechnung der Mengenwahl gilt hier nicht.
-                            // Gerenderte Größe wie dort ([MathBoardSizing]): sp durch die
-                            // nichtlineare Skalierung von `Density`, nicht mal `fontScale`.
-                            val promptEmojiSize = with(LocalDensity.current) { 40.sp.toDp() } *
-                                MathBoardSizing.EmojiAspect
-                            MathQuantityPrompt(
-                                icon, round.left, round.right, operation,
-                                emojiSize = promptEmojiSize,
-                            )
-                        }
+                        NumberTowers(
+                            left = round.left,
+                            right = round.right,
+                            operation = operation,
+                            solved = solved != null,
+                            revealed = locked,
+                            enabled = !interactionLocked,
+                            onSpeakNumber = { onSpeakCounting(GermanNumberWord.of(it)) },
+                            height = TypedTowersHeight,
+                        )
                     }
             
                 }
@@ -233,7 +222,11 @@ fun MathExercise(
             ttsAvailable = ttsAvailable,
             speaking = speaking,
             onSpeakPrompt = onSpeakPrompt,
+            onSpeakNumber = { onSpeakCounting(GermanNumberWord.of(it)) },
             modifier = modifier.fillMaxSize(),
         )
     }
 }
+
+/** Im Tipp-Modus teilt sich die Aufgabe die Bühne mit dem Ziffernblock. */
+private val TypedTowersHeight = 180.dp

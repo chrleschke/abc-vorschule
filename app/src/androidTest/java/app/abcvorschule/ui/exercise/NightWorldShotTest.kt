@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.testTag
@@ -183,4 +185,46 @@ class NightWorldShotTest {
         rule.mainClock.advanceTimeBy(5_000)
         save("end-done.png")
     }
+
+    private fun towers(left: Int, right: Int, op: MathOperation, choices: List<Int>, tap: Boolean, solve: Boolean, name: String) {
+        var solved by androidx.compose.runtime.mutableStateOf<Int?>(null)
+        rule.setContent {
+            InWorld(TrainerWorld.ForestNight) {
+                VisualQuantityBoard(
+                    emoji = "",
+                    left = left,
+                    right = right,
+                    operation = op,
+                    choices = choices,
+                    onChoose = {},
+                    solved = solved,
+                    ttsAvailable = true,
+                )
+            }
+        }
+        rule.mainClock.advanceTimeBy(3_000)
+        save("$name-start.png")
+        if (tap) {
+            rule.onNodeWithTag("number_towers").performClick()
+            rule.mainClock.advanceTimeBy(4_000)
+            save("$name-jumped.png")
+        }
+        if (solve) {
+            rule.runOnUiThread { solved = op.answer(left, right) }
+            rule.mainClock.advanceTimeBy(4_000)
+            save("$name-solved.png")
+        }
+    }
+
+    @Test
+    fun towersPlus() = towers(4, 3, MathOperation.Add, listOf(6, 7, 8), tap = true, solve = true, name = "towers-plus")
+
+    @Test
+    fun towersMinus() = towers(9, 6, MathOperation.Subtract, listOf(3, 2, 4), tap = true, solve = true, name = "towers-minus")
+
+    @Test
+    fun towersTimes() = towers(3, 4, MathOperation.Multiply, listOf(12, 7, 16), tap = false, solve = true, name = "towers-times")
+
+    @Test
+    fun towersBig() = towers(13, 4, MathOperation.Add, listOf(16, 17, 18), tap = false, solve = true, name = "towers-big")
 }

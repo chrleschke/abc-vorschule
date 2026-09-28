@@ -546,6 +546,34 @@ niemals mit einem stummen No-Op.
 
 ## 8. Mathematik-Visuals
 
+- **Zahlentürme (seit September 2026, `NumberTowers`).** Die Aufgabe steht nicht mehr als
+  Emoji-Gruppen da (bei 9 − 6 fünfzehn Hüte in Zweierpaaren — unruhig, und ab etwa fünf
+  Dingen zählen Vorschulkinder einzeln ab), sondern als **Figuren aus Blöcken**, nach dem
+  Prinzip von Numberblocks, aber mit Silbos eigenem Gesicht und ohne feste Farbe je Zahl.
+  - **Säulen zu je fünf:** sieben ist „eine volle Säule und zwei", zehn sind zwei volle
+    Säulen mit hellem Rahmen (der Zehner), 13 ist ein Zehner und drei — bis 30 ohne
+    Symbol-Trick. Farbe nach **Rolle**: die erste Zahl Honig, die zweite Himmelblau.
+  - **Schritt 1, Tippen:** tippt das Kind auf die Aufgabe (oder einen Turm), springen die
+    Blöcke — bei Plus die blauen einzeln auf den Honig-Turm (sie bleiben blau: man sieht die
+    4 und die 3 in der 7), bei Minus die weggenommenen oben herunter auf die gestrichelten
+    blauen Plätze über der rechten Zahl, die **von Anfang an** dastehen; ihre alten Plätze
+    bleiben als Geisterblöcke, die erste Zahl bleibt sichtbar. Bis zum Tipp hüpfen die
+    springbereiten Blöcke alle 4,5 s kurz, als Einladung. Ein Tipp auf einen Turm sagt
+    außerdem seine Zahl (Zählkanal, `GermanNumberWord`).
+  - **Schritt 2, richtige Antwort:** erst jetzt verschmelzen die Figuren endgültig — Blau
+    wird Honig (Plus), Geister und Weggenommenes gehen (Minus), die Türme rücken zusammen
+    (Mal) — und die fertige Figur bekommt ein **großes Gesicht** über ihr größtes voll
+    gefülltes Rechteck (`NumberTowerGeometry.faceRect`). Ohne vorherigen Tipp läuft erst der
+    Sprung, dann das Verschmelzen; Auflösen zeigt den Sprung ohne Feier.
+  - **Malnehmen:** „3 mal 4" sind drei gleiche Vierertürme, jeder mit eigenem kleinen Gesicht,
+    die nacheinander hereinfallen; nach der Antwort rücken sie zusammen, und aus den kleinen
+    Gesichtern wird ein großes.
+  - **Antwortkacheln zeigen nur die Zahl** — kleine Türme darin machten es zu leicht,
+    brachten eine dritte Farbe und mehr Unruhe. Die Platte unter den Türmen trägt die Aufgabe
+    als Ziffern (`4 + 3`); eine zweite Ziffernzeile gibt es nicht mehr.
+  - Die Zähl-Hilfe nach zwei Fehlversuchen (Tipp-Modus) bleibt, wie sie unten beschrieben ist.
+  Die Regeln unten zu Emoji-Gruppen, Symbol ab 11 und Matrix gelten nur noch für die Zähl-Hilfe.
+
 - Mengen bis 10 als Bilder/Emojis, sinnvoll gruppiert (Subitizing: Paare + Rest, z. B. 5 = 2+2+1). Ab 11 steht ein einzelnes Bildsymbol mit der Zahl für die Menge.
 - **Ein Bildwort muss verdient sein — `iconAtomId` ist optional.** Genau bis 10 zeigt der
   Trainer echte Stückzahlen; ab 11 bleibt ein einzelnes Symbol neben der Ziffer übrig, das
