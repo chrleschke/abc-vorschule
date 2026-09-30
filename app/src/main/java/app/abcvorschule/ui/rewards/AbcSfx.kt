@@ -45,7 +45,7 @@ enum class Sfx(val asset: String) {
     /** Das Jagd-Feld mischt neu. */
     Shuffle("shuffle"),
 
-    /** Etwas geht (noch) nicht: gesperrtes Schild, Fehltipp ohne deutsche Stimme. */
+    /** Etwas geht (noch) nicht: gesperrtes Schild, Fehltipp ohne deutsche Stimme, Fehlversuch im Rechnen. */
     Blocked("blocked"),
 
     /** Ein Tipp, während die Ansage noch läuft: „hör erst zu" — leise gespielt. */

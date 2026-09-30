@@ -13,7 +13,7 @@ import app.abcvorschule.content.SymbolHuntRound
 import app.abcvorschule.content.SymbolInWordRound
 import app.abcvorschule.content.TrainerRound
 import app.abcvorschule.content.WordBuildRound
-import app.abcvorschule.content.spokenAnswer
+import app.abcvorschule.speech.GermanNumberWord
 import app.abcvorschule.ui.rewards.PraisePhrases
 import kotlin.random.Random
 
@@ -26,9 +26,11 @@ object SuccessSpeech {
         random: Random = Random.Default,
     ): List<String> = when (round) {
         is CountAddRound -> {
-            // Praise first, answer last (§7): the quantity must be the last thing
-            // the child hears — "Ausgezeichnet! Zwei Ameisen", never the reverse.
-            val answer = round.spokenAnswer(round.iconAtomId?.let { pack.atoms[it] })
+            // Praise first, answer last (§7): the number must be the last thing
+            // the child hears — "Ausgezeichnet! fünf", never the reverse. Als
+            // Zahlwort, nicht als Ziffer: "fünf" hat einen Clip (Zählkanal), "5"
+            // fiel direkt nach dem kuratierten Lob auf Android-TTS zurück.
+            val answer = GermanNumberWord.of(round.answer)
             if (praise) listOf(PraisePhrases.pick(random), answer) else listOf(answer)
         }
         is SyllableMergeRound -> listOf(

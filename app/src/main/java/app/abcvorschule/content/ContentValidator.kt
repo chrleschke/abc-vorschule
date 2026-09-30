@@ -394,12 +394,6 @@ object ContentValidator {
                     }
                 }
                 is CountAddSpec -> spec.rounds.forEach { round ->
-                    round.iconAtomId?.let { icon ->
-                        requireAtom("task $id", icon)
-                        if (pack.atoms[icon]?.emoji?.isBlank() == true) {
-                            issues += ValidationIssue("task $id counts $icon which carries no emoji")
-                        }
-                    }
                     if (round.left < 0 || round.right < 0) {
                         issues += ValidationIssue("task $id has a negative operand")
                     }

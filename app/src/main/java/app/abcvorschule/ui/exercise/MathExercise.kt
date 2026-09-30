@@ -14,6 +14,7 @@ import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.session.ScheduledTrainer
 import app.abcvorschule.speech.GermanNumberWord
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.playBlockedBlip
 
 /**
  * Trainer 7 — Rechnen. Die Aufgabe steht als Zahlentürme ([NumberTowers]), die Antwort
@@ -52,20 +53,15 @@ fun MathExercise(
         if (solved != null) return
         if (guess == round.answer) {
             solved = guess
-            onResult(MathAttempt(distance = 0, resolved = false, correct = true, guess = guess))
+            onResult(MathAttempt(resolved = false, correct = true))
         } else {
-            // Kein lokales Echo: ein zweiter Primary-speak (der Miss-Hinweis aus dem
-            // ViewModel) flusht die Engine und würde die Zahl mitten im Wort abschneiden.
+            // Ein Fehlversuch ist nur ein Klang, keine Sprache (PRODUCT_PRINCIPLES §8):
+            // das ViewModel spricht für Rechnen keinen Miss-Hinweis, also muss der Tipp
+            // hier hörbar werden — mit und ohne deutsche Stimme.
             haptics.nudge()
+            playBlockedBlip()
             misses += 1
-            onResult(
-                MathAttempt(
-                    distance = MathHinting.distance(round.answer, guess),
-                    resolved = false,
-                    correct = false,
-                    guess = guess,
-                ),
-            )
+            onResult(MathAttempt(resolved = false, correct = false))
         }
     }
 

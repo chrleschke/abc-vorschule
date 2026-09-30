@@ -61,20 +61,6 @@ class ContentRepositoryTest {
     }
 
     @Test
-    fun countAddRoundsUseLessonContextIcons() {
-        pack.tasksOf(pack.lesson("l01")).filterIsInstance<CountAddSpec>().forEach { math ->
-            math.rounds.forEach { round ->
-                // Ohne Bildwort zeigt die Aufgabe nur Ziffern; steht eins da,
-                // muss es auflösen und ein Emoji tragen.
-                round.iconAtomId?.let { icon ->
-                    assertTrue(icon in pack.atoms.keys)
-                    assertTrue(pack.atom(icon).emoji.isNotBlank())
-                }
-            }
-        }
-    }
-
-    @Test
     fun duplicateIdsFailParsingInsteadOfSilentlyKeepingTheLastOne() {
         // `associateBy` is last-wins: without the parse-time check a duplicated id
         // would shadow its first definition and the validator could never see it.

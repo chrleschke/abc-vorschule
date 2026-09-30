@@ -125,22 +125,11 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
     richtige Karte groß in die Bildschirmmitte und hält sie dort, solange der Satz
     wiederholt wird; die andere Karte blendet aus. **Auflösen („Zeig mir")
     markiert nur, es feiert nicht.**
-7. **Rechnen** — reine Mengen-Arithmetik in *jeder* Lektion, Icons aus dem Wortschatz
-  derselben Lektion. **Keine Wörter zum Lesen oder Schreiben**; Singular/Plural nur gesprochen.
-  - **Der Prompt behauptet eine Szene — die muss stimmen.** „Vier Reihen mit je sechs
-    Eisbären sitzen am Ufer" ist gleich dreifach falsch: Eisbären sind Einzelgänger, ein
-    Ufer ist kein Eismeer, und in Reihen sitzt gar kein Tier. Reihen (Malnehmen) gibt es
-    nur dort, wo die Welt wirklich Reihen kennt: Beet, Regal, Parkplatz, Bussitze,
-    Eierkarton, Vögel auf der Leitung. Bei Einzelgängern (Eisbär, Krokodil, Eule, Maus)
-    und bei Mengen, die es nie gibt (dreißig Türen an einem Haus, neunundzwanzig
-    Schneemänner in einem Garten) wird die Runde zu Plus oder Wegnehmen — oder ganz ohne
-    Szene gestellt („Vierzehn Mäuse und neun Mäuse."), was immer trägt.
-  - **Icon, gezähltes Nomen und gesprochene Antwort sind dasselbe Ding.** Ein Prompt, der
-    Kinder zählt, während das Icon Busse zeigt und die Antwort „24 Schulbusse" sagt, ist
-    drei Aufgaben in einer. Das Icon-Atom braucht ein `pluralDisplay`, sonst spricht der
-    Erfolg „18 Pizza".
-  - **Nur der Finale-Satz darf Quatsch sein** (Abschnitt 12) — und dann muss er lustig
-    sein. Alles andere, was das Kind hört, beschreibt eine Welt, die es wiedererkennt.
+7. **Rechnen** — reine Arithmetik mit Zahlentürmen in *jeder* Lektion (Abschnitt 8).
+  **Keine Wörter zum Lesen oder Schreiben**, keine Bilder. Seit September 2026 gibt es keine
+  Sachaufgaben mehr: die Ansage fragt nur die Rechnung, die Antwort ist die Zahl. Die früheren
+  Regeln für Szene, Icon und Plural (`iconAtomId`, „18 Pizza") sind damit mitsamt dem Feld
+  entfallen.
 
 Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Jeder Treffer fliegt als Perle in die Herzmuschel am Boden der Tiefsee (siehe §10, „Nachtwelten"), ein Fehltipp mischt neu, ohne dass eine Perle verloren geht. Das Mischen ist **Absicht gegen Raten** (ohne es tippen Kinder alle Kugeln der Reihe nach an) und bleibt; seit September 2026 **hüpfen** die Kugeln dabei in kleinen, versetzten Bögen an ihre neuen Plätze statt zu teleportieren, und das Feld nimmt keine Tipps an, bis die letzte gelandet ist (~650 ms, `HuntShuffleHop`). Die Bewegung bremst Durchtippen zusätzlich, ohne zu strafen.
 
@@ -284,7 +273,7 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
 
 - Atome (Buchstabe / Silbe / Wort + Emoji) sind wiederverwendbar über alle sechs Trainer-Typen einer Lektion.
 - Atom-Emojis werden auch außerhalb der Trainer verwendet: die Pfad-Schilder zeigen bis zu drei
-  Emojis je Lektion, abgeleitet aus word_build → count_add → sentence_order → sentence_picture
+  Emojis je Lektion, abgeleitet aus word_build → sentence_order → sentence_picture
   (deterministisch, über den Emoji-Glyph dedupliziert). Der Satz-Versteher steht bewusst am Ende:
   seine Bildkarten sind Antwortmaterial und füllen nur auf, was die übrigen Trainer offenlassen.
   Jede autorierte Lektion trägt den Satz-Versteher; bis August 2026 fehlte er den Wiederholungen
@@ -427,14 +416,16 @@ niemals mit einem stummen No-Op.
   unbestimmten (ein/eine), Namen ohne. Neutrum-Personen bekommen „das": „ein Opa" und
   „ein Kind" wären sonst nicht unterscheidbar. Betroffen sind Wort-Bauer und Wort-Detektiv
   (`SuccessSpeech`). **Nicht** betroffen: Prompts, das Antippen von Items,
-  `missTts`, Rechnen („zwei Ameisen" — vor einer Zahl steht kein Artikel), ganze Sätze,
+  `missTts`, Rechnen (die Antwort ist ein nacktes Zahlwort), ganze Sätze,
   die ihre Artikel schon tragen, und die Fress-Sequenz des Laut-Fressers („Sch … Schuh"),
   weil ein Artikel zwischen Laut und Wort genau die Kopplung zerschnitte, die der Trainer
   lehrt. Abgeleitet wird in `AtomArticleSpeech`; `tools/tts` spiegelt
   die Regel, damit vorproduzierte Clips denselben Text tragen.
 - Lob (**nur Rechnen, nur gesprochen**): ein zufälliges Wort oder ein kurzer Ausruf aus
-  `PraisePhrases` steht vor der Antwort („Ausgezeichnet! zwei Ameisen"), damit die Menge das Letzte
-  bleibt, was das Kind hört. Nie als Text anzeigen — das Kind kann nicht lesen. Auflösen
+  `PraisePhrases` steht vor der Antwort („Ausgezeichnet! fünf"), damit die Zahl das Letzte
+  bleibt, was das Kind hört. Die Zahl als Wort (`GermanNumberWord`), nicht als Ziffer: „fünf"
+  ist ein Clip des Zählkanals, „5" fiel direkt nach dem kuratierten Lob auf Android-TTS zurück.
+  Nie als Text anzeigen — das Kind kann nicht lesen. Auflösen
   („Zeig mir") bekommt kein Lob. Jeder Eintrag ist eine eigene Äußerung und bringt seine
   Satzzeichen selbst mit („Bäääm! Volltreffer!"); zwei Einträge dürfen sich nicht nur durch
   Satzzeichen oder Groß-/Kleinschreibung unterscheiden, sonst kuratiert und rendert die
@@ -459,7 +450,10 @@ niemals mit einem stummen No-Op.
   Vorstellung selbst (`currentPromptParts` ist für ihn leer), damit Wackeln und Laut
   zusammenfallen. Ohne deutsches TTS steht das Wort als Text unter dem Emoji — ein
   Hörspiel ist sonst unspielbar.
-- Feedback bei Fehlern (besonders Rechnen): **vorsprechen**, nicht als Fehler-Satz anzeigen.
+- Feedback bei Fehlern: **vorsprechen** (oder ein Klang), nie als Fehler-Satz anzeigen.
+  **Rechnen spricht bei einem Fehlversuch nichts** — nur `Sfx.Blocked` und `nudge`-Haptik,
+  auch nicht den generischen Hinweis „Probiere eine andere Antwort" (seit September 2026;
+  vorher Echo plus Hinweis, „sieben, Du bist nah dran, denk noch einmal nach").
 - **Ansage-Sperre: ruhen statt dimmen** (`PromptRest`, seit September 2026). Solange die
   Rundenansage ihren Freigabe-Punkt nicht erreicht hat, nimmt die Aufgabe keine Tipps an —
   der gesuchte Buchstabe steckt nur in der Stimme, jeder Tipp davor wäre Raten. Sie ist dabei
@@ -485,7 +479,7 @@ niemals mit einem stummen No-Op.
   `ding` Erfolgs-Stern fliegt los/landet im Punktestand · `chime` Runde geschafft · `fanfare`
   Lektion geschafft (der Finale-Satz beginnt 0,7 s danach) · `tap` Ziffernblock · `blip`
   Spurensucher-Stern (Tonleiter über die Abspielrate) · `shuffle` Jagd mischt · `blocked`
-  gesperrt. Kein Klang klingt nach „falsch" — auch `boing` und `blocked` sind weich.
+  gesperrt, Fehlversuch im Rechnen. Kein Klang klingt nach „falsch" — auch `boing` und `blocked` sind weich.
   **Tief und warm, nicht hell:** Grundtöne 150–800 Hz, reine Sinus-Töne mit höchstens einer
   leisen Oktave, keine Glocken-Obertöne, Tiefpass 3 kHz; der Generator bricht ab, wenn ein
   Klang im Mittel über 1,1 kHz liegt. Die erste Fassung (Glöckchen bis 2,7 kHz) war laut
@@ -513,14 +507,10 @@ niemals mit einem stummen No-Op.
   Buchstaben-Jagd, Wort-Detektiv) — nicht für Silben-Verschmelzer (dort werden Laute bewusst
   aneinandergezogen) oder für Ganzwörter.
 - **Die Rechenaufgabe endet auf „?" — und sie ist die einzige Frage.** Alle anderen Prompts
-  sind Aufforderungen („Baue das Wort …", „Finde alle …") und enden auf einen Punkt. Die
-  Rechenaufgabe trägt Erzählung und Frage in einem String („Neun Tomaten liegen im Korb. Vier
-  werden gegessen. Wie viele Tomaten bleiben?"); das „?" sagt der kuratierten Stimme
-  (TTS-Profil `math`), dass nur der letzte Satz fragend anzuheben ist, die Erzählung davor nicht.
-  Bis September 2026 galt das Gegenteil („Letzte Frage ohne Fragezeichen"), weil die
-  System-TTS am „?" die Stimme unruhig hochzieht — diese Regel zielte auf den Fallback, nicht auf
-  die kuratierten Clips. Wo noch kein `math`-Clip liegt, klingt der Fallback deshalb fragend;
-  das ist der Preis, und er ist befristet.
+  sind Aufforderungen („Baue das Wort …", „Finde alle …") und enden auf einen Punkt. Gesprochen
+  wird der Text aber nicht als Ganzes, sondern als Einleitung + Aufgabe (`MathPromptSpeech`,
+  Abschnitt 8); der `promptTts` („Wie viel ist drei plus zwei?") bleibt die lesbare Fassung im
+  Content und muss zu `left`/`right`/`operation` passen (`MathPromptSpeechTest`).
 - **Wortwiederholungen werden am Stück gelesen, nicht buchstabiert.** Nennt ein Trainer ein Wort
   erneut, dann am Stück („Ameise.", nicht „A - M - eise."). Eine buchstabierte/segmentierte
   Wiederholung wird von der System-TTS Buchstabe für Buchstabe vorgelesen und ist für Vorschulkinder
@@ -575,6 +565,10 @@ niemals mit einem stummen No-Op.
   - **Nur Zahlen, keine Sachaufgaben:** Da keine Bilder mehr zu sehen sind, fragt die Ansage
     nur die Rechnung („Wie viel ist vier plus drei?"), Rechenrunden tragen kein `iconAtomId`
     mehr. Rechnen läuft in **jeder** Lektion.
+  - **Die Ansage:** Einleitung „Wie viel ist" + ganze Aufgabe als ein Clip („vier plus drei",
+    `MathPromptSpeech.taskText`, Profil `math`, einzeln im TTS-UI kuratiert), gebaut aus
+    `left`/`right`/`operation`, nicht aus dem Text. Zahl · „plus" · Zahl aus Einzelclips
+    zusammenzusetzen klang zu uneinheitlich — Qwen trifft Betonung und Stimme dabei nicht gleich.
 
 - Rechenaufgaben im Kachel-Modus: genau **3** Antwortoptionen, gleich groß, nur die Zahl. Die
   drei Kacheln stehen in **einer** Reihe und behalten ihre volle Trefferfläche; wird es eng,
@@ -584,7 +578,9 @@ niemals mit einem stummen No-Op.
   (jede Aufgabe bis 30 passt auf die schmalste Bühne).
 - **Progression (bewusst steil):** Zahlenraum 10 schon in Lektion 1, Wegnehmen ab Lektion 2, Zahlenraum 20 ab Lektion 3, Malnehmen ab Lektion 6, Zahlenraum **30** ab Lektion 9. Der Validator deckelt Operanden und Ergebnis bei 30 (`MaxMathQuantity`). Schwierigkeitsbänder: easy ≤5, medium ≤10, hard ≤20, expert ≤30.
 - Korrekte Antwort bestätigt sich **grün** (Kachel bzw. Zahlenfeld), solange sie vorgesprochen wird.
-  Falsche Antwort wird **nicht** rot markiert — Miss bleibt gesprochenes Feedback.
+  Falsche Antwort wird **nicht** rot markiert und **nicht** kommentiert: ein Fehlversuch ist
+  nur ein Klang (`Sfx.Blocked`) mit `nudge`-Haptik, ohne Sprache — kein Echo der getippten
+  Zahl, kein „nah dran", kein generischer Miss-Hinweis.
 - **Eingabeart:** Zahlen-Eingabe bei fortgeschrittenem Scaffold **oder** sobald das Ergebnis über 10 liegt (Band `hard`/`expert`) — außer die Eltern haben ausdrücklich „Mit Hilfe“ (`ParentMode.Beginner`) gewählt, dann bleiben überall die drei Kacheln. Die Regel prüft den Eltern-Modus, nicht das abgeleitete Scaffold: im Default `Auto` startet ein frisches Kind auf `Beginner`, gegen das Scaffold geprüft liefe sie beim Normalnutzer ins Leere. Grund: drei Kacheln mit Nachbar-Distraktoren machen Raten zur billigsten Strategie. Regel in `MathHinting.inputFor`.
 - **Kinder-Ziffernblock statt System-Tastatur** (`NumberPad`, seit September 2026; revidiert
   die frühere Regel „System-Tastatur im Zahlenmodus, kein Custom-Nummernblock"). Oben das

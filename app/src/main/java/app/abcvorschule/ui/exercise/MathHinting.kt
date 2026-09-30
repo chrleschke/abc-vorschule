@@ -2,11 +2,8 @@ package app.abcvorschule.ui.exercise
 
 import app.abcvorschule.progress.ParentMode
 import app.abcvorschule.progress.ScaffoldLevel
-import app.abcvorschule.speech.GermanNumberWord
 
 object MathHinting {
-    const val NearDistanceMax = 2
-
     /** Exactly three numeric choices including the answer (near distractors only). */
     fun threeChoices(answer: Int): List<Int> {
         val opts = linkedSetOf(answer)
@@ -19,33 +16,15 @@ object MathHinting {
         return opts.toList()
     }
 
-    fun distance(answer: Int, guess: Int): Int = kotlin.math.abs(answer - guess)
-
-    fun isNear(answer: Int, guess: Int): Boolean {
-        val d = distance(answer, guess)
-        return d in 1..NearDistanceMax
-    }
-
-    fun isNear(distance: Int): Boolean = distance in 1..NearDistanceMax
-
-    fun hintKey(answer: Int, guess: Int): String =
-        if (isNear(answer, guess)) "near" else "far"
-
-    fun hintText(answer: Int, guess: Int): String =
-        missFeedback(distance(answer, guess))
-
-    /** Feedback shown after a miss; [distance] null means the miss has no numeric distance. */
-    fun missFeedback(distance: Int?): String = when {
-        distance == null -> "Versuch es noch einmal"
-        isNear(distance) -> "Du bist nah dran, denk noch einmal nach"
-        else -> "Schau noch einmal genau hin"
-    }
-
     /**
      * Ab diesem Ergebnis wird getippt statt gewählt — das Band `hard`
      * (ProgressionEngine.bandFor) beginnt bei 11.
      */
     const val TypedAnswerFrom = 11
+
+    /** Lobt die Erfolgs-Zeremonie diesen Versuch? Nur eine selbst gefundene Antwort. */
+    fun praises(attempt: MathAttempt): Boolean =
+        attempt.correct && !attempt.resolved
 
     /**
      * Getippt wird bei fortgeschrittenem Scaffold — oder sobald das Ergebnis über
@@ -56,25 +35,6 @@ object MathHinting {
      * [ParentMode.Beginner] behält überall die Kacheln — Elternentscheidung schlägt
      * Aufgabenschwere.
      */
-    /** Lobt die Erfolgs-Zeremonie diesen Versuch? Nur eine selbst gefundene Antwort. */
-    fun praises(attempt: MathAttempt): Boolean =
-        attempt.correct && !attempt.resolved
-
-    /**
-     * Was nach einem Fehlversuch gesprochen wird.
-     *
-     * Der getippte Wert und der Hinweis als **eine** Äußerung — zwei
-     * aufeinanderfolgende Primary-speaks würden sich gegenseitig flushen und die
-     * Zahl mitten im Wort abschneiden. Die Zahl als Wort und mit Komma statt Punkt:
-     * „7." ist im Deutschen die Ordinalzahl ([GermanNumberWord]).
-     */
-    fun missSpeech(attempt: MathAttempt): String {
-        return listOfNotNull(
-            attempt.guess?.let { "${GermanNumberWord.of(it)}," },
-            missFeedback(attempt.distance),
-        ).joinToString(" ")
-    }
-
     fun inputFor(scaffold: ScaffoldLevel, parentMode: ParentMode, answer: Int): MathInputMode {
         val typed = scaffold == ScaffoldLevel.Advanced ||
             (parentMode != ParentMode.Beginner && answer >= TypedAnswerFrom)

@@ -9,15 +9,6 @@ import org.junit.Test
 
 class MathHintingTest {
     @Test
-    fun nearVersusFarHintsDiffer() {
-        assertEquals("near", MathHinting.hintKey(5, 4))
-        assertEquals("far", MathHinting.hintKey(5, 1))
-        assertTrue(MathHinting.hintText(5, 4) != MathHinting.hintText(5, 1))
-        assertEquals("Versuch es noch einmal", MathHinting.missFeedback(null))
-        assertEquals(MathHinting.hintText(5, 4), MathHinting.missFeedback(1))
-    }
-
-    @Test
     fun advancedScaffoldTypesRegardlessOfHowSmallTheAnswerIs() {
         assertEquals(
             MathInputMode.Typed,
@@ -55,16 +46,6 @@ class MathHintingTest {
     }
 
     @Test
-    fun aMissEchoesTheGuessAsAWordAndThenTheHint() {
-        val plain = attempt(guess = 7, distance = 1)
-        val spoken = MathHinting.missSpeech(plain)
-        assertEquals("sieben, ${MathHinting.missFeedback(1)}", spoken)
-        // Der eigentliche Regressionsschutz: keine Ziffer, auf die ein Punkt folgt —
-        // "7." wäre im Deutschen die Ordinalzahl und würde "siebte" gelesen.
-        assertFalse(spoken, spoken.contains(Regex("""\d\.""")))
-    }
-
-    @Test
     fun onlyAnAnswerFoundByTheChildIsPraised() {
         assertTrue(MathHinting.praises(attempt(correct = true)))
         assertFalse(MathHinting.praises(attempt(correct = true, resolved = true)))
@@ -72,11 +53,9 @@ class MathHintingTest {
     }
 
     private fun attempt(
-        distance: Int? = null,
         resolved: Boolean = false,
         correct: Boolean = false,
-        guess: Int? = null,
-    ) = MathAttempt(distance, resolved, correct, guess)
+    ) = MathAttempt(resolved, correct)
 
     @Test
     fun threeChoicesAlwaysExactlyThreeIncludingAnswer() {
