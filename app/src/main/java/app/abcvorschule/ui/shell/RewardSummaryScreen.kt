@@ -47,13 +47,18 @@ import app.abcvorschule.content.LessonFinale
 import app.abcvorschule.ui.components.AbcContinueButton
 import app.abcvorschule.ui.components.AbcSpeakerButton
 import app.abcvorschule.ui.components.IconStar
+import app.abcvorschule.ui.rewards.AbcSfx
 import app.abcvorschule.ui.rewards.ConfettiGeometry
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SilboEmoji
+import app.abcvorschule.ui.theme.SilboUi
+import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
-import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.SunCoral
 import kotlinx.coroutines.delay
 
@@ -144,6 +149,7 @@ fun RewardSummaryScreen(
     LaunchedEffect(Unit) {
         popped = true
         haptics.celebrate()
+        AbcSfx.play(Sfx.Fanfare)
     }
     // Absichtlich nicht `by`: der Wert wird erst im graphicsLayer-Block von
     // [BackgroundStar] gelesen, also in der Zeichenphase. Hier oben gelesen hätte
@@ -152,7 +158,7 @@ fun RewardSummaryScreen(
     // Animationen (PathSignNode, PathHereMarker, PathScreen).
     val starScale = animateFloatAsState(
         targetValue = if (popped) 1f else 0.7f,
-        animationSpec = tween(500),
+        animationSpec = tween(AbcMotion.LongMs),
         label = "reward-scale",
     )
     val fontScale = LocalDensity.current.fontScale
@@ -160,6 +166,9 @@ fun RewardSummaryScreen(
     // Den Satz einmal beim Erscheinen sprechen, wie die Prompt-Ansage in der Übung.
     LaunchedEffect(finale?.id, ttsAvailable) {
         val text = finale?.tts ?: return@LaunchedEffect
+        // Erst die Fanfare, dann der Satz: ihre drei Anlauftöne liegen sonst genau
+        // über den ersten Wörtern. Der gehaltene Schlusston klingt leise darunter aus.
+        delay(FanfareLeadMs)
         if (ttsAvailable) onSpeak(text)
     }
 
@@ -180,7 +189,8 @@ fun RewardSummaryScreen(
         ) {
             Text(
                 text = stringResource(R.string.reward_title),
-                style = MaterialTheme.typography.headlineMedium,
+                // Jubel für den Erwachsenen daneben, kein Lerninhalt: UI-Schrift wie das Icon.
+                style = MaterialTheme.typography.headlineMedium.copy(fontFamily = SilboUi),
                 color = MaterialTheme.colorScheme.onBackground,
                 // Ungedeckelt würde der Header bei großer Schriftskalierung nicht nur
                 // wachsen, sondern (ohne maxLines) auf zwei Zeilen umbrechen und den
@@ -395,7 +405,7 @@ private fun FinaleBody(
                     }
                     AnimatedVisibility(
                         visible = shown,
-                        enter = fadeIn(tween(260)) + scaleIn(tween(260), initialScale = 0.6f),
+                        enter = fadeIn(tween(AbcMotion.ShortMs)) + scaleIn(tween(AbcMotion.ShortMs), initialScale = 0.6f),
                     ) {
                         // Die Trefferfläche ist die Box, nicht das Glyph: ein Emoji
                         // ist kleiner als der Finger, der es trifft. Siehe
@@ -412,7 +422,7 @@ private fun FinaleBody(
                                 },
                             contentAlignment = Alignment.Center,
                         ) {
-                            Text(text = picture.emoji, fontSize = pictureSp)
+                            Text(text = picture.emoji, fontSize = pictureSp, fontFamily = SilboEmoji)
                         }
                     }
                 }
@@ -444,3 +454,6 @@ private fun FinaleBody(
         )
     }
 }
+
+/** Wie lange die Fanfare allein spielt, bevor der Finale-Satz beginnt. */
+private const val FanfareLeadMs = 700L

@@ -1,7 +1,6 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -52,8 +51,10 @@ import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.BurstGeometry
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.playStarBlip
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
@@ -296,7 +297,7 @@ private fun TraceRewardCard(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text(text = round.rewardEmoji, fontSize = 96.sp)
+        Text(text = round.rewardEmoji, fontSize = 96.sp, fontFamily = SilboEmoji)
         Text(
             text = buildAnnotatedString {
                 if (word == null) {
@@ -382,7 +383,7 @@ private fun TraceCanvas(
     // strokes a letter has, and each bar's fill is the animated index passing it.
     val filled by animateFloatAsState(
         targetValue = state.strokeIndex.toFloat(),
-        animationSpec = tween(durationMillis = 360, easing = EaseIn),
+        animationSpec = tween(durationMillis = AbcMotion.StandardMs, easing = AbcMotion.Fill),
         label = "stroke_fill",
     )
 
@@ -534,7 +535,7 @@ private fun TraceStarSpark(
     LaunchedEffect(spark?.second) {
         if (spark == null) return@LaunchedEffect
         progress.snapTo(0f)
-        progress.animateTo(1f, tween(400))
+        progress.animateTo(1f, tween(AbcMotion.LongMs))
     }
     val point = spark?.first ?: return
     // Dieselbe Fläche wie das TraceCanvas daneben — der Funkenpunkt kommt aus dessen

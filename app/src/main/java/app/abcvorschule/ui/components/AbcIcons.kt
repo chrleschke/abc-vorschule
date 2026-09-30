@@ -274,3 +274,36 @@ fun IconLock(
         )
     }
 }
+
+/**
+ * Löschen-Taste des Kinder-Ziffernblocks: ein Pfeil-Schild nach links mit einem
+ * Kreuz darin — die Form, die Kinder von jeder Tastatur-Rücktaste kennen, ohne
+ * Text.
+ */
+@Composable
+fun IconBackspace(
+    tint: Color,
+    modifier: Modifier = Modifier,
+    size: Dp = 28.dp,
+) {
+    Canvas(modifier.size(size)) {
+        val s = size.toPx()
+        val stroke = Stroke(width = s * 0.09f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        val shield = Path().apply {
+            moveTo(s * 0.32f, s * 0.24f)
+            lineTo(s * 0.88f, s * 0.24f)
+            lineTo(s * 0.88f, s * 0.76f)
+            lineTo(s * 0.32f, s * 0.76f)
+            lineTo(s * 0.10f, s * 0.50f)
+            close()
+        }
+        drawPath(shield, color = tint, style = stroke)
+        val cross = Path().apply {
+            moveTo(s * 0.47f, s * 0.38f)
+            lineTo(s * 0.71f, s * 0.62f)
+            moveTo(s * 0.71f, s * 0.38f)
+            lineTo(s * 0.47f, s * 0.62f)
+        }
+        drawPath(cross, color = tint, style = stroke)
+    }
+}

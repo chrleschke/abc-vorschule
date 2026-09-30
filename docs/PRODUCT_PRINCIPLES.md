@@ -22,7 +22,7 @@ Bei Konflikten mit Implementierungsdetails oder älteren Planabschnitten gelten 
 - Helles, warmes, ruhiges UI (Creme statt Weiß — augenfreundlich); weiches Feedback statt Strafe oder Drucksprache.
 - Distraktoren nur aus **echten, bereits geübten Atomen** (max. 2 pro Aufgabe, Tray ≤ 5 Kacheln) — nie erfundene „Fake-Antworten“. Falsche Kachel oder falsche Platzierung ist einfach falsch (gesprochenes Feedback). Die erste Begegnung mit neuem Stoff bleibt distraktorfrei.
 - Ausnahme Buchstaben-/Silben-Jagd: Streufeld statt Distraktor-Budget (bis zu 6 Distraktor-Kacheln, teils wiederholt) — die Übung braucht mehr Ablenker als eine autorierte Tray-Aufgabe.
-- Drag & Drop committet nur bei echtem Slot-Treffer (Hit-Testing); daneben losgelassene Kacheln schnappen ohne Strafe zurück.
+- Drag & Drop committet nur bei echtem Slot-Treffer (Hit-Testing); daneben oder in den falschen Slot losgelassene Kacheln fliegen ohne Strafe **federnd** an ihren Platz zurück (`DragCard`, Feder `AbcMotion.Soft`) — ein Teleport zurück liest sich wie ein Fehler der App, ein Rückflug wie „noch mal". Aufheben und Absetzen federn ebenfalls (Lift 1,08). Ein Fehlgriff gibt in jedem Trainer `nudge`-Haptik.
 - Safe-Area: Inhalt unter Status-/Nav-Leisten und über Home-Indikator halten; unten extra Abstand.
 
 
@@ -142,7 +142,7 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
   - **Nur der Finale-Satz darf Quatsch sein** (Abschnitt 12) — und dann muss er lustig
     sein. Alles andere, was das Kind hört, beschreibt eine Welt, die es wiedererkennt.
 
-Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Treffer füllen eine Batterie, Fehltipp mischt neu ohne Batterieverlust.
+Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Treffer füllen eine Batterie, Fehltipp mischt neu ohne Batterieverlust. Das Mischen ist **Absicht gegen Raten** (ohne es tippen Kinder alle Kugeln der Reihe nach an) und bleibt; seit September 2026 **hüpfen** die Kugeln dabei in kleinen, versetzten Bögen an ihre neuen Plätze statt zu teleportieren, und das Feld nimmt keine Tipps an, bis die letzte gelandet ist (~650 ms, `HuntShuffleHop`). Die Bewegung bremst Durchtippen zusätzlich, ohne zu strafen.
 
 Ebenfalls abgeleitet und nicht autoriert: der **Wort-Detektiv** direkt nach dem letzten
 Wort-Bauer — „Finde den Buchstaben / den Laut / die Silbe im Wort". Eine Runde pro eingeführtem Wort,
@@ -253,13 +253,17 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
   die vermeintlich fehlten. Der Stand ist seither **null**, und
   `LessonCoverageTest.noAtomSitsInThePackWithoutEverBeingShown` hält ihn dort. Ein
   neues Atom kommt also zusammen mit der Runde, die es zeigt, nicht auf Vorrat.
-- **Emoji-Alter prüfen.** Die App bündelt keinen Emoji-Font (`androidx.emoji2` ist
-  keine Abhängigkeit) und `minSdk` ist 26 — jedes Bild kommt aus dem System-Font des
-  Geräts. Ein Glyph, der jünger ist als das Gerät, rendert als leeres Kästchen. 🫜
-  (Unicode 15.1, 2023) war deshalb im August 2026 unter Android 15 unsichtbar und ist
-  raus. Was noch am Rand steht: 🪼 Qualle (15.0), 🪺 Nest/Vogelnest (14.0), 🪶 Feder
-  (14.0) — alles darunter ist ab Android 12 sicher. Im Zweifel den älteren Glyphen
-  nehmen; ein Bild, das ein Kind nicht sieht, ist kein Bild.
+- **Emojis kommen aus der App, nicht vom Gerät** (seit September 2026). Jeder `Text`, der ein
+  Bild zeigt, setzt `fontFamily = SilboEmoji` (`res/font/silbo_emoji.ttf`): Noto Color Emoji
+  2.057 (OFL, CBDT — rendert ab API 26; die COLRv1-Fassung erst ab Android 13), gekürzt auf
+  genau die Emojis des Packs samt Hautton- und ZWJ-Ligaturen, ~750 KB. Damit sieht jedes Bild
+  auf jedem Telefon gleich aus, und ein Glyph, der jünger ist als das Gerät, ist trotzdem zu
+  sehen — bis dahin rendert 🫜 (Unicode 15.1) unter Android 15 als leeres Kästchen, und die
+  Regel war „im Zweifel den älteren Glyphen nehmen". Die Grenze liegt jetzt bei der
+  gebündelten Noto-Version, nicht beim Gerät. **Ein neues Emoji im Pack verlangt einen
+  Neubau** (`tools/fonts/build_fonts.py`); ohne ihn fällt Android auf die Systemschrift
+  zurück, und `EmojiFontCoverageTest` wird rot. Kein `androidx.emoji2`: dessen Metadaten
+  überleben das Kürzen der Schrift nicht.
 - **Emoji-Doppelgänger sind keine zwei Karten.** Zwei Atome mit demselben Glyphen
   (Uhu/Eule 🦉, Wespe/Biene 🐝, Rad/Fahrrad 🚲, Pflanze/Gras 🌱) sehen für ein Kind
   gleich aus; das zweite wurde gelöscht statt platziert. Die Regel gilt für Dinge und
@@ -366,8 +370,13 @@ niemals mit einem stummen No-Op.
 - Kein Domänen-Mix, keine Zufallsrotation: die Trainer-Reihenfolge ist didaktisch fix.
 - Vor/Zurück zwischen Runden ist **immer** möglich, unabhängig von Punkten/Fortschritt.
 - Fortschritt speichern nach jeder Antwort; unfertige Lektion wird beim Öffnen fortgesetzt.
-- Back in der Übung und der Schließen-Button verlassen die Lektion **direkt** zum Pfad, ohne
-  End-Screen — unabhängig von den Punkten.
+- Back in der Übung und der Zurück-Pfeil verlassen die Lektion **direkt** zum Pfad, ohne
+  End-Screen — unabhängig von den Punkten. Der Zurück-Pfeil oben links verlangt dafür
+  **Gedrückthalten** (0,8 s, `AbcHoldToExitButton`): ein Ring in `SunCoral` füllt sich,
+  ein kurzer Tipp lässt den Pfeil nur wackeln. Er sitzt dort, wo die Hand beim Halten des
+  Telefons aufliegt, und eine Rückfrage-Box kann ein Vorschulkind nicht lesen. TalkBack
+  behält die direkte Aktion; die System-Zurück-Geste bleibt unverändert (sie ist im
+  Vollbild ohnehin Elternweg).
 - **Der End-Screen erscheint nur beim echten Lektionsabschluss**, mit Finale (Bildreihe + Satz
   + Speaker, Abschnitt 12). Der Satz belohnt damit Durchhalten und nutzt sich nicht ab.
 - Der End-Screen kennt zusätzlich eine **schlanke Variante** ohne Bildreihe und Satz. Sie ist
@@ -445,6 +454,22 @@ niemals mit einem stummen No-Op.
   zusammenfallen. Ohne deutsches TTS steht das Wort als Text unter dem Emoji — ein
   Hörspiel ist sonst unspielbar.
 - Feedback bei Fehlern (besonders Rechnen): **vorsprechen**, nicht als Fehler-Satz anzeigen.
+- **Geräusche (`AbcSfx`, `assets/sfx/`).** Elf kurze, synthetisierte Klänge, erzeugt von
+  `tools/sfx/generate_sfx.py` (keine Aufnahmen, keine Fremdlizenz; Ogg/Opus wie die Clips,
+  zusammen ~35 KB, Spitze −8 dBFS und mit 0,7 gespielt — leiser als die Stimme). **Eine Tat,
+  ein Klang**, wie beim Haptik-Vokabular: `pop` Jagd-Kugel eingesammelt · `snap` Einrasten
+  (Wort-Bauer, Satz-Architekt, Silben-Verschmelzer) · `boing` Karte federt zurück · `whoosh`/
+  `ding` Erfolgs-Stern fliegt los/landet im Punktestand · `chime` Runde geschafft · `fanfare`
+  Lektion geschafft (der Finale-Satz beginnt 0,7 s danach) · `tap` Ziffernblock · `blip`
+  Spurensucher-Stern (Tonleiter über die Abspielrate) · `shuffle` Jagd mischt · `blocked`
+  gesperrt. Kein Klang klingt nach „falsch" — auch `boing` und `blocked` sind weich.
+  **Tief und warm, nicht hell:** Grundtöne 150–800 Hz, reine Sinus-Töne mit höchstens einer
+  leisen Oktave, keine Glocken-Obertöne, Tiefpass 3 kHz; der Generator bricht ab, wenn ein
+  Klang im Mittel über 1,1 kHz liegt. Die erste Fassung (Glöckchen bis 2,7 kHz) war laut
+  Nutzer „schnell nervig für die Eltern". `chime` ist deshalb wieder genau das frühere
+  Sinus-Arpeggio C5–E5–G5–C6. **Keine
+  Musik, keine Dauergeräusche** (Cognitive Load). Ist ein Clip nicht ladbar, fallen `chime`,
+  `blip` und `blocked` auf die frühere Sinus-Synthese zurück, damit ein Tipp nie stumm bleibt.
 
 ### TTS-Grenzen und Autorierungs-Konventionen
 
@@ -523,8 +548,17 @@ niemals mit einem stummen No-Op.
 - Korrekte Antwort bestätigt sich **grün** (Kachel bzw. Zahlenfeld), solange sie vorgesprochen wird.
   Falsche Antwort wird **nicht** rot markiert — Miss bleibt gesprochenes Feedback. Auflösen ist nicht grün.
 - **Eingabeart:** Zahlen-Eingabe bei fortgeschrittenem Scaffold **oder** sobald das Ergebnis über 10 liegt (Band `hard`/`expert`) — außer die Eltern haben ausdrücklich „Mit Hilfe“ (`ParentMode.Beginner`) gewählt, dann bleiben überall die drei Kacheln. Die Regel prüft den Eltern-Modus, nicht das abgeleitete Scaffold: im Default `Auto` startet ein frisches Kind auf `Beginner`, gegen das Scaffold geprüft liefe sie beim Normalnutzer ins Leere. Grund: drei Kacheln mit Nachbar-Distraktoren machen Raten zur billigsten Strategie. Regel in `MathHinting.inputFor`.
-- Das Antwortfeld nutzt die **System-Tastatur im Zahlenmodus** (kein Custom-Nummernblock) plus einen CTA-Absenden-Button mit Pfeil-Icon.
-- **Zähl-Hilfe (nur Tipp-Modus):** nach 2 Fehlversuchen wird der Aufgabenbereich antippbar und **ersetzt** die Aufgabenvisualisierung (§9: Aufgabe nie zweimal). Beide Operanden teilen sich **ein** Fünfer-Feld, darüber die Aufgabe als Ziffernzeile (»15 − 6 = ?«). Der **Rahmen um die letzten `right` Objekte** markiert überall die zweite Zahl; was mit ihr passiert, entscheidet die Rechenart — bei Minus geht sie weg und **nur sie ist antippbar** (Zähler läuft rückwärts), bei Plus kommt sie dazu und alles ist antippbar. **Malnehmen zählt reihenweise**: ein Tipp macht eine ganze Geisterreihe echt und der Zähler springt in Schritten (5, 10, 15, 20) — Objekte einzeln anzutippen wäre Zählen in Einerschritten, also gerade nicht Multiplikation. Die Matrix ist dabei größer als im Prompt, weil sie den Aufgabenblock für sich hat. Die **nächste offene Einheit pulsiert** und führt durch die Aufgabe (bei Minus von hinten, weil rückwärts gezählt wird); erledigte gerahmte Zellen bekommen einen helleren Rahmen. Jeder Tipp spricht die erreichte Zahl mit, auf dem eigenen Kanal `SpeechChannel.Counting`, der eine laufende Ansage überlagern darf statt sie abzuwürgen. **Gesprochene Zahlen stehen als Wort, nie als Ziffer mit Punkt** — „8." ist im Deutschen die Ordinalzahl und wird „achte" gelesen (`GermanNumberWord`); wo ein Satzende nötig ist, trennt ein Komma — der Puls ist die Anleitung, der gesprochene Cue nur die Verstärkung, weil eine Ansage ohne Stimme oder Clip nicht ankommt. Der Zähler wird ab dem ersten Tipp ins Antwortfeld gespiegelt; die System-Tastatur klappt ein, solange die Hilfe offen ist. **In der Zähl-Hilfe werden Mengen ab 11 ausgeschrieben** (Fünferzeilen) — die einzige Ausnahme zur Symbol-ab-11-Regel oben, und sie gilt nie im Aufgaben-Prompt. Der „Auflösen“-Knopf erscheint im Tipp-Modus erst nach 4 Fehlversuchen (Kachel-Modus unverändert 2). Der Fehlversuch, der die Hilfe aufklappt, spricht **nur die Zählanweisung** — „probier es noch mal“ wäre dort die falsche Auskunft. Und eine mit der Zähl-Hilfe erreichte Antwort wird **bestätigt, aber nicht gelobt** (wie beim Auflösen); Punkte gibt es weiterhin, denn ein Punktabzug wäre eine Strafe.
+- **Kinder-Ziffernblock statt System-Tastatur** (`NumberPad`, seit September 2026; revidiert
+  die frühere Regel „System-Tastatur im Zahlenmodus, kein Custom-Nummernblock"). Oben das
+  Antwortfeld (blasses „?", solange leer) zwischen Löschen (Icon) und Absenden (SunCoral,
+  Pfeil-Icon), darunter zwei Fünferreihen Ziffern 1–5 / 6–0 — dieselbe Gliederung wie das
+  Fünfer-Feld der Zähl-Hilfe. Tasten 56–72 dp (`NumberPadInput.keySizeDp`: fünf je Reihe
+  passen auf 320 dp), federn beim Drücken ein, geben `tick` und **sprechen die Zahl, die jetzt
+  im Feld steht** („eins", dann „zwölf") auf dem Zählkanal. Eine führende Null wird ersetzt,
+  mehr als drei Ziffern gibt es nicht. Grund: die System-Tastatur kam in fast der Hälfte der
+  Rechenrunden, war Erwachsenen-UI (Komma, Minus, „Fertig"), klappte von selbst auf und
+  verdeckte die Aufgabe.
+- **Zähl-Hilfe (nur Tipp-Modus):** nach 2 Fehlversuchen wird der Aufgabenbereich antippbar und **ersetzt** die Aufgabenvisualisierung (§9: Aufgabe nie zweimal). Beide Operanden teilen sich **ein** Fünfer-Feld, darüber die Aufgabe als Ziffernzeile (»15 − 6 = ?«). Der **Rahmen um die letzten `right` Objekte** markiert überall die zweite Zahl; was mit ihr passiert, entscheidet die Rechenart — bei Minus geht sie weg und **nur sie ist antippbar** (Zähler läuft rückwärts), bei Plus kommt sie dazu und alles ist antippbar. **Malnehmen zählt reihenweise**: ein Tipp macht eine ganze Geisterreihe echt und der Zähler springt in Schritten (5, 10, 15, 20) — Objekte einzeln anzutippen wäre Zählen in Einerschritten, also gerade nicht Multiplikation. Die Matrix ist dabei größer als im Prompt, weil sie den Aufgabenblock für sich hat. Die **nächste offene Einheit pulsiert** und führt durch die Aufgabe (bei Minus von hinten, weil rückwärts gezählt wird); erledigte gerahmte Zellen bekommen einen helleren Rahmen. Jeder Tipp spricht die erreichte Zahl mit, auf dem eigenen Kanal `SpeechChannel.Counting`, der eine laufende Ansage überlagern darf statt sie abzuwürgen. **Gesprochene Zahlen stehen als Wort, nie als Ziffer mit Punkt** — „8." ist im Deutschen die Ordinalzahl und wird „achte" gelesen (`GermanNumberWord`); wo ein Satzende nötig ist, trennt ein Komma — der Puls ist die Anleitung, der gesprochene Cue nur die Verstärkung, weil eine Ansage ohne Stimme oder Clip nicht ankommt. Der Zähler wird ab dem ersten Tipp ins Antwortfeld gespiegelt; die Ziffernreihen des Kinder-Ziffernblocks klappen ein, solange die Hilfe offen ist (ein Tipp aufs Antwortfeld holt sie zurück). **In der Zähl-Hilfe werden Mengen ab 11 ausgeschrieben** (Fünferzeilen) — die einzige Ausnahme zur Symbol-ab-11-Regel oben, und sie gilt nie im Aufgaben-Prompt. Der „Auflösen“-Knopf erscheint im Tipp-Modus erst nach 4 Fehlversuchen (Kachel-Modus unverändert 2). Der Fehlversuch, der die Hilfe aufklappt, spricht **nur die Zählanweisung** — „probier es noch mal“ wäre dort die falsche Auskunft. Und eine mit der Zähl-Hilfe erreichte Antwort wird **bestätigt, aber nicht gelobt** (wie beim Auflösen); Punkte gibt es weiterhin, denn ein Punktabzug wäre eine Strafe.
 - Rechnen läuft in **jeder** Lektion. Wo eine Runde ein Bild trägt, kommt es aus dem
   Wortschatz derselben Lektion (kontextnah, aber nicht zwingend — Kinder erkennen die Icons
   ohnehin). Bewährte Form: die kleine Runde mit Bild und echter Szene als Auftakt, die
@@ -571,7 +605,7 @@ niemals mit einem stummen No-Op.
 - **Schutzbereiche sind durchsichtig:** kein globales `safeDrawing`-Padding auf der Wurzel —
   Hintergrund und Pfad-Landschaft laufen unter Status- und Nav-Bar durch, jedes Element
   konsumiert seinen Inset selbst. Die Unterkante des Aufgabenbereichs nutzt `safeDrawing`
-  (nicht nur `navigationBars`), damit die System-Zahlentastatur den Block weiter hochschiebt.
+  (nicht nur `navigationBars`), damit eine Tastatur den Block weiter hochschiebt — seit dem Kinder-Ziffernblock kommt in der Kind-UI keine mehr vor, die Regel bleibt als Absicherung.
   Die Kopfzeile nimmt aus demselben Grund `safeDrawing` statt der M3-Vorgabe `systemBars`: im
   Vollbild ist der Status-Bar-Inset null, ein Display-Ausschnitt bleibt aber bestehen.
   **Voraussetzung dafür ist `android:windowSoftInputMode="adjustResize"` im Manifest.** Ohne die
@@ -641,6 +675,24 @@ niemals mit einem stummen No-Op.
 ## 10. Design-System
 
 - Gemeinsame Komponenten unter `ui/components/` (`AbcContinueButton`, `AbcSpeakerButton`, `AbcNavChevron`, `AbcSegmentedProgress`, Vektor-Icons inkl. `IconStar`) und `ui/shell/AbcTopBar`.
+- **Schrift (verbindlich).** Zwei gebündelte Schriften, erzeugt von `tools/fonts/build_fonts.py`
+  (Quellen und Befehl im Skriptkopf), Lizenztexte unter `assets/licenses/`:
+  - **Silbo Fibel** (`SilboFibel`, `res/font/silbo_fibel_*.ttf`) für alles, was Lerninhalt ist —
+    Buchstaben, Silben, Wörter, Ziffern, Rechenzeichen. Abgeleitet von Andika (SIL OFL), auf Latin
+    gekürzt und **umbenannt**, weil Andika „Andika" und „SIL" als Reserved Font Names führt.
+    Einstöckiges a und g wie in der Schule, l mit Bogen am Fuß, und das große **I** ist ein
+    schlichter Strich wie in der Fibel und im Spurensucher (Andikas I hat Querstriche). So ist ein
+    I nie mit einem l zu verwechseln — das Pfad-Schild „I o" las sich in Roboto als „lo". Die
+    Zeilenmaße sind auf die Latin-Glyphen zusammengezogen (1,25 em statt Andikas 1,61 em mit
+    Platz für vietnamesische Doppelakzente), sonst wäre jeder Text ein Drittel höher geworden.
+  - **Baloo 2** (`SilboUi`, `res/font/baloo2.ttf`, variabel) für UI-Beschriftung: Punktestand,
+    Knöpfe, Eltern-Bereich, Jubel-Titel — dieselbe runde Schrift wie Store-Grafik und Icon.
+  - Rollen: `display*`/`headline*`/`body*` = Silbo Fibel, `title*`/`label*` = Baloo 2. Wer
+    Lerninhalt in eine Titel-Rolle setzt (Pfad-Schild, Fresser-Fallbackwort, Zeilennummern der
+    Malmatrix), überschreibt die Familie dort ausdrücklich. Keine Systemschrift mehr: bis
+    September 2026 lief alles in Roboto (doppelstöckiges a/g, I = l) und System-Serif.
+  - Die Strichdaten des Spurensuchers sind gegen Silbo Fibel geprüft und decken sich mit den
+    Großbuchstaben; ein neues Graphem wird gegen die Schrift gezeichnet, nicht gegen Roboto.
 - Buttons: keine Emojis — nur ASCII oder Canvas/SVG-Vektoren. Punkte-/Erfolgs-Symbol ist der Vektor-Stern `IconStar`, kein Text-Asterisk. Icons zeichnet die App selbst (`ui/components/AbcIcons.kt`); die eine Ausnahme ist das **native Overflow-Icon** der Elterntür (`Icons.Rounded.MoreVert` aus `material-icons-core`, ausdrücklich im Version-Catalog deklariert) — an ihm sollen Erwachsene ein Menü erkennen, und das leistet nur das Systemzeichen.
 - Übungen nutzen `ExerciseStage` für klare Trennung Speaker-Kopfzeile / Aufgabenblock /
   Antwortblock. Der Speaker geht in den Slot `promptChrome`, nie in `prompt` — nur der
@@ -687,6 +739,22 @@ niemals mit einem stummen No-Op.
   Der `SuccessBurst` am Trainer-Ende vibriert **nicht**: er folgt oft direkt auf den
   Trainer-eigenen Puls, und zwei Vibrationen hintereinander sind zu viel — dort trägt
   der Chime allein.
+- **Motion-Tokens (`AbcMotion` in `ui/theme/Motion.kt`).** Jede Animation wählt ihre
+  Dauer, Easing und Feder aus einer festen Palette: sechs Dauerstufen (90 · 170 · 260 ·
+  360 · 450 · 600 ms, Faktor ~1,4), drei Schleifen-Perioden (Puls, Atmen, Wippen), vier
+  Easings (Enter/Exit/Linger/Fill) und sieben benannte Federn (Settle, Soft, Bouncy,
+  Glide, Pop, Wobble, Snap). Federn für alles, was das Kind anfasst, Tweens für alles,
+  was nur passiert. Eine neue Feder am Aufrufort bricht `AbcMotionTest`; Figurenspiel
+  (Kau-/Spuck-Rhythmus der Fresser, Halte-Kurve des Jagd-Druckmorphs) darf eigene Dauern
+  tragen und begründet sie dort. Bewegung bleibt Antwort auf eine Tat — die Palette ist
+  keine Einladung, Bühnen beim Laden aufzubauen oder dauerhaft zu animieren.
+- **Der Erfolgs-Stern fliegt in den Punktestand** (`StarFlight`). Nach dem Aufpoppen
+  steht er kurz (450 ms), fliegt dann in leichtem Bogen hinauf und schrumpft dabei auf die
+  Größe des kleinen Sterns; erst beim Einschlag springt die Zahl in der Kopfzeile und der
+  Zähler hüpft (×1,35, Feder `Bouncy`). Bis dahin zeigt die Kopfzeile den alten Stand,
+  obwohl der Punkt schon verbucht ist — ein Kind, das nicht zählt, sieht so, *wohin* sein
+  Stern geht. Ohne gelegten Punktestand (letzte Runde vor dem End-Screen) schrumpft der
+  Stern wie früher an Ort und Stelle.
 - Erfolgsmomente: SuccessBurst (Gold-Stern + Funken, ohne Haptik), Gold-Puls an der
   Segmentgrenze je Trainer, Konfetti auf dem End-Screen.
 - **Shape-Morph beim Einrasten (Squish-Settle).** Rastet ein Wort in einen Peg des

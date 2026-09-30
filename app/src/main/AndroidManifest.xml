@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Ohne diese Zeile wirft jedes vibrate() eine SecurityException, die das
          runCatching in AbcHaptics schluckt: die Haptik ist dann lautlos tot,
@@ -40,5 +41,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- EmojiCompat kommt über Compose ui-text mit und ersetzt Emojis, die die
+             *Systemschrift* nicht kennt, durch nachgeladene Spans — an SilboEmoji
+             vorbei, und mit einem Nach-Layout, sobald es fertig geladen hat. Die App
+             bringt ihre Emojis selbst mit (PRODUCT_PRINCIPLES §3), also bleibt es aus. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                tools:node="remove" />
+        </provider>
     </application>
 </manifest>

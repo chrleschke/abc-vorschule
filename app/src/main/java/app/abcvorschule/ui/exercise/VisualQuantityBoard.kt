@@ -35,9 +35,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.SilboEmoji
+import app.abcvorschule.ui.theme.SilboFibel
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
 
@@ -69,7 +72,7 @@ fun VisualQuantityBoard(
 ) {
     val answerOpacity by animateFloatAsState(
         targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
         label = "math_choice_lock_opacity",
     )
     // Die Kacheln müssen ihre Größe aus der Bühne beziehen, nicht aus einer festen
@@ -302,6 +305,7 @@ internal fun EmojiGlyph(emoji: String, size: Dp, modifier: Modifier = Modifier) 
     val fontSize = with(LocalDensity.current) { (size / MathBoardSizing.EmojiAspect).toSp() }
     Text(
         text = emoji,
+        fontFamily = SilboEmoji,
         fontSize = fontSize,
         lineHeight = fontSize,
         style = LocalTextStyle.current.copy(
@@ -422,7 +426,8 @@ fun MultiplicationMatrixGrid(
                 // counting aid, so they must not fade along with the placeholders.
                 Text(
                     text = MultiplicationMatrix.rowLabel(row),
-                    style = MaterialTheme.typography.labelLarge,
+                    // Zeilennummern sind Ziffern, also Lerninhalt (§8): Lernschrift.
+                    style = MaterialTheme.typography.labelLarge.copy(fontFamily = SilboFibel),
                     color = WarmMuted,
                     textAlign = TextAlign.End,
                     modifier = Modifier
@@ -435,6 +440,7 @@ fun MultiplicationMatrixGrid(
                 repeat(columns) {
                     Text(
                         text = emoji,
+                        fontFamily = SilboEmoji,
                         fontSize = sizeSp.sp,
                         // Derselbe Layer, den `Modifier.alpha(…)` aufmacht — nur
                         // wird der Puls hier in der Zeichenphase gelesen.

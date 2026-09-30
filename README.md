@@ -212,6 +212,18 @@ und ausgelassene Typen sind erlaubt, ein Rücksprung nicht. Abgelehnt wird ein P
 eine autorierte Lektion einen abgeleiteten Trainer enthält, Kachelfolgen das Zielwort nicht
 buchstabieren, eine Summe nicht stimmt, Strichdaten fehlen oder Referenzen ins Leere zeigen.
 
+## Schriften und Geräusche
+
+Beides wird aus Werkzeugen im Repo erzeugt und als fertige Datei eingecheckt — die
+Quellen liegen nicht im Repo:
+
+- `tools/fonts/build_fonts.py` baut `res/font/silbo_fibel_*.ttf`, `baloo2.ttf` und
+  `silbo_emoji.ttf` (Quell-URLs und Aufruf im Skriptkopf, braucht `fonttools`). Neu
+  bauen, sobald ein neues Emoji in den Content kommt — `EmojiFontCoverageTest` meldet es.
+  Lizenztexte (SIL OFL) liegen unter `assets/licenses/`.
+- `tools/sfx/generate_sfx.py` erzeugt die elf Geräusche unter `assets/sfx/` (nur
+  Python-Standardbibliothek plus `ffmpeg` mit libopus).
+
 ## Offline-Smoke-Skript (manuell)
 
 1. `./gradlew :app:installDebug`, Gerät in den Flugmodus.
@@ -231,8 +243,9 @@ buchstabieren, eine Summe nicht stimmt, Strichdaten fehlen oder Referenzen ins L
 5. Bei jeder richtigen Antwort: Antwort wird vorgesprochen → Stern oben → dann nächste Runde.
 6. Eine Rechenaufgabe zweimal falsch beantworten → gesprochener Hinweis, danach **Auflösen** nutzen:
    keine Punkte, Session läuft weiter.
-7. Langer Druck auf ⋯ → Hilfestufe **Ohne Hilfe** erzwingen → nächste Rechenrunde zeigt die
-   System-Zahlentastatur; **Mit Hilfe** → drei visuelle Antworten.
+7. Langer Druck auf ⋯ → Hilfestufe **Ohne Hilfe** erzwingen → nächste Rechenrunde zeigt den
+   Kinder-Ziffernblock (zwei Fünferreihen, Löschen, Absenden; getippte Zahl wird vorgesprochen);
+   **Mit Hilfe** → drei visuelle Antworten.
 8. Mitten in der Lektion App killen und neu öffnen → dieselbe Lektion, dieselbe Runde.
 9. Lektion beenden → Belohnungszusammenfassung → Weiter → zurück auf dem Pfad, Lektion 1
    als gemeistert markiert, Lektion 2 freigeschaltet. Der Marker hüpft dabei von Schild 1 zu

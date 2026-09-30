@@ -179,4 +179,28 @@ class DragFieldStateTest {
 
         assertNull(state.endDrag("card"))
     }
+
+    /** Greift das Kind eine Karte im Rückflug, startet der Zug dort, wo sie gerade ist. */
+    @Test
+    fun aDragCanStartFromWhereTheCardIsFlying() {
+        val state = DragFieldState()
+        state.startDrag("card", from = Offset(30f, -12f))
+        state.drag("card", Offset(5f, 2f))
+
+        assertEquals(Offset(35f, -10f), state.dragOffset)
+    }
+
+    @Test
+    fun theFingerOwnsThePositionWhileDraggingAndTheFlightAfterwards() {
+        val state = DragFieldState()
+        val flight = Offset(80f, 40f)
+        state.startDrag("card")
+        state.drag("card", Offset(12f, 0f))
+
+        assertEquals(Offset(12f, 0f), state.renderOffset("card", flight))
+        assertEquals("eine andere Karte fliegt, nicht die gezogene", flight, state.renderOffset("other", flight))
+
+        state.endDrag("card")
+        assertEquals(flight, state.renderOffset("card", flight))
+    }
 }

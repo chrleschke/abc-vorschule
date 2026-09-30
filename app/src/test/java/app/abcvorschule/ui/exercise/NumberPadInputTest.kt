@@ -66,11 +66,14 @@ class NumberPadInputTest {
     private val displayLargeSp = 40f
 
     @Test
-    fun theFieldKeepsItsShippedWidthUpToTheTestDeviceScale() {
-        // Nothing may shift at 1.0 or on the font_scale-1.3 test device: the
-        // derived minimum only overtakes the 140dp floor once it actually must.
+    fun theFieldKeepsItsShippedWidthAtNormalScaleAndGrowsOnlyALittleOnTheTestDevice() {
+        // Bei 1.0 verschiebt sich nichts. Auf dem font_scale-1.3-Testgerät wächst das
+        // Feld seit der Lernschrift um wenige dp: ihre fetten Ziffern sind breiter als
+        // die früheren Serif-Ziffern (NumberPadInput.DigitAspect), und drei davon müssen
+        // hineinpassen.
         assertEquals(140f, NumberPadInput.fieldWidthDp(displayLargeSp, 1f), 0.01f)
-        assertEquals(140f, NumberPadInput.fieldWidthDp(displayLargeSp, 1.3f), 0.01f)
+        val onTestDevice = NumberPadInput.fieldWidthDp(displayLargeSp, 1.3f)
+        assertTrue("1.3: $onTestDevice", onTestDevice in 140f..150f)
     }
 
     @Test
@@ -93,5 +96,43 @@ class NumberPadInputTest {
             NumberPadInput.fieldWidthDp(displayLargeSp, 2f) >
                 NumberPadInput.fieldWidthDp(displayLargeSp, 1.3f) - 0.01f,
         )
+    }
+
+    @Test
+    fun keysAppendDigitsUpToTheMaximum() {
+        assertEquals("1", NumberPadInput.append("", 1))
+        assertEquals("12", NumberPadInput.append("1", 2))
+        assertEquals("123", NumberPadInput.append("12", 3))
+        assertEquals("123", NumberPadInput.append("123", 4))
+    }
+
+    /** „07" ist keine Zahl, die ein Kind schreiben soll. */
+    @Test
+    fun aLeadingZeroIsReplacedNotPrepended() {
+        assertEquals("0", NumberPadInput.append("", 0))
+        assertEquals("7", NumberPadInput.append("0", 7))
+        assertEquals("10", NumberPadInput.append("1", 0))
+    }
+
+    @Test
+    fun backspaceRemovesTheLastDigitAndStopsAtEmpty() {
+        assertEquals("1", NumberPadInput.backspace("12"))
+        assertEquals("", NumberPadInput.backspace("1"))
+        assertEquals("", NumberPadInput.backspace(""))
+    }
+
+    @Test
+    fun theKeyRowsHoldEveryDigitOnceInTwoRowsOfFive() {
+        assertEquals((0..9).toSet(), NumberPadInput.KeyRows.flatten().toSet())
+        assertEquals(listOf(5, 5), NumberPadInput.KeyRows.map { it.size })
+    }
+
+    /** Fünf Tasten passen auf ein 320-dp-Telefon, ohne unter den Kinder-Boden zu fallen. */
+    @Test
+    fun fiveKeysFitANarrowPhoneAndStayTappable() {
+        val narrow = NumberPadInput.keySizeDp(320f)
+        assertTrue(narrow >= NumberPadInput.MinKeyDp)
+        assertTrue(5 * narrow + 4 * NumberPadInput.KeyGapDp <= 320f + 0.01f)
+        assertEquals(NumberPadInput.MaxKeyDp, NumberPadInput.keySizeDp(900f), 0f)
     }
 }
