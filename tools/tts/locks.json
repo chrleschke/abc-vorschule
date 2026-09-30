@@ -479,34 +479,222 @@
       "seed": 301950401,
       "sourceText": "Die Qualle quetscht sich ins Taxi!"
     },
+    "math:07b0ece30c83": {
+      "seed": 1228506456,
+      "textOverride": "Fünfzehn plus Fünff –.",
+      "sourceText": "fünfzehn plus fünf"
+    },
+    "math:0da806c307fc": {
+      "seed": 1870334681,
+      "sourceText": "drei mal fünf"
+    },
+    "math:1eb0fea46a43": {
+      "seed": 1164423296,
+      "sourceText": "drei mal drei"
+    },
+    "math:1ff1b75f299b": {
+      "seed": 1826436744,
+      "sourceText": "vierzehn plus neun"
+    },
+    "math:20abce183c50": {
+      "seed": 1515266397,
+      "textOverride": "vierundzwanzig minus zwölff.",
+      "sourceText": "vierundzwanzig minus zwölf"
+    },
     "math:2578debe3052": {
       "seed": 1059656879,
       "sourceText": "Fünf Igel und vier Igel. Wie viele Igel sind das?"
+    },
+    "math:27fa596951f0": {
+      "seed": 1228506456,
+      "textOverride": "25 plus Fünf.",
+      "sourceText": "fünfundzwanzig plus fünf"
+    },
+    "math:2e9fd70d9d32": {
+      "seed": 1870334681,
+      "sourceText": "fünf mal sechs"
     },
     "math:2f9dd72c4bd9": {
       "seed": 279883260,
       "sourceText": "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das."
     },
+    "math:317571e30434": {
+      "seed": 1938953319,
+      "sourceText": "zehn minus sechs"
+    },
+    "math:34016d96fdbc": {
+      "seed": 1826436744,
+      "sourceText": "fünfzehn plus zehn"
+    },
+    "math:3504fd2bd7d3": {
+      "seed": 1515266397,
+      "sourceText": "vierzehn plus sechs"
+    },
+    "math:3522f6732e00": {
+      "seed": 1059656879,
+      "sourceText": "achtzehn minus neun"
+    },
+    "math:386f9f68cf4d": {
+      "seed": 1209181937,
+      "textOverride": "Sieben minus drei.",
+      "sourceText": "sieben minus drei"
+    },
+    "math:45c5c823c272": {
+      "seed": 1607038802,
+      "sourceText": "fünf mal zwei"
+    },
+    "math:54cccc60bef7": {
+      "seed": 1938953319,
+      "sourceText": "zwölf plus acht"
+    },
+    "math:58512600276c": {
+      "seed": 1870334681,
+      "sourceText": "drei mal sechs"
+    },
+    "math:5b615ff210d4": {
+      "seed": 1059656879,
+      "sourceText": "dreizehn plus neun"
+    },
+    "math:5cef9cead16d": {
+      "seed": 1515266397,
+      "sourceText": "zwei mal fünf"
+    },
+    "math:5ee2009112fe": {
+      "seed": 1607038802,
+      "sourceText": "sieben minus zwei"
+    },
     "math:610f19e043b3": {
       "seed": 279883260,
       "sourceText": "Acht Tische stehen in der Kita. Drei werden weggeräumt. Wie viele Tische bleiben?"
+    },
+    "math:6207639eb528": {
+      "seed": 1826436744,
+      "sourceText": "neun minus sechs"
+    },
+    "math:6757f65d554f": {
+      "seed": 1515266397,
+      "sourceText": "sechzehn minus sieben"
+    },
+    "math:6acedd8a5d68": {
+      "seed": 1059656879,
+      "textOverride": "drei plus zwei.",
+      "sourceText": "drei plus zwei"
+    },
+    "math:6fb0bb5bc590": {
+      "seed": 490982172,
+      "sourceText": "zwanzig plus fünf"
     },
     "math:79c28a9f6c9c": {
       "seed": 1059656879,
       "sourceText": "Vier Ameisen und drei Ameisen. Wie viele Ameisen sind das?"
     },
+    "math:7f96fbaf1380": {
+      "seed": 279883260,
+      "sourceText": "zwanzig plus zehn"
+    },
+    "math:8445ccf38fa5": {
+      "seed": 1720327602,
+      "sourceText": "zwanzig minus vier"
+    },
+    "math:86617385db2f": {
+      "seed": 1720327602,
+      "sourceText": "neun minus vier"
+    },
+    "math:87e13dc185fd": {
+      "seed": 1515266397,
+      "sourceText": "vier mal fünf"
+    },
     "math:8c2b7c6c4b52": {
       "seed": 1607038802,
       "sourceText": "Zwei Reihen mit je vier Rosen blühen im Beet. Wie viele Rosen sind das."
+    },
+    "math:91eae2147d59": {
+      "seed": 1720327602,
+      "sourceText": "drei mal vier"
     },
     "math:970f0fd9f7c9": {
       "seed": 1059656879,
       "sourceText": "Fünf Omas und vier Omas. Wie viele Omas sind das."
     },
+    "math:97513dcc4450": {
+      "seed": 1870334681,
+      "sourceText": "fünf plus vier"
+    },
+    "math:9f0e0564b4c6": {
+      "seed": 1515266397,
+      "sourceText": "sechs plus drei"
+    },
+    "math:a88670afa517": {
+      "seed": 1164423296,
+      "textOverride": "14 plus sieben.",
+      "sourceText": "vierzehn plus sieben"
+    },
+    "math:a9cb5d06259d": {
+      "seed": 1826436744,
+      "textOverride": "5 mal fünf.",
+      "sourceText": "fünf mal fünf"
+    },
+    "math:b29bb7415973": {
+      "seed": 279883260,
+      "sourceText": "zwei mal vier"
+    },
+    "math:b40032c4da90": {
+      "seed": 490982172,
+      "sourceText": "zwanzig minus acht"
+    },
+    "math:b5a8e9366136": {
+      "seed": 1228506456,
+      "sourceText": "vier mal sechs"
+    },
+    "math:b5eaf571ea67": {
+      "seed": 1870334681,
+      "sourceText": "dreißig minus zehn"
+    },
+    "math:b9b6b0362b9b": {
+      "seed": 1870334681,
+      "sourceText": "dreißig minus fünfzehn"
+    },
+    "math:baf173a0fcc8": {
+      "seed": 1826436744,
+      "sourceText": "vier plus drei"
+    },
     "math:c1f53397c0bc": {
       "seed": 1209181937,
       "textOverride": "Sieben Eier liegen im Korb, drei werden gekocht. Wie viele Eier bleiben?",
       "sourceText": "Sieben Eier liegen im Korb. Drei werden gekocht. Wie viele Eier bleiben?"
+    },
+    "math:d0e053e1e79b": {
+      "seed": 1938953319,
+      "sourceText": "sechzehn plus neun"
+    },
+    "math:d611ce1ed970": {
+      "seed": 279883260,
+      "sourceText": "acht minus drei"
+    },
+    "math:d9128708cfc3": {
+      "seed": 1826436744,
+      "sourceText": "zwölf plus neun"
+    },
+    "math:de0e2a53e9c1": {
+      "seed": 1870334681,
+      "sourceText": "zwölf plus fünf"
+    },
+    "math:e4893003001b": {
+      "seed": 1870334681,
+      "sourceText": "neun minus zwei"
+    },
+    "math:e5117fc2f0e6": {
+      "seed": 1938953319,
+      "sourceText": "Wie viel ist"
+    },
+    "math:eb479031bc80": {
+      "seed": 279883260,
+      "textOverride": "25 minus zehn.",
+      "sourceText": "fünfundzwanzig minus zehn"
+    },
+    "math:ec63d4f164d1": {
+      "seed": 1720327602,
+      "sourceText": "dreizehn plus sieben"
     },
     "math:f486c3cf6f4e": {
       "seed": 1720327602,
@@ -516,19 +704,141 @@
       "seed": 1521286730,
       "sourceText": "Sechzehn weniger sieben. Wie viele bleiben."
     },
+    "math:f74219098741": {
+      "seed": 1938953319,
+      "sourceText": "sechs minus zwei"
+    },
+    "math:fb00a0d2136e": {
+      "seed": 1826436744,
+      "sourceText": "achtzehn minus sechs"
+    },
+    "math:fdcb6cb170df": {
+      "seed": 1059656879,
+      "textOverride": "24 plus sechs.",
+      "sourceText": "vierundzwanzig plus sechs"
+    },
     "math:ff4a2bf1aba9": {
       "seed": 490982172,
       "sourceText": "Acht Igel laufen im Garten. Drei verstecken sich. Wie viele Igel bleiben?"
     },
+    "math:ffc73c53505c": {
+      "seed": 1059656879,
+      "textOverride": "11 plus sieben.",
+      "sourceText": "elf plus sieben"
+    },
+    "monster:07af03fb0629": {
+      "seed": 2049956050,
+      "sourceText": "Sch"
+    },
+    "monster:08f271887ce9": {
+      "seed": 1957961310,
+      "sourceText": "M"
+    },
+    "monster:3325c2b56f2b": {
+      "seed": 1953102963,
+      "sourceText": "Au"
+    },
+    "monster:333e0a1e2781": {
+      "seed": 1989642425,
+      "sourceText": "G"
+    },
+    "monster:3f39d5c348e5": {
+      "seed": 2012458472,
+      "sourceText": "D"
+    },
+    "monster:40b46ee569c3": {
+      "seed": 1966272936,
+      "sourceText": "S t"
+    },
+    "monster:44bd7ae60f47": {
+      "seed": 1946199643,
+      "sourceText": "H"
+    },
+    "monster:495f851d2eed": {
+      "seed": 2022733239,
+      "sourceText": "Pf"
+    },
+    "monster:5c62e091b8c0": {
+      "seed": 1944602655,
+      "sourceText": "P"
+    },
     "monster:64f570f6b0e3": {
       "seed": 1326941598,
       "sourceText": "Bäh!"
+    },
+    "monster:72dfcfb0c470": {
+      "seed": 1980063214,
+      "sourceText": "L"
+    },
+    "monster:86be9a55762d": {
+      "seed": 1938790457,
+      "sourceText": "K"
+    },
+    "monster:8c2574892063": {
+      "seed": 2119648954,
+      "sourceText": "R"
+    },
+    "monster:8cce03ee816b": {
+      "seed": 2031266577,
+      "sourceText": "Sp"
+    },
+    "monster:8ce86a6ae65d": {
+      "seed": 2062061576,
+      "sourceText": "N"
+    },
+    "monster:8de0b3c47f11": {
+      "seed": 2125473351,
+      "sourceText": "S"
+    },
+    "monster:913d7314efae": {
+      "seed": 2051542611,
+      "sourceText": "Ü"
+    },
+    "monster:a252f7aeeb24": {
+      "seed": 2101993091,
+      "sourceText": "Ei"
+    },
+    "monster:a83dd0ccbffe": {
+      "seed": 1907954775,
+      "sourceText": "I"
+    },
+    "monster:ae8f3419f228": {
+      "seed": 2038266517,
+      "sourceText": "Ö"
+    },
+    "monster:bbeebd879e1d": {
+      "seed": 1929856815,
+      "sourceText": "Z"
+    },
+    "monster:c4694f2e93d5": {
+      "seed": 2123668122,
+      "sourceText": "O"
     },
     "monster:c7497ed84146": {
       "seed": 1400730555,
       "speaker": "uncle_fu",
       "sourceText": "Mmmmh!",
       "generateSeed": 605562727
+    },
+    "monster:df7e70e50215": {
+      "seed": 2147074918,
+      "sourceText": "B"
+    },
+    "monster:e632b7095b0b": {
+      "seed": 1967051716,
+      "sourceText": "T"
+    },
+    "monster:f67ab10ad4e4": {
+      "seed": 2121308889,
+      "sourceText": "F"
+    },
+    "monster:fcb5f40df9be": {
+      "seed": 1980984696,
+      "sourceText": "W"
+    },
+    "monster:ff22e6c0c305": {
+      "seed": 2089630660,
+      "sourceText": "Eu"
     },
     "phoneme:07af03fb0629": {
       "seed": 1229924031,
@@ -1410,6 +1720,11 @@
     "prompt:54639eb75ea4": {
       "seed": 887871510,
       "sourceText": "Baue das Wort Ufo."
+    },
+    "prompt:5497562a3803": {
+      "seed": 122602205,
+      "textOverride": "Füttere die Laut-Fresser!",
+      "sourceText": "Füttere die Laut-Fresser."
     },
     "prompt:54a9f1941aeb": {
       "seed": 634912039,
@@ -4051,6 +4366,11 @@
       "textOverride": "Eis.",
       "sourceText": "Eis"
     },
+    "word:25a3c519a74b": {
+      "seed": 1677023100,
+      "textOverride": "Ziege.",
+      "sourceText": "Ziege"
+    },
     "word:263ed44ceed0": {
       "seed": 1820816805,
       "textOverride": "16 Hüte!",
@@ -4103,6 +4423,10 @@
     "word:308deceac8be": {
       "seed": 1512463413,
       "sourceText": "5 Fußbälle"
+    },
+    "word:313cfffa4256": {
+      "seed": 153000027,
+      "sourceText": "Möhre"
     },
     "word:3142c2c88913": {
       "seed": 1512463413,
@@ -4180,7 +4504,8 @@
       "sourceText": "Mia"
     },
     "word:4221b9b80815": {
-      "seed": 32521571,
+      "seed": 991901008,
+      "textOverride": "Die Uhr",
       "sourceText": "Uhr"
     },
     "word:42f3f7e9341e": {
@@ -4251,9 +4576,19 @@
       "seed": 955950463,
       "sourceText": "Papa"
     },
+    "word:4a0d2e52484e": {
+      "seed": 755659076,
+      "textOverride": "Pfanne.",
+      "sourceText": "Pfanne"
+    },
     "word:4a85329862f7": {
       "seed": 634327529,
       "sourceText": "5 Sterne"
+    },
+    "word:4aee2bc9d790": {
+      "seed": 1597358471,
+      "textOverride": "Wanne.",
+      "sourceText": "Wanne"
     },
     "word:4bef8ba63310": {
       "seed": 1299784779,
@@ -4272,6 +4607,10 @@
     "word:4d2405fc589a": {
       "seed": 1365805799,
       "sourceText": "9 Kühe"
+    },
+    "word:4e362074d7a3": {
+      "seed": 1765179368,
+      "sourceText": "Tanne"
     },
     "word:4e3d5e8b121a": {
       "seed": 1641277208,
@@ -4617,6 +4956,11 @@
       "seed": 153000027,
       "sourceText": "4 Pizzen"
     },
+    "word:81217fe5d264": {
+      "seed": 1017467044,
+      "textOverride": "Turm.",
+      "sourceText": "Turm"
+    },
     "word:81f3bf42a93c": {
       "seed": 1827038225,
       "sourceText": "Tom"
@@ -4765,6 +5109,11 @@
     "word:954f0a2d53ee": {
       "seed": 1389964126,
       "sourceText": "Pferd"
+    },
+    "word:95affc680e46": {
+      "seed": 406230635,
+      "textOverride": "Kanne.",
+      "sourceText": "Kanne"
     },
     "word:95b048a8eca0": {
       "seed": 1503563029,
@@ -5154,6 +5503,10 @@
       "seed": 1252292467,
       "sourceText": "Oma"
     },
+    "word:d539e8aa3b71": {
+      "seed": 153000027,
+      "sourceText": "Mütze"
+    },
     "word:d5968db704cf": {
       "seed": 158222434,
       "sourceText": "Opa"
@@ -5344,6 +5697,11 @@
       "seed": 1765179368,
       "sourceText": "30 Taxis"
     },
+    "word:f28f6a854ca4": {
+      "seed": 634327529,
+      "textOverride": "Pfeil.",
+      "sourceText": "Pfeil"
+    },
     "word:f3102c6b2fc2": {
       "seed": 1512463413,
       "sourceText": "7 Eis"
@@ -5417,6 +5775,10 @@
     "word:fa18c06733fb": {
       "seed": 1365805799,
       "sourceText": "Hand"
+    },
+    "word:fb7b0177ed5f": {
+      "seed": 1677023100,
+      "sourceText": "Wurm"
     },
     "word:fb9aa9a7b3d8": {
       "seed": 1069728556,

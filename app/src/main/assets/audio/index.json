@@ -1730,6 +1730,11 @@
       "fingerprint": "bfcf87cdd1409d33",
       "profile": "math"
     },
+    "Füttere die Laut-Fresser.": {
+      "file": "prompt_5497562a3803.ogg",
+      "fingerprint": "7033f24502b09a78",
+      "profile": "prompt"
+    },
     "G": {
       "file": "phoneme_333e0a1e2781.ogg",
       "fingerprint": "84edeb15ccfe0b44",
@@ -1994,6 +1999,11 @@
       "file": "reward_942624208a74.ogg",
       "fingerprint": "969ab0d2a9390fdf",
       "profile": "reward"
+    },
+    "Kanne": {
+      "file": "word_95affc680e46.ogg",
+      "fingerprint": "dfaa7461b0216d22",
+      "profile": "word"
     },
     "Katze": {
       "file": "word_cf95e1c70fb2.ogg",
@@ -2280,6 +2290,11 @@
       "fingerprint": "59a17e77c7727be8",
       "profile": "word"
     },
+    "Möhre": {
+      "file": "word_313cfffa4256.ogg",
+      "fingerprint": "85168f966b65b804",
+      "profile": "word"
+    },
     "Müll": {
       "file": "word_6443e382eb8c.ogg",
       "fingerprint": "b8d8b11ad11aba65",
@@ -2288,6 +2303,11 @@
     "Mülltonne": {
       "file": "word_489981ca2c24.ogg",
       "fingerprint": "aa8efd12eb8a3772",
+      "profile": "word"
+    },
+    "Mütze": {
+      "file": "word_d539e8aa3b71.ogg",
+      "fingerprint": "7ec5c367e314dfd3",
       "profile": "word"
     },
     "N": {
@@ -2604,6 +2624,16 @@
       "file": "reward_80235c4e7eab.ogg",
       "fingerprint": "f2ffa1c752f12bf0",
       "profile": "reward"
+    },
+    "Pfanne": {
+      "file": "word_4a0d2e52484e.ogg",
+      "fingerprint": "821db5692c277db9",
+      "profile": "word"
+    },
+    "Pfeil": {
+      "file": "word_f28f6a854ca4.ogg",
+      "fingerprint": "2ea0d572f9e4590b",
+      "profile": "word"
     },
     "Pferd": {
       "file": "word_954f0a2d53ee.ogg",
@@ -3205,6 +3235,11 @@
       "fingerprint": "f46f7a05afaa3845",
       "profile": "reward"
     },
+    "Tanne": {
+      "file": "word_4e362074d7a3.ogg",
+      "fingerprint": "3c6f41451a17c4c7",
+      "profile": "word"
+    },
     "Tasche": {
       "file": "word_53f8e1a2ac39.ogg",
       "fingerprint": "ea489e9e56fe393a",
@@ -3380,6 +3415,11 @@
       "fingerprint": "1189c73d251f82be",
       "profile": "word"
     },
+    "Turm": {
+      "file": "word_81217fe5d264.ogg",
+      "fingerprint": "d7fe7b5bf8a05c61",
+      "profile": "word"
+    },
     "Tür": {
       "file": "word_1cff8a95c840.ogg",
       "fingerprint": "76146c6bb4c54d21",
@@ -3460,6 +3500,11 @@
       "fingerprint": "dd5a74b46d56787b",
       "profile": "word"
     },
+    "Wanne": {
+      "file": "word_4aee2bc9d790.ogg",
+      "fingerprint": "0dceadad2452d52a",
+      "profile": "word"
+    },
     "Wasser": {
       "file": "word_f942c0f4855b.ogg",
       "fingerprint": "4fc0d51b5f04dfb1",
@@ -3494,6 +3539,11 @@
       "file": "reward_2732e9286b3a.ogg",
       "fingerprint": "a1fb6fa5de78fc8b",
       "profile": "reward"
+    },
+    "Wurm": {
+      "file": "word_fb7b0177ed5f.ogg",
+      "fingerprint": "7b7387ba1f0b3a00",
+      "profile": "word"
     },
     "X": {
       "file": "phoneme_4b68ab3847fe.ogg",
@@ -3749,6 +3799,11 @@
       "file": "prompt_22d108e09367.ogg",
       "fingerprint": "626c3ba9c8a92855",
       "profile": "prompt"
+    },
+    "Ziege": {
+      "file": "word_25a3c519a74b.ogg",
+      "fingerprint": "4a3d0d28243f6e2d",
+      "profile": "word"
     },
     "Zitrone": {
       "file": "word_d06917f3eee4.ogg",
@@ -4730,11 +4785,6 @@
       "fingerprint": "41966e15a80e84a6",
       "profile": "phoneme"
     },
-    "tt": {
-      "file": "monster_0e07cf830957.ogg",
-      "fingerprint": "1360fc1bd1cd507c",
-      "profile": "monster"
-    },
     "und": {
       "file": "word_856cc99d8734.ogg",
       "fingerprint": "81c376f6c2257e7d",
@@ -4864,11 +4914,150 @@
       "file": "reward_f28a4debbc30.ogg",
       "fingerprint": "248ddc22f47077f8",
       "profile": "reward"
-    },
-    "äää": {
-      "file": "monster_1cf0cca6ed0c.ogg",
-      "fingerprint": "a074a1e05e6527a6",
-      "profile": "monster"
+    }
+  },
+  "variants": {
+    "monster": {
+      "Au": {
+        "file": "monster_3325c2b56f2b.ogg",
+        "fingerprint": "mic:aa4829b992890529",
+        "profile": "monster"
+      },
+      "B": {
+        "file": "monster_df7e70e50215.ogg",
+        "fingerprint": "mic:bb732ec3d630dc8c",
+        "profile": "monster"
+      },
+      "Bäh!": {
+        "file": "monster_64f570f6b0e3.ogg",
+        "fingerprint": "ce585c95152fc113",
+        "profile": "monster"
+      },
+      "D": {
+        "file": "monster_3f39d5c348e5.ogg",
+        "fingerprint": "mic:856a36cc57d1a038",
+        "profile": "monster"
+      },
+      "Ei": {
+        "file": "monster_a252f7aeeb24.ogg",
+        "fingerprint": "mic:de60366270b09a3b",
+        "profile": "monster"
+      },
+      "Eu": {
+        "file": "monster_ff22e6c0c305.ogg",
+        "fingerprint": "mic:adbff28f336a7373",
+        "profile": "monster"
+      },
+      "F": {
+        "file": "monster_f67ab10ad4e4.ogg",
+        "fingerprint": "mic:733569b500570e54",
+        "profile": "monster"
+      },
+      "G": {
+        "file": "monster_333e0a1e2781.ogg",
+        "fingerprint": "mic:66f76dd6da8f8926",
+        "profile": "monster"
+      },
+      "H": {
+        "file": "monster_44bd7ae60f47.ogg",
+        "fingerprint": "mic:1a0c3351463d720d",
+        "profile": "monster"
+      },
+      "I": {
+        "file": "monster_a83dd0ccbffe.ogg",
+        "fingerprint": "mic:a6a19939159f77d5",
+        "profile": "monster"
+      },
+      "K": {
+        "file": "monster_86be9a55762d.ogg",
+        "fingerprint": "mic:3969c1ed273c7946",
+        "profile": "monster"
+      },
+      "L": {
+        "file": "monster_72dfcfb0c470.ogg",
+        "fingerprint": "mic:fc26bd9932010b8b",
+        "profile": "monster"
+      },
+      "M": {
+        "file": "monster_08f271887ce9.ogg",
+        "fingerprint": "mic:0a2acbcf04b3fb59",
+        "profile": "monster"
+      },
+      "Mmmmh!": {
+        "file": "monster_c7497ed84146.ogg",
+        "fingerprint": "bef176dd436645da",
+        "profile": "monster"
+      },
+      "N": {
+        "file": "monster_8ce86a6ae65d.ogg",
+        "fingerprint": "mic:8cbec2e7f52e9c5c",
+        "profile": "monster"
+      },
+      "O": {
+        "file": "monster_c4694f2e93d5.ogg",
+        "fingerprint": "mic:7e69790e2c4a0bc1",
+        "profile": "monster"
+      },
+      "P": {
+        "file": "monster_5c62e091b8c0.ogg",
+        "fingerprint": "mic:f4aa4f75b2890f9f",
+        "profile": "monster"
+      },
+      "Pf": {
+        "file": "monster_495f851d2eed.ogg",
+        "fingerprint": "mic:39c9f650a14b0b2c",
+        "profile": "monster"
+      },
+      "R": {
+        "file": "monster_8c2574892063.ogg",
+        "fingerprint": "mic:548a22f9fc82ed14",
+        "profile": "monster"
+      },
+      "S": {
+        "file": "monster_8de0b3c47f11.ogg",
+        "fingerprint": "mic:abbe27ac92401ae2",
+        "profile": "monster"
+      },
+      "S t": {
+        "file": "monster_40b46ee569c3.ogg",
+        "fingerprint": "mic:d2abc8a8c7b55d2e",
+        "profile": "monster"
+      },
+      "Sch": {
+        "file": "monster_07af03fb0629.ogg",
+        "fingerprint": "mic:e13fe4a2fb2a23b2",
+        "profile": "monster"
+      },
+      "Sp": {
+        "file": "monster_8cce03ee816b.ogg",
+        "fingerprint": "mic:e294dec00028ef41",
+        "profile": "monster"
+      },
+      "T": {
+        "file": "monster_e632b7095b0b.ogg",
+        "fingerprint": "mic:b82b23287bf2cb55",
+        "profile": "monster"
+      },
+      "W": {
+        "file": "monster_fcb5f40df9be.ogg",
+        "fingerprint": "mic:1e6cd76383607d44",
+        "profile": "monster"
+      },
+      "Z": {
+        "file": "monster_bbeebd879e1d.ogg",
+        "fingerprint": "mic:5639acc2c225e5c0",
+        "profile": "monster"
+      },
+      "Ö": {
+        "file": "monster_ae8f3419f228.ogg",
+        "fingerprint": "mic:3735f18d20b3f239",
+        "profile": "monster"
+      },
+      "Ü": {
+        "file": "monster_913d7314efae.ogg",
+        "fingerprint": "mic:16ef21f6e15a241b",
+        "profile": "monster"
+      }
     }
   },
   "version": 1

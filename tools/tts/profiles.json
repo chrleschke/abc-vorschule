@@ -160,7 +160,9 @@
         2128207746
       ],
       "trim": true,
-      "normalize": true
+      "normalize": true,
+      "source": "tts",
+      "micPitchSemitones": 0
     },
     "article_word": {
       "label": "Artikel + Wort",
@@ -193,7 +195,9 @@
         2080298366
       ],
       "trim": true,
-      "normalize": true
+      "normalize": true,
+      "source": "tts",
+      "micPitchSemitones": 0
     },
     "phoneme": {
       "label": "Laut / Buchstabe",
@@ -227,7 +231,9 @@
         1962581002
       ],
       "trim": true,
-      "normalize": true
+      "normalize": true,
+      "source": "tts",
+      "micPitchSemitones": 0
     },
     "prompt": {
       "label": "Aufgaben-Frage",
@@ -336,26 +342,36 @@
         2143076980
       ],
       "trim": true,
-      "normalize": true
+      "normalize": true,
+      "source": "tts",
+      "micPitchSemitones": 0
     },
     "math": {
       "label": "Rechenaufgabe",
       "speaker": "sohee",
       "language": "german",
-      "instruct": "Sprich wie eine freundliche Kindergärtnerin zu einem fünfjährigen Kind: erzähle die Situation ruhig und deutlich, mache eine kleine Pause vor der letzten Frage und hebe nur diese leicht fragend an. Warm zugewandt, ruhiges Tempo, nicht übertrieben fröhlich.",
+      "instruct": "Sprich ruhig und deutlich.",
       "sampling": {
-        "temperature": 0.6,
+        "temperature": 0.95,
         "top_k": 30,
         "top_p": 0.9,
         "repetition_penalty": 1.05,
-        "subtalker_temperature": 0.9,
+        "subtalker_temperature": 0.5,
         "subtalker_top_k": 50,
-        "subtalker_top_p": 1.0,
-        "max_new_tokens": 200
+        "subtalker_top_p": 1,
+        "max_new_tokens": 50
       },
-      "seedPool": [],
-      "trim": true,
-      "normalize": true
+      "seedPool": [
+        122602205,
+        1059656879,
+        1164423296,
+        1515266397,
+        1720327602
+      ],
+      "trim": false,
+      "normalize": true,
+      "source": "tts",
+      "micPitchSemitones": 0
     },
     "miss": {
       "label": "Sanftes Feedback",
@@ -376,7 +392,9 @@
         2078418154
       ],
       "trim": true,
-      "normalize": true
+      "normalize": true,
+      "source": "tts",
+      "micPitchSemitones": 0
     },
     "reward": {
       "label": "Belohnung",
@@ -417,7 +435,9 @@
         2069761721
       ],
       "trim": true,
-      "normalize": true
+      "normalize": true,
+      "source": "tts",
+      "micPitchSemitones": 0
     },
     "sentence": {
       "label": "Einfacher Satz",
@@ -454,7 +474,9 @@
         1897889202
       ],
       "trim": true,
-      "normalize": true
+      "normalize": true,
+      "source": "tts",
+      "micPitchSemitones": 0
     },
     "finale": {
       "label": "Lektions-Finale",
@@ -483,7 +505,9 @@
         1965338209
       ],
       "trim": true,
-      "normalize": true
+      "normalize": true,
+      "source": "tts",
+      "micPitchSemitones": 0
     },
     "ui": {
       "label": "Oberflächen-Ansage",
@@ -502,7 +526,9 @@
       },
       "seedPool": [],
       "trim": true,
-      "normalize": true
+      "normalize": true,
+      "source": "tts",
+      "micPitchSemitones": 0
     },
     "monster": {
       "label": "Monster (Laute und Reaktionen)",
