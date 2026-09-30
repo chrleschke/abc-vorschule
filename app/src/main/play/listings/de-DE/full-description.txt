@@ -1,0 +1,31 @@
+Silbo ist eine Lern-App für Kinder im Vorschul- und Erstlesealter (etwa 4 bis 7 Jahre). Sie führt Silbe für Silbe zum Lesen: von einzelnen Lauten und Buchstaben über Silben und Wörter bis zu kurzen Sätzen. Dazu kommt in jeder Lektion eine kleine Rechenrunde mit Plus, Minus und gleichen Gruppen im Zahlenraum bis 20, in späteren Lektionen bis 30.
+
+FÜR WEN
+Für Kinder, die noch nicht lesen können. Jede Aufgabe wird vorgesprochen, jedes Bild, jeder Buchstabe und jede Silbe lässt sich antippen und anhören. Die Bedienung läuft über Bilder, Symbole und Sprache, nicht über Text. Ein Kind kann die App allein benutzen, ohne dass ein Erwachsener vorlesen muss.
+
+WIE EINE LEKTION ABLÄUFT
+Der Einstieg ist ein Lernpfad mit 34 Lektionen, angeordnet wie in einer Fibel. Jede Lektion führt einen oder mehrere neue Buchstaben ein und übt sie in fester Reihenfolge:
+1. Buchstaben nachspuren: Das Kind fährt den Buchstaben mit dem Finger nach und sammelt dabei Sterne.
+2. Silben verschmelzen: Zwei Laute werden zusammengeschoben und zur Silbe gelesen.
+3. Wörter bauen: Silben und Buchstaben werden in die passenden Felder unter einem Bild gelegt.
+4. Sätze ordnen: Wortschilder werden zu einem kurzen Satz sortiert.
+5. Sätze verstehen: Ein Satz wird vorgelesen, das Kind wählt das passende Bild.
+6. Rechnen: Mengen aus den Bildern der Lektion werden zusammengezählt, weggenommen oder in gleiche Gruppen geteilt.
+Dazwischen gibt es kleine Suchspiele, in denen der geübte Buchstabe oder die Silbe unter anderen gefunden wird. Falsche Antworten werden freundlich vorgesprochen, es gibt keine Strafen. Wer nicht weiterkommt, kann sich die Lösung zeigen lassen. Am Ende jeder Lektion steht ein kurzer Satz mit Bildern als Belohnung. Die nächste Lektion öffnet sich, sobald die vorherige durchgespielt ist.
+
+WAS DIE APP NICHT TUT
+- Keine Werbung, keine In-App-Käufe, keine Abonnements.
+- Kein Konto, keine Anmeldung, keine E-Mail-Adresse.
+- Keine Internetverbindung: Die App hat keine Internet-Berechtigung und funktioniert vollständig offline.
+- Keine Datenerhebung, keine Analyse-Dienste, keine Absturzberichte, keine Dienste von Drittanbietern.
+- Keine Links nach außen im Bereich für Kinder.
+Der Lernfortschritt wird nur auf dem Gerät gespeichert und mit dem Deinstallieren gelöscht.
+
+SPRACHAUSGABE
+Alle Ansagen sind als Audio-Clips in der App enthalten. Für Zahlen und in seltenen Fällen ohne passenden Clip nutzt die App die Sprachausgabe von Android auf dem Gerät. Eine installierte deutsche Stimme wird empfohlen.
+
+ELTERNBEREICH
+Über das Drei-Punkte-Menü auf dem Lernpfad (lange drücken) erreichen Eltern zwei Einstellungen: die Hilfestufe für die Rechen-Hilfe (Auto, Mit Hilfe, Ohne Hilfe) und die Freigabe der Lektionsreihenfolge, mit der alle Lektionen frei wählbar werden. Mehr Einstellungen gibt es nicht.
+
+KOSTENLOS
+Silbo ist vollständig kostenlos. Alle 34 Lektionen sind ohne Einschränkung enthalten.

@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.play.publisher)
 }
 
 // Upload-Schlüssel für den Play Store. Die Datei `keystore.properties` liegt im
@@ -117,6 +118,33 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
+
+// Play Console per Gradle (gradle-play-publisher, spricht die Google Play
+// Developer API). Zugang über ein Service-Konto; dessen JSON-Schlüssel liegt nie
+// im Repo, sondern standardmäßig unter ~/.config/silbo/play-sa.json — anderer Ort
+// per `-PplayCredentials=/pfad/key.json` oder `playCredentials=...` in
+// ~/.gradle/gradle.properties. Das Service-Konto muss in der Play Console unter
+// „Nutzer und Berechtigungen" für die App freigeschaltet sein.
+// Store-Texte, Grafiken und Versionshinweise liegen unter app/src/main/play/
+// (`./gradlew bootstrapReleaseListing --app-details --listings --release-notes`
+// holt den aktuellen Stand aus der Console; ohne die Flags bricht der Task ab,
+// weil er auch In-App-Produkte über die von Google abgeschaltete alte
+// inappproducts-API lädt — Silbo verkauft nichts, also weglassen).
+// Standard ist der interne Track: `./gradlew publishReleaseBundle` lädt dorthin
+// hoch, `promoteReleaseArtifact --track internal --promote-track production`
+// hebt ein geprüftes Release weiter. Hochladen braucht keystore.properties, sonst
+// ist das Bundle debug-signiert (siehe oben).
+play {
+    serviceAccountCredentials.set(
+        file(
+            providers.gradleProperty("playCredentials").getOrElse(
+                "${System.getProperty("user.home")}/.config/silbo/play-sa.json",
+            ),
+        ),
+    )
+    defaultToAppBundles.set(true)
+    track.set("internal")
 }
 
 dependencies {
