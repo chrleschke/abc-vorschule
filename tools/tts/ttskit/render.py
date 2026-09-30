@@ -290,6 +290,9 @@ def sample_candidates(
             wav = postprocess(wav, sample_rate, trim=profile.trim,
                               normalize=profile.normalize)
             write_wav(paths.candidates / clip.key / f"{seed}.wav", wav, sample_rate)
+            # Ein neuer Wurf auf demselben Seed ersetzt auch einen alten Schnitt:
+            # das gesicherte Original gehört zur vorigen Aufnahme.
+            _orig_path(paths, clip.key, seed).unlink(missing_ok=True)
             # Das Sidecar hält fest, WOMIT die Probeaufnahme entstand. Ohne
             # Zeitpunkt, Stimme und Text mischen sich in der UI die Batches
             # verschiedener Sessions zu einer unentwirrbaren Liste.
@@ -347,7 +350,89 @@ def production_fingerprint(paths: Paths, clip: Clip, profile: Profile) -> str:
     meta = candidate_meta(paths, clip.key, clip.seed)
     if meta.get("source") == "mic" and isinstance(meta.get("fingerprint"), str):
         return meta["fingerprint"]
-    return fingerprint(clip, profile)
+    base = fingerprint(clip, profile)
+    # Ein Schnitt in der Wellenform ändert die Datei, aber nicht die
+    # Profil-Einstellungen — ohne ihn im Fingerprint hielte der Export die
+    # Produktion für unverändert und die App behielte die ungeschnittene Fassung.
+    trim = meta.get("trim")
+    if isinstance(trim, dict):
+        return f"{base}~{float(trim['start']):.3f}-{float(trim['end']):.3f}"
+    return base
+
+
+#: Kürzester Rest, der nach einem Schnitt bleiben muss (Sekunden).
+MIN_TRIMMED_SECONDS = 0.05
+#: Weiche Kanten an beiden Schnittstellen, gegen Knackser (Sekunden).
+TRIM_FADE_SECONDS = 0.005
+
+
+def _orig_path(paths: Paths, clip_key: str, seed: int) -> Path:
+    return Path(paths.candidates) / clip_key / f"{seed}.orig.wav"
+
+
+def candidate_original_path(paths: Paths, clip_key: str, seed: int) -> Path | None:
+    """Die ungeschnittene Fassung eines geschnittenen Kandidaten, sonst None."""
+    path = _orig_path(paths, clip_key, seed)
+    trimmed = isinstance(candidate_meta(paths, clip_key, seed).get("trim"), dict)
+    return path if trimmed and path.exists() else None
+
+
+def trim_candidate(paths: Paths, clip: Clip, seed: int, start: float, end: float) -> dict[str, Any]:
+    """Probeaufnahme vorne und hinten beschneiden — verlustfrei.
+
+    Beim ersten Schnitt wird die Aufnahme als `<seed>.orig.wav` gesichert; jeder
+    weitere Schnitt geht wieder vom Original aus, man kann also auch zurückziehen.
+    Umfasst der Schnitt die volle Länge, fällt er weg und das Original kehrt
+    zurück. Ist der Kandidat die Produktion, zieht die Produktions-Datei mit.
+    Mikrofon-Aufnahmen haben ihren eigenen Editor (Rohdatei + Edit) und werden
+    hier abgewiesen.
+    """
+    import soundfile as sf
+
+    directory = Path(paths.candidates) / clip.key
+    wav_path = directory / f"{seed}.wav"
+    if not wav_path.exists():
+        raise FileNotFoundError(seed)
+    meta = candidate_meta(paths, clip.key, seed)
+    if meta.get("source") == "mic":
+        raise ValueError("Mikrofon-Aufnahmen werden über ✂ geschnitten")
+    orig = _orig_path(paths, clip.key, seed)
+    if not (orig.exists() and isinstance(meta.get("trim"), dict)):
+        orig.write_bytes(wav_path.read_bytes())
+
+    data, sr = sf.read(orig, dtype="float32")
+    duration = len(data) / sr
+    start, end = float(start), float(end)
+    if not (0.0 <= start < end <= duration + 1e-6):
+        raise ValueError(f"Schnitt 0 ≤ Anfang < Ende ≤ {duration:.3f} s verletzt "
+                         f"(Anfang {start:.3f}, Ende {end:.3f})")
+    if end - start < MIN_TRIMMED_SECONDS:
+        raise ValueError(f"Es müssen mindestens {MIN_TRIMMED_SECONDS * 1000:.0f} ms bleiben")
+
+    tolerance = 1.0 / sr
+    if start <= tolerance and end >= duration - tolerance:
+        wav_path.write_bytes(orig.read_bytes())
+        orig.unlink()
+        meta = update_candidate_meta(paths, clip.key, seed, trim=None)
+    else:
+        piece = np.array(data[int(round(start * sr)):int(round(end * sr))], dtype=np.float32)
+        fade = min(int(sr * TRIM_FADE_SECONDS), len(piece) // 2)
+        if fade > 0:
+            ramp = np.linspace(0.0, 1.0, fade, dtype=np.float32)
+            if start > tolerance:
+                piece[:fade] *= ramp
+            if end < duration - tolerance:
+                piece[-fade:] *= ramp[::-1]
+        write_wav(wav_path, piece, sr)
+        meta = update_candidate_meta(paths, clip.key, seed, trim={
+            "start": round(start, 4), "end": round(end, 4), "duration": round(duration, 4)})
+
+    production = Path(paths.audio) / f"{clip.key}.wav"
+    if clip.seed == seed and production.exists():
+        tmp = production.with_suffix(".wav.tmp")
+        tmp.write_bytes(wav_path.read_bytes())
+        os.replace(tmp, production)
+    return meta
 
 
 def update_candidate_meta(paths: Paths, clip_key: str, seed: int,
@@ -407,6 +492,8 @@ def candidate_infos(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
             "text": meta.get("text"),
             "good": meta.get("rating") == "good",
             "mic": is_mic,
+            # {start, end, duration} in Sekunden des Originals, sonst None.
+            "trim": meta.get("trim") if isinstance(meta.get("trim"), dict) else None,
         })
     infos.sort(key=lambda info: (info["createdAt"] or "", info["seed"]), reverse=True)
     return infos
@@ -486,6 +573,7 @@ def delete_candidate_wav(paths: Paths, clip: Clip, seed: int) -> None:
     wav.unlink()
     (paths.candidates / clip.key / f"{seed}.json").unlink(missing_ok=True)
     (paths.candidates / clip.key / f"{seed}.raw.wav").unlink(missing_ok=True)
+    _orig_path(paths, clip.key, seed).unlink(missing_ok=True)
 
     production = paths.audio / f"{clip.key}.wav"
     if clip.seed == seed and production.exists():

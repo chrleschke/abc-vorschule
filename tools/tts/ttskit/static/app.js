@@ -695,14 +695,6 @@ function seedOrigin(clip, profile) {
   return "automatisch gewürfelt (Pool ist leer)";
 }
 
-function formatWhen(iso) {
-  if (!iso) return "—";
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" }) +
-    " " + date.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
-}
-
 // Die Kurzfassung der globalen Einstellungen: erst der Klick auf „Bearbeiten“
 // klappt das Formular auf — die Detailsicht bleibt so oben ruhig.
 function profileSummaryCard(clip, profile) {
@@ -767,6 +759,11 @@ function candidateRow(clip, cand, index) {
   const src = cand.isProductionOnly
     ? `/audio/${encoded}.wav`
     : `/candidates/${encoded}/${cand.seed}.wav`;
+  // Ein Schnitt schreibt unter derselben URL neu — der Parameter hält den
+  // Browser davon ab, die alte Fassung aus dem Cache zu spielen.
+  const trim = cand.trim;
+  const audioSrc = trim ? `${src}?v=${trim.start}-${trim.end}` : src;
+  const trimmable = !cand.mic && !cand.isProductionOnly;
   const rateLabel = pendingRate ? "…" : (cand.good ? "✓" : "👍");
   const discardLabel = pendingDiscard ? "…" : "👎";
   return `
@@ -782,7 +779,7 @@ function candidateRow(clip, cand, index) {
           <span class="production-label">${isProduction ? "✓ fertig" : "wählen"}</span>
         </label>
       </td>
-      <td class="cand-audio-cell"><audio controls preload="metadata" src="${src}"
+      <td class="cand-audio-cell"><audio controls preload="metadata" src="${audioSrc}"
                  data-index="${index}" ${isProduction ? "data-current-production" : ""}></audio></td>
       <td class="nowrap">
         ${cand.isProductionOnly ? "" : `
@@ -802,7 +799,15 @@ function candidateRow(clip, cand, index) {
         ${cand.mic ? `<button data-edit-recording="${cand.seed}" class="icon" title="Schnitt und Tonhöhe dieser Aufnahme bearbeiten">✂</button>` : ""}
       </td>
       <td class="mono nowrap">${cand.seed}</td>
-      <td class="nowrap muted" title="Zeitpunkt der Erzeugung">${formatWhen(cand.createdAt)}</td>
+      <td class="wave-cell"><canvas class="cand-wave"
+                 data-wave-src="${trim ? `${src}?orig=1` : src}"
+                 data-wave-cache="${cand.mic ? "" : `${src}|${cand.createdAt || ""}`}"
+                 data-seed="${cand.seed}"
+                 ${trim ? `data-trim-start="${trim.start}" data-trim-end="${trim.end}"` : ""}
+                 ${trimmable ? 'data-trimmable="1"' : ""}
+                 title="${trimmable
+                   ? "Griffe am Rand ziehen schneidet vorne/hinten (sofort gespeichert) — Klick springt an die Stelle"
+                   : cand.mic ? "Wellenform — Mikrofon-Aufnahmen schneidet ✂" : "Wellenform — Klick springt an die Stelle"}"></canvas></td>
       <td class="nowrap">${cand.mic ? '<span title="Mikrofon-Aufnahme">🎙</span>' : cand.speaker ? escapeHtml(cand.speaker) : '<span class="muted">—</span>'}</td>
       <td class="text-cell" title="${escapeHtml(cand.text || "")}">
         ${cand.text ? escapeHtml(cand.text) : '<span class="muted">—</span>'}
@@ -823,7 +828,7 @@ function candidatesTableHtml(clip) {
         <th>Anhören</th>
         <th>Bewertung</th>
         <th>Seed</th>
-        <th>Erzeugt</th>
+        <th>Wellenform</th>
         <th>Stimme</th>
         <th>Text</th>
       </tr></thead>
@@ -1274,6 +1279,228 @@ async function stopRecording() {
   showBanner(`Aufnahme gespeichert (Seed ${result.seed}) — jetzt schneiden, dann „Übernehmen“.`, "ok");
 }
 
+// ------------------------------------------------ Wellenformen der Kandidaten
+
+// Spitzenwerte je Datei. Schlüssel ist Pfad + Erzeugungszeit, weil ein neuer
+// Kandidat mit demselben Seed dieselbe URL bekommt; Mikrofon-Aufnahmen werden
+// nie gecacht, denn „✂ Bearbeiten“ schreibt sie unter derselben URL neu. Bei
+// einem geschnittenen Kandidaten zeigt die Wellenform das Original
+// (`?orig=1`) — dessen Spitzen sind dieselben wie vor dem ersten Schnitt,
+// deshalb teilen sich beide denselben Schlüssel.
+const WAVE_BUCKETS = 400;
+const WAVE_HANDLE_PX = 7;          // Greifbreite eines Schnitt-Griffs
+const WAVE_MIN_SECONDS = 0.05;     // wie MIN_TRIMMED_SECONDS im Server
+const wavePeakCache = new Map();
+
+async function wavePeaks(src, cacheKey) {
+  if (cacheKey && wavePeakCache.has(cacheKey)) return wavePeakCache.get(cacheKey);
+  const response = await fetch(src, { cache: "no-store" });
+  if (!response.ok) throw new Error(`${src}: HTTP ${response.status}`);
+  // Nur zum Dekodieren — ein OfflineAudioContext braucht keine Nutzergeste.
+  const audio = await new OfflineAudioContext(1, 1, 24000)
+    .decodeAudioData(await response.arrayBuffer());
+  const data = audio.getChannelData(0);
+  const step = Math.max(1, Math.floor(data.length / WAVE_BUCKETS));
+  const peaks = new Float32Array(Math.ceil(data.length / step));
+  for (let i = 0; i < peaks.length; i++) {
+    let peak = 0;
+    for (let j = i * step, end = Math.min(data.length, j + step); j < end; j++) {
+      const v = Math.abs(data[j]);
+      if (v > peak) peak = v;
+    }
+    peaks[i] = peak;
+  }
+  const result = { peaks, duration: audio.duration };
+  if (cacheKey) wavePeakCache.set(cacheKey, result);
+  return result;
+}
+
+// Gespielt bis hierhin, in Sekunden des Originals: das <audio> spielt die
+// geschnittene Datei, die bei view.start beginnt.
+function wavePlayedTime(audio, view) {
+  if (!audio || !audio.duration || (audio.paused && audio.currentTime === 0)) return view.start;
+  return view.start + audio.currentTime;
+}
+
+function drawWave(canvas, view, played) {
+  const dpr = window.devicePixelRatio || 1;
+  const width = Math.max(1, Math.round(canvas.clientWidth * dpr));
+  const height = Math.max(1, Math.round(canvas.clientHeight * dpr));
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+  const ctx = canvas.getContext("2d");
+  const css = getComputedStyle(document.documentElement);
+  const accent = css.getPropertyValue("--accent");
+  const muted = css.getPropertyValue("--muted");
+  const { peaks, duration } = view;
+  const toX = (t) => (t / duration) * width;
+  const startX = toX(view.start);
+  const endX = toX(view.end);
+  const playedX = toX(played);
+  ctx.clearRect(0, 0, width, height);
+  const mid = height / 2;
+  for (let x = 0; x < width; x++) {
+    // Absolute Amplitude, nicht je Clip hochskaliert — so bleiben leise und
+    // laute Aufnahmen auch optisch unterscheidbar.
+    const a = Math.floor((x / width) * peaks.length);
+    const b = Math.max(a + 1, Math.floor(((x + 1) / width) * peaks.length));
+    let peak = 0;
+    for (let i = a; i < b && i < peaks.length; i++) peak = Math.max(peak, peaks[i]);
+    const h = Math.max(dpr, peak * (height - 2 * dpr));
+    const kept = x >= startX && x < endX;
+    ctx.globalAlpha = kept ? 1 : 0.22;          // Weggeschnittenes bleibt blass sichtbar
+    ctx.fillStyle = kept && x < playedX ? accent : muted;
+    ctx.fillRect(x, mid - h / 2, 1, h);
+  }
+  ctx.globalAlpha = 1;
+  if (canvas.dataset.trimmable === "1") {
+    ctx.fillStyle = accent;
+    for (const x of [startX, endX]) {
+      const left = Math.min(width - 2 * dpr, Math.max(0, x - dpr));
+      ctx.fillRect(left, 0, 2 * dpr, height);
+      ctx.fillRect(Math.min(width - 6 * dpr, Math.max(0, x - 3 * dpr)), 0, 6 * dpr, 4 * dpr);
+      ctx.fillRect(Math.min(width - 6 * dpr, Math.max(0, x - 3 * dpr)), height - 4 * dpr, 6 * dpr, 4 * dpr);
+    }
+  }
+}
+
+async function saveTrim(clip, canvas, view, audio) {
+  const seed = Number(canvas.dataset.seed);
+  const encoded = encodeURIComponent(clip.key);
+  const response = await fetch(`/api/clips/${encoded}/candidates/${seed}/trim`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ start: view.start, end: view.end }),
+  });
+  if (!response.ok) {
+    const detail = (await response.json().catch(() => ({}))).detail;
+    throw new Error(detail || `${response.status} ${response.statusText}`);
+  }
+  const { trim } = await response.json();
+  // Lokal nachziehen statt neu zu laden: die Detailsicht bleibt ruhig, und ein
+  // späteres Neuzeichnen kennt den Schnitt schon.
+  const cand = clip.candidates.find((c) => c.seed === seed);
+  if (cand) cand.trim = trim || null;
+  const base = `/candidates/${encoded}/${seed}.wav`;
+  canvas.dataset.waveSrc = trim ? `${base}?orig=1` : base;
+  if (audio) {
+    audio.src = trim ? `${base}?v=${trim.start}-${trim.end}` : `${base}?v=${Date.now()}`;
+    audio.load();
+  }
+  return trim;
+}
+
+function wireWaveforms(container, clip) {
+  container.querySelectorAll("canvas.cand-wave").forEach((canvas) => {
+    const audio = canvas.closest("tr")?.querySelector("audio");
+    wavePeaks(canvas.dataset.waveSrc, canvas.dataset.waveCache || null).then(({ peaks, duration }) => {
+      const view = {
+        peaks, duration,
+        start: Number(canvas.dataset.trimStart) || 0,
+        end: canvas.dataset.trimEnd ? Number(canvas.dataset.trimEnd) : duration,
+      };
+      canvas.wave = view;
+      const redraw = () => drawWave(canvas, view, wavePlayedTime(audio, view));
+      redraw();
+      if (audio) {
+        let frame = 0;
+        const tick = () => {
+          redraw();
+          frame = audio.paused ? 0 : requestAnimationFrame(tick);
+        };
+        audio.addEventListener("play", () => { if (!frame) frame = requestAnimationFrame(tick); });
+        for (const type of ["pause", "ended", "seeked", "loadedmetadata"]) {
+          audio.addEventListener(type, redraw);
+        }
+      }
+
+      const trimmable = canvas.dataset.trimmable === "1" && clip;
+      const timeAt = (clientX) => {
+        const rect = canvas.getBoundingClientRect();
+        return Math.min(1, Math.max(0, (clientX - rect.left) / rect.width)) * duration;
+      };
+      const handleAt = (clientX) => {
+        if (!trimmable) return null;
+        const rect = canvas.getBoundingClientRect();
+        const px = (t) => rect.left + (t / duration) * rect.width;
+        const dStart = Math.abs(clientX - px(view.start));
+        const dEnd = Math.abs(clientX - px(view.end));
+        if (Math.min(dStart, dEnd) > WAVE_HANDLE_PX) return null;
+        return dStart <= dEnd ? "start" : "end";
+      };
+      canvas.onpointermove = (event) => {
+        if (canvas.dragging) return;
+        canvas.style.cursor = handleAt(event.clientX) ? "ew-resize" : "pointer";
+      };
+      canvas.onpointerdown = (event) => {
+        const handle = handleAt(event.clientX);
+        if (!handle) {
+          // Klick: an die Stelle springen und spielen (Zeit im geschnittenen Clip).
+          if (!audio) return;
+          const offset = Math.min(view.end, Math.max(view.start, timeAt(event.clientX))) - view.start;
+          const seek = () => { audio.currentTime = offset; audio.play(); };
+          if (audio.readyState >= 1 && audio.duration) seek();
+          else audio.addEventListener("loadedmetadata", seek, { once: true });
+          return;
+        }
+        event.preventDefault();
+        canvas.setPointerCapture(event.pointerId);
+        canvas.dragging = handle;
+        if (audio) audio.pause();
+        const before = { start: view.start, end: view.end };
+        const move = (e) => {
+          const t = timeAt(e.clientX);
+          if (handle === "start") view.start = Math.min(t, view.end - WAVE_MIN_SECONDS);
+          else view.end = Math.max(t, view.start + WAVE_MIN_SECONDS);
+          view.start = Math.max(0, view.start);
+          view.end = Math.min(duration, view.end);
+          drawWave(canvas, view, view.start);
+        };
+        const up = async () => {
+          canvas.removeEventListener("pointermove", move);
+          canvas.removeEventListener("pointerup", up);
+          canvas.removeEventListener("pointercancel", up);
+          canvas.dragging = null;
+          if (view.start === before.start && view.end === before.end) return;
+          // Auf Millisekunden runden; ganz an den Rand gezogen heißt „nicht schneiden“.
+          view.start = view.start < 0.005 ? 0 : Math.round(view.start * 1000) / 1000;
+          view.end = view.end > duration - 0.005 ? duration : Math.round(view.end * 1000) / 1000;
+          try {
+            const trim = await saveTrim(clip, canvas, view, audio);
+            showBanner(trim
+              ? `Seed ${canvas.dataset.seed} geschnitten: ${germanNumber(trim.start)} – ${germanNumber(trim.end)} s`
+                // Wie im Server: nur eine vorhandene Produktion dieses Seeds zieht mit.
+                + (clip.status === "rendered" && clip.seed === Number(canvas.dataset.seed)
+                  ? " (Produktion mitgeschnitten)" : "")
+              : `Seed ${canvas.dataset.seed}: Schnitt aufgehoben, Original zurück`, "ok");
+          } catch (error) {
+            view.start = before.start;
+            view.end = before.end;
+            showError(error);
+          }
+          redraw();
+        };
+        canvas.addEventListener("pointermove", move);
+        canvas.addEventListener("pointerup", up);
+        canvas.addEventListener("pointercancel", up);
+      };
+    }).catch(() => {
+      canvas.title = "Wellenform nicht verfügbar";
+    });
+  });
+}
+
+// Nach einer Breitenänderung (Trenner, Fenster) neu zeichnen, ohne neu zu laden.
+function redrawWaveforms() {
+  document.querySelectorAll("canvas.cand-wave").forEach((canvas) => {
+    if (!canvas.wave) return;
+    const audio = canvas.closest("tr")?.querySelector("audio");
+    drawWave(canvas, canvas.wave, wavePlayedTime(audio, canvas.wave));
+  });
+}
+
 function syncCandidatesBody(clip) {
   const body = el("candidates-body");
   if (!body) return;
@@ -1283,6 +1510,7 @@ function syncCandidatesBody(clip) {
 
 function wireCandidateHandlers(clip) {
   const encoded = encodeURIComponent(clip.key);
+  wireWaveforms(el("detail"), clip);
   el("detail").querySelectorAll("[data-rate]").forEach((button) => {
     button.onclick = guard(async () => {
       if (globalCandidateActionBusy(clip.key)) return;
@@ -2014,5 +2242,54 @@ events.onmessage = (message) => {
     }
   }
 };
+
+// ---------------------------------------------- verschiebbare Clip-Liste
+
+// Die Breite ist reiner Ansichts-Zustand und liegt deshalb im localStorage.
+(function wireSplitter() {
+  const main = document.querySelector("main");
+  const splitter = el("splitter");
+  const MIN_LIST = 220;
+  const MIN_DETAIL = 360;
+  let redrawFrame = 0;
+  const apply = (px) => {
+    const max = Math.max(MIN_LIST, main.clientWidth - MIN_DETAIL - splitter.offsetWidth);
+    const width = Math.round(Math.min(Math.max(px, MIN_LIST), max));
+    main.style.setProperty("--list-w", `${width}px`);
+    if (!redrawFrame) {
+      redrawFrame = requestAnimationFrame(() => { redrawFrame = 0; redrawWaveforms(); });
+    }
+    return width;
+  };
+  const stored = () => Number(readLocal("ttsListWidth", 0)) || 0;
+  if (stored() > 0) apply(stored());
+
+  splitter.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    splitter.setPointerCapture(event.pointerId);
+    document.body.classList.add("resizing");
+    const left = main.getBoundingClientRect().left;
+    const move = (e) => apply(e.clientX - left);
+    const up = (e) => {
+      splitter.removeEventListener("pointermove", move);
+      splitter.removeEventListener("pointerup", up);
+      splitter.removeEventListener("pointercancel", up);
+      document.body.classList.remove("resizing");
+      try { writeLocal("ttsListWidth", apply(e.clientX - left)); } catch { /* ohne Speicher gilt die Breite nur bis zum Neuladen */ }
+    };
+    splitter.addEventListener("pointermove", move);
+    splitter.addEventListener("pointerup", up);
+    splitter.addEventListener("pointercancel", up);
+  });
+  splitter.addEventListener("dblclick", () => {
+    main.style.removeProperty("--list-w");
+    try { localStorage.removeItem("ttsListWidth"); } catch { /* egal */ }
+    requestAnimationFrame(redrawWaveforms);
+  });
+  window.addEventListener("resize", () => {
+    if (stored() > 0) apply(stored());
+    else requestAnimationFrame(redrawWaveforms);
+  });
+})();
 
 refresh().catch(showError);

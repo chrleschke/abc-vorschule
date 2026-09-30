@@ -49,7 +49,9 @@ from .render import production_fingerprint
 #: `monster` steht bewusst nicht drin: es ist eine Variante (siehe
 #: VARIANT_PROFILES), landet unter `variants.monster` und erreicht
 #: `_collision_winner` nie.
-PROFILE_PRIORITY = ("phoneme", "word", "article_word", "prompt", "miss",
+#: `math` (Rechenaufgaben, „drei plus zwei") kollidiert heute mit keinem anderen
+#: Text; es steht hier nur, damit eine künftige Kollision nicht an `.index` scheitert.
+PROFILE_PRIORITY = ("phoneme", "word", "article_word", "prompt", "math", "miss",
                     "reward", "sentence", "finale", "ui")
 
 #: Profile, deren Clips als *Variante* eines Textes gelten: die App sucht sie

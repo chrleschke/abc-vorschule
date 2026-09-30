@@ -183,30 +183,65 @@ def test_blank_text_can_be_collected_for_reporting(tmp_path):
     assert blanks == ["atom:empty:lemma"]
 
 
-def test_extracts_count_add_spoken_answers(tmp_path):
-    import json
-
+def test_count_add_rounds_yield_one_task_clip_and_no_sentence(tmp_path):
+    """Rechnen spricht „Wie viel ist" + die Aufgabe als ein Clip (MathPromptSpeech)
+    — der promptTts-Satz wird nie als Ganzes gesprochen, also auch nicht gerendert,
+    und die Antwort ist ein Zahlwort (countingNumber-Clips)."""
     d = tmp_path / "content"
     d.mkdir()
-    (d / "atoms.json").write_text(json.dumps({"atoms": [
-        {"id": "ameise", "lemma": "Ameise", "display": "Ameise", "emoji": "🐜",
-         "kind": "other", "pluralDisplay": "Ameisen"},
-    ]}), encoding="utf-8")
+    (d / "atoms.json").write_text(json.dumps({"atoms": []}), encoding="utf-8")
     (d / "tasks.json").write_text(json.dumps({"tasks": [
         {"trainer": "count_add", "id": "l01-t6", "rounds": [
-            {"promptTts": "Wie viele?", "iconAtomId": "ameise",
-             "left": 1, "right": 1, "answer": 2, "operation": "add"},
+            {"promptTts": "Wie viel ist fünf plus zwanzig?",
+             "left": 5, "right": 20, "answer": 25},
+            {"promptTts": "Wie viel ist neun minus sechs?",
+             "left": 9, "right": 6, "answer": 3, "operation": "subtract"},
+            {"promptTts": "Wie viel ist drei mal vier?",
+             "left": 3, "right": 4, "answer": 12, "operation": "multiply"},
         ]},
     ]}), encoding="utf-8")
     for name, key in (("sentences.json", "sentences"), ("finales.json", "finales"),
                       ("lessons.json", "lessons")):
         (d / name).write_text(json.dumps({key: []}), encoding="utf-8")
 
-    by_id = {i.id: i for i in extract_items(d)}
-    item = by_id["task:l01-t6:round:0:spokenAnswer"]
-    assert item.field == "spokenAnswerTts"
-    assert item.text == "2 Ameisen"
-    assert profile_for_item(item) == "word"
+    items = extract_items(d)
+    assert [i.text for i in items] == ["fünf plus zwanzig", "neun minus sechs", "drei mal vier"]
+    assert {i.field for i in items} == {"mathTaskTts"}
+    assert {profile_for_item(i) for i in items} == {"math"}
+    assert "spokenAnswerTts" not in FIELD_TO_PROFILE
+
+
+def test_number_words_match_the_counting_clips():
+    """`_number_word` spiegelt GermanNumberWord — dieselben Wörter wie die
+    countingNumber-Clips, sonst hörte das Kind in der Aufgabe andere Zahlen."""
+    from ttskit.extract import _number_word
+
+    extra = json.loads(Paths().extra_strings.read_text())
+    counting = {e["id"]: e["text"] for e in extra["strings"]
+                if e["id"].startswith("countingNumber")}
+    assert len(counting) == 31
+    for n in range(31):
+        assert _number_word(n) == counting[f"countingNumber{n:02d}"], n
+    assert _number_word(31) == "31"
+
+
+def test_shipped_math_tasks_are_48_distinct_clips_in_the_math_profile():
+    from ttskit.plan import clip_key
+
+    extra = json.loads(Paths().extra_strings.read_text())
+    items = extract_items(CONTENT_DIR, extra_strings=extra)
+    tasks = [i for i in items if i.field == "mathTaskTts" and i.source == "tasks.json"]
+    assert tasks and {profile_for_item(i) for i in tasks} == {"math"}
+    assert len({i.text for i in tasks}) == 48
+    assert len({clip_key(profile_for_item(i), i.text) for i in tasks}) == 48
+
+    by_id = {i.id: i for i in items}
+    intro = by_id["ui:mathPromptIntro"]
+    assert intro.text == "Wie viel ist"
+    assert profile_for_item(intro) == "math"
+    assert not any(i.id.startswith("ui:countingAidCue") for i in items)
+    for gone in ("ui:mathPromptPlus", "ui:mathPromptMinus", "ui:mathPromptTimes"):
+        assert gone not in by_id
 
 
 def test_instruction_tts_is_extracted_with_prompt_profile(tmp_path):
@@ -413,7 +448,6 @@ def test_a_sentence_round_prompt_shares_the_clip_of_its_sentence():
         "Ordne das richtige Bild zu.",
         "Zeichne den Buchstaben - M - nach und sammle dabei alle Sterne.",
         "Schiebe m und a zusammen. Welche Silbe entsteht.",
-        "Zwölf und fünf. Wie viele sind das.",
     ):
         assert not reads_as_bare_sentence(text), text
 
@@ -440,27 +474,10 @@ def test_no_text_is_rendered_under_two_profiles_by_accident():
     assert collisions == {"Ei": ["phoneme", "word"]}, collisions
 
 
-def test_a_math_task_gets_its_own_profile_not_the_prompt_melody():
-    """„Sechs Ameisen krabbeln im Bau. Drei krabbeln hinaus. Wie viele Ameisen
-    bleiben." trägt Erzählung *und* Frage in einem String — die einzige Aufgabe
-    der Fibel, die fragt. Als `prompt` bekäme der ganze Text die fragende
-    Melodie, als `sentence` (sie endet auf einen Punkt!) die erzählende."""
-    math = Item(id="task:l01-t10:round:0:promptTts",
-                text="Sechs Ameisen krabbeln im Bau. Drei krabbeln hinaus. "
-                     "Wie viele Ameisen bleiben?",
-                field="promptTts", source="tasks.json", lesson="l01", label="")
-    assert profile_for_item(math) == "math"
-
-    instruction = Item(id="task:l01-t6:round:0:promptTts",
-                       text="Baue das Wort Mama.", field="promptTts",
-                       source="tasks.json", lesson="l01", label="")
-    assert profile_for_item(instruction) == "prompt"
-
-
 def test_a_question_is_never_a_bare_sentence():
-    """Die einzigen Fragen der Fibel sind Rechenaufgaben, und die haben ihr
-    eigenes Profil. Alles andere mit „?" ist ein Autorenfehler — der darf nicht
-    zusätzlich die erzählende Satz-Melodie bekommen."""
+    """Die einzigen Fragen der Fibel sind Rechenaufgaben, und die werden nicht
+    als Ganzes extrahiert. Alles andere mit „?" ist ein Autorenfehler — der darf
+    nicht zusätzlich die erzählende Satz-Melodie bekommen."""
     assert not reads_as_bare_sentence("Hörst du das M?")
     assert reads_as_bare_sentence("Tom singt.")
     assert reads_as_bare_sentence("Mama Maus!")

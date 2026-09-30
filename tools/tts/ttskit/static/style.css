@@ -13,11 +13,21 @@ header {
   border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap;
 }
 header h1 { font-size: 16px; margin: 0 12px 0 0; }
-main { flex: 1; display: grid; grid-template-columns: minmax(320px, 1fr) 1.4fr; min-height: 0; }
-#list-pane {
-  display: flex; flex-direction: column; min-height: 0;
-  border-right: 1px solid var(--line);
+/* --list-w setzt der Trenner (#splitter) beim Ziehen; ohne Wert gilt die alte
+   Aufteilung von etwa 40 : 60. */
+main {
+  flex: 1; display: grid; min-height: 0;
+  grid-template-columns: var(--list-w, minmax(320px, 1fr)) 6px minmax(360px, 1.4fr);
 }
+#list-pane { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+#splitter {
+  cursor: col-resize; touch-action: none;
+  background: linear-gradient(90deg, transparent 2px, var(--line) 2px, var(--line) 4px, transparent 4px);
+}
+#splitter:hover, body.resizing #splitter {
+  background: linear-gradient(90deg, transparent 1px, var(--accent) 1px, var(--accent) 5px, transparent 5px);
+}
+body.resizing { cursor: col-resize; user-select: none; }
 #list-tools {
   display: flex; gap: 6px; align-items: center; padding: 6px 14px;
   border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap;
@@ -120,8 +130,11 @@ textarea.tts-text-input {
   outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px;
 }
 .cand-table .cand-audio-cell {
-  width: 42%; min-width: 10rem;
+  width: 30%; min-width: 10rem;
 }
+/* Wellenform der Aufnahme; Klick springt an die Stelle und spielt ab. */
+.cand-table .wave-cell { width: 26%; min-width: 9rem; }
+.cand-wave { display: block; width: 100%; height: 32px; cursor: pointer; }
 .cand-table audio {
   width: 100%; min-width: 10rem; max-width: 100%; height: 32px; display: block;
 }

@@ -1504,3 +1504,28 @@ def test_recorder_worklet_is_served(client):
     r = client.get("/recorder-worklet.js")
     assert r.status_code == 200
     assert "registerProcessor" in r.text
+
+
+def test_trim_endpoint_cuts_and_serves_the_original(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"fixedSeed": 5})
+    wait_for_idle(client)
+    full = client.get(f"/candidates/{key}/5.wav").content
+    response = client.put(f"/api/clips/{key}/candidates/5/trim", json={"start": 0.01, "end": 0.08})
+    assert response.status_code == 200
+    assert response.json()["trim"]["start"] == 0.01
+    assert len(client.get(f"/candidates/{key}/5.wav").content) < len(full)
+    assert client.get(f"/candidates/{key}/5.wav?orig=1").content == full
+    clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+    assert clip["candidates"][0]["trim"]["end"] == 0.08
+
+
+def test_trim_endpoint_rejects_bad_input(client):
+    key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/candidates", json={"fixedSeed": 5})
+    wait_for_idle(client)
+    assert client.put(f"/api/clips/{key}/candidates/5/trim", json={"start": 0.08}).status_code == 422
+    assert client.put(f"/api/clips/{key}/candidates/5/trim",
+                      json={"start": 0.08, "end": 0.02}).status_code == 422
+    assert client.put(f"/api/clips/{key}/candidates/77/trim",
+                      json={"start": 0.0, "end": 0.05}).status_code == 404

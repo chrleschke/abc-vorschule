@@ -30,8 +30,10 @@ FIELD_TO_PROFILE: dict[str, str] = {
     "sentenceTts": "sentence",
     "finaleTts": "finale",
     "uiText": "ui",
-    "spokenAnswerTts": "word",
     "articleTts": "article_word",
+    # Rechnen: die ganze Aufgabe („fünf plus zwanzig") als ein Clip, dazu die
+    # Einleitung „Wie viel ist" aus extra-strings.json — siehe `math_task_text`.
+    "mathTaskTts": "math",
     # Reaktionen der Laut-Fresser — die einzigen Strings, die nicht sauber
     # artikuliert sein müssen; Laute und Wörter laufen in normaler Stimme und
     # werden erst in der App per Tonhöhe zum Monster.
@@ -52,22 +54,11 @@ _PROMPT_FIELDS = frozenset({"promptTts", "instructionTts"})
 
 #: Textstücke, die eine Ansage an das Kind markieren, auch wenn der String wie
 #: ein Satz auf einen Punkt endet. Einzige Wahrheit für `reads_as_bare_sentence`
-#: und für die Kollisionsauflösung im Export.
-#: Die Rechenaufgabe. Sie ist die einzige Aufgabe der Fibel, die *fragt* — und
-#: sie fragt nicht nur: „Sechs Ameisen krabbeln im Bau. Drei krabbeln hinaus.
-#: Wie viele Ameisen bleiben." trägt Erzählung und Frage in einem String. Beides
-#: will eine andere Melodie als eine reine Aufforderung („Baue das Wort Mama."),
-#: also bekommt es ein eigenes Profil mit eigenem Seed-Pool.
+#: und für die Kollisionsauflösung im Export. Alles Imperative.
 #:
-#: Erkannt wird sie am Anfang ihres letzten Satzes, nicht am „?" — das steht seit
-#: September 2026 zwar dran (Qwen soll nur den letzten Satz fragend anheben),
-#: aber der Marker trug die Zuordnung schon, als die Fibel Fragen noch mit Punkt
-#: schrieb, und er bleibt die Wahrheit, falls ein Autor das „?" vergisst.
-MATH_MARKER = "Wie viele"
-
-#: Woran eine Aufgabenansage erkennbar ist. Alles Imperative — bis auf
-#: [MATH_MARKER], der sein eigenes Profil hat und hier nur mitläuft, damit eine
-#: Rechenaufgabe niemals als erzählender Satz durchgeht.
+#: Bis September 2026 stand hier auch „Wie viele" für die Rechenaufgabe. Deren
+#: `promptTts` wird heute gar nicht extrahiert; ihre Clips entstehen aus den
+#: Feldern der Runde (`math_task_text`) und tragen ihr eigenes Feld.
 INSTRUCTION_MARKERS = (
     "Baue das Wort", "Ordne ", "Finde den", "Finde alle", "Finde die",
     "Schiebe ", "Zeichne den",
@@ -75,7 +66,6 @@ INSTRUCTION_MARKERS = (
     # einen Punkt und liefe ohne diesen Marker als erzählender Satz durch; sie ist
     # aber eine Aufforderung und braucht die Prompt-Melodie.
     "Füttere ",
-    MATH_MARKER,
 )
 
 
@@ -94,9 +84,10 @@ def reads_as_bare_sentence(text: str) -> bool:
     erzählender Satz; sie im Satz-Profil aufzunehmen wäre derselbe Fehler wie
     „Tom singt." im Prompt-Profil, nur umgekehrt. Bis September 2026 stand „?"
     hier mit in der Liste und schob jede Frage, die keinen Marker trug, ins
-    Satz-Profil. Die einzigen Fragen der Fibel sind die Rechenaufgaben, und die
-    fängt [reads_as_math_task] vorher ab — hier landet also heute gar keine
-    Frage mehr; das „?" bleibt trotzdem draußen, damit es dabei bleibt.
+    Satz-Profil. Die einzigen Fragen der Fibel sind die Rechenaufgaben, und deren
+    `promptTts` wird gar nicht extrahiert (siehe `extract_items`) — hier landet
+    also heute keine Frage mehr; das „?" bleibt trotzdem draußen, damit es dabei
+    bleibt.
     """
     stripped = text.strip()
     if any(marker in stripped for marker in INSTRUCTION_MARKERS):
@@ -104,9 +95,35 @@ def reads_as_bare_sentence(text: str) -> bool:
     return stripped.endswith((".", "!"))
 
 
-def reads_as_math_task(text: str) -> bool:
-    """Trägt dieser Text eine Rechenaufgabe? Siehe [MATH_MARKER]."""
-    return MATH_MARKER in text
+#: Spiegel von `GermanNumberWord` (Kotlin) — der Zahlenraum des Lehrplans endet bei 30.
+_NUMBER_WORDS = (
+    "null", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht",
+    "neun", "zehn", "elf", "zwölf", "dreizehn", "vierzehn", "fünfzehn",
+    "sechzehn", "siebzehn", "achtzehn", "neunzehn", "zwanzig",
+    "einundzwanzig", "zweiundzwanzig", "dreiundzwanzig", "vierundzwanzig",
+    "fünfundzwanzig", "sechsundzwanzig", "siebenundzwanzig",
+    "achtundzwanzig", "neunundzwanzig", "dreißig",
+)
+
+_MATH_OPERATORS = {"add": "plus", "subtract": "minus", "multiply": "mal"}
+
+
+def _number_word(n: int) -> str:
+    """Mirror GermanNumberWord.of: Zahlwort bis 30, darüber die Ziffern."""
+    return _NUMBER_WORDS[n] if 0 <= n < len(_NUMBER_WORDS) else str(n)
+
+
+def math_task_text(round_: dict) -> str | None:
+    """Mirror MathPromptSpeech.taskText: „fünf plus zwanzig", klein, ohne Satzzeichen.
+
+    Qwen spricht aus Zahl · Rechenwort · Zahl zusammengesetzte Einzelclips zu
+    uneinheitlich in Betonung und Stimme — deshalb ist die ganze Aufgabe ein Clip.
+    `None` bei unbekannter Operation (die App fällt dann auf `promptTts` zurück).
+    """
+    op = _MATH_OPERATORS.get(round_.get("operation", "add"))
+    if op is None:
+        return None
+    return f"{_number_word(round_['left'])} {op} {_number_word(round_['right'])}"
 
 
 _SOUND_PAIR_RE = re.compile(r'SoundPair\(\s*"([^"]+)"\s*,\s*"([^"]+)"')
@@ -130,14 +147,8 @@ def profile_for_item(item: Item) -> str:
     """Map an extracted item to its synthesis profile."""
     if item.field == "lemma" and item.atom_kind in _PHONEME_LEMMA_KINDS:
         return "phoneme"
-    if item.field in _PROMPT_FIELDS:
-        # Reihenfolge: die Rechenaufgabe zuerst. Sie endet auf einen Punkt und
-        # wäre ohne ihren Marker ein „erzählender Satz" — die Frage am Ende
-        # bekäme dann Aussage-Melodie.
-        if reads_as_math_task(item.text):
-            return "math"
-        if reads_as_bare_sentence(item.text):
-            return "sentence"
+    if item.field in _PROMPT_FIELDS and reads_as_bare_sentence(item.text):
+        return "sentence"
     return FIELD_TO_PROFILE[item.field]
 
 
@@ -172,18 +183,6 @@ def _lesson_index(lessons: list[dict]) -> tuple[dict[str, str], dict[str, str]]:
         if finale_id:
             by_finale[finale_id] = lesson["id"]
     return by_task, by_finale
-
-
-def _spoken_answer(answer: int, icon: dict) -> str:
-    """Mirror CountAddRound.spokenAnswer in TaskSpecs.kt."""
-    if not icon:
-        return str(answer)
-    display = icon.get("display") or ""
-    if answer == 1:
-        noun = display
-    else:
-        noun = icon.get("pluralDisplay") or display
-    return f"{answer} {noun}".strip()
 
 
 _DEFINITE = {"m": "der", "f": "die", "n": "das"}
@@ -249,7 +248,6 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
     lessons = _load(content_dir, "lessons.json", "lessons")
 
     lesson_by_task, lesson_by_finale = _lesson_index(lessons)
-    atom_by_id = {atom["id"]: atom for atom in atoms}
     items: list[Item] = []
 
     def add(item_id: str, text: str, field: str, source: str,
@@ -299,19 +297,23 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
         if "instructionTts" in task:
             add(f"task:{task_id}:instructionTts", task["instructionTts"], "instructionTts",
                 "tasks.json", lesson, f"{task_id} · instructionTts")
+        # Rechnen spricht „Wie viel ist" (extra-strings) + die Aufgabe als ein Clip
+        # (MathPromptSpeech) und als Antwort Lob + Zahlwort (SuccessSpeech) — der
+        # promptTts-Satz selbst wird nie gesprochen, ein Clip dafür wäre Ballast.
+        # Gleiche Aufgaben in mehreren Runden kollabieren zu einem Clip (gleicher
+        # Text, gleiches Profil).
+        is_math = task.get("trainer") == "count_add"
+        skipped = {"promptTts"} if is_math else set()
         for index, round_ in enumerate(task.get("rounds", [])):
             for field in ROUND_FIELDS:
-                if field not in round_:
+                if field not in round_ or field in skipped:
                     continue
                 add(f"task:{task_id}:round:{index}:{field}", round_[field], field,
                     "tasks.json", lesson, f"{task_id} · Runde {index + 1} · {field}")
-            if task.get("trainer") == "count_add":
-                icon_id = round_.get("iconAtomId")
-                icon = atom_by_id.get(icon_id, {})
-                spoken = _spoken_answer(round_.get("answer", 0), icon)
-                add(f"task:{task_id}:round:{index}:spokenAnswer", spoken,
-                    "spokenAnswerTts", "tasks.json", lesson,
-                    f"{task_id} · Runde {index + 1} · spokenAnswer")
+            if is_math:
+                add(f"task:{task_id}:round:{index}:mathTask", math_task_text(round_) or "",
+                    "mathTaskTts", "tasks.json", lesson,
+                    f"{task_id} · Runde {index + 1} · Aufgabe")
 
     if extra_strings:
         for entry in extra_strings.get("strings", []):
