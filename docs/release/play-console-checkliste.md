@@ -121,9 +121,12 @@ Play Console > „Wachstum" > „Store-Präsenz" > „Haupt-Store-Eintrag". Text
       Screenshots dürfen keine für Kinder ungeeigneten Inhalte und keine Geräte-Statusleiste mit
       persönlichen Daten zeigen.
       Vorhanden unter `app/src/main/play/listings/de-DE/graphics/phone-screenshots/1.png`
-      bis `8.png` (Dateiname = Reihenfolge im Store): Pfad, Buchstabe nachfahren (M), Silben
-      verschmelzen (m–a), Wort-Bauer (Mama), Laut-Fresser (P/T), Buchstaben-Jagd, Rechnen
-      (9 − 4), Satz-Versteher. Hochgeladen wird per `./gradlew :app:publishReleaseListing`,
+      bis `8.png` (Dateiname = Reihenfolge im Store): Pfad (Himmelslaternen), Buchstabe
+      nachfahren (M, Dschungel), Silben verschmelzen (m–a, Glühwürmchen), Wort-Bauer (Mama),
+      Laut-Fresser (P/T, Pilzhöhle), Buchstaben-Jagd (Tiefsee), Rechnen (Zahlentürme 4 + 3),
+      Satz-Versteher (Bühne). Aufnehmen vom **Release-Build** (`assembleRelease`, vorher das
+      Debug-Paket deinstallieren — andere Signatur), das ist zugleich der R8-Smoke-Test;
+      danach wieder `installDebug`, sonst scheitert das in anderen Sessions an der Signatur. Hochgeladen wird per `./gradlew :app:publishReleaseListing`,
       nicht von Hand. Aufgenommen am Emulator `uxreview` mit `adb shell wm size 1080x1920`
       und `wm density 360` (gleiches dp-Layout wie 720 × 1280/240, anderthalbfache Auflösung),
       `font_scale` 1.0, Vollbild ohne Statusleiste; danach `wm size reset` und
