@@ -120,12 +120,18 @@ Play Console > „Wachstum" > „Store-Präsenz" > „Haupt-Store-Eintrag". Text
       **nicht** akzeptiert, ggf. auf 9:16 zuschneiden).
       Screenshots dürfen keine für Kinder ungeeigneten Inhalte und keine Geräte-Statusleiste mit
       persönlichen Daten zeigen.
-      Vorhanden (Emulator `uxreview`, 720 × 1280, Vollbild ohne Statusleiste), in dieser
-      Reihenfolge hochladen: `docs/release/store/screenshots/01-pfad.png`,
-      `02-buchstabe-nachfahren.png`, `03-buchstaben-jagd.png`, `04-silben-verschmelzer.png`,
-      `05-wort-bauer.png`, `06-laut-fresser.png`. Optional später durch Aufnahmen vom
-      Motorola-Testgerät ersetzen (höhere Auflösung; dort vor dem Screenshot `font_scale` auf
-      1.0 stellen und das Seitenverhältnis auf 9:16 zuschneiden).
+      Vorhanden unter `app/src/main/play/listings/de-DE/graphics/phone-screenshots/1.png`
+      bis `8.png` (Dateiname = Reihenfolge im Store): Pfad, Buchstabe nachfahren (M), Silben
+      verschmelzen (m–a), Wort-Bauer (Mama), Laut-Fresser (P/T), Buchstaben-Jagd, Rechnen
+      (9 − 4), Satz-Versteher. Hochgeladen wird per `./gradlew :app:publishReleaseListing`,
+      nicht von Hand. Aufgenommen am Emulator `uxreview` mit `adb shell wm size 1080x1920`
+      und `wm density 360` (gleiches dp-Layout wie 720 × 1280/240, anderthalbfache Auflösung),
+      `font_scale` 1.0, Vollbild ohne Statusleiste; danach `wm size reset` und
+      `wm density reset`. Zu den Trainern springt man mit den Vor/Zurück-Pfeilen der Lektion;
+      Lektionen ab L03 (Laut-Fresser) öffnet die Elterntür → „Reihenfolge frei wählbar“, die
+      Option danach wieder ausschalten. Nach jedem Schritt ≥ 5 s warten, sonst stehen Kacheln
+      noch halb eingeblendet im Bild. Play verlangt PNG **ohne Alphakanal** (24 Bit),
+      `adb screencap` liefert RGBA — vor dem Ablegen nach RGB konvertieren.
 - [ ] Tablet-Screenshots (7 Zoll / 10 Zoll): optional, aber empfohlen, wenn Tablets unterstützt
       werden; gleiche Formatregeln.
 - [ ] Video (YouTube-URL): optional, leer lassen.
@@ -207,6 +213,6 @@ Play Console > „Test und Release" > „Produktion":
 
 - Store-Texte und Formularantworten: `docs/release/store-listing.md`
 - Datenschutzerklärung (zu hosten): `docs/release/datenschutz.md`
-- Grafiken (Icon 512, Feature-Grafik, Screenshots): `docs/release/store/`
+- Grafiken (Icon 512, Feature-Grafik): `docs/release/store/`; Store-Eintrag samt Screenshots, wie er hochgeladen wird: `app/src/main/play/`
 - Signierung, Upload-Keystore und Release-Build: README, Abschnitt „Release-Signierung"
 - Produktprinzipien (Name, Icon, Zielgruppe): `docs/PRODUCT_PRINCIPLES.md` §1, §2, §10

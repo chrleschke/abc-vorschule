@@ -180,7 +180,7 @@ zurücksetzen. Der Schlüssel liegt **nie im Repo** (`.gitignore`: `keystore.pro
 
 Die Texte für den Store-Eintrag, die Datenschutzerklärung (Pflicht-URL, auch ohne Datenerhebung)
 und die Schritt-für-Schritt-Liste für die Play Console liegen unter `docs/release/`, die
-Grafiken (Icon 512×512, Feature-Grafik 1024×500, Screenshots) unter `docs/release/store/`.
+Grafik-Quellen (Icon 512×512, Feature-Grafik 1024×500) unter `docs/release/store/`. Was tatsächlich im Store steht — Texte, Icon, Feature-Grafik, Screenshots — liegt unter `app/src/main/play/` und geht per `./gradlew :app:publishReleaseListing` in die Play Console (Service-Konto, siehe `play { }` in `app/build.gradle.kts`).
 
 ## Content-Pack (Schema v2)
 
