@@ -9,6 +9,7 @@ import app.abcvorschule.content.CountAddRound
 import app.abcvorschule.content.LessonEmojis
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.Lesson
+import app.abcvorschule.content.MathPromptSpeech
 import app.abcvorschule.content.PromptUnlock
 import app.abcvorschule.content.SentenceOrderRound
 import app.abcvorschule.content.SentencePictureRound
@@ -41,9 +42,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import app.abcvorschule.speech.GermanNumberWord
 import app.abcvorschule.ui.exercise.MathAttempt
-import app.abcvorschule.ui.exercise.MathOperation
 
 class SessionViewModel(
     private val contentRepository: ContentRepository,
@@ -339,6 +338,7 @@ class SessionViewModel(
                 round,
                 _ui.value.roundIndex,
             )
+            is CountAddRound -> MathPromptSpeech.promptParts(round)
             // Der Trainer spricht Ansage und Vorstellung selbst, synchron zu seinen
             // Figuren (design doc §5) — die Bühne darf hier nichts sprechen.
             is SoundFeederRound -> emptyList()
@@ -470,7 +470,8 @@ class SessionViewModel(
             val round = _ui.value.currentRound as? CountAddRound ?: return@launch
             val position = attemptPosition()
             val key = ProgressionEngine.mathKey(round)
-            val (_, resolved, correct) = attempt
+            val resolved = attempt.resolved
+            val correct = attempt.correct
             val outcome = outcomeFor(correct, resolved)
             progress = progressRepository.update { current ->
                 var next = ProgressionEngine.recordMathAttempt(current, key, outcome)
@@ -483,18 +484,7 @@ class SessionViewModel(
                 correct = correct && !resolved,
                 resolved = resolved,
                 missHint = !correct && !resolved,
-                // Mit der Zähl-Hilfe gelöst heißt erarbeitet, nicht gewusst — dafür
-                // gibt es kein Lob. Dieselbe Unterscheidung, die das Auflösen schon
-                // trifft. Punkte bleiben: sie wegzunehmen wäre eine Strafe (§8).
                 praise = MathHinting.praises(attempt),
-                speakOverride = if (resolved || correct) {
-                    null
-                } else {
-                    MathHinting.missSpeech(
-                        attempt,
-                        MathOperation.fromWireName(round.operation) ?: MathOperation.Add,
-                    )
-                },
             )
         }
     }
@@ -526,7 +516,6 @@ class SessionViewModel(
         correct: Boolean,
         resolved: Boolean,
         missHint: Boolean,
-        speakOverride: String? = null,
         /** False, wenn die Antwort mit Hilfe zustande kam — dann bestätigt die
          * Zeremonie sie, lobt sie aber nicht. */
         praise: Boolean = true,
@@ -566,12 +555,16 @@ class SessionViewModel(
             // reason no longer applies to it; it stays lumped in with SymbolHuntRound
             // here as a harmless, defensive suppression rather than a required one.
             // Every other round type has no such synchronous speech.
-            val speaksMissItself = _ui.value.currentRound.let {
-                it is SymbolHuntRound || it is SymbolInWordRound || it is SoundFeederRound
+            // Rechnen quittiert einen Fehlversuch nur mit einem Klang (Sfx.Blocked,
+            // gespielt in MathExercise) — ohne Sprache, auch ohne den generischen
+            // Hinweis unten (PRODUCT_PRINCIPLES §8).
+            val answersMissItself = _ui.value.currentRound.let {
+                it is SymbolHuntRound || it is SymbolInWordRound || it is SoundFeederRound ||
+                    it is CountAddRound
             }
             _ui.update {
                 it.copy(
-                    speakCue = if (speaksMissItself) it.speakCue else speakOverride ?: missCueForCurrent(),
+                    speakCue = if (answersMissItself) it.speakCue else missCueForCurrent(),
                     points = progress.points,
                 )
             }

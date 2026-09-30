@@ -181,17 +181,6 @@ data class CountAddSpec(
 @Serializable
 data class CountAddRound(
     override val promptTts: String,
-    /**
-     * Bild der gezählten Dinge — **null, wenn die Aufgabe keins verdient**.
-     *
-     * Ein Bild lohnt sich nur, wo die Szene trägt: acht Kühe auf der Wiese kann
-     * ein Kind sich vorstellen, achtundzwanzig nicht, und ab elf zeichnet §8
-     * ohnehin nur noch *ein* Symbol neben der Ziffer — dort ist das Icon reine
-     * Dekoration, die eine Behauptung über die Welt aufstellt („dreißig
-     * Mülltonnen stehen am Weg"). Ohne Icon zeigt der Trainer nur die Zahlen,
-     * und der Prompt behauptet nichts mehr.
-     */
-    val iconAtomId: String? = null,
     val left: Int,
     val right: Int,
     val answer: Int,
@@ -346,19 +335,6 @@ val TaskSpec.rounds: List<TrainerRound>
 val TaskSpec.roundCount: Int get() = rounds.size
 
 fun TaskSpec.round(index: Int): TrainerRound? = rounds.getOrNull(index)
-
-/**
- * Spoken answer for a counting round: "1 Ameise" / "2 Ameisen" — never a bare
- * number. Rechnen shows no words, so the plural is carried entirely by speech.
- */
-fun CountAddRound.spokenAnswer(icon: Atom?): String {
-    val noun = when {
-        icon == null -> ""
-        answer == 1 -> icon.display
-        else -> icon.pluralDisplay ?: icon.display
-    }
-    return "$answer $noun".trim()
-}
 
 /** Atom ids a round scores against, used for per-atom stats and scaffolds. */
 fun TrainerRound.scoredAtomIds(): List<String> = when (this) {

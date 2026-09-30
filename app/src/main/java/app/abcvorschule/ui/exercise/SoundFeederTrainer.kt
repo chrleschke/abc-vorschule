@@ -1,8 +1,6 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -97,6 +95,12 @@ private enum class FeederPhase { Intro, Playing, Busy, Done }
  */
 private const val MinCardScale = 0.01f
 
+/** Über die ersten 15 % des Aufploppens blendet die Karte ein. */
+private const val CardFadeInPop = 0.15f
+
+/** Wie weit die Fresser über dem unteren Bühnenrand stehen. */
+private const val CreatureLiftDp = 40f
+
 /**
  * Laut-Fresser (design doc §5/§6): eine Bildkarte oben, zwei Fresser unten. Alle
  * Entscheidungen fallen in [SoundFeederProgress]; dieser Screen zeichnet, bewegt
@@ -174,11 +178,8 @@ fun SoundFeederTrainer(
     // entstand — ein direkt eingefangenes `enabled` wäre dort immer der Wert von
     // damals. Über den State liest der Drop den Stand von jetzt.
     val currentEnabled = rememberUpdatedState(enabled)
-    val interactionOpacity by animateFloatAsState(
-        targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(AbcMotion.QuickMs),
-        label = "feeder_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val interactionOpacity = rememberRestOpacity()
 
     fun animatorFor(side: FeederSide) = if (side == FeederSide.left) leftAnimator else rightAnimator
 
@@ -370,6 +371,11 @@ fun SoundFeederTrainer(
                                     val pop = cardPop.value.coerceAtLeast(MinCardScale)
                                     scaleX = pop
                                     scaleY = pop
+                                    // Auf 1 % geschrumpft blieb die Karte als 1-px-Punkt mit
+                                    // Rand und Schatten sichtbar, vor und nach jeder Karte.
+                                    // Deckkraft statt Skalierung 0: sie ändert die Matrix nicht,
+                                    // die Karte bleibt also invertierbar (siehe MinCardScale).
+                                    alpha = ((cardPop.value - MinCardScale) / CardFadeInPop).coerceIn(0f, 1f)
                                     translationX = cardBounce.value * 14f
                                 }
                                 .alpha(interactionOpacity),
@@ -391,7 +397,8 @@ fun SoundFeederTrainer(
             }
         },
         answers = {
-            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            // Etwas Luft unter den Fressern: sie stehen auf dem Höhlenboden, nicht an der Kante.
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth().padding(bottom = CreatureLiftDp.dp)) {
                 val creatureWidth = SoundFeederSizing.creatureWidthDp(maxWidth.value)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -409,6 +416,7 @@ fun SoundFeederTrainer(
                             FeederCreature(
                                 label = label,
                                 color = if (side == FeederSide.left) LeftCreatureColor else RightCreatureColor,
+                                shape = if (side == FeederSide.left) FeederShape.Pilli else FeederShape.Kora,
                                 animator = animatorFor(side),
                                 hint = state.hintActive && state.current?.side == side,
                                 widthDp = creatureWidth,

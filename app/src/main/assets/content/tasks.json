@@ -82,11 +82,10 @@
       "id": "l01-t9",
       "rounds": [
         {
-          "promptTts": "Drei Ameisen und zwei Ameisen. Wie viele Ameisen sind das?",
+          "promptTts": "Wie viel ist drei plus zwei?",
           "left": 3,
           "right": 2,
-          "answer": 5,
-          "iconAtomId": "ameise"
+          "answer": 5
         }
       ]
     },
@@ -95,11 +94,10 @@
       "id": "l01-t10",
       "rounds": [
         {
-          "promptTts": "Vier Ameisen und drei Ameisen. Wie viele Ameisen sind das?",
+          "promptTts": "Wie viel ist vier plus drei?",
           "left": 4,
           "right": 3,
-          "answer": 7,
-          "iconAtomId": "ameise"
+          "answer": 7
         }
       ]
     },
@@ -222,18 +220,16 @@
       "id": "l02-t10",
       "rounds": [
         {
-          "promptTts": "Fünf Igel und vier Igel. Wie viele Igel sind das?",
+          "promptTts": "Wie viel ist fünf plus vier?",
           "left": 5,
           "right": 4,
-          "answer": 9,
-          "iconAtomId": "igel"
+          "answer": 9
         },
         {
-          "promptTts": "Acht Igel laufen im Garten. Drei verstecken sich. Wie viele Igel bleiben?",
+          "promptTts": "Wie viel ist acht minus drei?",
           "left": 8,
           "right": 3,
           "answer": 5,
-          "iconAtomId": "igel",
           "operation": "subtract"
         }
       ]
@@ -381,15 +377,14 @@
       "id": "l03-t10",
       "rounds": [
         {
-          "promptTts": "Neun Tomaten liegen im Korb. Vier werden gegessen. Wie viele Tomaten bleiben?",
+          "promptTts": "Wie viel ist neun minus vier?",
           "left": 9,
           "right": 4,
           "answer": 5,
-          "iconAtomId": "tomate",
           "operation": "subtract"
         },
         {
-          "promptTts": "Zwölf und fünf. Wie viele sind das?",
+          "promptTts": "Wie viel ist zwölf plus fünf?",
           "left": 12,
           "right": 5,
           "answer": 17
@@ -523,15 +518,14 @@
       "id": "l04-t10",
       "rounds": [
         {
-          "promptTts": "Acht Lamas stehen auf der Wiese. Drei laufen weg. Wie viele Lamas bleiben?",
+          "promptTts": "Wie viel ist acht minus drei?",
           "left": 8,
           "right": 3,
           "answer": 5,
-          "iconAtomId": "lama",
           "operation": "subtract"
         },
         {
-          "promptTts": "Vierzehn und sechs. Wie viele sind das?",
+          "promptTts": "Wie viel ist vierzehn plus sechs?",
           "left": 14,
           "right": 6,
           "answer": 20
@@ -648,15 +642,14 @@
       "id": "l05-t10",
       "rounds": [
         {
-          "promptTts": "Neun Hüte hängen am Haken. Sechs werden aufgesetzt. Wie viele Hüte bleiben?",
+          "promptTts": "Wie viel ist neun minus sechs?",
           "left": 9,
           "right": 6,
           "answer": 3,
-          "iconAtomId": "hut",
           "operation": "subtract"
         },
         {
-          "promptTts": "Sechzehn weniger sieben. Wie viele bleiben?",
+          "promptTts": "Wie viel ist sechzehn minus sieben?",
           "left": 16,
           "right": 7,
           "answer": 9,
@@ -791,15 +784,14 @@
       "id": "l06-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Reihen mit je vier Rosen blühen im Beet. Wie viele Rosen sind das?",
+          "promptTts": "Wie viel ist zwei mal vier?",
           "left": 2,
           "right": 4,
           "answer": 8,
-          "iconAtomId": "rose",
           "operation": "multiply"
         },
         {
-          "promptTts": "Drei Reihen mit je fünf. Wie viele sind das?",
+          "promptTts": "Wie viel ist drei mal fünf?",
           "left": 3,
           "right": 5,
           "answer": 15,
@@ -945,15 +937,14 @@
       "id": "l07-t10",
       "rounds": [
         {
-          "promptTts": "Neun Rosen blühen im Garten. Vier werden gepflückt. Wie viele Rosen bleiben?",
+          "promptTts": "Wie viel ist neun minus vier?",
           "left": 9,
           "right": 4,
           "answer": 5,
-          "iconAtomId": "rose",
           "operation": "subtract"
         },
         {
-          "promptTts": "Elf und sieben. Wie viele sind das?",
+          "promptTts": "Wie viel ist elf plus sieben?",
           "left": 11,
           "right": 7,
           "answer": 18
@@ -1098,15 +1089,14 @@
       "id": "l08-t10",
       "rounds": [
         {
-          "promptTts": "Sechs Krokodile liegen am Fluss. Zwei gleiten ins Wasser. Wie viele Krokodile bleiben?",
+          "promptTts": "Wie viel ist sechs minus zwei?",
           "left": 6,
           "right": 2,
           "answer": 4,
-          "iconAtomId": "krokodil",
           "operation": "subtract"
         },
         {
-          "promptTts": "Dreizehn und sieben. Wie viele sind das?",
+          "promptTts": "Wie viel ist dreizehn plus sieben?",
           "left": 13,
           "right": 7,
           "answer": 20
@@ -1255,15 +1245,14 @@
       "id": "l09-t10",
       "rounds": [
         {
-          "promptTts": "Sieben Eier liegen im Korb. Drei werden gekocht. Wie viele Eier bleiben?",
+          "promptTts": "Wie viel ist sieben minus drei?",
           "left": 7,
           "right": 3,
           "answer": 4,
-          "iconAtomId": "ei",
           "operation": "subtract"
         },
         {
-          "promptTts": "Zwölf und neun. Wie viele sind das?",
+          "promptTts": "Wie viel ist zwölf plus neun?",
           "left": 12,
           "right": 9,
           "answer": 21
@@ -1392,15 +1381,14 @@
       "id": "l10-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Reihen mit je vier Büchern stehen im Regal. Wie viele Bücher sind das?",
+          "promptTts": "Wie viel ist zwei mal vier?",
           "left": 2,
           "right": 4,
           "answer": 8,
-          "iconAtomId": "buch",
           "operation": "multiply"
         },
         {
-          "promptTts": "Achtzehn weniger neun. Wie viele bleiben?",
+          "promptTts": "Wie viel ist achtzehn minus neun?",
           "left": 18,
           "right": 9,
           "answer": 9,
@@ -1518,15 +1506,14 @@
       "id": "l11-t10",
       "rounds": [
         {
-          "promptTts": "Im Wald wachsen sieben Pilze. Drei werden gepflückt. Wie viele Pilze bleiben?",
+          "promptTts": "Wie viel ist sieben minus drei?",
           "left": 7,
           "right": 3,
           "answer": 4,
-          "iconAtomId": "pilz",
           "operation": "subtract"
         },
         {
-          "promptTts": "Vierzehn und neun. Wie viele sind das?",
+          "promptTts": "Wie viel ist vierzehn plus neun?",
           "left": 14,
           "right": 9,
           "answer": 23
@@ -1686,15 +1673,14 @@
       "id": "l12-t10",
       "rounds": [
         {
-          "promptTts": "Neun Frösche sitzen am Teich. Vier hüpfen weg. Wie viele Frösche bleiben?",
+          "promptTts": "Wie viel ist neun minus vier?",
           "left": 9,
           "right": 4,
           "answer": 5,
-          "iconAtomId": "frosch",
           "operation": "subtract"
         },
         {
-          "promptTts": "Vier Reihen mit je fünf. Wie viele sind das?",
+          "promptTts": "Wie viel ist vier mal fünf?",
           "left": 4,
           "right": 5,
           "answer": 20,
@@ -1855,15 +1841,14 @@
       "id": "l13-t10",
       "rounds": [
         {
-          "promptTts": "Neun Fische schwimmen im Teich. Zwei schwimmen weg. Wie viele Fische bleiben?",
+          "promptTts": "Wie viel ist neun minus zwei?",
           "left": 9,
           "right": 2,
           "answer": 7,
-          "iconAtomId": "fisch",
           "operation": "subtract"
         },
         {
-          "promptTts": "Fünfzehn und fünf. Wie viele sind das?",
+          "promptTts": "Wie viel ist fünfzehn plus fünf?",
           "left": 15,
           "right": 5,
           "answer": 20
@@ -1986,14 +1971,13 @@
       "id": "l14-t10",
       "rounds": [
         {
-          "promptTts": "Sechs Zebras und drei Zebras. Wie viele Zebras sind das?",
+          "promptTts": "Wie viel ist sechs plus drei?",
           "left": 6,
           "right": 3,
-          "answer": 9,
-          "iconAtomId": "zebra"
+          "answer": 9
         },
         {
-          "promptTts": "Vier Reihen mit je sechs. Wie viele sind das?",
+          "promptTts": "Wie viel ist vier mal sechs?",
           "left": 4,
           "right": 6,
           "answer": 24,
@@ -2123,15 +2107,14 @@
       "id": "l15-t10",
       "rounds": [
         {
-          "promptTts": "Drei Reihen mit je drei Vögeln sitzen auf der Leitung. Wie viele Vögel sind das?",
+          "promptTts": "Wie viel ist drei mal drei?",
           "left": 3,
           "right": 3,
           "answer": 9,
-          "iconAtomId": "vogel",
           "operation": "multiply"
         },
         {
-          "promptTts": "Zwanzig weniger acht. Wie viele bleiben?",
+          "promptTts": "Wie viel ist zwanzig minus acht?",
           "left": 20,
           "right": 8,
           "answer": 12,
@@ -2260,15 +2243,14 @@
       "id": "l16-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Reihen mit je fünf Socken hängen auf der Leine. Wie viele Socken sind das?",
+          "promptTts": "Wie viel ist zwei mal fünf?",
           "left": 2,
           "right": 5,
           "answer": 10,
-          "iconAtomId": "socke",
           "operation": "multiply"
         },
         {
-          "promptTts": "Achtzehn weniger sechs. Wie viele bleiben?",
+          "promptTts": "Wie viel ist achtzehn minus sechs?",
           "left": 18,
           "right": 6,
           "answer": 12,
@@ -2403,15 +2385,14 @@
       "id": "l17-t10",
       "rounds": [
         {
-          "promptTts": "Acht Sterne funkeln am Himmel. Drei verstecken sich hinter einer Wolke. Wie viele Sterne bleiben?",
+          "promptTts": "Wie viel ist acht minus drei?",
           "left": 8,
           "right": 3,
           "answer": 5,
-          "iconAtomId": "stern",
           "operation": "subtract"
         },
         {
-          "promptTts": "Zwanzig und zehn. Wie viele sind das?",
+          "promptTts": "Wie viel ist zwanzig plus zehn?",
           "left": 20,
           "right": 10,
           "answer": 30
@@ -2576,15 +2557,14 @@
       "id": "l18-t12",
       "rounds": [
         {
-          "promptTts": "Zwei Reihen mit je vier Taxis warten am Flughafen. Wie viele Taxis sind das?",
+          "promptTts": "Wie viel ist zwei mal vier?",
           "left": 2,
           "right": 4,
           "answer": 8,
-          "iconAtomId": "taxi",
           "operation": "multiply"
         },
         {
-          "promptTts": "Fünf Reihen mit je sechs. Wie viele sind das?",
+          "promptTts": "Wie viel ist fünf mal sechs?",
           "left": 5,
           "right": 6,
           "answer": 30,
@@ -2710,15 +2690,14 @@
       "id": "l19-t10",
       "rounds": [
         {
-          "promptTts": "Sieben Mäuse sitzen im Stall. Zwei laufen davon. Wie viele Mäuse bleiben?",
+          "promptTts": "Wie viel ist sieben minus zwei?",
           "left": 7,
           "right": 2,
           "answer": 5,
-          "iconAtomId": "maus",
           "operation": "subtract"
         },
         {
-          "promptTts": "Dreizehn und neun. Wie viele sind das?",
+          "promptTts": "Wie viel ist dreizehn plus neun?",
           "left": 13,
           "right": 9,
           "answer": 22
@@ -2844,15 +2823,14 @@
       "id": "l20-t10",
       "rounds": [
         {
-          "promptTts": "Sechs Uhren hängen im Laden. Zwei werden verkauft. Wie viele Uhren bleiben?",
+          "promptTts": "Wie viel ist sechs minus zwei?",
           "left": 6,
           "right": 2,
           "answer": 4,
-          "iconAtomId": "uhr",
           "operation": "subtract"
         },
         {
-          "promptTts": "Fünfzehn und zehn. Wie viele sind das?",
+          "promptTts": "Wie viel ist fünfzehn plus zehn?",
           "left": 15,
           "right": 10,
           "answer": 25
@@ -2978,15 +2956,14 @@
       "id": "l21-t10",
       "rounds": [
         {
-          "promptTts": "Sieben Pizzen sind fertig. Drei werden abgeholt. Wie viele Pizzen bleiben?",
+          "promptTts": "Wie viel ist sieben minus drei?",
           "left": 7,
           "right": 3,
           "answer": 4,
-          "iconAtomId": "pizza",
           "operation": "subtract"
         },
         {
-          "promptTts": "Drei Reihen mit je sechs. Wie viele sind das?",
+          "promptTts": "Wie viel ist drei mal sechs?",
           "left": 3,
           "right": 6,
           "answer": 18,
@@ -3121,15 +3098,14 @@
       "id": "l22-t10",
       "rounds": [
         {
-          "promptTts": "Zwei Reihen mit je fünf Autos stehen auf dem Parkplatz. Wie viele Autos sind das?",
+          "promptTts": "Wie viel ist zwei mal fünf?",
           "left": 2,
           "right": 5,
           "answer": 10,
-          "iconAtomId": "auto",
           "operation": "multiply"
         },
         {
-          "promptTts": "Zwanzig und fünf. Wie viele sind das?",
+          "promptTts": "Wie viel ist zwanzig plus fünf?",
           "left": 20,
           "right": 5,
           "answer": 25
@@ -3255,15 +3231,14 @@
       "id": "l23-t10",
       "rounds": [
         {
-          "promptTts": "Acht Tische stehen in der Kita. Drei werden weggeräumt. Wie viele Tische bleiben?",
+          "promptTts": "Wie viel ist acht minus drei?",
           "left": 8,
           "right": 3,
           "answer": 5,
-          "iconAtomId": "tisch",
           "operation": "subtract"
         },
         {
-          "promptTts": "Fünf Reihen mit je fünf. Wie viele sind das?",
+          "promptTts": "Wie viel ist fünf mal fünf?",
           "left": 5,
           "right": 5,
           "answer": 25,
@@ -3410,15 +3385,14 @@
       "id": "l24-t10",
       "rounds": [
         {
-          "promptTts": "Zehn Stühle stehen im Kreis. Sechs Kinder setzen sich. Wie viele Stühle bleiben leer?",
+          "promptTts": "Wie viel ist zehn minus sechs?",
           "left": 10,
           "right": 6,
           "answer": 4,
-          "iconAtomId": "stuhl",
           "operation": "subtract"
         },
         {
-          "promptTts": "Fünfundzwanzig weniger zehn. Wie viele bleiben?",
+          "promptTts": "Wie viel ist fünfundzwanzig minus zehn?",
           "left": 25,
           "right": 10,
           "answer": 15,
@@ -3549,15 +3523,14 @@
       "id": "l25-t10",
       "rounds": [
         {
-          "promptTts": "Neun Küken laufen im Hof. Vier gehen in den Stall. Wie viele Küken bleiben?",
+          "promptTts": "Wie viel ist neun minus vier?",
           "left": 9,
           "right": 4,
           "answer": 5,
-          "iconAtomId": "kueken",
           "operation": "subtract"
         },
         {
-          "promptTts": "Vierundzwanzig und sechs. Wie viele sind das?",
+          "promptTts": "Wie viel ist vierundzwanzig plus sechs?",
           "left": 24,
           "right": 6,
           "answer": 30
@@ -3695,15 +3668,14 @@
       "id": "l26-t10",
       "rounds": [
         {
-          "promptTts": "Sieben Kühe stehen auf der Wiese. Drei gehen in den Stall. Wie viele Kühe bleiben?",
+          "promptTts": "Wie viel ist sieben minus drei?",
           "left": 7,
           "right": 3,
           "answer": 4,
-          "iconAtomId": "kuh",
           "operation": "subtract"
         },
         {
-          "promptTts": "Dreißig weniger fünfzehn. Wie viele bleiben?",
+          "promptTts": "Wie viel ist dreißig minus fünfzehn?",
           "left": 30,
           "right": 15,
           "answer": 15,
@@ -5677,15 +5649,14 @@
       "id": "l27-r1",
       "rounds": [
         {
-          "promptTts": "Fünf Kinder ziehen je zwei Handschuhe an. Wie viele Handschuhe sind das?",
+          "promptTts": "Wie viel ist fünf mal zwei?",
           "left": 5,
           "right": 2,
           "answer": 10,
-          "iconAtomId": "handschuh",
           "operation": "multiply"
         },
         {
-          "promptTts": "Vierzehn und sieben. Wie viele sind das?",
+          "promptTts": "Wie viel ist vierzehn plus sieben?",
           "left": 14,
           "right": 7,
           "answer": 21
@@ -5915,15 +5886,14 @@
       "id": "l28-r1",
       "rounds": [
         {
-          "promptTts": "Sechs Apfelkuchen stehen im Regal. Zwei werden verkauft. Wie viele Apfelkuchen bleiben?",
+          "promptTts": "Wie viel ist sechs minus zwei?",
           "left": 6,
           "right": 2,
           "answer": 4,
-          "iconAtomId": "apfelkuchen",
           "operation": "subtract"
         },
         {
-          "promptTts": "Zwanzig weniger vier. Wie viele bleiben?",
+          "promptTts": "Wie viel ist zwanzig minus vier?",
           "left": 20,
           "right": 4,
           "answer": 16,
@@ -6131,15 +6101,14 @@
       "id": "l29-r1",
       "rounds": [
         {
-          "promptTts": "Acht Fußbälle liegen auf dem Rasen. Drei werden geholt. Wie viele Fußbälle bleiben?",
+          "promptTts": "Wie viel ist acht minus drei?",
           "left": 8,
           "right": 3,
           "answer": 5,
-          "iconAtomId": "fussball",
           "operation": "subtract"
         },
         {
-          "promptTts": "Sechzehn und neun. Wie viele sind das?",
+          "promptTts": "Wie viel ist sechzehn plus neun?",
           "left": 16,
           "right": 9,
           "answer": 25
@@ -6346,15 +6315,14 @@
       "id": "l30-r1",
       "rounds": [
         {
-          "promptTts": "Neun Pinguine stehen auf dem Eis. Vier springen ins Wasser. Wie viele Pinguine bleiben?",
+          "promptTts": "Wie viel ist neun minus vier?",
           "left": 9,
           "right": 4,
           "answer": 5,
-          "iconAtomId": "pinguin",
           "operation": "subtract"
         },
         {
-          "promptTts": "Drei Reihen mit je vier. Wie viele sind das?",
+          "promptTts": "Wie viel ist drei mal vier?",
           "left": 3,
           "right": 4,
           "answer": 12,
@@ -6584,15 +6552,14 @@
       "id": "l31-r1",
       "rounds": [
         {
-          "promptTts": "Neun Schneebälle liegen im Schnee. Vier werden geworfen. Wie viele Schneebälle bleiben?",
+          "promptTts": "Wie viel ist neun minus vier?",
           "left": 9,
           "right": 4,
           "answer": 5,
-          "iconAtomId": "schneeball",
           "operation": "subtract"
         },
         {
-          "promptTts": "Zwölf und acht. Wie viele sind das?",
+          "promptTts": "Wie viel ist zwölf plus acht?",
           "left": 12,
           "right": 8,
           "answer": 20
@@ -6833,15 +6800,14 @@
       "id": "l32-r1",
       "rounds": [
         {
-          "promptTts": "Zwei Reihen mit je fünf Sonnenblumen wachsen im Beet. Wie viele Sonnenblumen sind das?",
+          "promptTts": "Wie viel ist zwei mal fünf?",
           "left": 2,
           "right": 5,
           "answer": 10,
-          "iconAtomId": "sonnenblume",
           "operation": "multiply"
         },
         {
-          "promptTts": "Dreißig weniger zehn. Wie viele bleiben?",
+          "promptTts": "Wie viel ist dreißig minus zehn?",
           "left": 30,
           "right": 10,
           "answer": 20,
@@ -7069,15 +7035,14 @@
       "id": "l33-r1",
       "rounds": [
         {
-          "promptTts": "Sechs Bücher liegen in der Schultasche. Zwei werden herausgenommen. Wie viele Bücher bleiben?",
+          "promptTts": "Wie viel ist sechs minus zwei?",
           "left": 6,
           "right": 2,
           "answer": 4,
-          "iconAtomId": "buch",
           "operation": "subtract"
         },
         {
-          "promptTts": "Vierundzwanzig weniger zwölf. Wie viele bleiben?",
+          "promptTts": "Wie viel ist vierundzwanzig minus zwölf?",
           "left": 24,
           "right": 12,
           "answer": 12,
@@ -7322,15 +7287,14 @@
       "id": "l34-r1",
       "rounds": [
         {
-          "promptTts": "Acht Mülltonnen stehen am Weg. Drei werden geleert. Wie viele Mülltonnen bleiben?",
+          "promptTts": "Wie viel ist acht minus drei?",
           "left": 8,
           "right": 3,
           "answer": 5,
-          "iconAtomId": "muelltonne",
           "operation": "subtract"
         },
         {
-          "promptTts": "Fünfundzwanzig und fünf. Wie viele sind das?",
+          "promptTts": "Wie viel ist fünfundzwanzig plus fünf?",
           "left": 25,
           "right": 5,
           "answer": 30

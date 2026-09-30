@@ -46,7 +46,7 @@ als `tts` am Satz in `sentences.json` steht: „Tom singt." lief einmal als `pro
 einmal als `sentence`.
 
 `extract.reads_as_bare_sentence` entscheidet das jetzt an der Quelle: ein `promptTts`, das
-keine Aufgabenansage ist (kein „Baue das Wort", „Zeichne den", „Wie viele", „Ordne " …)
+keine Aufgabenansage ist (kein „Baue das Wort", „Zeichne den", „Ordne " …)
 und auf `.`/`!`/`?` endet, bekommt gleich das Profil `sentence`. Das ist auch inhaltlich
 richtig — die fragende Prompt-Melodie wäre für einen Aussagesatz ohnehin falsch. Dieselbe
 Funktion benutzt `export._pedagogical_winner`, damit es eine Wahrheit gibt.
@@ -143,8 +143,20 @@ entfernt nur ungeschützte Probeaufnahmen (ohne 👍, ohne Produktion); „Keine
 hebt eine bestätigte Aufnahme wieder auf; darunter die
 Profil-Zusammenfassung (Bearbeiten klappt das Formular auf). Bewertungen,
 Locks und Profile liegen in Dateien (Sidecar-JSONs, `locks.json`, `profiles.json`) und
-überleben damit Server- und Browser-Neustart; Filter und Batch-Auswahl merkt sich der
+überleben damit Server- und Browser-Neustart; Filter, Batch-Auswahl und die Breite der
+Clip-Liste (Trenner zwischen den Spalten ziehen, Doppelklick setzt zurück) merkt sich der
 Browser lokal.
+
+**Wellenform und Schnitt:** Jede Zeile der Kandidaten-Tabelle zeigt die Wellenform der
+Aufnahme; ein Klick springt an die Stelle und spielt ab. Die orangen Griffe an Anfang und
+Ende schneiden vorne und hinten — beim Loslassen ist der Schnitt gespeichert, ohne eigenen
+Knopf (`PUT /api/clips/{key}/candidates/{seed}/trim`). Verlustfrei: der erste Schnitt sichert
+die Aufnahme als `candidates/<key>/<seed>.orig.wav`, jeder weitere geht wieder vom Original aus,
+und die Wellenform zeigt das Original mit blass abgesetzten Rändern — ein Griff lässt sich also
+auch zurückziehen, ganz an den Rand gezogen kehrt das Original zurück. Ist der Kandidat die
+Produktion, zieht `out/audio/<key>.wav` mit; der Schnitt steht im Sidecar (`trim`) und im
+Export-Fingerprint, sonst hielte der Export die Produktion für unverändert. Ein neuer Wurf auf
+demselben Seed verwirft den Schnitt samt Original. Mikrofon-Aufnahmen schneidet weiter ✂.
 
 **Wichtig:** Instruktion/Sampling im Profil zu ändern, wirkt sich **nicht** auf schon
 gerenderte oder bestätigte Clips aus — nur auf künftige Generierungen. Details dazu und
@@ -279,6 +291,16 @@ Ein Artikel-Item entsteht nur für Atome, die `SuccessSpeech` erreichen kann
 (`word_build.targetAtomId`); die übrigen klassifizierten
 Substantive stünden sonst dauerhaft als „fehlt" in `tts status` und würden echte Lücken
 verdecken.
+
+**Rechnen: Einleitung „Wie viel ist" + ganze Aufgabe als ein Clip**
+(`MathPromptSpeech.taskText`, Profil `math`, einzeln im TTS-UI kuratiert). `extract`
+baut pro `count_add`-Runde aus `left`/`right`/`operation` den Text „fünf plus zwanzig"
+(`math_task_text`, Zahlwörter wie `GermanNumberWord`) im Feld `mathTaskTts`; gleiche
+Aufgaben kollabieren zu einem Clip. Die Einleitung ist `mathPromptIntro` in
+`extra-strings.json`, ebenfalls `mathTaskTts`. Der `promptTts`-Satz selbst wird nicht
+extrahiert, und die Antwort (Lob + Zahlwort, `SuccessSpeech`) nutzt die
+`countingNumber*`-Clips. Warum nicht Zahl · „plus" · Zahl aus Einzelclips: Qwen war in
+Betonung und Stimme zu uneinheitlich, das Zusammengesetzte klang wie Stückwerk.
 
 Beim Export (`ttskit/export.py`) darf derselbe gesprochene Text trotzdem nur einmal
 im Index stehen. Gewinnt bei Kollisionen zuerst die pädagogisch passende Variante

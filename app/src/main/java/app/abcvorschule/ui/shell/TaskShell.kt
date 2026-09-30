@@ -1,6 +1,12 @@
 package app.abcvorschule.ui.shell
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,18 +25,27 @@ import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.R
@@ -43,17 +58,32 @@ import app.abcvorschule.speech.SpokenPart
 import app.abcvorschule.ui.components.AbcNavChevron
 import app.abcvorschule.ui.components.AbcSegmentedProgress
 import app.abcvorschule.ui.components.abcStarCountHeight
+import app.abcvorschule.ui.exercise.LocalEarlyTaps
+import app.abcvorschule.ui.exercise.LocalPromptNudge
+import app.abcvorschule.ui.exercise.LocalPromptRest
+import app.abcvorschule.ui.exercise.LocalSpeakerBounds
+import app.abcvorschule.ui.exercise.SpeakerBounds
 import app.abcvorschule.ui.exercise.TrainerCallbacks
 import app.abcvorschule.ui.exercise.TrainerHost
+import app.abcvorschule.ui.exercise.rememberPromptRest
 import app.abcvorschule.ui.path.PathScreen
+import app.abcvorschule.ui.rewards.AbcSfx
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
+import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.rewards.StarCounterAnchor
 import app.abcvorschule.ui.rewards.SuccessBurst
 import app.abcvorschule.ui.rewards.playBlockedBlip
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.AbcMotion
+import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.PaperCenter
 import app.abcvorschule.ui.theme.PaperEdge
+import app.abcvorschule.ui.world.LocalChromeColors
+import app.abcvorschule.ui.world.TrainerWorld
+import app.abcvorschule.ui.world.WorldBackground
+import app.abcvorschule.ui.world.WorldTaps
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -147,15 +177,18 @@ fun TaskShell(
             state.screen == AppScreen.RewardSummary -> {
                 RewardSummaryScreen(
                     finale = state.completedFinaleId?.let { pack.finales[it] },
+                    // Über die Lektions-ID, nicht über die Finale-ID: acht Finales teilen sich
+                    // zwei Lektionen (f-l18 gehört l18 und l26), und die erste gefundene hätte
+                    // dem Sternbild fremde Buchstaben gegeben (nach l26 ein „C").
+                    lesson = state.lessonId?.let { id -> pack.lessons.firstOrNull { it.id == id } },
                     pack = pack,
                     ttsAvailable = ttsAvailable,
                     speaking = speaking,
                     onSpeak = onSpeak,
                     onContinue = viewModel::continueAfterSummary,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .windowInsetsPadding(WindowInsets.safeDrawing)
-                        .padding(bottom = AbcDimens.screenBottomExtra),
+                    // Randlos: der Abendhimmel läuft unter die Systemleisten, die Insets
+                    // hält der Screen für seinen Inhalt selbst frei.
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
             state.screen == AppScreen.Path -> {
@@ -262,6 +295,14 @@ private fun PracticeBody(
     // Composition, damit kein Frame lang die neue Runde fälschlich entsperrt
     // aussieht, bevor der Effekt unten läuft (siehe design doc).
     var interactionLocked by remember(task?.spec?.id, state.roundIndex) { mutableStateOf(true) }
+    // Ruhen und Aufwachen (PromptRest): die Aufgabe ruht, solange die Ansage läuft, und
+    // ein Tipp in dieser Zeit bekommt eine leise Antwort statt zu verpuffen.
+    val promptRest = rememberPromptRest(interactionLocked)
+    val earlyTaps = remember { MutableSharedFlow<Offset>(extraBufferCapacity = 8) }
+    var promptNudge by remember { mutableIntStateOf(0) }
+    val earlyRings = remember { mutableStateListOf<EarlyTapRing>() }
+    val stageOrigin = remember { StageOrigin() }
+    val speakerBounds = remember { SpeakerBounds() }
 
     LaunchedEffect(task?.spec?.id, state.roundIndex, ttsAvailable) {
         if (state.successPhase != SuccessPhase.Idle) return@LaunchedEffect
@@ -319,6 +360,31 @@ private fun PracticeBody(
         viewModel.onRevealFinished()
     }
 
+    // Die Welt hinter dem Trainer (PRODUCT_PRINCIPLES §10, „Nachtwelten"): Tiefsee für
+    // die Jagd, Dschungel für den Spurensucher, sonst der Papiergrund darunter. Die
+    // Kopfzeile nimmt die passenden Farben über LocalChromeColors mit.
+    val world = TrainerWorld.of(round)
+    // Je Welt ein eigener Speicher: jeder Hintergrund hat seine eigene Uhr, die bei 0
+    // beginnt. Ein geteilter hätte die Tipps der alten Welt mit deren Zeitstempeln
+    // behalten, und die wären Minuten später ohne Berührung aufgeblüht.
+    val worldTaps = remember(world) { WorldTaps() }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            // Tipps auf die Welt (§10, „Antippen macht Freude"): was kein Bauteil der
+            // Aufgabe verbraucht hat und kein Ziehen war, bekommt der Hintergrund.
+            .pointerInput(worldTaps) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Final)
+                    val up = waitForUpOrCancellation(pass = PointerEventPass.Final) ?: return@awaitEachGesture
+                    if (down.isConsumed || up.isConsumed) return@awaitEachGesture
+                    if ((up.position - down.position).getDistance() > viewConfiguration.touchSlop) return@awaitEachGesture
+                    worldTaps.add(up.position)
+                }
+            },
+    ) {
+    WorldBackground(world = world, modifier = Modifier.matchParentSize(), taps = worldTaps)
+    CompositionLocalProvider(LocalChromeColors provides world.chrome) {
     Column(modifier = Modifier.fillMaxSize()) {
         // Zurück-Pfeil links, Punktestand mittig — kein Lektionstitel
         // (Elterntext an der Stelle, an der das Kind zuerst hinsieht). Der Stern
@@ -330,6 +396,7 @@ private fun PracticeBody(
             centerPoints = true,
             onBack = viewModel::exitLesson,
             counterAnchor = counterAnchor,
+            starOutline = LocalChromeColors.current.starOutline,
         )
 
         // Fortschritt und die beiden Rückfall-Chevrons teilen sich eine Zeile
@@ -393,8 +460,39 @@ private fun PracticeBody(
                     // auch die System-Zahlentastatur hochkommt (§8) — sie muss den
                     // Aufgabenbereich weiterhin nach oben schieben.
                     .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom))
-                    .padding(bottom = AbcDimens.screenBottomExtra),
+                    .padding(bottom = AbcDimens.screenBottomExtra)
+                    .onGloballyPositioned { stageOrigin.topLeft = it.positionInRoot() }
+                    // Frühe Tipps: gelesen im Final-Pass, nachdem die Trainer ihren Teil
+                    // hatten. Was ein Kind-Element selbst verbraucht hat — der Lautsprecher
+                    // spielt die Ansage ja auch während der Sperre —, zählt nicht.
+                    .pointerInput(interactionLocked) {
+                        if (!interactionLocked) return@pointerInput
+                        awaitEachGesture {
+                            // Im Final-Pass und ohne auf „verbraucht" zu achten: gesperrte
+                            // Bauteile mancher Trainer nehmen Tipps trotzdem an sich.
+                            val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Final)
+                            val up = waitForUpOrCancellation(pass = PointerEventPass.Final) ?: return@awaitEachGesture
+                            val at = stageOrigin.topLeft + up.position
+                            // Der Lautsprecher spielt die Ansage — ein Tipp auf ihn ist gewollt.
+                            if (speakerBounds.rect.inflate(SpeakerSlopPx).contains(at)) return@awaitEachGesture
+                            if ((up.position - down.position).getDistance() > viewConfiguration.touchSlop) return@awaitEachGesture
+                            val now = System.currentTimeMillis()
+                            if (now - stageOrigin.lastEarlyTap < EarlyTapCooldownMs) return@awaitEachGesture
+                            stageOrigin.lastEarlyTap = now
+                            earlyTaps.tryEmit(at)
+                            promptNudge++
+                            earlyRings += EarlyTapRing(up.position)
+                            // Leise: das „Blubb" darf die Ansage nicht übertönen.
+                            AbcSfx.play(Sfx.Blubb, volume = EarlyTapVolume)
+                        }
+                    },
             ) {
+                CompositionLocalProvider(
+                    LocalPromptRest provides promptRest,
+                    LocalEarlyTaps provides earlyTaps,
+                    LocalPromptNudge provides promptNudge,
+                    LocalSpeakerBounds provides speakerBounds,
+                ) {
                 TrainerHost(
                     trainer = task,
                     round = round,
@@ -418,7 +516,51 @@ private fun PracticeBody(
                     ),
                     modifier = Modifier.fillMaxSize(),
                 )
+                }
+                EarlyTapRings(earlyRings, Modifier.matchParentSize())
             }
         }
     }
 }
+    }
+}
+
+/** Wo die Übungsfläche im Root liegt, und wann zuletzt früh getippt wurde. Kein State. */
+private class StageOrigin {
+    var topLeft: Offset = Offset.Zero
+    var lastEarlyTap: Long = 0L
+}
+
+/** Ein kleiner, heller Ring an der Stelle eines frühen Tipps — ein Bläschen. */
+private class EarlyTapRing(val at: Offset) {
+    val progress = Animatable(0f)
+}
+
+@Composable
+private fun EarlyTapRings(rings: SnapshotStateList<EarlyTapRing>, modifier: Modifier) {
+    rings.forEach { ring ->
+        key(ring) {
+            LaunchedEffect(ring) {
+                ring.progress.animateTo(1f, tween(EarlyTapRingMs, easing = AbcMotion.Exit))
+                rings.remove(ring)
+            }
+        }
+    }
+    Canvas(modifier) {
+        rings.forEach { ring ->
+            val p = ring.progress.value
+            drawCircle(
+                color = Cream.copy(alpha = 0.55f * (1f - p)),
+                radius = (10f + 26f * p).dp.toPx(),
+                center = ring.at,
+                style = Stroke(width = 2.dp.toPx()),
+            )
+        }
+    }
+}
+
+/** Frühe Tipps antworten höchstens so oft — ein Trommeln bleibt ein leises Blubbern. */
+private const val EarlyTapCooldownMs = 220L
+private const val SpeakerSlopPx = 24f
+private const val EarlyTapVolume = 0.6f
+private const val EarlyTapRingMs = 600

@@ -93,6 +93,7 @@ fun ExerciseStage(
     prompt: @Composable ColumnScope.() -> Unit,
     answers: @Composable ColumnScope.() -> Unit,
 ) {
+    val rest = LocalPromptRest.current
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         // Versicherung, kein aktueller Fall: unter unbeschränkter Höhe ist maxHeight
         // Dp.Infinity, `fillMaxSize` wirkungslos und eine daraus berechnete
@@ -126,6 +127,7 @@ fun ExerciseStage(
             ) {
                 Column(
                     modifier = Modifier
+                        .promptRest(rest)
                         .widthIn(max = 420.dp)
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 8.dp),
@@ -145,7 +147,8 @@ fun ExerciseStage(
                                 Modifier.heightIn(min = answersMinHeight)
                         },
                     )
-                    .padding(bottom = 8.dp),
+                    .padding(bottom = 8.dp)
+                    .promptRest(rest),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(14.dp),
                 content = answers,

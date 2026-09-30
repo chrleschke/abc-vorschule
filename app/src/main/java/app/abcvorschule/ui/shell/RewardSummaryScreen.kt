@@ -1,76 +1,79 @@
 package app.abcvorschule.ui.shell
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.layout
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.R
 import app.abcvorschule.content.ContentPack
+import app.abcvorschule.content.Lesson
 import app.abcvorschule.content.LessonFinale
 import app.abcvorschule.ui.components.AbcContinueButton
 import app.abcvorschule.ui.components.AbcSpeakerButton
-import app.abcvorschule.ui.components.IconStar
+import app.abcvorschule.ui.path.LanternLoops
+import app.abcvorschule.ui.path.PathBackground
 import app.abcvorschule.ui.rewards.AbcSfx
-import app.abcvorschule.ui.rewards.ConfettiGeometry
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.Sfx
+import app.abcvorschule.ui.rewards.drawGlint
+import app.abcvorschule.ui.rewards.drawGlowStar
+import app.abcvorschule.ui.rewards.playStarBlip
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
-import app.abcvorschule.ui.theme.LeafGreen
+import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SilboUi
-import app.abcvorschule.ui.theme.SkyBlue
-import app.abcvorschule.ui.theme.StarGold
-import app.abcvorschule.ui.theme.StarGoldDeep
-import app.abcvorschule.ui.theme.SunCoral
+import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.world.LocalChromeColors
+import app.abcvorschule.ui.world.NightChrome
+import app.abcvorschule.ui.world.lightIsland
+import app.abcvorschule.ui.world.rememberReduceMotion
+import app.abcvorschule.ui.world.rememberWorldSeconds
+import kotlin.math.PI
+import kotlin.math.sin
 import kotlinx.coroutines.delay
-
-// Kosmetische Werte für den Hintergrundstern: anders als die Schriftgrößen entscheiden
-// sie nicht über die Höhe der Spalte (der Stern trägt nicht zur gemessenen Größe seiner
-// Box bei, siehe excludedFromMeasurement()) und bleiben deshalb bewusst hier, nicht in
-// FinaleLayout.
-// Bewusst größer als die Bildreihe, die er hinterlegt: der Stern soll als Bühne lesbar
-// sein, nicht als Rahmen. Weil er aus der Messung fällt, kostet zusätzliche Größe keinen
-// Platz und kann den Weiter- oder Speaker-Button nicht verdrängen.
-private val BackgroundStarSize = 300.dp
-private const val BackgroundStarAlpha = 0.15f
 
 // Zusätzliches horizontales Polster für den Satz, oben auf das 24dp der Spalte drauf
 // (macht 44dp insgesamt pro Seite): 20dp liegt in der von der Produktseite gewünschten
@@ -99,39 +102,21 @@ private fun pictureTouchSize(count: Int): Dp =
     if (count >= 4) 56.dp else AbcDimens.kidTouch
 
 /**
- * Der End-Screen einer Lektion, in zwei Varianten:
+ * Der End-Screen einer Lektion (PRODUCT_PRINCIPLES §10, „Lektions-Ende", Variante A).
  *
- * - [finale] gesetzt (echter Abschluss): Bildreihe, Satz und Speaker über einem
- *   gedämpften Hintergrundstern, der hinter der Bildreihe sitzt (nicht hinter dem
- *   ganzen Bildschirm) — er rahmt die Bilder, statt über den Satz zu laufen. Der
- *   Stern ist rein dekorativ und darf größer sein als die Bildreihe, ohne deren
- *   Höhe (und damit die Höhe der ganzen Spalte) zu beeinflussen — siehe
- *   [excludedFromMeasurement]. Der Satztext richtet sich an den mitlesenden
- *   Erwachsenen — die einzige bewusste Ausnahme von „das Kind kann nicht lesen"
- *   (PRODUCT_PRINCIPLES.md Abschnitt 12), weil keine Handlung am Text hängt.
- * - [finale] null (Defensivpfad: Finale nicht auflösbar — Abbrüche führen direkt
- *   zum Pfad und erreichen diesen Screen nie, §5): nur Erfolgs-Header, derselbe Stern und
- *   Weiter. Ohne Bildreihe ist der Stern der einzige Inhalt des mittleren Blocks und
- *   sitzt darum exakt in dessen Zentrum — tiefer als beim Finale, wo der Stern hinter
- *   der Bildreihe sitzt, die selbst über der Mitte der (durch Satz und Speaker
- *   verlängerten) Spalte liegt. Er bleibt also in beiden Varianten sichtbar und an
- *   vorhersagbarer, wenn auch unterschiedlicher Stelle, statt zu verschwinden oder
- *   irgendwo beliebig zu landen.
+ * Er spielt am Abendhimmel des Pfads ([PathBackground]) — der Weg zurück zum Pfad ist
+ * dann ein Schritt, kein Wechsel. Die Sterne der Lektion fliegen von oben an den Himmel
+ * und setzen sich zum **Sternbild eines Buchstabens** zusammen, der im Finale-Satz steht
+ * und in der Lektion geübt wurde ([FinaleConstellation]); Linien verbinden sie, das
+ * Sternbild leuchtet einmal auf. Darunter steht der Finale-Satz mit seinen Bildern auf
+ * einer hellen Karte (Licht-Insel), die Bilder hüpfen einmal, während er gesprochen wird.
  *
- * Header, mittlerer Block und Weiter-Button liegen in einer Spalte; der mittlere
- * Block trägt `weight(1f)` und zentriert seinen Inhalt vertikal darin. `weight(1f)`
- * (mit dem Standard `fill = true`) gibt diesem Block eine feste Höhe, unabhängig vom
- * Inhalt — der Weiter-Button rutscht dadurch nie vom Bildschirm, ganz gleich wie der
- * Inhalt innerhalb des Blocks ausgerichtet ist. Eine frühere Fassung richtete den
- * Inhalt oben statt zentriert aus; das ließ ihn am oberen Bildschirmviertel kleben,
- * statt wie eine zusammenhängende Komposition zu wirken — die Erfolgsmeldung selbst
- * bleibt trotzdem oben, das Zentrieren betrifft nur den mittleren Block. Der Block
- * schneidet überlaufenden Inhalt nicht ab (kein `clipToBounds`): eine dekorative
- * Fläche darf über ihre Kindgrenzen hinausragen, aber ein Bedienelement (der
- * Speaker-Button) darf nie unsichtbar abgeschnitten werden — deshalb bleibt der Stern
- * von der Höhenmessung ausgenommen, statt echten Inhalt wegzuschneiden, falls er zu
- * groß würde.
+ * Kein Konfetti mehr: die fallenden Quadrate in vier Rollenfarben verwässerten Grün
+ * (richtig) und Gold (Belohnung). Der Satztext richtet sich an den mitlesenden
+ * Erwachsenen — die einzige bewusste Ausnahme von „das Kind kann nicht lesen" (§12).
  *
+ * Header, mittlerer Block und Weiter-Button liegen in einer Spalte; Himmel und Karte
+ * teilen sich den Platz über `weight`, der Weiter-Button rutscht also nie vom Bildschirm.
  * Zeigt bewusst **keine** Punktezahl: die steht im Übungs-Chrome und auf dem Pfad.
  */
 @Composable
@@ -143,25 +128,18 @@ fun RewardSummaryScreen(
     onSpeak: (String) -> Unit,
     onContinue: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Die geschaffte Lektion: ihre geübten Buchstaben bestimmen das Sternbild. */
+    lesson: Lesson? = null,
 ) {
-    var popped by remember { mutableStateOf(false) }
     val haptics = LocalAbcHaptics.current
     LaunchedEffect(Unit) {
-        popped = true
         haptics.celebrate()
         AbcSfx.play(Sfx.Fanfare)
     }
-    // Absichtlich nicht `by`: der Wert wird erst im graphicsLayer-Block von
-    // [BackgroundStar] gelesen, also in der Zeichenphase. Hier oben gelesen hätte
-    // er den ganzen End-Screen — Header, Bildreihe, Satz, Speaker, Weiter-Knopf —
-    // 500ms lang jeden Frame rekomponiert. Dieselbe Regel wie bei den Pfad-
-    // Animationen (PathSignNode, PathHereMarker, PathScreen).
-    val starScale = animateFloatAsState(
-        targetValue = if (popped) 1f else 0.7f,
-        animationSpec = tween(AbcMotion.LongMs),
-        label = "reward-scale",
-    )
     val fontScale = LocalDensity.current.fontScale
+    val constellation = remember(finale?.id, lesson?.id) {
+        FinaleConstellation.letterFor(lesson, finale, pack)?.let(FinaleConstellation::of)
+    }
 
     // Den Satz einmal beim Erscheinen sprechen, wie die Prompt-Ansage in der Übung.
     LaunchedEffect(finale?.id, ttsAvailable) {
@@ -172,127 +150,65 @@ fun RewardSummaryScreen(
         if (ttsAvailable) onSpeak(text)
     }
 
-    Box(
-        modifier = modifier.fillMaxSize(),
-    ) {
-        // Ganz unten in der z-Reihenfolge: rein dekorativ, überlagert weder
-        // Bildreihe/Satz/Buttons noch fängt es Toucheingaben (Canvas ist nicht
-        // klickbar) — siehe ConfettiOverlay-Kommentar.
-        ConfettiOverlay(modifier = Modifier.fillMaxSize())
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp)
-                .padding(top = 24.dp, bottom = 40.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = stringResource(R.string.reward_title),
-                // Jubel für den Erwachsenen daneben, kein Lerninhalt: UI-Schrift wie das Icon.
-                style = MaterialTheme.typography.headlineMedium.copy(fontFamily = SilboUi),
-                color = MaterialTheme.colorScheme.onBackground,
-                // Ungedeckelt würde der Header bei großer Schriftskalierung nicht nur
-                // wachsen, sondern (ohne maxLines) auf zwei Zeilen umbrechen und den
-                // Puffer auffressen, den die gedeckelten Bilder und der gedeckelte Satz
-                // freihalten. Siehe FinaleLayout.headerSizeSp/-headerLineHeightSp.
-                fontSize = FinaleLayout.headerSizeSp(fontScale).sp,
-                lineHeight = FinaleLayout.headerLineHeightSp(fontScale).sp,
-            )
-
-            Box(
+    Box(modifier = modifier.fillMaxSize()) {
+        // Der Himmel des Pfads, randlos hinter allem — ohne Scrollen, die Hügel stehen.
+        PathBackground(scrollOffset = { 0 }, loops = remember { LanternLoops() }, sunAndLanterns = false)
+        CompositionLocalProvider(LocalChromeColors provides NightChrome) {
+            Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center,
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.safeDrawing)
+                    .padding(bottom = AbcDimens.screenBottomExtra)
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 20.dp, bottom = 40.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                if (finale == null) {
-                    // Ohne Bildreihe gibt es keine Größe, die der Stern aufblähen könnte, aber
-                    // excludedFromMeasurement() bleibt trotzdem dran: sonst wäre die Aussage im
-                    // Datei-Kommentar oben ("der Stern trägt nicht zur gemessenen Größe seiner
-                    // Box bei") nur für die Finale-Variante wahr, nicht unbedingt.
-                    BackgroundStar(
-                        scale = starScale,
-                        modifier = Modifier.excludedFromMeasurement(),
-                    )
-                } else {
-                    FinaleBody(
-                        finale = finale,
-                        pack = pack,
-                        ttsAvailable = ttsAvailable,
-                        speaking = speaking,
-                        onSpeak = onSpeak,
-                        fontScale = fontScale,
-                        starScale = starScale,
-                    )
+                Text(
+                    text = stringResource(R.string.reward_title),
+                    // Jubel für den Erwachsenen daneben, kein Lerninhalt: klein und oben.
+                    // Das Sternbild spricht für das Kind.
+                    style = MaterialTheme.typography.titleLarge.copy(fontFamily = SilboUi),
+                    color = Cream.copy(alpha = 0.85f),
+                    fontSize = (FinaleLayout.headerSizeSp(fontScale) * TitleShrink).sp,
+                    lineHeight = (FinaleLayout.headerLineHeightSp(fontScale) * TitleShrink).sp,
+                    maxLines = 1,
+                )
+                ConstellationSky(
+                    constellation = constellation,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(0.85f)
+                        .testTag("finale_constellation"),
+                )
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (finale != null) {
+                        FinaleBody(
+                            finale = finale,
+                            pack = pack,
+                            ttsAvailable = ttsAvailable,
+                            onSpeak = onSpeak,
+                            fontScale = fontScale,
+                        )
+                    }
                 }
-            }
-
-            AbcContinueButton(
-                onClick = onContinue,
-                centered = true,
-            )
-        }
-    }
-}
-
-/**
- * Fallendes Konfetti hinter dem gesamten Inhalt des End-Screens: läuft einmalig
- * über [ConfettiDurationMillis] und zeichnet danach nichts mehr (deterministische
- * Geometrie aus [ConfettiGeometry], Seed fest, damit Recompositions stabil bleiben).
- * Reine Deko-Ebene — kein Klick-/Touch-Handling, liegt unterhalb des restlichen
- * Inhalts in der Box, verdeckt also weder Bildreihe noch Satz noch Buttons.
- */
-private const val ConfettiCount = 40
-private const val ConfettiSeed = 42L
-private const val ConfettiDurationMillis = 2200
-
-/**
- * Einmal alloziert statt je Rekomposition: die vier Rollenfarben sind konstant,
- * und die Liste wurde vorher in jedem Frame der 2200ms neu gebaut.
- */
-private val ConfettiColors = listOf(StarGold, SunCoral, SkyBlue, LeafGreen)
-
-@Composable
-private fun ConfettiOverlay(modifier: Modifier = Modifier) {
-    val pieces = remember { ConfettiGeometry.pieces(count = ConfettiCount, seed = ConfettiSeed) }
-    var progress by remember { mutableStateOf(0f) }
-    // Absichtlich nicht `by`, und das `if (animatedProgress < 1f)` ist bewusst in
-    // die Zeichenphase gewandert: als Bedingung um das Canvas herum war der
-    // Fortschritt ein Kompositions-Lesezugriff und rekomponierte diese Composable
-    // — und mit ihr den ganzen End-Screen — 2200ms lang in jedem Frame. Jetzt
-    // bleibt das Canvas stehen und zeichnet nach dem Lauf schlicht nichts mehr;
-    // die Zusage aus dem Kommentar oben („zeichnet danach nichts mehr") gilt
-    // unverändert.
-    val animatedProgress = animateFloatAsState(
-        targetValue = progress,
-        animationSpec = tween(ConfettiDurationMillis, easing = LinearEasing),
-        label = "confetti-progress",
-    )
-    LaunchedEffect(Unit) {
-        progress = 1f
-    }
-
-    Canvas(modifier = modifier) {
-        val fallen = animatedProgress.value
-        if (fallen >= 1f) return@Canvas
-        val width = size.width
-        val height = size.height
-        pieces.forEach { piece ->
-            val y = ConfettiGeometry.yFraction(piece, fallen)
-            if (y in -0.1f..1.1f) {
-                val x = (piece.xFraction + piece.drift * fallen).coerceIn(0f, 1f) * width
-                val pieceSize = (10f * piece.sizeFraction)
-                withTransform({
-                    translate(left = x, top = y * height)
-                    rotate(degrees = piece.drift * 360f * fallen, pivot = Offset.Zero)
-                }) {
-                    drawRoundRect(
-                        color = ConfettiColors[piece.colorIndex],
-                        topLeft = Offset(-pieceSize / 2f, -pieceSize / 2f),
-                        size = Size(pieceSize, pieceSize),
-                        cornerRadius = CornerRadius(pieceSize * 0.3f),
-                    )
+                // Unten nebeneinander: Satz noch einmal hören, und der große grüne Pfeil.
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(32.dp),
+                ) {
+                    if (finale != null) {
+                        AbcSpeakerButton(
+                            enabled = ttsAvailable,
+                            speaking = speaking,
+                            onClick = { onSpeak(finale.tts) },
+                        )
+                    }
+                    AbcContinueButton(onClick = onContinue)
                 }
             }
         }
@@ -300,60 +216,104 @@ private fun ConfettiOverlay(modifier: Modifier = Modifier) {
 }
 
 /**
- * Der gedämpfte Erfolgsstern: gleiche Instanz für die echte und die schlanke
- * Variante. [scale] kommt als `State` herein und wird im graphicsLayer-Block
- * gelesen, also in der Zeichenphase — ein Skalierungsframe zeichnet den Stern neu,
- * ohne irgendetwas zu rekomponieren.
+ * Das Sternbild: jeder Stern fliegt von oben in einem Bogen an seinen Platz und funkelt
+ * beim Ankommen, dann zeichnen sich die Linien in Schreibrichtung nach, und das ganze Bild
+ * leuchtet einmal auf. Ohne passenden Buchstaben ([constellation] null) bleibt der Himmel
+ * leer — der Satz trägt den Moment dann allein. Bei „Bewegung reduzieren" steht das fertige
+ * Sternbild sofort da.
  */
 @Composable
-private fun BackgroundStar(scale: State<Float>, modifier: Modifier = Modifier) {
-    IconStar(
-        tint = StarGold.copy(alpha = BackgroundStarAlpha),
-        // Ohne Override würde die neue Standard-Kontur (StarGoldDeep, siehe AbcIcons.kt)
-        // mit voller Deckkraft gezeichnet — ein scharfer Ring um einen sonst absichtlich
-        // fast unsichtbaren Hintergrundstern. Die Kontur bleibt darum auf derselben
-        // gedämpften Alpha wie die Füllung; Kontrast ist hier ohnehin irrelevant, weil
-        // dieser Stern rein dekorativ ist, kein bedienbares Glyph.
-        outline = StarGoldDeep.copy(alpha = BackgroundStarAlpha),
-        size = BackgroundStarSize,
-        modifier = modifier.graphicsLayer {
-            val factor = scale.value
-            scaleX = factor
-            scaleY = factor
+private fun ConstellationSky(constellation: FinaleConstellation.Constellation?, modifier: Modifier) {
+    val still = rememberReduceMotion()
+    val stars = constellation?.stars.orEmpty()
+    val flyEnd = SkyStartS + StarGapS * stars.size + StarFlyS
+    val linesEnd = flyEnd + LinesS
+    val total = linesEnd + FlashS
+    val clock = remember(constellation) { Animatable(0f) }
+    LaunchedEffect(constellation, still) {
+        if (constellation == null) return@LaunchedEffect
+        if (still) clock.snapTo(total) else clock.animateTo(total, tween((total * 1000).toInt(), easing = LinearEasing))
+    }
+    // Nach dem Aufbau lebt das Sternbild weiter: jeder Stern funkelt und dreht sich leicht,
+    // und ein angetippter Stern springt kurz größer und schaukelt aus. Uhr und Tipps werden
+    // nur im Zeichnen gelesen.
+    val idle = rememberWorldSeconds(still)
+    val tapped = remember(constellation) { mutableStateMapOf<Int, Float>() }
+    val touchRadius = with(LocalDensity.current) { StarTouchRadius.toPx() }
+    Canvas(
+        modifier.pointerInput(constellation, still) {
+            val c = constellation ?: return@pointerInput
+            if (still) return@pointerInput
+            // Tippen oder Nachzeichnen: jeder Stern, über den der Finger kommt, springt —
+            // beim Nachzeichnen mit aufsteigenden Tönen wie die Sterne im Spurensucher.
+            awaitEachGesture {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                var step = 0
+                fun touch(at: Offset) {
+                    val w = size.width.toFloat()
+                    val h = size.height.toFloat()
+                    val hit = c.stars.indices
+                        .minByOrNull { (starAt(c, it, w, h) - at).getDistance() }
+                        ?.takeIf { (starAt(c, it, w, h) - at).getDistance() <= touchRadius }
+                        ?: return
+                    val last = tapped[hit]
+                    if (last != null && idle.value - last < RetouchS) return
+                    tapped[hit] = idle.value
+                    playStarBlip(step++)
+                }
+                touch(down.position)
+                while (true) {
+                    val event = awaitPointerEvent()
+                    val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                    if (!change.pressed) break
+                    touch(change.position)
+                    change.consume()
+                }
+            }
         },
-    )
-}
-
-/**
- * Misst den Inhalt ungebunden (`maxWidth`/`maxHeight` = unendlich, damit die gemeldete
- * Größe garantiert der tatsächlich gezeichneten entspricht — dazu gleich mehr) und
- * meldet dem Eltern-Layout trotzdem eine Größe von 0×0 zurück, zentriert auf demselben
- * Punkt, an dem der Inhalt sonst gestanden hätte. Für rein dekorative Elemente, die
- * größer sein dürfen als das, was sie hinterlegen, ohne dessen Größe (und damit die
- * Höhe der ganzen Spalte) zu beeinflussen.
- *
- * `Modifier.wrapContentSize(unbounded = true)` allein reicht dafür nicht: eine `Box`
- * misst alle Kinder mit denselben eingehenden Constraints, die hier recht locker sind
- * (die Bildreihe braucht viel weniger als verfügbar ist) — der Stern würde also seine
- * volle gemessene Größe zurückmelden, solange sie unter diesen Constraints bleibt, egal
- * wie "unbounded" er gemessen wurde. Hier wird die gemeldete Größe stattdessen explizit
- * überschrieben, unabhängig von den eingehenden Constraints.
- *
- * Wichtig: mit den *eingehenden* Constraints zu messen wäre trotzdem falsch, selbst mit
- * der 0×0-Überschreibung — auf einem 320dp breiten Gerät ist die Inhaltsbreite z. B. nur
- * 272dp, `IconStar` zeichnet aber immer anhand seines deklarierten `size`-Parameters
- * (`AbcIcons.kt`: `val w = size.toPx()`), nicht anhand der gemessenen Breite. Mit engen
- * eingehenden Constraints würde `placeable.width` (und damit `-placeable.width / 2` bei
- * der Zentrierung) auf 272dp geklemmt, während der Stern weiterhin bei seiner vollen,
- * deklarierten Größe gezeichnet wird — die Zentrierung würde um die halbe Differenz
- * danebenliegen. Ungebundenes Messen hält gemeldete und gezeichnete Größe deckungsgleich.
- */
-private fun Modifier.excludedFromMeasurement(): Modifier = this.layout { measurable, constraints ->
-    val placeable = measurable.measure(
-        constraints.copy(maxWidth = Constraints.Infinity, maxHeight = Constraints.Infinity),
-    )
-    layout(0, 0) {
-        placeable.place(-placeable.width / 2, -placeable.height / 2)
+    ) {
+        val c = constellation ?: return@Canvas
+        val t = clock.value
+        val now = idle.value
+        fun at(i: Int) = starAt(c, i, size.width, size.height)
+        val from = Offset(size.width / 2f, -24.dp.toPx())
+        // Linien: in der Reihenfolge, in der der Buchstabe geschrieben wird.
+        val drawn = ((t - flyEnd) / LinesS).coerceIn(0f, 1f) * c.lines.size
+        c.lines.forEachIndexed { index, (a, b) ->
+            val part = (drawn - index).coerceIn(0f, 1f)
+            if (part <= 0f) return@forEachIndexed
+            val start = at(a)
+            val end = start + (at(b) - start) * part
+            drawLine(LineGlow, start, end, strokeWidth = 7.dp.toPx(), cap = StrokeCap.Round, alpha = 0.35f)
+            drawLine(LineLight, start, end, strokeWidth = 2.dp.toPx(), cap = StrokeCap.Round, alpha = 0.8f)
+        }
+        val flash = if (t > linesEnd) kotlin.math.exp(-(t - linesEnd) * 2.2f) else 0f
+        c.stars.indices.forEach { i ->
+            val start = SkyStartS + i * StarGapS
+            val f = ((t - start) / StarFlyS).coerceIn(0f, 1f)
+            if (f <= 0f) return@forEach
+            val e = f * f * (3f - 2f * f)
+            val to = at(i)
+            val ctrl = Offset((from.x + to.x) / 2f + (if (i % 2 == 0) -40 else 40).dp.toPx(), from.y + 60.dp.toPx())
+            val pos = from * ((1 - e) * (1 - e)) + ctrl * (2 * (1 - e) * e) + to * (e * e)
+            val arrived = if (f >= 1f) kotlin.math.exp(-(t - start - StarFlyS) * 4f) else 0f
+            // Angekommen: leises Funkeln (Größe ±8 %) und eine leichte Drehung (±10°),
+            // jeder Stern mit eigenem Takt; ab und zu blitzt ein Glanzlicht auf.
+            val settled = f >= 1f
+            val period = 2.4f + (i % 3) * 0.5f
+            val twinkle = if (settled) 0.08f * sin(now / period * 2f * PI.toFloat() + i) else 0f
+            val sway = if (settled) 10f * sin(now / 5f * 2f * PI.toFloat() + i * 1.3f) else 0f
+            val sparkle = if (settled) sin(now / 7f * 2f * PI.toFloat() + i * 2.1f).coerceAtLeast(0f).let { it * it * it * it * it * it * it * it } else 0f
+            // Angetippt: größer, dann federnd zurück, mit einem Schaukeln.
+            val tapAge = tapped[i]?.let { now - it }?.takeIf { it in 0f..TapBounceS }
+            val bounce = tapAge?.let { a -> 0.55f * kotlin.math.exp(-a * 3.2f) * kotlin.math.cos(a * 9f) } ?: 0f
+            val tapSpin = tapAge?.let { a -> 30f * kotlin.math.exp(-a * 3f) * sin(a * 12f) } ?: 0f
+            val radius = (8f + 4f * arrived + 3f * flash).dp.toPx() * (1f + twinkle + bounce)
+            drawGlowStar(pos, radius, rotationDeg = e * 360f + sway + tapSpin, halo = 0.8f + bounce)
+            if (sparkle > 0.05f) drawGlint(pos + Offset(radius * 0.7f, -radius * 0.7f), 8.dp.toPx() * sparkle, 0.8f * sparkle)
+            if (tapAge != null && tapAge < 0.6f) drawGlint(pos, 18.dp.toPx() * (1f - tapAge / 0.6f), 1f - tapAge / 0.6f)
+            if (arrived > 0.05f) drawGlint(pos, 12.dp.toPx() * arrived, arrived)
+        }
     }
 }
 
@@ -362,10 +322,8 @@ private fun FinaleBody(
     finale: LessonFinale,
     pack: ContentPack,
     ttsAvailable: Boolean,
-    speaking: Boolean,
     onSpeak: (String) -> Unit,
     fontScale: Float,
-    starScale: State<Float>,
 ) {
     val pictures = FinaleLayout.picturesOf(pack, finale)
     val pictureSp = FinaleLayout.pictureSizeSp(pictures.size, fontScale).sp
@@ -373,22 +331,15 @@ private fun FinaleBody(
     val sentenceSp = FinaleLayout.sentenceSizeSp(fontScale)
     val sentenceLineHeightSp = FinaleLayout.sentenceLineHeightSp(fontScale)
 
+    // Bilder und Satz auf einer hellen Karte (Licht-Insel, §10): Lerninhalt nur auf Licht.
+    // Etwas eingerückt, damit die Karte nicht bis an den Rand reicht.
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-    ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .padding(horizontal = CardInset)
+            .lightIsland(padH = 16.dp, padV = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // Hinter der Bildreihe statt hinter der ganzen Spalte. excludedFromMeasurement()
-            // ist hier Pflicht: ohne sie wäre der Stern (300dp) höher als die Bildreihe
-            // (~85dp) und würde die Box — und damit die ganze Spalte — entsprechend
-            // aufblähen, bis am Ende der Speaker-Button keinen Platz mehr hätte.
-            BackgroundStar(
-                scale = starScale,
-                modifier = Modifier.excludedFromMeasurement(),
-            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(
@@ -399,9 +350,14 @@ private fun FinaleBody(
             ) {
                 pictures.forEachIndexed { index, picture ->
                     var shown by remember(finale.id, picture.atomId) { mutableStateOf(false) }
+                    val hop = remember(finale.id, picture.atomId) { Animatable(0f) }
                     LaunchedEffect(finale.id, picture.atomId) {
                         delay(FinaleLayout.revealDelayMillis(index))
                         shown = true
+                        // Einmal hüpfen, während der Satz gesprochen wird, nacheinander.
+                        delay(FanfareLeadMs + HopDelayMs + index * HopStaggerMs)
+                        hop.animateTo(1f, tween(AbcMotion.ShortMs, easing = AbcMotion.Exit))
+                        hop.animateTo(0f, AbcMotion.Bouncy.spec())
                     }
                     AnimatedVisibility(
                         visible = shown,
@@ -416,6 +372,7 @@ private fun FinaleBody(
                                     minWidth = pictureTouch,
                                     minHeight = pictureTouch,
                                 )
+                                .graphicsLayer { translationY = -HopHeight.toPx() * hop.value }
                                 // Tippen liest das Wort vor (Prinzip 7).
                                 .clickable(enabled = ttsAvailable) {
                                     onSpeak(picture.lemma)
@@ -427,33 +384,51 @@ private fun FinaleBody(
                     }
                 }
             }
-        }
 
-        Text(
-            text = finale.text,
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center,
-            // Wrapping ist jetzt das erwartete Verhalten, kein Fehlerfall: die
-            // Schriftgröße bleibt unverändert (siehe FinaleLayout.sentenceSizeSp), der
-            // Satz darf dafür über mehr Zeilen laufen. 4 Zeilen sind eine sichere
-            // Obergrenze für 4–7 Wörter in der jetzt schmaleren Textspalte;
-            // TextOverflow.Ellipsis bleibt als letzte Absicherung, falls doch mehr
-            // Zeilen nötig wären.
-            maxLines = 4,
-            overflow = TextOverflow.Ellipsis,
-            fontSize = sentenceSp.sp,
-            lineHeight = sentenceLineHeightSp.sp,
-            modifier = Modifier.padding(horizontal = SentenceExtraHorizontalPadding),
-        )
-
-        AbcSpeakerButton(
-            enabled = ttsAvailable,
-            speaking = speaking,
-            onClick = { onSpeak(finale.tts) },
-        )
+            Text(
+                text = finale.text,
+                style = MaterialTheme.typography.headlineSmall,
+                color = WarmInk,
+                textAlign = TextAlign.Center,
+                // Wrapping ist das erwartete Verhalten, kein Fehlerfall: die Schriftgröße
+                // bleibt unverändert (siehe FinaleLayout.sentenceSizeSp), der Satz darf
+                // dafür über mehr Zeilen laufen. 4 Zeilen sind eine sichere Obergrenze
+                // für 4–7 Wörter; TextOverflow.Ellipsis bleibt als letzte Absicherung.
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = sentenceSp.sp,
+                lineHeight = sentenceLineHeightSp.sp,
+                modifier = Modifier.padding(horizontal = SentenceExtraHorizontalPadding),
+            )
     }
 }
 
 /** Wie lange die Fanfare allein spielt, bevor der Finale-Satz beginnt. */
 private const val FanfareLeadMs = 700L
+
+/** Der Jubel-Titel steht nur noch klein oben (für den Erwachsenen). */
+private const val TitleShrink = 0.85f
+
+private const val SkyStartS = 0.4f
+private const val StarGapS = 0.22f
+private const val StarFlyS = 0.7f
+private const val LinesS = 1.1f
+private const val FlashS = 1.4f
+private const val HopDelayMs = 400L
+private const val HopStaggerMs = 260L
+private val HopHeight = 12.dp
+private val StarTouchRadius = 32.dp
+private const val TapBounceS = 1.4f
+
+/** So lange springt derselbe Stern nicht noch einmal, wenn der Finger auf ihm bleibt. */
+private const val RetouchS = 0.6f
+
+/** Wo Stern [i] im Himmel der Größe [w] × [h] steht: das Einheitsquadrat des Buchstabens, mittig. */
+private fun starAt(c: FinaleConstellation.Constellation, i: Int, w: Float, h: Float): Offset {
+    val side = minOf(w * 0.62f, h * 0.86f)
+    val origin = Offset((w - side) / 2f, (h - side) / 2f)
+    return origin + Offset(c.stars[i].first * side, c.stars[i].second * side)
+}
+private val CardInset = 14.dp
+private val LineLight = Color(0xFFFFECBE)
+private val LineGlow = Color(0xFFFFD678)

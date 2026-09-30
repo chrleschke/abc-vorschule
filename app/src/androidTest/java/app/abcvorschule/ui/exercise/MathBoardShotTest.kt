@@ -28,7 +28,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Beleg statt Rechnung (gleiche Bauart wie [SymbolHuntBatteryShotTest]): die
+ * Beleg statt Rechnung (gleiche Bauart wie [SymbolHuntMorphShotTest]): die
  * Mengenwahl auf echten Bühnengrößen. Bühne = Bildschirmbreite minus
  * `AbcDimens.screenHorizontal` je Seite, ein 360dp-Telefon hat also 280dp. Keine
  * Assertion — die prüfen [MathBoardSizingTest] und [MathBoardBoundsTest]; hier
@@ -66,7 +66,6 @@ class MathBoardShotTest {
                             .testTag("math_stage"),
                     ) {
                         VisualQuantityBoard(
-                            emoji = "🐜",
                             left = case.left,
                             right = case.right,
                             operation = MathOperation.Add,

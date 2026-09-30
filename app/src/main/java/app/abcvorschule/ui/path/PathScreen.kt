@@ -5,25 +5,28 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +36,9 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -41,12 +47,14 @@ import app.abcvorschule.progress.LessonGating
 import app.abcvorschule.progress.LessonState
 import app.abcvorschule.ui.shell.AbcTopBar
 import app.abcvorschule.ui.shell.ParentGateButton
-import app.abcvorschule.ui.shell.TopBarFloatingActionTop
 import app.abcvorschule.ui.shell.TopBarExtraTop
+import app.abcvorschule.ui.shell.TopBarFloatingActionTop
 import app.abcvorschule.ui.shell.TopBarHeight
 import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.StarGold
-import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.world.LocalChromeColors
+import app.abcvorschule.ui.world.NightChrome
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 
@@ -77,9 +85,37 @@ fun PathScreen(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
+    val lanternLoops = remember { LanternLoops() }
 
-    Box(modifier.fillMaxSize()) {
-        PathBackground(scrollOffset = { scrollState.value })
+    Box(
+        modifier
+            .fillMaxSize()
+            // Laternen antippen: sie liegen hinter dem Scroll-Bereich, also hört der
+            // Eltern-Knoten mit (Final-Pass). Ein Tipp, den ein Schild schon verbraucht
+            // hat, und jedes Ziehen (Scrollen) zählen nicht.
+            .pointerInput(lanternLoops) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Final)
+                    var moved = false
+                    while (true) {
+                        val event = awaitPointerEvent(PointerEventPass.Final)
+                        val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                        if ((change.position - down.position).getDistance() > viewConfiguration.touchSlop) moved = true
+                        if (!change.pressed) {
+                            if (!moved && !change.isConsumed) {
+                                lanternLoops.tap(
+                                    at = change.position,
+                                    size = Size(size.width.toFloat(), size.height.toFloat()),
+                                    minRadiusPx = LanternTouchRadius.toPx(),
+                                )
+                            }
+                            break
+                        }
+                    }
+                }
+            },
+    ) {
+        PathBackground(scrollOffset = { scrollState.value }, loops = lanternLoops)
 
         val density = LocalDensity.current
         val safeDrawingTop = WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding()
@@ -212,7 +248,9 @@ fun PathScreen(
                                 color = if (dot.nodeProgress <= head) {
                                     StarGold.copy(alpha = 0.8f)
                                 } else {
-                                    WarmInk.copy(alpha = 0.18f)
+                                    // Noch nicht gegangen: helle Punkte auf dem
+                                    // Abendhimmel, leise, aber sichtbar.
+                                    Cream.copy(alpha = 0.32f)
                                 },
                                 radius = dot.radius,
                                 center = Offset(dot.x, dot.y),
@@ -244,15 +282,15 @@ fun PathScreen(
 
         // Über dem Scroll-Inhalt, nicht darüber gestapelt: die Leiste ist
         // durchsichtig, die Schilder wandern unter ihr hindurch.
-        AbcTopBar(
-            // Der Stern bekommt hier als einziger Ort der App eine WarmInk-Kontur:
-            // er steht über dem Himmel, nicht über Cream, und StarGoldDeep fällt
-            // dort auf 2.07:1 — WarmInk gibt ihm 6.97:1, die Tinte, in der auch die
-            // Zahl daneben steht.
-            points = points,
-            starOutline = WarmInk,
-            modifier = Modifier.align(Alignment.TopStart),
-        )
+        // Der Abendhimmel ist dunkel: Stern und Zahl stehen hell auf ihm, wie in
+        // den Nachtwelten der Trainer (NightChrome). Gold braucht dort keine Kontur.
+        CompositionLocalProvider(LocalChromeColors provides NightChrome) {
+            AbcTopBar(
+                points = points,
+                starOutline = StarGold,
+                modifier = Modifier.align(Alignment.TopStart),
+            )
+        }
 
         // Schwebt über der Kopfzeile statt in ihr: die drei Punkte sind kein
         // Bar-Element, sondern die Elterntür. Sie sitzen auf der Mittelachse der
@@ -387,3 +425,6 @@ private fun PathSigns(
         )
     }
 }
+
+/** Trefferradius für ferne, kleine Laternen — ein Kinderfinger trifft keine 12dp. */
+private val LanternTouchRadius = 28.dp

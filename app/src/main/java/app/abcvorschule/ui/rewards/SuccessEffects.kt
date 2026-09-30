@@ -4,148 +4,178 @@ import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.dp
-import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.theme.AbcMotion
-import app.abcvorschule.ui.theme.SkyBlue
-import app.abcvorschule.ui.theme.StarGold
-import app.abcvorschule.ui.theme.SunCoral
 import kotlin.math.PI
 import kotlin.math.sin
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/**
+ * Der Stern am Ende eines Trainers (PRODUCT_PRINCIPLES §10). Er steigt leicht gedreht
+ * auf und federt ein, ein Lichtring läuft aus, vier Glanzfunken blitzen, ein Glanzstreifen
+ * zieht über ihn. Dann fliegt er im Bogen mit einer Funkenspur in den Punktestand, wird
+ * dabei klein und dreht sich einmal; beim Einschlag funkelt es kurz am Zähler.
+ *
+ * Bis September 2026 war es ein flacher Stern mit dunkler Kontur, acht bunten Punkten und
+ * einem geraden Flug — auf den dunklen Welten wirkte das wie aus einem alten Spiel.
+ * Alles hier wird nur in der Zeichenphase gelesen; nichts rekomponiert pro Frame.
+ */
 @Composable
 fun SuccessBurst(
     trigger: Boolean,
     onFinished: () -> Unit,
     modifier: Modifier = Modifier,
-    /** Wohin der Stern fliegt (Punktestand). Ohne Ziel schrumpft er an Ort und Stelle. */
+    /** Wohin der Stern fliegt (Punktestand). Ohne Ziel verglimmt er an Ort und Stelle. */
     target: StarCounterAnchor? = null,
     /** Der Stern ist im Punktestand eingeschlagen — jetzt darf die Zahl springen. */
     onLanded: () -> Unit = {},
 ) {
     if (!trigger) return
-    val scale = remember(trigger) { Animatable(0.4f) }
-    val alpha = remember(trigger) { Animatable(0f) }
-    val burst = remember(trigger) { Animatable(0f) }
+    val rise = remember(trigger) { Animatable(0f) }
+    val clock = remember(trigger) { Animatable(0f) }
     val flight = remember(trigger) { Animatable(0f) }
-    var starCenter by remember(trigger) { mutableStateOf<Offset?>(null) }
+    val fade = remember(trigger) { Animatable(1f) }
+    val landed = remember(trigger) { Animatable(0f) }
+    var origin by remember(trigger) { mutableStateOf<Offset?>(null) }
+    var landing by remember(trigger) { mutableStateOf<Offset?>(null) }
 
     LaunchedEffect(trigger) {
         // Bewusst ohne Haptik: der große Stern am Trainer-Ende kommt oft direkt
         // nach einem Trainer-eigenen Puls (celebrate/success) — zwei Vibrationen
         // hintereinander waren zu viel. Der Chime trägt den Moment allein.
         playSuccessChime()
-        // Fire-and-forget, purely decorative: NOT inside the coroutineScope below —
-        // that scope suspends until every launched child completes, so awaiting a
-        // 600ms burst there would stretch the whole entry phase to 600ms and push
-        // back delay(550)/exit/onFinished. The burst is only ever read via
-        // `burst.value` in the Canvas below, so it never needs to be joined.
-        launch { burst.animateTo(1f, tween(AbcMotion.CelebrateMs, easing = AbcMotion.Enter)) }
-        coroutineScope {
-            launch {
-                scale.animateTo(
-                    targetValue = 1.3f,
-                    animationSpec = AbcMotion.Bouncy.spec(),
-                )
-            }
-            launch { alpha.animateTo(1f, tween(AbcMotion.QuickMs)) }
-        }
+        // Die Uhr für Ring, Funken und Glanzstreifen läuft nebenher und wird nie abgewartet.
+        launch { clock.animateTo(ClockEndS, tween((ClockEndS * 1000).toInt(), easing = LinearEasing)) }
+        launch { rise.animateTo(1f, AbcMotion.Settle.spec()) }
+        delay(RiseMs)
         delay(StarFlight.HoldMs)
-        val landing = target?.centerInRoot
-        if (landing != null && starCenter != null) {
-            // Hinauf in den Punktestand (StarFlight): beschleunigend, wie angesaugt,
-            // und dabei auf die Größe des kleinen Sterns schrumpfend.
+        val to = target?.centerInRoot
+        if (to != null && origin != null) {
+            landing = to
             AbcSfx.play(Sfx.Whoosh)
-            flight.animateTo(1f, tween(AbcMotion.StandardMs, easing = AbcMotion.Exit))
+            flight.animateTo(1f, tween(FlightMs, easing = FastOutSlowInEasing))
             AbcSfx.play(Sfx.Ding)
             onLanded()
-            alpha.animateTo(0f, tween(AbcMotion.MicroMs))
+            landed.animateTo(1f, tween(LandSparkMs, easing = AbcMotion.Exit))
         } else {
-            // Wait for the exit animation to fully finish before the caller advances —
-            // otherwise the composable is torn down mid-shrink and the star just vanishes.
-            coroutineScope {
-                launch { scale.animateTo(0.7f, tween(AbcMotion.StandardMs)) }
-                launch { alpha.animateTo(0f, tween(AbcMotion.StandardMs)) }
-            }
+            // Ohne Ziel: sanft verglimmen, und erst danach weiter — sonst verschwände
+            // der Stern mitten in der Bewegung.
+            fade.animateTo(0f, tween(AbcMotion.StandardMs))
             onLanded()
         }
         onFinished()
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.34f)
-                .align(Alignment.TopCenter),
-            contentAlignment = Alignment.Center,
-        ) {
-            Canvas(modifier = Modifier.size(200.dp)) {
-                val sparkColors = listOf(StarGold, SunCoral, SkyBlue)
-                val offsets = BurstGeometry.sparkOffsets(
-                    count = 8,
-                    progress = burst.value,
-                    radiusPx = size.minDimension / 2f,
-                )
-                offsets.forEachIndexed { i, offset ->
-                    drawCircle(
-                        color = sparkColors[i % sparkColors.size],
-                        radius = 5.dp.toPx() * (1f - burst.value),
-                        center = center + offset,
-                        alpha = 1f - burst.value,
-                    )
+    Canvas(
+        modifier = modifier
+            .fillMaxSize()
+            .onGloballyPositioned { origin = it.positionInRoot() },
+    ) {
+        val home = Offset(size.width / 2f, size.height * HomeFraction)
+        val t = clock.value
+        val f = flight.value
+        val r0 = BigRadius.toPx()
+        // Weicher Lichtschein hinter dem Aufstieg.
+        val bloom = (t / 0.25f).coerceIn(0f, 1f) * (1f - ((t - 1f) / 0.4f).coerceIn(0f, 1f)) * (1f - f)
+        if (bloom > 0f) {
+            val br = 120.dp.toPx()
+            drawCircle(
+                Brush.radialGradient(0f to Bloom.copy(alpha = 0.28f * bloom), 1f to Color.Transparent, center = home, radius = br),
+                radius = br,
+                center = home,
+            )
+        }
+        // Lichtring, der ausläuft.
+        val ring = ((t - 0.12f) / 0.6f).coerceIn(0f, 1f)
+        if (ring in 0.001f..0.999f) {
+            drawCircle(
+                color = RingLight.copy(alpha = 0.5f * (1f - ring)),
+                radius = (30 + 90 * (1f - (1f - ring) * (1f - ring) * (1f - ring))).dp.toPx(),
+                center = home,
+                style = Stroke(width = (2.5f * (1f - ring) + 0.5f).dp.toPx()),
+            )
+        }
+        // Vier Glanzfunken, versetzt.
+        GlintSpots.forEach { (dx, dy, start) ->
+            val p = ((t - start) / 0.5f).coerceIn(0f, 1f)
+            val s = kotlin.math.sin(p * PI.toFloat())
+            drawGlint(home + Offset(dx.dp.toPx(), dy.dp.toPx()), 11.dp.toPx() * s, s * (1f - f))
+        }
+        val from = origin
+        val to = landing?.let { if (from != null) it - from else null }
+        if (landed.value <= 0f) {
+            val r = rise.value
+            var center = home + Offset(0f, (1f - r) * 40.dp.toPx())
+            var radius = r0 * r.coerceIn(0f, 1.2f) * (1f + 0.02f * kotlin.math.sin(t * 4f))
+            var rotation = (1f - r) * -26f
+            if (to != null && f > 0f) {
+                val ctrl = home + Offset(110.dp.toPx(), -10.dp.toPx())
+                fun bez(u: Float) = home * ((1 - u) * (1 - u)) + ctrl * (2 * (1 - u) * u) + to * (u * u)
+                center = bez(f)
+                radius = r0 + (LandedRadius.toPx() - r0) * f
+                rotation = f * 360f
+                for (i in 1..7) {
+                    val u = f - i * 0.06f
+                    if (u <= 0f) continue
+                    drawGlint(bez(u), (7f - i * 0.6f).dp.toPx(), 0.7f * (1f - i / 8f))
                 }
             }
-            IconStar(
-                tint = StarGold,
-                size = 84.dp,
-                modifier = Modifier
-                    // Vor dem graphicsLayer gemessen: die Ruheposition, nicht die
-                    // fliegende — sonst liefe das Ziel beim Fliegen mit.
-                    .onGloballyPositioned { starCenter = it.boundsInRoot().center }
-                    .graphicsLayer {
-                        val from = starCenter
-                        val to = target?.centerInRoot
-                        val t = flight.value
-                        if (from != null && to != null && t > 0f) {
-                            val o = StarFlight.offset(from, to, t)
-                            translationX = o.x
-                            translationY = o.y
-                            val s = StarFlight.scale(from = scale.value, t = t)
-                            scaleX = s
-                            scaleY = s
-                        } else {
-                            scaleX = scale.value
-                            scaleY = scale.value
-                        }
-                        this.alpha = alpha.value
-                    },
-            )
+            val shimmer = if (f == 0f && t in 0.6f..1.15f) (t - 0.6f) / 0.55f else -1f
+            drawGlowStar(center, radius, rotation, alpha = fade.value, shimmer = shimmer)
+        }
+        // Einschlag: kurzes Funkeln am Zähler.
+        val l = landed.value
+        if (to != null && l > 0f && l < 1f) {
+            for (i in 0 until 5) {
+                val a = i / 5f * 2f * PI.toFloat() + 0.3f
+                val d = (8 + 22 * (1f - (1f - l) * (1f - l))).dp.toPx()
+                drawGlint(to + Offset(kotlin.math.cos(a) * d, kotlin.math.sin(a) * d), 5.dp.toPx() * (1f - l), 1f - l)
+            }
         }
     }
 }
+
+/**
+ * Wo der Stern aufsteigt: unter dem Lautsprecher. In der Mitte des oberen Drittels (bis
+ * September 2026) überdeckte er Fortschritt und Lautsprecher zugleich.
+ */
+private const val HomeFraction = 0.32f
+private val BigRadius = 42.dp
+/** Halbe Größe des Sterns im Punktestand (22 dp). */
+private val LandedRadius = 11.dp
+private const val RiseMs = 520L
+private const val FlightMs = 560
+private const val LandSparkMs = 320
+private const val ClockEndS = 1.6f
+private val Bloom = Color(0xFFFFD278)
+private val RingLight = Color(0xFFFFECBE)
+
+/** (dx dp, dy dp, Start s) — um den Stern verteilt, nie symmetrisch. */
+private val GlintSpots = listOf(
+    Triple(-58f, -34f, 0.25f),
+    Triple(62f, -18f, 0.42f),
+    Triple(-40f, 48f, 0.58f),
+    Triple(50f, 44f, 0.75f),
+)
 
 private const val SampleRate = 44100
 

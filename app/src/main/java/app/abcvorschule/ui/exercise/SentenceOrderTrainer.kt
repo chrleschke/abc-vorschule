@@ -1,44 +1,56 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.SentenceOrderRound
@@ -60,6 +72,10 @@ import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
+import app.abcvorschule.ui.world.lightIsland
+import app.abcvorschule.ui.world.lightPlate
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 object SentenceOrderTray {
     /** A sentence can need more cards than a word, but the tray stays scannable. */
@@ -141,11 +157,8 @@ fun SentenceOrderTrainer(
         seed = round.sentenceId.hashCode(),
     )
     val haptics = LocalAbcHaptics.current
-    val interactionOpacity by animateFloatAsState(
-        targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
-        label = "sentence_order_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val interactionOpacity = rememberRestOpacity()
 
     fun place(index: Int, card: WordBlock) {
         if (resolved || placed[index] != null) return
@@ -186,8 +199,15 @@ fun SentenceOrderTrainer(
                     text = illustrationEmoji,
                     fontFamily = SilboEmoji,
                     fontSize = TaskPromptSizing.pictureSp(LocalDensity.current.fontScale).sp,
+                    // Das Bild steht auf einem hellen Teller über der Leine (Garten-Welt).
+                    modifier = Modifier.lightPlate(),
                 )
             }
+            val density = LocalDensity.current
+            val window = LocalWindowInfo.current.containerSize
+            val line = remember(roundKey) { ClothesLineState() }
+            val sagPx = with(density) { ClothesLineGeometry.SagDp.dp.toPx() }
+            val insetPx = with(density) { ClothesLineGeometry.PoleInsetDp.dp.toPx() }
             // `key(roundKey)` bindet die Transition an die Runde. Ohne Schlüssel
             // merkt sich AnimatedContent seinen Zustand in einem ungekeyten
             // `remember`, und der Aufrufort überlebt einen Rundenwechsel: folgen
@@ -198,16 +218,30 @@ fun SentenceOrderTrainer(
             // sentence_order-Tasks hintereinander, im Wort-Bauer schon: die
             // ausführliche Herleitung steht dort in WordBuildTrainer.kt.
             key(roundKey) {
+                // Die Leine hängt am Rahmen um die Reihe, nicht an der Reihe selbst: sie
+                // bleibt stehen, wenn die Pegs dem fertigen Satz weichen.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clothesLine(line, window.width.toFloat(), window.height.toFloat())
+                        .padding(top = ClothesLineGeometry.PinRiseDp.dp, bottom = ClothesLineGeometry.SagDp.dp),
+                ) {
                 AnimatedContent(
                     targetState = completed,
-                    transitionSpec = { fadeIn(tween(AbcMotion.ShortMs)) togetherWith fadeOut(tween(AbcMotion.QuickMs)) },
+                    // clip = false: Klammern, Schwingen und die Überlänge langer Sätze
+                    // ragen über die Grenzen des Inhalts hinaus.
+                    transitionSpec = {
+                        (fadeIn(tween(AbcMotion.ShortMs)) togetherWith fadeOut(tween(AbcMotion.QuickMs)))
+                            .using(SizeTransform(clip = false))
+                    },
                     label = "sentence_complete",
                 ) { isComplete ->
                     // Die Bühne wird gemessen, nicht geraten: die Peg-Reihe bricht nie um
                     // (Produktentscheidung), also ist die gemessene Breite die einzige
                     // Größe, gegen die Glyph und Peg-Breiten gelöst werden dürfen.
-                    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                    BoxWithConstraints(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
                         val fontScale = LocalDensity.current.fontScale
+                        val widthPx = with(density) { maxWidth.toPx() }
                         if (isComplete) {
                             // Auch der fertige Satz wird gelöst statt in headlineSmall
                             // gesetzt: „Oma hat einen Hut" braucht dort bei font_scale
@@ -223,6 +257,8 @@ fun SentenceOrderTrainer(
                                 maxLines = 1,
                                 modifier = Modifier
                                     .align(Alignment.Center)
+                                    .graphicsLayer { translationY = line.sagAt(widthPx / 2f, insetPx, sagPx) }
+                                    .lightIsland()
                                     .testTag("completed_sentence"),
                             )
                         } else {
@@ -231,15 +267,24 @@ fun SentenceOrderTrainer(
                             // Silhouette des Wortes, und der Grund, warum die Reihe
                             // überhaupt in eine Zeile passt. Herleitung und der alte
                             // Überlauf stehen in SentencePegSizing.
-                            val row = SentencePegSizing.solve(maxWidth.value, words)
+                            // Auf der Leine darf ein langer Satz über die Bühne hinaus
+                            // hängen (solveOnLine); requiredWidth zentriert die Reihe dann
+                            // über der Bühne, statt die letzten Pegs zu stauchen.
+                            val row = SentencePegSizing.solveOnLine(maxWidth.value, words)
                             val glyphSp = SentencePegSizing.glyphSp(row.glyphDp, fontScale)
+                            val rowLeftPx = with(density) { (widthPx - row.widthDp.dp.toPx()) / 2f }
+                            val pegCentersPx = with(density) {
+                                var x = rowLeftPx
+                                row.pegWidthsDp.map { w ->
+                                    val center = x + w.dp.toPx() / 2f
+                                    x += (w + row.gapDp).dp.toPx()
+                                    center
+                                }
+                            }
                             Row(
-                                horizontalArrangement = Arrangement.spacedBy(
-                                    row.gapDp.dp,
-                                    Alignment.CenterHorizontally,
-                                ),
+                                horizontalArrangement = Arrangement.spacedBy(row.gapDp.dp),
                                 verticalAlignment = Alignment.Top,
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.requiredWidth(row.widthDp.dp),
                             ) {
                                 words.forEachIndexed { index, expected ->
                                     val filled = if (resolved) expected else placed[index]
@@ -270,11 +315,15 @@ fun SentenceOrderTrainer(
                                             SentencePegSizing.MinPegWidthDp
                                         },
                                         glyphSp = glyphSp,
+                                        hang = {
+                                            line.sagAt(pegCentersPx.getOrElse(index) { 0f }, insetPx, sagPx)
+                                        },
                                     )
                                 }
                             }
                         }
                     }
+                }
                 }
             }
         },
@@ -301,6 +350,7 @@ fun SentenceOrderTrainer(
                             modifier = Modifier
                                 .defaultMinSize(minHeight = AbcDimens.kidTouch - 8.dp)
                                 .alpha(interactionOpacity)
+                                .shadow(6.dp, RoundedCornerShape(18.dp))
                                 .background(
                                     // SkyBlue, nicht LeafGreen: die Auswahl ist ein
                                     // unvalidierter Aktiv-Zustand, kein "richtig" —
@@ -360,6 +410,16 @@ private val PegBorderGreen = Color(0xFF3A7A44)
 private val PegCornerRadius = 16.dp
 private val PegBorderWidth = 3.dp
 
+/**
+ * Ausschlag des Nachschwingens. 8° statt anfangs 4° auf der schnellen `Wobble`-Feder:
+ * das las sich wie Zittern, nicht wie eine Karte an der Leine (Nutzer-Feedback). Bei
+ * langen Sätzen berühren sich Nachbarn dabei kurz; das ist an der Leine erlaubt.
+ */
+private const val PegSwingDegrees = 8f
+
+/** Anstoß beim Antippen, in Grad pro Sekunde — auf der `Glide`-Feder rund 7° Ausschlag. */
+private const val PegTapKick = 160f
+
 @Composable
 private fun Peg(
     index: Int,
@@ -374,15 +434,33 @@ private fun Peg(
     registerWith: app.abcvorschule.ui.exercise.drag.DragFieldState,
     pegWidthDp: Float,
     glyphSp: Float,
+    /** Durchhang der Leine an diesem Peg, in px — nur beim Platzieren gelesen, nie in der Komposition. */
+    hang: () -> Float,
 ) {
     // Bewusst nicht `by`: der Wert wird ausschließlich in graphicsLayer und
     // drawBehind gelesen, also in der Zeichenphase.
     val settle = rememberSlotFillSettle(filled = filled != null, morphOnFill = morphOnFill)
+    // Frisch aufgehängt schwingt die Karte an ihrer Klammer nach wie ein Pendel:
+    // die langsame `Glide`-Feder, nicht das schnelle `Wobble`.
+    val swing = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(filled != null) {
+        if (filled != null && morphOnFill) {
+            swing.snapTo(PegSwingDegrees)
+            swing.animateTo(0f, AbcMotion.Glide.spec())
+        }
+    }
 
     // SkyBlue-Wash wie die armierte Karte im Tray: "hier kann die gewählte Karte
     // hin" ist ein Aktiv-Signal, kein "richtig" — LeafGreen bleibt dem gefüllten
     // Peg (§10).
-    val fill = if (armed) SkyBlue.copy(alpha = 0.22f) else CreamElevated
+    // Auf der dunklen Garten-Welt: ein leerer Platz ist ein gestrichelter, fast
+    // durchsichtiger Umriss, erst die aufgehängte Karte ist hell.
+    val fill = when {
+        armed -> SkyBlue.copy(alpha = 0.35f)
+        filled != null -> CreamElevated
+        else -> Cream.copy(alpha = 0.12f)
+    }
     // Same deviation as WordBuildTrainer's Frame() border (identical pattern, "wie
     // WordBuild-Slots" per the brief): the literal LeafGreen.copy(0.7f) /
     // WarmMuted.copy(0.32f) fail the 3:1 UI-component floor once composited over
@@ -390,12 +468,22 @@ private fun Peg(
     // itself (3.11:1). LeafGreen at full opacity still only reaches 2.87:1 against
     // CreamElevated — PegBorderGreen is the dedicated darker fix for that case
     // (3.79:1).
-    val borderColor = if (filled != null) PegBorderGreen else WarmMuted.copy(alpha = 0.9f)
+    val borderColor = if (filled != null) PegBorderGreen else Cream.copy(alpha = 0.6f)
+    val dashed = filled == null
 
+    // Der Durchhang ist ein Versatz beim Platzieren, außen um die DropZone: sie meldet
+    // ihre Bounds und nimmt Tipps am äußeren Knoten an, vor dem übergebenen Modifier.
+    // Als translationY im graphicsLayer hing die Karte bis zu 14dp tiefer,
+    // als sie Tipps und Karten annahm — der untere Rand eines mittleren Pegs war taub.
+    Box(Modifier.offset { IntOffset(0, hang().roundToInt()) }) {
     DropZone(
         state = registerWith,
         key = SentenceOrderTray.pegKey(index),
-        onTap = onTap,
+        // Jeder Tipp stupst die Karte an der Leine an: sie schaukelt kurz, voll wie leer.
+        onTap = {
+            scope.launch { swing.animateTo(0f, AbcMotion.Glide.spec(), initialVelocity = PegTapKick) }
+            onTap()
+        },
         enabled = enabled,
         modifier = Modifier
             .width(pegWidthDp.dp)
@@ -404,6 +492,11 @@ private fun Peg(
                 scaleX = SlotFillMorph.scaleX(settle.value)
                 scaleY = SlotFillMorph.scaleY(settle.value)
                 alpha = opacity
+                rotationZ = swing.value
+                // An der Klammer aufgehängt: der Drehpunkt sitzt oben in der Mitte.
+                transformOrigin = TransformOrigin(0.5f, 0f)
+                // Die Klammer ragt über den Peg hinaus — nicht in einer Ebene abschneiden.
+                compositingStrategy = CompositingStrategy.ModulateAlpha
             }
             .drawBehind {
                 val radius = SlotFillMorph.cornerRadius(
@@ -421,8 +514,12 @@ private fun Peg(
                     topLeft = Offset(stroke / 2f, stroke / 2f),
                     size = Size(size.width - stroke, size.height - stroke),
                     cornerRadius = CornerRadius((radius - stroke / 2f).coerceAtLeast(0f)),
-                    style = Stroke(width = stroke),
+                    style = Stroke(
+                        width = if (dashed) stroke * 0.7f else stroke,
+                        pathEffect = if (dashed) PathEffect.dashPathEffect(floatArrayOf(stroke * 2.2f, stroke * 1.6f)) else null,
+                    ),
                 )
+                drawClothesPin()
             }
             .padding(
                 horizontal = SentencePegSizing.PegPaddingDp.dp,
@@ -440,18 +537,19 @@ private fun Peg(
             showGhost -> Text(
                 text = expected,
                 style = MaterialTheme.typography.headlineSmall.copy(fontSize = glyphSp.sp),
-                color = WarmInk,
+                color = Cream,
                 maxLines = 1,
-                modifier = Modifier.alpha(0.22f),
+                modifier = Modifier.alpha(0.4f),
             )
             else -> Text(
                 text = "_",
                 style = MaterialTheme.typography.headlineSmall.copy(fontSize = glyphSp.sp),
                 // Decorative empty-peg marker, not reading content — alpha bumped +0.1
                 // (0.45f -> 0.55f), same pattern as WordBuildTrainer's Frame().
-                color = WarmMuted.copy(alpha = 0.55f),
+                color = Cream.copy(alpha = 0.55f),
                 maxLines = 1,
             )
         }
+    }
     }
 }

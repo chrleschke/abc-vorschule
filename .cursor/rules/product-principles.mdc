@@ -17,7 +17,7 @@ Full source: `docs/PRODUCT_PRINCIPLES.md`. Follow it for every change.
 - Sechs Trainer pro Lektion in fester Reihenfolge: Auditiver Finder · Spurensucher · Verschmelzer · Wort-Bauer · Satz-Architekt · Rechnen. Pfad-Screen ist der Einstieg; gesperrte Knoten antworten mit gesprochenem Hinweis, nie stumm.
 - No fake wrong-answer distractors — only authored, already-practiced atoms (max. 2 per round, tray ≤ 5 word / ≤ 6 sentence); freeware, ad-free, offline-capable core.
 - Exercise layout: prompt upper-center, answers bottom-center (`ExerciseStage`).
-- Rechnen: 3 Antworten (visuell) bzw. System-Zahlentastatur + CTA-Absenden-Pfeil; in jeder Lektion; keine Lesewörter; Miss-Feedback nur gesprochen.
+- Rechnen: 3 Zahlkacheln bzw. Kinder-Ziffernblock (`NumberPad`, keine System-Tastatur); in jeder Lektion; keine Lesewörter; Ansage: Einleitung „Wie viel ist“ + ganze Aufgabe als ein Clip (`MathPromptSpeech.taskText`, Profil `math`, einzeln im TTS-UI kuratiert); Fehlversuch nur `Sfx.Blocked`, keine Sprache.
 
 ## When principles conflict with older plan text
 

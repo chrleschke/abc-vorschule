@@ -29,11 +29,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -48,9 +50,7 @@ import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.rewards.Sfx
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
-import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.LeafGreen
-import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.WarmInk
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -123,11 +123,8 @@ fun SyllableMergeTrainer(
         listOf(round.leftAtomId, round.rightAtomId, round.resultAtomId).distinct()
     }
     val haptics = LocalAbcHaptics.current
-    val interactionOpacity by animateFloatAsState(
-        targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
-        label = "syllable_merge_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val interactionOpacity = rememberRestOpacity()
 
     fun commit() {
         if (merged) return
@@ -400,19 +397,41 @@ private fun MergeTrack(progress: () -> Float, modifier: Modifier = Modifier) {
             // 0 at the edges, 1 in the middle — the wave chases this value.
             val toMiddle = 1f - abs(x - size.width / 2f) / (size.width / 2f)
             val highlight = (1f - abs(toMiddle - phase.value) * 3f).coerceIn(0f, 1f)
+            // Funken statt Punkte: kleine Lichter, die zur Mitte hin wandern.
+            val center = Offset(x, centerY)
+            val sparkAlpha = fade * (0.25f + 0.6f * highlight)
             drawCircle(
-                color = SkyBlue.copy(alpha = fade * (0.30f + 0.55f * highlight)),
-                radius = dotRadius * (0.8f + 0.4f * highlight),
-                center = Offset(x, centerY),
+                brush = Brush.radialGradient(
+                    0f to FireflyHalo.copy(alpha = sparkAlpha * 0.6f),
+                    1f to Color.Transparent,
+                    center = center,
+                    radius = dotRadius * 4f,
+                ),
+                radius = dotRadius * 4f,
+                center = center,
+            )
+            drawCircle(
+                color = FireflyCore.copy(alpha = sparkAlpha),
+                radius = dotRadius * (0.7f + 0.4f * highlight),
+                center = center,
             )
         }
     }
 }
 
-/** Ruheradius der Kachelecke — unverändert der bisherige Wert. */
-private val FloeCornerRadius = 26.dp
-
 private val FloeBorderWidth = 4.dp
+
+/**
+ * Glühwürmchen-Licht (Waldlichtung, PRODUCT_PRINCIPLES §10): die Silbe steht auf
+ * einem hellen Kern, der Hof darum wird heller, je näher sich die beiden Lichter
+ * kommen — [MergeProgress.glow] trägt die Verstärkung, die das TTS nicht kann.
+ */
+private val FireflyCore = Color(0xFFF4FBC8)
+private val FireflyHalo = Color(0xFFE6F596)
+private val FloeCoreLight = Color(0xFFFFFBE8)
+private val FloeCoreMid = Color(0xFFF6EFD4)
+private val FloeCoreEdge = Color(0xFFE9F3B8)
+private val FloeRing = Color(0xFFD9EC7A)
 
 @Composable
 private fun Floe(
@@ -433,23 +452,51 @@ private fun Floe(
     opacity: Float = 1f,
     modifier: Modifier = Modifier,
 ) {
-    val fill = if (frozen) LeafGreen.copy(alpha = 0.25f) else CreamElevated
-    val borderColor = if (frozen) LeafGreen else SkyBlue
+    // Der verschmolzene Laut bekommt den grünen Rand „richtig" (§10), das Licht bleibt.
+    val borderColor = if (frozen) LeafGreen else FloeRing
     Box(
         modifier = modifier
             .width(widthDp.dp)
             .height(AbcDimens.letterFrame)
-            .alpha(opacity)
-            // Fläche und Rand selbst gezeichnet statt background()/border(): nur
+            // ModulateAlpha statt .alpha(): der Lichthof wird außerhalb der Kachel
+            // gezeichnet, und eine Offscreen-Ebene schnitte ihn an der Kante ab.
+            .graphicsLayer {
+                alpha = opacity
+                compositingStrategy = CompositingStrategy.ModulateAlpha
+            }
+            // Fläche, Hof und Rand selbst gezeichnet statt background()/border(): nur
             // so lässt sich der Glühwert in der Zeichenphase lesen. Der Rand
             // sitzt um seine halbe Breite eingerückt und damit innen, genau wie
             // Modifier.border — dieselbe Rechnung wie am Rahmen des Wort-Bauers.
             .drawBehind {
-                val radius = FloeCornerRadius.toPx()
-                drawRoundRect(color = fill, cornerRadius = CornerRadius(radius))
+                val g = glow().coerceIn(0f, 1f)
+                val radius = size.height / 2f
+                // Der Hof: ein weicher Schein um das Licht, hell mit dem Glühwert.
+                val halo = size.maxDimension * (0.7f + 0.25f * g)
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        0f to FireflyHalo.copy(alpha = 0.2f + 0.45f * g),
+                        0.55f to FireflyHalo.copy(alpha = 0.1f + 0.2f * g),
+                        1f to Color.Transparent,
+                        center = center,
+                        radius = halo,
+                    ),
+                    radius = halo,
+                    center = center,
+                )
+                drawRoundRect(
+                    brush = Brush.radialGradient(
+                        0f to FloeCoreLight,
+                        0.6f to FloeCoreMid,
+                        1f to FloeCoreEdge,
+                        center = Offset(size.width * 0.4f, size.height * 0.35f),
+                        radius = size.maxDimension * 0.7f,
+                    ),
+                    cornerRadius = CornerRadius(radius),
+                )
                 val stroke = FloeBorderWidth.toPx()
                 drawRoundRect(
-                    color = borderColor.copy(alpha = glow().coerceIn(0f, 1f)),
+                    color = borderColor.copy(alpha = 0.35f + 0.65f * g),
                     topLeft = Offset(stroke / 2f, stroke / 2f),
                     size = Size(size.width - stroke, size.height - stroke),
                     cornerRadius = CornerRadius((radius - stroke / 2f).coerceAtLeast(0f)),
@@ -465,10 +512,8 @@ private fun Floe(
             // durch fontScale, Muster FinaleLayout.capEffectiveSize) und auf
             // schmalen Bühnen darunter geschrumpft, damit die Zeile nie überläuft.
             fontSize = glyphSp.sp,
-            // Always WarmInk, even when frozen: LeafGreen text on the LeafGreen-tinted
-            // wash below only reaches ~2.25:1 (and ~2.87:1 even against plain
-            // CreamElevated) — short of the required 3:1 for large glyphs on Cream. The
-            // wash, border and scale-in animation already carry the "merged" cue.
+            // Always WarmInk on the light core, also when merged: the border, the
+            // brighter halo and the scale-in carry the "merged" cue.
             color = WarmInk,
         )
     }

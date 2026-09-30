@@ -24,6 +24,7 @@ import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
 import app.abcvorschule.ui.theme.WarmInk
+import app.abcvorschule.ui.world.LocalChromeColors
 
 /** Kantenlänge des Sterns neben der Zahl. */
 private val StarGlyphSize = 22.dp
@@ -85,8 +86,10 @@ fun AbcStarCount(
     }
     Row(
         modifier = modifier.graphicsLayer {
+            // Gestaucht statt nur größer: breiter und flacher beim Einschlag, dann federt
+            // er zurück — der Stern „landet" im Zähler.
             scaleX = bump.value
-            scaleY = bump.value
+            scaleY = 1f - (bump.value - 1f) * 0.7f
         },
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -104,7 +107,7 @@ fun AbcStarCount(
         Text(
             text = "$points",
             style = MaterialTheme.typography.titleLarge,
-            color = WarmInk,
+            color = LocalChromeColors.current.content,
         )
     }
 }

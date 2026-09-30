@@ -125,24 +125,13 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
     richtige Karte groß in die Bildschirmmitte und hält sie dort, solange der Satz
     wiederholt wird; die andere Karte blendet aus. **Auflösen („Zeig mir")
     markiert nur, es feiert nicht.**
-7. **Rechnen** — reine Mengen-Arithmetik in *jeder* Lektion, Icons aus dem Wortschatz
-  derselben Lektion. **Keine Wörter zum Lesen oder Schreiben**; Singular/Plural nur gesprochen.
-  - **Der Prompt behauptet eine Szene — die muss stimmen.** „Vier Reihen mit je sechs
-    Eisbären sitzen am Ufer" ist gleich dreifach falsch: Eisbären sind Einzelgänger, ein
-    Ufer ist kein Eismeer, und in Reihen sitzt gar kein Tier. Reihen (Malnehmen) gibt es
-    nur dort, wo die Welt wirklich Reihen kennt: Beet, Regal, Parkplatz, Bussitze,
-    Eierkarton, Vögel auf der Leitung. Bei Einzelgängern (Eisbär, Krokodil, Eule, Maus)
-    und bei Mengen, die es nie gibt (dreißig Türen an einem Haus, neunundzwanzig
-    Schneemänner in einem Garten) wird die Runde zu Plus oder Wegnehmen — oder ganz ohne
-    Szene gestellt („Vierzehn Mäuse und neun Mäuse."), was immer trägt.
-  - **Icon, gezähltes Nomen und gesprochene Antwort sind dasselbe Ding.** Ein Prompt, der
-    Kinder zählt, während das Icon Busse zeigt und die Antwort „24 Schulbusse" sagt, ist
-    drei Aufgaben in einer. Das Icon-Atom braucht ein `pluralDisplay`, sonst spricht der
-    Erfolg „18 Pizza".
-  - **Nur der Finale-Satz darf Quatsch sein** (Abschnitt 12) — und dann muss er lustig
-    sein. Alles andere, was das Kind hört, beschreibt eine Welt, die es wiedererkennt.
+7. **Rechnen** — reine Arithmetik mit Zahlentürmen in *jeder* Lektion (Abschnitt 8).
+  **Keine Wörter zum Lesen oder Schreiben**, keine Bilder. Seit September 2026 gibt es keine
+  Sachaufgaben mehr: die Ansage fragt nur die Rechnung, die Antwort ist die Zahl. Die früheren
+  Regeln für Szene, Icon und Plural (`iconAtomId`, „18 Pizza") sind damit mitsamt dem Feld
+  entfallen.
 
-Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Treffer füllen eine Batterie, Fehltipp mischt neu ohne Batterieverlust. Das Mischen ist **Absicht gegen Raten** (ohne es tippen Kinder alle Kugeln der Reihe nach an) und bleibt; seit September 2026 **hüpfen** die Kugeln dabei in kleinen, versetzten Bögen an ihre neuen Plätze statt zu teleportieren, und das Feld nimmt keine Tipps an, bis die letzte gelandet ist (~650 ms, `HuntShuffleHop`). Die Bewegung bremst Durchtippen zusätzlich, ohne zu strafen.
+Zusätzlich, bis zu zweimal pro Lektion und ohne eigenen autorierten Content: eine **Buchstaben-Jagd** direkt nach dem Spurensucher und eine **Silben-Jagd** direkt nach dem Silben-Verschmelzer — jeweils nur, wenn die Lektion den entsprechenden Trainer führt und mindestens ein bereits bekanntes Vergleichssymbol existiert. Kind tippt alle Vorkommen des gesuchten Symbols in einem verstreuten Feld an; Jeder Treffer fliegt als Perle in die Herzmuschel am Boden der Tiefsee (siehe §10, „Nachtwelten"), ein Fehltipp mischt neu, ohne dass eine Perle verloren geht. Das Mischen ist **Absicht gegen Raten** (ohne es tippen Kinder alle Kugeln der Reihe nach an) und bleibt; seit September 2026 **hüpfen** die Kugeln dabei in kleinen, versetzten Bögen an ihre neuen Plätze statt zu teleportieren, und das Feld nimmt keine Tipps an, bis die letzte gelandet ist (~650 ms, `HuntShuffleHop`). Die Bewegung bremst Durchtippen zusätzlich, ohne zu strafen.
 
 Ebenfalls abgeleitet und nicht autoriert: der **Wort-Detektiv** direkt nach dem letzten
 Wort-Bauer — „Finde den Buchstaben / den Laut / die Silbe im Wort". Eine Runde pro eingeführtem Wort,
@@ -284,7 +273,7 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
 
 - Atome (Buchstabe / Silbe / Wort + Emoji) sind wiederverwendbar über alle sechs Trainer-Typen einer Lektion.
 - Atom-Emojis werden auch außerhalb der Trainer verwendet: die Pfad-Schilder zeigen bis zu drei
-  Emojis je Lektion, abgeleitet aus word_build → count_add → sentence_order → sentence_picture
+  Emojis je Lektion, abgeleitet aus word_build → sentence_order → sentence_picture
   (deterministisch, über den Emoji-Glyph dedupliziert). Der Satz-Versteher steht bewusst am Ende:
   seine Bildkarten sind Antwortmaterial und füllen nur auf, was die übrigen Trainer offenlassen.
   Jede autorierte Lektion trägt den Satz-Versteher; bis August 2026 fehlte er den Wiederholungen
@@ -330,8 +319,14 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
 
 ## 5. Session-Modell
 
-- **Pfad-Screen ist der Einstieg**: ein gepunkteter Trittspuren-Weg durch eine Taglandschaft
-  (Himmelsverlauf, Sonne und Wolken, grüne Hügel mit Parallaxe — helles Warmer-Tag-Theme). Ein Wegweiser-Schild pro
+- **Pfad-Screen ist der Einstieg**: ein gepunkteter Trittspuren-Weg durch eine **Abendlandschaft**
+  (Himmel von Nachtblau über Pflaume zu warmem Orange, tief stehende Sonne hinter den Hügeln,
+  Sterne, drei dunkle Hügelbänder mit Bäumen als Silhouetten und Parallaxe; bis September 2026
+  ein heller Tag). Hinter den Hügeln steigen **ständig Himmelslaternen** auf (`SkyLanterns`):
+  im Mittel alle 10 s eine, jede braucht 90–150 s bis über den oberen Rand und pendelt dabei
+  leicht; ferne sind kleiner, langsamer und blasser. Sie sind reine Stimmung, ohne Aufgabe, und
+  stehen bei „Bewegung reduzieren" still — der Himmel ist dann trotzdem voll. Erreichbare
+  Schilder leuchten warm, Stern und Punktestand stehen hell auf dem Himmel. Ein Wegweiser-Schild pro
   Lektion, Label = Graphem, darunter drei Emojis aus dem Bildwortschatz der Lektion.
   Der bereits zurückgelegte Teil des Weges ist wärmer gezeichnet als der Rest.
   Gesperrte Schilder zeigen ihre Emojis nur als Silhouette.
@@ -421,14 +416,16 @@ niemals mit einem stummen No-Op.
   unbestimmten (ein/eine), Namen ohne. Neutrum-Personen bekommen „das": „ein Opa" und
   „ein Kind" wären sonst nicht unterscheidbar. Betroffen sind Wort-Bauer und Wort-Detektiv
   (`SuccessSpeech`). **Nicht** betroffen: Prompts, das Antippen von Items,
-  `missTts`, Rechnen („zwei Ameisen" — vor einer Zahl steht kein Artikel), ganze Sätze,
+  `missTts`, Rechnen (die Antwort ist ein nacktes Zahlwort), ganze Sätze,
   die ihre Artikel schon tragen, und die Fress-Sequenz des Laut-Fressers („Sch … Schuh"),
   weil ein Artikel zwischen Laut und Wort genau die Kopplung zerschnitte, die der Trainer
   lehrt. Abgeleitet wird in `AtomArticleSpeech`; `tools/tts` spiegelt
   die Regel, damit vorproduzierte Clips denselben Text tragen.
 - Lob (**nur Rechnen, nur gesprochen**): ein zufälliges Wort oder ein kurzer Ausruf aus
-  `PraisePhrases` steht vor der Antwort („Ausgezeichnet! zwei Ameisen"), damit die Menge das Letzte
-  bleibt, was das Kind hört. Nie als Text anzeigen — das Kind kann nicht lesen. Auflösen
+  `PraisePhrases` steht vor der Antwort („Ausgezeichnet! fünf"), damit die Zahl das Letzte
+  bleibt, was das Kind hört. Die Zahl als Wort (`GermanNumberWord`), nicht als Ziffer: „fünf"
+  ist ein Clip des Zählkanals, „5" fiel direkt nach dem kuratierten Lob auf Android-TTS zurück.
+  Nie als Text anzeigen — das Kind kann nicht lesen. Auflösen
   („Zeig mir") bekommt kein Lob. Jeder Eintrag ist eine eigene Äußerung und bringt seine
   Satzzeichen selbst mit („Bäääm! Volltreffer!"); zwei Einträge dürfen sich nicht nur durch
   Satzzeichen oder Groß-/Kleinschreibung unterscheiden, sonst kuratiert und rendert die
@@ -453,7 +450,27 @@ niemals mit einem stummen No-Op.
   Vorstellung selbst (`currentPromptParts` ist für ihn leer), damit Wackeln und Laut
   zusammenfallen. Ohne deutsches TTS steht das Wort als Text unter dem Emoji — ein
   Hörspiel ist sonst unspielbar.
-- Feedback bei Fehlern (besonders Rechnen): **vorsprechen**, nicht als Fehler-Satz anzeigen.
+- Feedback bei Fehlern: **vorsprechen** (oder ein Klang), nie als Fehler-Satz anzeigen.
+  **Rechnen spricht bei einem Fehlversuch nichts** — nur `Sfx.Blocked` und `nudge`-Haptik,
+  auch nicht den generischen Hinweis „Probiere eine andere Antwort" (seit September 2026;
+  vorher Echo plus Hinweis, „sieben, Du bist nah dran, denk noch einmal nach").
+- **Ansage-Sperre: ruhen statt dimmen** (`PromptRest`, seit September 2026). Solange die
+  Rundenansage ihren Freigabe-Punkt nicht erreicht hat, nimmt die Aufgabe keine Tipps an —
+  der gesuchte Buchstabe steckt nur in der Stimme, jeder Tipp davor wäre Raten. Sie ist dabei
+  aber nicht mehr auf 50 % gedimmt (das sah kaputt aus), sondern **ruht**: kaum gedämpft
+  (10 %), 3 % abgesunken. In der Jagd liegt das ganze Feld wie in der Ferne — 12 % kleiner,
+  jede Blase noch einmal 25 % kleiner und zu 45 % ins Meer verblasst, **ohne Ring, ohne Leuchten und ohne Buchstaben**. Beim
+  Freigabe-Punkt **wacht** sie auf: ein ruhiges Heranschwimmen über 1,1 s mit Ease, keine Feder — das Feld kommt heran, Ringe, Leuchten und
+  Buchstaben erscheinen. Beim Sperren springt der Wert sofort auf „ruht", damit die Buchstaben
+  der neuen Runde keinen Frame lang sichtbar sind.
+  **Ein Tipp in der Ruhe bekommt eine Antwort**: ein kleiner heller Ring an der Tippstelle, ein
+  leises „Blubb" (`Sfx.Blubb`, 520–1000 Hz — tiefer geben Handy-Lautsprecher nichts wieder —, mit 0,6 gespielt, damit es die Ansage nicht übertönt), der
+  Lautsprecher leuchtet einmal auf, und in der Jagd bläht sich die gedrückte Blase wie gewohnt und wackelt dann (einsammeln lässt sie sich erst wach) — höchstens alle
+  220 ms, kein Fehler, kein Mischen. Maßgeblich ist das Aufsetzen des Fingers: eine in der Ruhe
+  gedrückte Blase wackelt auch dann nur, wenn erst nach der Freigabe losgelassen wird
+  (`HuntPressLatch.pressedResting`). Ausgenommen ist der Lautsprecher selbst (über seine Lage,
+  `LocalSpeakerBounds`): er spielt die Ansage auch während der Sperre ab. Während er spricht,
+  atmet er sanft mit. Die Herzmuschel ruht mit dem Feld und lugt erst nach der Freigabe.
 - **Geräusche (`AbcSfx`, `assets/sfx/`).** Elf kurze, synthetisierte Klänge, erzeugt von
   `tools/sfx/generate_sfx.py` (keine Aufnahmen, keine Fremdlizenz; Ogg/Opus wie die Clips,
   zusammen ~35 KB, Spitze −8 dBFS und mit 0,7 gespielt — leiser als die Stimme). **Eine Tat,
@@ -462,7 +479,7 @@ niemals mit einem stummen No-Op.
   `ding` Erfolgs-Stern fliegt los/landet im Punktestand · `chime` Runde geschafft · `fanfare`
   Lektion geschafft (der Finale-Satz beginnt 0,7 s danach) · `tap` Ziffernblock · `blip`
   Spurensucher-Stern (Tonleiter über die Abspielrate) · `shuffle` Jagd mischt · `blocked`
-  gesperrt. Kein Klang klingt nach „falsch" — auch `boing` und `blocked` sind weich.
+  gesperrt, Fehlversuch im Rechnen. Kein Klang klingt nach „falsch" — auch `boing` und `blocked` sind weich.
   **Tief und warm, nicht hell:** Grundtöne 150–800 Hz, reine Sinus-Töne mit höchstens einer
   leisen Oktave, keine Glocken-Obertöne, Tiefpass 3 kHz; der Generator bricht ab, wenn ein
   Klang im Mittel über 1,1 kHz liegt. Die erste Fassung (Glöckchen bis 2,7 kHz) war laut
@@ -490,14 +507,10 @@ niemals mit einem stummen No-Op.
   Buchstaben-Jagd, Wort-Detektiv) — nicht für Silben-Verschmelzer (dort werden Laute bewusst
   aneinandergezogen) oder für Ganzwörter.
 - **Die Rechenaufgabe endet auf „?" — und sie ist die einzige Frage.** Alle anderen Prompts
-  sind Aufforderungen („Baue das Wort …", „Finde alle …") und enden auf einen Punkt. Die
-  Rechenaufgabe trägt Erzählung und Frage in einem String („Neun Tomaten liegen im Korb. Vier
-  werden gegessen. Wie viele Tomaten bleiben?"); das „?" sagt der kuratierten Stimme
-  (TTS-Profil `math`), dass nur der letzte Satz fragend anzuheben ist, die Erzählung davor nicht.
-  Bis September 2026 galt das Gegenteil („Letzte Frage ohne Fragezeichen"), weil die
-  System-TTS am „?" die Stimme unruhig hochzieht — diese Regel zielte auf den Fallback, nicht auf
-  die kuratierten Clips. Wo noch kein `math`-Clip liegt, klingt der Fallback deshalb fragend;
-  das ist der Preis, und er ist befristet.
+  sind Aufforderungen („Baue das Wort …", „Finde alle …") und enden auf einen Punkt. Gesprochen
+  wird der Text aber nicht als Ganzes, sondern als Einleitung + Aufgabe (`MathPromptSpeech`,
+  Abschnitt 8); der `promptTts` („Wie viel ist drei plus zwei?") bleibt die lesbare Fassung im
+  Content und muss zu `left`/`right`/`operation` passen (`MathPromptSpeechTest`).
 - **Wortwiederholungen werden am Stück gelesen, nicht buchstabiert.** Nennt ein Trainer ein Wort
   erneut, dann am Stück („Ameise.", nicht „A - M - eise."). Eine buchstabierte/segmentierte
   Wiederholung wird von der System-TTS Buchstabe für Buchstabe vorgelesen und ist für Vorschulkinder
@@ -522,47 +535,63 @@ niemals mit einem stummen No-Op.
   `word_build` o. ä. nutzte die ID). Ersatzlos entfernt statt „repariert".
 
 ## 8. Mathematik-Visuals
+- **Zahlentürme (seit September 2026, `NumberTowers`).** Die Aufgabe steht nicht mehr als
+  Emoji-Gruppen da (bei 9 − 6 fünfzehn Hüte in Zweierpaaren — unruhig, und ab etwa fünf
+  Dingen zählen Vorschulkinder einzeln ab), sondern als **Figuren aus Blöcken**, nach dem
+  Prinzip von Numberblocks, aber mit Silbos eigenem Gesicht und ohne feste Farbe je Zahl.
+  - **Säulen zu je fünf:** sieben ist „eine volle Säule und zwei", zehn sind zwei volle
+    Säulen mit hellem Rahmen (der Zehner), 13 ist ein Zehner und drei — bis 30 ohne
+    Symbol-Trick. Farbe nach **Rolle**: die erste Zahl Honig, die zweite Himmelblau.
+  - **Schritt 1, Tippen:** tippt das Kind auf die Aufgabe (oder einen Turm), springen die
+    Blöcke — bei Plus die blauen einzeln auf den Honig-Turm (sie bleiben blau: man sieht die
+    4 und die 3 in der 7), bei Minus die weggenommenen oben herunter auf die gestrichelten
+    blauen Plätze über der rechten Zahl, die **von Anfang an** dastehen; ihre alten Plätze
+    bleiben als Geisterblöcke, die erste Zahl bleibt sichtbar. Bis zum Tipp hüpfen die
+    springbereiten Blöcke alle 4,5 s kurz, als Einladung. Ein Tipp auf einen Turm sagt
+    außerdem seine Zahl (Zählkanal, `GermanNumberWord`).
+  - **Schritt 2, richtige Antwort:** erst jetzt verschmelzen die Figuren endgültig — Blau
+    wird Honig (Plus), Geister und Weggenommenes gehen (Minus), die Türme rücken zusammen
+    (Mal) — und die fertige Figur bekommt ein **großes Gesicht** über ihr größtes voll
+    gefülltes Rechteck (`NumberTowerGeometry.faceRect`). Ohne vorherigen Tipp läuft erst der
+    Sprung, dann das Verschmelzen.
+  - **Malnehmen:** „3 mal 4" sind drei gleiche Vierertürme, jeder mit eigenem kleinen Gesicht,
+    die nacheinander hereinfallen; nach der Antwort rücken sie zusammen, und aus den kleinen
+    Gesichtern wird ein großes.
+  - **Antwortkacheln zeigen nur die Zahl** — kleine Türme darin machten es zu leicht,
+    brachten eine dritte Farbe und mehr Unruhe. Die Platte unter den Türmen trägt die Aufgabe
+    als Ziffern (`4 + 3`); eine zweite Ziffernzeile gibt es nicht mehr.
+  - **Kein Auflösen, keine Zähl-Hilfe** (entfernt September 2026): die Türme lassen sich
+    jederzeit antippen und springen — das ist die Hilfe, und sie ist immer da.
+  - **Nur Zahlen, keine Sachaufgaben:** Da keine Bilder mehr zu sehen sind, fragt die Ansage
+    nur die Rechnung („Wie viel ist vier plus drei?"), Rechenrunden tragen kein `iconAtomId`
+    mehr. Rechnen läuft in **jeder** Lektion.
+  - **Die Ansage:** Einleitung „Wie viel ist" + ganze Aufgabe als ein Clip („vier plus drei",
+    `MathPromptSpeech.taskText`, Profil `math`, einzeln im TTS-UI kuratiert), gebaut aus
+    `left`/`right`/`operation`, nicht aus dem Text. Zahl · „plus" · Zahl aus Einzelclips
+    zusammenzusetzen klang zu uneinheitlich — Qwen trifft Betonung und Stimme dabei nicht gleich.
 
-- Mengen bis 10 als Bilder/Emojis, sinnvoll gruppiert (Subitizing: Paare + Rest, z. B. 5 = 2+2+1). Ab 11 steht ein einzelnes Bildsymbol mit der Zahl für die Menge.
-- **Ein Bildwort muss verdient sein — `iconAtomId` ist optional.** Genau bis 10 zeigt der
-  Trainer echte Stückzahlen; ab 11 bleibt ein einzelnes Symbol neben der Ziffer übrig, das
-  nichts mehr zählbar macht und stattdessen eine Szene behauptet („dreißig Mülltonnen
-  stehen am Weg"). Solche Runden tragen **kein** `iconAtomId`: der Aufgabenblock zeigt nur
-  Ziffern, der Prompt nur Zahlen („Zwanzig und zehn. Wie viele sind das."), und das
-  Erfolgs-Vorsprechen sagt schlicht „dreißig". Ein Bild also nur, wo ein Kind sich die
-  Menge wirklich hinstellen kann — `LessonCoverageTest.aPictureIsOnlyPromisedWhereAChildCanPictureIt`
-  hält die Grenze bei 10. Wo die **Form** die Didaktik trägt und trotzdem kein Bildwort da
-  ist (Multiplikations-Matrix, Zähl-Hilfe), zeichnet der Trainer ein neutrales
-  Zählplättchen (`NeutralCountingToken`, ein Punkt) — zählbar, ohne etwas zu behaupten.
-- Zahl unter der Bildgruppe anzeigen.
-- Aufgabe oben, Antwortwahl unten; Bilder in der Aufgabe ausreichend groß.
-- Visuelle Mengenaufgaben: genau **3** Antwortoptionen; gleiche Dimensionen der buttons. Situationen bleiben gesprochen, konkret und kindernah.
-- **Die drei Kacheln stehen in *einer* Reihe, und die Aufgabe bleibt lesbar.** Verbindliche Rangfolge in `MathBoardSizing`: (1) die Reihe bricht nie um, (2) jede Kachel bleibt tippbar (`AbcDimens.kidTouch`; wird es eng, gibt der Kachelabstand nach, nicht die Trefferfläche), (3) Aufgabe und Antwort teilen sich die Bühne — der Antwortblock nimmt höchstens die Hälfte, den Auflösen-Knopf schon eingerechnet, damit der Aufgabenblock nach zwei Fehlversuchen nicht hochrückt (§9), (4) der Aufgabenblock nimmt, was übrig bleibt, (5) die Emojis nehmen den Rest. Reicht es nicht mehr für eine abzählbare Menge, fällt die **ganze** Runde auf die symbolische Darstellung von oben zurück — Kacheln *und* Aufgabe, nie gemischt.
-  Der Anlass: mit fest verdrahteten 28sp in einer `FlowRow` brauchten drei Kacheln rund 350dp und brachen auf jedem 360dp-Telefon (280dp Bühne) in zwei Zeilen um. Weil `ExerciseStage` den Antwortblock ungewichtet gegen die volle Höhe misst, blieb dem Aufgabenblock nichts übrig: „4 + 3" aus Lektion 1 war auf halber Höhe abgeschnitten, schon bei `font_scale 1.0`. Geprüft von `MathBoardSizingTest` (Rechnung), `MathBoardBoundsTest` (gerendertes Layout) und `MathBoardShotTest` (Bild).
-  **Gerechnet wird in gerenderten dp, nicht in sp mal `fontScale`:** Androids Schriftskalierung ist seit API 34 nichtlinear — kleine Größen werden angehoben, große gestaucht —, die Umrechnung kennt nur `Density`. Die Mengenbilder sind deshalb in **dp** gedeckelt (sie sind Bilder, keine Schrift); die Ziffer unter der Gruppe skaliert weiter mit. Ein Emoji belegt `MathBoardSizing.EmojiAspect` mal seine Schriftgröße (gemessen, `EmojiAspectTest`) und trägt seine **eigene** Zeilenhöhe: ohne sie erbt es die 28sp aus `bodyLarge` und eine Emoji-Zeile spart beim Schrumpfen keine Höhe.
+- Rechenaufgaben im Kachel-Modus: genau **3** Antwortoptionen, gleich groß, nur die Zahl. Die
+  drei Kacheln stehen in **einer** Reihe und behalten ihre volle Trefferfläche; wird es eng,
+  gibt der Abstand nach (`MathBoardSizing`). Die Türme nehmen gut zwei Fünftel der Bühne,
+  im Ziffernblock-Modus gut ein Drittel. Geprüft von `MathBoardBoundsTest` (gerendertes
+  Layout auf drei Breiten, drei Höhen, drei Schriftgrößen) und `NumberTowerGeometryTest`
+  (jede Aufgabe bis 30 passt auf die schmalste Bühne).
 - **Progression (bewusst steil):** Zahlenraum 10 schon in Lektion 1, Wegnehmen ab Lektion 2, Zahlenraum 20 ab Lektion 3, Malnehmen ab Lektion 6, Zahlenraum **30** ab Lektion 9. Der Validator deckelt Operanden und Ergebnis bei 30 (`MaxMathQuantity`). Schwierigkeitsbänder: easy ≤5, medium ≤10, hard ≤20, expert ≤30.
-- **Multiplikations-Matrix:** „4 mal 5" wird als Matrix gezeichnet — `left` Reihen × `right` Spalten. Nur die **erste Reihe** zeigt die echten Objekte („je 5"), alle weiteren Reihen zeigen geisterhafte Platzhalter (gleiches Emoji, stark transparent). So lernen Kinder Multiplikation als zweidimensionale Fläche, nicht als Additionskette. Prompts sprechen die Struktur mit („Vier Reihen mit je fünf …"). Grid-Deckel für Lesbarkeit: max. 5 Reihen × 6 Spalten (validator-geprüft, `MultiplicationMatrix`).
-  - **Über** der Matrix steht die Rechenaufgabe als Ziffern-Zeile („3 × 4", `headlineMedium`), **links vor jeder Reihe** ihre Zeilennummer (1…n, `labelLarge`, `WarmMuted`, feste Gutter-Breite). Ziffern darf das Kind sehen — sie sind selbst Lerninhalt und stehen ohnehin unter jeder Mengengruppe. Die Zeilennummern behalten volle Deckkraft, auch neben Geisterreihen: sie sind die Zählhilfe, kein Teil des Platzhalters.
-  - Weil die Matrix ihre Aufgabe selbst beschriftet, unterdrückt die Zahlen-Eingabe ihre symbolische Zeile („5 × 6 = ?") bei Multiplikation — sonst stünde dieselbe Aufgabe zweimal im Aufgabenblock (§9).
-- **Plausibilität der Malaufgaben (Content-Regel):** Ein Malnehmen-Objekt muss ein **einzeln zählbares Ding** sein, das in echten, gleich großen Reihen vorkommt — Eier im Karton, Dosen im Regal, Fenster am Haus, Taxis am Flughafen, Omas im Chor. Nicht erlaubt: Abstrakta ohne Stückzahl („vier Reihen mit je vier **Wegen**"), abgetrennte Körperteile („achtzehn **Füße**"), Dinge, die es nie in Reihen gibt („neun **Tore**"), und Massen von angstbesetzten Tieren („dreißig **Spinnen**"). Prüffrage wie bei den Finale-Bildern: Würde dieses Bild in einem Kinderbuch stehen? Der gesprochene Prompt nennt zusätzlich den **Ort** der Reihen („… stehen im Regal") — er macht die Anordnung erst glaubhaft. Das Bildwort wird **pro Runde** gewählt, nicht pro Lektion (bis August 2026 erzwang ein Test ein Icon je Lektion — das zwang eine Kuh-Lektion, auch ihre Dreißiger-Aufgabe mit Kühen zu rechnen). Gleiches Icon **und** gleiches Raster darf sich über den Lehrplan nicht wortgleich wiederholen.
 - Korrekte Antwort bestätigt sich **grün** (Kachel bzw. Zahlenfeld), solange sie vorgesprochen wird.
-  Falsche Antwort wird **nicht** rot markiert — Miss bleibt gesprochenes Feedback. Auflösen ist nicht grün.
+  Falsche Antwort wird **nicht** rot markiert und **nicht** kommentiert: ein Fehlversuch ist
+  nur ein Klang (`Sfx.Blocked`) mit `nudge`-Haptik, ohne Sprache — kein Echo der getippten
+  Zahl, kein „nah dran", kein generischer Miss-Hinweis.
 - **Eingabeart:** Zahlen-Eingabe bei fortgeschrittenem Scaffold **oder** sobald das Ergebnis über 10 liegt (Band `hard`/`expert`) — außer die Eltern haben ausdrücklich „Mit Hilfe“ (`ParentMode.Beginner`) gewählt, dann bleiben überall die drei Kacheln. Die Regel prüft den Eltern-Modus, nicht das abgeleitete Scaffold: im Default `Auto` startet ein frisches Kind auf `Beginner`, gegen das Scaffold geprüft liefe sie beim Normalnutzer ins Leere. Grund: drei Kacheln mit Nachbar-Distraktoren machen Raten zur billigsten Strategie. Regel in `MathHinting.inputFor`.
 - **Kinder-Ziffernblock statt System-Tastatur** (`NumberPad`, seit September 2026; revidiert
   die frühere Regel „System-Tastatur im Zahlenmodus, kein Custom-Nummernblock"). Oben das
   Antwortfeld (blasses „?", solange leer) zwischen Löschen (Icon) und Absenden (SunCoral,
-  Pfeil-Icon), darunter zwei Fünferreihen Ziffern 1–5 / 6–0 — dieselbe Gliederung wie das
-  Fünfer-Feld der Zähl-Hilfe. Tasten 56–72 dp (`NumberPadInput.keySizeDp`: fünf je Reihe
+  Pfeil-Icon), darunter zwei Fünferreihen Ziffern 1–5 / 6–0 — dieselbe Gliederung wie die
+  Fünfersäulen der Zahlentürme. Tasten 56–72 dp (`NumberPadInput.keySizeDp`: fünf je Reihe
   passen auf 320 dp), federn beim Drücken ein, geben `tick` und **sprechen die Zahl, die jetzt
   im Feld steht** („eins", dann „zwölf") auf dem Zählkanal. Eine führende Null wird ersetzt,
   mehr als drei Ziffern gibt es nicht. Grund: die System-Tastatur kam in fast der Hälfte der
   Rechenrunden, war Erwachsenen-UI (Komma, Minus, „Fertig"), klappte von selbst auf und
   verdeckte die Aufgabe.
-- **Zähl-Hilfe (nur Tipp-Modus):** nach 2 Fehlversuchen wird der Aufgabenbereich antippbar und **ersetzt** die Aufgabenvisualisierung (§9: Aufgabe nie zweimal). Beide Operanden teilen sich **ein** Fünfer-Feld, darüber die Aufgabe als Ziffernzeile (»15 − 6 = ?«). Der **Rahmen um die letzten `right` Objekte** markiert überall die zweite Zahl; was mit ihr passiert, entscheidet die Rechenart — bei Minus geht sie weg und **nur sie ist antippbar** (Zähler läuft rückwärts), bei Plus kommt sie dazu und alles ist antippbar. **Malnehmen zählt reihenweise**: ein Tipp macht eine ganze Geisterreihe echt und der Zähler springt in Schritten (5, 10, 15, 20) — Objekte einzeln anzutippen wäre Zählen in Einerschritten, also gerade nicht Multiplikation. Die Matrix ist dabei größer als im Prompt, weil sie den Aufgabenblock für sich hat. Die **nächste offene Einheit pulsiert** und führt durch die Aufgabe (bei Minus von hinten, weil rückwärts gezählt wird); erledigte gerahmte Zellen bekommen einen helleren Rahmen. Jeder Tipp spricht die erreichte Zahl mit, auf dem eigenen Kanal `SpeechChannel.Counting`, der eine laufende Ansage überlagern darf statt sie abzuwürgen. **Gesprochene Zahlen stehen als Wort, nie als Ziffer mit Punkt** — „8." ist im Deutschen die Ordinalzahl und wird „achte" gelesen (`GermanNumberWord`); wo ein Satzende nötig ist, trennt ein Komma — der Puls ist die Anleitung, der gesprochene Cue nur die Verstärkung, weil eine Ansage ohne Stimme oder Clip nicht ankommt. Der Zähler wird ab dem ersten Tipp ins Antwortfeld gespiegelt; die Ziffernreihen des Kinder-Ziffernblocks klappen ein, solange die Hilfe offen ist (ein Tipp aufs Antwortfeld holt sie zurück). **In der Zähl-Hilfe werden Mengen ab 11 ausgeschrieben** (Fünferzeilen) — die einzige Ausnahme zur Symbol-ab-11-Regel oben, und sie gilt nie im Aufgaben-Prompt. Der „Auflösen“-Knopf erscheint im Tipp-Modus erst nach 4 Fehlversuchen (Kachel-Modus unverändert 2). Der Fehlversuch, der die Hilfe aufklappt, spricht **nur die Zählanweisung** — „probier es noch mal“ wäre dort die falsche Auskunft. Und eine mit der Zähl-Hilfe erreichte Antwort wird **bestätigt, aber nicht gelobt** (wie beim Auflösen); Punkte gibt es weiterhin, denn ein Punktabzug wäre eine Strafe.
-- Rechnen läuft in **jeder** Lektion. Wo eine Runde ein Bild trägt, kommt es aus dem
-  Wortschatz derselben Lektion (kontextnah, aber nicht zwingend — Kinder erkennen die Icons
-  ohnehin). Bewährte Form: die kleine Runde mit Bild und echter Szene als Auftakt, die
-  größere ohne Bild als reine Zahlenarbeit.
 
 
 
@@ -632,7 +661,7 @@ niemals mit einem stummen No-Op.
   Systemschriftgröße kennt die Geometrie nicht). Das Kind soll die Lösung im Blick
   behalten, nicht dem Wort nachsehen.
 - Keine doppelte Aufgabe+Vorschau desselben Tokens.
-- Ausnahme Buchstaben-/Silben-Jagd: Kacheln verstreuen sich über den gesamten Aufgabenbereich statt in einer geordneten Antwortliste; die Batterie bleibt im Antwortbereich unten.
+- Ausnahme Buchstaben-/Silben-Jagd: Kacheln verstreuen sich über den gesamten Aufgabenbereich statt in einer geordneten Antwortliste; die Herzmuschel liegt im Antwortbereich unten.
 - Ausnahme Wort-Detektiv: der Antwortbereich trägt **Quittungs-Striche statt Wahloptionen**.
   Sie sind bloße Grundstriche ohne Rahmen und ohne Tray — die einzige Symbolquelle ist das
   Wort im Aufgabenblock. Damit sind sie von den Schablonen des Wort-Bauers unterscheidbar.
@@ -735,7 +764,7 @@ niemals mit einem stummen No-Op.
   Fremdfarben.
 - Haptik-Vokabular `AbcHaptics` (tick/success/celebrate/nudge): tick = kleiner Sammel-Erfolg
   (Trace-Stern, Jagd-Treffer, Einrasten), success = Aufgabe richtig, celebrate = Lektions-/
-  Batterie-Feier, nudge = sanfte Korrektur. Haptik ergänzt Ton, ersetzt ihn nie.
+  Muschel-Feier, nudge = sanfte Korrektur. Haptik ergänzt Ton, ersetzt ihn nie.
   Der `SuccessBurst` am Trainer-Ende vibriert **nicht**: er folgt oft direkt auf den
   Trainer-eigenen Puls, und zwei Vibrationen hintereinander sind zu viel — dort trägt
   der Chime allein.
@@ -748,15 +777,37 @@ niemals mit einem stummen No-Op.
   (Kau-/Spuck-Rhythmus der Fresser, Halte-Kurve des Jagd-Druckmorphs) darf eigene Dauern
   tragen und begründet sie dort. Bewegung bleibt Antwort auf eine Tat — die Palette ist
   keine Einladung, Bühnen beim Laden aufzubauen oder dauerhaft zu animieren.
-- **Der Erfolgs-Stern fliegt in den Punktestand** (`StarFlight`). Nach dem Aufpoppen
-  steht er kurz (450 ms), fliegt dann in leichtem Bogen hinauf und schrumpft dabei auf die
-  Größe des kleinen Sterns; erst beim Einschlag springt die Zahl in der Kopfzeile und der
-  Zähler hüpft (×1,35, Feder `Bouncy`). Bis dahin zeigt die Kopfzeile den alten Stand,
+- **Der Erfolgs-Stern fliegt in den Punktestand** (`StarFlight`, `SuccessBurst`, gezeichnet
+  mit `drawGlowStar`). Seit September 2026 ein Stern mit Licht statt eines flachen Sterns
+  mit dunkler Kontur: gerundete Spitzen, innen hell und außen bernstein, Glanzpunkt, weicher
+  Schein. Er steigt unter dem Lautsprecher leicht gedreht auf und federt ein (`Settle`), ein
+  Lichtring läuft aus, vier Glanzfunken blitzen versetzt (statt acht bunter Punkte), ein
+  Glanzstreifen zieht über ihn. Nach dem Stehen (450 ms) fliegt er im Bogen mit Funkenspur
+  hinauf, dreht sich einmal und schrumpft auf die Größe des kleinen Sterns; erst beim
+  Einschlag springt die Zahl in der Kopfzeile, der Zähler wird gestaucht (breiter und
+  flacher, Feder `Bouncy`) und es funkelt kurz um ihn. Bis dahin zeigt die Kopfzeile den alten Stand,
   obwohl der Punkt schon verbucht ist — ein Kind, das nicht zählt, sieht so, *wohin* sein
   Stern geht. Ohne gelegten Punktestand (letzte Runde vor dem End-Screen) schrumpft der
   Stern wie früher an Ort und Stelle.
-- Erfolgsmomente: SuccessBurst (Gold-Stern + Funken, ohne Haptik), Gold-Puls an der
-  Segmentgrenze je Trainer, Konfetti auf dem End-Screen.
+- Erfolgsmomente: SuccessBurst (leuchtender Stern + Glanzfunken, ohne Haptik), Gold-Puls an
+  der Segmentgrenze je Trainer, das Sternbild auf dem End-Screen.
+- **Lektions-Ende: das Sternbild** (`RewardSummaryScreen`, `FinaleConstellation`). Der
+  End-Screen spielt am Abendhimmel des Pfads (ohne Sonne und Laternen — dort gehört der Himmel
+  dem Sternbild, und eine helle Scheibe neben dem Lautsprecher läse sich wie ein Knopf). Die
+  Sterne fliegen einzeln von oben an ihren Platz und bilden einen **Buchstaben**, Linien
+  zeichnen ihn in Schreibrichtung nach, dann leuchtet er einmal auf. Der Buchstabe passt zum
+  Finale-Satz **und** wurde in der Lektion geübt: der erste Anfangsbuchstabe eines Satzworts,
+  der ein geübter Einzelbuchstabe ist, sonst ein geübter Buchstabe, der im Satz vorkommt,
+  sonst der Anfangsbuchstabe des ersten Bild-Nomens (Nutzerentscheidung). „Geübt" heißt: in
+  der gerade gespielten Lektion, gesucht über ihre ID — acht Finales gehören zwei Lektionen
+  (f-l18: l18 und l26), die erste Lektion zum Finale wäre die falsche. Die Sterne kommen
+  aus den Spurdaten des Buchstabens (vereinfacht, Ecken bleiben, gemeinsame Enden werden ein
+  Stern). Bilder und Satz liegen auf einer hellen Karte, die Bilder hüpfen einmal, während der
+  Satz gesprochen wird. Nach dem Aufbau funkeln die Sterne leise weiter (Größe ±8 %, Drehung
+  ±10°, ab und zu ein Glanzlicht); ein angetippter Stern springt größer und schaukelt aus — auch beim Nachzeichnen des Buchstabens mit dem Finger, dann mit aufsteigenden Tönen wie die Sterne im Spurensucher.
+  Unten stehen Lautsprecher und ein großer runder grüner Pfeil (88 dp, `AbcContinueButton`)
+  nebeneinander. „Super gemacht!" steht oben, für den Erwachsenen.
+  **Kein Konfetti** mehr: die Quadrate in vier Rollenfarben verwässerten Grün und Gold.
 - **Shape-Morph beim Einrasten (Squish-Settle).** Rastet ein Wort in einen Peg des
   Satz-Architekten **oder ein Baustein in einen Rahmen des Wort-Bauers**, quetscht
   das Bauteil horizontal und federt in Form zurück: `scaleX`
@@ -800,17 +851,109 @@ niemals mit einem stummen No-Op.
   Morph *ist* die Druckantwort. Werte und Begründung in `HuntTileMorph`, Filmstreifen zum
   Beurteilen in `SymbolHuntMorphShotTest`.
 
-- **Die Jagd-Batterie ist ein Gegenstand, keine Balkenreihe.** Gehäuse mit Pluspol,
-  Lichtkante und Glasglanz, darin eine dunkle Wanne mit drei bzw. fünf Ladebalken; leere
-  Plätze sind Vertiefungen in der Wanne, keine hellen Kästchen. Jeder gefüllte Balken hat
-  seinen **eigenen Grünton**, von links tief nach rechts hell (`ChargeLow` → `ChargeMid` →
-  `ChargeHigh`), plus Lichtsaum in die Wanne — Laden liest sich damit über Helligkeit und
-  nicht nur über Anzahl. **Voll ist grün, nicht gold**: alle Balken springen auf
-  `ChargeHigh`, ein Blitz erscheint in der Mitte und ein pulsierender Lichtsaum umgibt das
-  Gehäuse. Gold bleibt der Sternbelohnung vorbehalten (Farbrollen oben) — die Batterie
-  zeigt einen Ladezustand, keinen Preis, und Grün ist app-weit „richtig". Maße, Töne und
-  Blitzform in `HuntBatteryDesign`, Zustandsbild zum Beurteilen in
-  `SymbolHuntBatteryShotTest`.
+- **Nachtwelten (seit September 2026).** Jeder Trainer bekommt eine eigene, **dunkle** Welt,
+  immer dieselbe — das Kind erkennt die Aufgabe am Ort, bevor es die Ansage hört
+  (`TrainerWorld`): Jagd → **Tiefsee**, Spurensucher → **Dschungel bei Nacht**,
+  Rechnen → **Nacht am Waldrand**, Wort-Detektiv → **Dachboden**, Wort-Bauer → **Werkstatt**,
+  Satz-Architekt → **Garten**, Satz-Versteher → **Puppentheater**, Laut-Fresser → **Pilzhöhle**,
+  Silben-Verschmelzer → **Waldlichtung**. Regeln:
+  1. **Lerninhalt nur auf Licht.** Buchstaben, Silben, Wörter und Ziffern stehen in Tinte auf
+     einer hellen Fläche — Blase, Weg, Karte, Klotz (≥ 7:1). Der Hintergrund trägt nie
+     Lerninhalt; die Kontrastrechnungen der Lernschrift gelten deshalb unverändert.
+  2. **Ruhige Mitte durch Tiefe**, nicht durch Leere: Bilder sind asymmetrisch, die Mitte liegt
+     weit weg im Dunkel oder Nebel. Bilddateien kommen abgedunkelt und mit beruhigter Mitte
+     eingebacken als WebP (Dschungel: 57 KB statt 1,9 MB PNG).
+  3. **Kopfzeile in Creme** (`ChromeColors`/`NightChrome` über `LocalChromeColors`): Pfeil und
+     Zahl Creme, Fortschritt `SkyBlueLight`, Chevrons Creme 60 %, der Lautsprecher wird ein
+     heller Knopf mit Leuchtring — auf Papier bleibt alles wie bisher (`PaperChrome`).
+  4. **Die Welt atmet, der Inhalt steht.** Umgebungsbewegung ist erlaubt, wenn sie sehr langsam
+     ist (Zyklen ab ~8 s), kontrastarm und nie auf den Licht-Inseln; bei „Bewegung reduzieren"
+     (`ANIMATOR_DURATION_SCALE` 0) steht alles still. Die Weltuhr (`rememberWorldSeconds`)
+     läuft über `withInfiniteAnimationFrameMillis`, damit Compose-Tests nicht auf Ruhe warten.
+  - **Tiefsee** (Jagd): ohne Bilddatei gezeichnet (`DeepSeaLight`, `WorldBackground`) — Verlauf,
+    sieben Lichtstrahlen, deren Winkel, Breite, Länge, Helligkeit und **Lichtkern** (die hellste
+    Stelle im Querschnitt) an eigenen Sinuswellen mit 19–47 s Periode hängen, wie Licht unter
+    einer leicht bewegten Wasseroberfläche; Blasen steigen 0,4–1 % der Höhe pro Sekunde. Die
+    Jagd-Kugeln sind **helle Luftblasen** mit farbigem Ring (`TilePalette`, helle Stufen, auf dem
+    Meer ≥ 3,9:1) und Leuchten.
+  - **Herzmuschel statt Batterie** (`CockleShell`, `PearlFlight`): von oben gesehen, gerippt.
+    Jeder Treffer fliegt **im selben Frame** als Perle in der Farbe seines Blasenrings in die
+    Muschel, die dafür aufklappt (Deckel nach hinten über das Scharnier, innen Perlmutt mit
+    einer Mulde je gesuchtem Symbol), und federt danach zu. Die Ringfarben haben damit eine
+    Aufgabe: „das ist deine Perle". Nach 6 s ohne Tipp lugt die Muschel halb auf, danach alle
+    10 s — damit das Kind sieht, wie viele Perlen es hat. Voll: sie bleibt offen und leuchtet,
+    dann geht es automatisch weiter. Nach „Zeig mir" zeigt sie nur die selbst gefangenen Perlen.
+    Muschel und Perlmutt tragen Sand- und Rosatöne — weder Gold (Stern) noch Grün (richtig).
+  - **Licht-Inseln** (`ui/world/LightIsland.kt`): `lightIsland` (Karte), `lightPlate` (Teller
+    unter einem Bild), `lightPool` (weicher Lichtfleck). Sie werden **um** das Bauteil gezeichnet,
+    nicht als Hülle — Layout und Größenrechnungen der Trainer bleiben unberührt. Eine Insel
+    steht in der Modifier-Kette **vor** jeder Deckkraft (`alpha`), sonst zeichnet sie in deren
+    Ebene und wird an den Kanten des Bauteils eckig abgeschnitten.
+  - **Nacht am Waldrand** (Rechnen, gezeichnet): kein Mond (eine helle Scheibe neben dem
+    Lautsprecher las sich wie ein zweiter Knopf), Sterne (wenige
+    funkeln mit 8–14 s), Hügel und Bäume unten. Die Zahlentürme stehen auf ihrer hellen Platte,
+    Antwortkacheln und Ziffernblock sind ohnehin hell.
+  - **Dachboden** (Wort-Detektiv, gezeichnet): Dachbalken, rundes Fenster, Mondstrahl mit
+    langsam treibendem Staub (17–31 s). Das Wort liegt im Lichtfleck, das Zielpaar („P / p")
+    auf einer hellen Pille; gefundene Buchstaben fliegen und landen in `StarGold` (auf Dunkel
+    ≈ 8:1), die Quittungs-Striche sind Creme.
+  - **Werkstatt** (Wort-Bauer, gezeichnet): dunkles Holz mit Maserung, warmer Lampenkegel, der
+    ganz langsam atmet (9 s). Das Bild steht auf einem Teller, die Bausteine sind Ahorn-Klötze
+    mit Schatten, das fertige Wort liegt auf einer Karte.
+  - **Antippen macht Freude, auch ohne Aufgabe.** Was ein Kind in einer Welt anfasst, antwortet
+    mit einer kleinen, weichen Bewegung — nie mit Stern oder Ton, und nie so, dass es die Aufgabe
+    stört: Himmelslaternen auf dem Pfad fliegen einen Looping (`LanternLoops`, 2,8 s, Drehung um
+    die eigene Mitte), Karten auf der Wäscheleine schaukeln an ihrer Klammer, die Laut-Fresser
+    stauchen sich und schaukeln aus. Tipps auf die Welt selbst (`WorldTaps`: was kein Bauteil der
+    Aufgabe verbraucht hat und kein Ziehen war) beantwortet der Hintergrund: in der Tiefsee
+    steigen Bläschen vom Finger auf, auf der Lichtung weichen Glühwürmchen aus und kehren zurück,
+    im Theater bauscht sich der Vorhang auf der Seite des Tipps, auf dem Dachboden wirbelt Staub,
+    in der Werkstatt schwingt die Lampe, in der Pilzhöhle flammt der nächste Leuchtpilz auf und
+    stößt Sporen aus. Alles klingt in 2–5 s aus; bei „Bewegung reduzieren" passiert nichts.
+  - **Garten in der blauen Stunde** (Satz-Architekt, gezeichnet): Sterne, ein warmer
+    Horizontstreifen, Hügel mit runden Baumgruppen. Oben steht das Bild auf einem Teller,
+    darunter spannt sich eine **Wäscheleine** über die ganze Breite zwischen zwei Pfosten
+    (`ClothesLine`); jeder Peg hängt mit einer Holzklammer an seinem Punkt der durchhängenden
+    Leine, leere Plätze sind gestrichelte, fast durchsichtige Umrisse. Der Durchhang verschiebt
+    den ganzen Peg samt Tipp- und Ablagefläche (Versatz beim Platzieren, nicht im
+    `graphicsLayer`), sonst nähme ein mittlerer Peg Tipps bis 14 dp über seinem Bild an. Eine frisch aufgehängte
+    Karte schwingt wie ein Pendel nach (8°, langsame Feder `Glide`; 4° auf `Wobble` las sich
+    wie Zittern), jeder Tipp stößt sie erneut an. Bei langen Sätzen berühren sich Nachbarn
+    dabei kurz, das ist an der Leine erlaubt. Lange Sätze dürfen über die Pfosten hinaus bis 8 dp vor den Bildschirmrand
+    hängen (`SentencePegSizing.solveOnLine`): nur wenn der Glyph auf der Bühne unter 20 dp
+    fiele, sonst bleibt die Reihe auf der Bühne. „der Schneemann ist groß" kommt so auf einem
+    360-dp-Gerät auf rund 18 statt 15 dp.
+  - **Puppentheater** (Satz-Versteher, gezeichnet): dunkler Bühnenraum, roter Samtvorhang
+    links und rechts, der ganz leicht atmet (7 s), ein schmaler Lambrequin unter dem
+    Lautsprecher, darüber eine Lichterkette, deren Birnen langsam glimmen (6 s). Die zwei
+    Bildkarten sind **gerahmte Bilder** (helle Fläche, Holzrahmen, richtig = `LeafGreen`) und
+    stehen auf Bühnenbrettern, die der Trainer unter die Kartenreihe zeichnet.
+  - **Pilzhöhle** (Laut-Fresser): `world_cave.webp` (30 KB), vom Nutzer generiert, abgedunkelt
+    und mit beruhigter Mitte eingebacken. Die zwei Fresser sind **neu gezeichnet**
+    (`FeederCreature`, `FeederShape`): **Pilli** (links, blau) rund mit zwei Öhrchen, **Kora**
+    (rechts, koralle) tropfenförmig mit Blattspross — zwei Silhouetten, die ein Kind auch ohne
+    Farbe unterscheidet. Volumen durch Licht oben links und Lichtkante, Augen mit zwei
+    Glanzpunkten, die zur Karte hinaufschauen und zeitversetzt blinzeln (5,5 / 6,7 s), Wangen,
+    ein Maul mit Zunge, Füße und Ärmchen; die Figuren atmen leicht (3,6 s). Beim Antippen
+    stauchen sie sich kurz und schaukeln auf einer weichen Feder um die Füße aus (kein
+    Tween-Zickzack), beim Spucken schütteln sie den Kopf auf einer schnelleren Feder. Sie
+    stehen 40 dp über dem unteren Bühnenrand; durch die Höhle schweben langsam Leuchtsporen
+    (türkis, wenige bernstein, Bahnen 28–52 s), vor allem an den Rändern und unten. Der Bauchfleck ist
+    schmaler als beim alten Geisterkörper (62 % der Breite, Glyph-Boden 10 sp).
+  - **Waldlichtung** (Silben-Verschmelzer, gezeichnet): Glühwürmchen treiben auf Bahnen von
+    20–40 s und glimmen langsam, unten Gras als Silhouette. Die Silben sind die **zwei hellsten
+    Lichter**: heller Kern, weicher Hof, der mit dem Zieh-Fortschritt heller wird (trägt die
+    Verstärkung, die das TTS nicht kann); die Spur dazwischen sind wandernde Funken. Das
+    verschmolzene Licht bekommt den grünen Rand „richtig".
+  - **Dschungel** (Spurensucher): `world_jungle.webp` aus dem Capybara-Experiment des Nutzers.
+    Der Weg ist hell (`RoadLight`, fertig `RoadDone`) mit dunklem Schattensaum gegen das Bild; das
+    Fahrzeug ist ein **Leuchtkäfer** (Glühwürmchen sind Käfer und leben im Regenwald), der zum
+    nächsten Stern schaut. Im Bild treiben blinkende Glühwürmchen (kurz hell, lange dunkel,
+    Bahnen 26–46 s), nur am Rand und unten, nie über dem Weg. Der Käfer ist von oben gezeichnet mit sechs Beinen, orangefarbenem Halsschild mit
+    dunklem Fleck, hell gerandeten Flügeldecken und leuchtendem Hinterleib — ohne Beine las er
+    sich auf dem Kopf stehend wie ein Mensch von hinten. Im Stand tasten die Fühler, die Beine
+    treten leicht, der Hinterleib glimmt; fährt er, laufen die Beine im Dreifußgang mit. Die **Sterne bleiben** — „Punkte" wären schwerer zu erklären. Die
+    Belohnung („M wie Mond") steht auf einer hellen Karte.
 - **Name: „Silbo", Store-Titel „Silbo – ABC Vorschule".** Ein Kunstname aus der Silbe, weil
   die Silbe die Mechanik ist, die das Kind in den Lektionen erlebt (Verschmelzer, Jagd,
   Wort-Bauer) — Pfad und Hügel sind nur Start-Screen-Motive und taugen deshalb nicht als

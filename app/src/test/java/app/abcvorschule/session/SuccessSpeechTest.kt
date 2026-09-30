@@ -15,61 +15,56 @@ import app.abcvorschule.content.SymbolInWordMode
 import app.abcvorschule.content.SymbolInWordRound
 import app.abcvorschule.content.WordBlock
 import app.abcvorschule.content.WordBuildRound
+import app.abcvorschule.speech.ClipIndex
+import app.abcvorschule.speech.GermanNumberWord
 import app.abcvorschule.ui.rewards.PraisePhrases
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SuccessSpeechTest {
     private val pack: ContentPack = ContentRepository.fromClasspath().load()
 
-    private val ameise = Atom(
-        id = "ameise",
-        lemma = "Ameise",
-        display = "Ameise",
-        emoji = "🐜",
-        kind = AtomKind.other,
-        pluralDisplay = "Ameisen",
-    )
-
     private val countRound = CountAddRound(
-        promptTts = "Wie viele?",
-        iconAtomId = ameise.id,
-        left = 1,
-        right = 1,
-        answer = 2,
+        promptTts = "Wie viel ist drei plus zwei?",
+        left = 3,
+        right = 2,
+        answer = 5,
     )
 
     @Test
     fun countAddSuccessSpeaksPraiseBeforeAnswer() {
-        // §7: das Lob steht vor der Antwort, damit die Menge das Letzte ist,
-        // was das Kind hört ("Ausgezeichnet! 2 Ameisen").
-        val parts = SuccessSpeech.partsForRound(countRound, packWithAmeise(), praise = true)
+        // §7: das Lob steht vor der Antwort, damit die Zahl das Letzte ist,
+        // was das Kind hört ("Ausgezeichnet! fünf").
+        val parts = SuccessSpeech.partsForRound(countRound, pack, praise = true)
         assertEquals(2, parts.size)
         assertTrue(parts[0] in PraisePhrases.All)
-        assertEquals("2 Ameisen", parts[1])
+        assertEquals("fünf", parts[1])
     }
 
     @Test
-    fun countAddResolveSpeaksOnlyAnswer() {
-        val parts = SuccessSpeech.partsForRound(countRound, packWithAmeise(), praise = false)
-        assertEquals(listOf("2 Ameisen"), parts)
+    fun countAddWithoutPraiseSpeaksOnlyTheNumberWord() {
+        val parts = SuccessSpeech.partsForRound(countRound, pack, praise = false)
+        assertEquals(listOf("fünf"), parts)
     }
 
     @Test
-    fun everyShippedCountAddRoundHasExtractableSpokenAnswer() {
+    fun everyShippedCountAddAnswerIsSpokenAsANumberWordWithAClip() {
+        // Die Ziffer ("5") hat keinen Clip — nach dem kuratierten Lob sprang sonst
+        // Android-TTS ein. Das Zahlwort ist der Clip des Zählkanals.
+        val index = ClipIndex.load { path ->
+            javaClass.classLoader!!.getResourceAsStream(path)
+                ?: throw java.io.FileNotFoundException(path)
+        }
         pack.tasks.values.filterIsInstance<CountAddSpec>().forEach { spec ->
             spec.rounds.forEach { round ->
                 val parts = SuccessSpeech.partsForRound(round, pack, praise = false)
-                assertEquals(1, parts.size)
-                assertTrue(parts[0].isNotBlank())
+                assertEquals(listOf(GermanNumberWord.of(round.answer)), parts)
+                assertNotNull("${spec.id}: no clip for ${parts[0]}", index.lookup(parts[0]))
             }
         }
     }
-
-    private fun packWithAmeise(): ContentPack = pack.copy(
-        atoms = pack.atoms + (ameise.id to ameise),
-    )
 
     @Test
     fun sentencePictureSuccessRepeatsTheSentence() {

@@ -62,14 +62,14 @@ Plan nur anfassen, wenn der Contract selbst falsch oder unvollständig ist.
 Kernpunkte (Kurzfassung):
 
 - **Sechs autorierte Trainer-Typen** pro Lektion in fester Rangfolge (Visueller Spurensucher → … → Satz-Versteher → Rechnen). Reihenfolge fällt nicht zurück; `ContentValidator` erzwingt Struktur. Zur Laufzeit können sich abgeleitete Zusatz-Trainer (Jagd, Wort-Detektiv, Laut-Fresser, siehe unten) dazwischenschieben — sie sind keine siebten/achten autorierten Typen.
-- **Buchstaben-/Silben-Jagd**: Optional bis zu 2× pro Lektion, keine separaten Autorierungen — wird zur Laufzeit aus letter_trace/syllable_merge abgeleitet (`SymbolHuntInsertion`). Batterie voll → kurze Feier, dann automatisch weiter — kein „Weiter"-Button, das Kind kann ihn nicht lesen. Kacheln sind weiche Kugeln: Drücken bläht sie verzögert bis +10 % auf, Loslassen kollabiert und ploppt, ein Treffer ploppt aus dem Feld (`HuntTileMorph`, PRODUCT_PRINCIPLES §10).
+- **Buchstaben-/Silben-Jagd**: Optional bis zu 2× pro Lektion, keine separaten Autorierungen — wird zur Laufzeit aus letter_trace/syllable_merge abgeleitet (`SymbolHuntInsertion`). Herzmuschel voll → kurze Feier, dann automatisch weiter (jeder Treffer fliegt als Perle hinein, Tiefsee-Welt) — kein „Weiter"-Button, das Kind kann ihn nicht lesen. Kacheln sind weiche Kugeln: Drücken bläht sie verzögert bis +10 % auf, Loslassen kollabiert und ploppt, ein Treffer ploppt aus dem Feld (`HuntTileMorph`, PRODUCT_PRINCIPLES §10).
 - **Wort-Detektiv**: „Finde den Buchstaben / den Laut / die Silbe im Wort", ebenfalls abgeleitet (`SymbolInWordInsertion`), eine Runde pro eingeführtem `word_build`-Wort, direkt nach dem letzten Wort-Bauer. Mehrzeichen-Grapheme (`Sch`, `ei`, …) heißen „Laut", nicht „Buchstabe". Grapheme kommen aus `WordGraphemes` — pack-abgeleitet und auf bereits eingeführte Lektionen beschränkt, sonst würde „Nest" in L07 zu `N·e·st` verschmelzen und das gesuchte `S` unantippbar machen.
 - **Laut-Fresser**: „Füttere die Laut-Fresser" — dritter abgeleiteter Trainer (`SoundFeederInsertion`), direkt nach der Buchstaben-Jagd, ab L03. Zwei Monster mit je einem Laut, Bildkarten per Drag zum richtigen; Paar-Tabelle in `SoundPairs` (Kontrast/Aufwärmen/Vokal), Zuordnung und Karten in `SoundFeederDerivation` (deterministisch, Snapshot-Test). Fragt „welcher Laut", nie „wo". Monster-Stimme = Tonhöhe (`VoiceStyle`), Reaktionen im TTS-Profil `monster`; Laute sind das Lemma in der Index-Variante `monster` (Mikrofon-Aufnahmen, kein `soundTts`).
 - **Distraktoren**: Im autorieren Content (Tray ≤ 5–6), oder verstreut im Hunt-Feld (bis 6, mit Wiederholungen).
 - **Session-Modell**: Pfad-Screen → freigeschaltete Knoten starten Trainer-Sequenz → Fortschritt persistent, Vor/Zurück immer möglich.
 - **Audio-First**: Kinder lesen nicht. Bilder, Icons, Layout, Sprache. Lesbare Labels nur wo nötig (Atom-Namen sind Aufgabe selbst).
 - **Drag & Drop**: Committet bei echtem Treffer, sonst Snap-back. Keine Strafen.
-- **Rechnen**: Icons (keine Wörter). 3 Optionen (visuell) **oder** Kinder-Ziffernblock (`NumberPad`, keine System-Tastatur) — getippt wird ab Ergebnis 11, außer im ausdrücklichen Eltern-Modus „Mit Hilfe“ (`MathHinting.inputFor`). Im Tipp-Modus nach 2 Fehlversuchen die **Zähl-Hilfe**: ein Fünfer-Feld mit beiden Operanden, der zweite gerahmt, Aufgabe als Ziffernzeile darüber, die nächste offene Einheit pulsiert und jeder Tipp zählt hörbar mit. Malnehmen zählt reihenweise, nicht Bild für Bild. Das Kind führt die Rechnung mit dem Finger aus, „Auflösen“ erst nach 4. Erfolg vorgesprochen (kein sichtbarer Text), Miss gesprochenes Feedback. Ab 11 Mengen nur als Symbol + Ziffer — **außer** in der Zähl-Hilfe, die sie ausschreibt. Progression Plus → Wegnehmen → gleiche Gruppen.
+- **Rechnen**: Zahlentürme (`NumberTowers`), keine Wörter, keine Bilder. 3 Zahlkacheln **oder** Kinder-Ziffernblock (`NumberPad`, keine System-Tastatur) — getippt wird ab Ergebnis 11, außer im ausdrücklichen Eltern-Modus „Mit Hilfe“ (`MathHinting.inputFor`). Kein Auflösen, keine Zähl-Hilfe: die Türme antippen ist die Hilfe. Ansage: Einleitung „Wie viel ist“ + ganze Aufgabe als ein Clip (`MathPromptSpeech.taskText`, Profil `math`, einzeln im TTS-UI kuratiert) — zusammengesetzte Zahl-Clips klangen in Betonung und Stimme zu uneinheitlich. Erfolg: Lob + Zahlwort vorgesprochen (kein sichtbarer Text). Fehlversuch: nur `Sfx.Blocked` + Nudge, **keine** Sprache. Progression Plus → Wegnehmen → Malnehmen.
 - **Artikel im Erfolgs-Vorsprechen**: Substantiv-Lösungswörter werden mit Artikel
   vorgesprochen („das Haus"), Aufgabenstellungen nicht. Genus und Nomenklasse stehen am
   Atom, Regel in `AtomArticleSpeech`, Details in PRODUCT_PRINCIPLES §4/§7.
@@ -87,6 +87,12 @@ Kernpunkte (Kurzfassung):
   UI-Schrift *Baloo 2*, Bildschrift *SilboEmoji* (Noto Color Emoji, auf den Pack gekürzt).
   Neubau mit `tools/fonts/build_fonts.py` — Pflicht, sobald ein neues Emoji in den Content
   kommt (`EmojiFontCoverageTest`). Keine Systemschrift, kein EmojiCompat.
+- **Nachtwelten** unter `ui/world/`: `TrainerWorld` ordnet jedem Trainer seine Welt zu. Gemalt sind nur
+  Dschungel (Spurensucher, `world_jungle.webp`) und Pilzhöhle (Laut-Fresser, `world_cave.webp`), alle
+  anderen sind gezeichnet (`WorldBackground`, `WorldScenes`, `WorldScenesLanguage`). `ChromeColors`
+  schaltet die Kopfzeile auf hell. Lerninhalt steht immer auf einer hellen Fläche (PRODUCT_PRINCIPLES §10).
+  Standbilder in der Welt: `NightWorldShotTest`; auf dem eigenen Gerät per `adb shell am instrument`
+  starten statt `connectedAndroidTest`, weil Gradle danach die App samt Spielstand deinstalliert.
 - **Geräusche** unter `assets/sfx/`, synthetisiert von `tools/sfx/generate_sfx.py`, gespielt
   über `AbcSfx` (SoundPool). Eine Tat, ein Klang; keine Musik (PRODUCT_PRINCIPLES §7).
 - Content: versioniertes JSON unter `app/src/main/assets/content/`

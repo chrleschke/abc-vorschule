@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.theme.StarGoldDeep
@@ -73,6 +74,16 @@ fun IconArrowBack(
         drawPath(shaft, color = tint, style = stroke)
         drawPath(head, color = tint, style = stroke)
     }
+}
+
+/** Pfeil nach rechts: [IconArrowBack] gespiegelt — „weiter". */
+@Composable
+fun IconArrowForward(
+    tint: Color,
+    modifier: Modifier = Modifier,
+    size: Dp = 28.dp,
+) {
+    IconArrowBack(tint = tint, size = size, modifier = modifier.graphicsLayer { scaleX = -1f })
 }
 
 @Composable

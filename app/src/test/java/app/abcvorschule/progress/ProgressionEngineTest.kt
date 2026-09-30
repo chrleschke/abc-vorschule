@@ -72,7 +72,6 @@ class ProgressionEngineTest {
     fun mathKeyIsDerivedFromOperationBandAndOperands() {
         val round = CountAddRound(
             promptTts = "x",
-            iconAtomId = "ameise",
             left = 2,
             right = 1,
             answer = 3,

@@ -1,7 +1,6 @@
 package app.abcvorschule.ui.exercise
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,10 +60,6 @@ import app.abcvorschule.ui.theme.WarmMuted
  * Zählfeld und zwei Hände. Jede Taste federt beim Drücken ein, gibt `tick`-Haptik und
  * **spricht die Zahl, die jetzt im Feld steht** („eins", dann „zwölf"): ein Kind, das
  * zweistellige Ziffern noch nicht liest, hört so, was es getippt hat.
- *
- * Solange die Zähl-Hilfe offen ist, klappen die Ziffernreihen ein — das Kind zählt
- * dann mit dem Finger im Aufgabenblock, und das Feld spiegelt den Zähler. Ein Tipp
- * aufs Feld holt die Ziffern zurück.
  */
 @Composable
 fun NumberPad(
@@ -77,23 +71,13 @@ fun NumberPad(
     solved: Boolean = false,
     /** False during the audio lock — the whole block is non-interactive and dimmed. */
     enabled: Boolean = true,
-    /** Von der Zähl-Hilfe hochgezählter Wert; `null` heißt „nichts (mehr)
-     * angetippt". Wirkt nur bei [countingOpen]. */
-    countedValue: Int? = null,
-    /** True, solange die Zähl-Hilfe offen ist: Ziffernreihen eingeklappt, das Feld
-     * spiegelt, was die Hilfe zählt. */
-    countingOpen: Boolean = false,
     /** Spricht die Zahl im Feld nach jedem Tastendruck (Zählkanal). */
     onSpeakValue: (String) -> Unit = {},
 ) {
     var value by remember(resetToken) { mutableStateOf("") }
-    var keysOpen by remember(resetToken, countingOpen) { mutableStateOf(!countingOpen) }
     val haptics = LocalAbcHaptics.current
-    val opacity by animateFloatAsState(
-        targetValue = if (enabled) 1f else 0.5f,
-        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
-        label = "number_pad_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val opacity = rememberRestOpacity()
     val interactive = enabled && !solved
 
     fun submit() {
@@ -113,19 +97,6 @@ fun NumberPad(
         next.toIntOrNull()?.let { onSpeakValue(GermanNumberWord.of(it)) }
     }
 
-    LaunchedEffect(countedValue, resetToken, countingOpen) {
-        // Auch auf resetToken gekeyed: der Token wechselt bei jedem Fehlversuch und
-        // leert das Feld. Ohne dieses Re-Spiegeln stünde das Feld nach einem Miss
-        // leer da, während die Haken in der Zähl-Hilfe noch gesetzt sind.
-        //
-        // Gespiegelt wird auch der LEERE Stand: nimmt das Kind alle Tipps wieder
-        // zurück, steht die Hilfe wieder bei null, und die zuletzt gespiegelte
-        // Zahl im Feld wäre eine Antwort, die niemand mehr gezählt hat — samt der
-        // Möglichkeit, sie abzusenden. Nur solange die Hilfe offen ist: sonst
-        // löschte dieser Effect die von Hand getippte Zahl.
-        if (!countingOpen) return@LaunchedEffect
-        value = NumberPadInput.mirroredValue(countedValue)
-    }
 
     BoxWithConstraints(modifier = modifier.fillMaxWidth().alpha(opacity), contentAlignment = Alignment.Center) {
         val key = NumberPadInput.keySizeDp(maxWidth.value).dp
@@ -155,7 +126,6 @@ fun NumberPad(
                     value = value,
                     solved = solved,
                     height = key,
-                    onTap = { if (interactive) keysOpen = true },
                 )
                 PadKey(
                     size = key,
@@ -167,23 +137,21 @@ fun NumberPad(
                     IconChevronRight(tint = Cream, size = key * 0.45f)
                 }
             }
-            if (keysOpen) {
-                NumberPadInput.KeyRows.forEach { row ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
-                        row.forEach { digit ->
-                            PadKey(
-                                size = key,
-                                enabled = interactive,
-                                color = CreamElevated,
-                                onClick = { type(digit) },
-                                modifier = Modifier.testTag("number_key_$digit"),
-                            ) {
-                                Text(
-                                    text = "$digit",
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    color = WarmInk,
-                                )
-                            }
+            NumberPadInput.KeyRows.forEach { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+                    row.forEach { digit ->
+                        PadKey(
+                            size = key,
+                            enabled = interactive,
+                            color = CreamElevated,
+                            onClick = { type(digit) },
+                            modifier = Modifier.testTag("number_key_$digit"),
+                        ) {
+                            Text(
+                                text = "$digit",
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = WarmInk,
+                            )
                         }
                     }
                 }
@@ -198,7 +166,6 @@ private fun AnswerField(
     value: String,
     solved: Boolean,
     height: Dp,
-    onTap: () -> Unit,
 ) {
     // Breite aus der effektiven Textgröße statt fest: bei großer System-Schrift
     // passte die Antwort sonst nicht mehr ins Feld (NumberPadInput.fieldWidthDp).
@@ -215,7 +182,6 @@ private fun AnswerField(
         modifier = Modifier
             .width(width)
             .height(height)
-            .clickable(onClick = onTap)
             .testTag("number_input"),
     ) {
         Box(contentAlignment = Alignment.Center) {

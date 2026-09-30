@@ -54,12 +54,16 @@ import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
+import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.LeafGreen
 import app.abcvorschule.ui.theme.SkyBlue
+import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
 import app.abcvorschule.ui.theme.SunCoral
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.theme.WarmMuted
+import app.abcvorschule.ui.world.lightIsland
+import app.abcvorschule.ui.world.lightPool
 import kotlinx.coroutines.delay
 
 /** Segment colours cycle; the palette only marks boundaries, it carries no meaning,
@@ -145,11 +149,8 @@ fun SymbolInWordTrainer(
     var resolved by remember(roundKey) { mutableStateOf(false) }
     var complete by remember(roundKey) { mutableStateOf(false) }
     val haptics = LocalAbcHaptics.current
-    val interactionOpacity by animateFloatAsState(
-        targetValue = if (interactionLocked) 0.5f else 1f,
-        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
-        label = "detective_lock_opacity",
-    )
+    // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
+    val interactionOpacity = rememberRestOpacity()
 
     val target = pack.atoms[round.targetAtomId]
     val label = target?.let { SymbolInWordDerivation.targetLabel(it, round.mode) }
@@ -267,7 +268,13 @@ fun SymbolInWordTrainer(
                             target?.lemma?.let(onSpeakFeedback) ?: onSpeakFeedback(target.display)
                         },
                         interactionLocked = interactionLocked,
-                        modifier = Modifier.alpha(interactionOpacity),
+                        // Auf dem dunklen Dachboden: das gesuchte Paar auf einer hellen
+                        // Pille, Tinte auf Licht wie jeder Lerninhalt (§10).
+                        // Insel vor der Deckkraft: sonst zeichnete sie in deren Ebene
+                        // und würde an den Kanten des Bauteils abgeschnitten.
+                        modifier = Modifier
+                            .lightIsland(padH = 14.dp, padV = 2.dp, corner = 999.dp)
+                            .alpha(interactionOpacity),
                     )
                 }
                 // Luft zwischen Frage und Arbeit. ExerciseStage setzt AbcDimens.blockGap
@@ -284,7 +291,8 @@ fun SymbolInWordTrainer(
                     onTap = ::handleTap,
                     onSegmentPlaced = { index, center -> segmentCenters[index] = center },
                     onGlyphSpMeasured = { segmentGlyphSp = it },
-                    modifier = Modifier.alpha(interactionOpacity),
+                    // Das Wort liegt im Lichtfleck der Taschenlampe.
+                    modifier = Modifier.lightPool().alpha(interactionOpacity),
                 )
             },
             answers = {
@@ -362,7 +370,10 @@ fun SymbolInWordTrainer(
                     // the Cream page this flight is drawn over — under the 3:1 floor for a
                     // glyph the child must track and read mid-flight. StarGoldDeep clears
                     // it at ~3.29:1 (same substitution as landedColor below).
-                    color = StarGoldDeep,
+                    // Auf dem Dachboden fliegt der Buchstabe durchs Dunkel: StarGold
+                    // leuchtet dort mit rund 8:1 von selbst, die dunkle Stufe für Papier
+                    // braucht es nicht mehr.
+                    color = StarGold,
                     modifier = Modifier.alpha(1f - progress * 0.15f),
                 )
             }
@@ -599,7 +610,8 @@ private fun SlotRow(
     } else {
         1f
     }
-    val landedColor = if (resolved) WarmMuted else StarGoldDeep
+    // Auf dem Dachboden: gelandete Buchstaben golden, nach „Zeig mir" gedämpft hell.
+    val landedColor = if (resolved) Cream.copy(alpha = 0.5f) else StarGold
     Row(
         modifier = Modifier.fillMaxWidth().testTag("detective_slots"),
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
@@ -646,7 +658,7 @@ private fun SlotRow(
                         Text(
                             text = round.segments[round.targetIndices[ordinal]],
                             fontSize = AbcDimens.syllableSp,
-                            color = WarmInk.copy(alpha = SilhouetteAlpha),
+                            color = Cream.copy(alpha = SilhouetteAlpha + 0.1f),
                         )
                     }
                 }
@@ -655,7 +667,7 @@ private fun SlotRow(
                         .width(slotWidth)
                         .height(SlotStrokeHeight)
                         .background(
-                            color = if (filled) landedColor else WarmMuted,
+                            color = if (filled) landedColor else Cream.copy(alpha = 0.75f),
                             shape = RoundedCornerShape(2.dp),
                         ),
                 )

@@ -21,6 +21,7 @@ import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.SkyBlue
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.WarmMuted
+import app.abcvorschule.ui.world.LocalChromeColors
 
 /**
  * Füllstand der Segmente einer Lektion — ein Segment je Trainer.
@@ -91,6 +92,7 @@ fun AbcSegmentedProgress(
         pulsedIndex = index
     }
 
+    val chrome = LocalChromeColors.current
     Canvas(
         modifier = modifier
             .fillMaxWidth()
@@ -113,7 +115,7 @@ fun AbcSegmentedProgress(
             // (Color.kt: 1.24:1 und 1.33:1), und die gefüllte Strecke selbst steht
             // mit 3.88:1 auf Cream ohnehin für sich.
             drawRoundRect(
-                color = WarmMuted.copy(alpha = 0.18f),
+                color = chrome.progressTrack,
                 topLeft = Offset(left, 0f),
                 size = Size(segmentWidth, size.height),
                 cornerRadius = corner,
@@ -125,7 +127,7 @@ fun AbcSegmentedProgress(
             }
             if (fraction > 0f) {
                 drawRoundRect(
-                    color = SkyBlue,
+                    color = chrome.progressFill,
                     topLeft = Offset(left, 0f),
                     size = Size(segmentWidth * fraction, size.height),
                     cornerRadius = corner,

@@ -30,8 +30,8 @@ from .recordings import apply_edit, preview_bytes, recording_info, store_recordi
 from .render import (
     candidate_fingerprint, candidate_meta, candidate_seeds, clear_production,
     clip_audio_list, deletable_candidate_seeds, delete_candidate_wav,
-    render_batch_candidates, sample_candidates,
-    seeds_for_candidates, update_candidate_meta,
+    candidate_original_path, render_batch_candidates, sample_candidates,
+    seeds_for_candidates, trim_candidate, update_candidate_meta,
 )
 from .mic import APP_MONSTER_PITCH, PITCH_MIN, PITCH_MAX
 from .store import (
@@ -206,21 +206,27 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
                 return ctx, clip
         raise HTTPException(status_code=404, detail=f"unbekannter Clip {key!r}")
 
+    # Ohne Cache-Header rät der Browser selbst und hält nach einer UI-Änderung
+    # die alte style.css fest, während index.html schon neu ist — das Layout
+    # zerfällt dann. no-cache heißt: jedes Mal nachfragen (ETag), nicht: nie cachen.
+    no_cache = {"Cache-Control": "no-cache"}
+
     @app.get("/", response_class=HTMLResponse)
-    def index() -> str:
-        return (STATIC / "index.html").read_text(encoding="utf-8")
+    def index() -> HTMLResponse:
+        return HTMLResponse((STATIC / "index.html").read_text(encoding="utf-8"), headers=no_cache)
 
     @app.get("/app.js")
     def app_js() -> FileResponse:
-        return FileResponse(STATIC / "app.js", media_type="application/javascript")
+        return FileResponse(STATIC / "app.js", media_type="application/javascript", headers=no_cache)
 
     @app.get("/style.css")
     def style_css() -> FileResponse:
-        return FileResponse(STATIC / "style.css", media_type="text/css")
+        return FileResponse(STATIC / "style.css", media_type="text/css", headers=no_cache)
 
     @app.get("/recorder-worklet.js")
     def recorder_worklet() -> FileResponse:
-        return FileResponse(STATIC / "recorder-worklet.js", media_type="application/javascript")
+        return FileResponse(STATIC / "recorder-worklet.js", media_type="application/javascript",
+                            headers=no_cache)
 
     @app.get("/api/state")
     def api_state() -> dict[str, Any]:
@@ -755,15 +761,35 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
         path = paths.audio / f"{key}.wav"
         if not path.exists():
             raise HTTPException(status_code=404, detail="noch nicht gerendert")
-        return FileResponse(path, media_type="audio/wav")
+        return FileResponse(path, media_type="audio/wav", headers=no_cache)
 
     @app.get("/candidates/{key}/{seed}.wav")
-    def api_candidate_audio(key: str, seed: int) -> FileResponse:
+    def api_candidate_audio(key: str, seed: int, orig: bool = False) -> FileResponse:
+        """`?orig=1` liefert bei einem geschnittenen Kandidaten die ungeschnittene
+        Fassung — die Wellenform zeigt sie, damit sich ein Schnitt auch wieder
+        aufziehen lässt."""
         clip_by_key(key)
         path = paths.candidates / key / f"{seed}.wav"
+        if orig:
+            path = candidate_original_path(paths, key, seed) or path
         if not path.exists():
             raise HTTPException(status_code=404, detail="kein Kandidat")
-        return FileResponse(path, media_type="audio/wav")
+        # Ein Schnitt schreibt unter derselben URL neu.
+        return FileResponse(path, media_type="audio/wav", headers=no_cache)
+
+    @app.put("/api/clips/{key}/candidates/{seed}/trim")
+    def api_trim_candidate(key: str, seed: int, body: dict = Body(...)) -> dict[str, Any]:
+        _, clip = clip_by_key(key)
+        try:
+            meta = trim_candidate(paths, clip, seed, body["start"], body["end"])
+        except KeyError as exc:
+            raise HTTPException(status_code=422, detail="'start' und 'end' fehlen") from exc
+        except FileNotFoundError as exc:
+            raise HTTPException(status_code=404, detail=f"kein Kandidat {seed} für {key!r}") from exc
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        jobs.publish({"type": "candidate-trimmed", "clipKey": key, "seed": seed})
+        return {"ok": "trimmed", "trim": meta.get("trim")}
 
     @app.get("/events")
     def api_events() -> StreamingResponse:
