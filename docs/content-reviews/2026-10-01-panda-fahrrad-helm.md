@@ -19,7 +19,7 @@ Helm, denn Fahrrad ist für den Wort-Bauer zu schwer.
 - `silbo_emoji.ttf` wurde nur um 🐼 ergänzt, aus derselben Noto-Version 2.057 (+2 KB).
   Fibel- und Baloo-Schrift sind unverändert. 801 Unit-Tests grün; beide Runden habe ich
   als Standbild auf dem Motorola angesehen.
-- **Audio fehlt noch** und wird im TTS-UI kuratiert: „Panda", „der Panda", „der Helm",
+- Audio im TTS-UI kuratiert und exportiert (`e0070bd`): „Panda", „der Panda", „der Helm",
   „Baue das Wort Panda.", „Baue das Wort Helm.".
 
 **Warum Helm nicht direkt nach Nest steht:** Der Wort-Detektiv wechselt pro Wort zwischen
