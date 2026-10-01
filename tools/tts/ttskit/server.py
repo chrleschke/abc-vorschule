@@ -30,13 +30,13 @@ from .recordings import apply_edit, preview_bytes, recording_info, store_recordi
 from .render import (
     candidate_fingerprint, candidate_meta, candidate_seeds, clear_production,
     clip_audio_list, deletable_candidate_seeds, delete_candidate_wav,
-    candidate_original_path, render_batch_candidates, sample_candidates,
-    seeds_for_candidates, trim_candidate, update_candidate_meta,
+    candidate_original_path, release_pool_seed, render_batch_candidates,
+    sample_candidates, seeds_for_candidates, trim_candidate, update_candidate_meta,
 )
 from .mic import APP_MONSTER_PITCH, PITCH_MIN, PITCH_MAX
 from .store import (
-    PROFILE_SOURCES, SAMPLING_PARAMS, SAMPLING_SPEC, SECONDS_PER_TOKEN,
-    Lock, Locks, Profiles, parse_seed,
+    CURATED_FILES_LOCK, PROFILE_SOURCES, SAMPLING_PARAMS, SAMPLING_SPEC,
+    SECONDS_PER_TOKEN, Lock, Locks, Profiles, parse_seed,
 )
 
 STATIC = Path(__file__).resolve().parent / "static"
@@ -206,6 +206,35 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
                 return ctx, clip
         raise HTTPException(status_code=404, detail=f"unbekannter Clip {key!r}")
 
+    def require_engine() -> None:
+        """503 statt eines Jobs, der jeden Kandidaten einzeln scheitern lässt.
+
+        Der Server startet bewusst auch ohne Modell (Kuratieren, Mikrofon,
+        Export gehen weiter). Generate und Batch-Lauf reihten trotzdem einen
+        Job ein, der dann pro Seed mit „Engine not loaded" fehlschlug — im UI
+        nur als „0 erzeugt, n fehlgeschlagen" sichtbar, ohne den Grund.
+        """
+        if getattr(engine, "loaded", False):
+            return
+        error = getattr(engine, "load_error", None)
+        raise HTTPException(
+            status_code=503,
+            detail=f"Modell nicht geladen: {error}" if error else "Modell nicht geladen")
+
+    def fresh_clip(key: str):
+        """Clip, Profil und Locks so, wie sie *jetzt* auf der Platte stehen.
+
+        Für Jobs: zwischen Einreihen und Ausführen kann eine Weile vergehen
+        (ein Batch-Lauf davor), und in der Zeit wird weiter kuratiert. Ein beim
+        Einreihen festgehaltener Clip würde mit dem alten Text, der alten
+        Stimme und dem alten Profil erzeugen. None, wenn es den Clip nicht mehr gibt.
+        """
+        ctx = context()
+        for clip in ctx.clips:
+            if clip.key == key:
+                return clip, ctx.profiles.profiles[clip.profile], ctx.locks
+        return None
+
     # Ohne Cache-Header rät der Browser selbst und hält nach einer UI-Änderung
     # die alte style.css fest, während index.html schon neu ist — das Layout
     # zerfällt dann. no-cache heißt: jedes Mal nachfragen (ETag), nicht: nie cachen.
@@ -238,12 +267,20 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
             clips.append({
                 "key": clip.key,
                 "profile": clip.profile,
+                # Text der Produktion (textOverride ?? sourceText) — nicht der
+                # Entwurf; der steht in `draftText`, was Generate spricht in
+                # `generationText`.
                 "text": clip.text,
+                "draftText": clip.draft_text,
+                "generationText": clip.generation_text,
                 "sourceText": clip.source_text,
                 "speaker": clip.speaker,
                 "seed": clip.seed,
                 "generateSeed": lock.generate_seed if lock else None,
                 "locked": clip.locked,
+                # „Keine Produktion" auf einem kuratierten Lock: Lock steht noch,
+                # ist aber keine Freigabe (`locked` ist dann false).
+                "cleared": bool(lock and lock.cleared),
                 "itemIds": list(clip.item_ids),
                 "fields": list(clip.fields),
                 "lessons": list(clip.lessons),
@@ -280,6 +317,10 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
 
     @app.put("/api/profiles/{name}")
     def api_update_profile(name: str, body: dict = Body(...)) -> dict[str, str]:
+        with CURATED_FILES_LOCK:
+            return _update_profile(name, body)
+
+    def _update_profile(name: str, body: dict) -> dict[str, str]:
         profiles = Profiles.load(paths.profiles)
         if name not in profiles.profiles:
             raise HTTPException(status_code=404, detail=f"unbekanntes Profil {name!r}")
@@ -386,71 +427,108 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
 
     @app.post("/api/profiles/{name}/pool")
     def api_add_seed(name: str, body: dict = Body(...)) -> dict[str, str]:
-        profiles = Profiles.load(paths.profiles)
-        if name not in profiles.profiles:
-            raise HTTPException(status_code=404, detail=f"unbekanntes Profil {name!r}")
-        try:
-            seed = parse_seed(body["seed"])
-        except ValueError as exc:
-            raise HTTPException(status_code=422, detail=str(exc)) from exc
-        pool = profiles.profiles[name].seed_pool
-        if seed not in pool:
-            pool.append(seed)
-            pool.sort()
-        profiles.save(paths.profiles)
+        with CURATED_FILES_LOCK:
+            profiles = Profiles.load(paths.profiles)
+            if name not in profiles.profiles:
+                raise HTTPException(status_code=404, detail=f"unbekanntes Profil {name!r}")
+            try:
+                seed = parse_seed(body["seed"])
+            except ValueError as exc:
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
+            pool = profiles.profiles[name].seed_pool
+            if seed not in pool:
+                pool.append(seed)
+                pool.sort()
+            profiles.save(paths.profiles)
         return {"ok": "added"}
 
     @app.delete("/api/profiles/{name}/pool/{seed}")
     def api_remove_seed(name: str, seed: int) -> dict[str, str]:
-        profiles = Profiles.load(paths.profiles)
-        if name not in profiles.profiles:
-            raise HTTPException(status_code=404, detail=f"unbekanntes Profil {name!r}")
-        profiles.profiles[name].seed_pool = [
-            s for s in profiles.profiles[name].seed_pool if s != seed
-        ]
-        profiles.save(paths.profiles)
+        with CURATED_FILES_LOCK:
+            profiles = Profiles.load(paths.profiles)
+            if name not in profiles.profiles:
+                raise HTTPException(status_code=404, detail=f"unbekanntes Profil {name!r}")
+            profiles.profiles[name].seed_pool = [
+                s for s in profiles.profiles[name].seed_pool if s != seed
+            ]
+            profiles.save(paths.profiles)
         return {"ok": "removed"}
+
+    def fixed_seed_of(body: dict, lock: Lock | None) -> int | None:
+        fixed = body.get("fixedSeed")
+        if fixed is None and lock and lock.generate_seed is not None:
+            fixed = lock.generate_seed
+        if fixed is None:
+            return None
+        try:
+            return parse_seed(fixed)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.post("/api/clips/{key}/candidates", status_code=202)
     def api_candidates(key: str, body: dict = Body(default={})) -> dict[str, str]:
         ctx, clip = clip_by_key(key)
-        profile = ctx.profiles.profiles[clip.profile]
-        fixed = body.get("fixedSeed")
-        if fixed is None:
-            lock = ctx.locks.get(key)
-            if lock and lock.generate_seed is not None:
-                fixed = lock.generate_seed
-        if fixed is not None:
-            try:
-                seeds = [parse_seed(fixed)]
-            except ValueError as exc:
-                raise HTTPException(status_code=422, detail=str(exc)) from exc
-        else:
-            count = max(1, min(MAX_CANDIDATES, int(body.get("n", 4))))
-            seeds = seeds_for_candidates(
-                count=count, clip=clip, profile=profile, paths=paths,
-                locks=ctx.locks,
-                use_top_seeds=bool(body.get("useTopSeeds")),
-                use_known_seeds=bool(body.get("useKnownSeeds")),
-            )
+        fixed = fixed_seed_of(body, ctx.locks.get(key))
+        # Ein neuer Wurf auf dem Produktions-Seed läge unter demselben Seed wie
+        # die Produktion, klänge aber anders: die Tabelle zeigte ihn als
+        # Produktion, Promote hielte ihn für „schon da", und App und Kandidat
+        # liefen still auseinander.
+        if fixed is not None and fixed == clip.seed and (paths.audio / f"{key}.wav").exists():
+            raise HTTPException(
+                status_code=409,
+                detail=f"Seed {fixed} ist die Produktion — erst „Keine Produktion\u201c, "
+                       "dann neu würfeln, oder einen anderen festen Seed wählen")
+        require_engine()
+        count = max(1, min(MAX_CANDIDATES, int(body.get("n", 4))))
+        use_top = bool(body.get("useTopSeeds"))
+        use_known = bool(body.get("useKnownSeeds"))
 
         def run(is_cancelled) -> None:
-            written = sample_candidates(
-                clip, profile, engine, paths, seeds,
-                progress=lambda p: jobs.publish({
-                    "type": "candidate", "clipKey": clip.key,
+            # Alles erst hier aufgelöst, nicht beim Einreihen: Text, Stimme und
+            # Profil können sich geändert haben, und ein Kandidat, der in der
+            # Zwischenzeit entstand, darf nicht ein zweites Mal gewürfelt —
+            # und damit samt Sidecar überschrieben — werden.
+            fresh = fresh_clip(key)
+            if fresh is None:
+                raise RuntimeError(f"Clip {key!r} gibt es nicht mehr")
+            clip_now, profile_now, locks_now = fresh
+            fixed_now = body.get("fixedSeed")
+            if fixed_now is None:
+                lock_now = locks_now.get(key)
+                fixed_now = lock_now.generate_seed if lock_now else None
+            if fixed_now is not None:
+                seeds = [parse_seed(fixed_now)]
+            else:
+                seeds = seeds_for_candidates(
+                    count=count, clip=clip_now, profile=profile_now, paths=paths,
+                    locks=locks_now, use_top_seeds=use_top, use_known_seeds=use_known)
+            tally = {"ok": 0, "failed": 0, "skipped": 0}
+
+            def on_progress(p) -> None:
+                tally[p.status] = tally.get(p.status, 0) + 1
+                jobs.publish({
+                    "type": "candidate", "clipKey": key,
                     "index": p.index, "total": p.total,
-                    "status": p.status, "message": p.message}),
-                cancel=is_cancelled)
+                    "status": p.status, "message": p.message})
+
+            sample_candidates(clip_now, profile_now, engine, paths, seeds,
+                              progress=on_progress, cancel=is_cancelled)
+            attempted = tally["ok"] + tally["failed"] + tally["skipped"]
             jobs.publish({"type": "job-summary", "job": f"candidates:{key}",
-                          "rendered": len(written), "skipped": 0,
-                          "failed": len(seeds) - len(written)})
+                          "rendered": tally["ok"], "skipped": tally["skipped"],
+                          "failed": tally["failed"],
+                          # Nicht mehr drangekommen — ein Abbruch ist kein Fehlschlag.
+                          "cancelled": len(seeds) - attempted})
 
         jobs.submit(f"candidates:{key}", run)
         return {"ok": "queued"}
 
     @app.post("/api/clips/{key}/lock")
     def api_lock(key: str, body: dict = Body(...)) -> dict[str, str]:
+        with CURATED_FILES_LOCK:
+            return _lock(key, body)
+
+    def _lock(key: str, body: dict) -> dict[str, str]:
         ctx, clip = clip_by_key(key)
         locks = Locks.load(paths.locks)
         existing = locks.get(key)
@@ -476,15 +554,21 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
         if speaker is not None:
             _checked_speaker(speaker)
 
-        if "seed" not in body:
-            raise HTTPException(status_code=422, detail="'seed' fehlt im Request-Body")
-        try:
-            lock_seed = int(body["seed"])
-        except (TypeError, ValueError) as exc:
-            raise HTTPException(
-                status_code=422,
-                detail=f"'seed' muss eine Ganzzahl sein, nicht {type(body['seed']).__name__}",
-            ) from exc
+        # `seed` ist optional und wird nur geändert, wenn er im Body steht.
+        # Vorher war er Pflicht und überschrieb den Lock-Seed: ein verspätetes
+        # Text-Autosave (600 ms Debounce) mit dem Seed von vor dem Klick nahm
+        # einen gerade gemachten Promote zurück. Ohne `seed` bleibt der des
+        # Locks; ohne Lock wird der aufgelöste Seed des Clips festgenagelt.
+        if body.get("seed") is not None:
+            try:
+                lock_seed = int(body["seed"])
+            except (TypeError, ValueError) as exc:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"'seed' muss eine Ganzzahl sein, nicht {type(body['seed']).__name__}",
+                ) from exc
+        else:
+            lock_seed = existing.seed if existing else clip.seed
 
         generate_seed = merged("generateSeed",
                                existing.generate_seed if existing else None)
@@ -496,28 +580,55 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
         elif "generateSeed" in body and body["generateSeed"] is None:
             generate_seed = None
 
+        text_override = merged("textOverride", existing.text_override if existing else None)
+        draft = merged("draftText", existing.draft_text if existing else None)
+        for field, value in (("textOverride", text_override), ("draftText", draft)):
+            if value is not None and not isinstance(value, str):
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"'{field}' muss ein Text oder null sein, nicht {type(value).__name__}")
+        # Ein Entwurf, der dem Produktionstext gleicht (oder leer ist), ist
+        # keiner — sonst bliebe nach jedem Zurücktippen ein Lock-Feld stehen,
+        # das nichts bedeutet und den Clip als „hat Entwurf" markiert.
+        if draft is not None and (not draft.strip() or draft == (text_override or clip.source_text)):
+            draft = None
+
         locks.set(key, Lock(
             seed=lock_seed,
             profile=override,
-            text_override=merged("textOverride",
-                                 existing.text_override if existing else None),
+            text_override=text_override,
+            draft_text=draft,
             note=merged("note", existing.note if existing else None),
             source_text=clip.source_text,
             speaker=speaker,
             generate_seed=generate_seed,
+            # Text, Stimme oder fester Seed machen aus einer aufgehobenen
+            # Produktion keine bestätigte — das tut nur ein Promote. Ebenso
+            # wenig ein erster Entwurf auf einem ungelockten Clip: der Lock
+            # hält dann nur Hörarbeit, keine Freigabe (sonst zählte der
+            # Hash-Seed als bestätigt, `render` und Export behandelten den Clip
+            # als abgenommen).
+            cleared=(existing.cleared if existing
+                     else draft is not None and text_override is None
+                     and body.get("seed") is None),
         ))
         locks.save(paths.locks)
         return {"ok": "locked"}
 
     @app.delete("/api/clips/{key}/lock")
     def api_unlock(key: str) -> dict[str, str]:
-        locks = Locks.load(paths.locks)
-        locks.remove(key)
-        locks.save(paths.locks)
+        with CURATED_FILES_LOCK:
+            locks = Locks.load(paths.locks)
+            locks.remove(key)
+            locks.save(paths.locks)
         return {"ok": "unlocked"}
 
     @app.post("/api/clips/{key}/promote")
     def api_promote(key: str, body: dict = Body(...)) -> dict[str, Any]:
+        with CURATED_FILES_LOCK:
+            return _promote(key, body)
+
+    def _promote(key: str, body: dict) -> dict[str, Any]:
         ctx, clip = clip_by_key(key)
         if "seed" not in body:
             raise HTTPException(status_code=422, detail="'seed' fehlt im Request-Body")
@@ -533,15 +644,41 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
             raise HTTPException(status_code=404,
                                 detail=f"kein Kandidat mit Seed {seed} für {key!r}")
 
+        meta = candidate_meta(paths, key, seed) if source.exists() else {}
+        is_mic = meta.get("source") == "mic"
+        existing = Locks.load(paths.locks).get(key)
+        # Der Produktionstext ist der Text, mit dem der übernommene Kandidat
+        # entstand — nicht, was gerade im TTS-Feld steht. Sonst trüge die
+        # Produktion den Text eines späteren Entwurfs und ihr Fingerprint (und
+        # der Export) passten nicht zum Audio. Ohne aufgezeichneten Text
+        # (Nachbau-Eintrag, Alt-Sidecar) und bei Aufnahmen, die kein Text
+        # erzeugt hat, bleibt der bisherige.
+        recorded_text = meta.get("text")
+        if isinstance(recorded_text, str) and recorded_text and not is_mic:
+            text_override = None if recorded_text == clip.source_text else recorded_text
+        else:
+            text_override = existing.text_override if existing else None
+        production_text = text_override or clip.source_text
+        draft = existing.draft_text if existing else None
+        # Eine kuratierte Aussprache, die der übernommene Kandidat nicht trägt
+        # (z. B. ein älterer Wurf mit dem Originalsatz), darf nicht verloren
+        # gehen: sie bleibt als Entwurf für das nächste Generate stehen.
+        if (draft is None and existing and existing.text_override
+                and existing.text_override != production_text):
+            draft = existing.text_override
+        if draft == production_text:
+            draft = None
+
         # Lock zuerst: anders als api_lock bleiben vorhandene kuratierte
-        # Felder (profile, textOverride, note) erhalten — Promote entscheidet
-        # nur über den Seed, nicht über den Rest der Hörarbeit.
+        # Felder (profile, note, Stimme, fester Seed) erhalten — Promote
+        # entscheidet über Seed und Produktionstext, nicht über den Rest der
+        # Hörarbeit. `cleared` fällt: das hier ist die neue Freigabe.
         locks = Locks.load(paths.locks)
-        existing = locks.get(key)
         locks.set(key, Lock(
             seed=seed,
             profile=existing.profile if existing else None,
-            text_override=existing.text_override if existing else None,
+            text_override=text_override,
+            draft_text=draft,
             note=existing.note if existing else None,
             source_text=clip.source_text,
             speaker=existing.speaker if existing else None,
@@ -558,12 +695,11 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
         # durch ein späteres Profil-Update invalidiert (siehe plan.status_of).
         if source.exists():
             profile = ctx.profiles.profiles[clip.profile]
-            meta = candidate_meta(paths, key, seed)
-            if meta.get("source") == "mic":
+            if is_mic:
                 # Eine Aufnahme hängt an keiner Profil-Einstellung — nichts zu prüfen.
                 verified = True
             else:
-                target = fingerprint(replace(clip, seed=seed), profile)
+                target = fingerprint(replace(clip, seed=seed, text=production_text), profile)
                 verified = candidate_fingerprint(paths, key, seed) == target
         else:
             # Nachbau-Eintrag ohne Sidecar — es gibt nichts, wogegen sich das
@@ -579,6 +715,10 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
         try:
             return store_recording(paths, clip, ctx.profiles.profiles[clip.profile], data)
         except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except RuntimeError as exc:
+            # z. B. librosa fehlt für den Profil-Pitch: das ist eine Meldung für
+            # den Menschen am Mikrofon, kein anonymer 500.
             raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     @app.get("/api/clips/{key}/recordings/{seed}")
@@ -635,16 +775,19 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
             raise HTTPException(status_code=404,
                                 detail=f"kein Kandidat mit Seed {seed} für {key!r}")
         good = bool(body.get("good"))
-        update_candidate_meta(paths, key, seed, rating="good" if good else None)
-
-        profiles = Profiles.load(paths.profiles)
-        pool = profiles.profiles[clip.profile].seed_pool
-        if good and seed not in pool:
-            pool.append(seed)
-            pool.sort()
-        elif not good:
-            profiles.profiles[clip.profile].seed_pool = [s for s in pool if s != seed]
-        profiles.save(paths.profiles)
+        with CURATED_FILES_LOCK:
+            update_candidate_meta(paths, key, seed, rating="good" if good else None)
+            if good:
+                profiles = Profiles.load(paths.profiles)
+                pool = profiles.profiles[clip.profile].seed_pool
+                if seed not in pool:
+                    pool.append(seed)
+                    pool.sort()
+                    profiles.save(paths.profiles)
+            else:
+                # Der Pool gehört dem Profil: hält ein anderer Clip den Seed
+                # noch mit 👍, bleibt er drin.
+                release_pool_seed(paths, clip.profile, seed, exclude_key=key)
         return {"ok": "rated", "good": good}
 
     @app.delete("/api/clips/{key}/candidates/{seed}")
@@ -666,11 +809,12 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
     def api_delete_deletable_candidates(key: str) -> dict[str, Any]:
         """Alle löschbaren Probeaufnahmen — ohne 👍 und ohne Produktion."""
         ctx, clip = clip_by_key(key)
-        deletable, skipped = deletable_candidate_seeds(paths, clip)
         deleted: list[int] = []
-        for seed in deletable:
-            delete_candidate_wav(paths, clip, seed)
-            deleted.append(seed)
+        with CURATED_FILES_LOCK:
+            deletable, skipped = deletable_candidate_seeds(paths, clip)
+            for seed in deletable:
+                delete_candidate_wav(paths, clip, seed)
+                deleted.append(seed)
         return {"ok": "deleted", "deleted": len(deleted), "skipped": skipped,
                 "seeds": deleted}
 
@@ -703,6 +847,7 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
                 raise HTTPException(status_code=422,
                                     detail=f"unbekannte Clips: {', '.join(unknown)}")
 
+        require_engine()
         selection = set(keys) if keys is not None else None
         name = (f"render:{len(selection)} ausgewählte" if selection is not None
                 else f"render:{profile or 'alle'}")
@@ -728,13 +873,16 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
                 clip_start=lambda key: jobs.publish({
                     "type": "clip-start", "clipKey": key}),
                 clip_done=lambda key: jobs.publish({
-                    "type": "clip-done", "clipKey": key}))
+                    "type": "clip-done", "clipKey": key}),
+                # Jeder Clip mit dem Stand von jetzt, nicht vom Start des Laufs.
+                refresh=fresh_clip)
             # render_batch_candidates swallows per-clip failures so the batch
             # continues. Without this summary the job publishes `job-done` and
             # the UI says "fertig" even when every single clip failed.
             jobs.publish({"type": "job-summary", "job": name,
                           "rendered": report.rendered, "skipped": report.skipped,
-                          "failed": len(report.failed)})
+                          "failed": len(report.failed),
+                          "cancelled": report.cancelled})
 
         jobs.submit(name, run)
         return {"ok": "queued"}

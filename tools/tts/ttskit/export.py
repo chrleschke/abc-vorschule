@@ -198,6 +198,9 @@ def export_to_app(paths: Paths) -> ExportReport:
     retained_variants: dict[str, dict[str, dict]] = {}
     retained_files: set[str] = set()
     for clip in ctx.clips:
+        # Auch ein Lock mit `cleared` („Keine Produktion") zählt hier als nicht
+        # gelockt (plan.build_clips): weder Export noch Zurückbehalten — die
+        # committete .ogg fällt beim Aufräumen unten weg.
         if not clip.locked:
             continue
         status = status_of(clip, paths.audio)

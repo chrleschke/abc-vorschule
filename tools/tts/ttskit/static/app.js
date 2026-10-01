@@ -104,11 +104,22 @@ const guard = (fn) => (...args) => Promise.resolve()
   .then(() => fn(...args))
   .catch(showError);
 
+// FastAPI antwortet mit {"detail": "…"}; roh angezeigt stand im Banner
+// `422: {"detail":"…"}`. Validierungsfehler (Liste) bleiben als JSON lesbar.
+async function errorDetail(response) {
+  const raw = await response.text().catch(() => "");
+  try {
+    const detail = JSON.parse(raw).detail;
+    if (typeof detail === "string") return detail;
+    if (detail !== undefined) return JSON.stringify(detail);
+  } catch { /* kein JSON — Rohtext zeigen */ }
+  return raw || response.statusText;
+}
+
 async function api(path, options) {
   const response = await fetch(path, options);
   if (!response.ok) {
-    const detail = await response.text();
-    throw new Error(`${response.status}: ${detail}`);
+    throw new Error(`${response.status}: ${await errorDetail(response)}`);
   }
   return response.status === 204 ? null : response.json();
 }
@@ -141,8 +152,16 @@ function readLocal(key, fallback) {
   }
 }
 
-const writeLocal = (key, value) =>
-  localStorage.setItem(key, JSON.stringify(value));
+// Gesperrter oder voller Speicher darf keine Klick-Aktion abbrechen — es geht
+// nur um Ansichts-Komfort.
+function writeLocal(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch { /* egal */ }
+}
+
+const isPlainObject = (value) =>
+  value !== null && typeof value === "object" && !Array.isArray(value);
 
 function candidateCount() {
   const max = state.limits.maxCandidates || 16;
@@ -213,11 +232,15 @@ function persistViewState() {
 }
 
 function restoreViewState() {
-  const view = readLocal("ttsView", {});
-  el("search").value = view.search || "";
+  // Von Hand oder von einer älteren Version verbogene Werte (null, Zahl …)
+  // dürfen den ersten Aufbau nicht abbrechen.
+  const stored = readLocal("ttsView", {});
+  const view = isPlainObject(stored) ? stored : {};
+  el("search").value = typeof view.search === "string" ? view.search : "";
   el("filter-profile").value = view.profile || "";
   el("filter-status").value = view.status || "";
-  state.selectedKeys = new Set(readLocal("ttsSelection", []));
+  const selection = readLocal("ttsSelection", []);
+  state.selectedKeys = new Set(Array.isArray(selection) ? selection : []);
   const live = new Set(state.clips.map((c) => c.key));
   if (view.selected && live.has(view.selected)) state.selected = view.selected;
 }
@@ -225,10 +248,19 @@ function restoreViewState() {
 // ------------------------------------------------------------------- Daten
 
 let restored = false;
+// /api/state läuft serverseitig parallel; eine ältere, langsamere Antwort darf
+// eine neuere nicht überschreiben (sonst springt ein 👍 zurück oder der Job
+// steht nach setJobIdle() wieder auf „läuft").
+let refreshSeq = 0;
+let refreshApplied = 0;
+let engineBannerShown = false;
 
 async function refresh({ keepDetail = false } = {}) {
-  const before = keepDetail && state.selected ? clipSignature(state.selected) : null;
+  const id = ++refreshSeq;
   const data = await api("/api/state");
+  if (id < refreshApplied) return;
+  refreshApplied = id;
+  const before = keepDetail && state.selected ? clipSignature(state.selected) : null;
   Object.assign(state, data);
   state.appMonsterPitch = data.appMonsterPitch || state.appMonsterPitch;
 
@@ -254,13 +286,63 @@ async function refresh({ keepDetail = false } = {}) {
   ensureClipBaselines();
   if (state.selected) acknowledgeClip(state.selected);
 
-  if (!state.engine.loaded) {
-    showBanner(`Engine offline: ${state.engine.error || "unbekannt"}`, "warn");
+  // Einmal reicht: bei jedem refresh() neu gezeigt, überschrieb das Banner
+  // jede echte Fehler- oder Erfolgsmeldung. Generate und Batch-Lauf sind
+  // ohnehin gesperrt, solange die Engine fehlt (engineOffline()).
+  if (!state.engine.loaded && !engineBannerShown) {
+    engineBannerShown = true;
+    showBanner(`Engine offline: ${state.engine.error || "Modell nicht geladen"} — ` +
+      "Anhören, Bewerten, Bestätigen und Export gehen, Erzeugen nicht.", "warn");
   }
   renderList();
   const detailStale = before === null || before !== clipSignature(state.selected);
   if (state.selected && detailStale) redrawDetail();
-  if (state.paramsOpen) renderParams();
+  // Nicht mitten in eine ungespeicherte Eingabe hinein neu aufbauen — ein
+  // Batch-Lauf lädt nach jedem Clip nach.
+  if (state.paramsOpen && !el("params-panel").querySelector("[data-dirty]")) renderParams();
+}
+
+const engineOffline = () => !state.engine.loaded;
+
+// Profil-Formulare (⚙️-Panel, Profilkarte der Detailsicht) gelten als „in
+// Arbeit", sobald darin etwas geändert wurde: das Formular trägt dann
+// `data-dirty`. Der Neuaufbau per innerHTML entfernt das Attribut von selbst;
+// Speichern und Verwerfen bauen neu auf.
+function trackDirty(root, formSelector) {
+  if (!root || root.dataset.dirtyTracking) return;
+  root.dataset.dirtyTracking = "1";
+  const mark = (event) => {
+    const form = event.target.closest(formSelector);
+    if (form) form.dataset.dirty = "1";
+  };
+  root.addEventListener("input", mark);
+  root.addEventListener("change", mark);
+}
+
+// Werte eines geänderten Formulars über einen Neuaufbau retten — Reihenfolge
+// der Felder ist zwischen zwei Renderings desselben Profils gleich.
+function snapshotForm(form) {
+  if (!form || !form.dataset.dirty) return null;
+  return {
+    profile: form.dataset.formProfile,
+    values: [...form.querySelectorAll("input, select, textarea")].map((field) =>
+      field.type === "checkbox" || field.type === "radio" ? field.checked : field.value),
+  };
+}
+
+function restoreForm(form, snapshot) {
+  if (!form || !snapshot) return;
+  // Profil gewechselt: die Werte gehören einem anderen Profil und dürfen
+  // nicht beim nächsten „Speichern" auf diesem landen.
+  if (form.dataset.formProfile !== snapshot.profile) return;
+  const fields = [...form.querySelectorAll("input, select, textarea")];
+  if (fields.length !== snapshot.values.length) return;
+  snapshot = snapshot.values;
+  fields.forEach((field, i) => {
+    if (field.type === "checkbox" || field.type === "radio") field.checked = snapshot[i];
+    else field.value = snapshot[i];
+  });
+  form.dataset.dirty = "1";
 }
 
 // Ein Batch-Lauf lädt nach jedem fertigen Clip nach — und währenddessen hört
@@ -272,7 +354,7 @@ function clipSignature(key) {
   const clip = state.clips.find((c) => c.key === key);
   if (!clip) return "";
   return JSON.stringify([
-    clip.status, clip.locked, clip.seed, clip.text, clip.speaker, clip.profile,
+    clip.status, clip.locked, clip.seed, clip.text, clip.draftText, clip.speaker, clip.profile,
     clip.generateSeed,
     clip.candidates.map((c) => [c.seed, c.good, c.isProductionOnly, c.createdAt]),
   ]);
@@ -310,6 +392,7 @@ function visibleClips() {
     // Beide Texte durchsuchen: wer nach dem Satz aus der App sucht, findet den
     // Clip sonst nicht mehr, sobald eine eigene Aussprache hinterlegt ist.
     if (needle && !clip.text.toLowerCase().includes(needle) &&
+        !(clip.draftText || "").toLowerCase().includes(needle) &&
         !clip.sourceText.toLowerCase().includes(needle)) return false;
     return true;
   });
@@ -320,8 +403,11 @@ function visibleClips() {
 function updateBatchUi() {
   const count = state.selectedKeys.size;
   el("sel-count").textContent = count ? `${count} ausgewählt` : "nichts ausgewählt";
-  el("btn-render").textContent = count ? `▶ Batch-Lauf (${count})` : "▶ Batch-Lauf";
-  el("btn-render").disabled = count === 0;
+  const render = el("btn-render");
+  if (render.dataset.busy) return;
+  render.textContent = count ? `▶ Batch-Lauf (${count})` : "▶ Batch-Lauf";
+  render.disabled = count === 0 || engineOffline();
+  render.title = engineOffline() ? "Modell nicht geladen — Erzeugen geht gerade nicht" : "";
 }
 
 function setSelection(keys) {
@@ -383,6 +469,7 @@ function select(key) {
   // Sonst liefe eine Aufnahme für den bisherigen Clip im Hintergrund weiter
   // und ginge beim nächsten Wechsel oder Reload stillschweigend verloren.
   if (state.recorder) stopRecording().catch(showError);
+  if (state.editor) stopPreview(state.editor);
   state.selected = key;
   acknowledgeClip(key);
   persistViewState();
@@ -609,6 +696,9 @@ function wirePoolLinks(container) {
 
 const saveProfileFrom = (container, name) => guard(async () => {
   await put(`/api/profiles/${name}`, readProfileForm(container));
+  // Gespeichert ist nicht mehr „in Arbeit" — sonst bliebe das Formular für
+  // jeden weiteren refresh() eingefroren.
+  delete container.dataset.dirty;
   await refresh();
   showBanner(`Profil „${name}“ gespeichert — neue Kandidaten verwenden ab sofort ` +
     `diese Einstellungen. Bereits produzierte Clips bleiben unverändert.`, "ok");
@@ -730,7 +820,7 @@ function profileSummaryCard(clip, profile) {
         <button id="btn-profile-toggle">${state.profileEditOpen ? "Schließen" : "Bearbeiten"}</button>
       </div>
       ${state.profileEditOpen ? `
-        <div id="profile-form" class="profile-form">
+        <div id="profile-form" class="profile-form" data-form-profile="${escapeHtml(clip.profile)}">
           ${profileFormHtml(clip.profile)}
           <p>
             <button id="btn-profile-save" class="primary">Speichern</button>
@@ -876,7 +966,7 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
         ${clip.locked ? '<span class="chip locked">📌 festgelegt</span>' : ""}
       </div>
       <textarea id="tts-text" class="tts-text-input" rows="2" spellcheck="false"
-                title="Text, der ans Modell geht — wird automatisch gespeichert">${escapeHtml(clip.text)}</textarea>
+                title="Text für neue Aufnahmen — wird automatisch gespeichert. Die bestätigte Produktion behält ihren Text.">${escapeHtml(workingText(clip))}</textarea>
       <span id="tts-text-status" class="tts-text-status muted small" aria-live="polite"></span>
       <p class="voice-line">
         Profil:
@@ -904,8 +994,11 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
       ${clipSource(clip) === "tts" ? `
       <div class="generate-row">
         <button id="btn-candidates" class="primary ${generating ? "pending" : ""}"
-                ${generating ? "disabled" : ""}
-                title="${waitingForBatch
+                ${generating || engineOffline() ? "disabled" : ""}
+                title="${engineOffline()
+                  ? "Modell nicht geladen — Erzeugen geht erst nach einem Neustart " +
+                    "des Servers (./start-tts-ui.sh)"
+                  : waitingForBatch
                   ? "Der Batch-Lauf kommt später auch zu diesem Clip — eine Anfrage " +
                     "von hier reiht sich dahinter ein"
                   : "Neue Probeaufnahmen erzeugen — läuft schon ein Job, wird die " +
@@ -1155,8 +1248,11 @@ function wireEditor(clip) {
       const response = await fetch(`/api/clips/${encoded}/recordings/${ed.seed}/preview`, {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
       });
-      if (!response.ok) throw new Error((await response.json()).detail || response.statusText);
-      const url = URL.createObjectURL(await response.blob());
+      if (!response.ok) throw new Error(await errorDetail(response));
+      const blob = await response.blob();
+      // Editor inzwischen zu oder anderer Clip: die Vorschau gehört niemandem mehr.
+      if (state.editor !== ed) return;
+      const url = URL.createObjectURL(blob);
       stopPreview(ed);
       ed.playing = new Audio(url);
       const playing = ed.playing;
@@ -1165,7 +1261,8 @@ function wireEditor(clip) {
         // ohne das hier hielte jede abgehörte Bearbeitung ihre Blob-URL fest.
         URL.revokeObjectURL(playing.src);
         if (ed.playing === playing) ed.playing = null;
-        el("ed-status").textContent = "";
+        const status = el("ed-status");
+        if (status) status.textContent = "";
       };
       el("ed-status").textContent = button.dataset.appPitch
         ? `spielt mit App-Pitch ×${button.dataset.appPitch}` : "spielt";
@@ -1174,8 +1271,19 @@ function wireEditor(clip) {
   });
   el("ed-discard").onclick = () => closeEditor();
   el("ed-save").onclick = guard(async () => {
+    // Zwei Klicks hießen zwei gleichzeitige apply_edit auf dieselbe Datei.
+    if (ed.saving) return;
+    ed.saving = true;
+    el("ed-save").disabled = true;
     stopPreview(ed);
-    await put(`/api/clips/${encoded}/recordings/${ed.seed}`, ed.edit);
+    try {
+      await put(`/api/clips/${encoded}/recordings/${ed.seed}`, ed.edit);
+    } catch (error) {
+      ed.saving = false;
+      const save = el("ed-save");
+      if (save) save.disabled = false;
+      throw error;
+    }
     await refresh({ keepDetail: true });
     // refresh() zeichnet die Detailsicht nur neu, wenn sich an clipSignature()
     // etwas geändert hat — ein reiner Schnitt (Start/Ende/Tonhöhe) rührt daran
@@ -1205,14 +1313,28 @@ function encodeWav(chunks, sampleRate) {
 
 const MAX_RECORDING_SECONDS = 30;
 
+// Zwischen Klick und laufender Aufnahme liegen Rechte-Dialog und Laden des
+// Worklets. Ohne diese Sperre startete ein Doppelklick zwei Mikrofon-Ströme
+// (einer blieb offen, das Mikrofon-Symbol von macOS ging nie aus), und wer in
+// der Zeit den Clip wechselte, nahm unsichtbar für den alten Clip auf.
+let recorderStarting = false;
+
 async function startRecording(clip) {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: {
-    channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false,
-  } });
+  if (recorderStarting || state.recorder) return;
+  recorderStarting = true;
+  let stream;
   let ctx;
   try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: {
+      channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false,
+    } });
     ctx = new AudioContext();
     await ctx.audioWorklet.addModule("/recorder-worklet.js");
+    if (state.selected !== clip.key) {
+      stream.getTracks().forEach((t) => t.stop());
+      await ctx.close().catch(() => {});
+      return;
+    }
     const source = ctx.createMediaStreamSource(stream);
     const node = new AudioWorkletNode(ctx, "recorder", { numberOfInputs: 1, numberOfOutputs: 0 });
     const rec = { clipKey: clip.key, stream, ctx, node, chunks: [], samples: 0 };
@@ -1223,15 +1345,19 @@ async function startRecording(clip) {
       for (const s of event.data) peak = Math.max(peak, Math.abs(s));
       const bar = el("rec-level-bar");
       if (bar) bar.style.width = `${Math.min(100, Math.round(peak * 100))}%`;
-      if (rec.samples / ctx.sampleRate >= MAX_RECORDING_SECONDS) stopRecording().catch(showError);
+      if (rec.samples / ctx.sampleRate >= MAX_RECORDING_SECONDS && state.recorder === rec) {
+        stopRecording().catch(showError);
+      }
     };
     source.connect(node);
     state.recorder = rec;
     redrawDetail();
   } catch (error) {
-    stream.getTracks().forEach((t) => t.stop());
+    if (stream) stream.getTracks().forEach((t) => t.stop());
     if (ctx) await ctx.close().catch(() => {});
     throw error;
+  } finally {
+    recorderStarting = false;
   }
 }
 
@@ -1458,11 +1584,19 @@ function wireWaveforms(container, clip) {
           view.end = Math.min(duration, view.end);
           drawWave(canvas, view, view.start);
         };
-        const up = async () => {
+        const up = async (e) => {
           canvas.removeEventListener("pointermove", move);
           canvas.removeEventListener("pointerup", up);
           canvas.removeEventListener("pointercancel", up);
           canvas.dragging = null;
+          // Abgebrochen (Browser übernimmt die Geste, Fenster verliert den
+          // Fokus): nichts speichern — sonst stand ein zufälliger Schnitt fest.
+          if (e.type === "pointercancel") {
+            view.start = before.start;
+            view.end = before.end;
+            redraw();
+            return;
+          }
           if (view.start === before.start && view.end === before.end) return;
           // Auf Millisekunden runden; ganz an den Rand gezogen heißt „nicht schneiden“.
           view.start = view.start < 0.005 ? 0 : Math.round(view.start * 1000) / 1000;
@@ -1513,7 +1647,9 @@ function wireCandidateHandlers(clip) {
   wireWaveforms(el("detail"), clip);
   el("detail").querySelectorAll("[data-rate]").forEach((button) => {
     button.onclick = guard(async () => {
-      if (globalCandidateActionBusy(clip.key)) return;
+      // Eine Bewertung nach der anderen: zwei gleichzeitige PUTs mit
+      // entgegengesetztem `good` lieferten sich sonst ein Rennen.
+      if (globalCandidateActionBusy(clip.key) || isActionPending("rate", clip.key)) return;
       const seed = Number(button.dataset.rate);
       const cand = clip.candidates.find((c) => c.seed === seed);
       const good = !(cand && cand.good);
@@ -1526,8 +1662,8 @@ function wireCandidateHandlers(clip) {
         showBanner(good
           ? `Seed ${seed} als gut markiert und in den Seed-Pool von „${clip.profile}“ ` +
             `aufgenommen.`
-          : `Bewertung zurückgenommen — Seed ${seed} ist wieder aus dem Pool von ` +
-            `„${clip.profile}“ entfernt.`, "ok");
+          : `Bewertung zurückgenommen — Seed ${seed} verlässt den Pool von ` +
+            `„${clip.profile}“, sofern kein anderer Clip ihn mit 👍 trägt.`, "ok");
       } catch (error) {
         await refreshAfterDetailAction();
         throw error;
@@ -1540,6 +1676,7 @@ function wireCandidateHandlers(clip) {
       const seed = Number(button.dataset.discard);
       if (clip.status === "rendered" && clip.seed === seed) return;
       state.actionPending = { type: "discard", clipKey: clip.key, seed };
+      await flushPendingSaves(clip.key);
       syncCandidatesBody(clip);
       try {
         await api(`/api/clips/${encoded}/candidates/${seed}`, { method: "DELETE" });
@@ -1563,6 +1700,7 @@ function wireCandidateHandlers(clip) {
         return;
       }
       state.actionPending = { type: "promote", clipKey: clip.key, seed };
+      await flushPendingSaves(clip.key);
       syncCandidatesBody(clip);
       try {
         const result = await post(`/api/clips/${encoded}/promote`, { seed });
@@ -1600,6 +1738,7 @@ function wireDeleteAllCandidates(clip) {
       return;
     }
     state.actionPending = { type: "deleteAll", clipKey: clip.key };
+    await flushPendingSaves(clip.key);
     try {
       const result = await api(`/api/clips/${encoded}/candidates`, { method: "DELETE" });
       await refreshAfterDetailAction();
@@ -1628,6 +1767,7 @@ function wireClearProduction(clip) {
       return;
     }
     state.actionPending = { type: "clearProduction", clipKey: clip.key };
+    await flushPendingSaves(clip.key);
     renderDetail(clip.key);
     try {
       await post(`/api/clips/${encoded}/clear-production`, {});
@@ -1643,6 +1783,36 @@ function wireClearProduction(clip) {
 const TEXT_SAVE_DELAY_MS = 600;
 const textSaveTimers = new Map();
 const fixedSeedSaveTimers = new Map();
+// clipKey → persist() einer noch nicht gespeicherten Eingabe. Vor jeder
+// Aktion, die den Lock oder die Kandidaten anfasst (Generate, Produktion,
+// Löschen, Batch-Lauf), wird sie sofort ausgeführt: sonst erzeugte Generate
+// mit dem alten Text, und ein Autosave, der nach der Aktion feuerte, stand
+// auf einem veralteten Stand.
+const pendingSaves = new Map();
+
+function registerPendingSave(key, timers, persist) {
+  const saves = pendingSaves.get(key) || new Map();
+  saves.set(timers, persist);
+  pendingSaves.set(key, saves);
+}
+
+function forgetPendingSave(key, timers) {
+  const saves = pendingSaves.get(key);
+  if (!saves) return;
+  saves.delete(timers);
+  if (!saves.size) pendingSaves.delete(key);
+}
+
+async function flushPendingSaves(key) {
+  const saves = pendingSaves.get(key);
+  if (!saves) return;
+  pendingSaves.delete(key);
+  for (const [timers, persist] of saves) {
+    window.clearTimeout(timers.get(key));
+    timers.delete(key);
+    await persist();
+  }
+}
 const MAX_RANDOM_SEED = 2147483647;
 
 function parseFixedSeedInput(input) {
@@ -1664,12 +1834,18 @@ function setGenerateOptionsDisabled(disabled) {
   if (top) top.disabled = disabled;
 }
 
+// Text für neue Aufnahmen: ein Entwurf (`draftText`), sonst der Text der
+// Produktion. Das Textfeld schreibt nur den Entwurf — die bestätigte Aufnahme
+// behält den Text, mit dem sie entstanden ist; Produktion übernimmt beim
+// Bestätigen den Text des gewählten Kandidaten (Server: api_promote).
+const workingText = (clip) => clip.draftText ?? clip.text;
+
 function wireTtsTextAutosave(clip) {
   const input = el("tts-text");
   const status = el("tts-text-status");
   if (!input) return;
   const encoded = encodeURIComponent(clip.key);
-  let lastSaved = clip.text;
+  let lastSaved = workingText(clip);
 
   const setStatus = (message) => {
     if (status) status.textContent = message;
@@ -1683,12 +1859,21 @@ function wireTtsTextAutosave(clip) {
       return;
     }
     setStatus("Speichere …");
-    const body = text === clip.sourceText
-      ? { seed: clip.seed, textOverride: null }
-      : { seed: clip.seed, textOverride: text };
-    await post(`/api/clips/${encoded}/lock`, body);
+    // Ohne `seed`: der Server behält den Seed des Locks. Der Seed aus dem
+    // Rendering dieser Ansicht kann inzwischen veraltet sein (Produktion
+    // gewechselt) — mitgeschickt hätte er die neue Wahl still rückgängig
+    // gemacht.
+    // Gleich dem Text der Produktion heißt: kein Entwurf (der Server
+    // normalisiert das ebenso).
+    const body = { draftText: text === clip.text ? null : text };
+    try {
+      await post(`/api/clips/${encoded}/lock`, body);
+    } catch (error) {
+      setStatus("Nicht gespeichert");
+      throw error;
+    }
     lastSaved = text;
-    await refresh();
+    await refresh({ keepDetail: true });
     setStatus("Gespeichert");
     window.setTimeout(() => {
       if (status && status.textContent === "Gespeichert") setStatus("");
@@ -1699,8 +1884,10 @@ function wireTtsTextAutosave(clip) {
     setStatus("");
     const pending = textSaveTimers.get(clip.key);
     if (pending) window.clearTimeout(pending);
+    registerPendingSave(clip.key, textSaveTimers, persist);
     textSaveTimers.set(clip.key, window.setTimeout(() => {
       textSaveTimers.delete(clip.key);
+      forgetPendingSave(clip.key, textSaveTimers);
       persist();
     }, TEXT_SAVE_DELAY_MS));
   };
@@ -1733,12 +1920,14 @@ function wireFixedSeedAutosave(clip) {
     }
     if (parsed.value === lastSaved) return;
     setStatus("Speichere …");
-    await post(`/api/clips/${encoded}/lock`, {
-      seed: clip.seed,
-      generateSeed: parsed.value,
-    });
+    try {
+      await post(`/api/clips/${encoded}/lock`, { generateSeed: parsed.value });
+    } catch (error) {
+      setStatus("Nicht gespeichert");
+      throw error;
+    }
     lastSaved = parsed.value;
-    await refresh();
+    await refresh({ keepDetail: true });
     setStatus("Gespeichert");
     window.setTimeout(() => {
       if (status && status.textContent === "Gespeichert") setStatus("");
@@ -1755,8 +1944,10 @@ function wireFixedSeedAutosave(clip) {
     setStatus("");
     const pending = fixedSeedSaveTimers.get(clip.key);
     if (pending) window.clearTimeout(pending);
+    registerPendingSave(clip.key, fixedSeedSaveTimers, persist);
     fixedSeedSaveTimers.set(clip.key, window.setTimeout(() => {
       fixedSeedSaveTimers.delete(clip.key);
+      forgetPendingSave(clip.key, fixedSeedSaveTimers);
       persist();
     }, TEXT_SAVE_DELAY_MS));
   };
@@ -1780,6 +1971,7 @@ function renderDetail(key) {
     ${detailTitleHtml(clip)}
     ${candidatesCardHtml(clip, profile, max, poolSize, topSize)}
     ${profileSummaryCard(clip, profile)}`;
+  trackDirty(el("detail"), "#profile-form");
 
   // ---- Profil-Zusammenfassung (unten, sekundär)
   el("btn-profile-toggle").onclick = () => {
@@ -1822,10 +2014,20 @@ function renderDetail(key) {
     btnGenerate.classList.add("pending");
     btnGenerate.textContent = "⏳ Starte …";
     try {
+      // Eine gerade getippte Aussprache muss stehen, bevor der Server den Job
+      // aus dem Lock baut — sonst entstehen die Kandidaten mit dem alten Text.
+      await flushPendingSaves(clip.key);
       await post(`/api/clips/${encoded}/candidates`, body);
+    } catch (error) {
+      // Kein Job, also auch kein job-done, das den Spinner wieder abräumt.
+      state.generatingKeys.delete(clip.key);
+      renderList();
+      throw error;
     } finally {
       state.actionPending = null;
-      if (state.selected === clip.key) renderDetail(clip.key);
+      // redrawDetail statt renderDetail: wer nach dem Klick schon weitertippt,
+      // behält Text und Fokus.
+      if (state.selected === clip.key) redrawDetail();
     }
   });
   el("cand-count").onchange = () => {
@@ -1850,7 +2052,7 @@ function renderDetail(key) {
 
   el("clip-profile").onchange = guard(async (event) => {
     await post(`/api/clips/${encoded}/lock`,
-               { seed: clip.seed, profile: event.target.value });
+               { profile: event.target.value });
     await refresh();
     showBanner(`Profil gewechselt — Seed ${clip.seed} wurde dabei festgelegt (Lock).`, "info");
   });
@@ -1859,7 +2061,7 @@ function renderDetail(key) {
 
   el("clip-speaker").onchange = guard(async (event) => {
     const speaker = event.target.value;
-    await post(`/api/clips/${encoded}/lock`, { seed: clip.seed, speaker });
+    await post(`/api/clips/${encoded}/lock`, { speaker });
     await refresh();
     const origin = voiceOf(speaker)?.origin || "unbekannt";
     showBanner(`Stimme dieses Clips: ${speaker} (${origin}). ` +
@@ -1935,6 +2137,7 @@ function renderParams() {
         bei ganzen Sätzen kaum hörbar, bei einem einzelnen Laut deutlich.</p>
     </div>
     ${Object.keys(state.profiles).sort().map(paramsCard).join("")}`;
+  trackDirty(panel, "[data-profile]");
 
   el("btn-params-close").onclick = () => {
     state.paramsOpen = false;
@@ -1960,7 +2163,10 @@ function renderParams() {
       for (const profileName of Object.keys(state.profiles)) {
         await put(`/api/profiles/${profileName}`, { sampling });
       }
+      // Alle Karten neu: sonst zeigten die übrigen weiter die alten Werte, und
+      // ihr nächstes „Speichern" nähme die Übertragung still zurück.
       await refresh();
+      renderParams();
       showBanner("Sampling-Werte auf alle Profile übertragen (ohne die maximale " +
         "Dauer) — gilt ab sofort für neue Kandidaten.", "ok");
     });
@@ -1976,7 +2182,8 @@ function jobLabel(name) {
   if (name.startsWith("candidates:")) {
     const key = name.slice("candidates:".length);
     const clip = state.clips.find((c) => c.key === key);
-    const text = clip ? `„${clip.text.slice(0, 30)}${clip.text.length > 30 ? "…" : ""}“` : key;
+    const spoken = clip ? workingText(clip) : "";
+    const text = clip ? `„${spoken.slice(0, 30)}${spoken.length > 30 ? "…" : ""}“` : key;
     return `Kandidaten für ${text}`;
   }
   if (name.startsWith("render:")) return `Batch-Lauf (${name.slice("render:".length)})`;
@@ -2067,17 +2274,84 @@ function clearBatchTracking() {
         || state.batchPendingKeys.has(state.selected));
   state.batchActiveKey = null;
   state.batchPendingKeys.clear();
+  batchQueue.length = 0;
+  renderList();
+  if (affected) redrawDetail();
+}
+
+// Ein Batch-Lauf hinter einem anderen: jeder Lauf trägt seine eigenen
+// wartenden Clips. Endet der vordere, verschwinden nur dessen ⏳ — die des
+// eingereihten bleiben, bis er selbst drankommt und fertig wird.
+const batchQueue = [];
+
+function finishBatch(which = "first") {
+  const done = which === "last" ? batchQueue.pop() : batchQueue.shift();
+  if (!batchQueue.length) {
+    clearBatchTracking();
+    return;
+  }
+  const stillQueued = new Set(batchQueue.flatMap((keys) => [...keys]));
+  const affected = state.selected !== null
+    && (state.batchActiveKey === state.selected || done?.has(state.selected));
+  if (which === "first") state.batchActiveKey = null;
+  (done || []).forEach((key) => { if (!stillQueued.has(key)) state.batchPendingKeys.delete(key); });
+  renderList();
   if (affected) redrawDetail();
 }
 
 function redrawDetail() {
+  // Nur die eine fokussierte Eingabe zu retten reichte nicht: in der
+  // Profilkarte gingen alle anderen geänderten Felder verloren, sobald ein
+  // Job des Clips fertig wurde.
+  const profileForm = snapshotForm(el("profile-form"));
   withPreservedInput(() => renderDetail(state.selected));
+  restoreForm(el("profile-form"), profileForm);
 }
 
 // ------------------------------------------------------------------ Events
 
+// Felder, in denen getippt wird. Radio, Checkbox und Knopf zählen nicht: nach
+// einem Klick auf „Produktion" oder 👍 sollen j/k und 1–9 weiter gehen.
+const TYPING_INPUTS = new Set(["text", "search", "number", "email", "url", "password", ""]);
+const isTypingTarget = (target) =>
+  target.tagName === "TEXTAREA" || target.tagName === "SELECT" || target.isContentEditable ||
+  (target.tagName === "INPUT" && TYPING_INPUTS.has(target.type));
+
+function pauseAllAudio(except) {
+  document.querySelectorAll("#detail audio").forEach((audio) => {
+    if (audio !== except) audio.pause();
+  });
+}
+
+function playFromStart(audio) {
+  pauseAllAudio(audio);
+  audio.currentTime = 0;
+  audio.play().catch(() => { /* Datei fehlt — die Zeile zeigt das selbst */ });
+}
+
+// Eine Wiedergabe zur Zeit — auch per Maus: wer Kandidaten vergleicht, will
+// den vorigen nicht weiterlaufen hören.
+document.addEventListener("play", (event) => {
+  if (event.target.closest?.("#detail")) pauseAllAudio(event.target);
+}, true);
+
 document.addEventListener("keydown", (event) => {
-  if (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) return;
+  // Escape gibt die Tastatur zurück: vorher landete das nächste „j" als
+  // Buchstabe in der Aussprache — und wurde 600 ms später gespeichert.
+  if (event.key === "Escape" && isTypingTarget(event.target)) {
+    event.target.blur();
+    return;
+  }
+  if (isTypingTarget(event.target)) return;
+  // Cmd+J (Downloads), Cmd+1…9 (Tabs) gehören dem Browser.
+  if (event.metaKey || event.ctrlKey || event.altKey) return;
+  // Pfeiltasten auf einem fokussierten Radio „Produktion" wählten still die
+  // Nachbar-Aufnahme als Produktion — ein Tastendruck zum Scrollen genügte.
+  if (event.target.matches?.("input[type=radio][data-promote]") &&
+      event.key.startsWith("Arrow")) {
+    event.preventDefault();
+    return;
+  }
   const clips = visibleClips();
   const current = clips.findIndex((c) => c.key === state.selected);
 
@@ -2086,18 +2360,24 @@ document.addEventListener("keydown", (event) => {
   } else if (event.key === "k" && current > 0) {
     select(clips[current - 1].key);
   } else if (event.key === " ") {
+    // Knöpfe, Häkchen und Radios (außer „Produktion") bedient die Leertaste
+    // wie gewohnt selbst.
+    if (event.target.tagName === "BUTTON" ||
+        event.target.matches?.("input[type=checkbox], input[type=radio]:not([data-promote])")) return;
     event.preventDefault();
-    const audio = el("detail").querySelector("audio[data-current-production]");
-    if (audio) {
-      audio.currentTime = 0;
-      audio.play();
+    // Leertaste schaltet um: läuft etwas, hält sie an; sonst Produktion von
+    // vorn, und ohne Produktion (Clip fehlt noch) die erste Aufnahme.
+    const playing = [...el("detail").querySelectorAll("audio")].find((a) => !a.paused);
+    if (playing) {
+      playing.pause();
+      return;
     }
+    const audio = el("detail").querySelector("audio[data-current-production]")
+      || el("detail").querySelector('audio[data-index="0"]');
+    if (audio) playFromStart(audio);
   } else if (/^[1-9]$/.test(event.key)) {
     const audio = el("detail").querySelector(`audio[data-index="${Number(event.key) - 1}"]`);
-    if (audio) {
-      audio.currentTime = 0;
-      audio.play();
-    }
+    if (audio) playFromStart(audio);
   }
 });
 
@@ -2128,9 +2408,33 @@ el("batch-count").onchange = () => {
   el("batch-count").value = batchCount();
 };
 
+// Knopf sperren, bis die Anfrage durch ist: ein Doppelklick (Export dauert
+// wegen der OGG-Kodierung) lief sonst zweimal parallel — beim Export mit
+// Rennen um index.json, beim Batch-Lauf mit doppelten Kandidaten.
+async function whileBusy(button, label, action) {
+  if (button.dataset.busy) return;
+  button.dataset.busy = "1";
+  const text = button.textContent;
+  button.disabled = true;
+  button.textContent = label;
+  try {
+    await action();
+  } finally {
+    delete button.dataset.busy;
+    button.textContent = text;
+    button.disabled = false;
+    updateBatchUi();
+  }
+}
+
 el("btn-render").onclick = guard(async () => {
   const keys = [...state.selectedKeys];
-  if (keys.length === 0) return;
+  if (keys.length === 0 || el("btn-render").dataset.busy) return;
+  if (engineOffline()) {
+    showBanner("Batch-Lauf geht nicht: das Modell ist nicht geladen. " +
+      "Server neu starten (./start-tts-ui.sh).", "warn");
+    return;
+  }
   const n = batchCount();
   if (!confirm(`Batch-Lauf für ${keys.length} ausgewählte Clips starten? ` +
                `Erzeugt wird nur, was noch fehlt — fertige Clips ` +
@@ -2139,15 +2443,28 @@ el("btn-render").onclick = guard(async () => {
   // Dieselbe Regel wie im Server (`force` ist hier nie gesetzt): fertige Clips
   // überspringt der Lauf. Sie als „wartet" zu markieren hieße, sie auf einen
   // Lauf warten zu lassen, der sie nie anfasst.
-  state.batchPendingKeys = new Set(
-    state.clips.filter((c) => keys.includes(c.key) && c.status !== "rendered")
-      .map((c) => c.key));
-  state.batchActiveKey = null;
+  // Hinzufügen statt ersetzen: steht schon ein Lauf, reiht sich dieser
+  // dahinter ein, und dessen wartende Clips warten weiter.
+  const waiting = new Set(state.clips
+    .filter((c) => keys.includes(c.key) && c.status !== "rendered").map((c) => c.key));
+  waiting.forEach((key) => state.batchPendingKeys.add(key));
+  batchQueue.push(waiting);
   renderList();
-  await post("/api/render", { keys, n });
+  await whileBusy(el("btn-render"), "⏳ Starte …", async () => {
+    for (const key of keys) await flushPendingSaves(key);
+    try {
+      await post("/api/render", { keys, n });
+    } catch (error) {
+      finishBatch("last");
+      throw error;
+    }
+  });
 });
 
-el("btn-export").onclick = guard(async () => {
+el("btn-export").onclick = guard(() => whileBusy(el("btn-export"), "⏳ Exportiere …",
+  exportToApp));
+
+async function exportToApp() {
   const report = await api("/api/export", { method: "POST" });
   const parts = [`${report.exported.length} Clips in die App exportiert`];
   if (report.unchanged.length) parts.push(`${report.unchanged.length} unverändert`);
@@ -2167,7 +2484,7 @@ el("btn-export").onclick = guard(async () => {
     }
     console.info("Export: übersprungene Clips nach Grund", byReason);
   }
-});
+}
 
 el("btn-cancel").onclick = guard(() => post("/api/jobs/cancel", {}));
 
@@ -2176,6 +2493,16 @@ el("btn-cancel").onclick = guard(() => post("/api/jobs/cancel", {}));
 let lastSummary = null;
 
 const events = new EventSource("/events");
+// EventSource verbindet sich selbst neu; bis dahin soll niemand glauben, der
+// Job in der Kopfzeile laufe noch oder ein Klick komme an.
+let connectionLost = false;
+events.onerror = () => {
+  if (connectionLost) return;
+  connectionLost = true;
+  if (job.name) setJobIdle("");
+  showBanner("Verbindung zum Server verloren — läuft ./start-tts-ui.sh noch? " +
+    "Die Seite verbindet sich von selbst neu.", "warn");
+};
 events.onmessage = (message) => {
   const event = JSON.parse(message.data);
   if (event.type === "render" || event.type === "candidate") {
@@ -2193,12 +2520,16 @@ events.onmessage = (message) => {
       state.generatingKeys.delete(event.job.slice("candidates:".length));
     }
     if (event.job?.startsWith("render:")) {
-      clearBatchTracking();
+      finishBatch();
     }
+    const cancelled = summary?.cancelled || 0;
     if (summary && summary.failed > 0) {
       setJobIdle("");
       showBanner(`${summary.failed} von ${summary.failed + summary.rendered} ` +
-        `fehlgeschlagen! ${summary.rendered} erzeugt, ${summary.skipped} übersprungen.`, "warn");
+        `fehlgeschlagen! ${summary.rendered} erzeugt, ${summary.skipped} übersprungen` +
+        (cancelled ? `, ${cancelled} abgebrochen` : "") + ".", "warn");
+    } else if (summary && cancelled) {
+      setJobIdle(`abgebrochen — ${summary.rendered} erzeugt, ${cancelled} nicht mehr drangekommen`);
     } else if (summary) {
       setJobIdle(`fertig — ${summary.rendered} erzeugt, ${summary.skipped} übersprungen`);
     } else {
@@ -2211,7 +2542,7 @@ events.onmessage = (message) => {
       state.generatingKeys.delete(event.job.slice("candidates:".length));
     }
     if (event.job?.startsWith("render:")) {
-      clearBatchTracking();
+      finishBatch();
     }
     setJobIdle("");
     showBanner(event.message, "warn");
@@ -2228,6 +2559,18 @@ events.onmessage = (message) => {
     // irgendwann ein refresh() vorbeikommt.
     if (started && started === state.selected) redrawDetail();
   } else if ("running" in event) {
+    if (connectionLost) {
+      connectionLost = false;
+      // Nach einem Server-Neustart ist die Warteschlange weg (sie lebt nur im
+      // Speicher): wer noch auf einen Job wartete, wartet sonst ewig.
+      if (!event.running && !event.queued) {
+        state.generatingKeys.clear();
+        clearBatchTracking();
+      }
+      engineBannerShown = false;
+      showBanner("Verbindung zum Server wieder da.", "ok");
+      refresh().catch(showError);
+    }
     if (event.running) {
       // Initialframe des SSE-Streams: es läuft bereits ein Job.
       setJobRunning(event.running);

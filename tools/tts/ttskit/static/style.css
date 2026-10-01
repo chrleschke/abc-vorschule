@@ -134,7 +134,7 @@ textarea.tts-text-input {
 }
 /* Wellenform der Aufnahme; Klick springt an die Stelle und spielt ab. */
 .cand-table .wave-cell { width: 26%; min-width: 9rem; }
-.cand-wave { display: block; width: 100%; height: 32px; cursor: pointer; }
+.cand-wave { display: block; width: 100%; height: 32px; cursor: pointer; touch-action: none; }
 .cand-table audio {
   width: 100%; min-width: 10rem; max-width: 100%; height: 32px; display: block;
 }

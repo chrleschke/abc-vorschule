@@ -155,6 +155,7 @@ def cmd_render(paths: Paths, args) -> int:
                               force=args.force, only=args.only,
                               profile=args.profile, dry_run=True)
         print(f"{report.rendered} Clips würden gerendert, {report.skipped} übersprungen.")
+        _print_protected(report)
         return 0
 
     engine = _engine_or_exit(ctx.profiles)
@@ -178,11 +179,26 @@ def cmd_render(paths: Paths, args) -> int:
     report = render_clips(ctx.clips, ctx.profiles, engine, ctx.state, paths,
                           force=args.force, only=args.only,
                           profile=args.profile, progress=show)
-    print(f"\n{report.rendered} gerendert, {report.skipped} übersprungen, "
-          f"{len(report.failed)} fehlgeschlagen.")
+    summary = (f"\n{report.rendered} gerendert, {report.skipped} übersprungen, "
+               f"{len(report.failed)} fehlgeschlagen")
+    if report.cancelled:
+        summary += f", {report.cancelled} abgebrochen"
+    print(summary + ".")
     for key, message in report.failed:
         print(f"  {key}: {message}")
+    _print_protected(report)
     return 1 if report.failed else 0
+
+
+def _print_protected(report) -> None:
+    """Geschützte Clips nach Grund — sie fehlen lokal, werden aber bewusst
+    nicht gerendert, und ohne Grund sähe das wie ein vergessener Clip aus."""
+    if not report.protected:
+        return
+    print(f"\n{len(report.protected)} bewusst nicht gerendert:")
+    by_reason = collections.Counter(reason for _, reason in report.protected)
+    for reason, count in by_reason.most_common():
+        print(f"  {count:4} × {reason}")
 
 
 def cmd_sample(paths: Paths, args) -> int:

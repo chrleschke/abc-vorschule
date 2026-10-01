@@ -464,3 +464,24 @@ def test_top_seeds_limit_cuts_where_the_score_actually_drops():
 def test_top_seeds_never_returns_more_than_it_has():
     locks = _locks(("a", 7, None))
     assert top_seeds(locks, "prompt", limit=10) == [7]
+
+
+def test_a_cleared_lock_is_no_approval_but_keeps_its_pronunciation():
+    key = clip_key("reward", "Super!")
+    items = [item("r1", "Super!", "rewardTts")]
+    locks = Locks({key: Lock(seed=5, text_override="Suuuper!", cleared=True)})
+    clip = build_clips(items, profiles(), locks)[0]
+    assert clip.locked is False, "Export und Status sehen keine Freigabe mehr"
+    assert clip.text == "Suuuper!"
+    assert top_seeds(locks, "reward") == [], "ein aufgehobener Seed hat nicht überzeugt"
+
+
+def test_a_draft_feeds_new_takes_but_not_the_production_text():
+    key = clip_key("reward", "Super!")
+    items = [item("r1", "Super!", "rewardTts")]
+    plain = build_clips(items, profiles(), Locks({key: Lock(seed=5)}))[0]
+    drafted = build_clips(items, profiles(), Locks({key: Lock(seed=5, draft_text="Suuuper!")}))[0]
+    assert drafted.text == "Super!" and drafted.generation_text == "Suuuper!"
+    assert plain.generation_text == "Super!"
+    prof = profiles().profiles["reward"]
+    assert fingerprint(drafted, prof) == fingerprint(plain, prof)

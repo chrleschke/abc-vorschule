@@ -84,3 +84,21 @@ def test_wire_locks_rendered_clip_without_lock(tmp_path, content_dir):
     assert (clip.key, report.locked[0][1]) in report.locked
     reloaded = Locks.load(paths.locks)
     assert reloaded.get(clip.key) is not None
+
+
+def test_wire_locks_leaves_a_cleared_lock_alone(tmp_path, content_dir):
+    """„Keine Produktion" auf einem kuratierten Clip ist eine Entscheidung samt
+    Aussprache — ein später gerenderter WAV darf sie nicht still ersetzen."""
+    paths = Paths(root=tmp_path, content_dir=content_dir,
+                  app_audio_dir=tmp_path / "app-audio",
+                  sound_pairs_kt=tmp_path / "SoundPairs.kt")
+    key = next(c.key for c in load_context(paths).clips if c.source_text == "Mama.")
+    locks = Locks()
+    locks.set(key, Lock(seed=3, text_override="Anders.", cleared=True))
+    locks.save(paths.locks)
+    write_wav(paths.audio / f"{key}.wav")
+
+    report = wire_production_locks(paths)
+    assert key not in [k for k, _ in report.locked]
+    lock = Locks.load(paths.locks).get(key)
+    assert lock.cleared is True and lock.text_override == "Anders."

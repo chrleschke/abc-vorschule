@@ -59,6 +59,10 @@ def top_seeds(locks: Locks, profile_name: str, limit: int = TOP_SEED_LIMIT) -> l
     """
     counts: Counter[int] = Counter()
     for key, lock in locks.locks.items():
+        # Eine aufgehobene Produktion ist keine Entscheidung für ihren Seed —
+        # der steht dort nur noch als Hash-Fallback (siehe render.clear_production).
+        if lock.cleared:
+            continue
         # Ein Lock darf das Profil überschreiben; der Key-Präfix ist nur das
         # Default-Profil. Gezählt wird, womit tatsächlich synthetisiert wird.
         effective = lock.profile or key.split(":", 1)[0]
@@ -124,11 +128,14 @@ def build_clips(items: list[Item], profiles: Profiles, locks: Locks) -> list[Cli
             text=text,
             source_text=bucket["source_text"],
             seed=resolve_seed(key, profile_name, profiles, locks),
-            locked=lock is not None,
+            # Ein Lock mit `cleared` trägt nur noch Aussprache & Co. — bestätigt
+            # ist der Clip damit nicht mehr, also exportiert ihn auch niemand.
+            locked=lock is not None and not lock.cleared,
             item_ids=tuple(sorted(bucket["item_ids"])),
             fields=tuple(sorted(bucket["fields"])),
             lessons=tuple(sorted(bucket["lessons"])),
             speaker=speaker,
+            draft_text=lock.draft_text if lock and lock.draft_text else None,
         ))
     return clips
 

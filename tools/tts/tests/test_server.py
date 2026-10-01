@@ -472,11 +472,12 @@ def test_deleting_the_last_candidate_keeps_a_curated_pronunciation(client):
     Probeaufnahme darf sie nicht mitnehmen."""
     clip = client.get("/api/state").json()["clips"][0]
     key = clip["key"]
+    # Aussprache zuerst: Promote übernimmt den Text, mit dem der Kandidat entstand.
+    client.post(f"/api/clips/{key}/lock", json={"textOverride": "Mmmmm."})
     client.post(f"/api/clips/{key}/candidates", json={"n": 1})
     wait_for_idle(client)
     seed = next(c for c in client.get("/api/state").json()["clips"]
                 if c["key"] == key)["candidates"][0]["seed"]
-    client.post(f"/api/clips/{key}/lock", json={"seed": seed, "textOverride": "Mmmmm."})
     client.post(f"/api/clips/{key}/promote", json={"seed": seed})
 
     assert client.delete(f"/api/clips/{key}/candidates/{seed}").status_code == 409
@@ -719,21 +720,16 @@ def test_candidate_count_is_clamped(client):
 
 
 def test_a_render_where_everything_fails_does_not_report_success(tmp_path, content_dir):
-    """Engine offline is the realistic case: Engine.load swallows exceptions so
-    the server can start model-less, and the render button is never disabled."""
+    """Geladen, aber jede Generierung scheitert (z. B. MPS-Fehler). Ein Modell,
+    das gar nicht geladen ist, weist der Server schon vorher mit 503 ab."""
     import shutil as _shutil
 
     from ttskit.paths import Paths as _Paths
     from ttskit.server import create_app as _create_app
 
     class BrokenEngine(FakeEngine):
-        def __init__(self):
-            super().__init__()
-            self.loaded = False
-            self.load_error = "RuntimeError: kein Modell"
-
         def generate(self, text, profile, seed):
-            raise RuntimeError("Engine not loaded — call load() first.")
+            raise RuntimeError("MPS backend out of memory")
 
     root = tmp_path / "broken"
     (root / "content").mkdir(parents=True)
@@ -1140,11 +1136,11 @@ def test_clear_production_preserves_liked_candidates(client):
 
 def test_clear_production_preserves_curated_override(client):
     key = client.get("/api/state").json()["clips"][0]["key"]
+    client.post(f"/api/clips/{key}/lock", json={"textOverride": "Mmmmm."})
     client.post(f"/api/clips/{key}/candidates", json={"n": 1})
     wait_for_idle(client)
     clip = next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
     seed = clip["candidates"][0]["seed"]
-    client.post(f"/api/clips/{key}/lock", json={"seed": seed, "textOverride": "Mmmmm."})
     client.post(f"/api/clips/{key}/promote", json={"seed": seed})
 
     assert client.post(f"/api/clips/{key}/clear-production").status_code == 200
@@ -1529,3 +1525,373 @@ def test_trim_endpoint_rejects_bad_input(client):
                       json={"start": 0.08, "end": 0.02}).status_code == 422
     assert client.put(f"/api/clips/{key}/candidates/77/trim",
                       json={"start": 0.0, "end": 0.05}).status_code == 404
+
+
+# --- Review-Fixes (Oktober 2026) ---------------------------------------------
+
+
+def _key_of(client, text):
+    return next(c["key"] for c in client.get("/api/state").json()["clips"]
+                if c["sourceText"] == text)
+
+
+def _clip(client, key):
+    return next(c for c in client.get("/api/state").json()["clips"] if c["key"] == key)
+
+
+def _generate(client, key, **body):
+    assert client.post(f"/api/clips/{key}/candidates", json=body).status_code == 202
+    wait_for_idle(client)
+
+
+def _locks(client):
+    return json.loads(client.paths.locks.read_text(encoding="utf-8"))["locks"]
+
+
+def _pool(client, profile):
+    return json.loads(client.paths.profiles.read_text(encoding="utf-8"))[
+        "profiles"][profile]["seedPool"]
+
+
+class _Gate:
+    """Hält den Job-Worker an, bis `open()` — so lässt sich etwas einreihen und
+    vor der Ausführung noch ändern, wie es in der UI hinter einem Batch-Lauf passiert."""
+
+    def __init__(self, client):
+        import threading
+        self.event = threading.Event()
+        client.app.state.jobs.submit("gate", lambda cancel: self.event.wait(5))
+
+    def open(self):
+        self.event.set()
+
+
+def _capture_events(client):
+    jobs = client.app.state.jobs
+    seen = []
+    original = jobs.publish
+    jobs.publish = lambda event: (seen.append(event), original(event))[1]
+    return seen
+
+
+def test_clear_production_on_a_curated_clip_stops_the_export(client):
+    from ttskit.export import asset_name, export_to_app
+    key = _key_of(client, "Mama.")
+    client.post(f"/api/clips/{key}/lock", json={"textOverride": "Mamaa."})
+    _generate(client, key, fixedSeed=111)
+    assert client.post(f"/api/clips/{key}/promote", json={"seed": 111}).status_code == 200
+    assert key in export_to_app(client.paths).exported
+
+    assert client.post(f"/api/clips/{key}/clear-production").status_code == 200
+    lock = _locks(client)[key]
+    assert lock["cleared"] is True and lock["textOverride"] == "Mamaa."
+    assert _clip(client, key)["locked"] is False
+
+    report = export_to_app(client.paths)
+    index = json.loads((client.paths.app_audio_dir / "index.json").read_text())
+    assert "Mama." not in index["clips"]
+    assert asset_name(key) in report.removed
+    # Ein zweites Aufheben hat nichts mehr aufzuheben.
+    assert client.post(f"/api/clips/{key}/clear-production").status_code == 409
+
+    # Promote ist die neue Freigabe.
+    assert client.post(f"/api/clips/{key}/promote", json={"seed": 111}).status_code == 200
+    assert "cleared" not in _locks(client)[key]
+    assert key in export_to_app(client.paths).exported
+
+
+def test_deleting_a_fresh_take_on_a_fresh_checkout_keeps_lock_and_asset(client):
+    from ttskit.export import asset_name, export_to_app
+    key = _key_of(client, "Mama.")
+    _generate(client, key, fixedSeed=111)
+    client.post(f"/api/clips/{key}/promote", json={"seed": 111})
+    export_to_app(client.paths)
+    shutil.rmtree(client.paths.out)  # frischer Checkout: nur Lock und .ogg
+
+    _generate(client, key, n=2)
+    assert client.delete(f"/api/clips/{key}/candidates").json()["deleted"] == 2
+    assert _locks(client)[key]["seed"] == 111
+    report = export_to_app(client.paths)
+    assert asset_name(key) not in report.removed
+    assert (client.paths.app_audio_dir / asset_name(key)).exists()
+
+
+def test_a_fixed_seed_equal_to_the_production_is_rejected(client):
+    key = _key_of(client, "Mama.")
+    _generate(client, key, fixedSeed=444)
+    client.post(f"/api/clips/{key}/promote", json={"seed": 444})
+    response = client.post(f"/api/clips/{key}/candidates", json={"fixedSeed": 444})
+    assert response.status_code == 409
+    assert "Produktion" in response.json()["detail"]
+
+
+def test_regenerating_a_liked_seed_keeps_its_rating_and_pool_entry(client):
+    key = _key_of(client, "Mama.")
+    _generate(client, key, fixedSeed=222)
+    client.put(f"/api/clips/{key}/candidates/222/rating", json={"good": True})
+    _generate(client, key, fixedSeed=222)
+    meta = json.loads((client.paths.candidates / key / "222.json").read_text())
+    assert meta["rating"] == "good"
+    assert 222 in _pool(client, "sentence")
+
+
+def test_queued_generates_pick_their_seeds_when_they_run(client):
+    """Zwei Generates hinter einem laufenden Job mit demselben kleinen Pool:
+    beim Einreihen ausgewählt, hätten beide dieselben Seeds gewürfelt und der
+    zweite den ersten samt Sidecar überschrieben."""
+    key = _key_of(client, "Mama.")
+    for seed in (111, 222):
+        client.post("/api/profiles/sentence/pool", json={"seed": seed})
+    gate = _Gate(client)
+    for _ in range(2):
+        assert client.post(f"/api/clips/{key}/candidates",
+                           json={"n": 2, "useKnownSeeds": True}).status_code == 202
+    gate.open()
+    wait_for_idle(client)
+    assert len(_clip(client, key)["candidates"]) == 4
+
+
+def test_a_queued_generate_speaks_the_text_from_when_it_runs(client):
+    key = _key_of(client, "Mama.")
+    engine = client.app.state.engine
+    gate = _Gate(client)
+    client.post(f"/api/clips/{key}/candidates", json={"n": 1})
+    client.post(f"/api/clips/{key}/lock", json={"draftText": "Ma-ma."})
+    gate.open()
+    wait_for_idle(client)
+    assert [text for text, _ in engine.calls] == ["Ma-ma."]
+
+
+def test_a_queued_batch_run_speaks_the_text_from_when_each_clip_runs(client):
+    key = _key_of(client, "Mama.")
+    engine = client.app.state.engine
+    gate = _Gate(client)
+    assert client.post("/api/render", json={"keys": [key], "n": 1}).status_code == 202
+    client.post(f"/api/clips/{key}/lock", json={"draftText": "Ma-ma."})
+    gate.open()
+    wait_for_idle(client)
+    assert [text for text, _ in engine.calls] == ["Ma-ma."]
+
+
+def test_a_lock_without_seed_keeps_a_just_promoted_seed(client):
+    """Ein verspätetes Text-Autosave darf einen gerade gemachten Promote nicht
+    zurücknehmen — der Seed ändert sich nur, wenn er im Body steht."""
+    key = _key_of(client, "Mama.")
+    _generate(client, key, fixedSeed=10)
+    _generate(client, key, fixedSeed=20)
+    client.post(f"/api/clips/{key}/promote", json={"seed": 20})
+    assert client.post(f"/api/clips/{key}/lock",
+                       json={"draftText": "Mamaaa."}).status_code == 200
+    assert _locks(client)[key]["seed"] == 20
+    assert client.post(f"/api/clips/{key}/lock", json={"seed": 10}).status_code == 200
+    assert _locks(client)[key]["seed"] == 10, "ausdrücklich gesetzt, dann schon"
+
+
+def test_a_lock_without_seed_on_a_fresh_clip_pins_the_resolved_seed(client):
+    key = _key_of(client, "Mama.")
+    resolved = _clip(client, key)["seed"]
+    assert client.post(f"/api/clips/{key}/lock",
+                       json={"generateSeed": 5}).status_code == 200
+    assert _locks(client)[key] == {"seed": resolved, "generateSeed": 5,
+                                   "sourceText": "Mama."}
+
+
+def test_unliking_on_one_clip_keeps_a_seed_another_clip_still_likes(client):
+    k1, k2 = _key_of(client, "Maus."), _key_of(client, "Baum.")
+    for key in (k1, k2):
+        _generate(client, key, fixedSeed=333)
+        client.put(f"/api/clips/{key}/candidates/333/rating", json={"good": True})
+    client.put(f"/api/clips/{k1}/candidates/333/rating", json={"good": False})
+    assert 333 in _pool(client, "miss"), "Baum. hält den Seed noch mit 👍"
+
+    # 👎 = Löschen: dasselbe, solange Baum. ihn hält …
+    client.put(f"/api/clips/{k1}/candidates/333/rating", json={"good": True})
+    assert client.delete(f"/api/clips/{k1}/candidates/333").status_code == 200
+    assert 333 in _pool(client, "miss")
+    # … und erst der letzte 👍 räumt den Pool ab.
+    client.put(f"/api/clips/{k2}/candidates/333/rating", json={"good": False})
+    assert 333 not in _pool(client, "miss")
+
+
+def test_concurrent_curation_writes_lose_nothing(client, monkeypatch):
+    """Jeder Handler lädt, ändert und speichert profiles.json; ohne Sperre
+    überschrieb der zweite Save im Threadpool still den ersten."""
+    from concurrent.futures import ThreadPoolExecutor
+    from ttskit.store import Profiles as _Profiles
+
+    # Ein langsamer Save macht das Fenster zwischen Laden und Speichern groß
+    # genug, dass der Test ohne Sperre zuverlässig scheitert.
+    original_save = _Profiles.save
+    monkeypatch.setattr(_Profiles, "save",
+                        lambda self, path: (time.sleep(0.01), original_save(self, path))[1])
+    seeds = list(range(1000, 1040))
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        codes = list(pool.map(
+            lambda seed: client.post("/api/profiles/prompt/pool",
+                                     json={"seed": seed}).status_code, seeds))
+    assert set(codes) == {200}
+    assert set(seeds) <= set(_pool(client, "prompt"))
+
+
+def test_a_failed_recording_edit_is_422_and_leaves_no_raw_take(client, monkeypatch):
+    from ttskit import mic
+    key = _first_key(client)
+
+    def broken(*args, **kwargs):
+        raise RuntimeError("Tonhöhen-Verschiebung braucht librosa")
+
+    monkeypatch.setattr(mic, "render", broken)
+    response = client.post(f"/api/clips/{key}/recordings", content=_upload_wav(),
+                           headers={"Content-Type": "audio/wav"})
+    assert response.status_code == 422
+    assert "librosa" in response.json()["detail"]
+    assert not list((client.paths.candidates / key).glob("*.wav"))
+
+
+def test_a_cancelled_generate_reports_cancelled_not_failed(client):
+    key = _key_of(client, "Mama.")
+    seen = _capture_events(client)
+    engine = client.app.state.engine
+    original = engine.generate
+
+    def generate_then_cancel(text, profile, seed):
+        client.app.state.jobs.cancel()
+        return original(text, profile, seed)
+
+    engine.generate = generate_then_cancel
+    _generate(client, key, n=3)
+    summary = next(e for e in seen if e["type"] == "job-summary")
+    assert summary["rendered"] == 1
+    assert summary["failed"] == 0
+    assert summary["cancelled"] == 2
+
+
+def test_a_batch_summary_always_carries_a_cancelled_count(client):
+    seen = _capture_events(client)
+    client.post("/api/render", json={"profile": "finale"})
+    wait_for_idle(client)
+    summary = next(e for e in seen if e["type"] == "job-summary")
+    assert summary["cancelled"] == 0
+
+
+def test_generate_and_batch_without_a_model_are_503_but_recording_works(tmp_path, content_dir):
+    class OfflineEngine(FakeEngine):
+        def __init__(self):
+            super().__init__()
+            self.loaded = False
+            self.load_error = "OSError: kein Checkpoint"
+
+    root = tmp_path / "offline"
+    (root / "content").mkdir(parents=True)
+    for f in content_dir.iterdir():
+        shutil.copy(f, root / "content" / f.name)
+    paths = Paths(root=root, content_dir=root / "content",
+                  app_audio_dir=tmp_path / "app-audio",
+                  sound_pairs_kt=tmp_path / "SoundPairs.kt")
+    with TestClient(create_app(paths, engine=OfflineEngine())) as c:
+        key = c.get("/api/state").json()["clips"][0]["key"]
+        for response in (c.post(f"/api/clips/{key}/candidates", json={"n": 1}),
+                         c.post("/api/render", json={})):
+            assert response.status_code == 503
+            assert response.json()["detail"] == "Modell nicht geladen: OSError: kein Checkpoint"
+        assert c.get("/api/jobs").json()["queued"] == 0
+        assert c.post(f"/api/clips/{key}/recordings", content=_upload_wav(),
+                      headers={"Content-Type": "audio/wav"}).status_code == 201
+
+
+# --- Entwurf vs. Produktionstext ---------------------------------------------
+
+
+def test_drafting_after_approval_leaves_the_production_untouched(client):
+    from ttskit.export import export_to_app
+    key = _key_of(client, "Mama.")
+    _generate(client, key, fixedSeed=111)
+    client.post(f"/api/clips/{key}/promote", json={"seed": 111})
+    assert key in export_to_app(client.paths).exported
+
+    assert client.post(f"/api/clips/{key}/lock",
+                       json={"draftText": "Nur ein Test."}).status_code == 200
+    clip = _clip(client, key)
+    assert clip["text"] == "Mama."
+    assert clip["draftText"] == "Nur ein Test."
+    assert clip["generationText"] == "Nur ein Test."
+    assert "textOverride" not in _locks(client)[key]
+    report = export_to_app(client.paths)
+    assert key in report.unchanged and key not in report.exported
+    assert all(c["fresh"] for c in clip["candidates"]), "kein „⚠️ alt“ durch einen Entwurf"
+
+
+def test_generate_speaks_the_draft(client):
+    key = _key_of(client, "Mama.")
+    client.post(f"/api/clips/{key}/lock", json={"draftText": "Ma-ma."})
+    _generate(client, key, fixedSeed=7)
+    assert client.app.state.engine.calls == [("Ma-ma.", 7)]
+    assert _clip(client, key)["candidates"][0]["text"] == "Ma-ma."
+
+
+def test_promote_takes_the_text_the_candidate_was_made_with(client):
+    key = _key_of(client, "Mama.")
+    client.post(f"/api/clips/{key}/lock", json={"draftText": "Ma-ma."})
+    _generate(client, key, fixedSeed=7)
+    # Danach weiter getippt: der Entwurf ist nicht der Text des Kandidaten.
+    client.post(f"/api/clips/{key}/lock", json={"draftText": "Mammma."})
+    response = client.post(f"/api/clips/{key}/promote", json={"seed": 7})
+    assert response.json() == {"ok": "promoted", "verified": True}
+    lock = _locks(client)[key]
+    assert lock["textOverride"] == "Ma-ma."
+    assert lock["draftText"] == "Mammma.", "ein abweichender Entwurf bleibt stehen"
+
+    client.post(f"/api/clips/{key}/lock", json={"draftText": "Ma-ma."})
+    _generate(client, key, fixedSeed=8)
+    client.post(f"/api/clips/{key}/promote", json={"seed": 8})
+    assert "draftText" not in _locks(client)[key], "gleich dem Produktionstext → weg"
+
+
+def test_promoting_a_take_of_the_source_text_drops_the_override(client):
+    key = _key_of(client, "Mama.")
+    _generate(client, key, fixedSeed=7)
+    client.post(f"/api/clips/{key}/lock", json={"textOverride": "Ma-ma."})
+    client.post(f"/api/clips/{key}/promote", json={"seed": 7})
+    assert "textOverride" not in _locks(client)[key]
+    assert _clip(client, key)["text"] == "Mama."
+    # Die kuratierte Aussprache geht nicht verloren: sie wird zum Entwurf.
+    assert _locks(client)[key]["draftText"] == "Ma-ma."
+    assert _clip(client, key)["generationText"] == "Ma-ma."
+
+
+def test_a_first_draft_on_an_unlocked_clip_is_no_approval(client):
+    """Ein Entwurf ist Hörarbeit, keine Freigabe: der Hash-Seed des Clips darf
+    dadurch nicht als bestätigt gelten (render, Export, Top-Seeds)."""
+    key = _key_of(client, "Mama.")
+    assert _clip(client, key)["locked"] is False
+    client.post(f"/api/clips/{key}/lock", json={"draftText": "Ma-ma."})
+    assert _locks(client)[key]["cleared"] is True
+    assert _clip(client, key)["locked"] is False
+    _generate(client, key, fixedSeed=7)
+    client.post(f"/api/clips/{key}/promote", json={"seed": 7})
+    assert "cleared" not in _locks(client)[key]
+    assert _clip(client, key)["locked"] is True
+
+
+def test_a_draft_equal_to_the_production_text_or_blank_is_not_stored(client):
+    key = _key_of(client, "Mama.")
+    for draft in ("Mama.", "", "   "):
+        assert client.post(f"/api/clips/{key}/lock",
+                           json={"draftText": draft}).status_code == 200
+        assert "draftText" not in _locks(client)[key], repr(draft)
+        assert _clip(client, key)["draftText"] is None
+    client.post(f"/api/clips/{key}/lock", json={"textOverride": "Ma-ma."})
+    client.post(f"/api/clips/{key}/lock", json={"draftText": "Ma-ma."})
+    assert "draftText" not in _locks(client)[key]
+    assert client.post(f"/api/clips/{key}/lock",
+                       json={"draftText": 5}).status_code == 422
+
+
+def test_clear_production_keeps_the_draft(client):
+    key = _key_of(client, "Mama.")
+    _generate(client, key, fixedSeed=7)
+    client.post(f"/api/clips/{key}/promote", json={"seed": 7})
+    client.post(f"/api/clips/{key}/lock", json={"draftText": "Ma-ma."})
+    client.post(f"/api/clips/{key}/clear-production")
+    lock = _locks(client)[key]
+    assert lock["draftText"] == "Ma-ma." and lock["cleared"] is True
