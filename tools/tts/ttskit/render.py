@@ -209,6 +209,7 @@ def render_batch_candidates(
     clip_done: Callable[[str], None] | None = None,
     cancel: Callable[[], bool] | None = None,
     refresh: Callable[[str], tuple[Clip, Profile, Locks] | None] | None = None,
+    trim: bool | None = None,
 ) -> RenderReport:
     """Batch-Lauf im Web-Interface: erzeugt pro Clip `count` Kandidaten statt
     direkt eine Produktions-Datei zu schreiben.
@@ -235,6 +236,9 @@ def render_batch_candidates(
     erzeugte er die späten Clips mit dem Text, der Stimme und dem Profil vom
     Start des Laufs, also mit einer Aussprache, die längst korrigiert war.
     Ein inzwischen bestätigter Clip wird übersprungen wie beim Start.
+
+    `trim` wählt das Stille-Wegschneiden für den ganzen Lauf (None: das des
+    jeweiligen Profils, siehe `sample_candidates`).
     """
     selected = _select(clips, only, profile)
     report = RenderReport()
@@ -294,7 +298,7 @@ def render_batch_candidates(
                                   clip_key=clip.key, status=p.status, message=p.message))
 
         sample_candidates(clip, prof, engine, paths, seeds,
-                          progress=on_candidate, cancel=cancel)
+                          progress=on_candidate, cancel=cancel, trim=trim)
         units_done += len(seeds)
         if tally["failed"]:
             report.failed.append((
@@ -386,8 +390,14 @@ def sample_candidates(
     seeds: list[int],
     progress: Callable[[Progress], None] | None = None,
     cancel: Callable[[], bool] | None = None,
+    trim: bool | None = None,
 ) -> list[int]:
     """Kandidaten erzeugen; gibt die geschriebenen Seeds zurück.
+
+    `trim` (Stille vorne und hinten wegschneiden) ist eine Wahl pro Wurf;
+    None heißt „wie im Profil". Was tatsächlich galt, steht im Sidecar als
+    `trimSilence` — Frische, Promote und Export rechnen damit, sonst wäre ein
+    bewusst ungeschnittener Wurf gegen ein schneidendes Profil sofort „alt".
 
     Zwei Seeds werden übersprungen (Progress-Status "skipped"), statt sie zu
     überschreiben: eine Mikrofon-Aufnahme unter demselben Pseudo-Seed, und der
@@ -397,6 +407,7 @@ def sample_candidates(
     """
     written: list[int] = []
     production = Path(paths.audio) / f"{clip.key}.wav"
+    trim_silence = profile.trim if trim is None else bool(trim)
     for index, seed in enumerate(seeds, start=1):
         if cancel is not None and cancel():
             break
@@ -411,7 +422,7 @@ def sample_candidates(
                 # genau dafür da, einen neuen Text auszuprobieren.
                 wav, sample_rate = engine.generate(
                     clip.generation_text, effective_profile(clip, profile), seed)
-                wav = postprocess(wav, sample_rate, trim=profile.trim,
+                wav = postprocess(wav, sample_rate, trim=trim_silence,
                                   normalize=profile.normalize)
                 with CURATED_FILES_LOCK:
                     write_wav(paths.candidates / clip.key / f"{seed}.wav", wav, sample_rate)
@@ -423,12 +434,17 @@ def sample_candidates(
                     # verschiedener Sessions zu einer unentwirrbaren Liste.
                     meta = {
                         "fingerprint": fingerprint(
-                            replace(clip, seed=seed, text=clip.generation_text), profile),
+                            replace(clip, seed=seed, text=clip.generation_text), profile,
+                            trim=trim_silence),
                         "createdAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                         "speaker": clip.speaker,
                         # Steht hier, damit Promote genau diesen Text als
                         # Produktionstext übernimmt (server.api_promote).
                         "text": clip.generation_text,
+                        # Nicht zu verwechseln mit `trim` (Schnitt in der
+                        # Wellenform, von Hand): das hier ist das automatische
+                        # Stille-Wegschneiden direkt nach dem Modell.
+                        "trimSilence": trim_silence,
                     }
                     # Erst hier, unter der Sperre, gelesen: ein 👍 während der
                     # Generierung gilt mit. Ohne Übernahme verlor ein neuer Wurf
@@ -476,6 +492,13 @@ def candidate_fingerprint(paths: Paths, clip_key: str, seed: int) -> str | None:
     return value if isinstance(value, str) else None
 
 
+def recorded_trim_silence(meta: dict[str, Any]) -> bool | None:
+    """Das Stille-Wegschneiden, mit dem ein Kandidat entstand — None bei
+    Alt-Sidecars ohne `trimSilence`; dann gilt, was im Profil steht."""
+    value = meta.get("trimSilence")
+    return value if isinstance(value, bool) else None
+
+
 def production_fingerprint(paths: Paths, clip: Clip, profile: Profile) -> str:
     """Fingerprint der Produktion für Export und Promote.
 
@@ -486,7 +509,9 @@ def production_fingerprint(paths: Paths, clip: Clip, profile: Profile) -> str:
     meta = candidate_meta(paths, clip.key, clip.seed)
     if meta.get("source") == "mic" and isinstance(meta.get("fingerprint"), str):
         return meta["fingerprint"]
-    base = fingerprint(clip, profile)
+    # Ohne `trimSilence` im Sidecar (Alt-Kandidat, `tts render`) das des
+    # Profils — genau wie bisher, der Export encodiert also nichts neu.
+    base = fingerprint(clip, profile, trim=recorded_trim_silence(meta))
     # Ein Schnitt in der Wellenform ändert die Datei, aber nicht die
     # Profil-Einstellungen — ohne ihn im Fingerprint hielte der Export die
     # Produktion für unverändert und die App behielte die ungeschnittene Fassung.
@@ -627,7 +652,11 @@ def candidate_infos(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
         # verglichen, würde jeder Tastendruck im TTS-Feld alle Kandidaten auf
         # „⚠️ alt" kippen; welcher Text gesprochen ist, zeigt die Text-Spalte.
         own_text = meta.get("text") if isinstance(meta.get("text"), str) else clip.generation_text
-        current = fingerprint(replace(clip, seed=seed, text=own_text), profile)
+        # Ebenso mit *seinem eigenen* Stille-Wegschneiden: wer bewusst ohne
+        # Trim würfelt, hat damit keine veraltete Aufnahme erzeugt.
+        trim_silence = recorded_trim_silence(meta)
+        current = fingerprint(replace(clip, seed=seed, text=own_text), profile,
+                              trim=trim_silence)
         is_mic = meta.get("source") == "mic"
         infos.append({
             "seed": seed,
@@ -641,6 +670,9 @@ def candidate_infos(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
             "mic": is_mic,
             # {start, end, duration} in Sekunden des Originals, sonst None.
             "trim": meta.get("trim") if isinstance(meta.get("trim"), dict) else None,
+            # Stille-Wegschneiden beim Erzeugen; None = Alt-Sidecar (oder
+            # Mikrofon), dort ist es unbekannt.
+            "trimSilence": trim_silence,
         })
     infos.sort(key=lambda info: (info["createdAt"] or "", info["seed"]), reverse=True)
     return infos
@@ -678,6 +710,9 @@ def clip_audio_list(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
         "good": False,
         "isProductionOnly": True,
         "mic": False,
+        # Ohne Sidecar unbekannt (`tts render` nimmt das Profil, das sich
+        # seither geändert haben kann).
+        "trimSilence": None,
     })
     infos.sort(key=lambda info: (info["createdAt"] or "", info["seed"]), reverse=True)
     return infos

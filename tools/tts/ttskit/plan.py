@@ -121,6 +121,9 @@ def build_clips(items: list[Item], profiles: Profiles, locks: Locks) -> list[Cli
             raise ValueError(
                 f"{origin} the unknown speaker {speaker!r}. "
                 f"Known speakers: {', '.join(voices.speaker_names())}")
+        # Die Sprache ist schon beim Laden geprüft (`Lock.from_dict`, und das
+        # Profil über den Server) — hier bleibt nur das Auflösen.
+        language = lock.language if lock and lock.language else profiles.profiles[profile_name].language
         text = lock.text_override if lock and lock.text_override else bucket["source_text"]
         clips.append(Clip(
             key=key,
@@ -135,6 +138,7 @@ def build_clips(items: list[Item], profiles: Profiles, locks: Locks) -> list[Cli
             fields=tuple(sorted(bucket["fields"])),
             lessons=tuple(sorted(bucket["lessons"])),
             speaker=speaker,
+            language=language,
             draft_text=lock.draft_text if lock and lock.draft_text else None,
         ))
     return clips
@@ -143,21 +147,26 @@ def build_clips(items: list[Item], profiles: Profiles, locks: Locks) -> list[Cli
 def effective_profile(clip: Clip, profile: Profile) -> Profile:
     """Das Profil, mit dem für genau diesen Clip synthetisiert wird.
 
-    Ein Lock darf die Stimme einzeln austauschen; Instruktion, Sampling und
-    Sprache bleiben die des Profils. Ohne Override wird das Profil unverändert
+    Ein Lock darf Stimme und Sprache einzeln austauschen; Instruktion und
+    Sampling bleiben die des Profils. Ohne Override wird das Profil unverändert
     zurückgegeben, damit die Identität erhalten bleibt — Tests, die ein Profil
     mutieren und danach den Fingerprint vergleichen, hängen daran.
     """
-    if profile.speaker == clip.speaker:
+    if profile.speaker == clip.speaker and profile.language == clip.language:
         return profile
-    return replace(profile, speaker=clip.speaker)
+    return replace(profile, speaker=clip.speaker, language=clip.language)
 
 
-def fingerprint(clip: Clip, profile: Profile) -> str:
+def fingerprint(clip: Clip, profile: Profile, *, trim: bool | None = None) -> str:
     """Everything that changes the audio bytes — and nothing else.
 
     Deliberately excludes item_ids, fields and lessons: a new lesson reusing an
     existing prompt must not force a re-render.
+
+    `trim` ist das Stille-Wegschneiden, mit dem eine Aufnahme *tatsächlich*
+    entstand (Sidecar `trimSilence`), None = das des Profils. Generate und
+    Batch-Lauf dürfen es pro Wurf abweichend wählen; ohne diesen Parameter
+    stünde jeder solche Kandidat sofort als „⚠️ alt" da.
     """
     payload = {
         "text": clip.text,
@@ -168,10 +177,12 @@ def fingerprint(clip: Clip, profile: Profile) -> str:
         # eigener Fingerprint ändern. Ohne Override sind beide gleich, alte
         # Fingerprints bleiben also gültig.
         "speaker": clip.speaker,
-        "language": profile.language,
+        # Wie `speaker`: clip.language trägt den Lock-Override, ohne ihn ist
+        # es die Profil-Sprache — alte Fingerprints bleiben gültig.
+        "language": clip.language,
         "instruct": profile.instruct,
         "sampling": dict(sorted(profile.sampling.items())),
-        "trim": profile.trim,
+        "trim": profile.trim if trim is None else trim,
         "normalize": profile.normalize,
         # The flags alone are not enough: the trim threshold, the trim pad and
         # the normalisation target all change the bytes too. They are constants

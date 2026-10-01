@@ -547,3 +547,31 @@ def test_a_non_boolean_cleared_names_the_file_and_the_key(tmp_path):
         "a:1": {"seed": 1, "cleared": "ja"}}}), encoding="utf-8")
     with pytest.raises(ValueError, match=r"locks\.json.*'a:1'.*cleared"):
         Locks.load(path)
+
+
+def test_a_lock_language_roundtrips_and_counts_as_curation(tmp_path):
+    path = tmp_path / "locks.json"
+    locks = Locks()
+    locks.set("a:1", Lock(seed=1))
+    locks.set("b:2", Lock(seed=2, language="english"))
+    locks.save(path)
+    raw = json.loads(path.read_text(encoding="utf-8"))["locks"]
+    assert raw["a:1"] == {"seed": 1}, "ohne Sprache kein neues Feld in locks.json"
+    assert raw["b:2"] == {"seed": 2, "language": "english"}
+    loaded = Locks.load(path)
+    assert loaded.get("a:1").language is None
+    assert loaded.get("b:2").language == "english"
+    assert loaded.get("b:2").curated is True
+    assert loaded.get("a:1").curated is False
+
+
+def test_an_unknown_lock_language_names_the_file_and_the_key(tmp_path):
+    path = tmp_path / "locks.json"
+    path.write_text(json.dumps({"version": 1, "locks": {
+        "a:1": {"seed": 1, "language": "klingonisch"}}}), encoding="utf-8")
+    with pytest.raises(ValueError) as excinfo:
+        Locks.load(path)
+    message = str(excinfo.value)
+    assert "locks.json" in message and "'a:1'" in message
+    assert "klingonisch" in message
+    assert "german" in message, "the valid options must be listed"

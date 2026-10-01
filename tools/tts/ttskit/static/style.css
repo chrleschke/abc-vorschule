@@ -46,6 +46,9 @@ body.resizing { cursor: col-resize; user-select: none; }
   color: var(--text); overflow-wrap: anywhere;
 }
 .clip-head.compact { margin-bottom: 8px; }
+/* Titel, Clip-Key und Status in einer Zeile */
+.card-head-row { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.card-head-row .card-title { margin: 0; }
 textarea.tts-text-input {
   width: 100%; margin: 8px 0 2px; min-height: 0; font-size: 17px; line-height: 1.35;
   background: var(--panel);
@@ -65,12 +68,9 @@ textarea.tts-text-input {
   border-radius: 5px; overflow: hidden; background: #fff;
 }
 .rec-level span { display: block; height: 100%; width: 0; background: var(--ok); transition: width 60ms linear; }
-.candidates-toolbar {
-  display: flex; justify-content: flex-end; margin: 8px 0 4px;
-}
+/* Aufräumen links unten, direkt unter der Tabelle — kurzer Weg vom letzten 👎 */
 .candidates-footer {
-  display: flex; justify-content: center; margin-top: 10px; padding-top: 10px;
-  border-top: 1px solid var(--line);
+  display: flex; justify-content: flex-start; margin-top: 8px;
 }
 .row {
   padding: 8px 14px; border-bottom: 1px solid var(--line); cursor: pointer;
@@ -79,6 +79,12 @@ textarea.tts-text-input {
 .row:hover { background: #f6f0e7; }
 .row.active { background: #f0e5d6; box-shadow: inset 3px 0 0 var(--accent); }
 .row .sel { flex: none; margin: 0; }
+/* ▶ erscheint beim Hovern (Platz bleibt reserviert, die Zeile springt nicht) */
+.row .row-play {
+  flex: none; visibility: hidden; width: 26px; height: 26px; padding: 0;
+  border-radius: 50%; font-size: 11px; line-height: 1;
+}
+.row:hover .row-play:not(:disabled), .row .row-play.playing { visibility: visible; }
 /* Zwei Zeilen, sobald der gesprochene Text vom Satz abweicht — das Abschneiden
    sitzt deshalb auf den Kindern, nicht auf dem Container. */
 .row .text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -126,8 +132,8 @@ textarea.tts-text-input {
 .cand-table tr.outdated td { opacity: 0.55; }
 .cand-table tr.production { background: #fdf3ea; box-shadow: inset 3px 0 0 var(--accent); }
 .cand-table tr.production td { background: transparent; }
-.cand-table tr.pending-promote .production-pick {
-  outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px;
+.cand-table tr.pending-promote .pick-toggle {
+  outline: 2px solid var(--accent); outline-offset: 2px;
 }
 .cand-table .cand-audio-cell {
   width: 30%; min-width: 10rem;
@@ -140,14 +146,19 @@ textarea.tts-text-input {
 }
 .cand-table .center { text-align: center; }
 .cand-table .nowrap { white-space: nowrap; }
-.production-pick {
-  display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
-  cursor: pointer; font-size: 11px; color: var(--muted);
+/* Spalte „Auswahl": Schalter statt Radio — an = geht in die App */
+button.pick-toggle {
+  position: relative; width: 38px; height: 22px; padding: 0; border-radius: 11px;
+  background: #e6ded2; border: 1px solid #d3c8b8; transition: background 120ms ease;
 }
-.production-pick.pending { color: var(--accent); font-weight: 600; }
-.production-pick input { margin: 0; }
-.production-label { white-space: nowrap; }
-.cand-table tr.production .production-label { color: var(--ok); font-weight: 600; }
+button.pick-toggle:hover:not(:disabled) { background: #d9cfc0; }
+button.pick-toggle .pick-knob {
+  position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); transition: left 120ms ease;
+}
+button.pick-toggle.on { background: var(--ok); border-color: var(--ok); }
+button.pick-toggle.on:hover:not(:disabled) { background: #446a36; }
+button.pick-toggle.on .pick-knob { left: 18px; }
 .cand-table .text-cell {
   max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
@@ -166,9 +177,11 @@ button {
   font: inherit; padding: 5px 11px; border-radius: 6px; border: 1px solid var(--line);
   background: var(--panel); cursor: pointer;
 }
-button:hover { background: #f6f0e7; }
+button:hover:not(:disabled) { background: #f6f0e7; }
+button:active:not(:disabled) { transform: translateY(1px); }
 button:disabled { opacity: 0.5; cursor: default; }
 button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.primary:hover:not(:disabled) { background: #a9521f; border-color: #a9521f; }
 input, select, textarea {
   font: inherit; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px;
   background: var(--panel); color: inherit;

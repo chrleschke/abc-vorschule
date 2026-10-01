@@ -243,6 +243,7 @@ function restoreViewState() {
   state.selectedKeys = new Set(Array.isArray(selection) ? selection : []);
   const live = new Set(state.clips.map((c) => c.key));
   if (view.selected && live.has(view.selected)) state.selected = view.selected;
+  pruneSelection();
 }
 
 // ------------------------------------------------------------------- Daten
@@ -313,10 +314,21 @@ function trackDirty(root, formSelector) {
   root.dataset.dirtyTracking = "1";
   const mark = (event) => {
     const form = event.target.closest(formSelector);
-    if (form) form.dataset.dirty = "1";
+    if (form) markFormDirty(form);
   };
   root.addEventListener("input", mark);
   root.addEventListener("change", mark);
+}
+
+// „Speichern" ist nur aktiv, solange es etwas zu speichern gibt — vorher
+// sah der Knopf vor und nach dem Speichern gleich aus.
+function markFormDirty(form) {
+  form.dataset.dirty = "1";
+  form.querySelectorAll("[data-save-button]").forEach((button) => {
+    button.disabled = false;
+    button.textContent = "Speichern";
+    button.title = "";
+  });
 }
 
 // Werte eines geänderten Formulars über einen Neuaufbau retten — Reihenfolge
@@ -342,7 +354,7 @@ function restoreForm(form, snapshot) {
     if (field.type === "checkbox" || field.type === "radio") field.checked = snapshot[i];
     else field.value = snapshot[i];
   });
-  form.dataset.dirty = "1";
+  markFormDirty(form);
 }
 
 // Ein Batch-Lauf lädt nach jedem fertigen Clip nach — und währenddessen hört
@@ -354,7 +366,8 @@ function clipSignature(key) {
   const clip = state.clips.find((c) => c.key === key);
   if (!clip) return "";
   return JSON.stringify([
-    clip.status, clip.locked, clip.seed, clip.text, clip.draftText, clip.speaker, clip.profile,
+    clip.status, clip.locked, clip.seed, clip.text, clip.draftText, clip.speaker,
+    clip.language, clip.profile,
     clip.generateSeed,
     clip.candidates.map((c) => [c.seed, c.good, c.isProductionOnly, c.createdAt]),
   ]);
@@ -416,11 +429,50 @@ function setSelection(keys) {
   renderList();
 }
 
+// Anker für Shift-Klick in der Liste.
+let lastCheckedKey = null;
+
+// Eine Aufnahme direkt aus der Liste: die Produktion, sonst die neueste.
+function rowAudioSrc(clip) {
+  const encoded = encodeURIComponent(clip.key);
+  if (clip.status === "rendered") return `/audio/${encoded}.wav`;
+  const newest = clip.candidates.find((c) => !c.isProductionOnly);
+  return newest ? `/candidates/${encoded}/${newest.seed}.wav` : null;
+}
+
+const rowPlayer = new Audio();
+let rowPlayerKey = null;
+rowPlayer.onended = rowPlayer.onpause = () => {
+  document.querySelectorAll(".row-play.playing").forEach((b) => {
+    b.classList.remove("playing");
+    b.textContent = "▶";
+  });
+};
+
+function playRow(clip, button) {
+  const src = rowAudioSrc(clip);
+  if (!src) return;
+  if (rowPlayerKey === clip.key && !rowPlayer.paused) {
+    rowPlayer.pause();
+    return;
+  }
+  pauseAllAudio();
+  rowPlayer.pause();
+  rowPlayerKey = clip.key;
+  // Cache-Bust wie in der Detailsicht: nach Schnitt oder neuer Auswahl liegt
+  // unter derselben URL eine andere Datei.
+  rowPlayer.src = `${src}?t=${clip.seed}-${clip.candidates.length}`;
+  rowPlayer.play().then(() => {
+    button.classList.add("playing");
+    button.textContent = "■";
+  }).catch(() => {});
+}
+
 function renderList() {
   const list = el("list");
   const clips = visibleClips();
   list.innerHTML = "";
-  clips.forEach((clip) => {
+  clips.forEach((clip, index) => {
     const row = document.createElement("div");
     row.className = "row" + (clip.key === state.selected ? " active" : "");
     const spoken = clip.text !== clip.sourceText;
@@ -433,7 +485,8 @@ function renderList() {
     row.innerHTML = `
       <input type="checkbox" class="sel" ${state.selectedKeys.has(clip.key) ? "checked" : ""}
              title="Für den Batch-Lauf auswählen" />
-      <span class="chip">${clip.profile}</span>
+      <button class="row-play" title="Anhören (Produktion, sonst die neueste Aufnahme)"
+              ${rowAudioSrc(clip) ? "" : "disabled"} aria-label="Anhören">▶</button>
       <span class="text">
         <span class="row-source">${escapeHtml(clip.sourceText)}</span>
         ${spoken ? `<span class="row-tts">🔊 ${escapeHtml(clip.text)}</span>` : ""}
@@ -453,10 +506,30 @@ function renderList() {
     const checkbox = row.querySelector(".sel");
     checkbox.onclick = (event) => {
       event.stopPropagation();
+      // Shift-Klick: alles zwischen dem zuletzt angeklickten Häkchen und
+      // diesem bekommt denselben Zustand.
+      const anchor = clips.findIndex((c) => c.key === lastCheckedKey);
+      if (event.shiftKey && anchor >= 0) {
+        const [from, to] = [anchor, index].sort((a, b) => a - b);
+        clips.slice(from, to + 1).forEach((c) => {
+          if (checkbox.checked) state.selectedKeys.add(c.key);
+          else state.selectedKeys.delete(c.key);
+        });
+        lastCheckedKey = clip.key;
+        persistViewState();
+        renderList();
+        return;
+      }
+      lastCheckedKey = clip.key;
       if (checkbox.checked) state.selectedKeys.add(clip.key);
       else state.selectedKeys.delete(clip.key);
       persistViewState();
       updateBatchUi();
+    };
+    const play = row.querySelector(".row-play");
+    play.onclick = (event) => {
+      event.stopPropagation();
+      playRow(clip, play);
     };
     row.onclick = () => select(clip.key);
     list.appendChild(row);
@@ -599,8 +672,6 @@ function profileFormHtml(name) {
     <textarea data-instruct>${escapeHtml(profile.instruct)}</textarea>
     ${groups}
     <p>
-      <label><input type="checkbox" data-trim ${profile.trim ? "checked" : ""} />
-        Stille am Anfang/Ende wegschneiden (trim)</label>
       <label><input type="checkbox" data-norm ${profile.normalize ? "checked" : ""} />
         Lautstärke normalisieren</label>
     </p>
@@ -651,7 +722,6 @@ function readProfileForm(container) {
     speaker: container.querySelector("[data-speaker]").value,
     language: container.querySelector("[data-language]").value,
     sampling,
-    trim: container.querySelector("[data-trim]").checked,
     normalize: container.querySelector("[data-norm]").checked,
   };
 }
@@ -699,6 +769,11 @@ const saveProfileFrom = (container, name) => guard(async () => {
   // Gespeichert ist nicht mehr „in Arbeit" — sonst bliebe das Formular für
   // jeden weiteren refresh() eingefroren.
   delete container.dataset.dirty;
+  container.querySelectorAll("[data-save-button]").forEach((button) => {
+    button.disabled = true;
+    button.textContent = "✓ Gespeichert";
+    button.title = "Nichts Neues zu speichern";
+  });
   await refresh();
   showBanner(`Profil „${name}“ gespeichert — neue Kandidaten verwenden ab sofort ` +
     `diese Einstellungen. Bereits produzierte Clips bleiben unverändert.`, "ok");
@@ -779,10 +854,15 @@ function isClipWaitingForBatch(key) {
   return state.batchPendingKeys.has(key);
 }
 
-function seedOrigin(clip, profile) {
-  if (clip.locked) return "festgelegt per Lock";
-  if (profile.seedPool.includes(clip.seed)) return "automatisch aus dem Seed-Pool";
-  return "automatisch gewürfelt (Pool ist leer)";
+// Sprache dieses Clips: eigene (Lock) oder die des Profils.
+const clipLanguage = (clip, profile) => clip.language || profile.language;
+
+// „Stille trimmen" ist ein globaler Schalter wie „Use top seeds": einmal
+// gesetzt gilt er für jedes Generate und den Batch-Lauf, bis man ihn ändert.
+// Noch nie gesetzt → Vorgabe des Profils.
+function trimSilence(profile) {
+  const stored = readLocal("ttsTrimSilence", null);
+  return typeof stored === "boolean" ? stored : profile.trim !== false;
 }
 
 // Die Kurzfassung der globalen Einstellungen: erst der Klick auf „Bearbeiten“
@@ -823,7 +903,8 @@ function profileSummaryCard(clip, profile) {
         <div id="profile-form" class="profile-form" data-form-profile="${escapeHtml(clip.profile)}">
           ${profileFormHtml(clip.profile)}
           <p>
-            <button id="btn-profile-save" class="primary">Speichern</button>
+            <button id="btn-profile-save" class="primary" data-save-button disabled
+                    title="Erst etwas ändern">Speichern</button>
             <button id="btn-profile-reset"
                     title="Verwirft die Änderungen im Formular">Zurücksetzen</button>
             <span class="muted small">Speichern wirkt sich auf neue Kandidaten aus —
@@ -838,6 +919,7 @@ function candidateRow(clip, cand, index) {
   const isProduction = clip.status === "rendered" && clip.seed === cand.seed;
   const pendingRate = isActionPending("rate", clip.key, cand.seed);
   const pendingPromote = isActionPending("promote", clip.key, cand.seed);
+  const pendingClear = isProduction && isActionPending("clearProduction", clip.key);
   const pendingDiscard = isActionPending("discard", clip.key, cand.seed);
   const rowBusy = candidateRowBusy(clip.key, cand.seed);
   const discardDisabled = candidateDiscardDisabled(clip, cand);
@@ -859,15 +941,14 @@ function candidateRow(clip, cand, index) {
   return `
     <tr class="${classes}" data-cand-seed="${cand.seed}">
       <td class="center production-cell">
-        <label class="production-pick ${pendingPromote ? "pending" : ""}"
-               title="${isProduction
-                 ? "Diese Aufnahme ist die Produktion"
-                 : "Genau diese Aufnahme wird sofort die Produktions-Audio, der Seed wird festgelegt."}">
-          <input type="radio" name="production" data-promote="${cand.seed}"
-                 ${isProduction ? "checked" : ""}
-                 ${promoteBusy ? "disabled" : ""} />
-          <span class="production-label">${isProduction ? "✓ fertig" : "wählen"}</span>
-        </label>
+        <button class="pick-toggle ${isProduction ? "on" : ""} ${pendingPromote || pendingClear ? "pending" : ""}"
+                data-pick="${cand.seed}" role="switch"
+                aria-checked="${isProduction ? "true" : "false"}"
+                ${promoteBusy ? "disabled" : ""}
+                title="${isProduction
+                  ? "Ausgewählt — geht in die App. Klick hebt die Auswahl auf (Aufnahme und 👍 bleiben)."
+                  : "Diese Aufnahme auswählen — sie geht sofort in die App, der Seed wird festgelegt."}">
+          <span class="pick-knob"></span></button>
       </td>
       <td class="cand-audio-cell"><audio controls preload="metadata" src="${audioSrc}"
                  data-index="${index}" ${isProduction ? "data-current-production" : ""}></audio></td>
@@ -884,7 +965,7 @@ function candidateRow(clip, cand, index) {
                 class="icon ${pendingDiscard ? "pending" : ""}"
                 ${discardDisabled ? "disabled" : ""}
                 title="${clip.status === "rendered" && clip.seed === cand.seed
-                  ? "Produktion kann nicht gelöscht werden — „Keine Produktion“ nutzen"
+                  ? "Die Auswahl kann nicht gelöscht werden — erst in der Spalte „Auswahl“ abwählen"
                   : "Klingt schlecht — Probeaufnahme löschen"}">${discardLabel}</button>`}
         ${cand.mic ? `<button data-edit-recording="${cand.seed}" class="icon" title="Schnitt und Tonhöhe dieser Aufnahme bearbeiten">✂</button>` : ""}
       </td>
@@ -914,7 +995,7 @@ function candidatesTableHtml(clip) {
   }
   return `<div class="cand-scroll"><table class="cand-table">
       <thead><tr>
-        <th title="Genau eine Aufnahme kann Produktion sein">Produktion</th>
+        <th title="Genau eine Aufnahme ist ausgewählt — sie geht in die App">Auswahl</th>
         <th>Anhören</th>
         <th>Bewertung</th>
         <th>Seed</th>
@@ -933,10 +1014,6 @@ function deletableCandidates(clip) {
     !c.isProductionOnly
     && !(clip.status === "rendered" && c.seed === clip.seed)
     && !c.good);
-}
-
-function hasProduction(clip) {
-  return clip.status === "rendered" || clip.locked;
 }
 
 function detailTitleHtml(clip) {
@@ -959,9 +1036,9 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
   const fixedSeedActive = clip.generateSeed != null;
   return `
     <div class="card card-primary" id="candidates-card">
-      <h3 class="card-title">Aufnahmen erzeugen &amp; bestätigen</h3>
-      <div class="clip-head compact">
-        <span class="mono muted">${clip.key}</span>
+      <div class="card-head-row">
+        <h3 class="card-title">Aufnahmen erzeugen &amp; bestätigen</h3>
+        <span class="mono muted small">${clip.key}</span>
         <span class="chip ${clip.status}">${STATUS_LABELS[clip.status] || clip.status}</span>
         ${clip.locked ? '<span class="chip locked">📌 festgelegt</span>' : ""}
       </div>
@@ -981,15 +1058,18 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
                   'title="Stimme nur für diesen Clip — überschreibt die des Profils"'}>
           ${voiceOptions(clip.speaker)}
         </select>
-        ${ownVoice
+        · Sprache
+        <select id="clip-language"
+                ${clipSource(clip) === "mic" ? 'disabled title="Für Aufnahmen bedeutungslos"' :
+                  'title="Sprache nur für diesen Clip — überschreibt die des Profils"'}>
+          ${languageOptions(clipLanguage(clip, profile))}
+        </select>
+        ${ownVoice || clipLanguage(clip, profile) !== profile.language
           ? `<span class="chip changed" title="Das Profil „${escapeHtml(clip.profile)}“ ` +
-            `spricht sonst mit ${escapeHtml(profile.speaker)}">nur für diesen Clip</span>`
+            `spricht sonst mit ${escapeHtml(profile.speaker)} auf ` +
+            `${escapeHtml(profile.language)}">nur für diesen Clip</span>`
           : ""}
-        ${accentBadge(clip.speaker, profile.language)}
       </p>
-      <p class="muted small">Seed <span class="mono">${clip.seed}</span>
-        <span>(${seedOrigin(clip, profile)})</span>
-        · Sprache ${escapeHtml(profile.language)} (aus dem Profil)</p>
       ${sourceSwitchHtml(clip)}
       ${clipSource(clip) === "tts" ? `
       <div class="generate-row">
@@ -1047,50 +1127,29 @@ function candidatesCardHtml(clip, profile, max, poolSize, topSize) {
             ? `(${topSize} Top-Seeds)`
             : "(keine Locks — es kommen Zufalls-Seeds)"}</span>
         </label>
+        <label class="inline"
+               title="Stille am Anfang und Ende der neuen Aufnahmen wegschneiden — gilt für alle Clips und den Batch-Lauf, bis du es änderst">
+          <input id="cand-trim" type="checkbox" ${trimSilence(profile) ? "checked" : ""}
+                 ${generating ? "disabled" : ""} />
+          Stille trimmen
+        </label>
         <span id="cand-progress" class="muted small">${
           genRunning ? "Erzeuge Probeaufnahmen …"
             : genQueued ? "eingereiht — wartet auf den laufenden Job …"
               : waitingForBatch ? "steht noch im Batch-Lauf" : ""}</span>
       </div>` : recorderPanelHtml(clip)}
-      <details class="help">
-        <summary>Was bedeuten die Spalten?</summary>
-        <ul class="small">
-          <li><b>Produktion</b> — es kann nur eine geben: die Auswahl übernimmt genau
-            diese Aufnahme sofort als Produktions-Audio und legt ihren Seed fest.</li>
-          <li><b>👍 / ✓</b> — klingt gut: Bewertung wird gespeichert und der Seed automatisch
-            in den Seed-Pool des Profils „${clip.profile}“ aufgenommen.</li>
-          <li><b>👎</b> — klingt schlecht: Probeaufnahme löschen (nimmt einen
-            👍-Seed auch wieder aus dem Pool).</li>
-          <li><b>Alle löschen</b> — entfernt alle Probeaufnahmen ohne 👍 und ohne
-            Produktion; bewertete und bestätigte Aufnahmen bleiben.</li>
-          <li><b>Keine Produktion</b> — hebt die bestätigte Aufnahme auf; Kandidaten
-            und 👍 bleiben erhalten.</li>
-          <li><b>Erzeugt / Stimme / Text</b> — womit die Aufnahme entstand.</li>
-        </ul>
-      </details>
-      <div class="candidates-toolbar">
+      <div id="candidates-body">${candidatesTableHtml(clip)}</div>
+      ${clip.candidates.length ? `
+      <div class="candidates-footer">
         <button id="btn-delete-all-candidates"
                 class="${isActionPending("deleteAll", clip.key) ? "pending" : ""}"
                 ${deletableCount === 0 || deleteBusy ? "disabled" : ""}
-                title="Löscht alle Probeaufnahmen ohne 👍 und ohne Produktion">
+                title="Löscht alle Aufnahmen ohne 👍, die nicht ausgewählt sind">
           ${isActionPending("deleteAll", clip.key)
-            ? "⏳ Lösche …"
-            : deletableCount
-              ? `Alle löschen (${deletableCount})`
-              : "Alle löschen"}</button>
-      </div>
-      <div id="candidates-body">${candidatesTableHtml(clip)}</div>
-      ${clipSource(clip) === "tts" ? editorHtml(clip) : ""}
-      ${hasProduction(clip) ? `
-      <div class="candidates-footer">
-        <button id="btn-clear-production"
-                class="${isActionPending("clearProduction", clip.key) ? "pending" : ""}"
-                ${globalCandidateActionBusy(clip.key) ? "disabled" : ""}
-                title="Hebt die Produktions-Auswahl auf — Kandidaten und 👍 bleiben">
-          ${isActionPending("clearProduction", clip.key)
-            ? "⏳ Hebe auf …"
-            : "Keine Produktion"}</button>
+            ? "⏳ Räume auf …"
+            : deletableCount ? `🧹 Aufräumen (${deletableCount})` : "🧹 Aufräumen"}</button>
       </div>` : ""}
+      ${clipSource(clip) === "tts" ? editorHtml(clip) : ""}
     </div>`;
 }
 
@@ -1688,15 +1747,33 @@ function wireCandidateHandlers(clip) {
       }
     });
   });
-  el("detail").querySelectorAll("[data-promote]").forEach((radio) => {
-    radio.onclick = guard(async (event) => {
-      if (globalCandidateActionBusy(clip.key)) {
-        event.preventDefault();
-        return;
-      }
-      const seed = Number(radio.dataset.promote);
-      if (clip.seed === seed) {
-        showBanner("Diese Aufnahme ist bereits die Produktion.", "info");
+  // Spalte „Auswahl": ein Schalter pro Zeile. An → diese Aufnahme geht in
+  // die App (Promote); die schon ausgewählte noch einmal → Auswahl aufheben.
+  // Ersetzt Radio-Buttons und den eigenen Knopf „Keine Produktion".
+  el("detail").querySelectorAll("[data-pick]").forEach((button) => {
+    button.onclick = guard(async () => {
+      if (globalCandidateActionBusy(clip.key)) return;
+      const seed = Number(button.dataset.pick);
+      const cand = clip.candidates.find((c) => c.seed === seed);
+      const selected = clip.status === "rendered" && clip.seed === seed;
+      if (selected) {
+        // Ohne eigene Probeaufnahme (Nachbau-Eintrag) ist die Produktions-WAV
+        // die einzige Kopie — Abwählen löscht sie endgültig.
+        if (cand?.isProductionOnly &&
+            !confirm("Diese Aufnahme gibt es nur als Produktion. Abwählen löscht sie " +
+                     "endgültig. Trotzdem abwählen?")) return;
+        state.actionPending = { type: "clearProduction", clipKey: clip.key };
+        await flushPendingSaves(clip.key);
+        syncCandidatesBody(clip);
+        try {
+          await post(`/api/clips/${encoded}/clear-production`, {});
+          await refreshAfterDetailAction();
+          showBanner("Auswahl aufgehoben — der Clip geht nicht mehr in die App. " +
+            "Aufnahmen und 👍 bleiben.", "ok");
+        } catch (error) {
+          await refreshAfterDetailAction();
+          throw error;
+        }
         return;
       }
       state.actionPending = { type: "promote", clipKey: clip.key, seed };
@@ -1706,8 +1783,8 @@ function wireCandidateHandlers(clip) {
         const result = await post(`/api/clips/${encoded}/promote`, { seed });
         await refreshAfterDetailAction();
         showBanner(result.verified
-          ? "In Produktion übernommen — der Clip ist fertig."
-          : "Übernommen und Seed festgelegt. Hinweis: die Aufnahme entstand mit " +
+          ? "Ausgewählt — der Clip ist fertig."
+          : "Ausgewählt und Seed festgelegt. Hinweis: die Aufnahme entstand mit " +
             "älteren Einstellungen und ließ sich nicht verifizieren.",
           result.verified ? "ok" : "info");
       } catch (error) {
@@ -1716,6 +1793,7 @@ function wireCandidateHandlers(clip) {
       }
     });
   });
+
   el("detail").querySelectorAll("[data-edit-recording]").forEach((button) => {
     button.onclick = guard(() => openEditor(clip.key, Number(button.dataset.editRecording)));
   });
@@ -1729,14 +1807,11 @@ function wireDeleteAllCandidates(clip) {
     if (globalCandidateActionBusy(clip.key)) return;
     const deletable = deletableCandidates(clip);
     if (deletable.length === 0) {
-      showBanner("Nichts löschbar — alle Aufnahmen sind bewertet oder Produktion.", "info");
+      showBanner("Nichts aufzuräumen — alle Aufnahmen sind bewertet oder ausgewählt.", "info");
       return;
     }
-    if (deletable.length > 1 &&
-        !confirm(`${deletable.length} löschbare Probeaufnahmen entfernen? ` +
-                 "Bewertete und Produktion bleiben erhalten.")) {
-      return;
-    }
+    // Ohne Rückfrage: Aufräumen trifft nur Probeaufnahmen ohne 👍 und ohne
+    // Auswahl — genau die, die man nach dem Anhören loswerden will.
     state.actionPending = { type: "deleteAll", clipKey: clip.key };
     await flushPendingSaves(clip.key);
     try {
@@ -1757,28 +1832,6 @@ function wireDeleteAllCandidates(clip) {
   });
 }
 
-function wireClearProduction(clip) {
-  const button = el("btn-clear-production");
-  if (!button) return;
-  const encoded = encodeURIComponent(clip.key);
-  button.onclick = guard(async () => {
-    if (globalCandidateActionBusy(clip.key)) return;
-    if (!confirm("Produktion aufheben? Kandidaten und 👍-Bewertungen bleiben erhalten.")) {
-      return;
-    }
-    state.actionPending = { type: "clearProduction", clipKey: clip.key };
-    await flushPendingSaves(clip.key);
-    renderDetail(clip.key);
-    try {
-      await post(`/api/clips/${encoded}/clear-production`, {});
-      await refreshAfterDetailAction();
-      showBanner("Produktion aufgehoben — keine Aufnahme ist mehr bestätigt.", "ok");
-    } catch (error) {
-      await refreshAfterDetailAction();
-      throw error;
-    }
-  });
-}
 
 const TEXT_SAVE_DELAY_MS = 600;
 const textSaveTimers = new Map();
@@ -2005,7 +2058,8 @@ function renderDetail(key) {
     writeLocal("ttsCandCount", count);
     const known = el("cand-known-seeds").checked;
     const top = el("cand-top-seeds").checked;
-    const body = { n: count, useKnownSeeds: known, useTopSeeds: top };
+    const body = { n: count, useKnownSeeds: known, useTopSeeds: top,
+                   trim: el("cand-trim") ? el("cand-trim").checked : trimSilence(profile) };
     if (fixedParsed.value != null) body.fixedSeed = fixedParsed.value;
     state.actionPending = { type: "generate", clipKey: clip.key };
     state.generatingKeys.add(clip.key);
@@ -2064,13 +2118,22 @@ function renderDetail(key) {
     await post(`/api/clips/${encoded}/lock`, { speaker });
     await refresh();
     const origin = voiceOf(speaker)?.origin || "unbekannt";
-    showBanner(`Stimme dieses Clips: ${speaker} (${origin}). ` +
-      `Seed ${clip.seed} wurde dabei festgelegt (Lock).`, "ok");
+    showBanner(`Stimme dieses Clips: ${speaker} (${origin}).`, "ok");
   });
+
+  el("clip-language").onchange = guard(async (event) => {
+    // Gleich der Profil-Sprache heißt: keine eigene (der Server normalisiert).
+    const language = event.target.value === profile.language ? null : event.target.value;
+    await post(`/api/clips/${encoded}/lock`, { language });
+    await refresh({ keepDetail: true });
+    showBanner(`Sprache dieses Clips: ${event.target.value}.`, "ok");
+  });
+
+  const trimBox = el("cand-trim");
+  if (trimBox) trimBox.onchange = () => writeLocal("ttsTrimSilence", trimBox.checked);
 
   wireCandidateHandlers(clip);
   wireDeleteAllCandidates(clip);
-  wireClearProduction(clip);
 
   el("detail").querySelectorAll('input[name="source"]').forEach((radio) => {
     radio.onchange = () => { setClipSource(clip, radio.value); renderDetail(clip.key); };
@@ -2102,7 +2165,8 @@ function paramsCard(name) {
         <span class="muted normal">— ${profileClipCount(name)} Clips</span></h3>
       ${profileFormHtml(name)}
       <p>
-        <button data-save class="primary">Speichern</button>
+        <button data-save data-save-button class="primary" disabled
+                title="Erst etwas ändern">Speichern</button>
         <button data-reset title="Verwirft die Änderungen in dieser Karte">Zurücksetzen</button>
         <button data-save-all
                 title="Nur die Sampling-Werte dieser Karte auf alle Profile übertragen — die maximale Dauer bleibt ausgenommen, die gilt pro Profil">
@@ -2311,7 +2375,7 @@ function redrawDetail() {
 // ------------------------------------------------------------------ Events
 
 // Felder, in denen getippt wird. Radio, Checkbox und Knopf zählen nicht: nach
-// einem Klick auf „Produktion" oder 👍 sollen j/k und 1–9 weiter gehen.
+// einem Klick auf „Auswahl" oder 👍 sollen j/k und 1–9 weiter gehen.
 const TYPING_INPUTS = new Set(["text", "search", "number", "email", "url", "password", ""]);
 const isTypingTarget = (target) =>
   target.tagName === "TEXTAREA" || target.tagName === "SELECT" || target.isContentEditable ||
@@ -2332,7 +2396,10 @@ function playFromStart(audio) {
 // Eine Wiedergabe zur Zeit — auch per Maus: wer Kandidaten vergleicht, will
 // den vorigen nicht weiterlaufen hören.
 document.addEventListener("play", (event) => {
-  if (event.target.closest?.("#detail")) pauseAllAudio(event.target);
+  if (event.target.closest?.("#detail")) {
+    pauseAllAudio(event.target);
+    rowPlayer.pause();
+  }
 }, true);
 
 document.addEventListener("keydown", (event) => {
@@ -2345,13 +2412,6 @@ document.addEventListener("keydown", (event) => {
   if (isTypingTarget(event.target)) return;
   // Cmd+J (Downloads), Cmd+1…9 (Tabs) gehören dem Browser.
   if (event.metaKey || event.ctrlKey || event.altKey) return;
-  // Pfeiltasten auf einem fokussierten Radio „Produktion" wählten still die
-  // Nachbar-Aufnahme als Produktion — ein Tastendruck zum Scrollen genügte.
-  if (event.target.matches?.("input[type=radio][data-promote]") &&
-      event.key.startsWith("Arrow")) {
-    event.preventDefault();
-    return;
-  }
   const clips = visibleClips();
   const current = clips.findIndex((c) => c.key === state.selected);
 
@@ -2360,10 +2420,11 @@ document.addEventListener("keydown", (event) => {
   } else if (event.key === "k" && current > 0) {
     select(clips[current - 1].key);
   } else if (event.key === " ") {
-    // Knöpfe, Häkchen und Radios (außer „Produktion") bedient die Leertaste
-    // wie gewohnt selbst.
-    if (event.target.tagName === "BUTTON" ||
-        event.target.matches?.("input[type=checkbox], input[type=radio]:not([data-promote])")) return;
+    // Knöpfe, Häkchen und Radios bedient die Leertaste wie gewohnt selbst —
+    // außer dem Auswahl-Schalter: nach einem Klick darauf hat er den Fokus,
+    // und die Leertaste zum Anhören höbe die Auswahl gleich wieder auf.
+    if ((event.target.tagName === "BUTTON" && !event.target.matches(".pick-toggle")) ||
+        event.target.matches?.("input[type=checkbox], input[type=radio]")) return;
     event.preventDefault();
     // Leertaste schaltet um: läuft etwas, hält sie an; sonst Produktion von
     // vorn, und ohne Produktion (Clip fehlt noch) die erste Aufnahme.
@@ -2381,8 +2442,14 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+function pruneSelection() {
+  const visible = new Set(visibleClips().map((c) => c.key));
+  state.selectedKeys = new Set([...state.selectedKeys].filter((k) => visible.has(k)));
+}
+
 ["search", "filter-profile", "filter-status"].forEach((id) => {
   el(id).addEventListener("input", () => {
+    pruneSelection();
     persistViewState();
     renderList();
   });
@@ -2398,8 +2465,10 @@ el("btn-params").onclick = () => {
 };
 
 // Batch-Auswahl in der Liste
-el("sel-visible").onclick = () => setSelection(visibleClips().map((c) => c.key));
-el("sel-all").onclick = () => setSelection(state.clips.map((c) => c.key));
+// Ausgewählt ist nur, was man sieht: „Alle" nimmt die gefilterten Clips, und
+// ein Filterwechsel wirft Unsichtbares aus der Auswahl (pruneSelection) — ein
+// Batch-Lauf soll nie Clips treffen, die gerade nicht in der Liste stehen.
+el("sel-all").onclick = () => setSelection(visibleClips().map((c) => c.key));
 el("sel-none").onclick = () => setSelection([]);
 
 el("batch-count").value = batchCount();
@@ -2439,7 +2508,7 @@ el("btn-render").onclick = guard(async () => {
   if (!confirm(`Batch-Lauf für ${keys.length} ausgewählte Clips starten? ` +
                `Erzeugt wird nur, was noch fehlt — fertige Clips ` +
                `werden übersprungen. Pro Clip entstehen ${n} Kandidaten, die du ` +
-               `danach in der Liste als Produktion bestätigst.`)) return;
+               `danach in der Spalte „Auswahl“ bestätigst.`)) return;
   // Dieselbe Regel wie im Server (`force` ist hier nie gesetzt): fertige Clips
   // überspringt der Lauf. Sie als „wartet" zu markieren hieße, sie auf einen
   // Lauf warten zu lassen, der sie nie anfasst.
@@ -2453,7 +2522,10 @@ el("btn-render").onclick = guard(async () => {
   await whileBusy(el("btn-render"), "⏳ Starte …", async () => {
     for (const key of keys) await flushPendingSaves(key);
     try {
-      await post("/api/render", { keys, n });
+      // Der globale Schalter „Stille trimmen" gilt auch hier; nie gesetzt →
+      // jedes Profil seine eigene Vorgabe.
+      const trim = readLocal("ttsTrimSilence", null);
+      await post("/api/render", typeof trim === "boolean" ? { keys, n, trim } : { keys, n });
     } catch (error) {
       finishBatch("last");
       throw error;

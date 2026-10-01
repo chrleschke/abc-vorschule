@@ -30,8 +30,8 @@ from .recordings import apply_edit, preview_bytes, recording_info, store_recordi
 from .render import (
     candidate_fingerprint, candidate_meta, candidate_seeds, clear_production,
     clip_audio_list, deletable_candidate_seeds, delete_candidate_wav,
-    candidate_original_path, release_pool_seed, render_batch_candidates,
-    sample_candidates, seeds_for_candidates, trim_candidate, update_candidate_meta,
+    candidate_original_path, recorded_trim_silence, release_pool_seed,
+    render_batch_candidates, sample_candidates, seeds_for_candidates, trim_candidate, update_candidate_meta,
 )
 from .mic import APP_MONSTER_PITCH, PITCH_MIN, PITCH_MAX
 from .store import (
@@ -72,6 +72,34 @@ def _checked_speaker(name: Any) -> str:
             detail=f"unbekannte Stimme {name!r}. Bekannt: "
                    f"{', '.join(voices.speaker_names())}")
     return name
+
+
+def _checked_language(name: Any) -> str:
+    """Eine Sprache aus `voices.LANGUAGES` — sonst 422, aus demselben Grund
+    wie bei `_checked_speaker`."""
+    if name not in voices.LANGUAGES:
+        raise HTTPException(
+            status_code=422,
+            detail=f"unbekannte Sprache {name!r}. Bekannt: "
+                   f"{', '.join(voices.LANGUAGES)}")
+    return name
+
+
+def _trim_choice(body: dict) -> bool | None:
+    """`trim` aus dem Body: True/False wählt das Stille-Wegschneiden für diesen
+    Wurf, fehlt es (oder null), gilt das Profil.
+
+    Streng bool: `bool("false")` wäre True, und ein so verschluckter Fehler
+    landete unbemerkt im Sidecar und in der Frische-Anzeige.
+    """
+    value = body.get("trim")
+    if value is None:
+        return None
+    if not isinstance(value, bool):
+        raise HTTPException(
+            status_code=422,
+            detail=f"'trim' muss true, false oder null sein, nicht {value!r}")
+    return value
 
 
 def _copy_atomic(src: Path, dst: Path) -> None:
@@ -275,6 +303,8 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
                 "generationText": clip.generation_text,
                 "sourceText": clip.source_text,
                 "speaker": clip.speaker,
+                # Wirksame Sprache: Lock-Override oder die des Profils.
+                "language": clip.language,
                 "seed": clip.seed,
                 "generateSeed": lock.generate_seed if lock else None,
                 "locked": clip.locked,
@@ -337,13 +367,7 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
         if "speaker" in body:
             profile.speaker = _checked_speaker(body["speaker"])
         if "language" in body:
-            language = body["language"]
-            if language not in voices.LANGUAGES:
-                raise HTTPException(
-                    status_code=422,
-                    detail=f"unbekannte Sprache {language!r}. Bekannt: "
-                           f"{', '.join(voices.LANGUAGES)}")
-            profile.language = language
+            profile.language = _checked_language(body["language"])
         if "sampling" in body:
             sampling = body["sampling"]
             if not isinstance(sampling, dict):
@@ -482,6 +506,7 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
         count = max(1, min(MAX_CANDIDATES, int(body.get("n", 4))))
         use_top = bool(body.get("useTopSeeds"))
         use_known = bool(body.get("useKnownSeeds"))
+        trim = _trim_choice(body)
 
         def run(is_cancelled) -> None:
             # Alles erst hier aufgelöst, nicht beim Einreihen: Text, Stimme und
@@ -512,7 +537,7 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
                     "status": p.status, "message": p.message})
 
             sample_candidates(clip_now, profile_now, engine, paths, seeds,
-                              progress=on_progress, cancel=is_cancelled)
+                              progress=on_progress, cancel=is_cancelled, trim=trim)
             attempted = tally["ok"] + tally["failed"] + tally["skipped"]
             jobs.publish({"type": "job-summary", "job": f"candidates:{key}",
                           "rendered": tally["ok"], "skipped": tally["skipped"],
@@ -553,6 +578,17 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
         speaker = merged("speaker", existing.speaker if existing else None)
         if speaker is not None:
             _checked_speaker(speaker)
+        language = merged("language", existing.language if existing else None)
+        if language is not None:
+            _checked_language(language)
+            # Die Sprache des Profils ausdrücklich gewählt heißt „wie im Profil":
+            # gespeichert hielte sie den Clip an einer Sprache fest, die das
+            # Profil später ändern kann, und markierte ihn als kuratiert.
+            # Gegen das Profil, das nach diesem Request gilt.
+            target_profile = override or key.split(":", 1)[0]
+            if ("language" in body and target_profile in ctx.profiles.profiles
+                    and language == ctx.profiles.profiles[target_profile].language):
+                language = None
 
         # `seed` ist optional und wird nur geändert, wenn er im Body steht.
         # Vorher war er Pflicht und überschrieb den Lock-Seed: ein verspätetes
@@ -593,7 +629,14 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
         if draft is not None and (not draft.strip() or draft == (text_override or clip.source_text)):
             draft = None
 
-        locks.set(key, Lock(
+        # Erster Lock auf einem ungelockten Clip, nur für Hörarbeit (Entwurf,
+        # Stimme, Sprache, Profil): das ist keine Freigabe. Wer `seed` oder
+        # `textOverride` ausdrücklich schickt, legt dagegen fest — wie bisher.
+        curation_only = (existing is None and body.get("seed") is None
+                         and text_override is None
+                         and any(f in body for f in ("draftText", "speaker",
+                                                     "language", "profile")))
+        lock = Lock(
             seed=lock_seed,
             profile=override,
             text_override=text_override,
@@ -601,17 +644,20 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
             note=merged("note", existing.note if existing else None),
             source_text=clip.source_text,
             speaker=speaker,
+            language=language,
             generate_seed=generate_seed,
             # Text, Stimme oder fester Seed machen aus einer aufgehobenen
             # Produktion keine bestätigte — das tut nur ein Promote. Ebenso
-            # wenig ein erster Entwurf auf einem ungelockten Clip: der Lock
-            # hält dann nur Hörarbeit, keine Freigabe (sonst zählte der
-            # Hash-Seed als bestätigt, `render` und Export behandelten den Clip
-            # als abgenommen).
-            cleared=(existing.cleared if existing
-                     else draft is not None and text_override is None
-                     and body.get("seed") is None),
-        ))
+            # wenig `curation_only`: sonst zählte der Hash-Seed als bestätigt,
+            # `render` und Export behandelten den Clip als abgenommen.
+            cleared=existing.cleared if existing else curation_only,
+        )
+        # Bleibt davon nichts übrig (Sprache = die des Profils, leerer Entwurf,
+        # Stimme auf null), gibt es nichts zu merken — ein leerer Lock wäre nur
+        # Rauschen in der git-verwalteten locks.json.
+        if curation_only and not lock.curated:
+            return {"ok": "locked"}
+        locks.set(key, lock)
         locks.save(paths.locks)
         return {"ok": "locked"}
 
@@ -682,6 +728,7 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
             note=existing.note if existing else None,
             source_text=clip.source_text,
             speaker=existing.speaker if existing else None,
+            language=existing.language if existing else None,
             generate_seed=existing.generate_seed if existing else None,
         ))
         locks.save(paths.locks)
@@ -699,7 +746,10 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
                 # Eine Aufnahme hängt an keiner Profil-Einstellung — nichts zu prüfen.
                 verified = True
             else:
-                target = fingerprint(replace(clip, seed=seed, text=production_text), profile)
+                # Mit dem Stille-Wegschneiden, das der Kandidat wirklich hatte —
+                # eine abweichende Wahl beim Würfeln ist keine Abweichung vom Profil.
+                target = fingerprint(replace(clip, seed=seed, text=production_text), profile,
+                                     trim=recorded_trim_silence(meta))
                 verified = candidate_fingerprint(paths, key, seed) == target
         else:
             # Nachbau-Eintrag ohne Sidecar — es gibt nichts, wogegen sich das
@@ -833,6 +883,7 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
         force = bool(body.get("force"))
         count = max(1, min(MAX_CANDIDATES, int(body.get("n", DEFAULT_BATCH_COUNT))))
         keys = body.get("keys")
+        trim = _trim_choice(body)
         if keys is not None:
             # Batch-Lauf über eine explizite Auswahl. Unbekannte Keys sind ein
             # Fehler und kein stilles Überspringen: die UI hätte sie gar nicht
@@ -875,7 +926,8 @@ def create_app(paths: Paths, engine=None, *, load_engine: bool = True) -> FastAP
                 clip_done=lambda key: jobs.publish({
                     "type": "clip-done", "clipKey": key}),
                 # Jeder Clip mit dem Stand von jetzt, nicht vom Start des Laufs.
-                refresh=fresh_clip)
+                refresh=fresh_clip,
+                trim=trim)
             # render_batch_candidates swallows per-clip failures so the batch
             # continues. Without this summary the job publishes `job-done` and
             # the UI says "fertig" even when every single clip failed.

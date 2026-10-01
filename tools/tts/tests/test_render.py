@@ -862,3 +862,144 @@ def test_candidates_speak_the_draft_but_production_keeps_its_text(tmp_path):
         seed=1, text_override="Frage Eins?", draft_text="Ganz anders?")}))
     again = next(c for c in redrafted if c.key == key)
     assert candidate_infos(paths, again, profile)[0]["fresh"] is True
+
+
+class _PaddedEngine(FakeEngine):
+    """Rauschen mit 0,1 s Stille davor und danach — so wird sichtbar, ob das
+    Stille-Wegschneiden lief. Merkt sich außerdem die Sprache jedes Aufrufs."""
+
+    def __init__(self):
+        super().__init__()
+        self.languages = []
+
+    def generate(self, text, profile, seed):
+        self.languages.append(profile.language)
+        wav, sr = super().generate(text, profile, seed)
+        silence = np.zeros(sr // 10, dtype=np.float32)
+        return np.concatenate([silence, wav, silence]), sr
+
+
+def _frames(path):
+    import soundfile as sf
+
+    return sf.info(path).frames
+
+
+def test_the_clip_language_reaches_the_engine_in_render_and_candidates(tmp_path):
+    from ttskit.plan import clip_key
+
+    paths = Paths(root=tmp_path, content_dir=tmp_path / "content")
+    profiles = Profiles.load(tmp_path / "nope.json")
+    items = [
+        Item("task:t1:round:0:promptTts", "Pizza?", "promptTts", "tasks.json", "l01", "a"),
+        Item("task:t2:round:0:promptTts", "Frage zwei?", "promptTts", "tasks.json", "l01", "b"),
+    ]
+    locks = Locks()
+    locks.set(clip_key("prompt", "Pizza?"), Lock(seed=7, language="italian"))
+    clips = {c.source_text: c for c in build_clips(items, profiles, locks)}
+
+    engine = _PaddedEngine()
+    render_clips(list(clips.values()), profiles, engine, RenderState(), paths)
+    spoken = dict(zip([text for text, _ in engine.calls], engine.languages))
+    assert spoken == {"Pizza?": "italian", "Frage zwei?": "german"}
+
+    engine = _PaddedEngine()
+    sample_candidates(clips["Pizza?"], profiles.profiles["prompt"], engine, paths, [1])
+    assert engine.languages == ["italian"]
+    assert profiles.profiles["prompt"].language == "german"
+
+
+def test_sample_candidates_trim_choice_overrides_the_profile_and_is_recorded(setup):
+    from dataclasses import replace
+    from ttskit.plan import fingerprint
+    from ttskit.render import candidate_infos, candidate_meta
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    assert profile.trim is True
+    engine = _PaddedEngine()
+    sample_candidates(clip, profile, engine, paths, [11])             # Profil: schneiden
+    sample_candidates(clip, profile, engine, paths, [22], trim=False)  # bewusst nicht
+
+    assert candidate_meta(paths, clip.key, 11)["trimSilence"] is True
+    assert candidate_meta(paths, clip.key, 22)["trimSilence"] is False
+    untrimmed = _frames(paths.candidates / clip.key / "22.wav")
+    trimmed = _frames(paths.candidates / clip.key / "11.wav")
+    assert untrimmed == 2400 + 2 * 2400, "ohne Trim bleibt die Stille stehen"
+    assert trimmed < untrimmed
+    assert candidate_meta(paths, clip.key, 22)["fingerprint"] == \
+        fingerprint(replace(clip, seed=22), profile, trim=False)
+
+    infos = {i["seed"]: i for i in candidate_infos(paths, clip, profile)}
+    assert infos[22]["fresh"] is True, "eine andere Trim-Wahl ist kein ⚠️ alt"
+    assert infos[22]["trimSilence"] is False
+    assert infos[11]["trimSilence"] is True
+
+
+def test_freshness_uses_the_recorded_trim_and_old_sidecars_fall_back(setup):
+    import json as jsonlib
+    from ttskit.render import candidate_infos
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    sample_candidates(clip, profile, FakeEngine(), paths, [11, 22])
+    # 22 als Alt-Sidecar: so sahen sie vor `trimSilence` aus.
+    path = paths.candidates / clip.key / "22.json"
+    meta = jsonlib.loads(path.read_text(encoding="utf-8"))
+    del meta["trimSilence"]
+    path.write_text(jsonlib.dumps(meta), encoding="utf-8")
+
+    infos = {i["seed"]: i for i in candidate_infos(paths, clip, profile)}
+    assert infos[22]["trimSilence"] is None
+    assert infos[11]["fresh"] is True and infos[22]["fresh"] is True
+
+    # Profil-Trim umgestellt: der Kandidat mit festgehaltener Wahl bleibt
+    # frisch, der alte rechnet mit dem Profil — wie bisher veraltet.
+    profile.trim = False
+    infos = {i["seed"]: i for i in candidate_infos(paths, clip, profile)}
+    assert infos[11]["fresh"] is True
+    assert infos[22]["fresh"] is False
+
+
+def test_production_fingerprint_uses_the_recorded_trim_choice(setup):
+    import json as jsonlib
+    from ttskit.plan import fingerprint
+    from ttskit.render import production_fingerprint
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    # Ohne Sidecar (z. B. `tts render`) und mit Alt-Sidecar: unverändert.
+    assert production_fingerprint(paths, clip, profile) == fingerprint(clip, profile)
+    sample_candidates(clip, profile, FakeEngine(), paths, [clip.seed])
+    path = paths.candidates / clip.key / f"{clip.seed}.json"
+    meta = jsonlib.loads(path.read_text(encoding="utf-8"))
+    del meta["trimSilence"]
+    path.write_text(jsonlib.dumps(meta), encoding="utf-8")
+    assert production_fingerprint(paths, clip, profile) == fingerprint(clip, profile)
+
+    sample_candidates(clip, profile, FakeEngine(), paths, [clip.seed], trim=False)
+    assert production_fingerprint(paths, clip, profile) == \
+        fingerprint(clip, profile, trim=False)
+    assert production_fingerprint(paths, clip, profile) != fingerprint(clip, profile)
+
+
+def test_render_batch_candidates_passes_the_trim_choice_on(setup):
+    from ttskit.render import candidate_meta, candidate_seeds
+
+    paths, profiles, clips, state = setup
+    render_batch_candidates(clips, profiles, _PaddedEngine(), state, paths, Locks(),
+                            count=1, trim=False)
+    for clip in clips:
+        (seed,) = candidate_seeds(paths, clip.key)
+        assert candidate_meta(paths, clip.key, seed)["trimSilence"] is False
+
+    paths2 = Paths(root=paths.root / "zwei", content_dir=paths.root / "content")
+    render_batch_candidates(clips, profiles, _PaddedEngine(), state, paths2, Locks(),
+                            count=1)
+    for clip in clips:
+        (seed,) = candidate_seeds(paths2, clip.key)
+        assert candidate_meta(paths2, clip.key, seed)["trimSilence"] is \
+            profiles.profiles[clip.profile].trim, "ohne Wahl gilt das Profil"

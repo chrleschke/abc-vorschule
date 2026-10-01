@@ -14,6 +14,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from . import voices
+
 #: Ein Codec-Token des Talkers entspricht so vielen Sekunden Audio.
 #: Hergeleitet aus dem 12-Hz-Tokenizer: decode_upsample_rate 1920 bei
 #: 24 kHz Ausgabe, also 1920 / 24000. Steht hier und nur hier — das UI
@@ -496,6 +498,10 @@ class Lock:
     source_text: str | None = None
     #: Stimme nur für diesen Clip. None heißt „die des Profils" — nicht „keine".
     speaker: str | None = None
+    #: Sprache nur für diesen Clip (ein Wort aus `voices.LANGUAGES`), None = die
+    #: des Profils. Für Lehnwörter wie „Pizza" oder „Computer", die mit deutschem
+    #: Sprach-Token eingedeutscht klingen, ohne gleich ein eigenes Profil zu brauchen.
+    language: str | None = None
     #: Fester Seed für Probeaufnahmen — Generate nutzt nur diesen, solange gesetzt.
     generate_seed: int | None = None
     #: „Keine Produktion" auf einem kuratierten Clip: der Lock bleibt nur als
@@ -526,6 +532,14 @@ class Lock:
             except ValueError as exc:
                 raise ValueError(
                     f"{where}lock {key!r} has invalid generateSeed: {exc}") from exc
+        language = raw.get("language")
+        # Gleich beim Laden geprüft, wie Profil und Stimme in `build_clips`: ein
+        # Tippfehler fiele sonst erst im Modell auf, pro Clip mitten im Lauf —
+        # oder gar nicht, wenn das Modell eine unbekannte Sprache still ignoriert.
+        if language is not None and language not in voices.LANGUAGES:
+            raise ValueError(f"{where}lock {key!r} names the unknown language "
+                             f"{language!r}. Known languages: "
+                             f"{', '.join(voices.LANGUAGES)}")
         cleared = raw.get("cleared", False)
         if not isinstance(cleared, bool):
             raise ValueError(f"{where}lock {key!r} has a non-boolean 'cleared' "
@@ -538,6 +552,7 @@ class Lock:
             note=raw.get("note"),
             source_text=raw.get("sourceText"),
             speaker=raw.get("speaker"),
+            language=language,
             generate_seed=generate_seed,
             cleared=cleared,
         )
@@ -546,6 +561,7 @@ class Lock:
         out: dict[str, Any] = {"seed": self.seed}
         for key, value in (("profile", self.profile),
                            ("speaker", self.speaker),
+                           ("language", self.language),
                            ("textOverride", self.text_override),
                            ("draftText", self.draft_text),
                            ("note", self.note),
@@ -561,8 +577,8 @@ class Lock:
     @property
     def curated(self) -> bool:
         """Trägt der Lock mehr als einen Seed — Hörarbeit, die bleiben muss?"""
-        return any((self.text_override, self.draft_text, self.speaker, self.profile,
-                    self.note, self.generate_seed is not None))
+        return any((self.text_override, self.draft_text, self.speaker, self.language,
+                    self.profile, self.note, self.generate_seed is not None))
 
 
 @dataclass

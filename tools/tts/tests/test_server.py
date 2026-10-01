@@ -1548,6 +1548,10 @@ def _locks(client):
     return json.loads(client.paths.locks.read_text(encoding="utf-8"))["locks"]
 
 
+def _locks_or_empty(client):
+    return _locks(client) if client.paths.locks.exists() else {}
+
+
 def _pool(client, profile):
     return json.loads(client.paths.profiles.read_text(encoding="utf-8"))[
         "profiles"][profile]["seedPool"]
@@ -1878,8 +1882,11 @@ def test_a_draft_equal_to_the_production_text_or_blank_is_not_stored(client):
     for draft in ("Mama.", "", "   "):
         assert client.post(f"/api/clips/{key}/lock",
                            json={"draftText": draft}).status_code == 200
-        assert "draftText" not in _locks(client)[key], repr(draft)
+        # Auf dem ungelockten Clip bleibt damit gar nichts zu merken — kein
+        # leerer Lock und vor allem keine Freigabe des Hash-Seeds.
+        assert key not in _locks_or_empty(client), repr(draft)
         assert _clip(client, key)["draftText"] is None
+        assert _clip(client, key)["locked"] is False
     client.post(f"/api/clips/{key}/lock", json={"textOverride": "Ma-ma."})
     client.post(f"/api/clips/{key}/lock", json={"draftText": "Ma-ma."})
     assert "draftText" not in _locks(client)[key]
@@ -1895,3 +1902,159 @@ def test_clear_production_keeps_the_draft(client):
     client.post(f"/api/clips/{key}/clear-production")
     lock = _locks(client)[key]
     assert lock["draftText"] == "Ma-ma." and lock["cleared"] is True
+
+
+# --- Sprache pro Clip ------------------------------------------------------
+
+def test_a_clip_language_is_stored_shown_and_cleared(client):
+    key = _key_of(client, "Mama.")
+    profile_language = _clip(client, key)["language"]
+    assert profile_language == "german"
+    assert profile_language in client.get("/api/state").json()["languages"]
+
+    assert client.post(f"/api/clips/{key}/lock",
+                       json={"seed": 1, "language": "english"}).status_code == 200
+    assert _locks(client)[key]["language"] == "english"
+    assert _clip(client, key)["language"] == "english"
+
+    assert client.post(f"/api/clips/{key}/lock", json={"language": None}).status_code == 200
+    assert "language" not in _locks(client)[key]
+    assert _clip(client, key)["language"] == "german"
+
+
+def test_choosing_the_profile_language_stores_nothing(client):
+    key = _key_of(client, "Mama.")
+    client.post(f"/api/clips/{key}/lock", json={"seed": 1, "language": "english"})
+    client.post(f"/api/clips/{key}/lock", json={"language": "german"})
+    assert "language" not in _locks(client)[key]
+
+
+def test_an_unknown_clip_language_is_rejected(client):
+    key = _key_of(client, "Mama.")
+    response = client.post(f"/api/clips/{key}/lock",
+                           json={"seed": 1, "language": "klingonisch"})
+    assert response.status_code == 422
+    assert "klingonisch" in response.json()["detail"]
+    assert "german" in response.json()["detail"]
+    assert key not in _locks_or_empty(client)
+
+
+def test_a_hand_edited_unknown_language_says_which_file_and_key(client):
+    key = _key_of(client, "Mama.")
+    client.paths.locks.write_text(json.dumps({"version": 1, "locks": {
+        key: {"seed": 1, "language": "klingonisch"}}}), encoding="utf-8")
+    response = client.get("/api/state")
+    assert response.status_code == 500
+    detail = response.json()["detail"]
+    assert "locks.json" in detail and key in detail and "klingonisch" in detail
+
+
+@pytest.mark.parametrize("body", [
+    {"language": "english"},
+    {"speaker": "ryan"},
+    {"profile": "word"},
+    {"draftText": "Ma-ma."},
+])
+def test_a_first_curation_only_lock_is_no_approval(client, body):
+    """Wie beim Entwurf: Sprache, Stimme oder Profil auf einem ungelockten Clip
+    sind Hörarbeit — der Hash-Seed gilt dadurch nicht als bestätigt."""
+    key = _key_of(client, "Mama.")
+    assert client.post(f"/api/clips/{key}/lock", json=body).status_code == 200
+    assert _locks(client)[key]["cleared"] is True
+    assert _clip(client, key)["locked"] is False
+
+
+def test_a_first_curation_only_lock_that_resolves_to_nothing_is_not_stored(client):
+    key = _key_of(client, "Mama.")
+    for body in ({"language": "german"}, {"speaker": None}, {"language": None}):
+        assert client.post(f"/api/clips/{key}/lock", json=body).status_code == 200
+        assert key not in _locks_or_empty(client), body
+        assert _clip(client, key)["locked"] is False
+
+
+@pytest.mark.parametrize("body", [
+    {"seed": 3, "language": "english"},
+    {"textOverride": "Ma-ma.", "language": "english"},
+])
+def test_an_explicit_seed_or_text_override_still_approves(client, body):
+    key = _key_of(client, "Mama.")
+    client.post(f"/api/clips/{key}/lock", json=body)
+    assert "cleared" not in _locks(client)[key]
+    assert _clip(client, key)["locked"] is True
+
+
+def test_a_language_change_on_a_locked_clip_keeps_the_approval(client):
+    key = _key_of(client, "Mama.")
+    _generate(client, key, fixedSeed=7)
+    client.post(f"/api/clips/{key}/promote", json={"seed": 7})
+    client.post(f"/api/clips/{key}/lock", json={"language": "english"})
+    assert _clip(client, key)["locked"] is True
+
+
+def test_promote_keeps_the_clip_language(client):
+    key = _key_of(client, "Mama.")
+    client.post(f"/api/clips/{key}/lock", json={"language": "english"})
+    _generate(client, key, fixedSeed=7)
+    assert client.post(f"/api/clips/{key}/promote",
+                       json={"seed": 7}).json()["verified"] is True
+    assert _locks(client)[key]["language"] == "english"
+    assert _clip(client, key)["locked"] is True
+
+
+def test_a_language_change_marks_only_that_clips_candidates_as_old(client):
+    key = _key_of(client, "Mama.")
+    _generate(client, key, fixedSeed=7)
+    assert _clip(client, key)["candidates"][0]["fresh"] is True
+    client.post(f"/api/clips/{key}/lock", json={"language": "english"})
+    assert _clip(client, key)["candidates"][0]["fresh"] is False
+
+
+# --- Trim pro Wurf -----------------------------------------------------------
+
+def _candidate(client, key, seed):
+    return next(c for c in _clip(client, key)["candidates"] if c["seed"] == seed)
+
+
+def test_generate_records_the_trim_choice_and_defaults_to_the_profile(client):
+    key = _key_of(client, "Mama.")
+    profile = _clip(client, key)["profile"]
+    profile_trim = client.get("/api/state").json()["profiles"][profile]["trim"]
+    _generate(client, key, fixedSeed=7)
+    _generate(client, key, fixedSeed=8, trim=not profile_trim)
+    assert _candidate(client, key, 7)["trimSilence"] is profile_trim
+    assert _candidate(client, key, 8)["trimSilence"] is (not profile_trim)
+    assert _candidate(client, key, 8)["fresh"] is True, \
+        "eine andere Trim-Wahl als im Profil ist kein ⚠️ alt"
+    assert client.post(f"/api/clips/{key}/promote",
+                       json={"seed": 8}).json()["verified"] is True
+
+
+def test_a_non_boolean_trim_is_rejected(client):
+    key = _key_of(client, "Mama.")
+    for bad in ("false", 0, 1, [True]):
+        assert client.post(f"/api/clips/{key}/candidates",
+                           json={"n": 1, "trim": bad}).status_code == 422, bad
+        assert client.post("/api/render",
+                           json={"keys": [key], "n": 1, "trim": bad}).status_code == 422, bad
+
+
+def test_the_batch_run_records_the_trim_choice(client):
+    key = _key_of(client, "Mama.")
+    assert client.post("/api/render",
+                       json={"keys": [key], "n": 1, "trim": False}).status_code == 202
+    wait_for_idle(client)
+    (candidate,) = _clip(client, key)["candidates"]
+    assert candidate["trimSilence"] is False
+    assert candidate["fresh"] is True
+
+
+def test_old_sidecars_without_trim_silence_show_null(client):
+    key = _key_of(client, "Mama.")
+    _generate(client, key, fixedSeed=7)
+    path = client.paths.candidates / key / "7.json"
+    meta = json.loads(path.read_text(encoding="utf-8"))
+    del meta["trimSilence"]
+    path.write_text(json.dumps(meta), encoding="utf-8")
+    candidate = _candidate(client, key, 7)
+    assert candidate["trimSilence"] is None
+    assert candidate["fresh"] is True, "ohne Eintrag gilt das Profil — wie bisher"
