@@ -63,6 +63,11 @@
       "seed": 752724038,
       "sourceText": "der Handschuh"
     },
+    "article_word:2ea2872ba3e2": {
+      "seed": 1281280044,
+      "textOverride": "Der Helm.",
+      "sourceText": "der Helm"
+    },
     "article_word:302e90b4e5bd": {
       "seed": 1236049303,
       "sourceText": "das Tor"
@@ -124,6 +129,11 @@
     "article_word:526c8d6b856c": {
       "seed": 752724038,
       "sourceText": "die Schultasche"
+    },
+    "article_word:5550deb44d8d": {
+      "seed": 66028957,
+      "textOverride": "Der Panda.",
+      "sourceText": "der Panda"
     },
     "article_word:5d15a2ff3b93": {
       "seed": 427919886,
@@ -1581,6 +1591,10 @@
       "seed": 1521286730,
       "sourceText": "Der Eisbär schwimmt."
     },
+    "prompt:330377e127f2": {
+      "seed": 716323404,
+      "sourceText": "Baue das Wort Panda."
+    },
     "prompt:33b85ad089da": {
       "seed": 548253113,
       "sourceText": "Vierzehn Mäuse und neun Mäuse. Wie viele Mäuse sind das."
@@ -2486,6 +2500,10 @@
     "prompt:f8d91895467d": {
       "seed": 848883329,
       "sourceText": "Oma hat einen Hut."
+    },
+    "prompt:f904bc0528f9": {
+      "seed": 716323404,
+      "sourceText": "Baue das Wort Helm."
     },
     "prompt:f938adb9d746": {
       "seed": 2110445096,
@@ -5755,6 +5773,11 @@
     "word:f7d8232215e4": {
       "seed": 489055453,
       "sourceText": "Nilpferd"
+    },
+    "word:f7d9ea7f3980": {
+      "seed": 1017467044,
+      "textOverride": "Panda.",
+      "sourceText": "Panda"
     },
     "word:f814933892ab": {
       "seed": 627244297,

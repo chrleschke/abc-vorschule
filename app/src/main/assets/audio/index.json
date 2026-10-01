@@ -285,6 +285,11 @@
       "fingerprint": "4dca68f5afbcd028",
       "profile": "prompt"
     },
+    "Baue das Wort Helm.": {
+      "file": "prompt_f904bc0528f9.ogg",
+      "fingerprint": "610bfdf6d8fd8157",
+      "profile": "prompt"
+    },
     "Baue das Wort Hut.": {
       "file": "prompt_44d371ae00ce.ogg",
       "fingerprint": "cc328a552470af48",
@@ -388,6 +393,11 @@
     "Baue das Wort Opa.": {
       "file": "prompt_a4f538f3cef1.ogg",
       "fingerprint": "9c1937762668c8e5",
+      "profile": "prompt"
+    },
+    "Baue das Wort Panda.": {
+      "file": "prompt_330377e127f2.ogg",
+      "fingerprint": "7343eabb8e344acc",
       "profile": "prompt"
     },
     "Baue das Wort Papa.": {
@@ -2265,6 +2275,11 @@
       "fingerprint": "7d0ef2f74c8c510f",
       "profile": "word"
     },
+    "Panda": {
+      "file": "word_f7d9ea7f3980.ogg",
+      "fingerprint": "a949e2694bce1633",
+      "profile": "word"
+    },
     "Papa": {
       "file": "word_4959de6ed9b8.ogg",
       "fingerprint": "28bc0acfcd9e742c",
@@ -3890,6 +3905,11 @@
       "fingerprint": "69f3ba39e688b03a",
       "profile": "article_word"
     },
+    "der Helm": {
+      "file": "article_word_2ea2872ba3e2.ogg",
+      "fingerprint": "e1423351417faf1b",
+      "profile": "article_word"
+    },
     "der Hut": {
       "file": "article_word_ecd1bad46451.ogg",
       "fingerprint": "b85ff71101b297c4",
@@ -3913,6 +3933,11 @@
     "der Müll": {
       "file": "article_word_ebcb852192bb.ogg",
       "fingerprint": "552293627856260e",
+      "profile": "article_word"
+    },
+    "der Panda": {
+      "file": "article_word_5550deb44d8d.ogg",
+      "fingerprint": "f34ac88580a1d690",
       "profile": "article_word"
     },
     "der Regen": {
