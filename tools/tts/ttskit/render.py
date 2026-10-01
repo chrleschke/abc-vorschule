@@ -22,7 +22,7 @@ from .audio import postprocess, write_wav
 from .models import Clip
 from .paths import Paths
 from .plan import effective_profile, fingerprint, resolve_seed, status_of, top_seeds
-from .store import Lock, Locks, Profile, Profiles, RenderState
+from .store import CURATED_FILES_LOCK, Lock, Locks, Profile, Profiles, RenderState
 
 
 class SupportsGenerate(Protocol):
@@ -41,8 +41,65 @@ class Progress:
 @dataclass
 class RenderReport:
     rendered: int = 0
+    #: Alles Übersprungene, auch das aus `protected`.
     skipped: int = 0
     failed: list[tuple[str, str]] = field(default_factory=list)
+    #: (clipKey, Grund) für Clips, die `render_clips` absichtlich nicht anfasst,
+    #: obwohl sie lokal fehlen — siehe `render_protection`. Einzeln aufgeführt,
+    #: damit die CLI sagt, *warum* ein fehlender Clip nicht gerendert wurde.
+    protected: list[tuple[str, str]] = field(default_factory=list)
+    #: Clips, die ein Abbruch nicht mehr (ganz) drankommen ließ. Kein
+    #: Fehlschlag: vorher landete der Rest eines abgebrochenen Laufs unter
+    #: `failed`, und die UI meldete „fehlgeschlagen", wo nur jemand Stopp drückte.
+    cancelled: int = 0
+
+
+def _is_mic_seed(seed: int) -> bool:
+    # Lokaler Import: mic.py zieht scipy, und `render` braucht es sonst nie.
+    from .mic import MIC_SEED_MIN
+
+    return seed >= MIC_SEED_MIN
+
+
+def render_protection(clip: Clip, profile: Profile, paths: Paths, *,
+                      force: bool = False) -> str | None:
+    """Warum `tts render` diesen Clip nicht neu erzeugen darf — None, wenn er darf.
+
+    `out/` ist gitignored. Auf einem frischen Checkout fehlt darum jede
+    Produktions-WAV, auch die der längst committeten, von Hand kuratierten
+    Clips — und `render` hätte sie alle mit Qwen neu gewürfelt, worauf der
+    nächste Export die committete .ogg überschrieb:
+
+    * **Mikrofon** (Profil-Quelle `mic` oder ein Pseudo-Seed ab
+      `mic.MIC_SEED_MIN`): ein Qwen-Render ist dort nie die Aufnahme, auch nicht
+      mit `--force`. Die Monster-Reaktionen entstehen über die Kandidaten im
+      Web-Interface.
+    * **Gelockt und schon exportiert**: die .ogg in den App-Assets ist die
+      freigegebene Fassung, womöglich geschnitten oder per Kandidat bestätigt —
+      ein Neu-Render mit demselben Seed wäre bestenfalls gleich, meistens
+      nicht. Hier hilft `--force`, wenn man es wirklich will.
+    """
+    if profile.source == "mic":
+        return "Profil nimmt per Mikrofon auf — nie mit Qwen gerendert (Web-Interface nutzen)"
+    if candidate_meta(paths, clip.key, clip.seed).get("source") == "mic":
+        return "Produktion ist eine Mikrofon-Aufnahme — nie mit Qwen gerendert"
+    # Auf einem frischen Checkout fehlt das Sidecar; dann bleibt nur der Bereich.
+    # Nur am Lock: ein ungelockter Clip ohne Seed-Pool bekommt seinen Seed aus
+    # dem Hash (`plan.resolve_seed`, bis 2**31) und landet damit gelegentlich im
+    # selben Bereich, ohne je eine Aufnahme gewesen zu sein. Und nur ohne lokale
+    # Produktions-WAV: liegt sie da und hat kein Mikrofon-Sidecar, ist sie ein
+    # Qwen-Render mit Hash-Seed — `--force` muss sie neu erzeugen können.
+    if (clip.locked and _is_mic_seed(clip.seed)
+            and not (paths.audio / f"{clip.key}.wav").exists()):
+        return "Lock-Seed liegt im Mikrofon-Bereich — nie mit Qwen gerendert"
+    if force or not clip.locked:
+        return None
+    # Lokaler Import: export importiert render auf Modulebene.
+    from .export import asset_name
+
+    if (Path(paths.app_audio_dir) / asset_name(clip.key)).exists():
+        return "gelockt und schon in die App exportiert — committete Datei bleibt (--force rendert neu)"
+    return None
 
 
 def _select(clips: Iterable[Clip], only: str | None, profile: str | None) -> list[Clip]:
@@ -80,8 +137,15 @@ def render_clips(
         prof = profiles.profiles[clip.profile]
         # `status_of` owns the "already rendered" predicate — re-deriving it
         # here once made `status` and `render` two expressions for one truth.
+        # Erst danach der Schutz: „bewusst nicht gerendert" soll nur nennen,
+        # was lokal fehlt, sonst stehen dort Hunderte fertige Clips.
         if status_of(clip, paths.audio) == "rendered" and not force:
             report.skipped += 1
+            continue
+        reason = render_protection(clip, prof, paths, force=force)
+        if reason is not None:
+            report.skipped += 1
+            report.protected.append((clip.key, reason))
             continue
         todo.append((clip, prof))
 
@@ -97,8 +161,11 @@ def render_clips(
     total = len(todo)
     for index, (clip, prof) in enumerate(todo, start=1):
         if cancel is not None and cancel():
+            report.cancelled = total - index + 1
             break
         try:
+            # `clip.text`, nicht der Entwurf: hier entsteht die Produktion, und
+            # deren Fingerprint (Export) rechnet mit dem Produktionstext.
             wav, sample_rate = engine.generate(
                 clip.text, effective_profile(clip, prof), clip.seed)
             wav = postprocess(wav, sample_rate, trim=prof.trim, normalize=prof.normalize)
@@ -141,6 +208,8 @@ def render_batch_candidates(
     clip_start: Callable[[str], None] | None = None,
     clip_done: Callable[[str], None] | None = None,
     cancel: Callable[[], bool] | None = None,
+    refresh: Callable[[str], tuple[Clip, Profile, Locks] | None] | None = None,
+    trim: bool | None = None,
 ) -> RenderReport:
     """Batch-Lauf im Web-Interface: erzeugt pro Clip `count` Kandidaten statt
     direkt eine Produktions-Datei zu schreiben.
@@ -160,6 +229,16 @@ def render_batch_candidates(
     Web-Interface braucht beide Momente aber genau: um zu zeigen, wo der Lauf
     steht, und um einen fertigen Clip sofort zum Abhören freizugeben, während
     der Lauf weitergeht.
+
+    `refresh(key)` liefert Clip, Profil und Locks so, wie sie *jetzt* auf der
+    Platte stehen (None: den Clip gibt es nicht mehr). Ein Lauf dauert Minuten
+    bis Stunden, und währenddessen wird weiter kuratiert — ohne Nachladen
+    erzeugte er die späten Clips mit dem Text, der Stimme und dem Profil vom
+    Start des Laufs, also mit einer Aussprache, die längst korrigiert war.
+    Ein inzwischen bestätigter Clip wird übersprungen wie beim Start.
+
+    `trim` wählt das Stille-Wegschneiden für den ganzen Lauf (None: das des
+    jeweiligen Profils, siehe `sample_candidates`).
     """
     selected = _select(clips, only, profile)
     report = RenderReport()
@@ -185,30 +264,51 @@ def render_batch_candidates(
     total_units = total * count
     for index, clip in enumerate(todo, start=1):
         if cancel is not None and cancel():
+            report.cancelled += total - index + 1
             break
+        prof = profiles.profiles[clip.profile]
+        clip_locks = locks
+        if refresh is not None:
+            fresh = refresh(clip.key)
+            if fresh is None or (status_of(fresh[0], paths.audio) == "rendered"
+                                 and not force):
+                report.skipped += 1
+                units_done += count
+                # Die UI führt den Clip seit dem Start als „kommt noch dran".
+                if clip_done is not None:
+                    clip_done(clip.key)
+                continue
+            clip, prof, clip_locks = fresh
         if clip_start is not None:
             clip_start(clip.key)
-        prof = profiles.profiles[clip.profile]
         seeds = seeds_for_candidates(
-            count=count, clip=clip, profile=prof, paths=paths, locks=locks,
+            count=count, clip=clip, profile=prof, paths=paths, locks=clip_locks,
             use_top_seeds=True)
 
         base = units_done
+        tally = {"attempted": 0, "failed": 0}
 
-        def on_candidate(p: Progress, clip: Clip = clip, base: int = base) -> None:
+        def on_candidate(p: Progress, clip: Clip = clip, base: int = base,
+                         tally: dict = tally) -> None:
+            tally["attempted"] += 1
+            if p.status == "failed":
+                tally["failed"] += 1
             if progress is not None:
                 progress(Progress(index=base + p.index, total=total_units,
                                   clip_key=clip.key, status=p.status, message=p.message))
 
-        written = sample_candidates(clip, prof, engine, paths, seeds,
-                                    progress=on_candidate, cancel=cancel)
+        sample_candidates(clip, prof, engine, paths, seeds,
+                          progress=on_candidate, cancel=cancel, trim=trim)
         units_done += len(seeds)
-        if len(written) == len(seeds):
-            report.rendered += 1
-        else:
+        if tally["failed"]:
             report.failed.append((
                 clip.key,
-                f"{len(seeds) - len(written)} von {len(seeds)} Kandidaten fehlgeschlagen"))
+                f"{tally['failed']} von {len(seeds)} Kandidaten fehlgeschlagen"))
+        elif tally["attempted"] < len(seeds):
+            # Mitten im Clip abgebrochen: was fehlt, hat niemand versucht.
+            report.cancelled += 1
+        else:
+            report.rendered += 1
         # Auch ein fehlgeschlagener Clip ist abgearbeitet: bliebe er aus, wäre
         # er in der UI für den Rest des Laufs „erzeugt gerade". Was schief ging,
         # sagt am Ende `job-summary`.
@@ -229,6 +329,11 @@ def seeds_for_candidates(
 ) -> list[int]:
     """Seeds für neue Kandidaten — dieselbe Logik wie „🎲 Generate" in der UI."""
     rendered = set(candidate_seeds(paths, clip.key))
+    # Der Produktions-Seed auch dann, wenn lokal kein Kandidat dazu liegt (frischer
+    # Checkout, Nachbau-Eintrag): ein neuer Wurf darauf läge neben einer
+    # Produktion, die anders klingt, unter demselben Seed (siehe sample_candidates).
+    if (Path(paths.audio) / f"{clip.key}.wav").exists():
+        rendered.add(clip.seed)
     top = top_seeds(locks, clip.profile) if use_top_seeds else []
     if top:
         return pooled_seeds(count, top, exclude=rendered)
@@ -271,6 +376,12 @@ def pooled_seeds(n: int, pool: list[int], exclude: set[int] | None = None) -> li
     return chosen
 
 
+#: Sidecar-Felder, die ein Mensch gesetzt hat und die ein neuer Wurf auf
+#: demselben Seed übernimmt. Bewusst nicht `trim`: der Schnitt gehörte zur
+#: vorigen Aufnahme (siehe unten).
+CURATED_SIDECAR_FIELDS = ("rating",)
+
+
 def sample_candidates(
     clip: Clip,
     profile: Profile,
@@ -279,34 +390,75 @@ def sample_candidates(
     seeds: list[int],
     progress: Callable[[Progress], None] | None = None,
     cancel: Callable[[], bool] | None = None,
+    trim: bool | None = None,
 ) -> list[int]:
+    """Kandidaten erzeugen; gibt die geschriebenen Seeds zurück.
+
+    `trim` (Stille vorne und hinten wegschneiden) ist eine Wahl pro Wurf;
+    None heißt „wie im Profil". Was tatsächlich galt, steht im Sidecar als
+    `trimSilence` — Frische, Promote und Export rechnen damit, sonst wäre ein
+    bewusst ungeschnittener Wurf gegen ein schneidendes Profil sofort „alt".
+
+    Zwei Seeds werden übersprungen (Progress-Status "skipped"), statt sie zu
+    überschreiben: eine Mikrofon-Aufnahme unter demselben Pseudo-Seed, und der
+    Produktions-Seed, solange die Produktion liegt — der neue Kandidat sähe aus
+    wie die Produktion, klänge aber anders, und Promote hielte ihn für „schon
+    Produktion".
+    """
     written: list[int] = []
+    production = Path(paths.audio) / f"{clip.key}.wav"
+    trim_silence = profile.trim if trim is None else bool(trim)
     for index, seed in enumerate(seeds, start=1):
         if cancel is not None and cancel():
             break
-        try:
-            wav, sample_rate = engine.generate(
-                clip.text, effective_profile(clip, profile), seed)
-            wav = postprocess(wav, sample_rate, trim=profile.trim,
-                              normalize=profile.normalize)
-            write_wav(paths.candidates / clip.key / f"{seed}.wav", wav, sample_rate)
-            # Ein neuer Wurf auf demselben Seed ersetzt auch einen alten Schnitt:
-            # das gesicherte Original gehört zur vorigen Aufnahme.
-            _orig_path(paths, clip.key, seed).unlink(missing_ok=True)
-            # Das Sidecar hält fest, WOMIT die Probeaufnahme entstand. Ohne
-            # Zeitpunkt, Stimme und Text mischen sich in der UI die Batches
-            # verschiedener Sessions zu einer unentwirrbaren Liste.
-            meta_path = paths.candidates / clip.key / f"{seed}.json"
-            meta_path.write_text(json.dumps({
-                "fingerprint": fingerprint(replace(clip, seed=seed), profile),
-                "createdAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                "speaker": clip.speaker,
-                "text": clip.text,
-            }, ensure_ascii=False) + "\n", encoding="utf-8")
-            written.append(seed)
-            status, message = "ok", ""
-        except Exception as exc:  # noqa: BLE001
-            status, message = "failed", f"{type(exc).__name__}: {exc}"
+        if candidate_meta(paths, clip.key, seed).get("source") == "mic":
+            status, message = "skipped", f"Seed {seed} ist eine Mikrofon-Aufnahme"
+        elif seed == clip.seed and production.exists():
+            status, message = ("skipped", f"Seed {seed} ist die Produktion — "
+                               "erst „Keine Produktion\u201c, dann neu würfeln")
+        else:
+            try:
+                # Der Entwurf, nicht der Produktionstext: Probeaufnahmen sind
+                # genau dafür da, einen neuen Text auszuprobieren.
+                wav, sample_rate = engine.generate(
+                    clip.generation_text, effective_profile(clip, profile), seed)
+                wav = postprocess(wav, sample_rate, trim=trim_silence,
+                                  normalize=profile.normalize)
+                with CURATED_FILES_LOCK:
+                    write_wav(paths.candidates / clip.key / f"{seed}.wav", wav, sample_rate)
+                    # Ein neuer Wurf auf demselben Seed ersetzt auch einen alten
+                    # Schnitt: das gesicherte Original gehört zur vorigen Aufnahme.
+                    _orig_path(paths, clip.key, seed).unlink(missing_ok=True)
+                    # Das Sidecar hält fest, WOMIT die Probeaufnahme entstand. Ohne
+                    # Zeitpunkt, Stimme und Text mischen sich in der UI die Batches
+                    # verschiedener Sessions zu einer unentwirrbaren Liste.
+                    meta = {
+                        "fingerprint": fingerprint(
+                            replace(clip, seed=seed, text=clip.generation_text), profile,
+                            trim=trim_silence),
+                        "createdAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                        "speaker": clip.speaker,
+                        # Steht hier, damit Promote genau diesen Text als
+                        # Produktionstext übernimmt (server.api_promote).
+                        "text": clip.generation_text,
+                        # Nicht zu verwechseln mit `trim` (Schnitt in der
+                        # Wellenform, von Hand): das hier ist das automatische
+                        # Stille-Wegschneiden direkt nach dem Modell.
+                        "trimSilence": trim_silence,
+                    }
+                    # Erst hier, unter der Sperre, gelesen: ein 👍 während der
+                    # Generierung gilt mit. Ohne Übernahme verlor ein neuer Wurf
+                    # auf einem 👍-Seed die Bewertung, während der Seed im Pool
+                    # blieb — und 👎 räumte ihn danach nicht mehr ab.
+                    previous = candidate_meta(paths, clip.key, seed)
+                    for key in CURATED_SIDECAR_FIELDS:
+                        if key in previous:
+                            meta[key] = previous[key]
+                    _write_meta(paths, clip.key, seed, meta)
+                written.append(seed)
+                status, message = "ok", ""
+            except Exception as exc:  # noqa: BLE001
+                status, message = "failed", f"{type(exc).__name__}: {exc}"
         if progress is not None:
             progress(Progress(index=index, total=len(seeds), clip_key=clip.key,
                               status=status, message=message))
@@ -340,6 +492,13 @@ def candidate_fingerprint(paths: Paths, clip_key: str, seed: int) -> str | None:
     return value if isinstance(value, str) else None
 
 
+def recorded_trim_silence(meta: dict[str, Any]) -> bool | None:
+    """Das Stille-Wegschneiden, mit dem ein Kandidat entstand — None bei
+    Alt-Sidecars ohne `trimSilence`; dann gilt, was im Profil steht."""
+    value = meta.get("trimSilence")
+    return value if isinstance(value, bool) else None
+
+
 def production_fingerprint(paths: Paths, clip: Clip, profile: Profile) -> str:
     """Fingerprint der Produktion für Export und Promote.
 
@@ -350,7 +509,9 @@ def production_fingerprint(paths: Paths, clip: Clip, profile: Profile) -> str:
     meta = candidate_meta(paths, clip.key, clip.seed)
     if meta.get("source") == "mic" and isinstance(meta.get("fingerprint"), str):
         return meta["fingerprint"]
-    base = fingerprint(clip, profile)
+    # Ohne `trimSilence` im Sidecar (Alt-Kandidat, `tts render`) das des
+    # Profils — genau wie bisher, der Export encodiert also nichts neu.
+    base = fingerprint(clip, profile, trim=recorded_trim_silence(meta))
     # Ein Schnitt in der Wellenform ändert die Datei, aber nicht die
     # Profil-Einstellungen — ohne ihn im Fingerprint hielte der Export die
     # Produktion für unverändert und die App behielte die ungeschnittene Fassung.
@@ -443,12 +604,19 @@ def update_candidate_meta(paths: Paths, clip_key: str, seed: int,
     unangetastet: eine Bewertung darf einen Kandidaten nicht "frisch" oder
     "veraltet" machen.
     """
-    meta = candidate_meta(paths, clip_key, seed)
-    for key, value in changes.items():
-        if value is None:
-            meta.pop(key, None)
-        else:
-            meta[key] = value
+    with CURATED_FILES_LOCK:
+        meta = candidate_meta(paths, clip_key, seed)
+        for key, value in changes.items():
+            if value is None:
+                meta.pop(key, None)
+            else:
+                meta[key] = value
+        _write_meta(paths, clip_key, seed, meta)
+    return meta
+
+
+def _write_meta(paths: Paths, clip_key: str, seed: int, meta: dict[str, Any]) -> None:
+    """Sidecar atomar schreiben — der Server liest es parallel für /api/state."""
     path = Path(paths.candidates) / clip_key / f"{seed}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = json.dumps(meta, ensure_ascii=False) + "\n"
@@ -464,7 +632,6 @@ def update_candidate_meta(paths: Paths, clip_key: str, seed: int,
         except OSError:
             pass
         raise
-    return meta
 
 
 def candidate_infos(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
@@ -480,7 +647,16 @@ def candidate_infos(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
         meta = candidate_meta(paths, clip.key, seed)
         recorded = meta.get("fingerprint")
         recorded = recorded if isinstance(recorded, str) else None
-        current = fingerprint(replace(clip, seed=seed), profile)
+        # Frisch heißt: mit den heutigen Einstellungen (Profil, Stimme, Seed)
+        # für *seinen eigenen* Text erzeugt. Gegen den aktuellen Entwurf
+        # verglichen, würde jeder Tastendruck im TTS-Feld alle Kandidaten auf
+        # „⚠️ alt" kippen; welcher Text gesprochen ist, zeigt die Text-Spalte.
+        own_text = meta.get("text") if isinstance(meta.get("text"), str) else clip.generation_text
+        # Ebenso mit *seinem eigenen* Stille-Wegschneiden: wer bewusst ohne
+        # Trim würfelt, hat damit keine veraltete Aufnahme erzeugt.
+        trim_silence = recorded_trim_silence(meta)
+        current = fingerprint(replace(clip, seed=seed, text=own_text), profile,
+                              trim=trim_silence)
         is_mic = meta.get("source") == "mic"
         infos.append({
             "seed": seed,
@@ -494,6 +670,9 @@ def candidate_infos(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
             "mic": is_mic,
             # {start, end, duration} in Sekunden des Originals, sonst None.
             "trim": meta.get("trim") if isinstance(meta.get("trim"), dict) else None,
+            # Stille-Wegschneiden beim Erzeugen; None = Alt-Sidecar (oder
+            # Mikrofon), dort ist es unbekannt.
+            "trimSilence": trim_silence,
         })
     infos.sort(key=lambda info: (info["createdAt"] or "", info["seed"]), reverse=True)
     return infos
@@ -531,6 +710,9 @@ def clip_audio_list(paths: Paths, clip: Clip, profile: Profile) -> list[dict]:
         "good": False,
         "isProductionOnly": True,
         "mic": False,
+        # Ohne Sidecar unbekannt (`tts render` nimmt das Profil, das sich
+        # seither geändert haben kann).
+        "trimSilence": None,
     })
     infos.sort(key=lambda info: (info["createdAt"] or "", info["seed"]), reverse=True)
     return infos
@@ -557,70 +739,115 @@ def deletable_candidate_seeds(paths: Paths, clip: Clip) -> tuple[list[int], int]
     return deletable, protected
 
 
+def seed_rated_good_elsewhere(paths: Paths, profile_name: str, seed: int,
+                              exclude_key: str) -> bool:
+    """Hält ein anderer Clip desselben Profils diesen Seed noch mit 👍?
+
+    Der Seed-Pool gehört dem Profil, die Bewertung dem einzelnen Kandidaten.
+    Ein 👎 (oder das Zurücknehmen von 👍) an *einem* Clip nahm den Seed bisher
+    aus dem Pool, obwohl ein anderer Clip ihn weiter für gut befand — der Pool
+    vergaß eine Bewertung, die in dessen Sidecar noch stand.
+
+    Gesucht wird über die Kandidaten-Ordner statt über die Clip-Liste, damit
+    die Helfer ohne Content-Pack auskommen; das Profil eines Ordners ist das,
+    mit dem wirklich synthetisiert wird (Lock-Override vor Key-Präfix, wie in
+    `plan.top_seeds`).
+    """
+    locks = Locks.load(paths.locks)
+    for meta_path in Path(paths.candidates).glob(f"*/{seed}.json"):
+        key = meta_path.parent.name
+        if key == exclude_key or not meta_path.with_suffix(".wav").exists():
+            continue
+        lock = locks.get(key)
+        effective = lock.profile if lock and lock.profile else key.split(":", 1)[0]
+        if effective != profile_name:
+            continue
+        if candidate_meta(paths, key, seed).get("rating") == "good":
+            return True
+    return False
+
+
+def release_pool_seed(paths: Paths, profile_name: str, seed: int, exclude_key: str) -> bool:
+    """Seed aus dem Pool nehmen — außer ein anderer Clip des Profils hält ihn mit 👍.
+
+    True, wenn der Seed wirklich entfernt wurde.
+    """
+    with CURATED_FILES_LOCK:
+        if seed_rated_good_elsewhere(paths, profile_name, seed, exclude_key):
+            return False
+        profiles = Profiles.load(paths.profiles)
+        profile = profiles.profiles[profile_name]
+        if seed not in profile.seed_pool:
+            return False
+        profile.seed_pool = [s for s in profile.seed_pool if s != seed]
+        profiles.save(paths.profiles)
+        return True
+
+
 def delete_candidate_wav(paths: Paths, clip: Clip, seed: int) -> None:
     """Eine Probeaufnahme entfernen — Pool, Produktion und Lock wie im UI-👎."""
-    wav = paths.candidates / clip.key / f"{seed}.wav"
-    if not wav.exists():
-        raise FileNotFoundError(seed)
+    with CURATED_FILES_LOCK:
+        wav = paths.candidates / clip.key / f"{seed}.wav"
+        if not wav.exists():
+            raise FileNotFoundError(seed)
 
-    if candidate_meta(paths, clip.key, seed).get("rating") == "good":
-        profiles = Profiles.load(paths.profiles)
-        profiles.profiles[clip.profile].seed_pool = [
-            s for s in profiles.profiles[clip.profile].seed_pool if s != seed
-        ]
-        profiles.save(paths.profiles)
+        rated_good = candidate_meta(paths, clip.key, seed).get("rating") == "good"
 
-    wav.unlink()
-    (paths.candidates / clip.key / f"{seed}.json").unlink(missing_ok=True)
-    (paths.candidates / clip.key / f"{seed}.raw.wav").unlink(missing_ok=True)
-    _orig_path(paths, clip.key, seed).unlink(missing_ok=True)
+        wav.unlink()
+        (paths.candidates / clip.key / f"{seed}.json").unlink(missing_ok=True)
+        (paths.candidates / clip.key / f"{seed}.raw.wav").unlink(missing_ok=True)
+        _orig_path(paths, clip.key, seed).unlink(missing_ok=True)
 
-    production = paths.audio / f"{clip.key}.wav"
-    if clip.seed == seed and production.exists():
-        production.unlink()
+        # Nach dem Löschen: der eigene Sidecar zählt dann nicht mehr mit.
+        if rated_good:
+            release_pool_seed(paths, clip.profile, seed, exclude_key=clip.key)
 
-    if not candidate_seeds(paths, clip.key) and not production.exists():
-        locks = Locks.load(paths.locks)
-        lock = locks.get(clip.key)
-        curated = lock is not None and any(
-            (lock.text_override, lock.speaker, lock.profile, lock.note,
-             lock.generate_seed))
-        if lock is not None and not curated:
-            locks.remove(clip.key)
-            locks.save(paths.locks)
+        production = paths.audio / f"{clip.key}.wav"
+        if clip.seed == seed and production.exists():
+            production.unlink()
+
+        if not candidate_seeds(paths, clip.key) and not production.exists():
+            locks = Locks.load(paths.locks)
+            lock = locks.get(clip.key)
+            # Nur wenn der gelöschte Seed der Lock-Seed war. Auf einem frischen
+            # Checkout gibt es Lock und exportierte .ogg, aber keine lokale WAV:
+            # löscht man dort den letzten neu gewürfelten Kandidaten, fiel der
+            # Lock mit — und der nächste Export entfernte die committete Datei.
+            if lock is not None and lock.seed == seed and not lock.curated:
+                locks.remove(clip.key)
+                locks.save(paths.locks)
 
 
 def clear_production(paths: Paths, clip: Clip) -> bool:
-    """Produktions-Audio aufheben — 👍-Bewertungen und Kandidaten bleiben."""
-    production = paths.audio / f"{clip.key}.wav"
-    locks = Locks.load(paths.locks)
-    lock = locks.get(clip.key)
-    had_production = production.exists()
+    """Produktions-Audio aufheben — 👍-Bewertungen und Kandidaten bleiben.
 
-    if not had_production and lock is None:
-        return False
+    Ein Lock ohne Hörarbeit fällt weg. Ein kuratierter (Aussprache, Stimme,
+    Profil, Notiz, fester Seed) bleibt, wird aber als `cleared` markiert: der
+    Export liefert den Clip dann nicht mehr aus, auch nicht die schon
+    committete .ogg. Ein Promote macht die Markierung rückgängig.
 
-    if had_production:
-        production.unlink()
+    False, wenn es nichts aufzuheben gab.
+    """
+    with CURATED_FILES_LOCK:
+        production = paths.audio / f"{clip.key}.wav"
+        locks = Locks.load(paths.locks)
+        lock = locks.get(clip.key)
+        had_production = production.exists()
 
-    if lock is not None:
-        curated = any(
-            (lock.text_override, lock.speaker, lock.profile, lock.note,
-             lock.generate_seed))
-        if curated:
-            profiles = Profiles.load(paths.profiles)
-            auto = resolve_seed(clip.key, clip.profile, profiles, Locks())
-            locks.set(clip.key, Lock(
-                seed=auto,
-                profile=lock.profile,
-                text_override=lock.text_override,
-                note=lock.note,
-                source_text=clip.source_text,
-                speaker=lock.speaker,
-                generate_seed=lock.generate_seed,
-            ))
-        else:
-            locks.remove(clip.key)
-        locks.save(paths.locks)
+        if not had_production and (lock is None or lock.cleared):
+            return False
 
-    return True
+        if had_production:
+            production.unlink()
+
+        if lock is not None:
+            if lock.curated:
+                profiles = Profiles.load(paths.profiles)
+                auto = resolve_seed(clip.key, clip.profile, profiles, Locks())
+                locks.set(clip.key, replace(
+                    lock, seed=auto, source_text=clip.source_text, cleared=True))
+            else:
+                locks.remove(clip.key)
+            locks.save(paths.locks)
+
+        return True

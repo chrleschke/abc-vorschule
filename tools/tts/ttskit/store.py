@@ -9,9 +9,12 @@ from __future__ import annotations
 import json
 import os
 import tempfile
+import threading
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+from . import voices
 
 #: Ein Codec-Token des Talkers entspricht so vielen Sekunden Audio.
 #: Hergeleitet aus dem 12-Hz-Tokenizer: decode_upsample_rate 1920 bei
@@ -33,6 +36,18 @@ MAX_RANDOM_SEED = 2 ** 31
 #: Woher die Aufnahmen eines Profils standardmäßig kommen: Qwen („tts") oder
 #: Mikrofon („mic"). Der Umschalter im UI ist damit nur vorbelegt, nicht festgelegt.
 PROFILE_SOURCES = ("tts", "mic")
+
+#: Eine Sperre für jedes Laden-Ändern-Speichern von profiles.json, locks.json
+#: und den Kandidaten-Sidecars. Der Server bedient Requests aus einem
+#: Threadpool und den Job-Worker daneben; `_write_json` schützt nur davor, eine
+#: halbe Datei zu lesen, nicht davor, dass zwei Handler dieselbe Datei laden
+#: und der zweite Save den ersten still überschreibt (ein 👍 und ein Promote im
+#: selben Moment — eins von beiden war weg). Reentrant, weil die Helfer in
+#: render.py sich gegenseitig aufrufen. Eine Sperre für alle Dateien statt einer
+#: pro Datei: mehrere Handler fassen zwei Dateien an, und eine feste
+#: Reihenfolge zweier Sperren wäre eine Deadlock-Falle für nichts — die
+#: Abschnitte dauern Millisekunden.
+CURATED_FILES_LOCK = threading.RLock()
 
 
 def parse_seed(value: Any) -> int:
@@ -163,17 +178,18 @@ BASE_SAMPLING: dict[str, Any] = {
     p.key: p.default for p in SAMPLING_SPEC if p.default is not None}
 
 
-def _profile(label: str, instruct: str, max_tokens: int) -> dict[str, Any]:
+def _profile(label: str, instruct: str, max_tokens: int, *,
+             speaker: str = "sohee", source: str = "tts") -> dict[str, Any]:
     return {
         "label": label,
-        "speaker": "sohee",
+        "speaker": speaker,
         "language": "german",
         "instruct": instruct,
         "sampling": {**BASE_SAMPLING, "max_new_tokens": max_tokens},
         "seedPool": [],
         "trim": True,
         "normalize": True,
-        "source": "tts",
+        "source": source,
         "micPitchSemitones": 0,
     }
 
@@ -237,6 +253,25 @@ DEFAULT_PROFILES: dict[str, Any] = {
             "Sprich ruhig, freundlich und neutral. Kurze Ansage, keine Betonung "
             "auf einzelnen Wörtern, kein Drama.",
             75,  # 6,00 s
+        ),
+        # `math` und `monster` fehlten hier, obwohl extract.FIELD_TO_PROFILE auf
+        # beide abbildet — ohne profiles.json brach darum `build_clips` an jedem
+        # Rechen- und Monster-Clip ab, statt wie versprochen auf die Defaults
+        # zurückzufallen (tests/test_store.py hält die beiden Listen zusammen).
+        "math": _profile(
+            "Rechenaufgabe",
+            "Sprich die Rechenaufgabe ruhig und deutlich, in ruhigem Tempo, "
+            "jede Zahl klar betont. Keine Frage-Melodie.",
+            50,  # 4,00 s
+        ),
+        "monster": _profile(
+            "Monster (Laute und Reaktionen)",
+            "Sprich mit tiefer, knurriger Monsterstimme — verspielt, nicht "
+            "bedrohlich.",
+            25,  # 2,00 s
+            # Die Laute werden per Mikrofon aufgenommen; nur die zwei Reaktionen
+            # („Bäh!", „Mmmmh!") kommen aus Qwen, mit der Monsterstimme uncle_fu.
+            speaker="uncle_fu", source="mic",
         ),
     },
 }
@@ -449,13 +484,32 @@ class Profiles:
 class Lock:
     seed: int
     profile: str | None = None
+    #: Der Text der *bestätigten* Produktion (None = der Satz aus dem Content).
+    #: Geht in deren Fingerprint ein und damit in den Export.
     text_override: str | None = None
+    #: Arbeitstext für *neue* Aufnahmen (Generate, Batch-Lauf, `tts sample`).
+    #: Getrennt von `text_override`, damit ein Probesatz im TTS-Feld nicht
+    #: still den Text einer schon freigegebenen Aufnahme umschreibt — deren
+    #: Fingerprint, der Export und ein `--force`-Render hingen sonst am
+    #: Entwurf. Ein Promote übernimmt den Text des Kandidaten als
+    #: `text_override`. None = kein Entwurf, es gilt der Produktionstext.
+    draft_text: str | None = None
     note: str | None = None
     source_text: str | None = None
     #: Stimme nur für diesen Clip. None heißt „die des Profils" — nicht „keine".
     speaker: str | None = None
+    #: Sprache nur für diesen Clip (ein Wort aus `voices.LANGUAGES`), None = die
+    #: des Profils. Für Lehnwörter wie „Pizza" oder „Computer", die mit deutschem
+    #: Sprach-Token eingedeutscht klingen, ohne gleich ein eigenes Profil zu brauchen.
+    language: str | None = None
     #: Fester Seed für Probeaufnahmen — Generate nutzt nur diesen, solange gesetzt.
     generate_seed: int | None = None
+    #: „Keine Produktion" auf einem kuratierten Clip: der Lock bleibt nur als
+    #: Träger von Aussprache, Stimme, Profil und Notiz stehen, ist aber keine
+    #: Freigabe mehr. Ohne dieses Flag hielt der Export den Clip weiter für
+    #: bestätigt und lieferte die alte .ogg aus — die Aufhebung war wirkungslos.
+    #: Ein Promote setzt es zurück. Steht nur in locks.json, wenn gesetzt.
+    cleared: bool = False
 
     @classmethod
     def from_dict(cls, raw: dict[str, Any], *, key: str = "?",
@@ -478,27 +532,53 @@ class Lock:
             except ValueError as exc:
                 raise ValueError(
                     f"{where}lock {key!r} has invalid generateSeed: {exc}") from exc
+        language = raw.get("language")
+        # Gleich beim Laden geprüft, wie Profil und Stimme in `build_clips`: ein
+        # Tippfehler fiele sonst erst im Modell auf, pro Clip mitten im Lauf —
+        # oder gar nicht, wenn das Modell eine unbekannte Sprache still ignoriert.
+        if language is not None and language not in voices.LANGUAGES:
+            raise ValueError(f"{where}lock {key!r} names the unknown language "
+                             f"{language!r}. Known languages: "
+                             f"{', '.join(voices.LANGUAGES)}")
+        cleared = raw.get("cleared", False)
+        if not isinstance(cleared, bool):
+            raise ValueError(f"{where}lock {key!r} has a non-boolean 'cleared' "
+                             f"{cleared!r} — allowed: true or false")
         return cls(
             seed=seed,
             profile=raw.get("profile"),
             text_override=raw.get("textOverride"),
+            draft_text=raw.get("draftText"),
             note=raw.get("note"),
             source_text=raw.get("sourceText"),
             speaker=raw.get("speaker"),
+            language=language,
             generate_seed=generate_seed,
+            cleared=cleared,
         )
 
     def to_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"seed": self.seed}
         for key, value in (("profile", self.profile),
                            ("speaker", self.speaker),
+                           ("language", self.language),
                            ("textOverride", self.text_override),
+                           ("draftText", self.draft_text),
                            ("note", self.note),
                            ("sourceText", self.source_text),
                            ("generateSeed", self.generate_seed)):
             if value is not None:
                 out[key] = value
+        # Nur wenn gesetzt: jeder bestehende Lock bleibt Byte für Byte, wie er war.
+        if self.cleared:
+            out["cleared"] = True
         return out
+
+    @property
+    def curated(self) -> bool:
+        """Trägt der Lock mehr als einen Seed — Hörarbeit, die bleiben muss?"""
+        return any((self.text_override, self.draft_text, self.speaker, self.language,
+                    self.profile, self.note, self.generate_seed is not None))
 
 
 @dataclass

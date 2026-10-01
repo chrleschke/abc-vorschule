@@ -18,7 +18,7 @@ def test_pick_device_returns_something_torch_understands():
 def test_validate_reports_a_bad_speaker_without_loading():
     class FakeModel:
         def get_supported_speakers(self):
-            return ["sohee", "ryan"]
+            return ["sohee", "ryan", "uncle_fu"]
 
         def get_supported_languages(self):
             return ["german", "english"]
@@ -38,7 +38,7 @@ def test_validate_reports_a_bad_speaker_without_loading():
 def test_validate_reports_a_bad_language():
     class FakeModel:
         def get_supported_speakers(self):
-            return ["sohee"]
+            return ["sohee", "uncle_fu"]
 
         def get_supported_languages(self):
             return ["german"]
@@ -56,7 +56,7 @@ def test_validate_reports_a_bad_language():
 def test_validate_passes_for_the_defaults():
     class FakeModel:
         def get_supported_speakers(self):
-            return ["sohee"]
+            return ["sohee", "uncle_fu"]
 
         def get_supported_languages(self):
             return ["german"]

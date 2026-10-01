@@ -58,10 +58,18 @@ def store_recording(paths: Paths, clip: Clip, profile: Profile, data: bytes) -> 
     raw, sr = mic.load_upload(data)
     seed = new_recording_seed(paths, clip.key)
     write_wav(_raw_path(paths, clip.key, seed), raw, sr)
-    start, end = mic.auto_trim(raw, sr)
-    edit = mic.Edit(start=start, end=end, pitch_semitones=profile.mic_pitch_semitones,
-                    normalize=True)
-    _, fp = _write_edit(paths, clip, seed, raw, sr, edit)
+    try:
+        start, end = mic.auto_trim(raw, sr)
+        edit = mic.Edit(start=start, end=end, pitch_semitones=profile.mic_pitch_semitones,
+                        normalize=True)
+        _, fp = _write_edit(paths, clip, seed, raw, sr, edit)
+    except BaseException:
+        # Scheitert die Bearbeitung (librosa fehlt für den Profil-Pitch …), blieb
+        # sonst eine Rohdatei ohne Kandidat liegen: unsichtbar in der UI, von
+        # keinem „Alle löschen" erreicht, und beim nächsten Versuch die nächste.
+        _raw_path(paths, clip.key, seed).unlink(missing_ok=True)
+        (Path(paths.candidates) / clip.key / f"{seed}.wav").unlink(missing_ok=True)
+        raise
     meta = {
         "source": "mic",
         "createdAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),

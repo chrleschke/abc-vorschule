@@ -43,3 +43,14 @@ class Clip:
     #: nicht optional: wer den Clip in der Hand hat, soll die Stimme nicht noch
     #: einmal aus Profil plus Lock zusammensuchen müssen.
     speaker: str
+    #: Die Sprache, mit der synthetisiert wird — `Lock.language` oder die des
+    #: Profils, aufgelöst wie `speaker`.
+    language: str
+    #: Entwurfstext für neue Aufnahmen (`Lock.draft_text`), None = keiner.
+    #: `text` bleibt der Text der Produktion — er steckt in deren Fingerprint.
+    draft_text: str | None = None
+
+    @property
+    def generation_text(self) -> str:
+        """Was neue Kandidaten sprechen: Entwurf vor Produktionstext."""
+        return self.draft_text or self.text

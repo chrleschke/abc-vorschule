@@ -409,10 +409,11 @@ def test_clip_audio_list_skips_synthetic_entry_when_a_candidate_already_matches(
     paths, profiles, clips, state = setup
     clip = clips[0]
     profile = profiles.profiles[clip.profile]
-    render_clips([clip], profiles, FakeEngine(), state, paths)
     # Ein echter Kandidat mit demselben Seed wie die Produktion — z. B. weil
-    # er genau daraus per promote entstand.
+    # er genau daraus per promote entstand. Zuerst der Kandidat: auf einen
+    # Seed, der schon Produktion ist, würfelt sample_candidates nicht mehr.
     sample_candidates(clip, profile, FakeEngine(), paths, seeds=[clip.seed])
+    render_clips([clip], profiles, FakeEngine(), state, paths)
 
     infos = clip_audio_list(paths, clip, profile)
     assert len(infos) == 1
@@ -673,3 +674,332 @@ def test_production_fingerprint_prefers_the_microphone_sidecar(setup):
     (folder / f"{clip.seed}.json").write_text(json.dumps(
         {"source": "mic", "fingerprint": "mic:abc"}), encoding="utf-8")
     assert production_fingerprint(paths, clip, profile) == "mic:abc"
+
+
+# --- Schutz kuratierter Produktion vor `tts render` --------------------------
+
+
+def _isolated(tmp_path):
+    """Wie `setup`, aber mit App-Assets im tmp-Ordner — render_protection
+    schaut dort nach, und der Default zeigte auf die echten Assets."""
+    paths = Paths(root=tmp_path, content_dir=tmp_path / "content",
+                  app_audio_dir=tmp_path / "app-audio")
+    profiles = Profiles.load(tmp_path / "nope.json")
+    items = [
+        Item("task:t1:round:0:promptTts", "Frage eins?", "promptTts", "tasks.json", "l01", "a"),
+        Item("task:t3:round:0:rewardTts", "Super!", "rewardTts", "tasks.json", "l01", "c"),
+    ]
+    return paths, profiles, items
+
+
+def test_render_never_touches_a_microphone_profile_even_with_force(tmp_path):
+    paths, profiles, items = _isolated(tmp_path)
+    profiles.profiles["reward"].source = "mic"
+    clips = build_clips(items, profiles, Locks())
+    engine = FakeEngine()
+    for force in (False, True):
+        report = render_clips(clips, profiles, engine, RenderState(), paths, force=force)
+        reward = next(c for c in clips if c.profile == "reward")
+        assert [k for k, _ in report.protected] == [reward.key]
+        assert "Mikrofon" in report.protected[0][1]
+    assert all(text != "Super!" for text, _ in engine.calls)
+
+
+def test_render_never_overwrites_a_locked_microphone_seed(tmp_path):
+    from ttskit.mic import MIC_SEED_MIN
+    paths, profiles, items = _isolated(tmp_path)
+    probe = build_clips(items, profiles, Locks())
+    reward = next(c for c in probe if c.profile == "reward")
+    locks = Locks({reward.key: Lock(seed=MIC_SEED_MIN + 7)})
+    clips = build_clips(items, profiles, locks)
+    report = render_clips(clips, profiles, FakeEngine(), RenderState(), paths, force=True)
+    assert reward.key in dict(report.protected)
+    assert not (paths.audio / f"{reward.key}.wav").exists()
+
+
+def test_force_rerenders_a_local_qwen_production_with_a_seed_in_the_mic_range(tmp_path):
+    """Hash-Seeds reichen bis 2**31 und damit in den Mikrofon-Bereich. Liegt die
+    Produktions-WAV lokal da und hat kein Mikrofon-Sidecar, ist sie ein Qwen-Render
+    — `--force` muss sie neu erzeugen dürfen."""
+    from ttskit.mic import MIC_SEED_MIN
+    paths, profiles, items = _isolated(tmp_path)
+    probe = build_clips(items, profiles, Locks())
+    reward = next(c for c in probe if c.profile == "reward")
+    clips = build_clips(items, profiles, Locks({reward.key: Lock(seed=MIC_SEED_MIN + 7)}))
+    paths.audio.mkdir(parents=True, exist_ok=True)
+    (paths.audio / f"{reward.key}.wav").write_bytes(b"RIFF")
+    report = render_clips(clips, profiles, FakeEngine(), RenderState(), paths,
+                          force=True, only=reward.key)
+    assert reward.key not in dict(report.protected)
+    assert report.rendered == 1
+
+
+def test_render_skips_a_locked_clip_whose_asset_is_already_exported(tmp_path):
+    """Frischer Checkout: Lock und .ogg sind committet, out/ fehlt. Ohne Schutz
+    würfelte `render` neu und der nächste Export überschrieb die .ogg."""
+    from ttskit.export import asset_name
+    paths, profiles, items = _isolated(tmp_path)
+    probe = build_clips(items, profiles, Locks())
+    reward = next(c for c in probe if c.profile == "reward")
+    clips = build_clips(items, profiles, Locks({reward.key: Lock(seed=5)}))
+    paths.app_audio_dir.mkdir(parents=True)
+    (paths.app_audio_dir / asset_name(reward.key)).write_bytes(b"OggS")
+
+    dry = render_clips(clips, profiles, None, RenderState(), paths, dry_run=True)
+    assert dry.rendered == 1 and dry.skipped == 1
+    report = render_clips(clips, profiles, FakeEngine(), RenderState(), paths)
+    assert report.rendered == 1
+    assert dict(report.protected)[reward.key].startswith("gelockt und schon in die App exportiert")
+    assert not (paths.audio / f"{reward.key}.wav").exists()
+
+    forced = render_clips(clips, profiles, FakeEngine(), RenderState(), paths, force=True)
+    assert forced.protected == [] and forced.rendered == 2, "--force rendert bewusst neu"
+
+
+def test_a_cancelled_render_counts_the_rest_as_cancelled_not_failed(setup):
+    paths, profiles, clips, state = setup
+    calls = []
+    report = render_clips(clips, profiles, FakeEngine(), state, paths,
+                          cancel=lambda: (calls.append(1), len(calls) > 1)[1])
+    assert report.rendered == 1
+    assert report.cancelled == 2
+    assert report.failed == []
+
+
+def test_a_cancelled_batch_reports_cancelled_clips_separately(setup):
+    paths, profiles, clips, state = setup
+    engine = FakeEngine()
+    # Abbruch nach dem ersten Kandidaten: Clip 1 halb, Clip 2 und 3 nie begonnen.
+    report = render_batch_candidates(clips, profiles, engine, state, paths, Locks(),
+                                     count=2, cancel=lambda: len(engine.calls) >= 1)
+    assert report.failed == []
+    assert report.rendered == 0
+    assert report.cancelled == 3
+
+
+def test_batch_refresh_uses_the_current_clip_and_skips_vanished_ones(setup):
+    from dataclasses import replace as _replace
+    paths, profiles, clips, state = setup
+    engine = FakeEngine()
+    first, second = clips[0], clips[1]
+
+    def refresh(key):
+        if key == second.key:
+            return None
+        clip = next(c for c in clips if c.key == key)
+        return _replace(clip, text=clip.text + " (neu)"), profiles.profiles[clip.profile], Locks()
+
+    done = []
+    report = render_batch_candidates([first, second], profiles, engine, state, paths,
+                                     Locks(), count=1, refresh=refresh,
+                                     clip_done=done.append)
+    assert [t for t, _ in engine.calls] == [first.text + " (neu)"]
+    assert report.rendered == 1 and report.skipped == 1
+    assert done == [first.key, second.key], "auch der weggefallene Clip gilt als abgearbeitet"
+
+
+# --- Kandidaten: Bewertung, Mikrofon, Produktions-Seed ------------------------
+
+
+def test_a_new_take_on_the_same_seed_keeps_the_rating(setup):
+    from ttskit.render import candidate_meta, update_candidate_meta
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    sample_candidates(clip, profile, FakeEngine(), paths, [77])
+    update_candidate_meta(paths, clip.key, 77, rating="good")
+    sample_candidates(clip, profile, FakeEngine(), paths, [77])
+    assert candidate_meta(paths, clip.key, 77)["rating"] == "good"
+
+
+def test_sampling_skips_the_production_seed_and_microphone_takes(setup):
+    import json
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    render_clips([clip], profiles, FakeEngine(), state, paths)  # Produktion liegt
+    folder = paths.candidates / clip.key
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "1950000000.wav").write_bytes(b"mic")
+    (folder / "1950000000.json").write_text(json.dumps({"source": "mic"}), encoding="utf-8")
+    engine, statuses = FakeEngine(), []
+    written = sample_candidates(clip, profile, engine, paths, [clip.seed, 1950000000, 5],
+                                progress=lambda p: statuses.append(p.status))
+    assert written == [5]
+    assert statuses == ["skipped", "skipped", "ok"]
+    assert (folder / "1950000000.wav").read_bytes() == b"mic"
+
+
+def test_seeds_for_candidates_never_offer_the_production_seed(setup):
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    render_clips([clip], profiles, FakeEngine(), state, paths)
+    profile = profiles.profiles[clip.profile]
+    profile.seed_pool = [clip.seed]
+    seeds = seeds_for_candidates(count=1, clip=clip, profile=profile, paths=paths,
+                                 locks=Locks(), use_known_seeds=True)
+    assert seeds != [clip.seed]
+
+
+def test_candidates_speak_the_draft_but_production_keeps_its_text(tmp_path):
+    from ttskit.render import candidate_infos, candidate_meta, production_fingerprint
+    from ttskit.plan import fingerprint
+    paths, profiles, items = _isolated(tmp_path)
+    probe = build_clips(items, profiles, Locks())
+    key = probe[0].key
+    clip = next(c for c in build_clips(items, profiles, Locks({key: Lock(
+        seed=1, text_override="Frage Eins?", draft_text="Frage EINS?")})) if c.key == key)
+    profile = profiles.profiles[clip.profile]
+    assert clip.text == "Frage Eins?" and clip.generation_text == "Frage EINS?"
+    engine = FakeEngine()
+    sample_candidates(clip, profile, engine, paths, [9])
+    assert engine.calls == [("Frage EINS?", 9)]
+    assert candidate_meta(paths, key, 9)["text"] == "Frage EINS?"
+    assert production_fingerprint(paths, clip, profile) == fingerprint(clip, profile), \
+        "ein Entwurf ändert den Fingerprint der Produktion nicht"
+    # Frische misst gegen den eigenen Text: ein neuer Entwurf macht nichts „alt".
+    redrafted = build_clips(items, profiles, Locks({key: Lock(
+        seed=1, text_override="Frage Eins?", draft_text="Ganz anders?")}))
+    again = next(c for c in redrafted if c.key == key)
+    assert candidate_infos(paths, again, profile)[0]["fresh"] is True
+
+
+class _PaddedEngine(FakeEngine):
+    """Rauschen mit 0,1 s Stille davor und danach — so wird sichtbar, ob das
+    Stille-Wegschneiden lief. Merkt sich außerdem die Sprache jedes Aufrufs."""
+
+    def __init__(self):
+        super().__init__()
+        self.languages = []
+
+    def generate(self, text, profile, seed):
+        self.languages.append(profile.language)
+        wav, sr = super().generate(text, profile, seed)
+        silence = np.zeros(sr // 10, dtype=np.float32)
+        return np.concatenate([silence, wav, silence]), sr
+
+
+def _frames(path):
+    import soundfile as sf
+
+    return sf.info(path).frames
+
+
+def test_the_clip_language_reaches_the_engine_in_render_and_candidates(tmp_path):
+    from ttskit.plan import clip_key
+
+    paths = Paths(root=tmp_path, content_dir=tmp_path / "content")
+    profiles = Profiles.load(tmp_path / "nope.json")
+    items = [
+        Item("task:t1:round:0:promptTts", "Pizza?", "promptTts", "tasks.json", "l01", "a"),
+        Item("task:t2:round:0:promptTts", "Frage zwei?", "promptTts", "tasks.json", "l01", "b"),
+    ]
+    locks = Locks()
+    locks.set(clip_key("prompt", "Pizza?"), Lock(seed=7, language="italian"))
+    clips = {c.source_text: c for c in build_clips(items, profiles, locks)}
+
+    engine = _PaddedEngine()
+    render_clips(list(clips.values()), profiles, engine, RenderState(), paths)
+    spoken = dict(zip([text for text, _ in engine.calls], engine.languages))
+    assert spoken == {"Pizza?": "italian", "Frage zwei?": "german"}
+
+    engine = _PaddedEngine()
+    sample_candidates(clips["Pizza?"], profiles.profiles["prompt"], engine, paths, [1])
+    assert engine.languages == ["italian"]
+    assert profiles.profiles["prompt"].language == "german"
+
+
+def test_sample_candidates_trim_choice_overrides_the_profile_and_is_recorded(setup):
+    from dataclasses import replace
+    from ttskit.plan import fingerprint
+    from ttskit.render import candidate_infos, candidate_meta
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    assert profile.trim is True
+    engine = _PaddedEngine()
+    sample_candidates(clip, profile, engine, paths, [11])             # Profil: schneiden
+    sample_candidates(clip, profile, engine, paths, [22], trim=False)  # bewusst nicht
+
+    assert candidate_meta(paths, clip.key, 11)["trimSilence"] is True
+    assert candidate_meta(paths, clip.key, 22)["trimSilence"] is False
+    untrimmed = _frames(paths.candidates / clip.key / "22.wav")
+    trimmed = _frames(paths.candidates / clip.key / "11.wav")
+    assert untrimmed == 2400 + 2 * 2400, "ohne Trim bleibt die Stille stehen"
+    assert trimmed < untrimmed
+    assert candidate_meta(paths, clip.key, 22)["fingerprint"] == \
+        fingerprint(replace(clip, seed=22), profile, trim=False)
+
+    infos = {i["seed"]: i for i in candidate_infos(paths, clip, profile)}
+    assert infos[22]["fresh"] is True, "eine andere Trim-Wahl ist kein ⚠️ alt"
+    assert infos[22]["trimSilence"] is False
+    assert infos[11]["trimSilence"] is True
+
+
+def test_freshness_uses_the_recorded_trim_and_old_sidecars_fall_back(setup):
+    import json as jsonlib
+    from ttskit.render import candidate_infos
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    sample_candidates(clip, profile, FakeEngine(), paths, [11, 22])
+    # 22 als Alt-Sidecar: so sahen sie vor `trimSilence` aus.
+    path = paths.candidates / clip.key / "22.json"
+    meta = jsonlib.loads(path.read_text(encoding="utf-8"))
+    del meta["trimSilence"]
+    path.write_text(jsonlib.dumps(meta), encoding="utf-8")
+
+    infos = {i["seed"]: i for i in candidate_infos(paths, clip, profile)}
+    assert infos[22]["trimSilence"] is None
+    assert infos[11]["fresh"] is True and infos[22]["fresh"] is True
+
+    # Profil-Trim umgestellt: der Kandidat mit festgehaltener Wahl bleibt
+    # frisch, der alte rechnet mit dem Profil — wie bisher veraltet.
+    profile.trim = False
+    infos = {i["seed"]: i for i in candidate_infos(paths, clip, profile)}
+    assert infos[11]["fresh"] is True
+    assert infos[22]["fresh"] is False
+
+
+def test_production_fingerprint_uses_the_recorded_trim_choice(setup):
+    import json as jsonlib
+    from ttskit.plan import fingerprint
+    from ttskit.render import production_fingerprint
+
+    paths, profiles, clips, state = setup
+    clip = clips[0]
+    profile = profiles.profiles[clip.profile]
+    # Ohne Sidecar (z. B. `tts render`) und mit Alt-Sidecar: unverändert.
+    assert production_fingerprint(paths, clip, profile) == fingerprint(clip, profile)
+    sample_candidates(clip, profile, FakeEngine(), paths, [clip.seed])
+    path = paths.candidates / clip.key / f"{clip.seed}.json"
+    meta = jsonlib.loads(path.read_text(encoding="utf-8"))
+    del meta["trimSilence"]
+    path.write_text(jsonlib.dumps(meta), encoding="utf-8")
+    assert production_fingerprint(paths, clip, profile) == fingerprint(clip, profile)
+
+    sample_candidates(clip, profile, FakeEngine(), paths, [clip.seed], trim=False)
+    assert production_fingerprint(paths, clip, profile) == \
+        fingerprint(clip, profile, trim=False)
+    assert production_fingerprint(paths, clip, profile) != fingerprint(clip, profile)
+
+
+def test_render_batch_candidates_passes_the_trim_choice_on(setup):
+    from ttskit.render import candidate_meta, candidate_seeds
+
+    paths, profiles, clips, state = setup
+    render_batch_candidates(clips, profiles, _PaddedEngine(), state, paths, Locks(),
+                            count=1, trim=False)
+    for clip in clips:
+        (seed,) = candidate_seeds(paths, clip.key)
+        assert candidate_meta(paths, clip.key, seed)["trimSilence"] is False
+
+    paths2 = Paths(root=paths.root / "zwei", content_dir=paths.root / "content")
+    render_batch_candidates(clips, profiles, _PaddedEngine(), state, paths2, Locks(),
+                            count=1)
+    for clip in clips:
+        (seed,) = candidate_seeds(paths2, clip.key)
+        assert candidate_meta(paths2, clip.key, seed)["trimSilence"] is \
+            profiles.profiles[clip.profile].trim, "ohne Wahl gilt das Profil"

@@ -213,7 +213,10 @@ def wire_production_locks(paths: Paths, *, dry_run: bool = False,
     report = WireReport()
 
     for clip in clips:
-        if clip.locked:
+        # Nach dem Lock fragen, nicht nach `clip.locked`: ein aufgehobener Lock
+        # (`cleared`) ist eine bewusste Entscheidung samt Aussprache — ihn durch
+        # einen nackten Seed-Lock zu ersetzen, nähme beides still zurück.
+        if locks.get(clip.key) is not None:
             continue
         if clip.profile in skip_profiles:
             continue

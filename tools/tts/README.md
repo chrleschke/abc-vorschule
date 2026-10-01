@@ -73,14 +73,34 @@ tts render                         # Batch-Lauf über alles, inkrementell, ca. 2
 tts export                         # bestätigte, fertige Clips nach app/.../assets/audio/
 ```
 
+**`tts render` lässt Kuratiertes liegen.** `out/` ist gitignored; auf einem frischen
+Checkout fehlt jede Produktions-WAV, auch die der längst exportierten Clips. Damit der
+nächste Export keine committete `.ogg` durch einen neuen Qwen-Wurf ersetzt, überspringt
+`render` (Begründung pro Grund in der Ausgabe, „bewusst nicht gerendert"):
+
+- Mikrofon-Clips — Profil mit `source: "mic"`, Mikrofon-Sidecar oder (ohne lokale
+  Produktions-WAV, also ohne Sidecar zum Nachsehen) Lock-Seed ab `mic.MIC_SEED_MIN` —
+  **immer**, auch mit `--force`. Eine lokale Qwen-WAV mit Hash-Seed in diesem Bereich
+  rendert `--force` dagegen neu;
+- gelockte Clips, deren Asset schon unter `app/src/main/assets/audio/` liegt — außer mit
+  `--force`, das weiterhin bewusst alles (Nicht-Mikrofon) neu rendert.
+
+`render` schreibt die Produktion und spricht darum den Produktionstext (`textOverride`),
+nie einen Entwurf (siehe „Aussprache und Stimme").
+
 Typisch: einmal `sample` pro Profil, im Web-Interface Kandidaten anhören und mit 👍
 bewerten — 👍 speichert die Bewertung **und** nimmt den Seed automatisch in den
-Seed-Pool des Profils auf (👎 löscht die Probeaufnahme und räumt den Pool wieder auf).
+Seed-Pool des Profils auf (👎 löscht die Probeaufnahme und räumt den Pool wieder auf —
+außer ein anderer Clip desselben Profils hält den Seed noch mit 👍; dasselbe beim
+Zurücknehmen von 👍). Ein neuer Wurf auf einem schon vorhandenen Seed behält dessen 👍.
 Einzelne schlechte Clips mit „🎲 Generate" (Anzahl einstellbar, 1–16) neu
 erzeugen: die Probeaufnahmen stehen als Tabelle, neueste zuerst, mit Erzeugungszeitpunkt,
 Stimme und Text — so bleiben mehrere Würfel-Runden auseinanderhaltbar. Der
-Radio-Button „Produktion" übernimmt genau eine Aufnahme sofort als Produktions-Audio
-und lockt ihren Seed (kein Re-Render, kein erneutes Anhören nötig).
+Schalter in der Spalte **„Auswahl"** übernimmt genau eine Aufnahme sofort als
+Produktions-Audio und lockt ihren Seed (kein Re-Render, kein erneutes Anhören nötig);
+die ausgewählte noch einmal angeklickt hebt die Auswahl wieder auf (einen eigenen Knopf
+„Keine Produktion" gibt es nicht mehr). Gibt es die Aufnahme nur als Produktion, ohne
+eigene Probeaufnahme, fragt das Abwählen nach — es löscht dann die einzige Kopie.
 
 Woher die Seeds beim Würfeln kommen, entscheiden zwei Häkchen neben „🎲 Generate" —
 angehakt wird höchstens eines, das UI hakt das andere ab:
@@ -102,10 +122,34 @@ statt stillschweigend weniger zu liefern.
 **Fester Seed:** Im Feld „Fester Seed" (Clip-Details, neben Generate) kann ein Wert
 0–2147483647 eingetragen werden — gespeichert in `locks.json` als `generateSeed`.
 Solange er gesetzt ist, erzeugt Generate **nur diesen einen** Seed (Anzahl und beide
-Häkchen werden ignoriert). Leer = wie bisher. Ungültige Werte werden abgewiesen.
+Häkchen werden ignoriert). Leer = wie bisher. Ungültige Werte werden abgewiesen, ein
+fester Seed gleich dem Produktions-Seed mit HTTP 409 (der neue Wurf läge sonst unter
+demselben Seed wie die Produktion, klänge aber anders — erst in „Auswahl" abwählen).
+
+**Stille wegschneiden (Trim):** Im Web-Interface das Häkchen „Stille trimmen" neben
+Generate — ein globaler Schalter wie „Use top seeds" (im Browser gemerkt, gilt für jedes
+Generate und den Batch-Lauf, bis man ihn ändert; nie gesetzt = Vorgabe des Profils). Im
+Profil-Formular steht Trim deshalb nicht mehr. `trim` im Profil ist nur noch die Vorgabe. Generate
+(`POST /api/clips/{key}/candidates`) und Batch-Lauf (`POST /api/render`) nehmen ein
+optionales `"trim": true|false` für genau diesen Wurf; fehlt es (oder `null`), gilt das
+Profil, alles andere ist HTTP 422. Was tatsächlich galt, steht im Sidecar als
+`trimSilence` und in `/api/state` pro Kandidat (`null` bei Kandidaten von vorher).
+„⚠️ alt", das `verified` von Promote und der Export-Fingerprint rechnen mit diesem Wert
+statt mit dem Profil — ein bewusst ungeschnittener Wurf ist also nicht „alt", und
+Produktionen ohne `trimSilence` behalten ihren Fingerprint. `tts render` schneidet
+weiter nach Profil. Nicht zu verwechseln mit dem Schnitt in der Wellenform (Sidecar
+`trim`, siehe unten).
+
+Generate und Batch-Lauf lösen Clip (Text, Stimme, Profil) und Seeds erst auf, wenn der
+Job **läuft**, nicht beim Einreihen — wer hinter einem langen Lauf weiter kuratiert,
+bekommt den aktuellen Stand. Ist das Modell nicht geladen, antworten beide sofort mit
+**HTTP 503** und dem Ladefehler im `detail` (statt eines Jobs, der jeden Kandidaten
+einzeln scheitern lässt); Mikrofon-Aufnahmen, Kuratieren und Export gehen weiter. Ein
+abgebrochener Job meldet den Rest in `job-summary` als `cancelled`, nicht als `failed`.
 
 Erzeugt wird über den **Batch-Lauf**: links in der Liste Clips ankreuzen (einzeln
-oder über „Sichtbare / Alle / Keine"), Anzahl Beispiele pro Clip einstellen (Default 2),
+oder über „Alle / Keine", Shift-Klick wählt einen Bereich), Anzahl Beispiele pro Clip
+einstellen (Default 2),
 dann „▶ Batch-Lauf" in der Kopfzeile — angefasst wird nur, was noch fehlt.
 Der Batch-Lauf nutzt immer die **Top-Seeds**-Logik (wie „Use top seeds" bei Generate):
 zufällig gezogen aus den am häufigsten gelockten Seeds des Profils; hat das Profil
@@ -130,17 +174,23 @@ sich an ihrem Clip wirklich etwas geändert hat.
 
 Der Lauf erzeugt Kandidaten wie „🎲 Generate", aber für alle ausgewählten Clips
 auf einmal; er schreibt nie direkt in die Produktion. Die Entwürfe stehen danach in
-derselben Kandidaten-Tabelle wie jede andere Probeaufnahme — dort per Radio-Button
-„Produktion" bestätigen. Ohne Bestätigung bleibt der Clip „fehlt"; eine
-Festlegung fällt von selbst weg, sobald keine Aufnahme des Clips mehr übrig ist (keine
-eigene „Lock entfernen"-Aktion nötig). Da viel von Hand korrigiert wird, gibt es bewusst
-keinen „finalen Lauf" über alles mehr; die Auswahl bestimmt den Umfang.
+derselben Kandidaten-Tabelle wie jede andere Probeaufnahme — dort in der Spalte
+„Auswahl" bestätigen. Ohne Bestätigung bleibt der Clip „fehlt"; eine
+Festlegung ohne Hörarbeit fällt von selbst weg, sobald die Aufnahme ihres Seeds gelöscht
+ist und keine andere mehr übrig (keine eigene „Lock entfernen"-Aktion nötig). Wer auf
+einem frischen Checkout neu gewürfelte Kandidaten wieder löscht, behält Lock und Export.
+Da viel von Hand korrigiert wird, gibt es bewusst keinen „finalen Lauf" über alles mehr;
+die Auswahl bestimmt den Umfang.
 
 Die Detailsicht ist auf **Erzeugen und Bestätigen** ausgerichtet: ganz oben steht der
 Satz aus dem Content-Pack als Titel; in der Hauptkarte folgen TTS-Textfeld (Auto-Save),
-Profil- und Stimmenwahl, Generate und Kandidaten-Tabelle (👍/Produktion); „Alle löschen"
-entfernt nur ungeschützte Probeaufnahmen (ohne 👍, ohne Produktion); „Keine Produktion"
-hebt eine bestätigte Aufnahme wieder auf; darunter die
+Profil-, Stimmen- und Sprachwahl, Generate (mit „Stille trimmen") und Kandidaten-Tabelle
+(Auswahl/👍); „🧹 Aufräumen" links unter der Tabelle entfernt ohne Rückfrage alle
+ungeschützten Probeaufnahmen (ohne 👍, nicht ausgewählt); Abwählen in „Auswahl"
+hebt eine bestätigte Aufnahme wieder auf — auch für den Export: ein Lock ohne Hörarbeit
+fällt weg, ein kuratierter (Aussprache, Stimme, Profil, Notiz, fester Seed) bleibt mit
+`"cleared": true` stehen, gilt nicht mehr als gelockt, und `tts export` entfernt seine
+`.ogg` samt Index-Eintrag; erst ein neuer Promote gibt ihn wieder frei. Darunter die
 Profil-Zusammenfassung (Bearbeiten klappt das Formular auf). Bewertungen,
 Locks und Profile liegen in Dateien (Sidecar-JSONs, `locks.json`, `profiles.json`) und
 überleben damit Server- und Browser-Neustart; Filter, Batch-Auswahl und die Breite der
@@ -158,6 +208,26 @@ Produktion, zieht `out/audio/<key>.wav` mit; der Schnitt steht im Sidecar (`trim
 Export-Fingerprint, sonst hielte der Export die Produktion für unverändert. Ein neuer Wurf auf
 demselben Seed verwirft den Schnitt samt Original. Mikrofon-Aufnahmen schneidet weiter ✂.
 
+**Tastatur:** `j`/`k` blättern, Leertaste spielt die Produktion (ohne Produktion die
+erste Aufnahme) bzw. hält an, `1`–`9` spielen Kandidaten — immer nur eine Aufnahme
+zugleich. **Esc** verlässt ein Textfeld; vorher landete das nächste `j` als Buchstabe in
+der Aussprache und wurde 600 ms später gespeichert. Die Kürzel gelten auch, solange
+Radio, Häkchen oder Knopf den Fokus haben; hat der Auswahl-Schalter nach einem Klick den
+Fokus, spielt die Leertaste trotzdem ab, statt die Auswahl wieder aufzuheben.
+Cmd/Ctrl/Alt-Kombinationen bleiben dem Browser.
+
+**Clip-Liste:** Beim Hovern erscheint ▶ — spielt die Produktion, sonst die neueste
+Aufnahme, ohne den Clip zu öffnen. Die Batch-Auswahl gilt nur für Sichtbares: „Alle"
+nimmt die gefilterten Clips, und ein Filterwechsel wählt Unsichtbares ab.
+
+**Wenn etwas noch speichert:** Ein noch nicht gespeicherter Text oder fester Seed wird
+vor Generate, Produktion, Löschen und Batch-Lauf sofort gespeichert — Generate erzeugt
+also mit dem gerade getippten Text. Geänderte Profil-Formulare (⚙️ und Profilkarte)
+überstehen das Nachladen während eines Batch-Laufs. Export, Batch-Lauf und
+„Übernehmen" im Aufnahme-Editor sind gesperrt, bis ihre Anfrage durch ist. Reißt die
+Verbindung zum Server ab, sagt das ein Banner; nach einem Server-Neustart räumt die
+Oberfläche Warteschlangen-Anzeigen ab, die es nicht mehr gibt.
+
 **Wichtig:** Instruktion/Sampling im Profil zu ändern, wirkt sich **nicht** auf schon
 gerenderte oder bestätigte Clips aus — nur auf künftige Generierungen. Details dazu und
 warum das Absicht ist: „Profil-Updates und bestätigter Content" unten.
@@ -173,11 +243,29 @@ Rendern.
 In der Detailsicht steht der **Satz** aus dem Content-Pack ganz oben als Titel; in der
 Hauptkarte darunter das **TTS-Textfeld** — genau der Text, der ans Modell geht. Änderungen
 speichert die Oberfläche nach kurzer Pause automatisch (600 ms Debounce) über
-`POST /api/clips/{key}/lock`; entspricht der Text wieder dem Satz, wird die
-eigene Aussprache (`textOverride`) gelöscht. Gespeichert wird als `textOverride`
-im Lock; der Satz selbst bleibt unangetastet. Weil ein Lock zwingend einen Seed
-braucht, nagelt Speichern den aktuellen Seed mit fest. Weicht der TTS-Text vom
-Satz ab, erscheint in der Clip-Liste eine zweite Zeile.
+`POST /api/clips/{key}/lock` mit `{"draftText": …}`. Der Lock trägt zwei Texte:
+
+| Feld | Bedeutung |
+| --- | --- |
+| `textOverride` | Text der **bestätigten Produktion** (fehlt = der Satz). Steckt in deren Fingerprint und damit im Export. |
+| `draftText` | **Entwurf** für neue Aufnahmen — Generate, Batch-Lauf und `tts sample` sprechen `draftText ?? textOverride ?? Satz`. |
+
+Ein Probesatz im TTS-Feld ändert so nie die schon freigegebene Aufnahme (Fingerprint,
+Export, „⚠️ alt"). **Promote** übernimmt als `textOverride` den Text, mit dem der
+Kandidat entstand (Sidecar `text`; fehlt er — Nachbau-Eintrag, Mikrofon —, bleibt der
+bisherige) und streicht einen Entwurf, der ihm gleicht. Ein Entwurf gleich dem
+Produktionstext oder leer wird gar nicht erst gespeichert. „⚠️ alt" vergleicht jeden
+Kandidaten mit den heutigen Einstellungen für *seinen eigenen* Text — ein neuer Entwurf
+macht also nichts alt; welcher Text gesprochen ist, zeigt die Text-Spalte. `/api/state`
+liefert pro Clip `text` (Produktion), `draftText` (oder `null`) und `generationText`.
+`textOverride` bleibt über die API schreibbar (Handarbeit, Altbestand); Locks ohne
+`draftText` verhalten sich wie bisher.
+
+`seed` ist bei `/lock` **optional** und ändert den Lock-Seed nur, wenn er im Body steht;
+sonst bleibt der des Locks, ohne Lock wird der aufgelöste Seed des Clips festgenagelt.
+Vorher konnte ein verspätetes Autosave mit dem Seed von vor einem Klick einen gerade
+gemachten Promote zurücknehmen. Weicht der TTS-Text vom Satz ab, erscheint in der
+Clip-Liste eine zweite Zeile.
 
 Die **Stimme** ist an drei Stellen wählbar — pro Clip in der Detailsicht, pro Profil in
 der Profilkarte darunter und in „⚙️ TTS-Parameter". Hinter jedem Namen steht die Herkunft
@@ -232,6 +320,22 @@ Modell-Config im HF-Cache abgeglichen, damit sie nicht auseinanderläuft. Ein St
 pro Profil gilt für neue Kandidaten aller seiner Clips; ein Wechsel pro Clip trifft nur
 diesen einen.
 
+Die **Sprache** lässt sich genauso pro Clip überschreiben — etwa für ein Lehnwort, das mit
+`german` eingedeutscht klingt: `POST /api/clips/{key}/lock` mit `{"language": "english"}`,
+`null` (oder die Sprache des Profils) heißt „wie im Profil" und wird nicht gespeichert.
+Erlaubt sind die Namen aus `languages` in `/api/state` (`voices.LANGUAGES`), sonst HTTP 422;
+ein Tippfehler in `locks.json` bricht beim Laden mit Datei und Schlüssel ab. `/api/state`
+liefert pro Clip die wirksame `language`. Generate, Batch-Lauf, `tts sample` und
+`tts render` sprechen damit; im Fingerprint steht die wirksame Sprache, ohne Override also
+dieselbe wie bisher — vorhandene Fingerprints bleiben gültig, nur die Kandidaten dieses
+einen Clips werden bei einem Wechsel „⚠️ alt".
+
+Ein **erster** Lock auf einem ungelockten Clip, der nur Hörarbeit trägt (Entwurf, Stimme,
+Sprache, Profil), ist keine Freigabe: er steht mit `"cleared": true` in `locks.json`, der
+Clip bleibt „fehlt". Bleibt davon nichts übrig (Sprache des Profils, leerer Entwurf),
+entsteht gar kein Lock. Wer `seed` oder `textOverride` ausdrücklich schickt, legt wie
+bisher fest.
+
 ## Mikrofon-Aufnahmen
 
 Jeder Clip kann statt aus Qwen aus dem **Mikrofon** kommen: Umschalter „Quelle:
@@ -245,7 +349,7 @@ Tonhöhe in Halbtönen (Default `micPitchSemitones` des Profils, Tempo bleibt �
 Bearbeitung; bei `monster` zusätzlich „▶ Laufzeit links/rechts" mit dem App-Pitch für Aufnahmen (je ±1 Halbstufe,
 `mic.APP_MONSTER_PITCH`, Spiegel von `VoiceStyle.variantPitch`). „Übernehmen" schreibt den Kandidaten.
 
-Eine Aufnahme **ist ein Kandidat**: Radio „Produktion", 👍/👎, „Alle löschen" und Export
+Eine Aufnahme **ist ein Kandidat**: „Auswahl", 👍/👎, „🧹 Aufräumen" und Export
 funktionieren unverändert. Ihr „Seed" ist ein Pseudo-Seed ≥ 1 900 000 000
 (`mic.MIC_SEED_MIN`; Qwen-Zufalls-Seeds bleiben darunter). Dateien unter
 `out/candidates/<key>/`: `<seed>.raw.wav` (Rohaufnahme, 24 kHz mono, bleibt),
@@ -360,7 +464,7 @@ identisch. `poolSalt` in `profiles.json` hochzählen würfelt bewusst alles neu.
 | Datei | Im Git? | Inhalt |
 | --- | --- | --- |
 | `profiles.json` | ja | Instruktionen, Sampling, Seed-Pools — **kuratierte Entscheidungen** |
-| `locks.json` | ja | pro Clip festgenagelte Seeds, TTS-Overrides, optional `generateSeed` — **kuratierte Entscheidungen** |
+| `locks.json` | ja | pro Clip festgenagelte Seeds, Produktionstext `textOverride`, Entwurf `draftText`, optional `speaker`, `language`, `generateSeed` und `cleared` — **kuratierte Entscheidungen** |
 | `extra-strings.json` | ja | hartkodierte Kotlin-Strings |
 | `out/` | nein | Manifest, Render-State, Audio, Kandidaten — jederzeit neu erzeugbar |
 
@@ -368,9 +472,10 @@ identisch. `poolSalt` in `profiles.json` hochzählen würfelt bewusst alles neu.
 
 Kandidaten unter `out/candidates/` tragen seit dem UI-Redesign eine Sidecar-Datei
 `{seed}.json` mit dem Erzeugungs-Fingerprint — inzwischen zusätzlich mit
-Erzeugungszeitpunkt, Stimme, Text und der 👍-Bewertung (`rating: "good"`), damit die
+Erzeugungszeitpunkt, Stimme, Text, Stille-Wegschneiden (`trimSilence`) und der
+👍-Bewertung (`rating: "good"`), damit die
 Kandidaten-Tabelle mehrere Würfel-Runden auseinanderhalten kann und Bewertungen einen
-Neustart überleben. Der Produktions-Radio-Button übernimmt die Aufnahme immer sofort
+Neustart überleben. Der Auswahl-Schalter übernimmt die Aufnahme immer sofort
 als Produktion und lockt den Seed; passt der Sidecar-Fingerprint nicht mehr zu den
 aktuellen Einstellungen, markiert die Zeile das nur mit dem Hinweis-Chip „⚠️ alt" —
 rein informativ, der Clip gilt trotzdem als fertig. Ein späteres Profil-Update
@@ -384,7 +489,7 @@ ersetzt eine leere oder abgeschnittene `profiles.json` **nicht** stillschweigend
 kuratierten Seed-Pools durch die Defaults, sondern ist ein Fehler. Wer wirklich zurück auf
 die Defaults will, löscht die Datei.
 
-`textOverride` und `speaker` schickt das Web-Interface selbst (siehe „Aussprache und
+`textOverride`, `speaker` und `language` schickt das Web-Interface selbst (siehe „Aussprache und
 Stimme" unten); `note` setzt man weiterhin per Hand:
 
 ```json
@@ -494,7 +599,8 @@ TTS_SMOKE=1 ~/qwen-tts-test/.venv/bin/python -m pytest tests/ -v # mit Modell
   Stimme oder die Aussprache eines Clips, entsteht automatisch ein *Lock*, das den zu
   diesem Zeitpunkt aufgelösten Seed festnagelt — der kann ein ungeprüfter Hash-Fallback
   sein. Ursache: `store.Lock` verlangt zwingend einen `seed`, ein Override lässt sich
-  also nicht ohne Seed-Pinning ausdrücken. Wie das sauber gelöst wird, ist noch offen.
+  also nicht ohne Seed-Pinning ausdrücken (die API nimmt `seed` inzwischen optional
+  und pinnt dann selbst). Wie das sauber gelöst wird, ist noch offen.
 - **„Festlegung (Lock) entfernen" entfernt alles.** Der Knopf löscht den ganzen
   Lock-Eintrag, also auch eine eigene Aussprache und eine eigene Stimme, nicht nur den
   Seed. Der Tooltip sagt es, der Knopftext nicht.

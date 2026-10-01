@@ -15,14 +15,15 @@ def test_profiles_load_falls_back_to_defaults(tmp_path):
     profiles = Profiles.load(tmp_path / "missing.json")
     assert set(profiles.profiles) == {
         "word", "article_word", "phoneme", "prompt", "miss", "reward", "sentence",
-        "finale", "ui",
+        "finale", "ui", "math", "monster",
     }
     assert profiles.pool_salt == "v1"
 
 
 def test_every_default_profile_is_complete():
     for name, raw in DEFAULT_PROFILES["profiles"].items():
-        assert raw["speaker"] == "sohee", name
+        # Das Monster spricht als einziges nicht mit der Standardstimme.
+        assert raw["speaker"] == ("uncle_fu" if name == "monster" else "sohee"), name
         assert raw["language"] == "german", name
         assert raw["instruct"].strip(), name
         sampling = dict(raw["sampling"])
@@ -304,7 +305,8 @@ def test_param_to_dict_carries_everything_the_ui_needs():
 def test_default_profiles_carry_the_measured_duration_limits():
     # Abgeleitet aus den Dauern der validierten Aufnahmen, siehe Spec.
     expected = {"phoneme": 25, "word": 38, "article_word": 35, "sentence": 50,
-                "finale": 63, "prompt": 125, "miss": 75, "reward": 63, "ui": 75}
+                "finale": 63, "prompt": 125, "miss": 75, "reward": 63, "ui": 75,
+                "math": 50, "monster": 25}
     actual = {name: profile["sampling"]["max_new_tokens"]
               for name, profile in DEFAULT_PROFILES["profiles"].items()}
     assert actual == expected
@@ -508,3 +510,68 @@ def test_shipped_monster_profile_records_by_microphone():
     monster = json.loads(Paths().profiles.read_text())["profiles"]["monster"]
     assert monster["source"] == "mic"
     assert monster["micPitchSemitones"] == -4
+
+
+def test_every_extracted_profile_has_a_default():
+    """Ohne profiles.json muss jeder Clip ein Profil finden — sonst bricht
+    `build_clips` an genau den Clips ab, deren Profil in den Defaults fehlt
+    (bis Oktober 2026: `math` und `monster`)."""
+    from ttskit.extract import FIELD_TO_PROFILE
+
+    assert set(FIELD_TO_PROFILE.values()) <= set(DEFAULT_PROFILES["profiles"])
+
+
+def test_the_default_monster_profile_records_by_microphone(tmp_path):
+    monster = Profiles.load(tmp_path / "absent.json").profiles["monster"]
+    assert monster.source == "mic"
+    assert monster.speaker == "uncle_fu"
+
+
+def test_a_cleared_lock_roundtrips_and_old_locks_stay_byte_identical(tmp_path):
+    path = tmp_path / "locks.json"
+    locks = Locks()
+    locks.set("a:1", Lock(seed=1))
+    locks.set("b:2", Lock(seed=2, text_override="Bee.", cleared=True))
+    locks.save(path)
+    raw = json.loads(path.read_text(encoding="utf-8"))["locks"]
+    assert raw["a:1"] == {"seed": 1}, "ohne Flag kein neues Feld in locks.json"
+    assert raw["b:2"]["cleared"] is True
+    loaded = Locks.load(path)
+    assert loaded.get("a:1").cleared is False
+    assert loaded.get("b:2").cleared is True
+
+
+def test_a_non_boolean_cleared_names_the_file_and_the_key(tmp_path):
+    path = tmp_path / "locks.json"
+    path.write_text(json.dumps({"version": 1, "locks": {
+        "a:1": {"seed": 1, "cleared": "ja"}}}), encoding="utf-8")
+    with pytest.raises(ValueError, match=r"locks\.json.*'a:1'.*cleared"):
+        Locks.load(path)
+
+
+def test_a_lock_language_roundtrips_and_counts_as_curation(tmp_path):
+    path = tmp_path / "locks.json"
+    locks = Locks()
+    locks.set("a:1", Lock(seed=1))
+    locks.set("b:2", Lock(seed=2, language="english"))
+    locks.save(path)
+    raw = json.loads(path.read_text(encoding="utf-8"))["locks"]
+    assert raw["a:1"] == {"seed": 1}, "ohne Sprache kein neues Feld in locks.json"
+    assert raw["b:2"] == {"seed": 2, "language": "english"}
+    loaded = Locks.load(path)
+    assert loaded.get("a:1").language is None
+    assert loaded.get("b:2").language == "english"
+    assert loaded.get("b:2").curated is True
+    assert loaded.get("a:1").curated is False
+
+
+def test_an_unknown_lock_language_names_the_file_and_the_key(tmp_path):
+    path = tmp_path / "locks.json"
+    path.write_text(json.dumps({"version": 1, "locks": {
+        "a:1": {"seed": 1, "language": "klingonisch"}}}), encoding="utf-8")
+    with pytest.raises(ValueError) as excinfo:
+        Locks.load(path)
+    message = str(excinfo.value)
+    assert "locks.json" in message and "'a:1'" in message
+    assert "klingonisch" in message
+    assert "german" in message, "the valid options must be listed"

@@ -363,7 +363,11 @@ def test_fingerprint_follows_the_profile_language():
     profile = prof.profiles["phoneme"]
     base = fingerprint(clip, profile)
     profile.language = "english"
-    assert fingerprint(clip, profile) != base
+    # Wie bei der Stimme: die Sprache steckt aufgelöst im Clip, also ändert
+    # erst der neu abgeleitete Clip den Fingerprint.
+    switched = build_clips([item("task:t1:phonemeTts", "M", "phonemeTts")], prof, Locks())[0]
+    assert switched.language == "english"
+    assert fingerprint(switched, profile) != base
 
 
 def test_effective_profile_swaps_the_voice_and_nothing_else():
@@ -464,3 +468,92 @@ def test_top_seeds_limit_cuts_where_the_score_actually_drops():
 def test_top_seeds_never_returns_more_than_it_has():
     locks = _locks(("a", 7, None))
     assert top_seeds(locks, "prompt", limit=10) == [7]
+
+
+def test_a_cleared_lock_is_no_approval_but_keeps_its_pronunciation():
+    key = clip_key("reward", "Super!")
+    items = [item("r1", "Super!", "rewardTts")]
+    locks = Locks({key: Lock(seed=5, text_override="Suuuper!", cleared=True)})
+    clip = build_clips(items, profiles(), locks)[0]
+    assert clip.locked is False, "Export und Status sehen keine Freigabe mehr"
+    assert clip.text == "Suuuper!"
+    assert top_seeds(locks, "reward") == [], "ein aufgehobener Seed hat nicht überzeugt"
+
+
+def test_a_draft_feeds_new_takes_but_not_the_production_text():
+    key = clip_key("reward", "Super!")
+    items = [item("r1", "Super!", "rewardTts")]
+    plain = build_clips(items, profiles(), Locks({key: Lock(seed=5)}))[0]
+    drafted = build_clips(items, profiles(), Locks({key: Lock(seed=5, draft_text="Suuuper!")}))[0]
+    assert drafted.text == "Super!" and drafted.generation_text == "Suuuper!"
+    assert plain.generation_text == "Super!"
+    prof = profiles().profiles["reward"]
+    assert fingerprint(drafted, prof) == fingerprint(plain, prof)
+
+
+def _legacy_fingerprint(clip, profile) -> str:
+    """`plan.fingerprint` vor Sprach-Override und Trim-Wahl, wörtlich
+    nachgebaut: Sprache und Trim kamen damals aus dem Profil."""
+    import hashlib
+    import json
+
+    from ttskit.audio import POSTPROCESS_VERSION
+
+    payload = {
+        "text": clip.text, "profile": clip.profile, "seed": clip.seed,
+        "speaker": clip.speaker, "language": profile.language,
+        "instruct": profile.instruct,
+        "sampling": dict(sorted(profile.sampling.items())),
+        "trim": profile.trim, "normalize": profile.normalize,
+        "postprocess": POSTPROCESS_VERSION,
+    }
+    blob = json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
+
+
+def test_fingerprints_without_overrides_stay_what_they_were():
+    """Exportierte Clips tragen ihren Fingerprint im Index — änderte er sich
+    ohne Override, encodierte der nächste Export alles neu."""
+    prof = profiles()
+    items = [item("task:t1:phonemeTts", "M", "phonemeTts"),
+             item("task:t1:round:0:promptTts", "Hallo", "promptTts")]
+    for clip in build_clips(items, prof, Locks()):
+        profile = prof.profiles[clip.profile]
+        assert clip.language == profile.language
+        assert fingerprint(clip, profile) == _legacy_fingerprint(clip, profile)
+        assert fingerprint(clip, profile, trim=profile.trim) == \
+            _legacy_fingerprint(clip, profile), "trim gleich dem Profil ist kein Unterschied"
+        assert fingerprint(clip, profile, trim=not profile.trim) != \
+            _legacy_fingerprint(clip, profile)
+
+
+def test_a_lock_language_overrides_only_its_own_clip():
+    prof = profiles()
+    items = [item("task:t1:phonemeTts", "M", "phonemeTts"),
+             item("task:t2:phonemeTts", "A", "phonemeTts")]
+    profile = prof.profiles["phoneme"]
+    before = {c.source_text: fingerprint(c, profile)
+              for c in build_clips(items, prof, Locks())}
+
+    locks = Locks()
+    locks.set(clip_key("phoneme", "M"), Lock(seed=5, language="english"))
+    clips = {c.source_text: c for c in build_clips(items, prof, locks)}
+
+    assert clips["M"].language == "english"
+    assert clips["A"].language == profile.language == "german"
+    assert fingerprint(clips["A"], profile) == before["A"]
+    assert fingerprint(clips["M"], profile) != before["M"]
+
+
+def test_effective_profile_swaps_the_language_too():
+    from ttskit.plan import effective_profile
+
+    prof = profiles()
+    profile = prof.profiles["phoneme"]
+    locks = Locks()
+    locks.set(clip_key("phoneme", "M"), Lock(seed=5, language="french"))
+    clip = build_clips([item("task:t1:phonemeTts", "M", "phonemeTts")], prof, locks)[0]
+    swapped = effective_profile(clip, profile)
+    assert swapped.language == "french"
+    assert swapped.speaker == profile.speaker
+    assert profile.language == "german", "the shared profile must not be mutated"

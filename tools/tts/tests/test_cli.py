@@ -335,3 +335,21 @@ def test_export_summarises_instead_of_listing_every_skip(
     verbose = capsys.readouterr().out
     assert "word:42" in verbose
     assert "stale_7.ogg" in verbose
+
+
+def test_render_names_why_protected_clips_were_left_alone(tmp_path, content_dir,
+                                                         monkeypatch, capsys):
+    paths = make_root(tmp_path, content_dir)
+    monkeypatch.setattr(cli, "_engine_or_exit", lambda profiles: FakeEngine())
+
+    import ttskit.render
+    reason = "gelockt und schon in die App exportiert — committete Datei bleibt (--force rendert neu)"
+    monkeypatch.setattr(ttskit.render, "render_clips", lambda *a, **k: RenderReport(
+        rendered=1, skipped=2, cancelled=4,
+        protected=[("a:1", reason), ("b:2", reason)]))
+
+    assert cli.cmd_render(paths, cli.build_parser().parse_args(["render"])) == 0
+    out = capsys.readouterr().out
+    assert "1 gerendert, 2 übersprungen, 0 fehlgeschlagen, 4 abgebrochen." in out
+    assert "2 bewusst nicht gerendert:" in out
+    assert f"   2 × {reason}" in out
