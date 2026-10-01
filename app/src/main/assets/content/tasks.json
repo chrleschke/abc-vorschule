@@ -921,6 +921,34 @@
       ]
     },
     {
+      "trainer": "word_build",
+      "id": "l07-t8a",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Helm.",
+          "targetAtomId": "helm",
+          "blocks": [
+            {
+              "atomId": "letter-h",
+              "display": "H"
+            },
+            {
+              "atomId": "letter-e",
+              "display": "e"
+            },
+            {
+              "atomId": "letter-l",
+              "display": "l"
+            },
+            {
+              "atomId": "letter-m",
+              "display": "m"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "trainer": "sentence_order",
       "id": "l07-t9",
       "rounds": [
@@ -4981,6 +5009,26 @@
             {
               "atomId": "letter-z",
               "display": "za"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "trainer": "word_build",
+      "id": "l21-t8c",
+      "rounds": [
+        {
+          "promptTts": "Baue das Wort Panda.",
+          "targetAtomId": "panda",
+          "blocks": [
+            {
+              "atomId": "letter-p",
+              "display": "Pan"
+            },
+            {
+              "atomId": "letter-d",
+              "display": "da"
             }
           ]
         }
