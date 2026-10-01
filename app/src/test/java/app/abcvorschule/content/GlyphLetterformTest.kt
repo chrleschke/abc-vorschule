@@ -9,6 +9,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.hypot
 
 /**
@@ -85,7 +86,7 @@ class GlyphLetterformTest {
     @Test
     fun theUBowlIsADenseCurveNotACoarsePolygon() {
         // The road is drawn with lineTo between authored points; six bowl vertices left
-        // visible corners. O uses ~17 samples — U/Ü should be in that ballpark.
+        // visible corners.
         val u = strokesOf("letter-u").single()
         val ue = strokesOf("letter-ue").first()
         assertTrue("U has only ${u.size} points", u.size >= 14)
@@ -127,18 +128,53 @@ class GlyphLetterformTest {
             val bowl = strokesOf(id)[index]
             assertTrue("$id bowl has only ${bowl.size} points", bowl.size >= 12)
 
-            // No three consecutive points on the outer arc may be collinear: that is the
-            // flat side. Sample from the widest point outwards in both directions.
-            val widest = bowl.indices.maxByOrNull { bowl[it].x }!!
-            listOf(widest - 1, widest, widest + 1).forEach { i ->
-                val a = bowl[i - 1]
-                val b = bowl[i]
-                val c = bowl[i + 1]
-                val cross = (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x)
-                val bend = abs(cross) / (hypot(b.x - a.x, b.y - a.y) * hypot(c.x - b.x, c.y - b.y))
-                assertTrue("$id bowl is flat at index $i (bend $bend)", bend > 0.1f)
+            // A flat side keeps the same x over a stretch of height. On a round bowl,
+            // points 0.15 box above and below the widest point already sit clearly
+            // further in. Measured over a window, because a dense curve bends only a
+            // little at every single vertex.
+            val widest = bowl.maxByOrNull { it.x }!!
+            val window = boxSize * 0.15f
+            listOf(widest.y - window, widest.y + window).forEach { y ->
+                val near = bowl.filter { it.x > widest.x - boxSize * 0.2f }
+                    .minByOrNull { abs(it.y - y) }!!
+                assertTrue(
+                    "$id bowl is flat: x ${near.x} at y ${near.y} vs widest ${widest.x}",
+                    widest.x - near.x > boxSize * 0.015f,
+                )
             }
         }
+    }
+
+    @Test
+    fun curvesAreSmoothAndCornersAreDeliberate() {
+        // The road is drawn with lineTo between the points and is wide, so a curve
+        // sampled at 20° steps showed its corners on the outer edge of the road (the
+        // 16-gon O). Every vertex either turns gently, which reads as a curve, or
+        // clearly, which reads as an intended corner (M/W peaks, G spur, ß waist).
+        // Anything in between is a curve with visible facets.
+        val smoothMax = 12f
+        val cornerMin = 30f
+        val offenders = mutableListOf<String>()
+        pack.atoms.values.filter { it.strokes.isNotEmpty() }.forEach { atom ->
+            strokesOf(atom.id).forEachIndexed { index, stroke ->
+                stroke.windowed(3).forEach { (a, b, c) ->
+                    val turn = turnDegrees(a, b, c)
+                    if (turn > smoothMax && turn < cornerMin) {
+                        offenders += "${atom.id} stroke $index turns $turn° at $b"
+                    }
+                }
+            }
+        }
+        assertTrue(offenders.joinToString("\n"), offenders.isEmpty())
+    }
+
+    private fun turnDegrees(a: TracePoint, b: TracePoint, c: TracePoint): Float {
+        val h1 = atan2(b.y - a.y, b.x - a.x)
+        val h2 = atan2(c.y - b.y, c.x - b.x)
+        var d = Math.toDegrees((h2 - h1).toDouble())
+        while (d > 180) d -= 360
+        while (d < -180) d += 360
+        return abs(d).toFloat()
     }
 
     @Test
