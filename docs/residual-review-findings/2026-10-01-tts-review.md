@@ -23,12 +23,10 @@ Korrektur änderte die Seeds aller ungelockten Clips. `render_protection` behand
 einen gelockten Seed in diesem Bereich deshalb nur dann als Mikrofon, wenn keine lokale
 Produktions-WAV da ist.
 
-## Altbestand: Probetexte als Produktionstext
+## Altbestand: Probetexte als Produktionstext (bereinigt)
 
 Vor der Trennung `textOverride` (Produktion) / `draftText` (Entwurf) schrieb jedes
-Tippen im TTS-Feld den Produktionstext. In `locks.json` stehen deshalb einzelne
-Probetexte als `textOverride`, obwohl die exportierte Aufnahme den Originalsatz spricht
-(bestätigt: `sentence:027d7fa9791a`, „Der Pirat hat die Kekse geklaut." →
-„Wer möchte Nudelauflauf?"). Über die Oberfläche lässt sich das nicht mehr korrigieren
-(das Feld schreibt nur noch den Entwurf); bereinigen per Hand in `locks.json` oder
-durch einen neuen Promote. Nicht automatisch angefasst, weil `locks.json` kuratiert ist.
+Tippen im TTS-Feld den Produktionstext. Die zwei bekannten Probetexte sind auf Wunsch
+der Nutzerin bzw. des Nutzers aus `locks.json` entfernt (`sentence:027d7fa9791a`
+„Der Pirat hat die Kekse geklaut.", `word:7253bc3fb39a` „30 Rüben", verwaist). Die
+ausgelieferte Pirat-Aufnahme sprach schon vorher den Originalsatz.
