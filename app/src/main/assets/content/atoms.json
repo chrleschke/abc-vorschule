@@ -8852,6 +8852,16 @@
       "pluralDisplay": "Pizzen"
     },
     {
+      "id": "panda",
+      "lemma": "Panda",
+      "display": "Panda",
+      "emoji": "🐼",
+      "kind": "word",
+      "gender": "m",
+      "nounClass": "thing",
+      "pluralDisplay": "Pandas"
+    },
+    {
       "id": "ampel",
       "lemma": "Ampel",
       "display": "Ampel",
@@ -10172,7 +10182,7 @@
       "lemma": "Helm",
       "display": "Helm",
       "emoji": "⛑️",
-      "kind": "other",
+      "kind": "word",
       "pluralDisplay": "Helme",
       "gender": "m",
       "nounClass": "thing"

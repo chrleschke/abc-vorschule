@@ -263,16 +263,17 @@ class SymbolInWordDerivationTest {
 
     @Test
     fun anAllHitsSyllableRoundFallsBackToLetterMode() {
-        // l07's third word is "Pepe": the syllable candidate `Pe·pe` / `pe` is two
+        // l07's fourth word is "Pepe": the syllable candidate `Pe·pe` / `pe` is two
         // hits in two segments and is dropped, exactly like the block-display
         // mismatch in l17. The letter round that replaces it hunts the lesson's own
-        // focus grapheme E and can be failed.
+        // focus grapheme E and can be failed. "Helm" stands before it, not after
+        // "Nest": in the second slot it would have taken Rose's syllable round `se`.
         val l07 = rounds("l07")
         assertEquals(
-            listOf(SymbolInWordMode.letter, SymbolInWordMode.syllable, SymbolInWordMode.letter),
+            listOf(SymbolInWordMode.letter, SymbolInWordMode.syllable, SymbolInWordMode.letter, SymbolInWordMode.letter),
             l07.map { it.mode },
         )
-        assertEquals(listOf("letter-s", "se", "letter-e"), l07.map { it.targetAtomId })
+        assertEquals(listOf("letter-s", "se", "letter-e", "letter-e"), l07.map { it.targetAtomId })
         // Die Wiederholungslektion leitet aus denselben Wörtern ab und muss folgen —
         // l20 hängt nur sein eigenes drittes Wort hinten an.
         val l02 = rounds("l02")
