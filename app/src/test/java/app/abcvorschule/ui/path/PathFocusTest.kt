@@ -110,12 +110,13 @@ class PathFocusTest {
 
     // ---- entryScrollTarget ----
     //
-    // All in dp-as-px (density 1). The hop headroom is a sign's full height plus
-    // the marker column above it, and the from-node sits one default spacing
-    // (168dp) above the head node — the geometry the finding was verified against.
+    // All in dp-as-px (density 1). The hop headroom is the hop start's sign
+    // height plus the marker column above it — here the common one-row sign of
+    // two sounds — and the from-node sits one default spacing (168dp) above the
+    // head node, the geometry the finding was verified against.
 
     private val hopHeadroom =
-        (PathSignDimens.TotalHeight + PathMarkerDimens.Headroom).value // 166dp
+        (PathSignDimens.totalHeight(2) + PathMarkerDimens.Headroom).value // 140dp
     private val fromY = 1000f
     private val headY = fromY + PathGeometry.DefaultSpacing // 1168
 

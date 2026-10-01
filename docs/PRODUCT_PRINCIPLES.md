@@ -272,13 +272,16 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
 ## 4. Content-Graph
 
 - Atome (Buchstabe / Silbe / Wort + Emoji) sind wiederverwendbar über alle sechs Trainer-Typen einer Lektion.
-- Atom-Emojis werden auch außerhalb der Trainer verwendet: die Pfad-Schilder zeigen bis zu drei
-  Emojis je Lektion, abgeleitet aus word_build → sentence_order → sentence_picture
-  (deterministisch, über den Emoji-Glyph dedupliziert). Der Satz-Versteher steht bewusst am Ende:
-  seine Bildkarten sind Antwortmaterial und füllen nur auf, was die übrigen Trainer offenlassen.
-  Jede autorierte Lektion trägt den Satz-Versteher; bis August 2026 fehlte er den Wiederholungen
-  l19–l26, die damit auf zwei Bilder kamen. `letter_trace.rewardEmoji` bleibt
-  bewusst außen vor — er ist die Belohnung des Trainers und wird nicht vorweggenommen.
+- **Pfad-Schilder** (`content/LessonSign.kt`, seit Oktober 2026): ein ABC-Klotz pro Fokus-Laut
+  der Lektion (`focusAtomIds`), in der **Großform** des Lauts (`M`, `Sch`, `Ei`; `ck` und `ß`
+  bleiben klein, es gibt sie nicht groß). Auf der Würfelseite steht das **Anlautbild aus dem
+  Spurensucher** derselben Lektion (`letter_trace.rewardEmoji`: „M wie Mond" → 🌙) — das Kind
+  hört genau dieses Paar nach dem Nachzeichnen wieder. Das kehrt die frühere Regel um, das
+  Belohnungsbild nicht vorwegzunehmen: es ist jetzt der Anker. Die Klotzfarbe hängt am Laut
+  (Reihenfolge der Einführung im Pack), nicht am Platz — `M` ist überall derselbe Klotz.
+  Wiederholungslektionen (Label endet auf „+") tragen statt des „+" ein ↻-Abzeichen.
+  Verworfen: „M a" (erster Laut groß, Rest klein — las sich wie ein Wort, das keins ist) und
+  drei Bildwörter aus späteren Trainern (👩 🐜 ☀️), die keinen Laut benannten.
 - Tasks referenzieren Atom-IDs; Validierung verhindert tote Referenzen.
 - **Glyphen-Strichenden treffen sich exakt oder deutlich nicht.** Ein Querstrich, der den Stamm
   kappt, teilt dessen y-Wert (E/F/Ei/Eu/Pf: obere Balken auf `0.08` wie der Stamm, untere auf
@@ -326,10 +329,17 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
   im Mittel alle 10 s eine, jede braucht 90–150 s bis über den oberen Rand und pendelt dabei
   leicht; ferne sind kleiner, langsamer und blasser. Sie sind reine Stimmung, ohne Aufgabe, und
   stehen bei „Bewegung reduzieren" still — der Himmel ist dann trotzdem voll. Erreichbare
-  Schilder leuchten warm, Stern und Punktestand stehen hell auf dem Himmel. Ein Wegweiser-Schild pro
-  Lektion, Label = Graphem, darunter drei Emojis aus dem Bildwortschatz der Lektion.
-  Der bereits zurückgelegte Teil des Weges ist wärmer gezeichnet als der Rest.
-  Gesperrte Schilder zeigen ihre Emojis nur als Silhouette.
+  Schilder leuchten warm, Stern und Punktestand stehen hell auf dem Himmel. Ein Schild pro
+  Lektion: **ABC-Klötze auf einem Brett** (`PathSignNode`), ein Klotz pro Laut (§4); ein oder
+  zwei Laute stehen nebeneinander, drei oder vier werden zu einem Turm gestapelt (zweite
+  Reihe obendrauf, das Brett bleibt am Weg). Die Klötze sind **Würfel**: vorn der Buchstabe,
+  an der Seite das Anlautbild. Nur das **aktuelle** Schild dreht seine Würfel — kurz nach dem
+  Öffnen des Pfads und dann alle ~9 s einmal nacheinander zum Bild, hält 1,6 s und dreht
+  zurück („M … wie Mond" ohne Worte). Alle anderen Schilder zeigen nur Buchstaben; so bleibt
+  der Pfad ruhig. Die Drehung ersetzt den früher atmenden Ring des aktuellen Schilds und steht
+  bei „Bewegung reduzieren" still. Der bereits zurückgelegte Teil des Weges ist wärmer
+  gezeichnet als der Rest. Gesperrte Schilder zeigen dunkle Klötze mit gedämpften, aber
+  lesbaren Buchstaben und ein Schloss; Bilder zeigen sie nicht.
 Gesperrte und noch nicht autorierte Schilder reagieren auf Tippen mit einem gesprochenen Hinweis —
 niemals mit einem stummen No-Op.
 - **„Du bist hier“-Marker**: über dem Schild der aktuellen Lektion steht eine Pin-Nadel
@@ -752,7 +762,9 @@ niemals mit einem stummen No-Op.
   Fortschritt/aktiv, `SunCoral` = Handlungs-CTA (auch der „Du bist hier“-Marker auf dem Pfad —
   er sagt „hier tippen“), `ClayRed` = Fehlertext (Erwachsene).
   `LeafGreenLight`/`SkyBlueLight` sind helle Ring-Varianten ausschließlich für Akzente AUF
-  dunklen Flächen (Holzschilder auf dem Pfad) — nie als Fläche oder Akzent auf dem Papiergrund.
+  dunklen Flächen (Bretter der Pfad-Schilder, ↻-Abzeichen) — nie als Fläche oder Akzent auf
+  dem Papiergrund. Die fünf Klotztöne der Pfad-Schilder (`SignBlockTones`) tragen keine
+  Bedeutung, sie unterscheiden nur Laute; Schrift darauf in `WoodDark` liegt über 8:1.
   Eine Bedeutung pro Farbe — Sterne und Progress greifen nie auf `primary` zu.
   Benannte Ausnahme: die **warm gelaufenen Trittspuren** des Pfades nutzen ein transparentes
   StarGold (§5 verlangt „wärmer", und ein kaltes SkyBlue widerspräche dem) — das ist eine
@@ -776,7 +788,10 @@ niemals mit einem stummen No-Op.
   was nur passiert. Eine neue Feder am Aufrufort bricht `AbcMotionTest`; Figurenspiel
   (Kau-/Spuck-Rhythmus der Fresser, Halte-Kurve des Jagd-Druckmorphs) darf eigene Dauern
   tragen und begründet sie dort. Bewegung bleibt Antwort auf eine Tat — die Palette ist
-  keine Einladung, Bühnen beim Laden aufzubauen oder dauerhaft zu animieren.
+  keine Einladung, Bühnen beim Laden aufzubauen oder dauerhaft zu animieren. Benannte
+  Ausnahme: die Würfel-Drehung des aktuellen Pfad-Schilds (`SignTurnChoreo`, Feder `Soft`),
+  vom Nutzer ausdrücklich gewählt; sie ersetzt den Atem-Ring dort, statt eine Schleife
+  hinzuzufügen.
 - **Der Erfolgs-Stern fliegt in den Punktestand** (`StarFlight`, `SuccessBurst`, gezeichnet
   mit `drawGlowStar`). Seit September 2026 ein Stern mit Licht statt eines flachen Sterns
   mit dunkler Kontur: gerundete Spitzen, innen hell und außen bernstein, Glanzpunkt, weicher
@@ -1009,9 +1024,8 @@ Welche Nomen ein Bild bekommen, ist **redaktionell autoriert** (`pictureAtomIds`
 aus dem Text abgeleitet. Automatisches Wort→Atom-Matching scheitert an Flexion („roten
 Hut"), an geteilten Glyphen (`dach` und `haus` sind beide 🏠) und an der Frage, welches
 Nomen ein Bild verdient. `pictureAtomIds` ist eine fest autorierte Reihenfolge — kein
-Random, kein Shuffle — nach demselben Muster wie `content/LessonEmojis.kt`, das die
-Emojis der Pfad-Schilder genauso deterministisch aus dem Lektions-Vokabular ableitet und
-ebenfalls auf dem Glyph statt der Atom-ID dedupliziert.
+Random, kein Shuffle — nach demselben Muster wie `content/LessonSign.kt`, das die
+Klötze und Bilder der Pfad-Schilder genauso deterministisch aus der Lektion ableitet.
 
 ### Redaktionsregeln für neue Sätze
 

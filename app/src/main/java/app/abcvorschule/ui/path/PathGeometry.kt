@@ -48,12 +48,12 @@ object PathGeometry {
      * first sign. See [DefaultHorizontalMargin] for the horizontal inset, which has
      * no such constraint.
      *
-     * The floor is a sign's height (`PathSignDimens.TotalHeight`, 116dp) plus the
-     * headroom the "you are here" marker needs above it (`PathMarkerDimens.Headroom`,
-     * 50dp) = 166dp; hence 168 and not the 132 of the sign-only path. Asserted in
-     * PathGeometryTest.
+     * The floor is the tallest sign (`PathSignDimens.MaxTotalHeight`, two rows of
+     * blocks: 145dp) plus the headroom the "you are here" marker needs above it
+     * (`PathMarkerDimens.Headroom`, 50dp) = 195dp; hence 196. Asserted in
+     * PathGeometryTest. (168 while every sign was a 116dp board.)
      */
-    const val DefaultMargin = 168f
+    const val DefaultMargin = 196f
 
     /**
      * Horizontal inset: how far the swing's outer edge stays from each screen

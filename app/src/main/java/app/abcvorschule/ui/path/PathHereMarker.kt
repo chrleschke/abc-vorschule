@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
@@ -68,7 +69,15 @@ internal object PathMarkerGeometry {
      * @param hopHeight Extra lift at the apex of the hop.
      * @return The tip in path-content pixels, or null when there are no nodes.
      */
-    fun tipFor(points: List<PathPoint>, index: Float, lift: Float, hopHeight: Float): PathPoint? {
+    fun tipFor(points: List<PathPoint>, index: Float, lift: Float, hopHeight: Float): PathPoint? =
+        tipFor(points, index, { lift }, hopHeight)
+
+    /**
+     * As above, with a lift per node: signs differ in height (one row of blocks or
+     * two), and mid-hop the lift blends from the sign the pin leaves to the one it
+     * lands on, so it never dips into a tall tower or floats over a short one.
+     */
+    fun tipFor(points: List<PathPoint>, index: Float, lift: (Int) -> Float, hopHeight: Float): PathPoint? {
         if (points.isEmpty()) return null
         val clamped = index.coerceIn(0f, points.lastIndex.toFloat())
         val from = points[floor(clamped).toInt()]
@@ -77,9 +86,11 @@ internal object PathMarkerGeometry {
         // sin(pi * t) is zero at both ends: a marker standing on a sign never floats,
         // and the arc peaks exactly halfway between two signs.
         val arc = hopHeight * sin(PI * t).toFloat()
+        val fromLift = lift(floor(clamped).toInt())
+        val toLift = lift(ceil(clamped).toInt())
         return PathPoint(
             x = from.x + (to.x - from.x) * t,
-            y = from.y + (to.y - from.y) * t - lift - arc,
+            y = from.y + (to.y - from.y) * t - (fromLift + (toLift - fromLift) * t) - arc,
         )
     }
 }
@@ -93,15 +104,18 @@ internal object PathMarkerGeometry {
  * @param index The node the pin stands on, fractional during the hop. A lambda, not
  * a Float: it is read inside [graphicsLayer], i.e. in the draw phase, so a hop frame
  * moves the pin without recomposing anything.
+ * @param signHeight Height of the sign standing on node `i`.
  */
 @Composable
 internal fun PathHereMarker(
     nodePoints: List<PathPoint>,
     index: () -> Float,
+    signHeight: (Int) -> Dp,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
-    val liftPx = with(density) { (PathSignDimens.TotalHeight + PathMarkerDimens.TipGap).toPx() }
+    val tipGapPx = with(density) { PathMarkerDimens.TipGap.toPx() }
+    val liftPx: (Int) -> Float = { i -> with(density) { signHeight(i).toPx() } + tipGapPx }
     val hopPx = with(density) { PathMarkerDimens.HopHeight.toPx() }
     val bobPx = with(density) { PathMarkerDimens.BobHeight.toPx() }
     val widthPx = with(density) { PathMarkerDimens.Width.toPx() }

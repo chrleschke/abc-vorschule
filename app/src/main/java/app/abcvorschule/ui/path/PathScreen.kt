@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import app.abcvorschule.content.Lesson
+import app.abcvorschule.content.LessonSign
 import app.abcvorschule.progress.LessonGating
 import app.abcvorschule.progress.LessonState
 import app.abcvorschule.ui.shell.AbcTopBar
@@ -74,7 +75,7 @@ fun PathScreen(
     lessons: List<Lesson>,
     states: Map<String, LessonState>,
     unlockAllLessons: Boolean,
-    emojisByLessonId: Map<String, List<String>>,
+    signsByLessonId: Map<String, LessonSign>,
     highlightedLessonId: String?,
     advanceFromLessonId: String?,
     points: Int,
@@ -232,7 +233,10 @@ fun PathScreen(
                     LaunchedEffect(Unit) {
                         if (advanceFromLessonId != null) onAdvanceAnimated()
                     }
-                    AutoScrollToHead(scrollState, nodePoints, contentTopPx, headIndex, markerStartIndex)
+                    val blockCounts = remember(lessons, signsByLessonId) {
+                        lessons.map { signsByLessonId[it.id]?.blocks?.size ?: 0 }
+                    }
+                    AutoScrollToHead(scrollState, nodePoints, contentTopPx, headIndex, markerStartIndex, blockCounts)
 
                     // Walked footprints are warm gold and nearly opaque, the ones
                     // still ahead are a faint warm grey — on a light landscape the
@@ -262,7 +266,7 @@ fun PathScreen(
                         lessons = lessons,
                         states = states,
                         unlockAllLessons = unlockAllLessons,
-                        emojisByLessonId = emojisByLessonId,
+                        signsByLessonId = signsByLessonId,
                         highlightedLessonId = highlightedLessonId,
                         points = nodePoints,
                         onOpenLesson = onOpenLesson,
@@ -271,7 +275,11 @@ fun PathScreen(
 
                     // Last, so the pin sits over the signs it hops between.
                     if (headIndex >= 0) {
-                        PathHereMarker(nodePoints = nodePoints, index = { markerIndex.value })
+                        PathHereMarker(
+                            nodePoints = nodePoints,
+                            index = { markerIndex.value },
+                            signHeight = { i -> PathSignDimens.totalHeight(blockCounts.getOrElse(i) { 0 }) },
+                        )
                     }
                 }
                 // Das letzte Schild muss sich über die Nav-Bar schieben lassen;
@@ -331,11 +339,12 @@ private fun AutoScrollToHead(
     contentTopPx: Float,
     headIndex: Int,
     hopStartIndex: Int,
+    blockCounts: List<Int>,
 ) {
     // Everything that has to be on screen above the hop's start node: the sign
-    // standing on it plus the marker (with bob) above the sign.
+    // standing on it (one row of blocks or two) plus the marker (with bob) above it.
     val hopHeadroomPx = with(LocalDensity.current) {
-        (PathSignDimens.TotalHeight + PathMarkerDimens.Headroom).toPx()
+        (PathSignDimens.totalHeight(blockCounts.getOrElse(hopStartIndex) { 0 }) + PathMarkerDimens.Headroom).toPx()
     }
     var lastScrolledHead by remember { mutableStateOf<Int?>(null) }
     LaunchedEffect(headIndex, nodePoints, contentTopPx) {
@@ -392,25 +401,26 @@ private fun PathSigns(
     lessons: List<Lesson>,
     states: Map<String, LessonState>,
     unlockAllLessons: Boolean,
-    emojisByLessonId: Map<String, List<String>>,
+    signsByLessonId: Map<String, LessonSign>,
     highlightedLessonId: String?,
     points: List<PathPoint>,
     onOpenLesson: (String) -> Unit,
     onLockedTap: () -> Unit,
 ) {
     val density = LocalDensity.current
-    val halfWidth = with(density) { (PathSignDimens.BoardWidth / 2).toPx() }
-    // The geometry point is where the post meets the ground, so the sign is drawn
-    // fully above it and the trail passes below the board instead of through it.
-    val fullHeight = with(density) { PathSignDimens.TotalHeight.toPx() }
+    val halfWidth = with(density) { (PathSignDimens.Width / 2).toPx() }
 
     lessons.forEachIndexed { index, lesson ->
         val point = points.getOrNull(index) ?: return@forEachIndexed
         val state = states[lesson.id] ?: LessonState.Locked
         val playable = LessonGating.isPlayable(state, unlockAllLessons)
+        val sign = signsByLessonId[lesson.id] ?: LessonSign(blocks = emptyList(), review = false)
+        // The geometry point is where the post meets the ground, so the sign is drawn
+        // fully above it and the trail passes below the plank instead of through it.
+        val fullHeight = with(density) { PathSignDimens.totalHeight(sign.blocks.size).toPx() }
         PathSignNode(
-            label = lesson.nodeLabel,
-            emojis = emojisByLessonId[lesson.id].orEmpty(),
+            sign = sign,
+            tag = lesson.nodeLabel,
             state = state,
             playable = playable,
             highlighted = lesson.id == highlightedLessonId,

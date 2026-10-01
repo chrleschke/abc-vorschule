@@ -6,7 +6,8 @@ import androidx.lifecycle.viewModelScope
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.ContentRepository
 import app.abcvorschule.content.CountAddRound
-import app.abcvorschule.content.LessonEmojis
+import app.abcvorschule.content.LessonSign
+import app.abcvorschule.content.LessonSigns
 import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.Lesson
 import app.abcvorschule.content.MathPromptSpeech
@@ -62,8 +63,8 @@ class SessionViewModel(
     )
     val ui: StateFlow<SessionUiState> = _ui.asStateFlow()
 
-    /** Backs [lessonEmojis] — computed once when [pack] loads, not on every call. */
-    private var lessonEmojisByLessonId: Map<String, List<String>> = emptyMap()
+    /** Backs [lessonSigns] — computed once when [pack] loads, not on every call. */
+    private var lessonSignsByLessonId: Map<String, LessonSign> = emptyMap()
 
     init {
         viewModelScope.launch { bootstrap() }
@@ -72,7 +73,7 @@ class SessionViewModel(
     private suspend fun bootstrap() {
         runCatching {
             pack = withContext(Dispatchers.IO) { contentRepository.load() }
-            lessonEmojisByLessonId = pack.lessons.associate { it.id to LessonEmojis.forLesson(pack, it) }
+            lessonSignsByLessonId = pack.lessons.associate { it.id to LessonSigns.forLesson(pack, it) }
             progress = progressRepository.current()
             val snapshot = progress.unfinishedSession
             val resumable = snapshot != null &&
@@ -121,14 +122,14 @@ class SessionViewModel(
         if (this::pack.isInitialized) LessonGating.nextPlayable(pack, progress)?.id else null
 
     /**
-     * Signpost emojis per lesson id. Computed once in [bootstrap] when the pack
+     * Path sign content (blocks, pictures, review badge) per lesson id. Computed once in [bootstrap] when the pack
      * loads and cached from then on — not rebuilt on every call — so every call
      * after the pack has loaded returns the same Map instance. That is all this
      * accessor guarantees: whether a Compose caller actually skips also depends on
      * the other arguments it passes alongside this one.
      */
-    fun lessonEmojis(): Map<String, List<String>> =
-        if (this::pack.isInitialized) lessonEmojisByLessonId else emptyMap()
+    fun lessonSigns(): Map<String, LessonSign> =
+        if (this::pack.isInitialized) lessonSignsByLessonId else emptyMap()
 
     /** Spoken cue for a locked/planned node — a tap must always produce feedback. */
     fun lockedLessonCue(): String = "Das üben wir später."
