@@ -1475,11 +1475,6 @@
       "fingerprint": "7033f24502b09a78",
       "profile": "prompt"
     },
-    "Füttere die Laut-Fresser.": {
-      "file": "prompt_5497562a3803.ogg",
-      "fingerprint": "7033f24502b09a78",
-      "profile": "prompt"
-    },
     "G": {
       "file": "phoneme_333e0a1e2781.ogg",
       "fingerprint": "84edeb15ccfe0b44",
@@ -1532,7 +1527,7 @@
     },
     "H": {
       "file": "phoneme_44bd7ae60f47.ogg",
-      "fingerprint": "c72ee2d70d99c12a",
+      "fingerprint": "dd01907a29c6c790~0.241-0.650",
       "profile": "phoneme"
     },
     "H - wie Hand.": {
@@ -1732,7 +1727,7 @@
     },
     "K": {
       "file": "phoneme_86be9a55762d.ogg",
-      "fingerprint": "9d1dcec473ccd302",
+      "fingerprint": "d7aca1b7491d45e1~0.358-0.816",
       "profile": "phoneme"
     },
     "K - wie Keks.": {
@@ -4407,7 +4402,7 @@
     },
     "la": {
       "file": "phoneme_b737ca7ee563.ogg",
-      "fingerprint": "d3edd3aa38e8c374",
+      "fingerprint": "ad45f5805a58150d~0.266-0.710",
       "profile": "phoneme"
     },
     "lachen": {
@@ -4507,7 +4502,7 @@
     },
     "pa": {
       "file": "phoneme_9513229d4359.ogg",
-      "fingerprint": "a5c2c94024908b0d",
+      "fingerprint": "ef4414c7b92b50cc~0.258-0.667",
       "profile": "phoneme"
     },
     "pe": {
@@ -4542,7 +4537,7 @@
     },
     "scha": {
       "file": "phoneme_f86d480308cb.ogg",
-      "fingerprint": "7b691684ef935511",
+      "fingerprint": "90cc90c6bd5d78ac",
       "profile": "phoneme"
     },
     "schu": {

@@ -926,8 +926,8 @@
       "sourceText": "Baum"
     },
     "phoneme:44bd7ae60f47": {
-      "seed": 483386276,
-      "textOverride": "Ha.",
+      "seed": 632486025,
+      "textOverride": "Das H.",
       "sourceText": "H"
     },
     "phoneme:495f851d2eed": {
@@ -1046,8 +1046,8 @@
       "sourceText": "ruh"
     },
     "phoneme:86be9a55762d": {
-      "seed": 243544604,
-      "textOverride": "Kah!",
+      "seed": 1020402770,
+      "textOverride": "Das K.",
       "sourceText": "K"
     },
     "phoneme:882ec0ce952f": {
@@ -1086,8 +1086,8 @@
       "sourceText": "geh"
     },
     "phoneme:9513229d4359": {
-      "seed": 1301789325,
-      "textOverride": "Pah.",
+      "seed": 311631161,
+      "textOverride": "Der Pah.",
       "sourceText": "pa"
     },
     "phoneme:9c3aee7110b7": {
@@ -1144,8 +1144,8 @@
       "sourceText": "fi"
     },
     "phoneme:b737ca7ee563": {
-      "seed": 1314977224,
-      "textOverride": "lah.",
+      "seed": 1428849799,
+      "textOverride": "Das lah.",
       "sourceText": "la"
     },
     "phoneme:ba6b95d82755": {
@@ -1255,6 +1255,7 @@
     },
     "phoneme:f86d480308cb": {
       "seed": 5382596,
+      "textOverride": "Die Silbe \"scha\".",
       "sourceText": "scha"
     },
     "phoneme:fa18c06733fb": {
