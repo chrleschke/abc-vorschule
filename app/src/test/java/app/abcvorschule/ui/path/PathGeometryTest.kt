@@ -68,7 +68,7 @@ class PathGeometryTest {
         // vertical margin did). 360 - 2 * 84 = 192dp of swing against a 136dp
         // board. Asserted on the shipped defaults, not on this class's fixture.
         val screenWidth = 360f
-        val boardWidth = PathSignDimens.BoardWidth.value
+        val boardWidth = PathSignDimens.Width.value
         val nominalSwing = screenWidth - 2 * PathGeometry.DefaultHorizontalMargin
         assertTrue(
             "swing $nominalSwing dp at 360dp width must exceed the ${boardWidth}dp sign",
@@ -91,7 +91,7 @@ class PathGeometryTest {
         // content, and everything a node carries is drawn *above* it: the sign, and
         // above that the "you are here" marker. Too small a margin silently clips the
         // marker off the top of the path — the one place it must never be invisible.
-        val needed = PathSignDimens.TotalHeight.value + PathMarkerDimens.Headroom.value
+        val needed = PathSignDimens.MaxTotalHeight.value + PathMarkerDimens.Headroom.value
         assertTrue(
             "DefaultMargin ${PathGeometry.DefaultMargin} must cover sign + marker ($needed dp)",
             PathGeometry.DefaultMargin >= needed,

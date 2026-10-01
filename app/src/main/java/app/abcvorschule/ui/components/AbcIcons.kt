@@ -287,6 +287,52 @@ fun IconLock(
 }
 
 /**
+ * Wiederholung: ein Kreispfeil im Uhrzeigersinn. Steht auf den Pfad-Schildern der
+ * Wiederholungslektionen, wo früher ein „+" im Label stand, das kein Kind liest.
+ */
+@Composable
+fun IconRepeat(
+    tint: Color,
+    modifier: Modifier = Modifier,
+    size: Dp = 22.dp,
+) {
+    Canvas(modifier.size(size)) {
+        val w = size.toPx()
+        val stroke = w * 0.13f
+        val inset = w * 0.2f
+        // Bogen im Uhrzeigersinn, oben rechts offen; die Spitze sitzt am Bogenende
+        // und zeigt entlang der Tangente in Laufrichtung.
+        val startDeg = -20f
+        val sweepDeg = 290f
+        drawArc(
+            color = tint,
+            startAngle = startDeg,
+            sweepAngle = sweepDeg,
+            useCenter = false,
+            topLeft = Offset(inset, inset),
+            size = androidx.compose.ui.geometry.Size(w - 2 * inset, w - 2 * inset),
+            style = Stroke(width = stroke, cap = StrokeCap.Round),
+        )
+        val r = (w - 2 * inset) / 2f
+        val c = Offset(w / 2f, w / 2f)
+        val end = Math.toRadians((startDeg + sweepDeg).toDouble())
+        val tip = c + Offset((r * kotlin.math.cos(end)).toFloat(), (r * kotlin.math.sin(end)).toFloat())
+        // Im Uhrzeigersinn (y nach unten) ist die Tangente (-sin, cos).
+        val dir = Offset(-kotlin.math.sin(end).toFloat(), kotlin.math.cos(end).toFloat())
+        val normal = Offset(-dir.y, dir.x)
+        val len = w * 0.22f
+        val half = w * 0.16f
+        val head = Path().apply {
+            moveTo(tip.x + dir.x * len * 0.7f, tip.y + dir.y * len * 0.7f)
+            lineTo(tip.x - dir.x * len * 0.3f + normal.x * half, tip.y - dir.y * len * 0.3f + normal.y * half)
+            lineTo(tip.x - dir.x * len * 0.3f - normal.x * half, tip.y - dir.y * len * 0.3f - normal.y * half)
+            close()
+        }
+        drawPath(head, tint)
+    }
+}
+
+/**
  * Löschen-Taste des Kinder-Ziffernblocks: ein Pfeil-Schild nach links mit einem
  * Kreuz darin — die Form, die Kinder von jeder Tastatur-Rücktaste kennen, ohne
  * Text.

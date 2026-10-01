@@ -160,16 +160,17 @@ val DuskSun = Color(0xFFF7A864)
 
 /**
  * Last hold-over from the retired night palette — kept solely because it still
- * has a live caller: the label lettering on PathSignNode's wood boards (see the
- * Signpost boards contrast notes below, measured against WoodDark/WoodMid/
- * WoodWarm). Every sibling constant from that palette (NightInk, NightPanel,
+ * has live callers on the path signs: the dimmed letters of locked blocks
+ * ([SignBlockLocked]) and the lock badge. (Until October 2026 it was the label
+ * lettering on the wood boards, measured in the notes below.) Every sibling constant from that palette (NightInk, NightPanel,
  * NightElevated, NightDeep, NightHorizon, SoftMint, SoftCoral, SoftSky,
  * SoftGold, MutedText) has been removed as unreferenced.
  */
 val SoftSand = Color(0xFFF2E8CF)
 
 /**
- * Signpost boards. Kept dark enough that SoftSand lettering stays above 4.5:1 on
+ * Signpost wood: the plank and post of every path sign (the lettering moved onto
+ * the ABC blocks in October 2026). Kept dark enough that SoftSand lettering stays above 4.5:1 on
  * every one of them — the lettering sits on the board, not on the sky behind it,
  * so this contrast pairing holds regardless of the surrounding theme. Measured
  * against SoftSand: WoodDark 13.06:1, WoodMid 9.22:1, WoodWarm 6.23:1.
@@ -210,3 +211,31 @@ val WoodWarm = Color(0xFF6B4E34)
 val WoodDarkShade = Color(0xFF201812)
 val WoodMidShade = Color(0xFF3F2E22)
 val WoodWarmShade = Color(0xFF5F462E)
+
+/**
+ * ABC-Klötze der Pfad-Schilder (seit Oktober 2026). Fünf Spielzeugtöne; welcher
+ * Klotz welchen bekommt, hängt am Laut, nicht am Platz auf dem Schild — `M` ist auf
+ * dem ganzen Pfad derselbe Klotz, auch in der Wiederholung. Die Töne tragen keine
+ * Bedeutung (kein „Vokale rot"), sie sollen nur unterscheiden.
+ *
+ * Jeder Ton ist hell genug, dass die Lernschrift in [WoodDark] darauf über 7:1 liegt
+ * (gemessen auf der Fläche `face`, dem dunkelsten Punkt des Verlaufs außer der
+ * Unterkante): Honig 10.0:1, Himmel 8.7:1, Blatt 9.0:1, Koralle 8.1:1, Flieder 8.3:1.
+ * Bewusst nicht die Rollenfarben der Zahlentürme (Honig/Himmelblau dort heißen
+ * „erste/zweite Zahl"), sondern weichere Geschwister davon.
+ *
+ * `hi` ist die Lichtkante oben links, `lo` die Schattenkante unten rechts, `rim` der
+ * Umriss — dieselbe Klotz-Grammatik wie in den Zahlentürmen.
+ */
+data class SignBlockTone(val face: Color, val hi: Color, val lo: Color, val rim: Color)
+
+val SignBlockTones = listOf(
+    SignBlockTone(Color(0xFFF4C766), Color(0xFFFFE3A3), Color(0xFFD9A440), Color(0xFFB07D2A)), // Honig
+    SignBlockTone(Color(0xFF9CC4E4), Color(0xFFCDE3F4), Color(0xFF6E9FC8), Color(0xFF4F7FA8)), // Himmel
+    SignBlockTone(Color(0xFF8ED1AE), Color(0xFFC4EBD5), Color(0xFF5FAE86), Color(0xFF428C67)), // Blatt
+    SignBlockTone(Color(0xFFF0A889), Color(0xFFFBD3C1), Color(0xFFD7825F), Color(0xFFB0603F)), // Koralle
+    SignBlockTone(Color(0xFFC9B2E6), Color(0xFFE6DAF5), Color(0xFFA287CB), Color(0xFF7F64A8)), // Flieder
+)
+
+/** Gesperrte Klötze: dunkles Holz. [SoftSand] bei 0.6 liegt darauf bei 4.97:1. */
+val SignBlockLocked = SignBlockTone(Color(0xFF3A2E23), Color(0xFF46382B), Color(0xFF2C221A), Color(0xFF241B14))

@@ -196,7 +196,7 @@ fun TaskShell(
                     lessons = viewModel.pathLessons(),
                     states = viewModel.lessonStates(),
                     unlockAllLessons = state.unlockAllLessons,
-                    emojisByLessonId = viewModel.lessonEmojis(),
+                    signsByLessonId = viewModel.lessonSigns(),
                     highlightedLessonId = viewModel.highlightedLessonId(),
                     advanceFromLessonId = state.pathAdvanceFromLessonId,
                     points = state.points,

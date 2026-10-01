@@ -60,4 +60,16 @@ class PathMarkerGeometryTest {
         assertEquals(50f, tip.x, 0.01f)
         assertEquals(500f - lift, tip.y, 0.01f)
     }
+
+    @Test
+    fun liftFollowsEachSignsOwnHeightAndBlendsMidHop() {
+        // Node 1 carries a two-row tower, the others one row: the pin stands higher
+        // there, and halfway through a hop its lift is halfway between the two.
+        val lifts = listOf(90f, 140f, 90f)
+        val onTall = PathMarkerGeometry.tipFor(nodes, 1f, { lifts[it] }, hop)!!
+        assertEquals(nodes[1].y - 140f, onTall.y, 0.01f)
+        val mid = PathMarkerGeometry.tipFor(nodes, 0.5f, { lifts[it] }, hop)!!
+        val straightY = (nodes[0].y + nodes[1].y) / 2f
+        assertEquals(straightY - 115f - hop, mid.y, 0.01f)
+    }
 }
