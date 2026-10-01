@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -21,8 +22,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import app.abcvorschule.content.Atom
 import app.abcvorschule.content.AtomKind
 import app.abcvorschule.content.ContentPack
+import app.abcvorschule.content.ContentRepository
 import app.abcvorschule.content.FeederSide
 import app.abcvorschule.content.Gender
+import app.abcvorschule.content.LetterTraceRound
 import app.abcvorschule.content.NounClass
 import app.abcvorschule.content.PackManifest
 import app.abcvorschule.content.SentenceOrderRound
@@ -226,4 +229,36 @@ class NightWorldShotTest {
 
     @Test
     fun towersBig() = towers(13, 4, MathOperation.Add, listOf(16, 17, 18), tap = false, solve = true, name = "towers-big")
+
+    /**
+     * Die runden Buchstaben aus dem ausgelieferten Pack, so wie das Kind sie sieht —
+     * zur Sichtprüfung von `tools/glyph_curves.py` (Bögen ohne sichtbare Ecken).
+     */
+    @Test
+    fun roundGlyphsInTheJungle() {
+        val pack = ContentRepository.fromContext(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+        ).load()
+        var atomId by mutableStateOf("letter-o")
+        rule.setContent {
+            InWorld(TrainerWorld.Jungle) {
+                val atom = pack.atom(atomId)
+                LetterTraceTrainer(
+                    round = LetterTraceRound(
+                        promptTts = "", atomId = atom.id, glyph = atom.display,
+                        rewardTts = "", rewardEmoji = "⭐",
+                    ),
+                    roundIndex = 0, atom = atom,
+                    ttsAvailable = true, speaking = false,
+                    onSpeakPrompt = {}, onSpeak = {}, onResult = { _, _, _ -> },
+                )
+            }
+        }
+        listOf("letter-o", "letter-oe", "letter-s", "letter-g", "letter-sz", "letter-sch", "letter-qu", "letter-c")
+            .forEach { id ->
+                atomId = id
+                rule.mainClock.advanceTimeBy(1_500)
+                save("trace-$id.png")
+            }
+    }
 }

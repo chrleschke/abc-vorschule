@@ -212,9 +212,9 @@ und ausgelassene Typen sind erlaubt, ein Rücksprung nicht. Abgelehnt wird ein P
 eine autorierte Lektion einen abgeleiteten Trainer enthält, Kachelfolgen das Zielwort nicht
 buchstabieren, eine Summe nicht stimmt, Strichdaten fehlen oder Referenzen ins Leere zeigen.
 
-## Schriften und Geräusche
+## Schriften, Geräusche und Buchstabenpfade
 
-Beides wird aus Werkzeugen im Repo erzeugt und als fertige Datei eingecheckt — die
+All das wird aus Werkzeugen im Repo erzeugt und als fertige Datei eingecheckt — die
 Quellen liegen nicht im Repo:
 
 - `tools/fonts/build_fonts.py` baut `res/font/silbo_fibel_*.ttf`, `baloo2.ttf` und
@@ -223,6 +223,12 @@ Quellen liegen nicht im Repo:
   Lizenztexte (SIL OFL) liegen unter `assets/licenses/`.
 - `tools/sfx/generate_sfx.py` erzeugt die elf Geräusche unter `assets/sfx/` (nur
   Python-Standardbibliothek plus `ffmpeg` mit libopus).
+- `tools/glyph_curves.py` erzeugt die **runden** Nachzeichen-Pfade in `atoms.json`
+  (O, C, G, S, J, U, B, P, R, D, ß und ihre Mehrzeichen-Formen) aus Ellipsen und
+  Bézierkurven, dicht abgetastet. Runde Pfade nicht von Hand in `atoms.json` ändern,
+  sondern im Skript; gerade Striche bleiben handautoriert. Danach
+  `tools/render_glyphs.py` zur Sichtprüfung. `GlyphLetterformTest` lässt pro Punkt nur
+  einen sanften Knick (≤ 12°) oder eine klare Ecke (≥ 30°) zu.
 
 ## Offline-Smoke-Skript (manuell)
 
