@@ -509,3 +509,28 @@ def test_monster_profile_exists_and_is_exportable():
     # monster ist eine Variante (siehe VARIANT_PROFILES) und steht deshalb
     # nicht in PROFILE_PRIORITY — es erreicht _collision_winner nie.
     assert "monster" in VARIANT_PROFILES
+
+
+def test_word_block_speech_mirrors_the_kotlin_rule():
+    from ttskit.extract import word_block_speech
+    letter_ae = {"id": "letter-ae", "lemma": "Ä", "display": "Ä"}
+    # Die Aufschrift zeigt das Atom → das Lemma wird gesprochen, kein eigener Clip.
+    assert word_block_speech(letter_ae, "Ä") is None
+    assert word_block_speech(letter_ae, "ä") is None
+    # Die Aufschrift ist ein anderes Stück → genau sie wird gesprochen.
+    assert word_block_speech(letter_ae, "är") == "är"
+    # Ohne Atom oder ohne Lemma spricht die App die Aufschrift.
+    assert word_block_speech(None, "Ha") == "Ha"
+    assert word_block_speech({"id": "x", "lemma": "", "display": "x"}, "Ha") == "Ha"
+    assert word_block_speech(letter_ae, " ") is None
+
+
+def test_word_blocks_that_speak_their_label_get_a_phoneme_clip():
+    items = extract_items(CONTENT_DIR)
+    blocks = [i for i in items if i.field == "blockTts"]
+    texts = {i.text for i in blocks}
+    # „Bär" = B + „är": die App spricht „är", also muss es im TTS-UI stehen.
+    assert "är" in texts
+    assert all(profile_for_item(i) == "phoneme" for i in blocks)
+    # Ein Baustein, der sein Atom zeigt („B" in „Bär"), bekommt keinen eigenen Clip.
+    assert "B" not in texts

@@ -38,6 +38,10 @@ FIELD_TO_PROFILE: dict[str, str] = {
     # artikuliert sein müssen; Laute und Wörter laufen in normaler Stimme und
     # werden erst in der App per Tonhöhe zum Monster.
     "monsterTts": "monster",
+    # Ein Wort-Bauer-Baustein, dessen Aufschrift nicht sein Atom ist („Bär" =
+    # B + „är", das Atom ist letter-ae): die App spricht die Aufschrift
+    # (SpeechClipText.forWordBlock). Silbenstücke wie „ma" — also Lautprofil.
+    "blockTts": "phoneme",
 }
 
 # Order matters: it decides the order of items within a round.
@@ -230,6 +234,28 @@ def _speech_reachable_atom_ids(tasks: list[dict]) -> set[str]:
     return reachable
 
 
+def word_block_speech(atom: dict | None, display: str) -> str | None:
+    """Was ein Wort-Bauer-Baustein sagt, wenn das *nicht* das Lemma seines Atoms ist.
+
+    Spiegelt `SpeechClipText.forWordBlock` in der App: zeigt der Baustein sein
+    Atom (Aufschrift = display oder lemma, ohne Groß/klein), spricht er das
+    Lemma — dafür gibt es den Atom-Clip schon, also None. Sonst spricht er die
+    Aufschrift, und genau dieser Text fehlte bis Oktober 2026 im TTS-UI („är"
+    in „Bär", „Ha" in „Hase"): die App fiel dort auf Android-TTS zurück.
+    """
+    if not display or not display.strip():
+        return None
+    if atom is None:
+        return display
+    lemma = atom.get("lemma") or ""
+    if not lemma.strip():
+        return display
+    shown = display.lower()
+    if shown in (str(atom.get("display", "")).lower(), lemma.lower()):
+        return None
+    return display
+
+
 def extract_items(content_dir: Path, extra_strings: dict | None = None,
                   blanks: list[str] | None = None,
                   monster_graphemes: Iterable[str] | None = None) -> list[Item]:
@@ -248,6 +274,7 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
     lessons = _load(content_dir, "lessons.json", "lessons")
 
     lesson_by_task, lesson_by_finale = _lesson_index(lessons)
+    atom_by_id = {atom["id"]: atom for atom in atoms}
     items: list[Item] = []
 
     def add(item_id: str, text: str, field: str, source: str,
@@ -314,6 +341,14 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
                 add(f"task:{task_id}:round:{index}:mathTask", math_task_text(round_) or "",
                     "mathTaskTts", "tasks.json", lesson,
                     f"{task_id} · Runde {index + 1} · Aufgabe")
+            for block_index, block in enumerate(round_.get("blocks") or []):
+                speech = word_block_speech(atom_by_id.get(block.get("atomId")),
+                                           block.get("display", ""))
+                if speech is None:
+                    continue
+                add(f"task:{task_id}:round:{index}:block:{block_index}", speech, "blockTts",
+                    "tasks.json", lesson,
+                    f"{task_id} · Runde {index + 1} · Baustein „{speech}“")
 
     if extra_strings:
         for entry in extra_strings.get("strings", []):
@@ -321,4 +356,9 @@ def extract_items(content_dir: Path, extra_strings: dict | None = None,
             add(f"ui:{entry['id']}", entry.get("text", ""), field,
                 "extra-strings.json", None, entry.get("note") or entry["id"])
 
-    return items
+    # Die App sucht Clips ohne Rücksicht auf Groß/klein (ClipIndex.lookup): ein
+    # Baustein „Da" spielt also das Wort „da", wenn es das schon gibt. Ein
+    # eigener Laut-Clip dafür wäre ein zweites Rendern desselben Klangs.
+    spoken_elsewhere = {i.text.strip().lower() for i in items if i.field != "blockTts"}
+    return [i for i in items
+            if i.field != "blockTts" or i.text.strip().lower() not in spoken_elsewhere]

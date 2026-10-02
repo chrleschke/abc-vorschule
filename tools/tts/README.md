@@ -59,6 +59,13 @@ Zweite Falle derselben Art: `stretchTts` läuft im Profil `phoneme` (es trägt d
 beim Ziehen gedehnt wird). Steht dort ein ganzes Wort, kollidiert es mit dem Wortclip —
 und `phoneme` gewinnt, das Kind hörte also die Lautdehnung, wo das Wort gemeint war.
 
+Wort-Bauer-Bausteine, deren Aufschrift nicht ihr Atom ist („Bär" = B + „är", das Atom von
+„är" ist `letter-ae`), sprechen in der App ihre Aufschrift (`SpeechClipText.forWordBlock`).
+Seit Oktober 2026 extrahiert `extract.word_block_speech` genau diese Aufschriften als Feld
+`blockTts` (Profil `phoneme`). Vorher tauchten sie im TTS-UI nicht auf, und die App fiel
+für sie auf Android-TTS zurück. Gibt es den Text schon als anderen Clip (Groß/klein egal,
+wie `ClipIndex.lookup`), entsteht kein zweiter.
+
 ## Ablauf
 
 ```bash
