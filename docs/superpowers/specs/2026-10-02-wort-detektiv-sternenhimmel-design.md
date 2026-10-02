@@ -138,8 +138,8 @@ Kurzfassung, falls betroffen.
   `StarFlight.offset(swaySign = -1)`.
 - **Hilfestufe „Beginner"** (Prinzip 6) bleibt: das gesuchte Segment liegt blass in der
   leeren Silhouette, wie vorher im Strich.
-- **Beibehalten:** der Schrägstrich im Formenpaar (`P / p`); das Mockup „Tomate" zeigt
-  `t · T` — das wäre eine Änderung von `SymbolInWordDerivation.targetLabel` und ist offen.
+- **Formenpaar mit Mittelpunkt** (`P · p`) statt Schrägstrich — freundlicher
+  (Nutzerentscheidung). Nur das Trennzeichen, die Reihenfolge der Formen bleibt.
 - **Standbilder:** `WordDetectiveShotTest` (kurzes/langes Wort, „Sch", Flug, alles
   gefunden, 360 dp Breite, 360 × 640 dp).
 

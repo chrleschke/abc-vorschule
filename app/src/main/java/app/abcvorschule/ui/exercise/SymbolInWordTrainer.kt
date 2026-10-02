@@ -417,11 +417,14 @@ private fun TargetLabelRow(
     ) {
         Text(text = label.primary, style = style)
         if (label.alternate != null) {
-            // A separator, not something to read: half size and dimmed so the two
-            // letters dominate (design doc §2). Decorative, not held to a contrast floor.
+            // A separator, not something to read: dimmed so the two letters dominate
+            // (design doc §2). Decorative, not held to a contrast floor. Ein Mittelpunkt
+            // statt des Schrägstrichs (Nutzerwunsch Oktober 2026): wirkt freundlicher und
+            // liest sich nicht als „oder"/„geteilt". Der Punkt ist von sich aus klein,
+            // darum in voller Schriftgröße — halb so groß wie der alte Strich verschwände er.
             Text(
-                text = "/",
-                style = style.copy(fontSize = density.glyphSize(size / 2), fontWeight = FontWeight.Normal, shadow = null),
+                text = "·",
+                style = style.copy(fontSize = density.glyphSize(size), fontWeight = FontWeight.Normal, shadow = null),
                 color = StarlightCream.copy(alpha = 0.45f),
             )
             Text(text = label.alternate, style = style)

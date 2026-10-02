@@ -155,7 +155,7 @@ ohne solche Fuge wird kleiner gesetzt statt falsch getrennt. Ein Treffer wird go
 und ein Stern fliegt in die nächste leere **Stern-Silhouette** unter dem Wort. Ein Fehltipp
 dreht das Segment einmal um seinen Mittelpunkt und kostet nichts. **Kein „Zeig mir"** (seit
 Oktober 2026): das Wort ist die ganze Auswahl, jeder Fehltipp spricht sein Segment vor. Der
-Buchstaben-Modus zeigt das Ziel als Formenpaar (`P / p`), damit „finde alle P" in „Papa"
+Buchstaben-Modus zeigt das Ziel als Formenpaar (`P · p`), damit „finde alle P" in „Papa"
 nicht schwerer ist als es aussieht; Silben stehen nur klein. Details und Beispiele:
 [Wort-Detektiv-Design](superpowers/specs/2026-07-31-wort-detektiv-design.md), ergänzt und wo
 nötig ersetzt durch
@@ -1203,7 +1203,7 @@ Wenn eine Änderung vorgeschlagen wird, prüfen:
 | Sieht eine geschaffte Lektion danach noch gesperrt aus (frei gewählte Reihenfolge)? | Nein → eigener Fortschritt schlägt die Sperre |
 | Erkennt das Kind ohne Text, welches Schild jetzt dran ist?                   | Ja → Nebelring + Auto-Scroll         |
 | Zeigt ein abgeleiteter Trainer ein Graphem, das die Lektion noch nicht kennt?  | Nein → Graphem-Tabelle ist lektionsbeschränkt |
-| Verlangt der Wort-Detektiv einen Tipp auf eine Form, die er nicht zeigt?       | Buchstaben nein → Paar `P / p`; Silben zeigen nur die Kleinform, der Treffer darf die Großform sein |
+| Verlangt der Wort-Detektiv einen Tipp auf eine Form, die er nicht zeigt?       | Buchstaben nein → Paar `P · p`; Silben zeigen nur die Kleinform, der Treffer darf die Großform sein |
 
 
 Siehe auch `[AGENTS.md](../AGENTS.md)` für den Arbeitsprozess und Dokumentationspflichten.
