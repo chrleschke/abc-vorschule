@@ -1,15 +1,14 @@
 package app.abcvorschule.ui.path
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,7 +53,6 @@ import app.abcvorschule.ui.components.IconRepeat
 import app.abcvorschule.ui.components.IconStar
 import app.abcvorschule.ui.theme.AbcMotion
 import app.abcvorschule.ui.theme.Cream
-import app.abcvorschule.ui.theme.LeafGreenLight
 import app.abcvorschule.ui.theme.SignBlockLocked
 import app.abcvorschule.ui.theme.SignBlockTone
 import app.abcvorschule.ui.theme.SignBlockTones
@@ -64,13 +61,8 @@ import app.abcvorschule.ui.theme.SilboFibel
 import app.abcvorschule.ui.theme.SkyBlueLight
 import app.abcvorschule.ui.theme.SoftSand
 import app.abcvorschule.ui.theme.StarGold
-import app.abcvorschule.ui.theme.WarmMuted
 import app.abcvorschule.ui.theme.WoodDark
 import app.abcvorschule.ui.theme.WoodDarkShade
-import app.abcvorschule.ui.theme.WoodMid
-import app.abcvorschule.ui.theme.WoodMidShade
-import app.abcvorschule.ui.theme.WoodWarm
-import app.abcvorschule.ui.theme.WoodWarmShade
 import app.abcvorschule.ui.world.rememberReduceMotion
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -81,8 +73,9 @@ import kotlin.math.sin
 
 /**
  * Sizes of a path sign, in dp. Pure numbers, so geometry and tests can reason about
- * them without Compose. A sign is a small tower of ABC blocks on a plank on a post;
- * its height depends on how many rows the tower has, its layout box does not.
+ * them without Compose. A sign is a small tower of ABC blocks standing free by the
+ * trail (no plank, no post since October 2026); its height depends on how many rows
+ * the tower has, its layout box does not.
  *
  * The blocks are a painted object in the landscape and do not grow with the
  * system font scale (dp-stable lettering on a pictorial object is the sanctioned
@@ -100,12 +93,13 @@ internal object PathSignLayout {
     const val RowGapDp = 3f
     const val GlyphDp = 30f
     const val PictureDp = 28f
-    const val ShelfHeightDp = 12f
-
-    /** The plank reaches this far past the tower on each side. */
-    const val ShelfOverhangDp = 6f
-    const val PostHeightDp = 26f
     const val PerRow = 2
+
+    /**
+     * Room a sign needs above its tower: the corner badges ride 10dp over the top row
+     * (see SignBadges), plus a little air so they never touch the top bar.
+     */
+    const val HeadroomDp = 14f
 
     /**
      * The layout box every sign is centred in. Wide enough for the widest pair the
@@ -143,14 +137,12 @@ internal object PathSignLayout {
         return rows * BlockDp + (rows - 1) * RowGapDp
     }
 
-    /** From the foot of the post to the top of the tower. */
-    fun totalHeightDp(blockCount: Int): Float = towerHeightDp(blockCount) + ShelfHeightDp + PostHeightDp
-
-    fun shelfWidthDp(glyphs: List<String>): Float {
+    /** Width of the widest row — the bottom one, or the top one when a wide sound sits there. */
+    fun towerWidthDp(glyphs: List<String>): Float {
         val widest = rows(glyphs).maxOf { row ->
             row.sumOf { blockWidthDp(it).toDouble() }.toFloat() + (row.size - 1).coerceAtLeast(0) * BlockGapDp
         }
-        return max(widest, BlockDp) + 2 * ShelfOverhangDp
+        return max(widest, BlockDp)
     }
 }
 
@@ -160,10 +152,14 @@ object PathSignDimens {
     val Width = PathSignLayout.WidthDp.dp
 
     /** The tallest sign the layout can produce: two rows of blocks. Used where one
-     *  number has to cover every sign (the path's top margin, the scroll headroom). */
-    val MaxTotalHeight = PathSignLayout.totalHeightDp(PathSignLayout.PerRow * 2).dp
+     *  number has to cover every sign (the path's top margin). */
+    val MaxHeight = PathSignLayout.towerHeightDp(PathSignLayout.PerRow * 2).dp
 
-    fun totalHeight(blockCount: Int) = PathSignLayout.totalHeightDp(blockCount).dp
+    /** From the node (the tower's foot) to the top of the tower. */
+    fun height(blockCount: Int) = PathSignLayout.towerHeightDp(blockCount).dp
+
+    /** See [PathSignLayout.HeadroomDp]. */
+    val Headroom = PathSignLayout.HeadroomDp.dp
 }
 
 /**
@@ -207,10 +203,11 @@ internal object CubeTurn {
  * Choreography of the current sign: its cubes turn one after another to show the
  * picture on their side ("M ... wie Mond"), hold, and turn back; then the sign rests.
  * Own numbers under AbcMotion's rule 3 (Figurenspiel) — and the one idle motion on the
- * path besides the marker's bob. It replaces the ring pulse the current sign had.
+ * path besides the fog ring under the same sign. It replaces the ring pulse the
+ * current sign had.
  */
 internal object SignTurnChoreo {
-    /** After the path appears, so the child has found the pin first. */
+    /** After the path appears, so the child has found the fog ring first. */
     const val FirstDelayMs = 1400L
     const val StaggerMs = AbcMotion.ShortMs.toLong()
     const val HoldMs = 1600L
@@ -220,19 +217,23 @@ internal object SignTurnChoreo {
 }
 
 /**
- * A lesson as a small tower of ABC blocks on a plank: one cube per sound, in its
- * capital form, with the sound's Anlaut picture on the cube's side. Only the
- * current sign turns its cubes to show the pictures; every other sign shows the
- * letters alone, which keeps the path calm. Locked signs carry a lock and dark,
- * dimmed blocks — the letters stay legible, so the path shows what is ahead.
+ * A lesson as a small tower of ABC blocks: one cube per sound, in its capital form,
+ * with the sound's Anlaut picture on the cube's side. Only the current sign turns its
+ * cubes to show the pictures; every other sign shows the letters alone, which keeps
+ * the path calm. Locked signs carry a lock and dark, dimmed blocks — the letters stay
+ * legible, so the path shows what is ahead. The state lives in the corner badges
+ * (star, started, lock) and the blocks' colour; "this one is next" is the fog ring
+ * the current sign stands in.
  *
  * @param playable Whether a tap opens the lesson. The caller owns this because the
  * parent's "free order" switch feeds into it — a sign can be [LessonState.Locked]
  * and still playable.
  * @param tag Stable id for tests.
+ * @param ring The fog ring under the tower: the current sign's, or the one fading out
+ * on the sign the child just finished. Null everywhere else.
  */
 @Composable
-fun PathSignNode(
+internal fun PathSignNode(
     sign: LessonSign,
     tag: String,
     state: LessonState,
@@ -241,31 +242,11 @@ fun PathSignNode(
     index: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    ring: FogRing? = null,
 ) {
     // Deliberately not `!playable`: a parent-unlocked sign keeps the dimmed look of the
     // lesson the child has not reached yet, so the path still shows where it stands.
     val dimmed = state == LessonState.Locked || state == LessonState.Planned
-    val shelf = when (state) {
-        LessonState.Mastered -> WoodWarm
-        LessonState.Available, LessonState.InProgress -> WoodMid
-        LessonState.Locked, LessonState.Planned -> WoodDark
-    }
-    // The post stands behind the plank, so it takes the plank's own shade instead of
-    // one global post tone — a single tone would sit above WoodDark and flip the depth
-    // on every locked sign.
-    val shade = when (state) {
-        LessonState.Mastered -> WoodWarmShade
-        LessonState.Available, LessonState.InProgress -> WoodMidShade
-        LessonState.Locked, LessonState.Planned -> WoodDarkShade
-    }
-    // The light variants on dark wood (LeafGreenLight on WoodMid 5.65:1, on WoodWarm
-    // 3.82:1; SkyBlueLight on WoodMid 5.37:1) — LeafGreen/SkyBlue themselves are
-    // calibrated against Cream and vanish on wood.
-    val ring: Color = when (state) {
-        LessonState.Mastered, LessonState.Available -> LeafGreenLight
-        LessonState.InProgress -> SkyBlueLight
-        LessonState.Locked, LessonState.Planned -> WarmMuted.copy(alpha = 0.55f)
-    }
     val stateDesc = stringResource(
         when {
             // What TalkBack has to convey is whether the sign opens, so a
@@ -276,8 +257,8 @@ fun PathSignNode(
         },
     )
     val nodeDesc = stringResource(R.string.path_node)
-    // The marker above the sign is decorative for TalkBack, so "this is the one" has
-    // to reach a screen-reader user here, on the sign itself.
+    // The fog ring is decorative for TalkBack, so "this is the one" has to reach a
+    // screen-reader user here, on the sign itself.
     val currentDesc = if (highlighted) ", ${stringResource(R.string.lesson_current)}" else ""
     val spoken = sign.blocks.joinToString(", ") { it.glyph }
 
@@ -307,101 +288,92 @@ fun PathSignNode(
         }
     }
 
+    val towerWidthDp = remember(sign) { PathSignLayout.towerWidthDp(sign.blocks.map { it.glyph }) }
     Box(
         modifier = modifier
             .width(PathSignDimens.Width)
-            .height(PathSignDimens.totalHeight(sign.blocks.size))
+            .height(PathSignDimens.height(sign.blocks.size))
             .clickable(onClick = onClick)
             .semantics { contentDescription = "$nodeDesc $spoken, $stateDesc$currentDesc" }
             .testTag("path_node_$tag"),
     ) {
-        Column(
-            modifier = Modifier
+        // Hintere Ringhälfte vor dem Turm gezeichnet, also hinter ihm; die vordere danach.
+        if (ring != null) FogRingBack(ring, towerWidthDp, Modifier.matchParentSize())
+        Box(
+            Modifier
                 .align(Alignment.BottomCenter)
-                // A hand-built sign is never perfectly straight. Deterministic, so it
-                // does not re-tilt on recomposition.
-                .graphicsLayer { rotationZ = 1.5f * PathNoise.signed(index, salt = 5) }
-                .width(IntrinsicSize.Max),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Box(
-                Modifier
-                    .padding(horizontal = PathSignLayout.ShelfOverhangDp.dp)
-                    // Am Abendhimmel: erreichbare Schilder leuchten warm, als hinge eine
-                    // Laterne daneben — sonst verschwände das Brett im Dunkel.
-                    .drawBehind {
-                        if (!dimmed) {
-                            val r = size.maxDimension * 0.85f
-                            drawCircle(
-                                brush = Brush.radialGradient(
-                                    0.35f to SignGlow.copy(alpha = if (highlighted) 0.55f else 0.34f),
-                                    1f to Color.Transparent,
-                                    center = center,
-                                    radius = r,
-                                ),
-                                radius = r,
+                // Am Abendhimmel: erreichbare Schilder leuchten warm, als hinge eine
+                // Laterne daneben — sonst verschwänden die Klötze im Dunkel. Das
+                // aktuelle nicht: dort ist der Nebelring das Licht, und ein Schein
+                // dahinter wüsche ihn zu einem orangen Fleck aus.
+                .drawBehind {
+                    if (!dimmed && !highlighted) {
+                        val r = size.maxDimension * 0.85f
+                        drawCircle(
+                            brush = Brush.radialGradient(
+                                0.35f to SignGlow.copy(alpha = 0.34f),
+                                1f to Color.Transparent,
                                 center = center,
-                            )
-                        }
-                    },
+                                radius = r,
+                            ),
+                            radius = r,
+                            center = center,
+                        )
+                    }
+                },
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(PathSignLayout.RowGapDp.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(PathSignLayout.RowGapDp.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    val rows = PathSignLayout.rows(sign.blocks.withIndex().toList())
-                    // Rows are listed bottom first; a Column lays out top first.
-                    rows.asReversed().forEachIndexed { level, row ->
-                        // Badges hang on the top row, not on the tower's box: with three
-                        // sounds the top row is one block wide, and the box's corner
-                        // above the lower row's second block is empty air.
-                        Box {
-                            Row(horizontalArrangement = Arrangement.spacedBy(PathSignLayout.BlockGapDp.dp)) {
-                                if (row.isEmpty()) {
-                                    // A planned lesson without sounds: one blank block, so
-                                    // the sign is not an empty plank.
-                                    SignCube(SignBlock("", "", null, 0), SignBlockLocked, dimmed = true, turn = { 0f }, tilt = 0f)
-                                }
-                                row.forEach { (i, block) ->
-                                    SignCube(
-                                        block = block,
-                                        tone = if (dimmed) SignBlockLocked else toneFor(block),
-                                        dimmed = dimmed,
-                                        turn = { turns[i].value },
-                                        tilt = 3f * PathNoise.signed(index * 8 + i, salt = 13),
-                                    )
-                                }
+                val rows = PathSignLayout.rows(sign.blocks.withIndex().toList())
+                // Rows are listed bottom first; a Column lays out top first.
+                rows.asReversed().forEachIndexed { level, row ->
+                    // Badges hang on the top row, not on the tower's box: with three
+                    // sounds the top row is one block wide, and the box's corner
+                    // above the lower row's second block is empty air.
+                    Box {
+                        Row(horizontalArrangement = Arrangement.spacedBy(PathSignLayout.BlockGapDp.dp)) {
+                            if (row.isEmpty()) {
+                                // A planned lesson without sounds: one blank block, so
+                                // the sign is not empty ground.
+                                SignCube(SignBlock("", "", null, 0), SignBlockLocked, dimmed = true, turn = { 0f }, tilt = 0f)
                             }
-                            if (level == 0) {
-                                SignBadges(
-                                    state = state,
-                                    playable = playable,
-                                    review = sign.review,
-                                    modifier = Modifier.matchParentSize(),
+                            row.forEach { (i, block) ->
+                                SignCube(
+                                    block = block,
+                                    tone = if (dimmed) SignBlockLocked else toneFor(block),
+                                    dimmed = dimmed,
+                                    turn = { turns[i].value },
+                                    tilt = 3f * PathNoise.signed(index * 8 + i, salt = 13),
                                 )
                             }
+                        }
+                        if (level == 0) {
+                            SignBadges(
+                                state = state,
+                                playable = playable,
+                                review = sign.review,
+                                modifier = Modifier.matchParentSize(),
+                            )
                         }
                     }
                 }
             }
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(PathSignLayout.ShelfHeightDp.dp)
-                    .background(shelf, PlankShape)
-                    .border(2.dp, ring, PlankShape),
-            )
-            Box(
-                Modifier
-                    .width(10.dp)
-                    .height(PathSignLayout.PostHeightDp.dp)
-                    .background(shade, RoundedCornerShape(bottomStart = 3.dp, bottomEnd = 3.dp)),
-            )
         }
+        if (ring != null) FogRingFront(ring, towerWidthDp, Modifier.matchParentSize())
     }
 }
 
-/** Star (mastered) or lock (not playable) at the top right, ↻ for a review at the top left. */
+/**
+ * Star (mastered), half-full disc (started) or lock (not playable) at the top right,
+ * ↻ for a review at the top left.
+ *
+ * "Started" was the plank's blue rim until October 2026 (green meant reachable, which
+ * the lit blocks already say). It is the one state nothing else on the sign shows —
+ * a lesson begun out of order, or one finished with "Zeig mir" and not yet alone —
+ * so it moved here instead of disappearing with the plank.
+ */
 @Composable
 private fun SignBadges(state: LessonState, playable: Boolean, review: Boolean, modifier: Modifier) {
     Box(modifier.clearAndSetSemantics {}) {
@@ -418,6 +390,20 @@ private fun SignBadges(state: LessonState, playable: Boolean, review: Boolean, m
                 // Gold star on dark wood, like every other star in the app; the flat
                 // silhouette, because the deep outline only eats a glyph this small.
                 IconStar(tint = StarGold, outline = StarGold, size = 15.dp)
+            }
+            // SkyBlue = progress (§10), the light variant because it sits on dark wood
+            // (SkyBlueLight on WoodDarkShade > 5.4:1). A half pie inside the badge's
+            // ring: half done. The ring keeps it from reading as a moon, which the
+            // cube next to it may well show (🌙).
+            state == LessonState.InProgress && playable -> Box(
+                corner
+                    .align(Alignment.TopEnd)
+                    .offset(x = 8.dp, y = (-10).dp)
+                    .background(WoodDarkShade, CircleShape)
+                    .border(1.5.dp, SkyBlueLight, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                HalfPie(SkyBlueLight, Modifier.size(15.dp))
             }
             // The child cannot read, so "not yet" must not rest on the dark blocks
             // alone. Vector lock, not the 🔒 emoji: the emoji renders vendor-gold and
@@ -542,6 +528,14 @@ private fun SignCube(block: SignBlock, tone: SignBlockTone, dimmed: Boolean, tur
     }
 }
 
+/** The right half of a disc, like a clock at half past: begun, not finished. */
+@Composable
+private fun HalfPie(tint: Color, modifier: Modifier) {
+    Canvas(modifier) {
+        drawArc(color = tint, startAngle = -90f, sweepAngle = 180f, useCenter = true)
+    }
+}
+
 /** Block grammar of the Zahlentürme: light edge top left, shadow bottom right, rim, sheen. */
 /**
  * @param sheen The glossy bar top left. Only lit blocks carry it: on a locked block's
@@ -573,7 +567,6 @@ private fun DrawScope.drawFaceShade(alpha: Float) {
 /** Same sound, same tone, everywhere on the path (see [SignBlock.tone]). */
 private fun toneFor(block: SignBlock): SignBlockTone = SignBlockTones[Math.floorMod(block.tone, SignBlockTones.size)]
 
-private val PlankShape = RoundedCornerShape(4.dp)
 private val BadgeSize = 24.dp
 
 /** Warmes Laternenlicht hinter erreichbaren Schildern. */

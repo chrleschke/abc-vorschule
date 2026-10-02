@@ -86,16 +86,26 @@ class PathGeometryTest {
     }
 
     @Test
-    fun defaultMarginLeavesRoomForASignAndItsMarker() {
+    fun defaultMarginLeavesRoomForASignAndItsBadges() {
         // The first node sits exactly DefaultMargin below the top of the scroll
-        // content, and everything a node carries is drawn *above* it: the sign, and
-        // above that the "you are here" marker. Too small a margin silently clips the
-        // marker off the top of the path — the one place it must never be invisible.
-        val needed = PathSignDimens.MaxTotalHeight.value + PathMarkerDimens.Headroom.value
+        // content, and the sign it carries is drawn *above* it, its badges riding
+        // over the top row. Too small a margin silently clips the first sign's star
+        // or lock off the top of the path.
+        val needed = PathSignDimens.MaxHeight.value + PathSignDimens.Headroom.value
         assertTrue(
-            "DefaultMargin ${PathGeometry.DefaultMargin} must cover sign + marker ($needed dp)",
+            "DefaultMargin ${PathGeometry.DefaultMargin} must cover sign + badges ($needed dp)",
             PathGeometry.DefaultMargin >= needed,
         )
+    }
+
+    @Test
+    fun defaultMarginLeavesRoomForTheFogRingBelowTheLastSign() {
+        // The ring lies at the foot of the sign, so it is the one thing that reaches
+        // *below* a node — the last sign's ring must not be cut by the content edge,
+        // not even with the pulse fully spread.
+        val widest = FogRingGeometry.band(PathSignDimens.Width.value, PathPoint(0f, 0f))
+        val reach = maxOf(FogRingGeometry.haze(widest).bottom, widest.scaled(FogRingGeometry.PulseMaxScale).bottom)
+        assertTrue("ring reaches ${reach}dp below the node", PathGeometry.DefaultMargin >= reach)
     }
 
     @Test

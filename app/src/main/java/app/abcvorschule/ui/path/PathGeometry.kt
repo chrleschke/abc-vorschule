@@ -12,12 +12,15 @@ data class PathPoint(val x: Float, val y: Float)
  * same (index, salt) always yields the same value in (-1f, 1f).
  *
  * The salt is what keeps two effects from moving in lockstep, so it is allocated
- * centrally here. Taken, across three files:
+ * centrally here. Taken, across four files:
  *
  * - 3 — horizontal node jitter ([PathGeometry.points])
- * - 5 — signpost tilt (`PathSignNode`)
+ * - 5 — free again: the tilt of the whole sign, gone with plank and post (Oct 2026)
  * - 7 — vertical node jitter ([PathGeometry.yOffsets])
  * - 11 — trail dot radius (`PathTrail.dots`)
+ * - 13 — tilt of each block (`PathSignNode`)
+ * - 17 — fog patches of the ring (`PathFogRing`)
+ * - 19 — grain spacing of the ring (`PathFogRing`)
  *
  * Pick an unused one for anything new: reusing a salt correlates two effects that
  * are supposed to look independent, and nothing crashes to tell you.
@@ -48,12 +51,15 @@ object PathGeometry {
      * first sign. See [DefaultHorizontalMargin] for the horizontal inset, which has
      * no such constraint.
      *
-     * The floor is the tallest sign (`PathSignDimens.MaxTotalHeight`, two rows of
-     * blocks: 145dp) plus the headroom the "you are here" marker needs above it
-     * (`PathMarkerDimens.Headroom`, 50dp) = 195dp; hence 196. Asserted in
-     * PathGeometryTest. (168 while every sign was a 116dp board.)
+     * The floor is the tallest sign (`PathSignDimens.MaxHeight`, two rows of
+     * blocks: 107dp) plus the room its badges need above it
+     * (`PathSignDimens.Headroom`, 14dp) = 121dp; hence 124. The fog ring lies at
+     * the foot of the sign and needs no headroom; below the last node it reaches
+     * some 25dp, well inside the same margin. Asserted in PathGeometryTest. (196
+     * with plank, post and the "you are here" pin above the sign; 168 while every
+     * sign was a 116dp board.)
      */
-    const val DefaultMargin = 196f
+    const val DefaultMargin = 124f
 
     /**
      * Horizontal inset: how far the swing's outer edge stays from each screen

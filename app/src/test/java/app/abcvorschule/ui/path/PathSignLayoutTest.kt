@@ -13,10 +13,10 @@ class PathSignLayoutTest {
     @Test
     fun everyShippedSignFitsItsLayoutBox() {
         // The swing in PathGeometry is sized against this box (PathGeometryTest), so
-        // a plank wider than it would run into the trail.
+        // a tower wider than it would run into the trail.
         pack.lessons.forEach { lesson ->
             val glyphs = LessonSigns.forLesson(pack, lesson).blocks.map { it.glyph }
-            val width = PathSignLayout.shelfWidthDp(glyphs)
+            val width = PathSignLayout.towerWidthDp(glyphs)
             assertTrue("${lesson.id} $glyphs is ${width}dp wide", width <= PathSignLayout.WidthDp)
         }
     }
@@ -35,8 +35,8 @@ class PathSignLayoutTest {
         assertEquals(1, PathSignLayout.rowCount(1))
         assertEquals(1, PathSignLayout.rowCount(2))
         assertEquals(2, PathSignLayout.rowCount(4))
-        assertTrue(PathSignLayout.totalHeightDp(3) > PathSignLayout.totalHeightDp(2))
-        assertEquals(PathSignLayout.totalHeightDp(4), PathSignDimens.MaxTotalHeight.value, 0f)
+        assertTrue(PathSignLayout.towerHeightDp(3) > PathSignLayout.towerHeightDp(2))
+        assertEquals(PathSignLayout.towerHeightDp(4), PathSignDimens.MaxHeight.value, 0f)
     }
 
     @Test

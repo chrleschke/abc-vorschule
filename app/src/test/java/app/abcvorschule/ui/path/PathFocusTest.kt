@@ -111,21 +111,22 @@ class PathFocusTest {
     // ---- entryScrollTarget ----
     //
     // All in dp-as-px (density 1). The hop headroom is the hop start's sign
-    // height plus the marker column above it — here the common one-row sign of
-    // two sounds — and the from-node sits one default spacing (168dp) above the
+    // height plus its badges above it — here the common one-row sign of two
+    // sounds — and the from-node sits one default spacing (168dp) above the
     // head node, the geometry the finding was verified against.
 
     private val hopHeadroom =
-        (PathSignDimens.totalHeight(2) + PathMarkerDimens.Headroom).value // 140dp
+        (PathSignDimens.height(2) + PathSignDimens.Headroom).value // 66dp
     private val fromY = 1000f
     private val headY = fromY + PathGeometry.DefaultSpacing // 1168
 
     @Test
     fun entryScrollShowsTheHopStartOnSmallViewports() {
-        // 470dp (a 640dp phone minus chrome) and 640dp: the plain head target
-        // would put the hop's start above the top edge — off screen entirely
-        // below ~690dp — so the entry target must pull back up.
-        for (viewport in listOf(470, 640)) {
+        // 470dp (a 640dp phone minus chrome) and 540dp: the plain head target
+        // would put the hop's start above the top edge (below ~557dp, since the
+        // pin is gone and a sign is only its tower) — so the entry target must
+        // pull back up.
+        for (viewport in listOf(470, 540)) {
             val headTarget = PathFocus.scrollTarget(headY, viewport, maxScroll = 5000)
             val entry = PathFocus.entryScrollTarget(fromY, headY, hopHeadroom, viewport, maxScroll = 5000)
             val hopStartTop = fromY - hopHeadroom

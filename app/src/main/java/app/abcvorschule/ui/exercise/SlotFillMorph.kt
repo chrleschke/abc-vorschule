@@ -31,7 +31,7 @@ import app.abcvorschule.ui.theme.AbcMotion
  *   den Ruheradius des Bauteils zurück — weicher beim Einrasten, ruhig im Sitzen.
  *
  * Alles drei wird in der **Zeichenphase** gelesen (`graphicsLayer` / `drawBehind`),
- * nicht in der Komposition — gleiche Begründung wie in `PathHereMarker`: eine
+ * nicht in der Komposition — gleiche Begründung wie beim Nebelring (`PathFogRing`): eine
  * Federphase darf keine 300ms lang rekomponieren, und Layout-Bounds dürfen dabei
  * nicht zittern, sonst wandert die registrierte Drop-Zone unter dem Finger weg.
  *

@@ -329,10 +329,15 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
   im Mittel alle 10 s eine, jede braucht 90–150 s bis über den oberen Rand und pendelt dabei
   leicht; ferne sind kleiner, langsamer und blasser. Sie sind reine Stimmung, ohne Aufgabe, und
   stehen bei „Bewegung reduzieren" still — der Himmel ist dann trotzdem voll. Erreichbare
-  Schilder leuchten warm, Stern und Punktestand stehen hell auf dem Himmel. Ein Schild pro
-  Lektion: **ABC-Klötze auf einem Brett** (`PathSignNode`), ein Klotz pro Laut (§4); ein oder
-  zwei Laute stehen nebeneinander, drei oder vier werden zu einem Turm gestapelt (zweite
-  Reihe obendrauf, das Brett bleibt am Weg). Die Klötze sind **Würfel**: vorn der Buchstabe,
+  Schilder leuchten warm (außer dem aktuellen, dort ist der Nebelring das Licht), Stern und
+  Punktestand stehen hell auf dem Himmel. Ein Schild pro Lektion: **ABC-Klötze, frei am Weg
+  stehend** (`PathSignNode`), ein Klotz pro Laut (§4); ein oder zwei Laute stehen
+  nebeneinander, drei oder vier werden zu einem Turm gestapelt (zweite Reihe obendrauf).
+  **Kein Brett, kein Pfosten** (bis Oktober 2026 standen die Klötze auf einem Holzbrett an
+  einem Pfosten). Der Zustand
+  steht an den Abzeichen oben rechts: Stern = geschafft, halb gefüllte Scheibe in
+  `SkyBlueLight` = angefangen (früher die blaue Brettkontur — die einzige Brett-Farbe, die
+  sonst nirgends stand), Schloss = gesperrt; ohne Abzeichen = bereit. Die Klötze sind **Würfel**: vorn der Buchstabe,
   an der Seite das Anlautbild. Nur das **aktuelle** Schild dreht seine Würfel — kurz nach dem
   Öffnen des Pfads und dann alle ~9 s einmal nacheinander zum Bild, hält 1,6 s und dreht
   zurück („M … wie Mond" ohne Worte). Alle anderen Schilder zeigen nur Buchstaben; so bleibt
@@ -342,14 +347,24 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
   lesbaren Buchstaben und ein Schloss; Bilder zeigen sie nicht.
 Gesperrte und noch nicht autorierte Schilder reagieren auf Tippen mit einem gesprochenen Hinweis —
 niemals mit einem stummen No-Op.
-- **„Du bist hier“-Marker**: über dem Schild der aktuellen Lektion steht eine Pin-Nadel
-  (`SunCoral` mit heller Kontur in `Cream`), die sanft auf und ab wippt — das Kind soll auf einem Screen
-  voller Wegweiser ohne Text erkennen, welches Schild dran ist. Der Pfad scrollt beim Öffnen
+- **„Du bist hier“ = der Nebelring** (`PathFogRing`): das Schild der aktuellen Lektion steht
+  in einem flachen Ring aus warmem Nebel (Breite : Höhe ≈ 6,5 : 1, Turmbreite + 2 × 20 dp,
+  Mitte an der Unterkante der Klötze). Die hintere Hälfte liegt hinter den Klötzen, die
+  vordere davor — er liest sich als Boden, nicht als Rahmen. Aufbau ohne Bilddatei und ohne
+  Blur: warmer Dunst, ein weicher Grund mit hellem Band, elf weiche Flecken in zwei
+  gegenläufigen Gruppen (Umlauf 30 s / 44 s), 40 Körner auf drei Bahnen (24 s / 36 s, ein
+  `drawPoints` pro Hälfte), alle 3,2 s eine Nebelwelle (1 → 1,5, verblassend), das Band atmet
+  in derselben Periode. Eine Uhr für alle Ringe, gezeichnet nur in der Zeichenphase; bei
+  „Bewegung reduzieren" stehen Dunst und Körner still, keine Welle. Nur das aktuelle Schild
+  hat einen Ring — gesperrte und noch nicht erreichte nie. Er ersetzt die frühere Stecknadel
+  (`SunCoral`, wippend), die einem Vorschulkind nichts sagte. Verworfen: glänzender
+  Planetenring, punktiger Staubring, Fortschrittsring mit Segmenten, Ringe unter allen
+  Schildern, Play-Knopf über dem Schild, zeigende Hand. Der Pfad scrollt beim Öffnen
   automatisch zu diesem Schild; wer selbst weiterscrollt, wird nicht zurückgerissen.
-- **Nach dem Abschluss animiert der Fortschritt**: der Marker hüpft in einem Bogen vom gerade
-  geschafften Schild zum nächsten, und die Trittspuren dazwischen werden dabei warm. Woher das
-  Kind kam und was jetzt dran ist, wird also gezeigt statt geschrieben. Der Sprung läuft genau
-  einmal pro Rückkehr auf den Pfad.
+- **Nach dem Abschluss animiert der Fortschritt**: der Ring verblasst am gerade geschafften
+  Schild und wächst am nächsten auf, und die Trittspuren dazwischen werden dabei warm. Woher
+  das Kind kam und was jetzt dran ist, wird also gezeigt statt geschrieben. Der Wechsel läuft
+  genau einmal pro Rückkehr auf den Pfad.
 - Mit der Eltern-Freigabe der Reihenfolge bleiben **noch nicht erreichte** gesperrte Schilder
   abgedunkelt und behalten ihre Silhouetten, verlieren aber Schloss und „später“-Hinweis und sind
   antippbar. Noch nicht autorierte Lektionen bleiben in jedem Fall gesperrt — sie haben keinen Inhalt.
@@ -357,7 +372,7 @@ niemals mit einem stummen No-Op.
   ist die stärkere Aussage. Eine frei gespielte Lektion zeigt danach ihren echten Zustand
   (angefangen bzw. geschafft mit Stern), bleibt antippbar und schaltet die folgende Lektion frei —
   auch wenn die Eltern-Freigabe später wieder ausgeht. „Gesperrt“ heißt damit: in der
-  Fibel-Reihenfolge noch nicht erreicht **und** hier noch nichts getan. Der Marker folgt trotzdem
+  Fibel-Reihenfolge noch nicht erreicht **und** hier noch nichts getan. Der Nebelring folgt trotzdem
   weiter der Fibel-Reihenfolge (erste nicht gemeisterte Lektion) und springt nicht zum Ausflug
   voraus.
 - **Freischalten heißt durchgespielt, nicht fehlerfrei.** Die nächste Lektion öffnet, sobald in
@@ -767,11 +782,12 @@ niemals mit einem stummen No-Op.
   stehen als Kommentar in `Color.kt`.
 - Farbrollen (verbindlich): `StarGold` = Sterne/Punkte/Belohnung (`StarGoldDeep` als Kontur-/
   Tiefton für den Stern-Glyph auf hellem Grund), `LeafGreen` = richtig/erledigt, `SkyBlue` =
-  Fortschritt/aktiv, `SunCoral` = Handlungs-CTA (auch der „Du bist hier“-Marker auf dem Pfad —
-  er sagt „hier tippen“), `ClayRed` = Fehlertext (Erwachsene).
+  Fortschritt/aktiv, `SunCoral` = Handlungs-CTA, `ClayRed` = Fehlertext (Erwachsene).
+  Der Nebelring des aktuellen Pfad-Schilds ist warmes Laternenlicht wie das Leuchten der
+  Schilder — Landschaft, keine Farbrolle (bis Oktober 2026 trug die Stecknadel `SunCoral`).
   `LeafGreenLight`/`SkyBlueLight` sind helle Ring-Varianten ausschließlich für Akzente AUF
-  dunklen Flächen (Bretter der Pfad-Schilder, ↻-Abzeichen) — nie als Fläche oder Akzent auf
-  dem Papiergrund. Die fünf Klotztöne der Pfad-Schilder (`SignBlockTones`) tragen keine
+  dunklen Flächen (Abzeichen der Pfad-Schilder: ↻ und „angefangen"; Ringe der Jagd-Kacheln)
+  — nie als Fläche oder Akzent auf dem Papiergrund. Die fünf Klotztöne der Pfad-Schilder (`SignBlockTones`) tragen keine
   Bedeutung, sie unterscheiden nur Laute; Schrift darauf in `WoodDark` liegt über 8:1.
   Eine Bedeutung pro Farbe — Sterne und Progress greifen nie auf `primary` zu.
   Benannte Ausnahme: die **warm gelaufenen Trittspuren** des Pfades nutzen ein transparentes
@@ -790,7 +806,8 @@ niemals mit einem stummen No-Op.
   der Chime allein.
 - **Motion-Tokens (`AbcMotion` in `ui/theme/Motion.kt`).** Jede Animation wählt ihre
   Dauer, Easing und Feder aus einer festen Palette: sechs Dauerstufen (90 · 170 · 260 ·
-  360 · 450 · 600 ms, Faktor ~1,4), drei Schleifen-Perioden (Puls, Atmen, Wippen), vier
+  360 · 450 · 600 ms, Faktor ~1,4), zwei Schleifen-Perioden (Puls, Atmen; das Wippen ging
+  mit der Stecknadel), vier
   Easings (Enter/Exit/Linger/Fill) und sieben benannte Federn (Settle, Soft, Bouncy,
   Glide, Pop, Wobble, Snap). Federn für alles, was das Kind anfasst, Tweens für alles,
   was nur passiert. Eine neue Feder am Aufrufort bricht `AbcMotionTest`; Figurenspiel
@@ -799,7 +816,9 @@ niemals mit einem stummen No-Op.
   keine Einladung, Bühnen beim Laden aufzubauen oder dauerhaft zu animieren. Benannte
   Ausnahme: die Würfel-Drehung des aktuellen Pfad-Schilds (`SignTurnChoreo`, Feder `Soft`),
   vom Nutzer ausdrücklich gewählt; sie ersetzt den Atem-Ring dort, statt eine Schleife
-  hinzuzufügen.
+  hinzuzufügen. Zweite benannte Ausnahme: der Nebelring unter demselben Schild
+  (`FogRingMotion`, eigene Perioden 3,2 s / 24–44 s), ebenfalls vom Nutzer gewählt; er
+  ersetzt die wippende Stecknadel.
 - **Der Erfolgs-Stern fliegt in den Punktestand** (`StarFlight`, `SuccessBurst`, gezeichnet
   mit `drawGlowStar`). Seit September 2026 ein Stern mit Licht statt eines flachen Sterns
   mit dunkler Kontur: gerundete Spitzen, innen hell und außen bernstein, Glanzpunkt, weicher
@@ -991,7 +1010,8 @@ niemals mit einem stummen No-Op.
 - **Launcher-Icon = der Pfad, verkleinert.** Ein Adaptive Icon aus drei Vektor-Ebenen
   (`res/drawable/ic_launcher_*.xml`): hinten die Taglandschaft des Pfad-Screens (Himmel,
   Sonne, Hügel, Baum aus den `PathBackground`-Farben), vorn das Holzschild aus
-  `PathSignNode` mit „ABC" in SoftSand auf WoodMid, hand-genagelt schräg, Stern der
+  `PathSignNode` (Stand vor Oktober 2026, mit Brett und Pfosten) mit „ABC" in SoftSand
+  auf dunklem Holz, hand-genagelt schräg, Stern der
   geschafften Lektion an der Ecke; dazu eine Monochrom-Ebene für Themed Icons (Brett und
   Pfosten, Buchstaben ausgestanzt). Kein eigenes Marken-Motiv, keine Fremdfarben: das
   Icon zeigt genau das, was das Kind nach dem Tippen sieht. Die Buchstaben sind Baloo 2
@@ -1100,7 +1120,7 @@ Wenn eine Änderung vorgeschlagen wird, prüfen:
 | Wäre das Bild des Finale-Satzes in einem Kinderbuch denkbar?                 | Ja — sonst AI-Slop                   |
 | Zeigt der End-Screen eine Punktezahl?                                        | Nein → Punkte leben im Chrome/Pfad   |
 | Sieht eine geschaffte Lektion danach noch gesperrt aus (frei gewählte Reihenfolge)? | Nein → eigener Fortschritt schlägt die Sperre |
-| Erkennt das Kind ohne Text, welches Schild jetzt dran ist?                   | Ja → wippender Marker + Auto-Scroll  |
+| Erkennt das Kind ohne Text, welches Schild jetzt dran ist?                   | Ja → Nebelring + Auto-Scroll         |
 | Zeigt ein abgeleiteter Trainer ein Graphem, das die Lektion noch nicht kennt?  | Nein → Graphem-Tabelle ist lektionsbeschränkt |
 | Verlangt der Wort-Detektiv einen Tipp auf eine Form, die er nicht zeigt?       | Buchstaben nein → Paar `P / p`; Silben zeigen nur die Kleinform, der Treffer darf die Großform sein |
 

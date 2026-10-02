@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,8 +57,11 @@ import app.abcvorschule.ui.theme.Cream
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.world.LocalChromeColors
 import app.abcvorschule.ui.world.NightChrome
+import app.abcvorschule.ui.world.rememberReduceMotion
+import app.abcvorschule.ui.world.rememberWorldSeconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlin.math.roundToInt
 
 /**
  * Fibel path: the app's start screen. A dotted trail winds through a sunny
@@ -65,10 +69,12 @@ import kotlinx.coroutines.flow.first
  * syllable, a grapheme) — never an instruction the child would have to read.
  *
  * @param advanceFromLessonId The lesson the child just came back from. When the
- * highlight has moved on since, the marker starts its hop there instead of appearing
- * on the new sign out of nowhere — that is what makes "I finished this one, that one
- * is next" readable without a word of text. [onAdvanceAnimated] hands the flag back
- * so the hop plays once and not again on the next recomposition.
+ * highlight has moved on since, the fog ring starts there and moves over (fades out
+ * at the old sign, grows in at the new one, while the trail between them warms up)
+ * instead of appearing on the new sign out of nowhere — that is what makes "I
+ * finished this one, that one is next" readable without a word of text.
+ * [onAdvanceAnimated] hands the flag back so the move plays once and not again on
+ * the next recomposition.
  */
 @Composable
 fun PathScreen(
@@ -132,8 +138,8 @@ fun PathScreen(
         // Leiste rechnet in AbcTopBar mit demselben Inset, und im Sticky-Immersive-
         // Vollbild ist der Status-Bar-Inset null, während der Display-Ausschnitt
         // bleibt. Mit `statusBars` fehlte hier deshalb immer mindestens die
-        // Handbreit, und der „Du bist hier"-Pin über dem ersten Schild rutschte ins
-        // Leistenband.
+        // Handbreit, und der damalige „Du bist hier"-Pin über dem ersten Schild
+        // rutschte ins Leistenband.
         //
         val contentTop = safeDrawingTop + TopBarExtraTop + TopBarHeight
         val contentTopPx = with(density) { contentTop.toPx() }
@@ -213,10 +219,13 @@ fun PathScreen(
                         ).coerceAtLeast(0)
                     }
                     val markerIndex = remember { Animatable(markerStartIndex.toFloat()) }
+                    // The sign the ring leaves while markerIndex walks to the head.
+                    var ringFrom by remember { mutableIntStateOf(markerStartIndex) }
                     LaunchedEffect(headIndex) {
                         if (headIndex < 0) return@LaunchedEffect
                         val target = headIndex.toFloat()
                         if (markerIndex.value == target) return@LaunchedEffect
+                        ringFrom = markerIndex.value.roundToInt()
                         delay(PathFocus.HopStartDelayMillis)
                         markerIndex.animateTo(
                             targetValue = target,
@@ -262,6 +271,10 @@ fun PathScreen(
                         }
                     }
 
+                    // Der Nebelring unter dem aktuellen Schild ersetzt die Stecknadel. Eine
+                    // Uhr für alle Ringe; gelesen wird sie nur in der Zeichenphase.
+                    val ringStill = rememberReduceMotion()
+                    val ringSeconds = rememberWorldSeconds(ringStill)
                     PathSigns(
                         lessons = lessons,
                         states = states,
@@ -271,16 +284,19 @@ fun PathScreen(
                         points = nodePoints,
                         onOpenLesson = onOpenLesson,
                         onLockedTap = onLockedTap,
+                        ringFor = { index ->
+                            if (headIndex < 0 || (index != headIndex && index != ringFrom)) {
+                                null
+                            } else {
+                                FogRing(
+                                    seconds = { ringSeconds.value },
+                                    presence = { FogRingTransfer.presence(index, markerIndex.value, ringFrom, headIndex) },
+                                    grows = index == headIndex,
+                                    still = ringStill,
+                                )
+                            }
+                        },
                     )
-
-                    // Last, so the pin sits over the signs it hops between.
-                    if (headIndex >= 0) {
-                        PathHereMarker(
-                            nodePoints = nodePoints,
-                            index = { markerIndex.value },
-                            signHeight = { i -> PathSignDimens.totalHeight(blockCounts.getOrElse(i) { 0 }) },
-                        )
-                    }
                 }
                 // Das letzte Schild muss sich über die Nav-Bar schieben lassen;
                 // die Landschaft läuft darunter weiter durch.
@@ -342,9 +358,9 @@ private fun AutoScrollToHead(
     blockCounts: List<Int>,
 ) {
     // Everything that has to be on screen above the hop's start node: the sign
-    // standing on it (one row of blocks or two) plus the marker (with bob) above it.
+    // standing on it (one row of blocks or two) plus its badges.
     val hopHeadroomPx = with(LocalDensity.current) {
-        (PathSignDimens.totalHeight(blockCounts.getOrElse(hopStartIndex) { 0 }) + PathMarkerDimens.Headroom).toPx()
+        (PathSignDimens.height(blockCounts.getOrElse(hopStartIndex) { 0 }) + PathSignDimens.Headroom).toPx()
     }
     var lastScrolledHead by remember { mutableStateOf<Int?>(null) }
     LaunchedEffect(headIndex, nodePoints, contentTopPx) {
@@ -360,8 +376,8 @@ private fun AutoScrollToHead(
         val hopFromY = nodePoints.getOrNull(hopStartIndex)?.y?.plus(contentTopPx)
         when {
             // First scroll with a hop pending: show the hop's start, then follow
-            // the marker down to the new sign. Delay and duration mirror the hop
-            // animation in PathScreen, so pin and viewport travel together.
+            // the ring down to the new sign. Delay and duration mirror the marker
+            // animation in PathScreen, so ring and viewport travel together.
             lastScrolledHead == null && hopStartIndex != headIndex && hopFromY != null -> {
                 val entry = PathFocus.entryScrollTarget(
                     fromNodeY = hopFromY,
@@ -406,6 +422,7 @@ private fun PathSigns(
     points: List<PathPoint>,
     onOpenLesson: (String) -> Unit,
     onLockedTap: () -> Unit,
+    ringFor: (Int) -> FogRing?,
 ) {
     val density = LocalDensity.current
     val halfWidth = with(density) { (PathSignDimens.Width / 2).toPx() }
@@ -415,9 +432,9 @@ private fun PathSigns(
         val state = states[lesson.id] ?: LessonState.Locked
         val playable = LessonGating.isPlayable(state, unlockAllLessons)
         val sign = signsByLessonId[lesson.id] ?: LessonSign(blocks = emptyList(), review = false)
-        // The geometry point is where the post meets the ground, so the sign is drawn
-        // fully above it and the trail passes below the plank instead of through it.
-        val fullHeight = with(density) { PathSignDimens.totalHeight(sign.blocks.size).toPx() }
+        // The geometry point is the tower's foot, so the sign is drawn fully above it
+        // and the trail arrives at the fog ring under the blocks.
+        val fullHeight = with(density) { PathSignDimens.height(sign.blocks.size).toPx() }
         PathSignNode(
             sign = sign,
             tag = lesson.nodeLabel,
@@ -425,6 +442,7 @@ private fun PathSigns(
             playable = playable,
             highlighted = lesson.id == highlightedLessonId,
             index = index,
+            ring = ringFor(index),
             modifier = Modifier.offset(
                 x = with(density) { (point.x - halfWidth).toDp() },
                 y = with(density) { (point.y - fullHeight).toDp() },

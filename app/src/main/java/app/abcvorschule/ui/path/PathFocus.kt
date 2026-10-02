@@ -6,9 +6,10 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
- * Where the path's attention sits: which node the "you are here" marker stands on,
- * how long it takes to hop to the next one, and how far the trail has to scroll to
- * keep it in view.
+ * Where the path's attention sits: which node the fog ring ("you are here") stands
+ * on, how long it takes to move to the next one, and how far the trail has to scroll
+ * to keep it in view. "Marker" below is that position — until October 2026 a pin
+ * that hopped, now the ring that fades out at the old sign and grows in at the new.
  *
  * Pure math on purpose — the whole focus logic is JVM-unit-testable, and nothing
  * here may depend on Compose.
@@ -21,8 +22,8 @@ internal object PathFocus {
 
     /**
      * Beat before the hop starts. The point of the animation is "I came from there,
-     * that one is next", and that needs the eye to land on the old sign first — a pin
-     * that has already left by the time the path is on screen shows only the second
+     * that one is next", and that needs the eye to land on the old sign first — a ring
+     * that has already moved by the time the path is on screen shows only the second
      * half of the sentence.
      */
     const val HopStartDelayMillis = 400L
@@ -93,9 +94,9 @@ internal object PathFocus {
      *
      * [scrollTarget] alone parks the NEW head sign at [ViewportAnchor] — but the
      * hop starts on the OLD sign, one node spacing (~168dp) further up plus the
-     * sign-and-marker column ([hopHeadroom], ~166dp) above its node. At anchor
-     * 0.42 that start is cut off on any viewport below ~795dp and completely off
-     * screen below ~690dp: the hop would play where nobody can see it, and
+     * sign and its badges ([hopHeadroom], ~66dp) above its node. At anchor 0.42
+     * that start is cut off on any viewport below ~557dp and completely off
+     * screen below ~400dp: the hop would play where nobody can see it, and
      * "where the child came from" (§5) is the whole point of the hop. This target
      * additionally keeps the hop's start inside the viewport; the caller then
      * animates from here to [scrollTarget] in step with the hop, which is still

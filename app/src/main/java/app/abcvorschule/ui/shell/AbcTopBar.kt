@@ -44,7 +44,7 @@ val TopBarFloatingActionSize: Dp = 48.dp
  *
  * Öffentlich, weil der Pfad denselben Platz freihalten muss, den die Leiste
  * einnimmt (`PathScreen.contentTop`) — mit einer zweiten Kopie der Zahl driftet
- * die Reserve, und dann rutscht der „Du bist hier"-Pin ins Leistenband.
+ * die Reserve, und dann rutschen Stern oder Schloss des ersten Schilds ins Leistenband.
  */
 val TopBarExtraTop: Dp = 10.dp
 

@@ -60,9 +60,6 @@ object AbcMotion {
     /** Halbe Periode des Atmens (Ring des aktuellen Pfad-Schilds). */
     const val BreathMs = 900
 
-    /** Halbe Periode des Wippens (Du-bist-hier-Marker). */
-    const val BobMs = 1100
-
     /** Etwas kommt herein oder bewegt sich: schnell los, weich an. */
     val Enter: Easing = FastOutSlowInEasing
 
