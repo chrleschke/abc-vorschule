@@ -31,8 +31,8 @@ enum class TrainerWorld(val night: Boolean) {
     /** Rechnen: Wiese am Waldrand bei Nacht, gezeichnet. */
     ForestNight(night = true),
 
-    /** Wort-Detektiv: Dachboden mit Mondstrahl, gezeichnet. */
-    Attic(night = true),
+    /** Wort-Detektiv: Sternenhimmel mit Deko-Teleskop, gezeichnet (bis Oktober 2026 ein Dachboden). */
+    Stars(night = true),
 
     /** Wort-Bauer: Werkbank im Lampenlicht, gezeichnet. */
     Workshop(night = true),
@@ -57,7 +57,7 @@ enum class TrainerWorld(val night: Boolean) {
             is SymbolHuntRound -> DeepSea
             is LetterTraceRound -> Jungle
             is CountAddRound -> ForestNight
-            is SymbolInWordRound -> Attic
+            is SymbolInWordRound -> Stars
             is WordBuildRound -> Workshop
             is SentenceOrderRound -> Garden
             is SentencePictureRound -> ReadingNook

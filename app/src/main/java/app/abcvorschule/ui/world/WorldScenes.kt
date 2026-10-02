@@ -7,22 +7,28 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import app.abcvorschule.ui.rewards.drawGlint
 import kotlin.math.PI
 import kotlin.math.sin
 
 /**
  * Drei gezeichnete Nachtwelten (PRODUCT_PRINCIPLES §10): keine Bilddateien, alles aus
  * Verläufen und wenigen Formen — 0 KB im Paket, und die ruhige Mitte ist eingebaut.
- * Bewegung nur ganz langsam und kontrastarm (Zyklen ≥ 8 s), bei „Bewegung reduzieren"
+ * Bewegung nur ganz langsam und kontrastarm (Zyklen ≥ 8 s; nur die wenigen Sterne des
+ * Sternenhimmels funkeln ab 4 s, wie seine Spec es festlegt), bei „Bewegung reduzieren"
  * steht alles.
  */
 
@@ -65,70 +71,132 @@ internal fun ForestNightBackground(modifier: Modifier) {
 }
 
 /**
- * Wort-Detektiv: ein Dachboden bei Nacht. Durch ein rundes Fenster oben rechts fällt ein
- * Mondstrahl schräg in den Raum, in ihm schweben langsam Staubkörner. Das Wort selbst
- * liegt in einem hellen Lichtfleck ([lightPool]) — die Taschenlampe findet es.
+ * Wo das Teleskop des Sternenhimmels steht — unten links, und dort gibt es **keinen
+ * Stern** (Nutzerentscheidung): weder Himmelssterne noch Sternbild-Linien noch das
+ * Funkeln beim Antippen, und der Wort-Detektiv hält Silhouetten-Reihe und Flugbahn
+ * davon fern (`WordDetectiveLayout.silhouetteRow`, Flug-Bogen nach rechts). In dp vom
+ * linken und unteren Rand der Welt.
+ */
+object StarsScene {
+    const val TelescopeZoneWidthDp = 92f
+    const val TelescopeZoneHeightDp = 170f
+}
+
+/**
+ * Wort-Detektiv: Sternenhimmel mit Deko-Teleskop (Spec
+ * `2026-10-02-wort-detektiv-sternenhimmel-design.md`) — „Finden" heißt hier: einen Stern
+ * am Himmel entdecken. Nachtblau → Violett, eine zarte Milchstraße als diagonales Band,
+ * wenige Sterne, die ganz ruhig funkeln (4–7 s), zwei schwache Sternbild-Linien, dunkler
+ * Horizont, unten links ein Teleskop auf Dreibein als Silhouette (ohne Funktion). Das
+ * Wort selbst liegt auf einer ruhigen dunklen Zone (`calmPool`), die zeichnet der Trainer.
  */
 @Composable
-internal fun AtticBackground(modifier: Modifier, taps: WorldTaps?) {
+internal fun StarsBackground(modifier: Modifier, taps: WorldTaps?) {
     val still = rememberReduceMotion()
     val seconds by rememberWorldSeconds(still)
     Canvas(modifier.graphicsLayer()) {
-        drawRect(Brush.linearGradient(0f to AtticTop, 0.6f to AtticMid, 1f to AtticLow, start = Offset.Zero, end = Offset(size.width, size.height)))
-        // Dachbalken als dunkle Schrägen links und rechts.
-        drawBeam(from = Offset(-size.width * 0.1f, size.height * 0.02f), to = Offset(size.width * 0.35f, size.height * 0.28f))
-        drawBeam(from = Offset(size.width * 1.1f, size.height * 0.02f), to = Offset(size.width * 0.66f, size.height * 0.28f))
-        val window = Offset(size.width * 0.82f, size.height * 0.23f)
-        val wr = 24.dp.toPx()
-        // Der Mondstrahl: vom Fenster schräg zur Mitte, weich ausgeblendet.
-        val target = Offset(size.width * 0.5f, size.height * 0.5f)
-        val beam = Path().apply {
-            moveTo(window.x - wr * 0.7f, window.y - wr * 0.4f)
-            lineTo(window.x + wr * 0.7f, window.y + wr * 0.4f)
-            lineTo(target.x + size.width * 0.3f, target.y + size.height * 0.08f)
-            lineTo(target.x - size.width * 0.34f, target.y - size.height * 0.02f)
+        val w = size.width
+        val h = size.height
+        drawRect(Brush.verticalGradient(0f to SkyTop, 0.65f to SkyMid, 1f to SkyLow))
+        val zone = Rect(
+            left = 0f,
+            top = h - StarsScene.TelescopeZoneHeightDp.dp.toPx(),
+            right = StarsScene.TelescopeZoneWidthDp.dp.toPx(),
+            bottom = h,
+        ).inflate(8.dp.toPx())
+        fun free(c: Offset) = !zone.contains(c)
+        // Die Milchstraße: ein weiches Band von links oben nach rechts, im oberen Drittel
+        // weit weg vom Teleskop. Gestapelte Striche abnehmender Breite statt einer Fläche:
+        // so läuft das Band an seinen Rändern weich aus, statt mit einer Kante zu enden,
+        // und an beiden Enden blendet es quer aus.
+        val band = Path().apply {
+            moveTo(-0.1f * w, 0.25f * h)
+            cubicTo(0.31f * w, 0.37f * h, 0.67f * w, 0.2f * h, 1.1f * w, 0.33f * h)
+        }
+        val fade = Brush.horizontalGradient(
+            0f to Milky.copy(alpha = 0f),
+            0.5f to Milky.copy(alpha = 0.018f),
+            1f to Milky.copy(alpha = 0f),
+        )
+        for (i in 0 until MilkyLayers) {
+            val width = 0.13f * h * (1f - i / MilkyLayers.toFloat())
+            drawPath(band, fade, style = Stroke(width = width, cap = StrokeCap.Round))
+        }
+        // Sternbild-Linien zuerst, damit ihre Sterne darüber liegen.
+        Constellations.forEach { line ->
+            line.zipWithNext().forEach { (a, b) ->
+                val from = Offset(SkyStars[a][0] * w, SkyStars[a][1] * h)
+                val to = Offset(SkyStars[b][0] * w, SkyStars[b][1] * h)
+                if (free(from) && free(to)) drawLine(Milky.copy(alpha = 0.35f), from, to, strokeWidth = 1.dp.toPx())
+            }
+        }
+        SkyStars.forEach { (fx, fy, r, a, period) ->
+            val c = Offset(fx * w, fy * h)
+            if (!free(c)) return@forEach
+            // Funkeln zwischen rund 30 % und 90 % wie im Mockup, nur die wenigen mit Periode.
+            val twinkle = if (period > 0f) 0.65f + 0.35f * sin(seconds / period * 2f * PI.toFloat() + fx * 17f) else 1f
+            drawCircle(SkyStar, alpha = a * twinkle, radius = r.dp.toPx(), center = c)
+        }
+        // Horizont: ein flacher dunkler Hügelzug.
+        val hill = Path().apply {
+            moveTo(0f, h - 84.dp.toPx())
+            cubicTo(0.23f * w, h - 114.dp.toPx(), 0.46f * w, h - 100.dp.toPx(), 0.67f * w, h - 84.dp.toPx())
+            cubicTo(0.88f * w, h - 68.dp.toPx(), 0.92f * w, h - 74.dp.toPx(), w, h - 88.dp.toPx())
+            lineTo(w, h)
+            lineTo(0f, h)
             close()
         }
-        drawPath(beam, Brush.linearGradient(0f to BeamLight.copy(alpha = 0.22f), 1f to BeamLight.copy(alpha = 0f), start = window, end = target + Offset(0f, size.height * 0.12f)))
-        drawCircle(Brush.radialGradient(0f to BeamLight.copy(alpha = 0.5f), 1f to Color.Transparent, center = window, radius = wr * 2.6f), radius = wr * 2.6f, center = window)
-        drawCircle(WindowGlass, radius = wr, center = window)
-        val bar = Stroke(width = 3.dp.toPx())
-        drawCircle(WindowFrame, radius = wr, center = window, style = Stroke(width = 5.dp.toPx()))
-        drawLine(WindowFrame, window - Offset(wr, 0f), window + Offset(wr, 0f), strokeWidth = bar.width)
-        drawLine(WindowFrame, window - Offset(0f, wr), window + Offset(0f, wr), strokeWidth = bar.width)
-        // Staub im Strahl: treibt ganz langsam (Perioden 17–31 s).
-        Dust.forEach { (t0, side, period, r) ->
-            val p = ((seconds / period + t0) % 1f)
-            val along = window + (target - window) * p
-            val drift = sin(seconds / (period * 0.7f) * 2f * PI.toFloat() + t0 * 9f) * 18.dp.toPx()
-            val pos = along + Offset(side * 40.dp.toPx() * p + drift * 0.3f, drift * 0.5f)
-            val a = 0.45f * sin(PI.toFloat() * p)
-            drawCircle(BeamLight, alpha = a, radius = r.dp.toPx(), center = pos)
-        }
-        // Angetippt wirbelt Staub auf: eine Handvoll Körner dreht sich spiralförmig vom
-        // Finger weg, steigt ein wenig und sinkt verblassend wieder ab.
+        drawPath(hill, Horizon)
+        drawTelescope(Offset(40.dp.toPx(), h - 120.dp.toPx()))
+        // Angetippt funkeln die nächsten paar Sterne kurz auf, leicht nacheinander. Kein
+        // Stern in der Nähe: ein kleines Glanzlicht am Finger — nur nie am Teleskop.
         taps?.let { tt ->
             tt.now = seconds
             tt.still = still
-            tt.forEachRecent(seconds, DustSwirlS) { tap, age ->
-                val p = age / DustSwirlS
-                val turn = if (tap.seed % 2 == 0) 1f else -1f
-                for (k in 0 until 14) {
-                    val angle = k / 14f * 2f * PI.toFloat() + turn * age * 1.6f
-                    val reach = (8 + 56 * (1f - (1f - p) * (1f - p)) * (0.6f + 0.4f * tapNoise(tap.seed, k))).dp.toPx()
-                    val lift = -18.dp.toPx() * sin(PI.toFloat() * p)
-                    val c = tap.at + Offset(kotlin.math.cos(angle) * reach, sin(angle) * reach * 0.6f + lift)
-                    drawCircle(BeamLight, alpha = 0.55f * (1f - p), radius = (0.9f + tapNoise(tap.seed, k + 30)).dp.toPx(), center = c)
+            tt.forEachRecent(seconds, StarFlashS) { tap, age ->
+                val reach = 150.dp.toPx()
+                val near = SkyStars.asSequence()
+                    .map { Offset(it[0] * w, it[1] * h) }
+                    .filter { free(it) && (it - tap.at).getDistance() < reach }
+                    .sortedBy { (it - tap.at).getDistance() }
+                    .take(4)
+                    .toList()
+                val targets = near.ifEmpty { if (free(tap.at)) listOf(tap.at) else emptyList() }
+                targets.forEachIndexed { k, c ->
+                    val env = tapEnvelope((age - k * 0.12f).coerceAtLeast(0f), rise = 0.15f, decay = 0.55f)
+                    drawGlint(c, size = (5f + 2f * tapNoise(tap.seed, k)).dp.toPx() * env, alpha = env)
                 }
             }
         }
     }
 }
 
-private const val DustSwirlS = 2.6f
+private const val StarFlashS = 3f
 
-private fun DrawScope.drawBeam(from: Offset, to: Offset) {
-    drawLine(AtticBeam, from, to, strokeWidth = 26.dp.toPx())
+/** So viele übereinander gezeichnete Striche ergeben die Milchstraße. */
+private const val MilkyLayers = 10
+
+/**
+ * Das Teleskop als Silhouette: Rohr 40° schräg nach rechts oben, Dreibein darunter.
+ * Ganz innerhalb von [StarsScene]s Zone (rechte Kante bei ~90 dp, oben bei ~163 dp).
+ */
+private fun DrawScope.drawTelescope(pivot: Offset) {
+    val leg = 4.dp.toPx()
+    listOf(Offset(-14f, 52f), Offset(16f, 52f), Offset(0f, 54f)).forEach { (dx, dy) ->
+        drawLine(TelescopeBody, pivot, pivot + Offset(dx.dp.toPx(), dy.dp.toPx()), strokeWidth = leg, cap = StrokeCap.Round)
+    }
+    rotate(-40f, pivot = pivot) {
+        fun part(x: Float, y: Float, bw: Float, bh: Float, r: Float, color: Color) = drawRoundRect(
+            color,
+            topLeft = pivot + Offset(x.dp.toPx(), y.dp.toPx()),
+            size = Size(bw.dp.toPx(), bh.dp.toPx()),
+            cornerRadius = CornerRadius(r.dp.toPx()),
+        )
+        part(-7f, -7f, 52f, 15f, 4f, TelescopeBody)
+        part(44f, -10f, 11f, 21f, 3f, TelescopeRim)
+        part(-14f, -4f, 8f, 9f, 2f, TelescopeRim)
+        drawCircle(TelescopeLens, alpha = 0.35f, radius = 6.dp.toPx(), center = pivot + Offset(55.dp.toPx(), 0.5f.dp.toPx()))
+    }
 }
 
 /**
@@ -205,19 +273,41 @@ private val NightStars: List<FloatArray> = run {
     }
 }
 
-private val AtticTop = Color(0xFF221B2E)
-private val AtticMid = Color(0xFF15111D)
-private val AtticLow = Color(0xFF0C0A12)
-private val AtticBeam = Color(0xFF0A0810)
-private val BeamLight = Color(0xFFFFF1D2)
-private val WindowGlass = Color(0xFF3B4466)
-private val WindowFrame = Color(0xFF2A2030)
+private val SkyTop = Color(0xFF090D24)
+private val SkyMid = Color(0xFF171D48)
+private val SkyLow = Color(0xFF2A2348)
+private val Milky = Color(0xFF8F9BD8)
+private val SkyStar = Color(0xFFFFFFFF)
+private val Horizon = Color(0xFF070A18)
+private val TelescopeBody = Color(0xFF2C3352)
+private val TelescopeRim = Color(0xFF3B4570)
+private val TelescopeLens = Color(0xFF9FB0E8)
 
-/** (Startphase, Seitenversatz −1…1, Periode s, Radius dp) */
-private val Dust: List<FloatArray> = run {
-    val rnd = java.util.Random(19)
-    List(16) { floatArrayOf(rnd.nextFloat(), rnd.nextFloat() * 2f - 1f, 17f + rnd.nextFloat() * 14f, 0.8f + rnd.nextFloat() * 1.2f) }
+/**
+ * Himmelssterne (x, y als Anteil, Radius dp, Deckkraft, Funkelperiode s — 0 = steht
+ * still). Die ersten neun sind die Lagen aus dem Mockup, fünf davon tragen die beiden
+ * Sternbilder ([Constellations]); dahinter wenige blasse, die stillstehen.
+ */
+private val SkyStars: List<FloatArray> = run {
+    val mock = listOf(
+        floatArrayOf(0.10f, 0.166f, 1.4f, 0.9f, 4.0f),
+        floatArrayOf(0.28f, 0.130f, 1.0f, 0.8f, 5.5f),
+        floatArrayOf(0.46f, 0.201f, 0.9f, 0.8f, 6.6f),
+        floatArrayOf(0.77f, 0.273f, 1.0f, 0.8f, 4.0f),
+        floatArrayOf(0.87f, 0.178f, 1.5f, 0.9f, 5.5f),
+        floatArrayOf(0.15f, 0.355f, 1.2f, 0.8f, 6.6f),
+        floatArrayOf(0.92f, 0.664f, 1.1f, 0.8f, 4.6f),
+        floatArrayOf(0.08f, 0.711f, 1.2f, 0.8f, 5.1f),
+        floatArrayOf(0.64f, 0.770f, 1.0f, 0.7f, 6.1f),
+    )
+    val rnd = java.util.Random(31)
+    mock + List(36) {
+        floatArrayOf(rnd.nextFloat(), rnd.nextFloat() * 0.86f, 0.5f + rnd.nextFloat() * 0.6f, 0.15f + rnd.nextFloat() * 0.3f, 0f)
+    }
 }
+
+/** Zwei schwache Sternbilder, als Indizes in [SkyStars]. */
+private val Constellations = listOf(listOf(0, 1, 2), listOf(3, 4))
 
 private val WoodTop = Color(0xFF3A271B)
 private val WoodMid = Color(0xFF24170F)

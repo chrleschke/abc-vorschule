@@ -81,12 +81,52 @@ object SymbolInWordDerivation {
                 ?: letterRound(pack, wordAtom, graphemes, focusLetterAtomIds, focusCursor)?.failable()
                 ?: return@forEach
 
-            rounds += built.round
+            rounds += built.round.copy(breakBefore = breakBefore(pack, wordAtom, word, built.round.segments))
             if (built.usedFocusIndex != null) {
                 focusCursor = (built.usedFocusIndex + 1) % focusLetterAtomIds.size
             }
         }
         return rounds
+    }
+
+    /**
+     * Wo das Wort getrennt werden darf, wenn es nicht in eine Zeile passt — als
+     * Segment-Indizes, vor denen eine neue Zeile beginnen darf.
+     *
+     * Der Content hat keine Silbentrennung, nur die Wort-Bauer-Blöcke, und die sind
+     * **keine verlässlichen Silben** (`Ba·ll`, `Ma·nn`, `Ha·n·d`, und `Son·ne` trägt das
+     * Atom `letter-s`). Verlässlich sind genau zwei Fugen:
+     *
+     * 1. **Zwischen zwei Wort-Blöcken** (`kind` word/other) — die Fuge eines
+     *    zusammengesetzten Worts ist immer eine Trennstelle: `Sonnen-blume`,
+     *    `Taschen-lampe`, `Schul-tasche`. Hier darf der Block anders heißen als sein Atom
+     *    (Fugen-n, Elision), die Fuge bleibt dieselbe.
+     * 2. **Zwischen zwei Silben-Blöcken**, die so heißen wie ihr Atom (`Ma·ma`, `Do·se`).
+     *    `Ton`/`to` oder `Spin`/`spi` zählen nicht — dieselbe Ehrlichkeitsregel wie im
+     *    Silben-Modus.
+     *
+     * Alles andere trennt nicht; das Layout setzt das Wort dann lieber kleiner
+     * (`WordDetectiveLayout`). Eine Fuge, die mitten in ein Graphem-Segment fiele, wird
+     * verworfen; spielen die Blöcke das Wort nicht wörtlich, gibt es gar keine.
+     */
+    internal fun breakBefore(pack: ContentPack, wordAtom: Atom, word: WordBuildRound, segments: List<String>): List<Int> {
+        if (!word.blocks.joinToString("") { it.display }.equals(wordAtom.display, ignoreCase = true)) return emptyList()
+        fun isWord(block: WordBlock) = pack.atoms[block.atomId]?.kind.let { it == AtomKind.word || it == AtomKind.other }
+        fun isSyllable(block: WordBlock) = pack.atoms[block.atomId]?.let {
+            it.kind == AtomKind.syllable && block.display.equals(it.display, ignoreCase = true)
+        } == true
+        val joints = mutableSetOf<Int>()
+        var offset = 0
+        word.blocks.zipWithNext().forEach { (a, b) ->
+            offset += a.display.length
+            if ((isWord(a) && isWord(b)) || (isSyllable(a) && isSyllable(b))) joints += offset
+        }
+        var chars = 0
+        return segments.indices.filter { index ->
+            val atJoint = index > 0 && chars in joints
+            chars += segments[index].length
+            atJoint
+        }
     }
 
     private data class Built(val round: SymbolInWordRound, val usedFocusIndex: Int?)

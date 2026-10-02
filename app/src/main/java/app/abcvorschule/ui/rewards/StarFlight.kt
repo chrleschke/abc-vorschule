@@ -40,8 +40,12 @@ object StarFlight {
      */
     const val SwayFraction = 0.12f
 
-    /** Versatz vom Startpunkt bei Fortschritt [t] ∈ 0…1. */
-    fun offset(start: Offset, target: Offset, t: Float): Offset {
+    /**
+     * Versatz vom Startpunkt bei Fortschritt [t] ∈ 0…1. [swaySign] −1 schwingt zur
+     * anderen Seite aus: der Wort-Detektiv fliegt nach unten und muss vom Teleskop unten
+     * links weg nach rechts ausholen statt darauf zu.
+     */
+    fun offset(start: Offset, target: Offset, t: Float, swaySign: Float = 1f): Offset {
         val p = t.coerceIn(0f, 1f)
         val delta = target - start
         // Senkrecht zur Flugrichtung ausschwingen, am Start und am Ziel null.
@@ -49,7 +53,7 @@ object StarFlight {
         val sway = if (length == 0f) {
             Offset.Zero
         } else {
-            Offset(-delta.y, delta.x) / length * (length * SwayFraction * kotlin.math.sin(kotlin.math.PI.toFloat() * p))
+            Offset(-delta.y, delta.x) / length * (swaySign * length * SwayFraction * kotlin.math.sin(kotlin.math.PI.toFloat() * p))
         }
         return delta * p + sway
     }

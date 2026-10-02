@@ -221,3 +221,40 @@ val SignBlockTones = listOf(
 
 /** Gesperrte Klötze: dunkles Holz. [SoftSand] bei 0.6 liegt darauf bei 4.97:1. */
 val SignBlockLocked = SignBlockTone(Color(0xFF3A2E23), Color(0xFF46382B), Color(0xFF2C221A), Color(0xFF241B14))
+
+/**
+ * Leuchtschrift des Wort-Detektivs unter dem Sternenhimmel (seit Oktober 2026,
+ * PRODUCT_PRINCIPLES §10). **Benannte Ausnahme** zu „Lerninhalt nur auf Licht": nur das
+ * große Wort und das gesuchte Symbol darüber stehen hell auf Dunkel; kleine Schrift und
+ * Kacheln bleiben Tinte auf Licht. Warmes Creme statt Reinweiß, fett und mit nur
+ * dezentem Schimmer, damit nichts überstrahlt.
+ *
+ * Gemessen auf der ruhigen Zone hinter dem Wort ([CalmNight] zu 80 % über dem Himmel
+ * auf halber Höhe, ≈ #080B23): **16.2:1**; auf dem nackten Himmel daneben (#141940)
+ * 14.2:1, ganz unten am violetten Horizont (#2A2348) 12.4:1 — überall über der
+ * 7:1-Grenze der Lernschrift.
+ */
+val StarlightCream = Color(0xFFF6EBCF)
+
+/**
+ * Gefunden: das getroffene Segment im Wort und die gefüllten Stern-Silhouetten darunter.
+ * Farbe nur mit Bedeutung — Gold heißt hier ausschließlich „gefunden". Auf der ruhigen
+ * Zone 13.5:1, auf dem Himmel 11.9:1. Heller als [StarGold], weil es auf Nacht statt
+ * auf Papier steht (StarGold selbst läge auf dem Himmel bei rund 8:1).
+ */
+val FoundGold = Color(0xFFFFD27A)
+
+/**
+ * Die zarte gestrichelte Linie, die die Rahmen-Sterne eines Treffers zum kleinen
+ * Sternbild verbindet, und die Kontur gefüllter Silhouetten. Nur Schmuck, trägt keinen
+ * Inhalt, wird mit 45 % Deckkraft gezeichnet und ist darum an keine Kontrastgrenze
+ * gebunden.
+ */
+val StarlineGold = Color(0xFFFFE7A8)
+
+/**
+ * Die ruhige Zone: ein weicher dunkler Radialfleck hinter Wort und Symbol, damit kein
+ * Hintergrundstern durch die Buchstaben flimmert (`calmPool`). Fast das Schwarzblau des
+ * Himmels oben, nur dunkler — er soll nicht als Fläche gelesen werden.
+ */
+val CalmNight = Color(0xFF060A1C)

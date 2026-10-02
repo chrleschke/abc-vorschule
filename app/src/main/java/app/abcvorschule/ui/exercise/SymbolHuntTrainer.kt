@@ -724,7 +724,7 @@ private fun HuntTile(
         // clippt (siehe .clip oben), also würde ein „Sch" auf der kleinsten
         // 64dp-Kachel ab font_scale 1.3 angeschnitten (28sp × 1.3 × 0.72 × 3
         // ≈ 79dp Vorschub). Gleiches dp-Budget-durch-fontScale-Muster wie
-        // WordFrameSizing.wordGlyphSp; GlyphAspect inklusive Headroom von dort.
+        // WordFrameSizing.glyphSp; GlyphAspect inklusive Headroom von dort.
         val glyphSp = (
             tileDp.value /
                 (glyph.length.coerceAtLeast(1) * WordFrameSizing.GlyphAspect * density.fontScale)

@@ -493,4 +493,40 @@ class SymbolInWordDerivationTest {
         assertEquals(listOf(1), haeuser.targetIndices)
         assertEquals("Finde den Laut - Äu - im Wort - Häuser.", haeuser.promptTts)
     }
+    // --- where a long word may break (Sternenhimmel-Spec) ---------------------
+
+    private fun round(lessonId: String, wordAtomId: String) =
+        rounds(lessonId).first { it.wordAtomId == wordAtomId }
+
+    @Test
+    fun aCompoundBreaksAtItsJoint() {
+        // T·a·sch·e·n | l·a·m·p·e — the Fugen-n stays with the first word.
+        assertEquals(listOf(5), round("l34", "taschenlampe").breakBefore)
+        assertEquals(listOf(6), round("l32", "sonnenblume").breakBefore)
+        assertEquals(listOf(4), round("l31", "schneemann").breakBefore)
+    }
+
+    @Test
+    fun twoHonestSyllableBlocksMayBreakBetweenThem() {
+        // Ma·ma, built from two `ma` syllable blocks: M·a | m·a.
+        assertEquals(listOf(2), round("l01", "mama").breakBefore)
+    }
+
+    @Test
+    fun letterBlocksAreNoSyllableBoundary() {
+        // Ba·ll and Re·gen are authored as letter blocks (or a block that disagrees with
+        // its atom, `gen`/`ge`): no reliable boundary, so the word never breaks.
+        assertTrue(round("l29", "ball").breakBefore.isEmpty())
+        assertTrue(round("l32", "regen").breakBefore.isEmpty())
+        assertTrue(round("l05", "hut").breakBefore.isEmpty())
+    }
+
+    @Test
+    fun everyBreakSitsBetweenTwoSegmentsOfItsRound() {
+        pack.authoredLessons.forEach { lesson ->
+            rounds(lesson.id).forEach { r ->
+                r.breakBefore.forEach { assertTrue("${r.wordAtomId}: $it", it in 1 until r.segments.size) }
+            }
+        }
+    }
 }

@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import app.abcvorschule.ui.theme.CalmNight
 import kotlin.math.max
 
 /**
@@ -48,22 +49,24 @@ fun Modifier.lightPlate(extra: Dp = 14.dp, color: Color = IslandCream): Modifier
 }
 
 /**
- * Ein Lichtkegel-Fleck: weich auslaufendes Licht statt einer Karte — für den
- * Wort-Detektiv, dessen Wort im Taschenlampenlicht liegt. Innen so hell wie eine
- * Insel, damit die Buchstaben ihren Kontrast behalten.
+ * Die ruhige Zone des Sternenhimmels: ein weicher **dunkler** Fleck hinter dem Wort des
+ * Wort-Detektivs (seit Oktober 2026, vorher der helle `lightPool` der Taschenlampe). Das
+ * Wort steht dort als Leuchtschrift ([app.abcvorschule.ui.theme.StarlightCream], die
+ * benannte Ausnahme zu „Inhalt nur auf Licht"); der Fleck sorgt dafür, dass kein
+ * Hintergrundstern durch die Buchstaben flimmert, und trägt die Kontrastrechnung
+ * (Creme ≈ 16:1 in der Mitte). Wie die Inseln **um** das Bauteil gezeichnet.
  */
-fun Modifier.lightPool(color: Color = PoolLight): Modifier = drawBehind {
-    val rx = size.width * 0.62f + 24.dp.toPx()
-    val ry = size.height * 0.95f + 28.dp.toPx()
+fun Modifier.calmPool(color: Color = CalmNight): Modifier = drawBehind {
+    val rx = size.width * 0.58f + 24.dp.toPx()
+    val ry = size.height * 0.75f + 56.dp.toPx()
     val c = center
     // Ein Kreisverlauf, senkrecht gestaucht: so läuft der Fleck an allen Rändern aus,
     // statt oben und unten an der Ellipse abgeschnitten zu werden.
     scale(scaleX = 1f, scaleY = ry / rx, pivot = c) {
         drawCircle(
             brush = Brush.radialGradient(
-                0f to color,
-                0.55f to color.copy(alpha = 0.92f),
-                0.8f to color.copy(alpha = 0.45f),
+                0f to color.copy(alpha = 0.8f),
+                0.55f to color.copy(alpha = 0.6f),
                 1f to Color.Transparent,
                 center = c,
                 radius = rx,
@@ -76,4 +79,3 @@ fun Modifier.lightPool(color: Color = PoolLight): Modifier = drawBehind {
 
 val IslandCream = Color(0xF2F8F4EA)
 private val IslandShadow = Color(0x47000000)
-private val PoolLight = Color(0xFFFBF2DC)

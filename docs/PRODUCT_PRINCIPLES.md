@@ -143,12 +143,23 @@ Ebenfalls abgeleitet und nicht autoriert: der **Wort-Detektiv** direkt nach dem 
 Wort-Bauer — „Finde den Buchstaben / den Laut / die Silbe im Wort". Eine Runde pro eingeführtem Wort,
 der Modus wechselt zwischen Buchstabe und Silbe, mit Rückfall auf Buchstabe, wenn die
 Silbe nicht sauber benannt werden kann (z. B. wenn der autorierte Wort-Bauer-Block anders
-geschrieben ist als sein Silben-Atom). Das Wort steht in farbige Segmente zerlegt da, jedes
-antippbar; Treffer wandern auf Platzhalter-Striche im Antwortbereich, ein Fehltipp dreht das
-Segment einmal um seinen Mittelpunkt und kostet nichts. Der Buchstaben-Modus zeigt das Ziel
-als Formenpaar (`P / p`), damit „finde alle P" in „Papa" nicht schwerer ist als es aussieht;
-Silben stehen nur klein. Details und Beispiele:
-[Wort-Detektiv-Design](superpowers/specs/2026-07-31-wort-detektiv-design.md).
+geschrieben ist als sein Silben-Atom). Seit Oktober 2026 steht das Wort **als ein Wort** da —
+normale Laufweite, eine Farbe (warmes Creme unter dem Sternenhimmel, §10) —, jedes Segment
+bleibt einzeln antippbar: die Tipp-Fläche wächst in die Höhe (≥ 56 dp), nicht in die Breite,
+schmale Segmente leihen sich unsichtbar Breite bis 36 dp von ihren Nachbarn
+(`WordDetectiveLayout`). Kein Umbruch nach Segmentanzahl: die Schrift passt das Wort in eine
+Zeile, erst unter 40 dp wird **an einer verlässlichen Fuge** mit Trennstrich getrennt
+(Wort-Fuge `Taschen-lampe` oder zwei ehrliche Silben-Blöcke, `SymbolInWordRound.breakBefore`),
+ohne solche Fuge wird kleiner gesetzt statt falsch getrennt. Ein Treffer wird golden, zwei
+(Buchstabe) bzw. drei (Mehrzeichen-Graphem, Silbe) Sterne rahmen ihn als kleines Sternbild,
+und ein Stern fliegt in die nächste leere **Stern-Silhouette** unter dem Wort. Ein Fehltipp
+dreht das Segment einmal um seinen Mittelpunkt und kostet nichts. **Kein „Zeig mir"** (seit
+Oktober 2026): das Wort ist die ganze Auswahl, jeder Fehltipp spricht sein Segment vor. Der
+Buchstaben-Modus zeigt das Ziel als Formenpaar (`P · p`), damit „finde alle P" in „Papa"
+nicht schwerer ist als es aussieht; Silben stehen nur klein. Details und Beispiele:
+[Wort-Detektiv-Design](superpowers/specs/2026-07-31-wort-detektiv-design.md), ergänzt und wo
+nötig ersetzt durch
+[Wort-Detektiv unter dem Sternenhimmel](superpowers/specs/2026-10-02-wort-detektiv-sternenhimmel-design.md).
 
 Dritter abgeleiteter Zusatz-Trainer: der **Laut-Fresser** direkt nach der Buchstaben-Jagd
 (ohne Jagd nach dem letzten Spurensucher), ab Lektion 3 — „Füttere die Laut-Fresser." Zwei
@@ -699,9 +710,12 @@ niemals mit einem stummen No-Op.
   behalten, nicht dem Wort nachsehen.
 - Keine doppelte Aufgabe+Vorschau desselben Tokens.
 - Ausnahme Buchstaben-/Silben-Jagd: Kacheln verstreuen sich über den gesamten Aufgabenbereich statt in einer geordneten Antwortliste; die Herzmuschel liegt im Antwortbereich unten.
-- Ausnahme Wort-Detektiv: der Antwortbereich trägt **Quittungs-Striche statt Wahloptionen**.
-  Sie sind bloße Grundstriche ohne Rahmen und ohne Tray — die einzige Symbolquelle ist das
-  Wort im Aufgabenblock. Damit sind sie von den Schablonen des Wort-Bauers unterscheidbar.
+- Ausnahme Wort-Detektiv: **kein Antwortbereich**. Die einzige Auswahl ist das Wort selbst;
+  der Fortschritt — eine Reihe Stern-Silhouetten, eine je gesuchtem Vorkommen — steht im
+  Aufgabenblock direkt unter dem Wort (bis Oktober 2026 Quittungs-Striche unten im
+  Antwortbereich; dort lagen sie auf dem Horizont, weit weg vom Wort). Symbol, Wort und
+  Silhouetten passen als Gruppe in den Aufgabenblock: auf kurzen Geräten gibt erst die Luft
+  nach, dann die Silhouetten, zuletzt die Wortgröße (`WordDetectiveLayout.verticalFit`).
 - Ausnahme Laut-Fresser: der Antwortblock trägt **zwei Drop-Zonen** (die Fresser) statt
   Kacheln, der Aufgabenblock die aktuelle Bildkarte und rechts daneben den Futterhaufen als
   Rundenfortschritt; er hält seine Höhe, wenn die letzte Karte gefressen ist. Weil das Kind
@@ -923,12 +937,17 @@ niemals mit einem stummen No-Op.
 - **Nachtwelten (seit September 2026).** Jeder Trainer bekommt eine eigene, **dunkle** Welt,
   immer dieselbe — das Kind erkennt die Aufgabe am Ort, bevor es die Ansage hört
   (`TrainerWorld`): Jagd → **Tiefsee**, Spurensucher → **Dschungel bei Nacht**,
-  Rechnen → **Nacht am Waldrand**, Wort-Detektiv → **Dachboden**, Wort-Bauer → **Werkstatt**,
+  Rechnen → **Nacht am Waldrand**, Wort-Detektiv → **Sternenhimmel**, Wort-Bauer → **Werkstatt**,
   Satz-Architekt → **Garten**, Satz-Versteher → **Leseecke**, Laut-Fresser → **Pilzhöhle**,
   Silben-Verschmelzer → **Waldlichtung**. Regeln:
   1. **Lerninhalt nur auf Licht.** Buchstaben, Silben, Wörter und Ziffern stehen in Tinte auf
      einer hellen Fläche — Blase, Weg, Karte, Klotz (≥ 7:1). Der Hintergrund trägt nie
      Lerninhalt; die Kontrastrechnungen der Lernschrift gelten deshalb unverändert.
+     **Benannte Ausnahme (seit Oktober 2026): Wort-Detektiv** — das große Wort und das
+     gesuchte Symbol darüber stehen als warmes Creme (`StarlightCream`, fett, dezenter
+     Schimmer) auf ruhigem Dunkel (`calmPool`), Kontrast ≈ 16:1, auf dem nackten Himmel
+     ≥ 12:1; gefunden ist `FoundGold` (≈ 13:1). Kleine Schrift und Kacheln bleiben überall
+     Tinte auf Licht. Farbe trägt dort nur Bedeutung: Gold heißt „gefunden", sonst nichts.
   2. **Ruhige Mitte durch Tiefe**, nicht durch Leere: Bilder sind asymmetrisch, die Mitte liegt
      weit weg im Dunkel oder Nebel. Bilddateien kommen abgedunkelt und mit beruhigter Mitte
      eingebacken als WebP (Dschungel: 57 KB statt 1,9 MB PNG).
@@ -954,7 +973,8 @@ niemals mit einem stummen No-Op.
     dann geht es automatisch weiter. Nach „Zeig mir" zeigt sie nur die selbst gefangenen Perlen.
     Muschel und Perlmutt tragen Sand- und Rosatöne — weder Gold (Stern) noch Grün (richtig).
   - **Licht-Inseln** (`ui/world/LightIsland.kt`): `lightIsland` (Karte), `lightPlate` (Teller
-    unter einem Bild), `lightPool` (weicher Lichtfleck). Sie werden **um** das Bauteil gezeichnet,
+    unter einem Bild) und als dunkles Gegenstück `calmPool` (ruhige Zone hinter der
+    Leuchtschrift des Wort-Detektivs). Sie werden **um** das Bauteil gezeichnet,
     nicht als Hülle — Layout und Größenrechnungen der Trainer bleiben unberührt. Eine Insel
     steht in der Modifier-Kette **vor** jeder Deckkraft (`alpha`), sonst zeichnet sie in deren
     Ebene und wird an den Kanten des Bauteils eckig abgeschnitten.
@@ -962,10 +982,16 @@ niemals mit einem stummen No-Op.
     Lautsprecher las sich wie ein zweiter Knopf), Sterne (wenige
     funkeln mit 8–14 s), Hügel und Bäume unten. Die Zahlentürme stehen auf ihrer hellen Platte,
     Antwortkacheln und Ziffernblock sind ohnehin hell.
-  - **Dachboden** (Wort-Detektiv, gezeichnet): Dachbalken, rundes Fenster, Mondstrahl mit
-    langsam treibendem Staub (17–31 s). Das Wort liegt im Lichtfleck, das Zielpaar („P / p")
-    auf einer hellen Pille; gefundene Buchstaben fliegen und landen in `StarGold` (auf Dunkel
-    ≈ 8:1), die Quittungs-Striche sind Creme.
+  - **Sternenhimmel** (Wort-Detektiv, gezeichnet, seit Oktober 2026 statt des Dachbodens,
+    der als Szene nicht erkennbar war): Nachtblau → Violett, zarte Milchstraße, wenige Sterne,
+    die ruhig funkeln (4–7 s), zwei schwache Sternbild-Linien, dunkler Horizont, unten links
+    ein **Teleskop** auf Dreibein als Silhouette (Deko, ohne Funktion). **Kein Stern berührt
+    das Teleskop:** seine Ecke ist sternfrei (`StarsScene`), und auch Silhouetten-Reihe und
+    Stern-Flug halten sich davon fern (die Reihe schrumpft notfalls, der Flug holt nach rechts
+    aus). Das Wort liegt auf der ruhigen Zone; ein Treffer wird `FoundGold`, kleine Sternbilder
+    rahmen ihn, ein Stern fliegt im Bogen in seine Silhouette und leuchtet beim Landen kurz
+    auf. „Bewegung reduzieren": kein Flug, kein Funkeln, die Silhouette füllt sich direkt.
+    Standbilder: `WordDetectiveShotTest`.
   - **Werkstatt** (Wort-Bauer, gezeichnet): dunkles Holz mit Maserung, warmer Lampenkegel, der
     ganz langsam atmet (9 s). Das Bild steht auf einem Teller, die Bausteine sind Ahorn-Klötze
     mit Schatten, das fertige Wort liegt auf einer Karte.
@@ -976,7 +1002,8 @@ niemals mit einem stummen No-Op.
     stauchen sich und schaukeln aus. Tipps auf die Welt selbst (`WorldTaps`: was kein Bauteil der
     Aufgabe verbraucht hat und kein Ziehen war) beantwortet der Hintergrund: in der Tiefsee
     steigen Bläschen vom Finger auf, auf der Lichtung weichen Glühwürmchen aus und kehren zurück,
-    in der Leseecke glimmt die Lampe kurz wärmer auf, auf dem Dachboden wirbelt Staub,
+    in der Leseecke glimmt die Lampe kurz wärmer auf, am Sternenhimmel funkeln die nächsten
+    Sterne kurz auf (nie am Teleskop),
     in der Werkstatt schwingt die Lampe, in der Pilzhöhle flammt der nächste Leuchtpilz auf und
     stößt Sporen aus. Alles klingt in 2–5 s aus; bei „Bewegung reduzieren" passiert nichts.
   - **Garten in der blauen Stunde** (Satz-Architekt, gezeichnet): Sterne, ein warmer
@@ -1176,7 +1203,7 @@ Wenn eine Änderung vorgeschlagen wird, prüfen:
 | Sieht eine geschaffte Lektion danach noch gesperrt aus (frei gewählte Reihenfolge)? | Nein → eigener Fortschritt schlägt die Sperre |
 | Erkennt das Kind ohne Text, welches Schild jetzt dran ist?                   | Ja → Nebelring + Auto-Scroll         |
 | Zeigt ein abgeleiteter Trainer ein Graphem, das die Lektion noch nicht kennt?  | Nein → Graphem-Tabelle ist lektionsbeschränkt |
-| Verlangt der Wort-Detektiv einen Tipp auf eine Form, die er nicht zeigt?       | Buchstaben nein → Paar `P / p`; Silben zeigen nur die Kleinform, der Treffer darf die Großform sein |
+| Verlangt der Wort-Detektiv einen Tipp auf eine Form, die er nicht zeigt?       | Buchstaben nein → Paar `P · p`; Silben zeigen nur die Kleinform, der Treffer darf die Großform sein |
 
 
 Siehe auch `[AGENTS.md](../AGENTS.md)` für den Arbeitsprozess und Dokumentationspflichten.

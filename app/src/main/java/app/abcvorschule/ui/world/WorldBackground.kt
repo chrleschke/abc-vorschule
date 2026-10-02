@@ -40,7 +40,7 @@ fun WorldBackground(world: TrainerWorld, modifier: Modifier = Modifier, taps: Wo
             JungleFireflies(Modifier.fillMaxSize())
         }
         TrainerWorld.ForestNight -> ForestNightBackground(modifier)
-        TrainerWorld.Attic -> AtticBackground(modifier, taps)
+        TrainerWorld.Stars -> StarsBackground(modifier, taps)
         TrainerWorld.Workshop -> WorkshopBackground(modifier, taps)
         TrainerWorld.Garden -> GardenBackground(modifier)
         TrainerWorld.ReadingNook -> ReadingNookBackground(modifier, taps)
