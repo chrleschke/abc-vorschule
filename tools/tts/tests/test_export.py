@@ -6,9 +6,10 @@ import numpy as np
 import soundfile as sf
 
 from ttskit.cli import load_context
-from ttskit.export import asset_name, export_to_app
+from ttskit.export import asset_name, export_fingerprint, export_to_app, wav_fingerprint
 from ttskit.paths import Paths
 from ttskit.plan import clip_key, fingerprint
+from ttskit.render import sample_candidates, trim_candidate
 
 
 def make_paths(tmp_path: Path, content_dir: Path) -> Paths:
@@ -17,10 +18,11 @@ def make_paths(tmp_path: Path, content_dir: Path) -> Paths:
                  sound_pairs_kt=tmp_path / "SoundPairs.kt")
 
 
-def write_wav(path: Path, seconds: float = 0.2, sr: int = 24000) -> None:
+def write_wav(path: Path, seconds: float = 0.2, sr: int = 24000,
+              freq: float = 440.0) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     t = np.linspace(0, seconds, int(sr * seconds), endpoint=False)
-    sf.write(path, (0.3 * np.sin(2 * np.pi * 440 * t)).astype(np.float32),
+    sf.write(path, (0.3 * np.sin(2 * np.pi * freq * t)).astype(np.float32),
              sr, subtype="PCM_16")
 
 
@@ -60,7 +62,8 @@ def test_exports_locked_rendered_clip_as_ogg(tmp_path, content_dir):
     entry = index["clips"]["Mama."]
     assert entry["file"] == asset_name(key)
     assert entry["profile"] == "sentence"
-    assert isinstance(entry["fingerprint"], str) and len(entry["fingerprint"]) == 16
+    assert entry["fingerprint"] == wav_fingerprint(paths.audio / f"{key}.wav")
+    assert entry["fingerprint"].startswith("wav:") and len(entry["fingerprint"]) == 20
 
 
 def test_skips_unlocked_and_missing_locked_clips(tmp_path, content_dir):
@@ -204,7 +207,7 @@ def test_collision_prefers_verified_audio(tmp_path):
     index = json.loads(index_path.read_text())
     ctx = load_context(paths)
     finale_clip = next(c for c in ctx.clips if c.key == finale_key)
-    finale_fp = fingerprint(finale_clip, ctx.profiles.profiles["finale"])
+    finale_fp = export_fingerprint(paths, finale_clip)
     index["clips"]["Baue das Wort Finale."] = {
         "file": asset_name(finale_key),
         "profile": "finale",
@@ -403,7 +406,9 @@ def test_second_export_leaves_ogg_bytes_untouched(tmp_path, content_dir):
     assert ogg.read_bytes() == first_bytes
 
 
-def test_fingerprint_change_forces_reencode(tmp_path, content_dir):
+def test_a_new_take_forces_reencode(tmp_path, content_dir):
+    """Promote kopiert den neuen Wurf in die Produktions-WAV — andere Audio,
+    anderer Fingerprint, neue .ogg."""
     paths = make_paths(tmp_path, content_dir)
     key = clip_key_for_text(paths, "Mama.")
     lock_and_render(paths, key)
@@ -411,26 +416,149 @@ def test_fingerprint_change_forces_reencode(tmp_path, content_dir):
     ogg = paths.app_audio_dir / asset_name(key)
     first_bytes = ogg.read_bytes()
 
-    # Ein neuer Seed macht den Clip fachlich zu einer neuen Aufnahme — die WAV
-    # bliebe im echten Ablauf durch `tts render` neu erzeugt; hier reicht die
-    # bestehende Datei, um den Re-Encode-Pfad über den geänderten Fingerprint
-    # zu prüfen (Text/Profil/Stimme/Instruktion/Sampling bleiben gleich, nur
-    # der Seed ändert sich).
-    locks_data = json.loads(paths.locks.read_text())
-    locks_data["locks"][key]["seed"] = 2
-    paths.locks.write_text(json.dumps(locks_data), encoding="utf-8")
-
-    ctx = load_context(paths)
-    clip = next(c for c in ctx.clips if c.key == key)
-    new_fp = fingerprint(clip, ctx.profiles.profiles[clip.profile])
-
+    write_wav(paths.audio / f"{key}.wav", seconds=0.3, freq=660.0)
     report = export_to_app(paths)
 
     assert report.exported == [key]
     assert report.unchanged == []
     assert ogg.read_bytes() != first_bytes
+    assert len(sf.read(ogg)[0]) == int(0.3 * 24000)
     index = json.loads((paths.app_audio_dir / "index.json").read_text())
-    assert index["clips"]["Mama."]["fingerprint"] == new_fp
+    assert index["clips"]["Mama."]["fingerprint"] == wav_fingerprint(paths.audio / f"{key}.wav")
+
+
+def test_profile_changes_never_reencode_a_locked_clip(tmp_path, content_dir):
+    """Regression: nach einer Änderung an Instruktion und Sampling in
+    profiles.json wurden 302 gelockte Clips neu encodiert — gleiche Audio,
+    andere Bytes (zufällige Ogg-Seriennummer), und der Index behauptete
+    Einstellungen, mit denen nie gerendert wurde. Der Export richtet sich nur
+    nach der Produktions-Audio."""
+    paths = make_paths(tmp_path, content_dir)
+    shutil.copy(Paths().profiles, paths.profiles)
+    keys = [clip_key_for_text(paths, t) for t in ("Mama.", "M", "Maus")]
+    for key in keys:
+        lock_and_render(paths, key)
+    export_to_app(paths)
+    before = {k: (paths.app_audio_dir / asset_name(k)).read_bytes() for k in keys}
+    index_before = (paths.app_audio_dir / "index.json").read_bytes()
+
+    profiles = json.loads(paths.profiles.read_text(encoding="utf-8"))
+    for profile in profiles["profiles"].values():
+        profile["instruct"] = profile.get("instruct", "") + " Ganz anders betont."
+        profile.setdefault("sampling", {})["max_new_tokens"] = 123
+        profile["sampling"]["temperature"] = 0.42
+    paths.profiles.write_text(json.dumps(profiles, ensure_ascii=False), encoding="utf-8")
+
+    report = export_to_app(paths)
+
+    assert report.exported == []
+    assert sorted(report.unchanged) == sorted(keys)
+    for key in keys:
+        assert (paths.app_audio_dir / asset_name(key)).read_bytes() == before[key]
+    assert (paths.app_audio_dir / "index.json").read_bytes() == index_before
+
+
+def test_a_waveform_trim_forces_reencode(tmp_path, content_dir):
+    """✂ an der Produktion schreibt die Produktions-WAV mit — der Export sieht
+    den Schnitt am Inhalt, ohne eigenen Sonderfall für `trim` im Sidecar."""
+    paths = make_paths(tmp_path, content_dir)
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)  # Lock-Seed 1
+    ctx = load_context(paths)
+    clip = next(c for c in ctx.clips if c.key == key)
+    profile = ctx.profiles.profiles[clip.profile]
+    # Kandidat auf dem Lock-Seed, der zugleich die Produktion ist.
+    (paths.audio / f"{key}.wav").unlink()
+
+    class Engine:
+        def generate(self, text, profile, seed):
+            t = np.linspace(0, 1.0, 24000, endpoint=False)
+            return (0.3 * np.sin(2 * np.pi * 440 * t)).astype(np.float32), 24000
+
+    sample_candidates(clip, profile, Engine(), paths, [clip.seed])
+    shutil.copy(paths.candidates / key / f"{clip.seed}.wav", paths.audio / f"{key}.wav")
+    export_to_app(paths)
+    ogg = paths.app_audio_dir / asset_name(key)
+    untrimmed = len(sf.read(ogg)[0])
+
+    trim_candidate(paths, clip, clip.seed, 0.0, 0.5)
+    report = export_to_app(paths)
+
+    assert report.exported == [key]
+    assert len(sf.read(ogg)[0]) < untrimmed
+
+
+def _write_legacy_index(paths: Paths, key: str, text: str, profile: str) -> None:
+    """Index wie vor dem Inhalts-Fingerprint: Render-Fingerprint aus plan.fingerprint."""
+    ctx = load_context(paths)
+    clip = next(c for c in ctx.clips if c.key == key)
+    legacy = fingerprint(clip, ctx.profiles.profiles[clip.profile])
+    assert not legacy.startswith(("wav:", "mic:"))
+    index_path = paths.app_audio_dir / "index.json"
+    index = json.loads(index_path.read_text())
+    index["clips"][text] = {"file": asset_name(key), "profile": profile,
+                            "fingerprint": legacy}
+    index_path.write_text(json.dumps(index), encoding="utf-8")
+
+
+def test_legacy_fingerprint_with_identical_audio_is_migrated_without_reencode(
+        tmp_path, content_dir):
+    paths = make_paths(tmp_path, content_dir)
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)
+    export_to_app(paths)
+    _write_legacy_index(paths, key, "Mama.", "sentence")
+    ogg = paths.app_audio_dir / asset_name(key)
+    first_bytes = ogg.read_bytes()
+    first_mtime = ogg.stat().st_mtime_ns
+
+    report = export_to_app(paths)
+
+    assert report.exported == []
+    assert report.unchanged == [key]
+    assert report.migrated == [key]
+    assert ogg.read_bytes() == first_bytes
+    assert ogg.stat().st_mtime_ns == first_mtime
+    index = json.loads((paths.app_audio_dir / "index.json").read_text())
+    assert index["clips"]["Mama."]["fingerprint"] == wav_fingerprint(paths.audio / f"{key}.wav")
+
+    # Danach ist nichts mehr zu migrieren.
+    again = export_to_app(paths)
+    assert again.unchanged == [key] and again.migrated == [] and again.exported == []
+
+
+def test_legacy_fingerprint_with_different_audio_is_reencoded(tmp_path, content_dir):
+    paths = make_paths(tmp_path, content_dir)
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)
+    export_to_app(paths)
+    _write_legacy_index(paths, key, "Mama.", "sentence")
+    ogg = paths.app_audio_dir / asset_name(key)
+    first_bytes = ogg.read_bytes()
+
+    # Ein neuer Wurf, gleiche Länge — nur der Klang unterscheidet sich.
+    write_wav(paths.audio / f"{key}.wav", freq=1234.0)
+    report = export_to_app(paths)
+
+    assert report.exported == [key]
+    assert report.migrated == []
+    assert ogg.read_bytes() != first_bytes
+    index = json.loads((paths.app_audio_dir / "index.json").read_text())
+    assert index["clips"]["Mama."]["fingerprint"] == wav_fingerprint(paths.audio / f"{key}.wav")
+
+
+def test_legacy_fingerprint_with_a_different_length_is_reencoded(tmp_path, content_dir):
+    paths = make_paths(tmp_path, content_dir)
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)
+    export_to_app(paths)
+    _write_legacy_index(paths, key, "Mama.", "sentence")
+
+    # Derselbe Ton, aber 100 ms länger — weit über der Toleranz.
+    write_wav(paths.audio / f"{key}.wav", seconds=0.3)
+    report = export_to_app(paths)
+
+    assert report.exported == [key] and report.migrated == []
 
 
 def test_monster_clips_go_to_the_variants_block_and_letters_stay_in_clips(tmp_path, content_dir):
@@ -516,3 +644,29 @@ def test_microphone_fingerprint_drives_reencoding(tmp_path, content_dir):
     (folder / "1.json").write_text(json.dumps(
         {"source": "mic", "fingerprint": "mic:0002"}), encoding="utf-8")
     assert export_to_app(paths).exported == [clip.key]
+
+
+def test_microphone_clips_ignore_profile_changes(tmp_path, content_dir):
+    """Wie bisher: eine Aufnahme hängt an keiner Profil-Einstellung, ihr
+    Fingerprint bleibt der aus dem Sidecar."""
+    paths = make_paths(tmp_path, content_dir)
+    shutil.copy(Paths().profiles, paths.profiles)
+    key = clip_key_for_text(paths, "Mama.")
+    lock_and_render(paths, key)
+    folder = paths.candidates / key
+    folder.mkdir(parents=True)
+    (folder / "1.json").write_text(json.dumps(
+        {"source": "mic", "fingerprint": "mic:0001"}), encoding="utf-8")
+    export_to_app(paths)
+    ogg = paths.app_audio_dir / asset_name(key)
+    first_bytes = ogg.read_bytes()
+
+    profiles = json.loads(paths.profiles.read_text(encoding="utf-8"))
+    profiles["profiles"]["sentence"]["instruct"] = "Flüstere."
+    paths.profiles.write_text(json.dumps(profiles, ensure_ascii=False), encoding="utf-8")
+
+    report = export_to_app(paths)
+    assert report.unchanged == [key] and report.exported == []
+    assert ogg.read_bytes() == first_bytes
+    index = json.loads((paths.app_audio_dir / "index.json").read_text())
+    assert index["clips"]["Mama."]["fingerprint"] == "mic:0001"

@@ -7,12 +7,13 @@ import numpy as np
 import pytest
 import soundfile as sf
 
+from ttskit.export import export_fingerprint
 from ttskit.models import Item
 from ttskit.paths import Paths
 from ttskit.plan import build_clips
 from ttskit.render import (
     candidate_infos, candidate_original_path, delete_candidate_wav,
-    production_fingerprint, sample_candidates, trim_candidate,
+    sample_candidates, trim_candidate,
 )
 from ttskit.store import Locks, Profiles
 
@@ -81,10 +82,12 @@ def test_trim_rewrites_production_and_changes_the_export_fingerprint(setup):
     production.parent.mkdir(parents=True, exist_ok=True)
     production.write_bytes((paths.candidates / clip.key / "7.wav").read_bytes())
     locked = replace(clip, seed=7)
-    before = production_fingerprint(paths, locked, profile)
+    before = export_fingerprint(paths, locked)
     trim_candidate(paths, locked, 7, 0.0, 0.5)
     assert len(read(production)) == SR // 2
-    assert production_fingerprint(paths, locked, profile) != before
+    # Der Export-Fingerprint geht nach dem Inhalt der Produktions-WAV — der
+    # Schnitt schreibt sie mit, also sieht der Export ihn ohne Sonderfall.
+    assert export_fingerprint(paths, locked) != before
 
 
 def test_trim_leaves_foreign_production_alone(setup):

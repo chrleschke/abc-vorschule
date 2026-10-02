@@ -165,7 +165,8 @@ def render_clips(
             break
         try:
             # `clip.text`, nicht der Entwurf: hier entsteht die Produktion, und
-            # deren Fingerprint (Export) rechnet mit dem Produktionstext.
+            # deren Render-Fingerprint (Promote, „⚠️ alt") rechnet mit dem
+            # Produktionstext.
             wav, sample_rate = engine.generate(
                 clip.text, effective_profile(clip, prof), clip.seed)
             wav = postprocess(wav, sample_rate, trim=prof.trim, normalize=prof.normalize)
@@ -396,7 +397,7 @@ def sample_candidates(
 
     `trim` (Stille vorne und hinten wegschneiden) ist eine Wahl pro Wurf;
     None heißt „wie im Profil". Was tatsächlich galt, steht im Sidecar als
-    `trimSilence` — Frische, Promote und Export rechnen damit, sonst wäre ein
+    `trimSilence` — Frische und Promote rechnen damit, sonst wäre ein
     bewusst ungeschnittener Wurf gegen ein schneidendes Profil sofort „alt".
 
     Zwei Seeds werden übersprungen (Progress-Status "skipped"), statt sie zu
@@ -497,28 +498,6 @@ def recorded_trim_silence(meta: dict[str, Any]) -> bool | None:
     Alt-Sidecars ohne `trimSilence`; dann gilt, was im Profil steht."""
     value = meta.get("trimSilence")
     return value if isinstance(value, bool) else None
-
-
-def production_fingerprint(paths: Paths, clip: Clip, profile: Profile) -> str:
-    """Fingerprint der Produktion für Export und Promote.
-
-    Für Qwen-Clips `plan.fingerprint`; für eine Mikrofon-Aufnahme der Hash der
-    bearbeiteten Audiodatei aus dem Sidecar — nur der ändert sich, wenn jemand
-    neu schneidet oder pitcht, und nur dann soll der Export neu encodieren.
-    """
-    meta = candidate_meta(paths, clip.key, clip.seed)
-    if meta.get("source") == "mic" and isinstance(meta.get("fingerprint"), str):
-        return meta["fingerprint"]
-    # Ohne `trimSilence` im Sidecar (Alt-Kandidat, `tts render`) das des
-    # Profils — genau wie bisher, der Export encodiert also nichts neu.
-    base = fingerprint(clip, profile, trim=recorded_trim_silence(meta))
-    # Ein Schnitt in der Wellenform ändert die Datei, aber nicht die
-    # Profil-Einstellungen — ohne ihn im Fingerprint hielte der Export die
-    # Produktion für unverändert und die App behielte die ungeschnittene Fassung.
-    trim = meta.get("trim")
-    if isinstance(trim, dict):
-        return f"{base}~{float(trim['start']):.3f}-{float(trim['end']):.3f}"
-    return base
 
 
 #: Kürzester Rest, der nach einem Schnitt bleiben muss (Sekunden).

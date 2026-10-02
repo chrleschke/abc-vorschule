@@ -276,6 +276,10 @@ def cmd_export(paths: Paths, args) -> int:
     target = Path(paths.app_audio_dir)
     print(f"{len(list(target.glob('*.ogg')))} Clips im Paket → {target}")
     line = f"  {len(report.exported)} neu · {len(report.unchanged)} unverändert"
+    if report.migrated:
+        # Einmalig nach der Umstellung auf Inhalts-Fingerprints: Datei gleich
+        # geblieben, nur ihr Eintrag in index.json trägt jetzt `wav:`.
+        line += f" (davon {len(report.migrated)} nur im Index umgestellt)"
     if report.removed:
         line += f" · {len(report.removed)} entfernt"
     print(line)

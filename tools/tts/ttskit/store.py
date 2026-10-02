@@ -485,7 +485,8 @@ class Lock:
     seed: int
     profile: str | None = None
     #: Der Text der *bestätigten* Produktion (None = der Satz aus dem Content).
-    #: Geht in deren Fingerprint ein und damit in den Export.
+    #: Geht in deren Render-Fingerprint ein (Promote, „⚠️ alt"); der Export
+    #: richtet sich nach der Audio selbst (`export.export_fingerprint`).
     text_override: str | None = None
     #: Arbeitstext für *neue* Aufnahmen (Generate, Batch-Lauf, `tts sample`).
     #: Getrennt von `text_override`, damit ein Probesatz im TTS-Feld nicht

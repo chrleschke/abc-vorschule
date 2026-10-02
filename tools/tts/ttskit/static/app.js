@@ -2540,6 +2540,8 @@ async function exportToApp() {
   const report = await api("/api/export", { method: "POST" });
   const parts = [`${report.exported.length} Clips in die App exportiert`];
   if (report.unchanged.length) parts.push(`${report.unchanged.length} unverändert`);
+  // Einmalig nach der Umstellung auf Inhalts-Fingerprints (siehe export.py).
+  if (report.migrated?.length) parts.push(`${report.migrated.length} davon nur im Index umgestellt`);
   if (report.removed.length) parts.push(`${report.removed.length} nicht mehr benötigte entfernt`);
   if (report.skipped.length) parts.push(`${report.skipped.length} übersprungen`);
   parts.push(...report.warnings);
