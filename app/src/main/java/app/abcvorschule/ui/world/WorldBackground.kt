@@ -43,7 +43,7 @@ fun WorldBackground(world: TrainerWorld, modifier: Modifier = Modifier, taps: Wo
         TrainerWorld.Attic -> AtticBackground(modifier, taps)
         TrainerWorld.Workshop -> WorkshopBackground(modifier, taps)
         TrainerWorld.Garden -> GardenBackground(modifier)
-        TrainerWorld.Theater -> TheaterBackground(modifier, taps)
+        TrainerWorld.ReadingNook -> ReadingNookBackground(modifier, taps)
         TrainerWorld.Cave -> Box(modifier) {
             PaintedBackground(R.drawable.world_cave, CaveFallback, Modifier.fillMaxSize())
             CaveGlowMotes(Modifier.fillMaxSize(), taps)

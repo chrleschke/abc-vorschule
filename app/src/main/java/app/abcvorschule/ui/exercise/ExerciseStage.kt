@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isFinite
 import androidx.compose.ui.zIndex
@@ -24,12 +26,13 @@ enum class AnswerAnchor {
     Bottom,
 
     /**
-     * Oberkante des Antwortblocks knapp unter der Bildschirmmitte. Für Übungen,
-     * deren Aufgabenblock fast leer ist: der Satz-Versteher trägt dort nur den
-     * Speaker (kein Titel, keine Kacheln, kein Wort — Ausnahme: ohne deutsches
-     * TTS erscheint der Satz dort als Text, damit ein Erwachsener vorlesen kann,
-     * siehe PRODUCT_PRINCIPLES §7), und am unteren Rand verdeckt die tippende
-     * Hand dann die Bildkarten, die den ganzen Inhalt der Aufgabe ausmachen.
+     * Oberkante des Antwortblocks knapp unter der Bildschirmmitte. Für den
+     * Satz-Versteher, dessen Aufgabenblock kein Lerninhalt zum Antippen trägt, nur
+     * das Bilderbuch mit leerem Rahmen und Wort-Balken (kein Titel, keine Kacheln,
+     * kein Wort — Ausnahme: ohne deutsches TTS steht der Satz als Text auf der
+     * Seite, damit ein Erwachsener vorlesen kann, siehe PRODUCT_PRINCIPLES §7): am
+     * unteren Rand verdeckt die tippende Hand sonst die Bildkarten, die den ganzen
+     * Inhalt der Aufgabe ausmachen.
      */
     BelowCenter,
 }
@@ -83,12 +86,19 @@ private const val PromptHeightFraction = 0.52f
  * verschwindet die Karte beim Ziehen hinter den Figuren. Vorbelegung bleibt `false`, weil
  * Wort-Bauer und Satz-Architekt in die andere Richtung ziehen, von unten nach oben in den
  * Aufgabenblock: mit `true` läge dort die Kachel dann hinter dem Aufgabenblock.
+ * @param answersBackdrop Zeichnet hinter den Antwortblock, **außerhalb** des Ruhens
+ * ([promptRest]): Oberkante ist die des Antwortblocks, gezeichnet werden darf auch weit
+ * über ihn hinaus. Benannte Ausnahme wie [answerAnchor], nur der Satz-Versteher nutzt
+ * sie — sein Lesetisch gehört zur Welt, nicht zur Aufgabe. Im Ruhe-Layer schrumpfte
+ * die Tischkante beim Vorlesen um 3 % zur Mitte des Blocks und glitte beim Aufwachen
+ * sichtbar zurück; die Kartenreihe selbst ruht weiter wie in jedem Trainer.
  */
 @Composable
 fun ExerciseStage(
     modifier: Modifier = Modifier,
     answerAnchor: AnswerAnchor = AnswerAnchor.Bottom,
     promptAboveAnswers: Boolean = false,
+    answersBackdrop: (DrawScope.() -> Unit)? = null,
     promptChrome: @Composable ColumnScope.() -> Unit = {},
     prompt: @Composable ColumnScope.() -> Unit,
     answers: @Composable ColumnScope.() -> Unit,
@@ -148,6 +158,7 @@ fun ExerciseStage(
                         },
                     )
                     .padding(bottom = 8.dp)
+                    .then(if (answersBackdrop != null) Modifier.drawBehind(answersBackdrop) else Modifier)
                     .promptRest(rest),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(14.dp),

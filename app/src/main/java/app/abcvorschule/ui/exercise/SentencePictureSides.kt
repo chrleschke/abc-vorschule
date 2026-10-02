@@ -58,10 +58,10 @@ object SentencePictureCardSizing {
     /**
      * @param contentWidthDp Breite *innerhalb* der Karteninnenabstände.
      * @param fontScale System-Schriftskalierung ([androidx.compose.ui.unit.Density.fontScale]).
-     * @param baseScale Faktor auf die Basisgröße, den die Erfolgsanimation von 1f
-     *   auf 1.6f fährt. Er hebt die Basis, **nicht** den Breitendeckel: die Karte
-     *   wird beim Feiern echt breiter gemessen, aber ohne diesen Faktor bliebe die
-     *   Basis die bindende Grenze und das Emoji würde nicht wachsen.
+     * @param baseScale Faktor auf die Basisgröße. Er hebt die Basis, **nicht** den
+     *   Breitendeckel. Bis Oktober 2026 fuhr ihn die Erfolgsanimation auf 1.6f (die
+     *   richtige Karte wuchs in die Mitte); seit dem Bilderbuch fliegt sie stattdessen
+     *   in den Rahmen, und alle Aufrufer nehmen die Vorbelegung.
      */
     fun emojiSp(
         atomCount: Int,

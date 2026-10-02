@@ -40,8 +40,8 @@ enum class TrainerWorld(val night: Boolean) {
     /** Satz-Architekt: Garten in der blauen Stunde, die Wäscheleine zeichnet der Trainer. */
     Garden(night = true),
 
-    /** Satz-Versteher: Puppentheater mit Samtvorhang und Lichterkette, gezeichnet. */
-    Theater(night = true),
+    /** Satz-Versteher: Leseecke im Lampenschein, gezeichnet; Buch und Tisch zeichnet der Trainer. */
+    ReadingNook(night = true),
 
     /** Laut-Fresser: Pilzhöhle (`world_cave.webp`), die Fresser zeichnet der Trainer. */
     Cave(night = true),
@@ -60,7 +60,7 @@ enum class TrainerWorld(val night: Boolean) {
             is SymbolInWordRound -> Attic
             is WordBuildRound -> Workshop
             is SentenceOrderRound -> Garden
-            is SentencePictureRound -> Theater
+            is SentencePictureRound -> ReadingNook
             is SoundFeederRound -> Cave
             is SyllableMergeRound -> Clearing
             else -> Paper
