@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import kotlin.math.PI
@@ -85,104 +86,50 @@ private fun DrawScope.drawTreeGroup(foot: Offset, scale: Float, color: Color) {
 }
 
 /**
- * Satz-Versteher: ein Puppentheater. Dunkler Bühnenraum, links und rechts roter
- * Samtvorhang, der ganz leicht atmet (7 s), oben ein Lambrequin und eine Lichterkette,
- * deren Birnen langsam glimmen. Die Bühnenbretter unter den Bildkarten zeichnet der
- * Trainer, damit sie genau unter den Karten liegen.
+ * Satz-Versteher: eine Leseecke. Ein dunkler Raum, oben Nachtblau, nach unten warmes
+ * Dunkelviolett, oben rechts der Schein einer Leselampe, der sehr langsam atmet (8 s).
+ * Mehr bewegt sich nicht — das Buch ist der Ort, an dem etwas passiert. Buch und Tisch
+ * zeichnet der Trainer ([app.abcvorschule.ui.exercise.SentencePictureTrainer]), weil
+ * sie am gemessenen Aufgaben- und Antwortblock hängen.
+ *
+ * Bis Oktober 2026 stand hier ein Puppentheater; ein Tester wollte die Karten auf die
+ * Bühne legen — die Bühne versprach eine Ablagefläche, die es nicht gab.
  */
 @Composable
-internal fun TheaterBackground(modifier: Modifier, taps: WorldTaps?) {
+internal fun ReadingNookBackground(modifier: Modifier, taps: WorldTaps?) {
     val still = rememberReduceMotion()
     val seconds by rememberWorldSeconds(still)
     Canvas(modifier.graphicsLayer()) {
         val w = size.width
         val h = size.height
-        drawRect(
-            Brush.radialGradient(
-                0f to StageBack,
-                0.6f to StageMid,
-                1f to StageDark,
-                center = Offset(w * 0.5f, h * 0.45f),
-                radius = h * 0.6f,
-            ),
-        )
-        val top = h * 0.3f
-        val bottom = h * 0.8f
-        val sway = sin(seconds / 7f * Tau) * 3.dp.toPx()
-        // Angetippt bauscht sich der Vorhang auf der Seite des Tipps: sein Saum schwingt
-        // ein paar Mal weich aus.
-        var billowLeft = 0f
-        var billowRight = 0f
+        drawRect(Brush.verticalGradient(0f to NookTop, 1f to NookLow))
+        val breath = if (still) 1f else 0.88f + 0.12f * sin(seconds / LampBreathS * Tau)
+        // Angetippt glimmt die Lampe kurz wärmer auf und klingt in ein paar Sekunden aus.
+        var flare = 0f
         taps?.let { tt ->
             tt.now = seconds
             tt.still = still
-            tt.forEachRecent(seconds, CurtainBillowS) { tap, age ->
-                val b = 18.dp.toPx() * sin(age / 1.3f * Tau) * kotlin.math.exp(-age / 1.1f)
-                if (tap.at.x < w / 2f) billowLeft += b else billowRight -= b
-            }
+            tt.forEachRecent(seconds, LampFlareS) { _, age -> flare += tapEnvelope(age, rise = 0.25f, decay = 1.1f) }
         }
-        drawCurtain(left = true, x = 0f, width = w * 0.2f, top = top, bottom = bottom, hemShift = sway + billowLeft)
-        drawCurtain(left = false, x = w * 0.8f, width = w * 0.2f, top = top, bottom = bottom, hemShift = -sway + billowRight)
-        // Lambrequin: eine Reihe Samtbögen über die ganze Breite.
-        // Schmal gehalten und unter dem Lautsprecher: nur ein Saum, kein Balken.
-        val valanceTop = h * 0.285f
-        val scallop = w / 11f
-        val band = 6.dp.toPx()
-        drawRect(CurtainMid, topLeft = Offset(0f, valanceTop - band), size = Size(w, band * 1.6f))
-        for (i in 0 until 11) {
-            val c = Offset(scallop * (i + 0.5f), valanceTop)
-            drawArc(
-                brush = Brush.verticalGradient(0f to CurtainLight, 1f to CurtainMid, startY = valanceTop, endY = valanceTop + scallop * 0.45f),
-                startAngle = 0f,
-                sweepAngle = 180f,
-                useCenter = true,
-                topLeft = Offset(c.x - scallop * 0.5f, c.y - scallop * 0.4f),
-                size = Size(scallop, scallop * 0.8f),
+        val alpha = LampAlpha * breath + 0.14f * flare.coerceAtMost(1f)
+        // Ein Kreisverlauf, waagerecht gestreckt: der Schein ist breiter als hoch,
+        // wie der Lichtkegel einer Lampe über dem Lesetisch.
+        val lamp = Offset(w * 0.8f, h * 0.1f)
+        val rx = w * 0.8f
+        val ry = h * 0.8f
+        scale(scaleX = rx / ry, scaleY = 1f, pivot = lamp) {
+            drawCircle(
+                brush = Brush.radialGradient(
+                    0f to LampGlow.copy(alpha = alpha),
+                    1f to LampGlow.copy(alpha = 0f),
+                    center = lamp,
+                    radius = ry,
+                ),
+                radius = ry,
+                center = lamp,
             )
         }
-        // Lichterkette knapp über dem Lambrequin, leicht durchhängend.
-        val bulbs = 9
-        for (i in 0 until bulbs) {
-            val t = i / (bulbs - 1f)
-            val x = w * (0.05f + 0.9f * t)
-            val y = valanceTop - band - 4.dp.toPx() + sin(t * PI.toFloat()) * 8.dp.toPx()
-            val glow = 0.75f + 0.25f * sin(seconds / 6f * Tau + i * 0.9f)
-            val c = Offset(x, y)
-            val gr = 12.dp.toPx()
-            drawCircle(Brush.radialGradient(0f to BulbGlow.copy(alpha = 0.45f * glow), 1f to Color.Transparent, center = c, radius = gr), radius = gr, center = c)
-            drawCircle(BulbLight, alpha = glow, radius = 3.dp.toPx(), center = c)
-        }
     }
-}
-
-/** Ein Vorhangflügel: senkrechte Falten aus hellen und dunklen Bahnen, unten schräg gerafft. */
-private fun DrawScope.drawCurtain(left: Boolean, x: Float, width: Float, top: Float, bottom: Float, hemShift: Float) {
-    val path = Path().apply {
-        if (left) {
-            moveTo(x - 10f, top)
-            lineTo(x + width, top)
-            quadraticTo(x + width * 0.7f + hemShift, (top + bottom) * 0.55f, x + width * 0.25f + hemShift, bottom)
-            lineTo(x - 10f, bottom + 30f)
-        } else {
-            moveTo(x, top)
-            lineTo(x + width + 10f, top)
-            lineTo(x + width + 10f, bottom + 30f)
-            lineTo(x + width * 0.75f + hemShift, bottom)
-            quadraticTo(x + width * 0.3f + hemShift, (top + bottom) * 0.55f, x, top)
-        }
-        close()
-    }
-    val fold = width / 3.5f
-    drawPath(
-        path,
-        Brush.horizontalGradient(
-            0f to CurtainDark, 0.18f to CurtainLight, 0.36f to CurtainMid,
-            0.55f to CurtainLight, 0.75f to CurtainDark, 1f to CurtainMid,
-            startX = x, endX = x + fold * 3.5f,
-        ),
-    )
-    // Unten dunkler: der Samt fällt aus dem Licht der Lichterkette.
-    drawPath(path, Brush.verticalGradient(0.5f to Color.Transparent, 1f to Color(0x99000000), startY = top, endY = bottom))
 }
 
 /**
@@ -404,7 +351,9 @@ private val CaveMotes: List<FloatArray> = run {
     }
 }
 
-private const val CurtainBillowS = 4f
+private const val LampBreathS = 8f
+private const val LampFlareS = 4f
+private const val LampAlpha = 0.38f
 private const val FireflyFleeS = 5f
 
 private val DuskTop = Color(0xFF1C2757)
@@ -424,14 +373,9 @@ private val GardenStars: List<FloatArray> = run {
     }
 }
 
-private val StageBack = Color(0xFF1D2A2A)
-private val StageMid = Color(0xFF0F1A1C)
-private val StageDark = Color(0xFF070D0F)
-private val CurtainDark = Color(0xFF5E121D)
-private val CurtainMid = Color(0xFF7C1A27)
-private val CurtainLight = Color(0xFF9A2432)
-private val BulbLight = Color(0xFFFFE2A0)
-private val BulbGlow = Color(0xFFFFC86E)
+private val NookTop = Color(0xFF17172A)
+private val NookLow = Color(0xFF2C2233)
+private val LampGlow = Color(0xFFFFCF8A)
 
 private val ClearingCenter = Color(0xFF183237)
 private val ClearingMid = Color(0xFF0E2024)

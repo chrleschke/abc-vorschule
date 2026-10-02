@@ -162,6 +162,63 @@ class NightWorldShotTest {
     fun longSentenceOnTheLine() =
         sentence(listOf("der", "Schneemann", "ist", "groß"), "⛄", place = 2, name = "garden-long")
 
+    /**
+     * Das Bilderbuch des Satz-Verstehers: Vorlesen (Balken glimmen), Flug der richtigen
+     * Karte in den Rahmen, gelandet, Umblättern zur zweiten Runde, neue Seite. Mit
+     * angehaltener Uhr, damit die Zwischenbilder des Flugs und des Blätterns stehen.
+     */
+    @Test
+    fun bookInTheReadingNook() = book(ttsAvailable = true, name = "nook")
+
+    /** Ohne deutsches TTS: der Satz steht als Text auf der Seite (§7). */
+    @Test
+    fun bookWithoutGermanVoice() = book(ttsAvailable = false, name = "nook-text")
+
+    private fun book(ttsAvailable: Boolean, name: String) {
+        val real = ContentRepository.fromContext(InstrumentationRegistry.getInstrumentation().targetContext).load()
+        val spec = real.tasks.getValue("l01-sp1") as app.abcvorschule.content.SentencePictureSpec
+        var roundIndex by mutableStateOf(0)
+        var speaking by mutableStateOf(true)
+        rule.mainClock.autoAdvance = false
+        rule.setContent {
+            InWorld(TrainerWorld.ReadingNook) {
+                // Die TaskShell lässt unten Luft (AbcDimens.screenBottomExtra).
+                Box(Modifier.padding(bottom = AbcDimens.screenBottomExtra)) {
+                    SentencePictureTrainer(
+                        round = spec.rounds[roundIndex],
+                        roundIndex = roundIndex,
+                        pack = real,
+                        ttsAvailable = ttsAvailable,
+                        speaking = speaking,
+                        onSpeakPrompt = {},
+                        onResult = { _, _, _ -> },
+                    )
+                }
+            }
+        }
+        rule.mainClock.advanceTimeBy(1_200)
+        save("$name-reading.png")
+        speaking = false
+        rule.mainClock.advanceTimeBy(800)
+        save("$name-quiet.png")
+        rule.onNodeWithTag("sentence_picture_card_correct").performClick()
+        rule.mainClock.advanceTimeBy(200)
+        save("$name-flight-1.png")
+        rule.mainClock.advanceTimeBy(200)
+        save("$name-flight-2.png")
+        rule.mainClock.advanceTimeBy(1_000)
+        save("$name-landed.png")
+        roundIndex = 1
+        rule.mainClock.advanceTimeBy(150)
+        save("$name-turn-1.png")
+        rule.mainClock.advanceTimeBy(150)
+        save("$name-turn-2.png")
+        rule.mainClock.advanceTimeBy(150)
+        save("$name-turn-3.png")
+        rule.mainClock.advanceTimeBy(1_500)
+        save("$name-next.png")
+    }
+
     /** Der End-Screen der ersten Lektion: Sternbild „M" über dem Finale-Satz. */
     @Test
     fun endScreenWithConstellation() {

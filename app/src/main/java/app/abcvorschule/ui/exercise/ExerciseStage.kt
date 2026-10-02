@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isFinite
 import androidx.compose.ui.zIndex
@@ -83,12 +85,19 @@ private const val PromptHeightFraction = 0.52f
  * verschwindet die Karte beim Ziehen hinter den Figuren. Vorbelegung bleibt `false`, weil
  * Wort-Bauer und Satz-Architekt in die andere Richtung ziehen, von unten nach oben in den
  * Aufgabenblock: mit `true` läge dort die Kachel dann hinter dem Aufgabenblock.
+ * @param answersBackdrop Zeichnet hinter den Antwortblock, **außerhalb** des Ruhens
+ * ([promptRest]): Oberkante ist die des Antwortblocks, gezeichnet werden darf auch weit
+ * über ihn hinaus. Benannte Ausnahme wie [answerAnchor], nur der Satz-Versteher nutzt
+ * sie — sein Lesetisch gehört zur Welt, nicht zur Aufgabe. Im Ruhe-Layer schrumpfte
+ * die Tischkante beim Vorlesen um 3 % zur Mitte des Blocks und glitte beim Aufwachen
+ * sichtbar zurück; die Kartenreihe selbst ruht weiter wie in jedem Trainer.
  */
 @Composable
 fun ExerciseStage(
     modifier: Modifier = Modifier,
     answerAnchor: AnswerAnchor = AnswerAnchor.Bottom,
     promptAboveAnswers: Boolean = false,
+    answersBackdrop: (DrawScope.() -> Unit)? = null,
     promptChrome: @Composable ColumnScope.() -> Unit = {},
     prompt: @Composable ColumnScope.() -> Unit,
     answers: @Composable ColumnScope.() -> Unit,
@@ -148,6 +157,7 @@ fun ExerciseStage(
                         },
                     )
                     .padding(bottom = 8.dp)
+                    .then(if (answersBackdrop != null) Modifier.drawBehind(answersBackdrop) else Modifier)
                     .promptRest(rest),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(14.dp),
