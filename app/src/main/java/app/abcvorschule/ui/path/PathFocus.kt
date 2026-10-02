@@ -118,4 +118,29 @@ internal object PathFocus {
         val hopStartTop = (minOf(fromNodeY, headNodeY) - hopHeadroom).roundToInt()
         return minOf(headTarget, hopStartTop).coerceIn(0, maxScroll)
     }
+
+    /**
+     * The sign that turns its cubes: of the [eligible] ones, the one whose node lies
+     * nearest to [ViewportAnchor] — the same line [scrollTarget] parks the head on, so
+     * after entering the path it is the current sign, and a child who scrolls hands
+     * the turn on to whatever sign comes to rest there. Measured on the node, not on
+     * the sign's middle: the sign stands above its node, and its middle would hand a
+     * resting head's turn to the sign below it.
+     *
+     * Null when no eligible node is inside the viewport — nothing turns off screen.
+     *
+     * @param nodeYs Node positions in scroll-content coordinates.
+     */
+    fun turningIndex(
+        nodeYs: List<Float>,
+        eligible: List<Boolean>,
+        scroll: Int,
+        viewportHeight: Int,
+    ): Int? {
+        if (viewportHeight <= 0) return null
+        val anchor = scroll + viewportHeight * ViewportAnchor
+        return nodeYs.indices
+            .filter { eligible.getOrElse(it) { false } && nodeYs[it] in scroll.toFloat()..(scroll + viewportHeight).toFloat() }
+            .minByOrNull { abs(nodeYs[it] - anchor) }
+    }
 }

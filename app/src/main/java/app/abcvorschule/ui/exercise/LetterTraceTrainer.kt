@@ -124,10 +124,15 @@ fun LetterTraceTrainer(
     var lastFinger by remember(roundKey) { mutableStateOf<TracePoint?>(null) }
     val haptics = LocalAbcHaptics.current
 
-    val morph by animateFloatAsState(
-        targetValue = if (reward || resolved) 1f else 0f,
-        label = "glyph_morph",
-    )
+    // Pro Runde neu angelegt: TrainerHost behält den Trainer über aufeinanderfolgende
+    // Spur-Runden (u → U), und ein ungekeyter animateFloatAsState trüge die 1f der
+    // fertigen Vorrunde in die neue — deren erster Frame zeigte dann schon die eigene
+    // Belohnungskarte (der Uhu vor „Zeichne den Buchstaben U", live gesehen).
+    val morphAnim = remember(roundKey) { Animatable(0f) }
+    LaunchedEffect(morphAnim, reward || resolved) {
+        morphAnim.animateTo(if (reward || resolved) 1f else 0f)
+    }
+    val morph = morphAnim.value
 
     // The completed glyph holds for a beat before the reward page takes over. The
     // delay has to sit in front of onResult: reporting the result starts the spoken

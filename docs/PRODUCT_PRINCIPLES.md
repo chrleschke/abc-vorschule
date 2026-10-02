@@ -338,11 +338,17 @@ Der Bildwortschatz ist der Teil des Contents, der am schnellsten altert. Zwei Re
   steht an den Abzeichen oben rechts: Stern = geschafft, halb gefüllte Scheibe in
   `SkyBlueLight` = angefangen (früher die blaue Brettkontur — die einzige Brett-Farbe, die
   sonst nirgends stand), Schloss = gesperrt; ohne Abzeichen = bereit. Die Klötze sind **Würfel**: vorn der Buchstabe,
-  an der Seite das Anlautbild. Nur das **aktuelle** Schild dreht seine Würfel — kurz nach dem
-  Öffnen des Pfads und dann alle ~9 s einmal nacheinander zum Bild, hält 1,6 s und dreht
-  zurück („M … wie Mond" ohne Worte). Alle anderen Schilder zeigen nur Buchstaben; so bleibt
-  der Pfad ruhig. Die Drehung ersetzt den früher atmenden Ring des aktuellen Schilds und steht
-  bei „Bewegung reduzieren" still. Der bereits zurückgelegte Teil des Weges ist wärmer
+  an der Seite das Anlautbild. Nur **ein** Schild dreht seine Würfel: das offene, dessen
+  Knoten der Fokuslinie am nächsten liegt (`PathFocus.turningIndex`, dieselbe Linie bei 42 %
+  der Höhe, auf der der Pfad das aktuelle Schild parkt). Nach dem Öffnen ist das also das
+  aktuelle Schild; scrollt das Kind, geht die Drehung an das Schild über, das dort zur Ruhe
+  kommt. Gesperrte und geplante Schilder drehen nie. Das Schild im Fokus dreht kurz nach
+  dem Öffnen (1,4 s) bzw. nach dem Hinscrollen (0,7 s) und dann alle ~9 s einmal
+  nacheinander zum Bild, hält 1,6 s und dreht zurück („M … wie Mond" ohne Worte); verliert
+  es den Fokus mitten in der Drehung, dreht es weich zurück. Alle anderen Schilder zeigen
+  nur Buchstaben; so bleibt der Pfad ruhig. Die Drehung ersetzt den früher atmenden Ring des
+  aktuellen Schilds und steht bei „Bewegung reduzieren" still. Der Nebelring bleibt dabei
+  immer unter dem aktuellen Schild, auch wenn ein anderes im Fokus dreht. Der bereits zurückgelegte Teil des Weges ist wärmer
   gezeichnet als der Rest. Gesperrte Schilder zeigen dunkle Klötze mit gedämpften, aber
   lesbaren Buchstaben und ein Schloss; Bilder zeigen sie nicht.
 Gesperrte und noch nicht autorierte Schilder reagieren auf Tippen mit einem gesprochenen Hinweis —

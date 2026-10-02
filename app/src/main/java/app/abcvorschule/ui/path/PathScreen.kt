@@ -28,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -275,12 +276,42 @@ fun PathScreen(
                     // Uhr für alle Ringe; gelesen wird sie nur in der Zeichenphase.
                     val ringStill = rememberReduceMotion()
                     val ringSeconds = rememberWorldSeconds(ringStill)
+
+                    val canTurn = remember(lessons, states, signsByLessonId) {
+                        lessons.map { lesson ->
+                            signsByLessonId[lesson.id]?.let { sign ->
+                                signCanTurn(states[lesson.id] ?: LessonState.Locked, sign)
+                            } ?: false
+                        }
+                    }
+                    // Derived, so scrolling recomposes the signs only when the turn
+                    // actually passes to another one.
+                    val turningIndex by remember(nodePoints, canTurn, contentTopPx) {
+                        derivedStateOf {
+                            PathFocus.turningIndex(
+                                nodeYs = nodePoints.map { it.y + contentTopPx },
+                                eligible = canTurn,
+                                scroll = scrollState.value,
+                                viewportHeight = scrollState.viewportSize,
+                            )
+                        }
+                    }
+                    // The first sign in focus waits for the child to find the fog ring;
+                    // after that, a sign scrolled into focus turns sooner.
+                    var entryTurnDone by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) {
+                        delay(SignTurnChoreo.FirstDelayMs)
+                        entryTurnDone = true
+                    }
+
                     PathSigns(
                         lessons = lessons,
                         states = states,
                         unlockAllLessons = unlockAllLessons,
                         signsByLessonId = signsByLessonId,
                         highlightedLessonId = highlightedLessonId,
+                        turningIndex = turningIndex,
+                        turnDelayMs = if (entryTurnDone) SignTurnChoreo.FocusDelayMs else SignTurnChoreo.FirstDelayMs,
                         points = nodePoints,
                         onOpenLesson = onOpenLesson,
                         onLockedTap = onLockedTap,
@@ -419,6 +450,8 @@ private fun PathSigns(
     unlockAllLessons: Boolean,
     signsByLessonId: Map<String, LessonSign>,
     highlightedLessonId: String?,
+    turningIndex: Int?,
+    turnDelayMs: Long,
     points: List<PathPoint>,
     onOpenLesson: (String) -> Unit,
     onLockedTap: () -> Unit,
@@ -441,6 +474,8 @@ private fun PathSigns(
             state = state,
             playable = playable,
             highlighted = lesson.id == highlightedLessonId,
+            turning = index == turningIndex,
+            turnDelayMs = turnDelayMs,
             index = index,
             ring = ringFor(index),
             modifier = Modifier.offset(

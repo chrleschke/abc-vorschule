@@ -168,4 +168,32 @@ class PathFocusTest {
         // A path shorter than the viewport does not scroll at all.
         assertEquals(0, PathFocus.entryScrollTarget(fromY, headY, hopHeadroom, 640, maxScroll = 0))
     }
+
+    // Nodes 168 px apart, viewport 800: the anchor line sits at scroll + 336.
+    private val nodeYs = listOf(200f, 368f, 536f, 704f, 872f)
+    private val allEligible = List(5) { true }
+
+    @Test
+    fun turningSignIsTheOneNearestTheAnchorLine() {
+        // Parked like scrollTarget parks node 2 (536 - 336 = 200): the resting head
+        // turns, not the sign below it.
+        assertEquals(2, PathFocus.turningIndex(nodeYs, allEligible, scroll = 200, viewportHeight = 800))
+        // Scrolled on by a bit more than half a spacing: the turn moves down one.
+        assertEquals(3, PathFocus.turningIndex(nodeYs, allEligible, scroll = 290, viewportHeight = 800))
+    }
+
+    @Test
+    fun lockedSignsAreSkippedForTheNearestEligibleOne() {
+        val eligible = listOf(true, true, false, false, false)
+        assertEquals(1, PathFocus.turningIndex(nodeYs, eligible, scroll = 200, viewportHeight = 800))
+    }
+
+    @Test
+    fun nothingTurnsWithoutAnEligibleSignOnScreen() {
+        val eligible = listOf(true, false, false, false, false)
+        // Node 0 at y 200 is above a viewport scrolled to 400.
+        assertNull(PathFocus.turningIndex(nodeYs, eligible, scroll = 400, viewportHeight = 800))
+        // Before the first layout the viewport is unknown.
+        assertNull(PathFocus.turningIndex(nodeYs, allEligible, scroll = 0, viewportHeight = 0))
+    }
 }
