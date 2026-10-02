@@ -212,7 +212,7 @@
         "subtalker_temperature": 0.8,
         "subtalker_top_k": 50,
         "subtalker_top_p": 1,
-        "max_new_tokens": 26
+        "max_new_tokens": 38
       },
       "seedPool": [
         106749763,

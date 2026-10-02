@@ -859,6 +859,11 @@
       "textOverride": "Em.",
       "sourceText": "M"
     },
+    "phoneme:14cb78d8521f": {
+      "seed": 569591576,
+      "textOverride": "Die Silbe: Ro.",
+      "sourceText": "Ro"
+    },
     "phoneme:170b16880561": {
       "seed": 2057075583,
       "textOverride": "küh",
@@ -874,6 +879,11 @@
       "textOverride": "üpsilonn.",
       "sourceText": "Y"
     },
+    "phoneme:1b06e2003f84": {
+      "seed": 106749763,
+      "textOverride": "nie",
+      "sourceText": "ny"
+    },
     "phoneme:2081c1f3fcd5": {
       "seed": 2124478754,
       "sourceText": "zeh"
@@ -885,6 +895,25 @@
     "phoneme:257a1a2e4d6f": {
       "seed": 634327529,
       "sourceText": "Eis"
+    },
+    "phoneme:2744ccd10c75": {
+      "seed": 1735541067,
+      "textOverride": "Blu - me.",
+      "draftText": "Blu-me.",
+      "sourceText": "me"
+    },
+    "phoneme:27a84712e4b2": {
+      "seed": 559820401,
+      "textOverride": "E.",
+      "sourceText": "ee"
+    },
+    "phoneme:2ccc8f42f009": {
+      "seed": 1381496200,
+      "sourceText": "sche"
+    },
+    "phoneme:2eac4f6a9c1b": {
+      "seed": 363018813,
+      "sourceText": "Ti"
     },
     "phoneme:2fe5ca1c1a3d": {
       "seed": 153000027,
@@ -906,6 +935,21 @@
     "phoneme:368848dc82d1": {
       "seed": 369609897,
       "sourceText": "kei"
+    },
+    "phoneme:3abd72ec6352": {
+      "seed": 438922133,
+      "textOverride": "Die Silbe: -chen.",
+      "sourceText": "chen"
+    },
+    "phoneme:3b6a765ede67": {
+      "seed": 1150665452,
+      "textOverride": "Ein kalter Re–gen.",
+      "sourceText": "gen",
+      "generateSeed": 1150665452
+    },
+    "phoneme:3c42d9ac9807": {
+      "seed": 1370202921,
+      "sourceText": "za"
     },
     "phoneme:3c44c3e1b8b7": {
       "seed": 1016093212,
@@ -964,6 +1008,11 @@
       "textOverride": "Es T!",
       "sourceText": "s t"
     },
+    "phoneme:4e850716074e": {
+      "seed": 765262133,
+      "textOverride": "Die Silbe: Son-",
+      "sourceText": "Son"
+    },
     "phoneme:50976ad58f5d": {
       "seed": 153000027,
       "sourceText": "Haus"
@@ -996,6 +1045,11 @@
       "textOverride": "P.",
       "sourceText": "P"
     },
+    "phoneme:61098a4bf2a5": {
+      "seed": 1077351914,
+      "textOverride": "Die Schul–le.",
+      "sourceText": "le"
+    },
     "phoneme:6152d43caa49": {
       "seed": 585589898,
       "textOverride": "guh!",
@@ -1009,6 +1063,10 @@
       "seed": 5382596,
       "textOverride": "Schul.",
       "sourceText": "Schul"
+    },
+    "phoneme:6652dad03ff5": {
+      "seed": 1364072441,
+      "sourceText": "Po"
     },
     "phoneme:6aeb0b7ea8fb": {
       "seed": 1629126965,
@@ -1034,6 +1092,12 @@
       "textOverride": "Jott.",
       "sourceText": "J"
     },
+    "phoneme:72aa80bf1ac4": {
+      "seed": 874064776,
+      "textOverride": "die Silbe: Ha.",
+      "draftText": "Der, Ha-ken.",
+      "sourceText": "Ha"
+    },
     "phoneme:72dfcfb0c470": {
       "seed": 678814598,
       "sourceText": "L"
@@ -1045,6 +1109,17 @@
     "phoneme:7717a57ec3d7": {
       "seed": 1774540729,
       "sourceText": "mei"
+    },
+    "phoneme:78e0b1fdb55e": {
+      "seed": 890481199,
+      "textOverride": "Der, Ha-ken.",
+      "sourceText": "ken",
+      "generateSeed": 890481199
+    },
+    "phoneme:78f76459d525": {
+      "seed": 159944282,
+      "textOverride": "ein kalter Re–gen.",
+      "sourceText": "Re"
     },
     "phoneme:82cefa8283d3": {
       "seed": 208068725,
@@ -1081,10 +1156,20 @@
       "textOverride": "En.",
       "sourceText": "N"
     },
+    "phoneme:8d5b20423ae6": {
+      "seed": 1661522523,
+      "textOverride": "ür wie Tür",
+      "sourceText": "ür"
+    },
     "phoneme:8de0b3c47f11": {
       "seed": 1079840589,
       "textOverride": "Es.",
       "sourceText": "S"
+    },
+    "phoneme:8f684d401d2b": {
+      "seed": 1389761623,
+      "textOverride": "bra, wie braten",
+      "sourceText": "bra"
     },
     "phoneme:913d7314efae": {
       "seed": 1504993665,
@@ -1095,6 +1180,11 @@
       "seed": 1229619544,
       "textOverride": "geh.",
       "sourceText": "geh"
+    },
+    "phoneme:94aaf6409aaa": {
+      "seed": 423679420,
+      "textOverride": "Die - Pizz.",
+      "sourceText": "Piz"
     },
     "phoneme:9513229d4359": {
       "seed": 311631161,
@@ -1142,6 +1232,11 @@
       "seed": 1402815107,
       "sourceText": "Regen"
     },
+    "phoneme:ad9a67fefa84": {
+      "seed": 1007983859,
+      "textOverride": "die Va'se.",
+      "sourceText": "se"
+    },
     "phoneme:ae8f3419f228": {
       "seed": 32024185,
       "sourceText": "Ö"
@@ -1154,10 +1249,20 @@
       "seed": 874064776,
       "sourceText": "fi"
     },
+    "phoneme:b5d82fc41702": {
+      "seed": 877085626,
+      "textOverride": "Die Ja - ke.",
+      "sourceText": "cke"
+    },
     "phoneme:b737ca7ee563": {
       "seed": 1428849799,
       "textOverride": "Das lah.",
       "sourceText": "la"
+    },
+    "phoneme:b9e96ae52a7b": {
+      "seed": 610854767,
+      "textOverride": "Spinn – ne.",
+      "sourceText": "Spin"
     },
     "phoneme:ba6b95d82755": {
       "seed": 1819803021,
@@ -1172,6 +1277,25 @@
       "textOverride": "schp",
       "sourceText": "sp"
     },
+    "phoneme:be284ff59808": {
+      "seed": 1735541067,
+      "textOverride": "Blu - me.",
+      "sourceText": "Blu",
+      "generateSeed": 1735541067
+    },
+    "phoneme:beba745afae8": {
+      "seed": 1004342343,
+      "textOverride": "Der buchstabe: U",
+      "sourceText": "uh"
+    },
+    "phoneme:c009dd051236": {
+      "seed": 1643123335,
+      "sourceText": "Ba"
+    },
+    "phoneme:c131f1441ec3": {
+      "seed": 363018813,
+      "sourceText": "Lam"
+    },
     "phoneme:c4694f2e93d5": {
       "seed": 1840266467,
       "sourceText": "O"
@@ -1184,14 +1308,33 @@
       "seed": 1197147303,
       "sourceText": "que"
     },
+    "phoneme:cb58e4600bf0": {
+      "seed": 1768941158,
+      "textOverride": "Son - ne.",
+      "sourceText": "ne"
+    },
     "phoneme:cb9db87912c0": {
       "seed": 634327529,
       "textOverride": "do.",
       "sourceText": "dough"
     },
+    "phoneme:ccfd37a495c3": {
+      "seed": 1629126965,
+      "sourceText": "Ku"
+    },
     "phoneme:cd3a7e92a911": {
       "seed": 1157983920,
       "sourceText": "ß"
+    },
+    "phoneme:cdc00f6c62a5": {
+      "seed": 1729010365,
+      "textOverride": "I – gel",
+      "sourceText": "gel"
+    },
+    "phoneme:cde9e58a9a4e": {
+      "seed": 1479908681,
+      "textOverride": "Ja.",
+      "sourceText": "Ja"
     },
     "phoneme:cdf69b25a417": {
       "seed": 1197147303,
@@ -1201,6 +1344,11 @@
       "seed": 1381496200,
       "textOverride": "Der, Schuh – ist schwarz",
       "sourceText": "schu"
+    },
+    "phoneme:d7bb53dca2ae": {
+      "seed": 282863626,
+      "textOverride": "Der - Ton.",
+      "sourceText": "Ton"
     },
     "phoneme:d93beca6efd0": {
       "seed": 1290081121,
@@ -1255,6 +1403,11 @@
       "textOverride": "rü.",
       "sourceText": "rü"
     },
+    "phoneme:f48d657a1859": {
+      "seed": 977504267,
+      "textOverride": "der B - E - R",
+      "sourceText": "är"
+    },
     "phoneme:f4a4ce5fa634": {
       "seed": 153000027,
       "textOverride": "Moe.",
@@ -1270,13 +1423,38 @@
       "textOverride": "Die Silbe \"scha\".",
       "sourceText": "scha"
     },
+    "phoneme:f9e012396be6": {
+      "seed": 787484843,
+      "textOverride": "ill, wie in ball",
+      "sourceText": "ll"
+    },
     "phoneme:fa18c06733fb": {
       "seed": 243544604,
       "sourceText": "Hand"
     },
+    "phoneme:fab66aa01347": {
+      "seed": 1709696075,
+      "sourceText": "nn"
+    },
+    "phoneme:fb1df1a24e3f": {
+      "seed": 1081755484,
+      "textOverride": "So.",
+      "sourceText": "So"
+    },
+    "phoneme:fb561a10cd98": {
+      "seed": 964074031,
+      "textOverride": "Die - Va - se.",
+      "draftText": "Die Va'se.",
+      "sourceText": "Va"
+    },
     "phoneme:fcb5f40df9be": {
       "seed": 1541118536,
       "sourceText": "W"
+    },
+    "phoneme:fd92d952db92": {
+      "seed": 1111511225,
+      "textOverride": "Pan – da.",
+      "sourceText": "Pan"
     },
     "phoneme:ff22e6c0c305": {
       "seed": 1402815107,
@@ -5218,7 +5396,8 @@
       "sourceText": "Hahn"
     },
     "word:a191067c05e3": {
-      "seed": 374387671,
+      "seed": 525385721,
+      "textOverride": "Feuer.",
       "sourceText": "Feuer"
     },
     "word:a21c8cef86cd": {
@@ -5690,8 +5869,8 @@
       "sourceText": "Brot"
     },
     "word:f00b1e56865e": {
-      "seed": 1765179368,
-      "textOverride": "Bär.",
+      "seed": 940755680,
+      "textOverride": "Der, Bär.",
       "sourceText": "Bär"
     },
     "word:f0a8b22bfa64": {
