@@ -2,6 +2,8 @@ package app.abcvorschule.speech
 
 import java.io.FileNotFoundException
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -199,8 +201,13 @@ class ClipIndexTest {
             index.lookup("Baue das Wort Baum.")?.file,
         )
         // Verschmelzer: display "ro" maps to phoneme lemma clip "roh"; "na" is keyed directly.
+        // Dass der Verschmelzer "roh" spricht und nicht "ro", prüft SyllableMergeSpeechTest.
         assertEquals("phoneme_57fbb5e0d270.ogg", index.lookup("roh")?.file)
-        assertNull("display grapheme ro is not indexed — speech must use lemma roh", index.lookup("ro"))
+        // Seit Oktober 2026 hat der Wort-Bauer-Baustein "Ro" (l07, Atom letter-r) einen
+        // eigenen Clip (Extractor-Feld blockTts) — ein anderer als das Silben-Lemma "roh".
+        val ro = index.lookup("Ro")?.file
+        assertNotNull("Baustein Ro hat einen Clip", ro)
+        assertNotEquals(index.lookup("roh")?.file, ro)
         assertEquals("phoneme_3d9fc4bde7ce.ogg", index.lookup("na")?.file)
     }
 }
