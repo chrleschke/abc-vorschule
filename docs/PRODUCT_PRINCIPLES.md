@@ -696,16 +696,20 @@ niemals mit einem stummen No-Op.
   fünf Pegs passen auf einem 320dp-Gerät physikalisch nicht in eine Zeile, dann
   schrumpft die ganze Reihe gleichmäßig auf rund 48dp je Peg.
 - Ausnahme Satz-Versteher: der Antwortblock beginnt bei **52 % der Bühnenhöhe**
-  statt am unteren Rand (`ExerciseStage(answerAnchor = AnswerAnchor.BelowCenter)`).
-  Sein Aufgabenblock ist leer — kein Titel, keine Kacheln, kein Wort; der Speaker
-  steht wie überall in der Kopfzeile darüber
-  (**Ausnahme:** ohne deutsches TTS steht dort der Satz als Text, damit ein
-  Erwachsener vorlesen kann — der visuelle Fallback aus §7; er darf nicht als
-  Verstoß gegen „kein Wort" gelöscht werden) — und am unteren Rand verdeckt die
-  tippende Hand genau die Bildkarten, die die ganze Aufgabe sind. Die 52 % sind
+  statt am unteren Rand (`ExerciseStage(answerAnchor = AnswerAnchor.BelowCenter)`) —
+  am unteren Rand verdeckt die tippende Hand genau die Bildkarten, die die ganze
+  Aufgabe sind. Der Aufgabenblock darüber trägt das **Bilderbuch** (§10, „Leseecke"):
+  rechte Seite mit leerem Bildrahmen und einem **Wort-Balken je Wort** des Satzes, ohne
+  Buchstaben (`SentenceBarSizing`: Satzzeichen zählen nicht, Länge nach Wortlänge,
+  geklemmt 28–96 dp, links bündig umbrechend; alle ausgelieferten Sätze passen auf der
+  schmalsten Seite in drei Zeilen, `SentenceBarSizingTest`). Kein Titel, keine Kacheln,
+  kein lesbares Wort — **Ausnahme:** ohne deutsches TTS steht statt der Balken der Satz
+  als Text auf der Seite, damit ein Erwachsener vorlesen kann — der visuelle Fallback
+  aus §7; er darf nicht als Verstoß gegen „kein Wort" gelöscht werden. Die 52 % sind
   eine **Untergrenze für den Antwortblock**, keine feste Höhe für den
   Aufgabenblock: der Antwortblock darf über die Marke hinaus nach oben wachsen,
-  wenn Karten, „Zeig mir" und Systemschriftgröße mehr Platz brauchen. Für alle
+  wenn Karten, „Zeig mir" und Systemschriftgröße mehr Platz brauchen; das Buch nimmt,
+  was übrig bleibt, und der Rahmen schrumpft zuerst. Für alle
   anderen Übungen bleibt `AnswerAnchor.Bottom` die Vorbelegung und damit die
   Grundform.
 
@@ -739,7 +743,10 @@ niemals mit einem stummen No-Op.
   Der Parameter `answerAnchor` ist mit `Bottom` vorbelegt; `BelowCenter` ist die
   eine benannte Ausnahme (§9, Satz-Versteher). Zweite benannte Ausnahme ist
   `promptAboveAnswers`, mit `false` vorbelegt und nur beim Laut-Fresser `true`
-  (§9), weil dort abwärts statt aufwärts gezogen wird.
+  (§9), weil dort abwärts statt aufwärts gezogen wird. Dritte ist `answersBackdrop`:
+  zeichnet hinter den Antwortblock **außerhalb** des Ruhens (`PromptRest`), nur der
+  Lesetisch des Satz-Verstehers nutzt es — im Ruhe-Layer glitte die Tischkante beim
+  Aufwachen sichtbar um einige dp zurück.
 - **Papiergrund (verbindlich).** Der Trainer-Grund ist eine Fläche des Babbel GDS,
   Familie `paper green`, und er ist **kein Volltonfeld**, sondern ein radialer Verlauf von
   `PaperCenter` (#F8F9F8) in der Mitte nach `PaperEdge` (#C5CDC9) an den Rändern —
@@ -870,7 +877,7 @@ niemals mit einem stummen No-Op.
   immer dieselbe — das Kind erkennt die Aufgabe am Ort, bevor es die Ansage hört
   (`TrainerWorld`): Jagd → **Tiefsee**, Spurensucher → **Dschungel bei Nacht**,
   Rechnen → **Nacht am Waldrand**, Wort-Detektiv → **Dachboden**, Wort-Bauer → **Werkstatt**,
-  Satz-Architekt → **Garten**, Satz-Versteher → **Puppentheater**, Laut-Fresser → **Pilzhöhle**,
+  Satz-Architekt → **Garten**, Satz-Versteher → **Leseecke**, Laut-Fresser → **Pilzhöhle**,
   Silben-Verschmelzer → **Waldlichtung**. Regeln:
   1. **Lerninhalt nur auf Licht.** Buchstaben, Silben, Wörter und Ziffern stehen in Tinte auf
      einer hellen Fläche — Blase, Weg, Karte, Klotz (≥ 7:1). Der Hintergrund trägt nie
@@ -922,7 +929,7 @@ niemals mit einem stummen No-Op.
     stauchen sich und schaukeln aus. Tipps auf die Welt selbst (`WorldTaps`: was kein Bauteil der
     Aufgabe verbraucht hat und kein Ziehen war) beantwortet der Hintergrund: in der Tiefsee
     steigen Bläschen vom Finger auf, auf der Lichtung weichen Glühwürmchen aus und kehren zurück,
-    im Theater bauscht sich der Vorhang auf der Seite des Tipps, auf dem Dachboden wirbelt Staub,
+    in der Leseecke glimmt die Lampe kurz wärmer auf, auf dem Dachboden wirbelt Staub,
     in der Werkstatt schwingt die Lampe, in der Pilzhöhle flammt der nächste Leuchtpilz auf und
     stößt Sporen aus. Alles klingt in 2–5 s aus; bei „Bewegung reduzieren" passiert nichts.
   - **Garten in der blauen Stunde** (Satz-Architekt, gezeichnet): Sterne, ein warmer
@@ -938,11 +945,31 @@ niemals mit einem stummen No-Op.
     hängen (`SentencePegSizing.solveOnLine`): nur wenn der Glyph auf der Bühne unter 20 dp
     fiele, sonst bleibt die Reihe auf der Bühne. „der Schneemann ist groß" kommt so auf einem
     360-dp-Gerät auf rund 18 statt 15 dp.
-  - **Puppentheater** (Satz-Versteher, gezeichnet): dunkler Bühnenraum, roter Samtvorhang
-    links und rechts, der ganz leicht atmet (7 s), ein schmaler Lambrequin unter dem
-    Lautsprecher, darüber eine Lichterkette, deren Birnen langsam glimmen (6 s). Die zwei
-    Bildkarten sind **gerahmte Bilder** (helle Fläche, Holzrahmen, richtig = `LeafGreen`) und
-    stehen auf Bühnenbrettern, die der Trainer unter die Kartenreihe zeichnet.
+  - **Leseecke** (Satz-Versteher, gezeichnet, seit Oktober 2026): dunkler Raum (Nachtblau →
+    warmes Dunkelviolett), oben rechts der Schein einer Leselampe, der sehr langsam atmet
+    (8 s); unten ein **Holztisch** ab knapp über der Kartenreihe (vom Trainer gezeichnet,
+    `drawReadingTable`, damit er an der gemessenen Reihe hängt). Darüber liegt ein
+    aufgeschlagenes **Bilderbuch** (`SentencePictureBook`): von der linken Seite nur ein
+    Streifen am Rand, Falz mit weichem Schatten, dunkelroter Einband, rechts zwei Linien
+    Seitendicke. Die **rechte Seite ist die Licht-Insel**: oben ein leerer, gestrichelter
+    Bildrahmen (warmes Papierbeige) mit blassem Stern, darunter die Wort-Balken (§9).
+    Solange gesprochen wird, glimmen die Balken ruhig in `SunCoral` — **alle zugleich**:
+    der Audio-Layer kennt die Clip-Dauer nicht (`ClipPlayer`/`SpeechController` melden nur
+    `speaking`), und eine erfundene Wort-für-Wort-Synchronisation wäre falsch. In Runde 1
+    glimmen sie deshalb auch während der Instruktion davor. Die zwei Bildkarten sind
+    **gerahmte Bilder** (helle Fläche, Holzrahmen, richtig = `LeafGreen`) und liegen auf
+    dem Tisch. **Richtig** (auch nach „Zeig mir"): die Karte fliegt im Bogen in den Rahmen
+    (600 ms, erst nach außen, dann zur Mitte, leicht gekippt) und landet in der Größe, in
+    der der Rahmen das Bild zeigt; dort geht sie auf, der Rahmen wird durchgezogen
+    `LeafGreen`, die falsche Karte blendet aus. **Nächste Runde:** die Seite blättert um den
+    Falz nach links (600 ms, langsam los — die sichtbare Hälfte bekommt die meiste Zeit),
+    darunter die neue Seite mit leerem Rahmen; die neuen Karten erscheinen, wenn das Blatt
+    fast liegt, und sind bis dahin nicht tippbar. Geblättert wird nur einen Schritt
+    vorwärts: Runde 1, eine fortgesetzte Lektion und der Rückwärts-Chevron zeigen die
+    Seite einfach. „Bewegung reduzieren": Überblenden statt Flug und Umblättern.
+    Vorher stand hier ein **Puppentheater** mit Vorhang und Bühnenbrettern; ein Tester
+    wollte die Karten auf die Bühne legen — sie versprach eine Ablagefläche, die es nicht
+    gab. Standbilder: `NightWorldShotTest.bookInTheReadingNook`/`bookWithoutGermanVoice`.
   - **Pilzhöhle** (Laut-Fresser): `world_cave.webp` (30 KB), vom Nutzer generiert, abgedunkelt
     und mit beruhigter Mitte eingebacken. Die zwei Fresser sind **neu gezeichnet**
     (`FeederCreature`, `FeederShape`): **Pilli** (links, blau) rund mit zwei Öhrchen, **Kora**

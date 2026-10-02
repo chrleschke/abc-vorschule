@@ -26,12 +26,13 @@ enum class AnswerAnchor {
     Bottom,
 
     /**
-     * Oberkante des Antwortblocks knapp unter der Bildschirmmitte. Für Übungen,
-     * deren Aufgabenblock fast leer ist: der Satz-Versteher trägt dort nur den
-     * Speaker (kein Titel, keine Kacheln, kein Wort — Ausnahme: ohne deutsches
-     * TTS erscheint der Satz dort als Text, damit ein Erwachsener vorlesen kann,
-     * siehe PRODUCT_PRINCIPLES §7), und am unteren Rand verdeckt die tippende
-     * Hand dann die Bildkarten, die den ganzen Inhalt der Aufgabe ausmachen.
+     * Oberkante des Antwortblocks knapp unter der Bildschirmmitte. Für den
+     * Satz-Versteher, dessen Aufgabenblock kein Lerninhalt zum Antippen trägt, nur
+     * das Bilderbuch mit leerem Rahmen und Wort-Balken (kein Titel, keine Kacheln,
+     * kein Wort — Ausnahme: ohne deutsches TTS steht der Satz als Text auf der
+     * Seite, damit ein Erwachsener vorlesen kann, siehe PRODUCT_PRINCIPLES §7): am
+     * unteren Rand verdeckt die tippende Hand sonst die Bildkarten, die den ganzen
+     * Inhalt der Aufgabe ausmachen.
      */
     BelowCenter,
 }
