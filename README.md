@@ -233,8 +233,9 @@ Quellen liegen nicht im Repo:
 ## Offline-Smoke-Skript (manuell)
 
 1. `./gradlew :app:installDebug`, Gerät in den Flugmodus.
-2. App öffnen → **Pfad-Screen** erscheint, der Pfad ist auf Lektion 1 gescrollt, ihr Schild pulsiert
-   und trägt den wippenden „Du bist hier“-Marker; Lektionen 2–26 sind gesperrt (entsperren sich nach Mastery).
+2. App öffnen → **Pfad-Screen** erscheint, der Pfad ist auf Lektion 1 gescrollt, ihr Schild dreht
+   seine Würfel und steht im Nebelring („du bist hier“); die folgenden Lektionen sind gesperrt
+   (entsperren sich, sobald die vorige durchgespielt ist).
 3. Gesperrten Knoten antippen → gesprochener Hinweis, kein stummes No-Op.
 4. Lektion 1 öffnen und die Trainer der Reihenfolge nach durchspielen:
    Visueller Spurensucher (Buchstaben nachspuren, zweimal) ·
