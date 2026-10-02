@@ -70,6 +70,8 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest
 die Bühnenkante — die Rechnung dahinter prüft `SentencePegSizingTest` in den
 Unit-Tests. `SymbolHuntTileBoundsTest` tut dasselbe für die Streukacheln der
 Buchstabenjagd, gegen `SymbolHuntLayoutTest` als Geometrie-Gegenstück.
+`TraceRewardBoundsTest` prüft die Belohnungskarte des Spurensuchers (Wortzeile ganz
+sichtbar, kein Umbruch im Wort) und legt dabei je Fall ein Standbild ab.
 Die Shot-Tests behaupten nichts, sie **rendern**: Layout in mehreren Breiten und
 Systemschriftgrößen, und Filmstreifen der Morphs bei angehaltener Testuhr. Sie
 legen ihre PNGs an **zwei verschiedenen Orten** ab — welchen Weg man zum Abholen
@@ -81,6 +83,7 @@ braucht, hängt also am Test:
 | `SentenceOrderMorphShotTest` | `filesDir/morphshots` | `run-as` (A) |
 | `WordBuildMorphShotTest` | `filesDir/wordbuildmorphshots` | `run-as` (A) |
 | `SoundFeederShotTest` | `filesDir/feedershots` | `run-as` (A) |
+| `TraceRewardBoundsTest` | `filesDir/rewardshots` | `run-as` (A) |
 | `SymbolHuntMorphShotTest` | `additionalTestOutputDir/huntmorphshots` | Gradle (B) |
 | `SymbolHuntBatteryShotTest` | `additionalTestOutputDir/huntbatteryshots` | Gradle (B) |
 

@@ -45,7 +45,7 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
   in die i-Straße und der Startpunkt sitzt am Fuß des i statt an seinem Kopf. Nach dem letzten
   Stern hält der fertige Buchstabe eine halbe
   Sekunde, dann folgt die Belohnungsseite: Bild groß, darunter die Wortzeile („**T** wie Tomate")
-  mit fettem Graphem. Kein zusätzlicher Buchstaben-Text unter dem Pfad.
+  mit rostrot eingefärbtem Graphem (`GraphemeRust`, 8:1 auf Cream — die Zeile ist ohnehin fett, Fett allein hob es nicht ab). Kein zusätzlicher Buchstaben-Text unter dem Pfad.
   **Der Merksatz muss halten, was er behauptet.** „X wie Y" heißt: Y fängt mit X an.
   „M wie Schneemann" tut das nicht — ein Kind, das gerade M lernt, hört am Wortanfang ein
   Sch. Zwei Regeln, von `LessonCoverageTest.everyMerksatzNamesAWordThatReallyStartsWithItsGrapheme`
@@ -681,6 +681,14 @@ niemals mit einem stummen No-Op.
   die Karte nach unten zu den Fressern zieht, zeichnet der Aufgabenblock über dem
   Antwortblock (`ExerciseStage(promptAboveAnswers = true)`) — Wort-Bauer und Satz-Architekt
   ziehen aufwärts und bleiben bei der Vorbelegung `false`.
+- **Spurensucher: die Wortzeile der Belohnungskarte ist immer ganz zu sehen.** Die Karte
+  („A wie Ampel" unter 🚦) bekommt den ganzen Aufgabenbereich, nicht den quadratischen
+  Glyph-Kasten — der ist auf schmalen Geräten kaum breiter als die Karte hoch, und dort
+  schnitt die Spalte das Wort unten ab. Reicht der Platz nicht, gilt die Rangfolge aus
+  `TraceRewardSizing`: (1) die Wortzeile bricht nur zwischen Wörtern um und wird nur
+  kleiner, wenn ihr längstes Wort sonst nicht in eine Zeile passt, (2) das Bild nimmt die
+  Resthöhe und fällt unter einem Viertel seiner Größe ganz weg. Gemessen im echten Layout
+  (`TraceRewardBoundsTest`, Breiten 394/320/280dp, font_scale 1/1,3/2).
 - **Satz-Architekt: die Peg-Reihe bricht nie um.** Ein Satz steht immer in *einer*
   Zeile. Damit das auf jeder Breite und bei jeder Systemschriftgröße gilt, ist die
   Rangfolge in `SentencePegSizing` verbindlich: (1) die Reihe passt, (2) jeder Peg
