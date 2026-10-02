@@ -135,14 +135,16 @@ class SuccessSpeechTest {
     }
 
     @Test
-    fun symbolHuntSuccessSpeaksBareGraphemeWithoutArticle() {
-        // §7: Trainer 2 spricht das Graphem, nie einen Artikel — dieser Zweig bleibt unangetastet.
+    fun symbolHuntSuccessSpeaksNothing() {
+        // Die Treffer haben das Graphem schon beim Antippen gesagt — am Ende kein
+        // zweites Vorsprechen (Oktober 2026).
         val round = SymbolHuntRound(
             promptTts = "Finde M",
             targetAtomId = "letter-m",
             mode = SymbolHuntMode.letter,
             distractorPool = listOf("N", "W"),
         )
-        assertEquals(listOf("M"), SuccessSpeech.partsForRound(round, pack, praise = false))
+        assertEquals(emptyList<String>(), SuccessSpeech.partsForRound(round, pack, praise = false))
+        assertEquals(emptyList<String>(), SuccessSpeech.partsForRound(round, pack, praise = true))
     }
 }

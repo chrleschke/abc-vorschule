@@ -45,9 +45,9 @@ object SuccessSpeech {
         is SentenceOrderRound -> listOf(pack.sentence(round.sentenceId).tts)
         is SentencePictureRound -> listOfNotNull(round.promptTts.takeIf { it.isNotBlank() })
         is LetterTraceRound -> listOfNotNull(round.rewardTts.takeIf { it.isNotBlank() })
-        is SymbolHuntRound -> listOfNotNull(
-            pack.atoms[round.targetAtomId]?.lemma ?: round.promptTts.takeIf { it.isNotBlank() },
-        )
+        // Jeder Treffer hat sein Symbol schon beim Antippen gesagt; es am Ende noch
+        // einmal vorzusprechen war zu viel (Nutzerentscheidung Oktober 2026).
+        is SymbolHuntRound -> emptyList()
         is SymbolInWordRound -> listOfNotNull(
             pack.atoms[round.wordAtomId]?.let { AtomArticleSpeech.forAtom(it) ?: it.display }
                 ?: round.promptTts.takeIf { it.isNotBlank() },
