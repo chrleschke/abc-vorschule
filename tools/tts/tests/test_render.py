@@ -660,20 +660,20 @@ def test_random_seeds_never_enter_the_microphone_range():
     assert all(0 <= s < MIC_SEED_MIN for s in seeds)
 
 
-def test_production_fingerprint_prefers_the_microphone_sidecar(setup):
+def test_export_fingerprint_prefers_the_microphone_sidecar(setup):
     import json
-    from dataclasses import replace
-    from ttskit.plan import fingerprint
-    from ttskit.render import production_fingerprint
+    from ttskit.export import export_fingerprint, wav_fingerprint
     paths, profiles, clips, state = setup
     clip = clips[0]
-    profile = profiles.profiles[clip.profile]
-    assert production_fingerprint(paths, clip, profile) == fingerprint(clip, profile)
+    render_clips([clip], profiles, FakeEngine(), state, paths)
+    production = paths.audio / f"{clip.key}.wav"
+    assert export_fingerprint(paths, clip) == wav_fingerprint(production)
+    assert export_fingerprint(paths, clip).startswith("wav:")
     folder = paths.candidates / clip.key
     folder.mkdir(parents=True, exist_ok=True)
     (folder / f"{clip.seed}.json").write_text(json.dumps(
         {"source": "mic", "fingerprint": "mic:abc"}), encoding="utf-8")
-    assert production_fingerprint(paths, clip, profile) == "mic:abc"
+    assert export_fingerprint(paths, clip) == "mic:abc"
 
 
 # --- Schutz kuratierter Produktion vor `tts render` --------------------------
@@ -842,8 +842,7 @@ def test_seeds_for_candidates_never_offer_the_production_seed(setup):
 
 
 def test_candidates_speak_the_draft_but_production_keeps_its_text(tmp_path):
-    from ttskit.render import candidate_infos, candidate_meta, production_fingerprint
-    from ttskit.plan import fingerprint
+    from ttskit.render import candidate_infos, candidate_meta
     paths, profiles, items = _isolated(tmp_path)
     probe = build_clips(items, profiles, Locks())
     key = probe[0].key
@@ -855,8 +854,8 @@ def test_candidates_speak_the_draft_but_production_keeps_its_text(tmp_path):
     sample_candidates(clip, profile, engine, paths, [9])
     assert engine.calls == [("Frage EINS?", 9)]
     assert candidate_meta(paths, key, 9)["text"] == "Frage EINS?"
-    assert production_fingerprint(paths, clip, profile) == fingerprint(clip, profile), \
-        "ein Entwurf ändert den Fingerprint der Produktion nicht"
+    assert not (paths.audio / f"{key}.wav").exists(), \
+        "ein Entwurf schreibt nie die Produktion (und ändert damit nichts am Export)"
     # Frische misst gegen den eigenen Text: ein neuer Entwurf macht nichts „alt".
     redrafted = build_clips(items, profiles, Locks({key: Lock(
         seed=1, text_override="Frage Eins?", draft_text="Ganz anders?")}))
@@ -961,29 +960,6 @@ def test_freshness_uses_the_recorded_trim_and_old_sidecars_fall_back(setup):
     infos = {i["seed"]: i for i in candidate_infos(paths, clip, profile)}
     assert infos[11]["fresh"] is True
     assert infos[22]["fresh"] is False
-
-
-def test_production_fingerprint_uses_the_recorded_trim_choice(setup):
-    import json as jsonlib
-    from ttskit.plan import fingerprint
-    from ttskit.render import production_fingerprint
-
-    paths, profiles, clips, state = setup
-    clip = clips[0]
-    profile = profiles.profiles[clip.profile]
-    # Ohne Sidecar (z. B. `tts render`) und mit Alt-Sidecar: unverändert.
-    assert production_fingerprint(paths, clip, profile) == fingerprint(clip, profile)
-    sample_candidates(clip, profile, FakeEngine(), paths, [clip.seed])
-    path = paths.candidates / clip.key / f"{clip.seed}.json"
-    meta = jsonlib.loads(path.read_text(encoding="utf-8"))
-    del meta["trimSilence"]
-    path.write_text(jsonlib.dumps(meta), encoding="utf-8")
-    assert production_fingerprint(paths, clip, profile) == fingerprint(clip, profile)
-
-    sample_candidates(clip, profile, FakeEngine(), paths, [clip.seed], trim=False)
-    assert production_fingerprint(paths, clip, profile) == \
-        fingerprint(clip, profile, trim=False)
-    assert production_fingerprint(paths, clip, profile) != fingerprint(clip, profile)
 
 
 def test_render_batch_candidates_passes_the_trim_choice_on(setup):

@@ -141,9 +141,10 @@ Profil-Formular steht Trim deshalb nicht mehr. `trim` im Profil ist nur noch die
 optionales `"trim": true|false` für genau diesen Wurf; fehlt es (oder `null`), gilt das
 Profil, alles andere ist HTTP 422. Was tatsächlich galt, steht im Sidecar als
 `trimSilence` und in `/api/state` pro Kandidat (`null` bei Kandidaten von vorher).
-„⚠️ alt", das `verified` von Promote und der Export-Fingerprint rechnen mit diesem Wert
-statt mit dem Profil — ein bewusst ungeschnittener Wurf ist also nicht „alt", und
-Produktionen ohne `trimSilence` behalten ihren Fingerprint. `tts render` schneidet
+„⚠️ alt" und das `verified` von Promote rechnen mit diesem Wert
+statt mit dem Profil — ein bewusst ungeschnittener Wurf ist also nicht „alt". Der Export
+braucht ihn nicht: er geht nach dem Inhalt der Produktions-WAV (siehe „Export: wann wird
+neu encodiert?"). `tts render` schneidet
 weiter nach Profil. Nicht zu verwechseln mit dem Schnitt in der Wellenform (Sidecar
 `trim`, siehe unten).
 
@@ -211,8 +212,9 @@ Knopf (`PUT /api/clips/{key}/candidates/{seed}/trim`). Verlustfrei: der erste Sc
 die Aufnahme als `candidates/<key>/<seed>.orig.wav`, jeder weitere geht wieder vom Original aus,
 und die Wellenform zeigt das Original mit blass abgesetzten Rändern — ein Griff lässt sich also
 auch zurückziehen, ganz an den Rand gezogen kehrt das Original zurück. Ist der Kandidat die
-Produktion, zieht `out/audio/<key>.wav` mit; der Schnitt steht im Sidecar (`trim`) und im
-Export-Fingerprint, sonst hielte der Export die Produktion für unverändert. Ein neuer Wurf auf
+Produktion, zieht `out/audio/<key>.wav` mit; der Schnitt steht im Sidecar (`trim`), und weil
+er die Produktions-WAV ändert, ändert er auch deren Export-Fingerprint (`wav:`) — der nächste
+Export encodiert neu. Ein neuer Wurf auf
 demselben Seed verwirft den Schnitt samt Original. Mikrofon-Aufnahmen schneidet weiter ✂.
 
 **Tastatur:** `j`/`k` blättern, Leertaste spielt die Produktion (ohne Produktion die
@@ -254,7 +256,7 @@ speichert die Oberfläche nach kurzer Pause automatisch (600 ms Debounce) über
 
 | Feld | Bedeutung |
 | --- | --- |
-| `textOverride` | Text der **bestätigten Produktion** (fehlt = der Satz). Steckt in deren Fingerprint und damit im Export. |
+| `textOverride` | Text der **bestätigten Produktion** (fehlt = der Satz). Steckt in deren Render-Fingerprint („⚠️ alt", `verified`). |
 | `draftText` | **Entwurf** für neue Aufnahmen — Generate, Batch-Lauf und `tts sample` sprechen `draftText ?? textOverride ?? Satz`. |
 
 Ein Probesatz im TTS-Feld ändert so nie die schon freigegebene Aufnahme (Fingerprint,
@@ -591,6 +593,34 @@ Unterschied" am erwarteten Verhalten, solange man nicht bewusst `--force` neu re
 Das gilt auch für `POSTPROCESS_VERSION` (Trim-Schwellwert, Trim-Polster,
 Normalisierungsziel in `ttskit/audio.py`): eine Änderung wirkt nur auf Clips, die
 danach neu gerendert werden, nie rückwirkend auf vorhandene Dateien.
+
+### Export: wann wird neu encodiert?
+
+Und auch nicht auf die App-Assets: wer Profil-Einstellungen ändert, bekommt beim nächsten
+Export **keine** neu encodierten Dateien. `index.json` merkt sich pro Clip einen
+Fingerprint der **Produktions-Audio selbst** (`export.export_fingerprint`), und nur wenn der
+sich ändert (oder die `.ogg` fehlt), wird neu encodiert:
+
+| Clip | Fingerprint | ändert sich durch |
+| --- | --- | --- |
+| Qwen | `wav:<sha>` über Samples + Rate von `out/audio/<key>.wav` | neuen Wurf übernehmen, Schnitt in der Wellenform, `tts render --force` |
+| Mikrofon | `mic:<sha>` aus dem Sidecar (`mic.fingerprint_of`) | ✂ neu schneiden/pitchen, neue Aufnahme übernehmen |
+
+Instruktion, Sampling, Seed-Pool, ein Entwurf im TTS-Feld — nichts davon ändert eine
+vorhandene WAV, also auch nichts am Export. Das musste so sein: OGG/Opus-Bytes sind pro
+Encode verschieden (zufällige Bitstream-Seriennummer), ein unnötiger Re-Encode erzeugt also
+hunderte Diffs ohne hörbaren Unterschied. Bis Oktober 2026 stand im Index der
+Render-Fingerprint (`plan.fingerprint`, mit der *heutigen* Profil-Instruktion und
+-Sampling) — eine Änderung an `profiles.json` encodierte damit 302 unveränderte Clips neu.
+
+**Einmal-Migration.** Index-Einträge mit einem Fingerprint ohne `wav:`/`mic:` (Altformat)
+werden nicht blind neu encodiert: der Export encodiert die Produktions-WAV im Speicher,
+decodiert beides und vergleicht (Länge ± 30 ms, Korrelation ≥ 0.98; dieselbe WAV ergibt
+bit-gleiche Samples, ein neuer Wurf liegt bei ≤ 0.2). Klingt die committete `.ogg` gleich,
+bleibt sie liegen und nur ihr Index-Eintrag bekommt den `wav:`-Fingerprint
+(`ExportReport.migrated`, in CLI und Banner als „nur im Index umgestellt"). Der erste Export
+nach der Umstellung ändert deshalb fast nur `index.json` und dauert einmalig rund eine Minute.
+Gelockte Clips ohne lokale WAV (frischer Checkout) behalten ihren Alt-Eintrag, bis die WAV da ist.
 
 ## Tests
 

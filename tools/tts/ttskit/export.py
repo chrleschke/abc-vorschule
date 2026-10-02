@@ -22,24 +22,42 @@ Determinismus heißt hier: ein wiederholter Lauf ohne geänderte Eingaben fasst
 keine Datei an. Die OGG-Bytes selbst sind pro Encode NICHT reproduzierbar —
 `soundfile`/libsndfile schreibt eine zufällige Ogg-Bitstream-Seriennummer, also
 erzeugt derselbe WAV-Input bei jedem Aufruf ein anderes .ogg. Deshalb merkt
-sich `index.json` pro Clip einen eigenen Fingerprint (Text, Profil, Seed,
-Stimme, Instruktion, Sampling — siehe `plan.fingerprint`) und ein Clip wird
-nur neu encodiert, wenn sich dieser Fingerprint geändert hat oder die
-Zieldatei fehlt.
+sich `index.json` pro Clip einen Fingerprint der **Produktions-Audio selbst**
+(siehe `export_fingerprint`) und ein Clip wird nur neu encodiert, wenn sich
+dieser Fingerprint geändert hat oder die Zieldatei fehlt:
+
+* Qwen-Clips: `wav:<sha>` über Samples und Rate von `out/audio/<key>.wav`.
+  Neuer Wurf übernommen, Schnitt in der Wellenform (`render.trim_candidate`
+  schreibt die Produktions-WAV mit) — beides ändert die Datei und damit den
+  Fingerprint. Profil-Einstellungen (Instruktion, Sampling, …) stehen bewusst
+  NICHT darin: ein Profil-Update ist eine Verbesserung für künftige Renders,
+  die vorhandene Aufnahme klingt danach genau wie vorher.
+* Mikrofon-Aufnahmen: `mic:<sha>` aus dem Sidecar (`mic.fingerprint_of`).
+
+Bis Oktober 2026 stand im Index der Render-Fingerprint aus `plan.fingerprint`
+(Text, Seed, Stimme, *aktuelle* Profil-Instruktion und -Sampling). Ein Eintrag
+in diesem Altformat wird nicht blind neu encodiert: `_matches_export`
+vergleicht die committete .ogg mit der Produktions-WAV, und klingen beide
+gleich, bleibt die Datei liegen und nur der Fingerprint im Index wechselt
+(`ExportReport.migrated`).
 """
 
 from __future__ import annotations
 
+import hashlib
+import io
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import numpy as np
 import soundfile as sf
 
 from .extract import reads_as_bare_sentence
+from .models import Clip
 from .paths import Paths
 from .plan import orphan_locks, status_of
-from .render import production_fingerprint
+from .render import candidate_meta
 
 #: Bei gleichem Quelltext in mehreren Profilen gewinnt das frühere Profil —
 #: nach verified-Audio (Fingerprint stimmt mit dem letzten Export überein).
@@ -112,6 +130,95 @@ def asset_name(key: str) -> str:
     return key.replace(":", "_") + ".ogg"
 
 
+#: Präfixe der Fingerprints, die nach dem Inhalt der Audio gehen. Alles andere
+#: im Index ist ein Render-Fingerprint aus der Zeit vor `export_fingerprint`.
+CONTENT_FINGERPRINT_PREFIXES = ("wav:", "mic:")
+
+#: Toleranzen für den Abgleich Alt-Eintrag ↔ Produktions-WAV (`_matches_export`).
+#: Gemessen am echten Bestand: dieselbe WAV, zweimal encodiert, decodiert
+#: bit-gleich (Korrelation 1.000); ein echter neuer Wurf liegt bei ≤ 0.2.
+MATCH_MAX_LENGTH_DIFF_SECONDS = 0.03
+MATCH_MIN_CORRELATION = 0.98
+
+
+def wav_fingerprint(path: Path) -> str:
+    """Hash über Samples und Rate einer WAV — gleiche Audio, gleicher Wert."""
+    data, sr = sf.read(path, dtype="float32", always_2d=True)
+    digest = hashlib.sha256(f"{sr}:{data.shape[1]}:".encode("ascii"))
+    digest.update(np.ascontiguousarray(data).tobytes())
+    return "wav:" + digest.hexdigest()[:16]
+
+
+def export_fingerprint(paths: Paths, clip: Clip) -> str:
+    """Fingerprint, der entscheidet, ob der Export einen Clip neu encodiert.
+
+    Geht nur nach der Produktions-Audio, nie nach dem heutigen Profil: wer die
+    Instruktion oder das Sampling eines Profils ändert, ändert keine einzige
+    schon gerenderte Aufnahme (siehe `plan.status_of`) — und darf deshalb auch
+    keinen Re-Encode auslösen. Für Mikrofon-Aufnahmen gilt der Hash der
+    bearbeiteten Datei aus dem Sidecar (`mic.fingerprint_of`).
+
+    Nicht zu verwechseln mit `plan.fingerprint`: der beschreibt, WOMIT eine
+    Aufnahme entstand, und treibt „⚠️ alt" und `verified` beim Promote.
+    """
+    meta = candidate_meta(paths, clip.key, clip.seed)
+    if meta.get("source") == "mic" and isinstance(meta.get("fingerprint"), str):
+        return meta["fingerprint"]
+    return wav_fingerprint(paths.audio / f"{clip.key}.wav")
+
+
+def _is_legacy_fingerprint(value: object) -> bool:
+    return isinstance(value, str) and not value.startswith(CONTENT_FINGERPRINT_PREFIXES)
+
+
+def _encode_ogg(data: np.ndarray, sr: int, dest) -> None:
+    sf.write(dest, data, sr, format="OGG", subtype="OPUS")
+
+
+def _mono(data: np.ndarray) -> np.ndarray:
+    return data.mean(axis=1) if data.ndim == 2 else data
+
+
+def _matches_export(wav_path: Path, ogg_path: Path) -> bool:
+    """Klingt die schon exportierte .ogg wie die heutige Produktions-WAV?
+
+    Verglichen wird nicht WAV gegen .ogg — Opus ist verlustbehaftet, gerade bei
+    Zischlauten fällt die Korrelation einer unveränderten Aufnahme so unter
+    0.98 (am echten Bestand bei vier von fünf Clips, teils unter 0.9). Stattdessen wird die WAV genauso encodiert wie beim Export (im
+    Speicher, ohne Datei) und *decodiert gegen decodiert* verglichen: dieselbe
+    WAV ergibt dieselben Samples, nur die Bitstream-Seriennummer unterscheidet
+    sich. Länge und Korrelation statt Bit-Gleichheit, damit eine andere
+    libopus-Version die Migration nicht in einen Massen-Re-Encode kippt.
+    """
+    try:
+        old, old_sr = sf.read(ogg_path, dtype="float32", always_2d=True)
+    except (RuntimeError, sf.LibsndfileError):
+        return False
+    data, sr = sf.read(wav_path, dtype="float32")
+    buf = io.BytesIO()
+    _encode_ogg(data, sr, buf)
+    buf.seek(0)
+    fresh, fresh_sr = sf.read(buf, dtype="float32", always_2d=True)
+    a, b = _mono(fresh), _mono(old)
+    if old_sr != fresh_sr:
+        # Lokaler Import: scipy braucht der Export sonst nie.
+        from math import gcd
+
+        from scipy.signal import resample_poly
+
+        g = gcd(int(fresh_sr), int(old_sr))
+        b = resample_poly(b, int(fresh_sr) // g, int(old_sr) // g).astype(np.float32)
+    if abs(len(a) - len(b)) > MATCH_MAX_LENGTH_DIFF_SECONDS * fresh_sr:
+        return False
+    n = min(len(a), len(b))
+    a, b = a[:n].astype(np.float64), b[:n].astype(np.float64)
+    norm = float(np.linalg.norm(a) * np.linalg.norm(b))
+    if norm == 0.0:
+        # Beides Stille ist gleich; nur eine Seite still ist es nicht.
+        return not np.any(a) and not np.any(b)
+    return float(np.dot(a, b)) / norm >= MATCH_MIN_CORRELATION
+
+
 @dataclass
 class ExportReport:
     exported: list[str] = field(default_factory=list)
@@ -121,6 +228,10 @@ class ExportReport:
     #: Clips, deren Fingerprint sich seit dem letzten Export nicht geändert
     #: hat — die vorhandene .ogg-Datei wurde unangetastet gelassen.
     unchanged: list[str] = field(default_factory=list)
+    #: Teilmenge von `unchanged`: der Index trug noch einen Alt-Fingerprint
+    #: (Render-Einstellungen statt Audio-Inhalt), die .ogg klang aber wie die
+    #: Produktions-WAV — nur der Fingerprint im Index wurde umgeschrieben.
+    migrated: list[str] = field(default_factory=list)
 
     def as_dict(self) -> dict:
         return {
@@ -129,6 +240,7 @@ class ExportReport:
             "removed": self.removed,
             "warnings": self.warnings,
             "unchanged": self.unchanged,
+            "migrated": self.migrated,
         }
 
 
@@ -231,8 +343,22 @@ def export_to_app(paths: Paths) -> ExportReport:
     # Datei, die im APK liegt, aber von keinem Call-Site gefunden wird.
     planned = []
     for clip in sorted(exportable, key=lambda c: c.key):
-        profile = ctx.profiles.profiles[clip.profile]
-        planned.append((clip, asset_name(clip.key), production_fingerprint(paths, clip, profile)))
+        planned.append((clip, asset_name(clip.key), export_fingerprint(paths, clip)))
+
+    # Einmal-Migration vom Render- auf den Inhalts-Fingerprint, noch vor der
+    # Kollisionsauflösung: `_clip_verified` vergleicht mit `previous`, und ein
+    # Alt-Eintrag darf einen Clip dort nicht plötzlich „unbestätigt" machen.
+    # Klingt die committete .ogg wie die Produktions-WAV, gilt der Eintrag als
+    # mit dem neuen Fingerprint geschrieben — die Datei bleibt liegen.
+    migrated: set[str] = set()
+    for clip, name, fp in planned:
+        prev = previous.get(name)
+        if prev is None or not _is_legacy_fingerprint(prev[1].get("fingerprint")):
+            continue
+        dest = target / name
+        if dest.exists() and _matches_export(paths.audio / f"{clip.key}.wav", dest):
+            previous[name] = (prev[0], {**prev[1], "fingerprint": fp})
+            migrated.add(clip.key)
 
     index: dict[str, dict] = {}
     variants: dict[str, dict[str, dict]] = {}
@@ -287,9 +413,11 @@ def export_to_app(paths: Paths) -> ExportReport:
         prev = previous.get(name)
         if prev is not None and prev[1].get("fingerprint") == fp and dest.exists():
             report.unchanged.append(clip.key)
+            if clip.key in migrated:
+                report.migrated.append(clip.key)
         else:
             data, sr = sf.read(paths.audio / f"{clip.key}.wav", dtype="float32")
-            sf.write(dest, data, sr, format="OGG", subtype="OPUS")
+            _encode_ogg(data, sr, dest)
             report.exported.append(clip.key)
 
     # Aufgeräumt wird gegen den Index, nicht gegen die Menge der gelockten
