@@ -827,9 +827,9 @@ niemals mit einem stummen No-Op.
   (Kau-/Spuck-Rhythmus der Fresser, Halte-Kurve des Jagd-Druckmorphs) darf eigene Dauern
   tragen und begründet sie dort. Bewegung bleibt Antwort auf eine Tat — die Palette ist
   keine Einladung, Bühnen beim Laden aufzubauen oder dauerhaft zu animieren. Benannte
-  Ausnahme: die Würfel-Drehung des aktuellen Pfad-Schilds (`SignTurnChoreo`, Feder `Soft`),
+  Ausnahme: die Würfel-Drehung des Pfad-Schilds im Fokus (`SignTurnChoreo`, Feder `Soft`),
   vom Nutzer ausdrücklich gewählt; sie ersetzt den Atem-Ring dort, statt eine Schleife
-  hinzuzufügen. Zweite benannte Ausnahme: der Nebelring unter demselben Schild
+  hinzuzufügen. Zweite benannte Ausnahme: der Nebelring unter dem aktuellen Schild
   (`FogRingMotion`, eigene Perioden 3,2 s / 24–44 s), ebenfalls vom Nutzer gewählt; er
   ersetzt die wippende Stecknadel.
 - **Der Erfolgs-Stern fliegt in den Punktestand** (`StarFlight`, `SuccessBurst`, gezeichnet
