@@ -204,14 +204,22 @@ internal object CubeTurn {
 }
 
 /**
- * Choreography of the current sign: its cubes turn one after another to show the
- * picture on their side ("M ... wie Mond"), hold, and turn back; then the sign rests.
- * Own numbers under AbcMotion's rule 3 (Figurenspiel) — and the one idle motion on the
- * path besides the marker's bob. It replaces the ring pulse the current sign had.
+ * Choreography of the sign in focus ([PathFocus.turningIndex]): its cubes turn one
+ * after another to show the picture on their side ("M ... wie Mond"), hold, and turn
+ * back; then the sign rests. Own numbers under AbcMotion's rule 3 (Figurenspiel) — and
+ * the one idle motion on the path besides the marker's bob. It replaces the ring pulse
+ * the current sign had.
  */
 internal object SignTurnChoreo {
     /** After the path appears, so the child has found the pin first. */
     const val FirstDelayMs = 1400L
+
+    /**
+     * After the child scrolled a sign into focus. Shorter than [FirstDelayMs]: the eye
+     * is already on it — but long enough that signs merely passing the focus line in
+     * a flick do not start turning.
+     */
+    const val FocusDelayMs = 700L
     const val StaggerMs = AbcMotion.ShortMs.toLong()
     const val HoldMs = 1600L
 
@@ -219,16 +227,26 @@ internal object SignTurnChoreo {
     const val PauseMs = 6500L
 }
 
+/** Locked and planned signs: dark, dimmed blocks, and they never turn. */
+internal fun LessonState.dimsSign() = this == LessonState.Locked || this == LessonState.Planned
+
+/** Whether a sign can be the one in focus that turns its cubes ([PathFocus.turningIndex]). */
+internal fun signCanTurn(state: LessonState, sign: LessonSign) =
+    !state.dimsSign() && sign.blocks.any { it.emoji != null }
+
 /**
  * A lesson as a small tower of ABC blocks on a plank: one cube per sound, in its
- * capital form, with the sound's Anlaut picture on the cube's side. Only the
- * current sign turns its cubes to show the pictures; every other sign shows the
- * letters alone, which keeps the path calm. Locked signs carry a lock and dark,
- * dimmed blocks — the letters stay legible, so the path shows what is ahead.
+ * capital form, with the sound's Anlaut picture on the cube's side. Only the sign in
+ * focus turns its cubes to show the pictures; every other sign shows the letters
+ * alone, which keeps the path calm. Locked signs carry a lock and dark, dimmed
+ * blocks — the letters stay legible, so the path shows what is ahead.
  *
  * @param playable Whether a tap opens the lesson. The caller owns this because the
  * parent's "free order" switch feeds into it — a sign can be [LessonState.Locked]
  * and still playable.
+ * @param highlighted The current lesson: brighter glow, and TalkBack says so.
+ * @param turning The sign in focus, which turns its cubes now and then.
+ * @param turnDelayMs Wait before the first turn once [turning] goes on.
  * @param tag Stable id for tests.
  */
 @Composable
@@ -238,13 +256,15 @@ fun PathSignNode(
     state: LessonState,
     playable: Boolean,
     highlighted: Boolean,
+    turning: Boolean,
+    turnDelayMs: Long,
     index: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // Deliberately not `!playable`: a parent-unlocked sign keeps the dimmed look of the
     // lesson the child has not reached yet, so the path still shows where it stands.
-    val dimmed = state == LessonState.Locked || state == LessonState.Planned
+    val dimmed = state.dimsSign()
     val shelf = when (state) {
         LessonState.Mastered -> WoodWarm
         LessonState.Available, LessonState.InProgress -> WoodMid
@@ -283,12 +303,17 @@ fun PathSignNode(
 
     val still = rememberReduceMotion()
     val turns = remember(sign) { sign.blocks.map { Animatable(0f) } }
-    LaunchedEffect(sign, highlighted, still) {
-        if (!highlighted || still) {
+    LaunchedEffect(sign, turning, still) {
+        if (still) {
             turns.forEach { it.snapTo(0f) }
             return@LaunchedEffect
         }
-        delay(SignTurnChoreo.FirstDelayMs)
+        if (!turning) {
+            // Scrolled out of focus mid-turn: the cubes turn back instead of jumping.
+            coroutineScope { turns.forEach { launch { it.animateTo(0f, AbcMotion.Soft.spec()) } } }
+            return@LaunchedEffect
+        }
+        delay(turnDelayMs)
         while (true) {
             coroutineScope {
                 var order = 0
