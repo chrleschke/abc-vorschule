@@ -14,7 +14,7 @@
         "subtalker_temperature": 0.45,
         "subtalker_top_k": 50,
         "subtalker_top_p": 1,
-        "max_new_tokens": 25
+        "max_new_tokens": 38
       },
       "seedPool": [
         2532180,
@@ -203,7 +203,7 @@
       "label": "Laut / Buchstabe",
       "speaker": "sohee",
       "language": "german",
-      "instruct": "LEsen Sie die Buchstaben des deutschen Alphabets vor. Sie sind Lehrerin. Dies ist keine Geschichte, sondern das Vorlesen einzelner deutscher Buchstaben. Sprechen Sie deutlich und normal, nicht zu langsam. Überbetonen Sie die Aussprache nicht. Vermeiden Sie ungewöhnliche Laute, Stöhnen und emotionale Expressionen. Bleiben Sie innerhalb von 1-2 Sekunden. Verwenden Sie niemals englische oder asiatische Aussprache.",
+      "instruct": "LEsen Sie die Buchstaben des deutschen Alphabets vor. ",
       "sampling": {
         "temperature": 0.3,
         "top_k": 30,
@@ -212,7 +212,7 @@
         "subtalker_temperature": 0.8,
         "subtalker_top_k": 50,
         "subtalker_top_p": 1,
-        "max_new_tokens": 13
+        "max_new_tokens": 26
       },
       "seedPool": [
         106749763,

@@ -1011,7 +1011,8 @@
       "sourceText": "Schul"
     },
     "phoneme:6aeb0b7ea8fb": {
-      "seed": 782997103,
+      "seed": 1629126965,
+      "textOverride": "steh - auf.",
       "sourceText": "steh"
     },
     "phoneme:6b23c0d5f35d": {
@@ -1020,8 +1021,8 @@
       "sourceText": "C"
     },
     "phoneme:6c51ed231f6e": {
-      "seed": 865860254,
-      "textOverride": "Bau.",
+      "seed": 1629126965,
+      "textOverride": "Der Bau, ist fast fertig.",
       "sourceText": "bau"
     },
     "phoneme:6d0ef3950c22": {
@@ -1110,13 +1111,13 @@
       "sourceText": "Ei"
     },
     "phoneme:a25513c7e0f6": {
-      "seed": 5382596,
-      "textOverride": "Ouh!",
+      "seed": 874064776,
+      "textOverride": "Der Buchstabe: U.",
       "sourceText": "U"
     },
     "phoneme:a4d0ef23161b": {
-      "seed": 373640532,
-      "textOverride": "fuh",
+      "seed": 106749763,
+      "textOverride": "Die Silbe: Fu.",
       "sourceText": "fu"
     },
     "phoneme:a821c62e8104": {
@@ -1197,8 +1198,8 @@
       "sourceText": "pe"
     },
     "phoneme:d5e955f91d28": {
-      "seed": 369609897,
-      "textOverride": "Shoe.",
+      "seed": 1381496200,
+      "textOverride": "Der, Schuh – ist schwarz",
       "sourceText": "schu"
     },
     "phoneme:d93beca6efd0": {
@@ -1260,7 +1261,8 @@
       "sourceText": "mo"
     },
     "phoneme:f67ab10ad4e4": {
-      "seed": 229331426,
+      "seed": 765262133,
+      "textOverride": "Der Buchstabe: F.",
       "sourceText": "F"
     },
     "phoneme:f86d480308cb": {
@@ -3524,7 +3526,7 @@
       "sourceText": "Der Fuß ist groß."
     },
     "sentence:605433bca3df": {
-      "seed": 1228004130,
+      "seed": 1624620892,
       "sourceText": "Am Strand brennt ein Feuer."
     },
     "sentence:6081bbc330c0": {
@@ -3594,7 +3596,7 @@
       "sourceText": "Hier stehen viele Häuser."
     },
     "sentence:76f3b1626cc0": {
-      "seed": 312820997,
+      "seed": 1228004130,
       "sourceText": "Zwei Ufos fliegen am Himmel."
     },
     "sentence:7742b47244c2": {
@@ -4037,7 +4039,7 @@
       "sourceText": "Die Spinne ist klein."
     },
     "ui:06385de71001": {
-      "seed": 843304287,
+      "seed": 1827027911,
       "sourceText": "neunzehn"
     },
     "ui:08d45bd49176": {
@@ -4102,7 +4104,8 @@
       "sourceText": "drei"
     },
     "ui:6b8baccb2f21": {
-      "seed": 843304287,
+      "seed": 1378102812,
+      "textOverride": "richtig! Vier.",
       "sourceText": "vier"
     },
     "ui:6d42ce6fdfae": {
@@ -4156,7 +4159,7 @@
       "sourceText": "zehn"
     },
     "ui:bfd6b995588e": {
-      "seed": 52174945,
+      "seed": 235461947,
       "textOverride": "eins.",
       "sourceText": "eins"
     },
@@ -4176,11 +4179,12 @@
       "sourceText": "zwanzig"
     },
     "ui:d26898598758": {
-      "seed": 173037020,
+      "seed": 1358096850,
+      "textOverride": "Richtig! fünf",
       "sourceText": "fünf"
     },
     "ui:d5b7e81295ca": {
-      "seed": 722032169,
+      "seed": 1358096850,
       "sourceText": "neun"
     },
     "ui:d66628127edf": {
@@ -4198,13 +4202,13 @@
       "sourceText": "zweiundzwanzig"
     },
     "ui:fb33ab7105db": {
-      "seed": 1827027911,
-      "textOverride": "8",
+      "seed": 198878665,
+      "textOverride": "richtig! Acht.",
       "sourceText": "acht"
     },
     "ui:fbbbc9228ea1": {
-      "seed": 783010756,
-      "textOverride": "28",
+      "seed": 1378102812,
+      "textOverride": "Richtig! 28.",
       "sourceText": "achtundzwanzig"
     },
     "word:006a933c950f": {
@@ -4223,7 +4227,7 @@
       "sourceText": "4 Uhren"
     },
     "word:0286249762f7": {
-      "seed": 1389618019,
+      "seed": 18311644,
       "sourceText": "Auto"
     },
     "word:02b4db5796e4": {
@@ -4257,7 +4261,8 @@
       "sourceText": "zur"
     },
     "word:0a7cb27e5292": {
-      "seed": 942923981,
+      "seed": 1197660154,
+      "textOverride": "der,  das und die",
       "sourceText": "das"
     },
     "word:0abd20997a05": {
@@ -4828,8 +4833,8 @@
       "sourceText": "Dose"
     },
     "word:6bc75e1bf7ef": {
-      "seed": 1239245134,
-      "textOverride": "Schu.",
+      "seed": 88237278,
+      "textOverride": "Der, Schuh – ist schwarz.",
       "sourceText": "Schuh"
     },
     "word:6bda42dcd5d1": {
@@ -5077,8 +5082,8 @@
       "sourceText": "18 Spinnen"
     },
     "word:8d0a36e2d012": {
-      "seed": 1017467044,
-      "textOverride": "Fehder",
+      "seed": 363018813,
+      "textOverride": "Eine Feder.",
       "sourceText": "Feder"
     },
     "word:8d55bb870b65": {
@@ -5620,7 +5625,8 @@
       "sourceText": "Nest"
     },
     "word:e5c286bb5e83": {
-      "seed": 1854465165,
+      "seed": 735418972,
+      "textOverride": "Der, Fisch.",
       "sourceText": "Fisch"
     },
     "word:e629fa6598d7": {
