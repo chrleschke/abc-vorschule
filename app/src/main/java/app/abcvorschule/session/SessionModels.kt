@@ -113,7 +113,8 @@ data class SessionUiState(
     val unlockAllLessons: Boolean = false,
     /**
      * Die Lektion, aus der das Kind gerade zum Pfad zurückgekommen ist — Startpunkt
-     * der „Du bist hier“-Animation auf dem Pfad. Muss durch den State laufen und
+     * des Ringwechsels auf dem Pfad (der Nebelring verblasst dort und wächst am
+     * nächsten Schild auf). Muss durch den State laufen und
      * nicht im Pfad-Screen bleiben: der Screen wird beim Verlassen des Pfades
      * verworfen, also ist das hier das Einzige, was „woher“ über die Lektion hinweg
      * trägt. Der Pfad meldet mit `onPathAdvanceAnimated()` zurück, sobald der Marker

@@ -10,9 +10,11 @@
         schräg, Stern der geschafften Lektion an der oberen Ecke. Alles liegt in
         der 66-dp-Safe-Zone, nur der Pfosten läuft nach unten aus der Maske.
 
-        Farben aus ui/theme/Color.kt: Brett WoodMid, Pfosten WoodWarmShade, Nägel
-        WoodMidShade, Schrift SoftSand (9.2:1 auf WoodMid), Stern StarGold mit
-        Kontur StarGoldDeep.
+        Farben: Brett #4A3728, Pfosten #5F462E, Nägel #3F2E22 (die früheren
+        WoodMid / WoodWarmShade / WoodMidShade aus ui/theme/Color.kt — seit Oktober
+        2026 stehen die Schilder auf dem Pfad ohne Brett und Pfosten, Color.kt führt
+        die Holztöne nicht mehr), Schrift SoftSand (9.2:1 auf dem Brett), Stern
+        StarGold mit Kontur StarGoldDeep.
 
         Die Buchstaben sind Baloo 2 ExtraBold (SIL Open Font License), als Pfade
         umgesetzt — VectorDrawable kennt keinen Text. Schriftgröße 21 im
