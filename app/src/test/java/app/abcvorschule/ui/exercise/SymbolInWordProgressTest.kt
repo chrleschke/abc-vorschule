@@ -3,7 +3,6 @@ package app.abcvorschule.ui.exercise
 import app.abcvorschule.content.SymbolInWordMode
 import app.abcvorschule.content.SymbolInWordRound
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -77,7 +76,6 @@ class SymbolInWordProgressTest {
         val result = SymbolInWordProgress.tap(state, 0)
         assertEquals(SymbolInWordTapOutcome.Ignored, result.outcome)
         assertEquals(listOf(0), result.state.collected)
-        assertEquals(0, result.state.consecutiveMisses)
     }
 
     @Test
@@ -116,40 +114,19 @@ class SymbolInWordProgressTest {
     }
 
     @Test
-    fun consecutiveMissesKeepCountingAfterReportingStops() {
-        // Reporting is for adaptivity, counting is for the resolve gate — two jobs.
+    fun missesAfterTheFirstStayFlaggedAsReported() {
         var state = SymbolInWordProgress.initialState(papa)
         repeat(3) { state = SymbolInWordProgress.tap(state, 1).state }
-        assertEquals(3, state.consecutiveMisses)
         assertTrue(state.reportedMissThisRound)
+        assertEquals(SymbolInWordTapOutcome.MissAlreadyReported, SymbolInWordProgress.tap(state, 3).outcome)
     }
 
     @Test
-    fun aCorrectTapResetsTheConsecutiveMissCount() {
+    fun manyMissesNeverFillASlot() {
+        // Kein „Zeig mir": Fehltipps lösen nichts auf, das Kind findet die Treffer selbst.
         var state = SymbolInWordProgress.initialState(papa)
-        repeat(3) { state = SymbolInWordProgress.tap(state, 1).state }
-        state = SymbolInWordProgress.tap(state, 0).state
-        assertEquals(0, state.consecutiveMisses)
-    }
-
-    @Test
-    fun resolveUnlocksOnlyAfterTheSharedThreshold() {
-        var state = SymbolInWordProgress.initialState(papa)
-        repeat(ResolveGate.Threshold - 1) { state = SymbolInWordProgress.tap(state, 1).state }
-        assertFalse(SymbolInWordProgress.resolveAvailable(state))
-        state = SymbolInWordProgress.tap(state, 1).state
-        assertTrue(SymbolInWordProgress.resolveAvailable(state))
-    }
-
-    @Test
-    fun resolveFillsEverySlot() {
-        val resolved = SymbolInWordProgress.resolve(SymbolInWordProgress.initialState(papa))
-        assertEquals(listOf(0, 2), resolved.collected)
-        assertEquals(0, resolved.remainingSlots)
-    }
-
-    @Test
-    fun theHuntSharesTheSameResolveThreshold() {
-        assertEquals(ResolveGate.Threshold, SymbolHuntProgress.ResolveThreshold)
+        repeat(ResolveGate.Threshold * 2) { state = SymbolInWordProgress.tap(state, 1).state }
+        assertTrue(state.collected.isEmpty())
+        assertEquals(2, state.remainingSlots)
     }
 }

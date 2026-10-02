@@ -13,7 +13,6 @@ data class SymbolInWordState(
     /** Hits in the order the child found them. A Set would lose that order, and the
      * flight animation needs to know which segment was just collected. */
     val collected: List<Int> = emptyList(),
-    val consecutiveMisses: Int = 0,
     val reportedMissThisRound: Boolean = false,
     /** Segment that was tapped wrong last, for the spin animation. */
     val wrongIndex: Int? = null,
@@ -36,10 +35,13 @@ data class SymbolInWordTapResult(val state: SymbolInWordState, val outcome: Symb
  * Buchstaben-Jagd, where reshuffling the scatter field is the feedback; here the
  * word must stay put, because its letter order is the whole point).
  *
- * Two independent counters, same split as [SymbolHuntProgress]: reporting stops
- * after the first miss of a round so a child tapping through an eight-segment
- * word cannot wreck the atom's statistics, while the consecutive-miss count keeps
- * running because it only gates "Zeig mir".
+ * Reporting stops after the first miss of a round so a child tapping through an
+ * eight-segment word cannot wreck the atom's statistics.
+ *
+ * Kein „Zeig mir" mehr (Nutzerentscheidung Oktober 2026, Sternenhimmel-Spec): das Wort
+ * ist die ganze Auswahl, jeder Fehltipp spricht sein Segment vor, und das Kind tippt
+ * weiter, bis es die Sterne gefunden hat. Deshalb gibt es weder `resolve` noch einen
+ * Zähler aufeinanderfolgender Fehltipps — der hat nur den Knopf freigeschaltet.
  */
 object SymbolInWordProgress {
     fun initialState(round: SymbolInWordRound): SymbolInWordState = SymbolInWordState(
@@ -53,7 +55,7 @@ object SymbolInWordProgress {
         }
         if (index in state.targetIndices) {
             val collected = state.collected + index
-            val next = state.copy(collected = collected, consecutiveMisses = 0, wrongIndex = null)
+            val next = state.copy(collected = collected, wrongIndex = null)
             val outcome = if (collected.size >= state.targetIndices.size) {
                 SymbolInWordTapOutcome.RoundComplete
             } else {
@@ -63,7 +65,6 @@ object SymbolInWordProgress {
         }
         val alreadyReported = state.reportedMissThisRound
         val next = state.copy(
-            consecutiveMisses = state.consecutiveMisses + 1,
             reportedMissThisRound = true,
             wrongIndex = index,
             wrongNonce = state.wrongNonce + 1,
@@ -75,11 +76,4 @@ object SymbolInWordProgress {
         }
         return SymbolInWordTapResult(next, outcome)
     }
-
-    fun resolveAvailable(state: SymbolInWordState): Boolean =
-        state.consecutiveMisses >= ResolveGate.Threshold
-
-    /** Resolve: drop every target into its slot, award nothing. */
-    fun resolve(state: SymbolInWordState): SymbolInWordState =
-        state.copy(collected = state.targetIndices.sorted(), wrongIndex = null)
 }

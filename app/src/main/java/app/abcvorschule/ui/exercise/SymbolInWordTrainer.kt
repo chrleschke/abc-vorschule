@@ -1,31 +1,30 @@
 package app.abcvorschule.ui.exercise
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -35,97 +34,89 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.SymbolInWordDerivation
 import app.abcvorschule.content.SymbolInWordRound
 import app.abcvorschule.progress.ScaffoldLevel
 import app.abcvorschule.speech.SpeechClipText
-import app.abcvorschule.ui.components.AbcResolveButton
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
-import app.abcvorschule.ui.theme.AbcDimens
+import app.abcvorschule.ui.rewards.StarFlight
+import app.abcvorschule.ui.rewards.drawGlint
+import app.abcvorschule.ui.rewards.drawGlowStar
+import app.abcvorschule.ui.rewards.roundedStarPath
 import app.abcvorschule.ui.theme.AbcMotion
-import app.abcvorschule.ui.theme.Cream
-import app.abcvorschule.ui.theme.LeafGreen
-import app.abcvorschule.ui.theme.SkyBlue
-import app.abcvorschule.ui.theme.StarGold
-import app.abcvorschule.ui.theme.StarGoldDeep
-import app.abcvorschule.ui.theme.SunCoral
-import app.abcvorschule.ui.theme.WarmInk
-import app.abcvorschule.ui.theme.WarmMuted
-import app.abcvorschule.ui.world.lightIsland
-import app.abcvorschule.ui.world.lightPool
+import app.abcvorschule.ui.theme.FoundGold
+import app.abcvorschule.ui.theme.SilboFibel
+import app.abcvorschule.ui.theme.StarlightCream
+import app.abcvorschule.ui.theme.StarlineGold
+import app.abcvorschule.ui.world.StarsScene
+import app.abcvorschule.ui.world.calmPool
+import app.abcvorschule.ui.world.rememberReduceMotion
+import app.abcvorschule.ui.world.rememberWorldSeconds
 import kotlinx.coroutines.delay
-
-/** Segment colours cycle; the palette only marks boundaries, it carries no meaning,
- * so repeating it on an eight-segment word is harmless (design doc §5).
- *
- * Four, not five (dropping the dark theme's near-white SoftSand entry, which would
- * vanish on the light field), and StarGold swapped for StarGoldDeep: StarGold alone is
- * only ~1.85:1 against Cream (see Color.kt), under the 3:1 floor these large single-glyph
- * segments need as UI-component-scale text; StarGoldDeep clears it at ~3.29:1. The other
- * three, solid against Cream: SunCoral ~3.61:1, SkyBlue ~3.88:1, LeafGreen ~3.57:1.
- */
-private val SegmentPalette = listOf(SunCoral, SkyBlue, LeafGreen, StarGoldDeep)
-
-/** A collected segment stays visible but spent — this is the "completed colour"
- * and the "no longer tappable" affordance in one treatment. Alpha bumped +0.1 (0.35f
- * dark-theme value) for the light theme, same pattern as the other muted alphas here. */
-private const val CollectedSegmentAlpha = 0.45f
-
-/** Scaffold "Beginner": the target lies in the stroke as a silhouette (Prinzip 6). */
-private const val SilhouetteAlpha = 0.15f
+import kotlin.math.PI
+import kotlin.math.sin
 
 /** How long a wrong segment spins around its own centre. */
 private const val SpinMs = AbcMotion.LongMs
 
-/** How long a collected glyph travels from the word down onto its slot. The flight
- * is the causal link for a child who cannot read: "I tapped that, and that moved
- * there." */
-private const val FlightMs = AbcMotion.StandardMs
+/**
+ * How long the star travels from the word into its silhouette. LongMs rather than the
+ * StandardMs of a straight A→B move: the path is an arc, and the child has to be able
+ * to follow it — the flight is the causal link "I found that, and that star is mine".
+ */
+private const val FlightMs = AbcMotion.LongMs
 
-/** ExerciseStage caps its content at 420dp and pads 12dp per side; used only as an
- * upper bound, the real width is measured so a narrow phone shrinks correctly. */
-private const val StageContentDp = 396f
+/** Pop-in of the framing stars and the landing flash of a silhouette, in seconds. */
+private const val PopS = AbcMotion.ShortMs / 1000f
+private const val FlashS = AbcMotion.LongMs / 1000f
 
-/** Design doc §5: the stroke is at least this wide even for a one-glyph target. */
-private const val MinSlotWidthDp = 40f
+/** Langsames Funkeln der Rahmen-Sterne — ruhig, ≥ 4 s wie der Himmel dahinter. */
+private const val SparkleS = 4f
 
-/** Height of the area above a stroke that holds the landed glyph. Also the flight's
- * landing box, so the glyph arrives exactly where it comes to rest. */
-private val SlotGlyphHeight = 56.dp
+/** Schimmer der Leuchtschrift: dezent, damit warmes Licht nicht überstrahlt (Spec „Kontrast"). */
+private const val CreamGlowAlpha = 0.35f
+private const val GoldGlowAlpha = 0.7f
 
-/** Design doc §5: a bare 3dp stroke, no frame, no fill. */
-private val SlotStrokeHeight = 3.dp
-
-/** Extra air between the target label and the word, on top of the two
- * [AbcDimens.blockGap]s ExerciseStage already puts around it. */
-private val TargetToWordExtraGap = 14.dp
-
-/** One collected glyph in transit: which segment was tapped, and which stroke it is
- * heading for. Held outside the state machine because it is pure presentation. */
+/** One found star in transit: which segment it leaves, which silhouette it fills. */
 private data class SymbolFlight(val segmentIndex: Int, val slotOrdinal: Int)
 
 /**
- * Wort-Detektiv: find the hunted letter or syllable inside a word the lesson just
- * built (design doc §5/§6).
+ * Wort-Detektiv unter dem Sternenhimmel (Spec
+ * `2026-10-02-wort-detektiv-sternenhimmel-design.md`, ergänzt
+ * `2026-07-31-wort-detektiv-design.md`): find the hunted letter or syllable inside a
+ * word the lesson just built.
  *
- * The word is rendered as plain coloured glyphs without frames — it must read as a
- * word, not as a tray. The placeholder strokes underneath collect the hits; they
- * are receipts, not answer options, which is why they are bare strokes rather than
- * the Wort-Bauer's rounded 22dp slots.
+ * The word stands as **one word** in warm cream light on a calm dark spot; each
+ * segment is still its own tap target, but the target grows in height, not width
+ * ([WordDetectiveLayout]). A hit turns gold, two or three stars frame it like a tiny
+ * constellation, and one star flies in an arc into the next empty star silhouette
+ * below the word. No "Zeig mir" (user decision, October 2026): the word is the whole
+ * choice, every miss speaks its segment, and the child keeps looking.
  *
- * All decisions (segmentation, targets, hit indices, tap outcomes, row wrapping)
- * are made in the unit-tested pure layers; this file only draws and animates.
+ * All decisions (segmentation, targets, hit indices, tap outcomes, line breaking,
+ * hit widths, star placement) are made in the unit-tested pure layers; this file only
+ * draws and animates.
  */
 @Composable
 fun SymbolInWordTrainer(
@@ -146,64 +137,60 @@ fun SymbolInWordTrainer(
 ) {
     val roundKey = "$roundIndex-${round.wordAtomId}-${round.targetAtomId}"
     var state by remember(roundKey) { mutableStateOf(SymbolInWordProgress.initialState(round)) }
-    var resolved by remember(roundKey) { mutableStateOf(false) }
     var complete by remember(roundKey) { mutableStateOf(false) }
     val haptics = LocalAbcHaptics.current
     // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
     val interactionOpacity = rememberRestOpacity()
+    // „Bewegung reduzieren": kein Flug, kein Funkeln — die Silhouette füllt sich direkt.
+    val still = rememberReduceMotion()
+    // Dieselbe Uhr wie die Welt dahinter; gelesen nur beim Zeichnen.
+    val seconds = rememberWorldSeconds(still)
 
     val target = pack.atoms[round.targetAtomId]
     val label = target?.let { SymbolInWordDerivation.targetLabel(it, round.mode) }
     val scaffold = scaffoldFor(round.targetAtomId)
-    val slotWidth = slotWidthDp(label, LocalDensity.current.fontScale)
 
     // Positions are captured in window space and differenced against the wrapping
     // Box, because a flight crosses ExerciseStage's two separate Columns and there
-    // is no shared layout node to animate inside (design doc §6).
-    // Observable maps, not plain ones: they are written from onGloballyPositioned and
-    // read during composition to gate the flight overlay. A plain map's write
-    // schedules no recomposition, so an endpoint that arrives late — a new round is
-    // handed empty maps, and onGloballyPositioned need not re-fire for a layout that
-    // is geometrically identical, e.g. L06's r·o·t -> T·o·r — would drop the flight
-    // silently. With state maps a late write invalidates and the flight self-heals.
+    // is no shared layout node to animate inside. Observable maps: written from
+    // onGloballyPositioned, read during composition to gate the flight — a late
+    // write must invalidate, or a geometrically identical next round (L06 r·o·t →
+    // T·o·r) would drop its flight silently.
     var rootOffset by remember(roundKey) { mutableStateOf(Offset.Zero) }
     val segmentCenters = remember(roundKey) { mutableStateMapOf<Int, Offset>() }
     val slotCenters = remember(roundKey) { mutableStateMapOf<Int, Offset>() }
+    var glyphDp by remember(roundKey) { mutableFloatStateOf(WordDetectiveLayout.MaxGlyphDp) }
+    var silhouetteDp by remember(roundKey) { mutableFloatStateOf(WordDetectiveLayout.SilhouetteDp) }
 
-    // An Animatable driven from a LaunchedEffect rather than animateFloatAsState:
-    // the flight's target value never changes (it is always "go to the slot"), and
-    // animateFloatAsState initialises its internal Animatable *at* the target, so a
-    // constant target would land the glyph instantly and never replay per hit.
+    // When each hit was found and each silhouette filled, on the world clock — drives
+    // the stars' pop-in and the landing flash in the draw phase without recomposing.
+    val foundAt = remember(roundKey) { mutableStateMapOf<Int, Float>() }
+    val landedAt = remember(roundKey) { mutableStateMapOf<Int, Float>() }
+
     var flight by remember(roundKey) { mutableStateOf<SymbolFlight?>(null) }
-
-    // Keyed on the flight, not the round: one Animatable per round would still hold
-    // 1f from the previous flight when the next hit's composition reads it, drawing
-    // the second glyph at rest on its stroke for one frame before the LaunchedEffect
-    // gets to reset it. A fresh Animatable starts at 0f by construction, so the
-    // frame ordering stops mattering. Reachable on every two-hit round (Papa, Mama,
-    // Keks, Mimi).
+    // Keyed on the flight, not the round: a fresh Animatable starts at 0f by
+    // construction, so the second hit of "Papa" never draws its star already landed
+    // for one frame before the LaunchedEffect resets it.
     val flightProgress = remember(flight) { Animatable(0f) }
 
-    // Reported up from WordSegments, which is where the row sizing is computed, so
-    // the flight can start at the size the segment is actually drawn at instead of
-    // popping to the stroke's size at take-off. Identical to the stroke size for
-    // every word in the current content; it only diverges once a word is long
-    // enough for WordFrameSizing to shrink the glyphs.
-    var segmentGlyphSp by remember(roundKey) { mutableFloatStateOf(WordFrameSizing.MaxGlyphSp) }
-
-    // A stroke only fills once its glyph has actually landed on it — while a copy is
-    // in the air the slot stays empty, so the child sees one glyph, not two.
+    // A silhouette only fills once its star has landed — while a star is in the air
+    // the slot stays empty, so the child sees one star, not two.
     val landedCount = state.collected.size - if (flight != null) 1 else 0
 
     fun handleTap(index: Int) {
-        if (resolved || complete) return
+        if (complete) return
         if (index !in round.segments.indices) return
         val result = SymbolInWordProgress.tap(state, index)
-        // A tap on an already collected segment does nothing at all — not even
-        // speech, so "already done" reads as inert rather than half-alive.
+        // A tap on an already found segment does nothing at all — not even speech,
+        // so "already done" reads as inert rather than half-alive.
         if (result.outcome == SymbolInWordTapOutcome.Ignored) return
         onSpeakFeedback(SpeechClipText.forSegment(pack, round, index))
         state = result.state
+        val ordinal = result.state.collected.size - 1
+        fun launchStar() {
+            foundAt[index] = seconds.value
+            if (still) landedAt[ordinal] = seconds.value else flight = SymbolFlight(index, ordinal)
+        }
         when (result.outcome) {
             SymbolInWordTapOutcome.Miss -> {
                 haptics.nudge()
@@ -213,15 +200,13 @@ fun SymbolInWordTrainer(
                 haptics.nudge()
             SymbolInWordTapOutcome.Collected -> {
                 haptics.tick()
-                flight = SymbolFlight(index, result.state.collected.size - 1)
+                launchStar()
             }
             SymbolInWordTapOutcome.RoundComplete -> {
-                // celebrate, nicht tick: alle Striche voll ist der Batterie-voll-Moment
-                // des Detektivs, und die Jagd feiert ihren mit celebrate — "both hunts
-                // must feel the same" (HuntCelebration in ResolveGate.kt); §10 reserviert
-                // celebrate genau für diese Batterie-Feier.
+                // celebrate, nicht tick: alle Silhouetten voll ist der Batterie-voll-Moment
+                // des Detektivs, und die Jagd feiert ihren mit celebrate (§10).
                 haptics.celebrate()
-                flight = SymbolFlight(index, result.state.collected.size - 1)
+                launchStar()
                 complete = true
             }
             SymbolInWordTapOutcome.Ignored -> Unit
@@ -229,19 +214,18 @@ fun SymbolInWordTrainer(
     }
 
     LaunchedEffect(flight) {
-        if (flight == null) return@LaunchedEffect
-        // No snapTo first: flightProgress is remembered on the same key, so it is a
-        // brand-new Animatable sitting at 0f whenever this effect starts.
+        val active = flight ?: return@LaunchedEffect
         flightProgress.animateTo(1f, tween(durationMillis = FlightMs, easing = AbcMotion.Enter))
-        // Clearing the flight is what fills the stroke, so the hand-off from the
-        // flying copy to the resting glyph happens in one frame.
+        // Clearing the flight is what fills the silhouette, so the hand-off from the
+        // flying star to the resting one happens in one frame — with a small flash.
+        landedAt[active.slotOrdinal] = seconds.value
         flight = null
     }
 
-    // The full set of slots IS the success signal, so a "Weiter" tap would only add
-    // a dead end for a child who cannot read the button. The delay sits in front of
-    // onResult because reporting starts the spoken success phase, which must not
-    // talk over the celebration.
+    // The full row of stars IS the success signal, so a "Weiter" tap would only add a
+    // dead end for a child who cannot read the button. The delay sits in front of
+    // onResult because reporting starts the spoken success phase, which must not talk
+    // over the last landing.
     LaunchedEffect(complete) {
         if (!complete) return@LaunchedEffect
         delay(HuntCelebration.HoldMs)
@@ -259,148 +243,154 @@ fun SymbolInWordTrainer(
                 )
             },
             prompt = {
-                // A non-null label implies a non-null target — it is derived from it —
-                // which is why `target.display` needs no second null check here.
-                if (label != null) {
-                    TargetLabelRow(
-                        label = label,
-                        onClick = {
-                            target?.lemma?.let(onSpeakFeedback) ?: onSpeakFeedback(target.display)
-                        },
-                        interactionLocked = interactionLocked,
-                        // Auf dem dunklen Dachboden: das gesuchte Paar auf einer hellen
-                        // Pille, Tinte auf Licht wie jeder Lerninhalt (§10).
-                        // Insel vor der Deckkraft: sonst zeichnete sie in deren Ebene
-                        // und würde an den Kanten des Bauteils abgeschnitten.
-                        modifier = Modifier
-                            .lightIsland(padH = 14.dp, padV = 2.dp, corner = 999.dp)
-                            .alpha(interactionOpacity),
-                    )
+                // Symbol, Wort und Silhouetten sind eine Gruppe, die als Ganzes in den
+                // Aufgabenblock passen muss: ExerciseStage scrollt und clippt nicht.
+                // Breite und Höhe kommen hier zusammen, die Rechnung steht in
+                // WordDetectiveLayout (verticalFit, layout).
+                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                    val density = LocalDensity.current
+                    val availableWidth = maxWidth.value
+                    val availableHeight = if (maxHeight.value.isFinite()) maxHeight.value else Float.MAX_VALUE
+                    val labelHeight = if (label != null) WordDetectiveLayout.MinHitHeightDp else 0f
+                    // Gemessen, nicht geschätzt: Silbo Fibel ist proportional, und die
+                    // Layout-Rechnung braucht die echten Vorschübe je Segment (in em).
+                    val measurer = rememberTextMeasurer()
+                    val advances = remember(round.segments, density) {
+                        val refStyle = TextStyle(fontFamily = SilboFibel, fontWeight = FontWeight.Bold, fontSize = density.glyphSize(100f))
+                        val refPx = with(density) { 100.dp.toPx() }
+                        (round.segments + "-").map { measurer.measure(it, refStyle).size.width / refPx }
+                    }
+                    val (layout, fit) = remember(advances, round.breakBefore, availableWidth, availableHeight, labelHeight) {
+                        fun lay(cap: Float) = WordDetectiveLayout.layout(
+                            advances = advances.dropLast(1),
+                            hyphenAdvance = advances.last(),
+                            breakBefore = round.breakBefore,
+                            availableDp = availableWidth,
+                            maxGlyphDp = cap,
+                        )
+                        val wide = lay(WordDetectiveLayout.MaxGlyphDp)
+                        val fit = WordDetectiveLayout.verticalFit(availableHeight, labelHeight, wide.lines.size)
+                        (if (fit.glyphCapDp < wide.glyphDp) lay(fit.glyphCapDp) else wide) to fit
+                    }
+                    LaunchedEffect(layout.glyphDp) { glyphDp = layout.glyphDp }
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        if (label != null) {
+                            TargetLabelRow(
+                                label = label,
+                                onClick = { target?.let { onSpeakFeedback(it.lemma) } },
+                                interactionLocked = interactionLocked,
+                                // Ohne eigene ruhige Zone: ein zweiter dunkler Fleck über dem
+                                // des Worts las sich als Schatten-Säule. Hinter dem Symbol
+                                // stehen nur blasse Sterne, Creme liegt dort auf dem Himmel
+                                // bei 14:1.
+                                modifier = Modifier.alpha(interactionOpacity),
+                            )
+                        }
+                        // Luft zwischen Frage und Arbeit: das Symbol ist die Frage, das Wort
+                        // die Arbeit, und der Blick soll nach unten wandern.
+                        Spacer(modifier = Modifier.height(fit.labelToWordDp.dp))
+                        DetectiveWord(
+                            round = round,
+                            layout = layout,
+                            state = state,
+                            enabled = !complete && !interactionLocked,
+                            still = still,
+                            seconds = seconds,
+                            foundAt = foundAt,
+                            onTap = ::handleTap,
+                            onSegmentPlaced = { index, center -> segmentCenters[index] = center },
+                            // Ruhige Zone vor der Deckkraft: sonst zeichnete sie in deren
+                            // Ebene und würde an den Kanten des Bauteils abgeschnitten (§10).
+                            modifier = Modifier.calmPool().alpha(interactionOpacity),
+                        )
+                        // Die Silhouetten stehen direkt unter dem Wort, nicht unten im
+                        // Antwortblock (Mockup): am unteren Rand lagen sie auf dem Horizont,
+                        // weit weg vom Wort, und der Stern hatte einen halben Bildschirm zu
+                        // fliegen. Die ganze Gruppe liegt so mittig im Himmel.
+                        Spacer(modifier = Modifier.height(fit.wordToStarsDp.dp))
+                        StarSilhouettes(
+                            round = round,
+                            maxSizeDp = fit.silhouetteCapDp,
+                            landedCount = landedCount,
+                            showGlyphs = scaffold == ScaffoldLevel.Beginner && label != null,
+                            celebrate = complete,
+                            still = still,
+                            seconds = seconds,
+                            landedAt = landedAt,
+                            onSlotPlaced = { ordinal, center -> slotCenters[ordinal] = center },
+                            onSize = { silhouetteDp = it },
+                        )
+                    }
                 }
-                // Luft zwischen Frage und Arbeit. ExerciseStage setzt AbcDimens.blockGap
-                // (22dp) zwischen *je zwei* Kinder, also auch links und rechts von diesem
-                // Spacer: aus 22dp Abstand Label→Wort werden damit 58dp. Weil der
-                // Aufgabenblock als Ganzes zentriert liegt, hebt das das gesuchte Symbol
-                // an, statt nur das Wort nach unten zu schieben. Der Speaker bleibt davon
-                // unberührt — er sitzt in der Kopfzeile der Bühne, nicht im Block.
-                Spacer(modifier = Modifier.height(TargetToWordExtraGap))
-                WordSegments(
-                    round = round,
-                    state = state,
-                    enabled = !complete && !resolved && !interactionLocked,
-                    onTap = ::handleTap,
-                    onSegmentPlaced = { index, center -> segmentCenters[index] = center },
-                    onGlyphSpMeasured = { segmentGlyphSp = it },
-                    // Das Wort liegt im Lichtfleck der Taschenlampe.
-                    modifier = Modifier.lightPool().alpha(interactionOpacity),
-                )
             },
-            answers = {
-                SlotRow(
-                    round = round,
-                    hasLabel = label != null,
-                    slotWidth = slotWidth,
-                    collected = state.collected,
-                    landedCount = landedCount,
-                    resolved = resolved,
-                    showSilhouette = scaffold == ScaffoldLevel.Beginner,
-                    celebrate = complete,
-                    onSlotPlaced = { ordinal, center -> slotCenters[ordinal] = center },
-                )
-                if (SymbolInWordProgress.resolveAvailable(state) && !resolved && !complete) {
-                    AbcResolveButton(
-                        onClick = {
-                            resolved = true
-                            flight = null
-                            state = SymbolInWordProgress.resolve(state)
-                            onResult(false, true, listOf(round.targetAtomId))
-                        },
-                    )
-                }
-            },
+            // Kein Antwortblock: es gibt nichts zu wählen außer dem Wort selbst, und seit
+            // „Zeig mir" entfallen ist, auch keinen Knopf (PRODUCT_PRINCIPLES §9).
+            answers = {},
         )
 
-        // The collected glyph travels from its place in the word onto its stroke. It
-        // is drawn here, above ExerciseStage, because the two endpoints live in the
-        // stage's two separate Columns and no layout node contains both.
+        // The star travels from the found segment into its silhouette. Drawn here,
+        // above ExerciseStage, because the two endpoints live in the stage's two
+        // separate Columns and no layout node contains both.
         val active = flight
         val from = active?.let { segmentCenters[it.segmentIndex] }
         val to = active?.let { slotCenters[it.slotOrdinal] }
-        if (active != null && from != null && to != null && label != null && !resolved) {
-            val progress = flightProgress.value
-            val current = Offset(
-                x = from.x + (to.x - from.x) * progress,
-                y = from.y + (to.y - from.y) * progress,
-            ) - rootOffset
-            // Grows (or shrinks) from the size the word is drawn at into the size the
-            // stroke holds, so the copy leaves the word at the size the child just
-            // touched rather than jumping to the stroke's size in mid-air.
-            val fontSp = segmentGlyphSp + (AbcDimens.syllableSp.value - segmentGlyphSp) * progress
+        if (active != null && from != null && to != null) {
             val density = LocalDensity.current
-            // The glyph in the word is now bigger than the one the stroke holds, so
-            // the box has to be measured against the *take-off*, not the landing:
-            // a "Sch" leaving the word at ~54sp is 117dp wide and 80dp tall, and the
-            // stroke's 99x56dp would clip it in the first frames. A constant box that
-            // covers both ends keeps the glyph centred on `current` the whole way,
-            // which an interpolated one would only do by accident.
-            val glyph = round.segments[active.segmentIndex]
-            val takeOffWidth = WordFrameSizing
-                .wordSegmentWidthDp(segmentGlyphSp, glyph.length, density.fontScale).dp
-            val takeOffHeight =
-                (segmentGlyphSp * density.fontScale / WordFrameSizing.WordGlyphHeightFraction).dp
-            val flightWidth = maxOf(slotWidth, takeOffWidth)
-            val flightHeight = maxOf(SlotGlyphHeight, takeOffHeight)
+            val start = from - rootOffset
+            val end = to - rootOffset
+            val startRadius = WordDetectiveLayout.frameStarRadiusDp(glyphDp)
+            val endRadius = silhouetteDp * SilhouetteStarFraction
+            // Dotted trail behind the star, fading towards its tail (Mockup „Tomate").
+            Canvas(Modifier.matchParentSize()) {
+                val p = flightProgress.value
+                val steps = 22
+                for (k in 0..steps) {
+                    val t = p * k / steps
+                    val c = start + StarFlight.offset(start, end, t, swaySign = -1f)
+                    drawCircle(StarlineGold, alpha = 0.55f * (k / steps.toFloat()), radius = 1.2.dp.toPx(), center = c)
+                }
+            }
+            val p = flightProgress.value
+            val current = start + StarFlight.offset(start, end, p, swaySign = -1f)
+            val radiusDp = startRadius + (endRadius - startRadius) * p
+            val boxDp = (endRadius * 3f).dp
             Box(
                 modifier = Modifier
                     .offset(
-                        x = with(density) { current.x.toDp() } - flightWidth / 2,
-                        y = with(density) { current.y.toDp() } - flightHeight / 2,
+                        x = with(density) { current.x.toDp() } - boxDp / 2,
+                        y = with(density) { current.y.toDp() } - boxDp / 2,
                     )
-                    .width(flightWidth)
-                    .height(flightHeight)
+                    .size(boxDp)
                     .testTag("detective_flight"),
-                contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    // The tapped segment's own form, not the label's: the child
-                    // touched a lowercase "m" in "Mama" and must see that "m" fly.
-                    text = glyph,
-                    fontSize = fontSp.sp,
-                    // StarGoldDeep, not StarGold: StarGold alone is only ~1.85:1 against
-                    // the Cream page this flight is drawn over — under the 3:1 floor for a
-                    // glyph the child must track and read mid-flight. StarGoldDeep clears
-                    // it at ~3.29:1 (same substitution as landedColor below).
-                    // Auf dem Dachboden fliegt der Buchstabe durchs Dunkel: StarGold
-                    // leuchtet dort mit rund 8:1 von selbst, die dunkle Stufe für Papier
-                    // braucht es nicht mehr.
-                    color = StarGold,
-                    modifier = Modifier.alpha(1f - progress * 0.15f),
-                )
+                Canvas(Modifier.fillMaxSize()) {
+                    drawGlowStar(center = center, radius = radiusDp.dp.toPx(), rotationDeg = -30f + 30f * p)
+                }
             }
         }
     }
 }
 
-/**
- * Stroke width from the target glyph's estimated advance, using the same fraction
- * WordFrameSizing uses, so a three-letter target like "Sch" gets a visibly wider
- * stroke than "e" — the stroke's width is what tells a child "Sch is one thing,
- * not three" (design doc §5).
- *
- * Mit [fontScale] multipliziert wie die Flight-Box oben und
- * [WordFrameSizing.wordSegmentWidthDp]: der gelandete Glyph rendert in
- * `syllableSp × fontScale`, also muss das dp-Budget des Strichs dieselbe
- * Skalierung tragen — sonst ragt „Sch" bei font_scale 2.0 über seinen Strich
- * hinaus und der Strich sagt nicht mehr „das ist EIN Ding".
- */
-private fun slotWidthDp(label: SymbolInWordDerivation.TargetLabel?, fontScale: Float): Dp =
-    (AbcDimens.syllableSp.value * fontScale * WordFrameSizing.GlyphAspect * (label?.primary?.length ?: 1))
-        .coerceAtLeast(MinSlotWidthDp).dp
+/** Outer radius of the five-pointed star inside its silhouette box. */
+private const val SilhouetteStarFraction = 0.46f
+
+/** Text size for a glyph that must *render* at [dp], whatever the system font scale. */
+private fun Density.glyphSize(dp: Float): TextUnit = dp.dp.toSp()
+
+private fun glowStyle(sizeDp: Float, density: Density, color: Color, glowAlpha: Float, blurDp: Float) = TextStyle(
+    fontFamily = SilboFibel,
+    fontWeight = FontWeight.Bold,
+    fontSize = density.glyphSize(sizeDp),
+    color = color,
+    shadow = Shadow(color = color.copy(alpha = glowAlpha), offset = Offset.Zero, blurRadius = with(density) { blurDp.dp.toPx() }),
+)
 
 /** The hunted symbol, as a case pair ("P / p") for letters and a single lowercase
- * form for syllables (design doc §2). Its size comes from
- * [WordFrameSizing.targetLabelSp] so it stays a fixed fraction of the word below it
- * at every system font scale. */
+ * form for syllables (design doc §2) — as warm light on the dark sky, the second named
+ * exception to "content only on light" next to the word. Tapping speaks it. */
 @Composable
 private fun TargetLabelRow(
     label: SymbolInWordDerivation.TargetLabel,
@@ -408,102 +398,99 @@ private fun TargetLabelRow(
     interactionLocked: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val targetGlyphSp = WordFrameSizing.targetLabelSp(LocalDensity.current.fontScale).sp
+    val density = LocalDensity.current
+    val size = WordDetectiveLayout.TargetLabelDp
+    val style = glowStyle(size, density, StarlightCream, CreamGlowAlpha, blurDp = 10f)
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        // Centred inside the enforced minimum, so a single narrow glyph does not sit
-        // off to the left of its own touch target.
         horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
         modifier = modifier
-            // A single-form single-glyph target ("ß" in L15's F·u·ß, where targetLabel
-            // returns no alternate because the atom is already lowercase) is barely
-            // one glyph wide, which is under the hit-box floor every touch target in
-            // this app has to clear.
-            .sizeIn(
-                minWidth = WordFrameSizing.MinFrameDp.dp,
-                minHeight = WordFrameSizing.MinFrameDp.dp,
-            )
-            .clickable(enabled = !interactionLocked) { onClick() }
+            // A single-form single-glyph target ("ß") is barely one glyph wide, under
+            // the hit-box floor every touch target in this app has to clear.
+            .sizeIn(minWidth = WordDetectiveLayout.MinHitHeightDp.dp, minHeight = WordDetectiveLayout.MinHitHeightDp.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                enabled = !interactionLocked,
+            ) { onClick() }
             .testTag("detective_target"),
     ) {
-        Text(text = label.primary, fontSize = targetGlyphSp, color = WarmInk)
+        Text(text = label.primary, style = style)
         if (label.alternate != null) {
             // A separator, not something to read: half size and dimmed so the two
-            // letters dominate (design doc §2). Decorative, so not held to 3:1/4.5:1;
-            // alpha bumped +0.1 (0.45f -> 0.55f), same pattern as the other muted alphas.
+            // letters dominate (design doc §2). Decorative, not held to a contrast floor.
             Text(
                 text = "/",
-                fontSize = targetGlyphSp / 2,
-                color = WarmMuted.copy(alpha = 0.55f),
+                style = style.copy(fontSize = density.glyphSize(size / 2), fontWeight = FontWeight.Normal, shadow = null),
+                color = StarlightCream.copy(alpha = 0.45f),
             )
-            Text(text = label.alternate, fontSize = targetGlyphSp, color = WarmInk)
+            Text(text = label.alternate, style = style)
         }
     }
 }
 
-/** The word as tappable coloured glyphs, wrapped into balanced rows when a word is
- * too long to keep 56dp targets on one line (design doc §5). */
+/**
+ * The word as one word: glyphs in their natural spacing, each segment with its own
+ * invisible, taller tap target ([WordDetectiveLayout]); found segments in gold with
+ * their framing stars on top.
+ */
 @Composable
-private fun WordSegments(
+private fun DetectiveWord(
     round: SymbolInWordRound,
+    layout: WordDetectiveLayout.Layout,
     state: SymbolInWordState,
     enabled: Boolean,
+    still: Boolean,
+    seconds: State<Float>,
+    foundAt: Map<Int, Float>,
     onTap: (Int) -> Unit,
     onSegmentPlaced: (Int, Offset) -> Unit,
-    onGlyphSpMeasured: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
-        // Measured rather than assumed: on a phone narrower than ExerciseStage's
-        // 420dp cap the usable width is smaller, and overestimating it would push
-        // the frames past the edge instead of wrapping them.
-        val available = maxWidth.value.coerceAtMost(StageContentDp)
-        val perRow = WordFrameSizing.segmentsPerRow(available, round.segments.size)
-        // A wrapped word buys its second row out of the height budget, not out of
-        // the touch target: the reduced height still clears the 56dp floor, and
-        // ExerciseStage's prompt block has no room for two 80dp rows on a short
-        // device (design doc §5).
-        val rowHeight = WordFrameSizing.rowHeightDp(round.segments.size, perRow)
-        // The Wort-Bauer's stage-sharing sizing is deliberately not used here: it
-        // spaces slots, and this is a word. The glyph takes the row's height and the
-        // hit boxes hug it, so the segments sit as close as 56dp targets allow.
-        val fontScale = LocalDensity.current.fontScale
-        val glyphSp = WordFrameSizing.wordGlyphSp(
-            available = available,
-            segmentsPerRow = perRow,
-            longestDisplayChars = round.segments.maxOfOrNull { it.length } ?: 1,
-            rowHeightDp = rowHeight,
-            fontScale = fontScale,
-        )
-        val gap = WordFrameSizing.WordSegmentGapDp
-        // In a SideEffect, not inline: this writes state the caller reads, and that
-        // is only safe once the composition it comes from has succeeded. Writing the
-        // same value again is a no-op for recomposition, so it settles immediately.
-        SideEffect { onGlyphSpMeasured(glyphSp) }
-
-        Column(
-            modifier = Modifier.align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(gap.dp),
-        ) {
-            round.segments.withIndex().toList().chunked(perRow).forEach { row ->
-                Row(horizontalArrangement = Arrangement.spacedBy(gap.dp)) {
-                    row.forEach { (index, segment) ->
+    val density = LocalDensity.current
+    Box(modifier = modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            layout.lines.forEachIndexed { lineIndex, line ->
+                val upperOfTwo = layout.lines.size > 1 && lineIndex == 0
+                Box(modifier = Modifier.fillMaxWidth().height(layout.rowHeightDp.dp)) {
+                    line.segments.forEach { box ->
                         SegmentGlyph(
-                            segment = segment,
-                            index = index,
+                            segment = round.segments[box.index],
+                            box = box,
+                            glyphDp = layout.glyphDp,
                             state = state,
-                            frameWidthDp = WordFrameSizing.wordSegmentWidthDp(
-                                glyphSp = glyphSp,
-                                displayChars = segment.length,
-                                fontScale = fontScale,
-                            ),
-                            rowHeightDp = rowHeight,
-                            glyphSp = glyphSp,
                             enabled = enabled,
                             onTap = onTap,
                             onPlaced = onSegmentPlaced,
                         )
+                    }
+                    line.hyphenX?.let { x ->
+                        Text(
+                            text = "-",
+                            style = glowStyle(layout.glyphDp, density, StarlightCream, CreamGlowAlpha, blurDp = 10f),
+                            softWrap = false,
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .offset(x = x.dp)
+                                .wrapContentWidth(Alignment.Start, unbounded = true),
+                        )
+                    }
+                    // Die Rahmen-Sterne über dem Wort: ein kleines Sternbild je Treffer.
+                    Canvas(Modifier.matchParentSize()) {
+                        val now = seconds.value
+                        line.segments.filter { it.index in state.collected }.forEach { box ->
+                            val pop = if (still) 1f else ((now - (foundAt[box.index] ?: now)) / PopS).coerceIn(0f, 1f)
+                            val points = WordDetectiveLayout.frameStars(
+                                box, round.segments[box.index].length, layout, upperOfTwo,
+                            ).map { Offset(it.x.dp.toPx(), it.y.dp.toPx()) }
+                            drawFrameConstellation(
+                                points = points,
+                                radius = WordDetectiveLayout.frameStarRadiusDp(layout.glyphDp).dp.toPx(),
+                                pop = pop,
+                                now = if (still) 0f else now,
+                                seed = box.index,
+                            )
+                        }
                     }
                 }
             }
@@ -511,26 +498,54 @@ private fun WordSegments(
     }
 }
 
+/**
+ * Zarte gestrichelte Linie zwischen den Sternen eines Treffers (geschlossen beim
+ * Dreieck), darauf vierstrahlige Glanzlichter, die leicht versetzt ruhig funkeln.
+ */
+private fun DrawScope.drawFrameConstellation(points: List<Offset>, radius: Float, pop: Float, now: Float, seed: Int) {
+    if (pop <= 0f) return
+    val path = Path().apply {
+        points.forEachIndexed { i, p -> if (i == 0) moveTo(p.x, p.y) else lineTo(p.x, p.y) }
+        if (points.size > 2) close()
+    }
+    drawPath(
+        path,
+        color = StarlineGold,
+        alpha = 0.45f * pop,
+        style = Stroke(
+            width = 1.5.dp.toPx(),
+            cap = StrokeCap.Round,
+            pathEffect = PathEffect.dashPathEffect(floatArrayOf(2.dp.toPx(), 5.dp.toPx())),
+        ),
+    )
+    points.forEachIndexed { k, p ->
+        val phase = now / SparkleS * 2f * PI.toFloat() + k * 2.1f + seed
+        val wave = if (now == 0f) 0f else sin(phase)
+        val scale = (0.98f + 0.12f * wave) * (0.6f + 0.4f * pop)
+        rotate(degrees = 10f + 10f * wave, pivot = p) {
+            drawGlint(p, size = radius * scale, alpha = (0.9f + 0.1f * wave) * pop)
+        }
+    }
+}
+
 @Composable
 private fun SegmentGlyph(
     segment: String,
-    index: Int,
+    box: WordDetectiveLayout.SegmentBox,
+    glyphDp: Float,
     state: SymbolInWordState,
-    frameWidthDp: Float,
-    rowHeightDp: Float,
-    glyphSp: Float,
     enabled: Boolean,
     onTap: (Int) -> Unit,
     onPlaced: (Int, Offset) -> Unit,
 ) {
-    val collected = index in state.collected
+    val index = box.index
+    val found = index in state.collected
     val isWrong = state.wrongIndex == index
+    val density = LocalDensity.current
     // An Animatable driven off the nonce, not animateFloatAsState off a target
     // value: the spin must replay when the child taps the *same* wrong segment
-    // twice, and a target value derived from state would be unchanged in that case.
-    // snapTo(0f) afterwards leaves the glyph upright rather than at a multiple of
-    // 360° that grows all round; the else branch un-rotates a segment whose spin was
-    // cut short by a tap on a different segment.
+    // twice. snapTo(0f) afterwards leaves the glyph upright; the else branch
+    // un-rotates a segment whose spin was cut short by a tap on a different one.
     val rotation = remember { Animatable(0f) }
     LaunchedEffect(state.wrongNonce) {
         if (isWrong && state.wrongNonce > 0) {
@@ -541,136 +556,151 @@ private fun SegmentGlyph(
             rotation.snapTo(0f)
         }
     }
+    val color by animateColorAsState(
+        targetValue = if (found) FoundGold else StarlightCream,
+        animationSpec = tween(durationMillis = AbcMotion.QuickMs),
+        label = "detective_segment_colour",
+    )
+    val style = if (found) {
+        glowStyle(glyphDp, density, color, GoldGlowAlpha, blurDp = 14f)
+    } else {
+        glowStyle(glyphDp, density, color, CreamGlowAlpha, blurDp = 10f)
+    }
+    // The hit box may be wider than the glyph (a narrow "i" borrows from its
+    // neighbours), so the box sits at hitX and the glyph is offset inside it — the
+    // visible spacing stays the word's own.
     Box(
+        contentAlignment = Alignment.CenterStart,
         modifier = Modifier
-            .width(frameWidthDp.dp)
-            .height(rowHeightDp.dp)
+            .offset(x = box.hitX.dp)
+            .width(box.hitWidth.dp)
+            .fillMaxHeight()
             .onGloballyPositioned { coordinates ->
-                val bounds = coordinates.size
+                // Flight start: the glyph's centre, not the (possibly off-centre) hit box's.
+                val origin = coordinates.positionInWindow()
                 onPlaced(
                     index,
-                    coordinates.positionInWindow() + Offset(bounds.width / 2f, bounds.height / 2f),
+                    origin + Offset(
+                        with(density) { (box.glyphX - box.hitX + box.glyphWidth / 2f).dp.toPx() },
+                        coordinates.size.height / 2f,
+                    ),
                 )
             }
-            .clickable(enabled = enabled && !collected) { onTap(index) }
+            // No ripple: the box is invisible and taller than the glyph, a grey slab
+            // flashing over the night sky would read as a mistake. Speech, spin and gold
+            // are the feedback.
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                enabled = enabled && !found,
+            ) { onTap(index) }
             .testTag("detective_segment_$index"),
-        contentAlignment = Alignment.Center,
     ) {
         Text(
             text = segment,
-            fontSize = glyphSp.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = if (collected) {
-                WarmMuted.copy(alpha = CollectedSegmentAlpha)
-            } else {
-                SegmentPalette[index % SegmentPalette.size]
-            },
-            modifier = Modifier.rotate(rotation.value),
+            style = style,
+            softWrap = false,
+            maxLines = 1,
+            modifier = Modifier
+                .offset(x = (box.glyphX - box.hitX).dp)
+                .wrapContentWidth(Alignment.Start, unbounded = true)
+                .graphicsLayer { rotationZ = rotation.value },
         )
     }
 }
 
 /**
- * One bare stroke per hit. A landed glyph rests in StarGoldDeep — the same colour
- * family as stars and points (StarGold itself is only ~1.85:1 against Cream, under the
- * 3:1 floor for this large glyph/stroke fill; StarGoldDeep clears it at ~3.29:1), so a
- * filled stroke reads as "earned". After "Zeig mir" the same glyphs arrive dimmed
- * instead: resolving is not a reward (Prinzip 8, design doc §6).
+ * One star silhouette per hit (dashed outline, nearly transparent), centred below the
+ * word but never reaching into the telescope's corner ([StarsScene]). A landed star is
+ * the reward star itself ([drawGlowStar]) and flashes briefly on landing; when the row
+ * is full the halos pulse until the success phase takes over.
  */
 @Composable
-private fun SlotRow(
+private fun StarSilhouettes(
     round: SymbolInWordRound,
-    /** False only for a round whose target atom is missing — then the strokes stay
-     * bare, the same way the prompt block drops the target label. */
-    hasLabel: Boolean,
-    slotWidth: Dp,
-    /** Hit segment indices in tap order; index `ordinal` is what landed on stroke
-     * `ordinal`. */
-    collected: List<Int>,
+    /** Höhendeckel aus [WordDetectiveLayout.verticalFit]. */
+    maxSizeDp: Float,
     landedCount: Int,
-    resolved: Boolean,
-    showSilhouette: Boolean,
+    /** Hilfestufe „Beginner" (Prinzip 6): das gesuchte Segment liegt blass in der Silhouette. */
+    showGlyphs: Boolean,
     celebrate: Boolean,
+    still: Boolean,
+    seconds: State<Float>,
+    landedAt: Map<Int, Float>,
     onSlotPlaced: (Int, Offset) -> Unit,
+    onSize: (Float) -> Unit,
 ) {
-    // The infinite pulse only ever runs while celebrating, so it is only created
-    // then instead of ticking for the whole round with nothing to show.
-    val glow = if (celebrate) {
-        val transition = rememberInfiniteTransition(label = "detective_slot_glow")
-        val animated by transition.animateFloat(
-            initialValue = 0.5f,
-            targetValue = 1f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = AbcMotion.PulseMs, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse,
-            ),
-            label = "detective_slot_glow_value",
-        )
-        animated
-    } else {
-        1f
-    }
-    // Auf dem Dachboden: gelandete Buchstaben golden, nach „Zeig mir" gedämpft hell.
-    val landedColor = if (resolved) Cream.copy(alpha = 0.5f) else StarGold
-    Row(
-        modifier = Modifier.fillMaxWidth().testTag("detective_slots"),
-        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+    val density = LocalDensity.current
+    // Where this row starts in the window: the telescope's no-star zone is measured
+    // from the world's left edge, which is the window's.
+    var leftInWindowDp by remember { mutableFloatStateOf(0f) }
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxWidth()
+            .onGloballyPositioned { leftInWindowDp = with(density) { it.positionInWindow().x.toDp().value } },
     ) {
-        repeat(round.targetIndices.size) { ordinal ->
-            val filled = ordinal < landedCount
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                // The pulse sits on the whole slot, so the 3dp stroke pulses with its
-                // glyph: design doc §6 says "die *Striche* pulsieren golden", and a
-                // glyph brightening over a static stroke is not that.
-                modifier = Modifier.alpha(if (celebrate) glow else 1f),
-            ) {
+        val keepOut = (StarsScene.TelescopeZoneWidthDp - leftInWindowDp).coerceAtLeast(0f)
+        val row = WordDetectiveLayout.silhouetteRow(round.targetIndices.size, maxWidth.value, keepOut, maxSizeDp)
+        LaunchedEffect(row.sizeDp) { onSize(row.sizeDp) }
+        Row(
+            modifier = Modifier.align(Alignment.Center).testTag("detective_slots"),
+            horizontalArrangement = Arrangement.spacedBy(row.gapDp.dp),
+        ) {
+            repeat(round.targetIndices.size) { ordinal ->
+                val filled = ordinal < landedCount
                 Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .width(slotWidth)
-                        .height(SlotGlyphHeight)
+                        .size(row.sizeDp.dp)
                         .onGloballyPositioned { coordinates ->
                             onSlotPlaced(
                                 ordinal,
                                 coordinates.positionInWindow() +
                                     Offset(coordinates.size.width / 2f, coordinates.size.height / 2f),
                             )
-                        },
-                    contentAlignment = Alignment.Center,
+                        }
+                        .testTag("detective_star_$ordinal"),
                 ) {
-                    if (filled && hasLabel) {
-                        // The form the child actually tapped, not the target atom's:
-                        // "Papa" ends as `P` `p` and "Mama" as `M` `m`. Both hits are
-                        // the same letter — that is the lesson the `P / p` label above
-                        // teaches — but the receipt has to show what was picked up, or
-                        // a child who tapped the small one sees a capital appear and
-                        // has no way to tell that its tap was the one that counted.
-                        Text(
-                            text = round.segments[collected[ordinal]],
-                            fontSize = AbcDimens.syllableSp,
-                            color = landedColor,
-                        )
-                    } else if (showSilhouette && hasLabel) {
-                        // Scaffold "Beginner": the target sits in the stroke as a
-                        // silhouette (Prinzip 6 — Silhouette vs. Lücke, per stroke
-                        // rather than globally). In reading order, so the two
-                        // silhouettes of "Mama" already spell out `M` and `m`.
+                    Canvas(Modifier.fillMaxSize()) {
+                        val outer = size.minDimension * SilhouetteStarFraction
+                        if (filled) {
+                            val now = seconds.value
+                            val flash = if (still) 0f else 1f - ((now - (landedAt[ordinal] ?: -100f)) / FlashS).coerceIn(0f, 1f)
+                            val pulse = if (celebrate && !still) 0.5f + 0.5f * sin(now * PI.toFloat() * 1000f / AbcMotion.PulseMs) else 0f
+                            drawGlowStar(
+                                center = center,
+                                radius = outer * (1f + 0.12f * flash),
+                                halo = 0.8f + 1.2f * flash + 0.6f * pulse,
+                            )
+                        } else {
+                            val path = roundedStarPath(center, outer, outer * 0.5f)
+                            drawPath(path, StarlightCream.copy(alpha = 0.08f))
+                            drawPath(
+                                path,
+                                StarlightCream.copy(alpha = 0.45f),
+                                style = Stroke(
+                                    width = 2.dp.toPx(),
+                                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(3.6.dp.toPx(), 3.2.dp.toPx())),
+                                ),
+                            )
+                        }
+                    }
+                    if (!filled && showGlyphs) {
+                        // In reading order, so the two silhouettes of "Mama" already spell
+                        // out `M` and `m` — the scaffold, not a second word.
                         Text(
                             text = round.segments[round.targetIndices[ordinal]],
-                            fontSize = AbcDimens.syllableSp,
-                            color = Cream.copy(alpha = SilhouetteAlpha + 0.1f),
+                            style = TextStyle(
+                                fontFamily = SilboFibel,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = density.glyphSize(row.sizeDp * 0.34f),
+                                color = StarlightCream.copy(alpha = 0.3f),
+                            ),
+                            softWrap = false,
+                            modifier = Modifier.offset(y = (row.sizeDp * 0.03f).dp),
                         )
                     }
                 }
-                Box(
-                    modifier = Modifier
-                        .width(slotWidth)
-                        .height(SlotStrokeHeight)
-                        .background(
-                            color = if (filled) landedColor else Cream.copy(alpha = 0.75f),
-                            shape = RoundedCornerShape(2.dp),
-                        ),
-                )
             }
         }
     }

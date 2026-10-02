@@ -41,9 +41,8 @@ object TaskPromptSizing {
 
     /**
      * Größe des Aufgabenbildes, mit demselben Deckel wie der Titel: ein Emoji ist
-     * ein Bild, keine Prosa (Muster `SentencePictureCardSizing.emojiSp` und
-     * `WordFrameSizing.targetLabelSp`), und ungedeckelt rendern die 84sp bei
-     * font_scale 2.0 als ~168dp — der Aufgabenblock von [ExerciseStage] scrollt
+     * ein Bild, keine Prosa (Muster `SentencePictureCardSizing.emojiSp`), und
+     * ungedeckelt rendern die 84sp bei font_scale 2.0 als ~168dp — der Aufgabenblock von [ExerciseStage] scrollt
      * nicht und clippt nicht, das Bild schöbe also Wort und Rahmen aus dem Bild.
      * Bei font_scale 1.0 kommt unverändert [PictureSp] heraus.
      */

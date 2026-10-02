@@ -245,6 +245,13 @@ data class SymbolInWordRound(
     val segments: List<String>,
     /** Indices into [segments] that are hits. Never empty. */
     val targetIndices: List<Int>,
+    /**
+     * Segment-Indizes, vor denen das Wort bei Platzmangel in zwei Zeilen getrennt werden
+     * *darf* — nur verlässliche Silben- bzw. Wortfugen aus den Wort-Bauer-Blöcken
+     * ([SymbolInWordDerivation.breakBefore]). Leer heißt: nie trennen, lieber kleiner
+     * setzen (Spec `2026-10-02-wort-detektiv-sternenhimmel-design.md`).
+     */
+    val breakBefore: List<Int> = emptyList(),
 ) : TrainerRound {
     init {
         require(targetIndices.isNotEmpty()) { "SymbolInWordRound $wordAtomId/$targetAtomId has no hit" }

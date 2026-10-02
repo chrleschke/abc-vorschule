@@ -117,7 +117,7 @@ object SyllableFrameSizing {
 
     /**
      * Kachelbreite aus der *gerenderten* Glyphbreite (sp × fontScale), Muster
-     * [WordFrameSizing.wordSegmentWidthDp]. [MinWidthDp] bleibt der Boden: zwei
+     * [WordFrameSizing.fittedFrameWidthDp]. [MinWidthDp] bleibt der Boden: zwei
      * Böden plus [MinGapDp] sind 240dp und passen auf jede unterstützte Bühne.
      */
     fun tileWidthDp(chars: Int, glyphSp: Float, fontScale: Float): Float =
