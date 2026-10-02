@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,11 +43,17 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isFinite
@@ -164,11 +171,11 @@ fun LetterTraceTrainer(
                     // nur der Deckel GlyphBoxMax übrig.
                     if (maxHeight.isFinite) maxHeight / bandOverhang else GlyphBoxMax,
                 )
-                Box(
-                    modifier = Modifier.size(glyphSide),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    if (morph < 1f) {
+                if (morph < 1f) {
+                    Box(
+                        modifier = Modifier.size(glyphSide),
+                        contentAlignment = Alignment.Center,
+                    ) {
                         // Keyed per round so a new glyph starts its fill animation from scratch
                         // instead of animating the previous round's bars back to empty.
                         key(roundKey) {
@@ -268,9 +275,17 @@ fun LetterTraceTrainer(
                             )
                         }
                         TraceStarSpark(spark = spark)
-                    } else {
-                        TraceRewardCard(round = round)
                     }
+                } else {
+                    // Die Karte bekommt den ganzen Aufgabenbereich, nicht den Glyph-Kasten:
+                    // der ist quadratisch und auf schmalen Geräten kaum breiter als die
+                    // Karte hoch ist — dort schnitt die Spalte die Wortzeile unten ab
+                    // („A wie Ampel" war nicht lesbar, siehe TraceRewardBoundsTest).
+                    TraceRewardCard(
+                        round = round,
+                        maxWidth = maxWidth,
+                        maxHeight = if (maxHeight.isFinite) maxHeight else Dp.Infinity,
+                    )
                 }
             }
         },
@@ -293,37 +308,98 @@ fun LetterTraceTrainer(
  * Reward page for a finished glyph: the object the letter stands for, and under it the
  * letter-word link the trainer is actually teaching — graphem in bold so the eye lands
  * on it first.
+ *
+ * Passt die Karte nicht in [maxWidth] × [maxHeight], gilt die Rangfolge aus
+ * [TraceRewardSizing]: die Wortzeile bleibt ganz sichtbar und bricht nur zwischen
+ * Wörtern um, das Bild nimmt, was an Höhe übrig bleibt.
  */
 @Composable
 private fun TraceRewardCard(
     round: LetterTraceRound,
+    maxWidth: Dp,
+    maxHeight: Dp,
     modifier: Modifier = Modifier,
 ) {
     val word = TraceReward.wordOf(round.rewardTts)
+    val line = buildAnnotatedString {
+        if (word == null) {
+            // An authored line that breaks the "<glyph> wie <word>" pattern is still
+            // shown rather than swallowed.
+            append(round.rewardTts)
+        } else {
+            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(round.glyph) }
+            append(" wie $word")
+        }
+    }
+    val density = LocalDensity.current
+    val measurer = rememberTextMeasurer()
+    val wordBase = MaterialTheme.typography.headlineMedium.copy(textAlign = TextAlign.Center)
+    // Dieselbe Verschmelzung wie in `Text(fontSize, fontFamily)`: gemessen wird genau
+    // der Stil, der nachher gezeichnet wird.
+    val emojiBase = LocalTextStyle.current.merge(
+        TextStyle(fontSize = TraceRewardSizing.EmojiSp.sp, fontFamily = SilboEmoji),
+    )
+    val sizing = remember(line, round.rewardEmoji, maxWidth, maxHeight, density, wordBase, emojiBase) {
+        with(density) {
+            // Skaliert wird in px und erst dann nach sp zurück: bei nichtlinearer
+            // Systemschrift (Android 14+) ist „halbe sp" nicht „halbe Pixel".
+            fun TextStyle.scaled(factor: Float) = if (factor == 1f) this else copy(
+                fontSize = (fontSize.toPx() * factor).toSp(),
+                lineHeight = if (lineHeight.isSp) (lineHeight.toPx() * factor).toSp() else lineHeight,
+            )
+            val innerWidthPx = (maxWidth - TraceRewardSizing.PaddingHorizontalDp.dp * 2)
+                .roundToPx().coerceAtLeast(1)
+            // (1) Kein Umbruch mitten im Wort: das längste Einzelwort muss in eine Zeile
+            // passen. Nur wenn es das nicht tut (schmales Gerät, große Systemschrift),
+            // wird die Wortzeile kleiner — sonst bleibt sie headlineMedium.
+            val longest = line.text.split(' ').maxBy { it.length }
+            val wordScale = TraceRewardSizing.largestFitting { f ->
+                measurer.measure(longest, wordBase.scaled(f), softWrap = false, maxLines = 1)
+                    .size.width <= innerWidthPx
+            } ?: TraceRewardSizing.MinScale
+            val wordStyle = wordBase.scaled(wordScale)
+            val wordHeightPx = measurer.measure(
+                line,
+                wordStyle,
+                constraints = Constraints(maxWidth = innerWidthPx),
+            ).size.height
+            // (2) Das Bild nimmt den Rest der Höhe; passt nicht einmal ein Viertel-Bild,
+            // fällt es weg und die Wortzeile steht allein.
+            val emojiScale = if (!maxHeight.isFinite) {
+                1f
+            } else {
+                val roomPx = maxHeight.toPx() - wordHeightPx -
+                    (TraceRewardSizing.PaddingVerticalDp * 2 + TraceRewardSizing.GapDp).dp.toPx()
+                TraceRewardSizing.largestFitting { f ->
+                    measurer.measure(round.rewardEmoji, emojiBase.scaled(f), maxLines = 1)
+                        .size.height <= roomPx
+                }
+            }
+            wordStyle to emojiScale?.let { emojiBase.scaled(it) }
+        }
+    }
+    val (wordStyle, emojiStyle) = sizing
     // Auf einer hellen Karte: im Dschungel ist der Grund dunkel, und Bild und Wort sind
     // Lerninhalt — der steht immer auf einer Licht-Insel (§10, „Nachtwelten").
     Column(
         modifier = modifier
             .testTag("trace_reward_${round.atomId}")
             .background(Cream.copy(alpha = 0.95f), RoundedCornerShape(28.dp))
-            .padding(horizontal = 32.dp, vertical = 24.dp),
+            .padding(
+                horizontal = TraceRewardSizing.PaddingHorizontalDp.dp,
+                vertical = TraceRewardSizing.PaddingVerticalDp.dp,
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(TraceRewardSizing.GapDp.dp),
     ) {
-        Text(text = round.rewardEmoji, fontSize = 96.sp, fontFamily = SilboEmoji)
+        if (emojiStyle != null) {
+            Text(text = round.rewardEmoji, style = emojiStyle, maxLines = 1)
+        }
         Text(
-            text = buildAnnotatedString {
-                if (word == null) {
-                    // An authored line that breaks the "<glyph> wie <word>" pattern is still
-                    // shown rather than swallowed.
-                    append(round.rewardTts)
-                } else {
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(round.glyph) }
-                    append(" wie $word")
-                }
-            },
-            style = MaterialTheme.typography.headlineMedium,
+            text = line,
+            style = wordStyle,
             color = WarmInk,
+            modifier = Modifier.testTag("trace_reward_word"),
         )
     }
 }

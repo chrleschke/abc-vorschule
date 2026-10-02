@@ -681,6 +681,14 @@ niemals mit einem stummen No-Op.
   die Karte nach unten zu den Fressern zieht, zeichnet der Aufgabenblock über dem
   Antwortblock (`ExerciseStage(promptAboveAnswers = true)`) — Wort-Bauer und Satz-Architekt
   ziehen aufwärts und bleiben bei der Vorbelegung `false`.
+- **Spurensucher: die Wortzeile der Belohnungskarte ist immer ganz zu sehen.** Die Karte
+  („A wie Ampel" unter 🚦) bekommt den ganzen Aufgabenbereich, nicht den quadratischen
+  Glyph-Kasten — der ist auf schmalen Geräten kaum breiter als die Karte hoch, und dort
+  schnitt die Spalte das Wort unten ab. Reicht der Platz nicht, gilt die Rangfolge aus
+  `TraceRewardSizing`: (1) die Wortzeile bricht nur zwischen Wörtern um und wird nur
+  kleiner, wenn ihr längstes Wort sonst nicht in eine Zeile passt, (2) das Bild nimmt die
+  Resthöhe und fällt unter einem Viertel seiner Größe ganz weg. Gemessen im echten Layout
+  (`TraceRewardBoundsTest`, Breiten 394/320/280dp, font_scale 1/1,3/2).
 - **Satz-Architekt: die Peg-Reihe bricht nie um.** Ein Satz steht immer in *einer*
   Zeile. Damit das auf jeder Breite und bei jeder Systemschriftgröße gilt, ist die
   Rangfolge in `SentencePegSizing` verbindlich: (1) die Reihe passt, (2) jeder Peg
