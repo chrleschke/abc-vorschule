@@ -17,8 +17,21 @@ object SentenceBarSizing {
     /** Abstand zweier Balken in einer Zeile — ein Wortzwischenraum. */
     const val GapDp = 8f
 
-    /** Abstand zwischen zwei Zeilen; mit der Balkenhöhe ergibt das 32dp Zeilenabstand. */
-    const val RowGapDp = 18f
+    /**
+     * Abstand zwischen zwei Zeilen; mit der Balkenhöhe ergibt das 38dp Zeilenabstand.
+     * 18dp (32dp Abstand) standen zu dicht und lasen sich als ein Block statt als Text.
+     */
+    const val RowGapDp = 24f
+
+    /**
+     * Mindestens so viele Zeilen. Eine einzelne Balkenreihe las sich als Leiste, nicht
+     * als Text (Nutzerentscheidung Oktober 2026): ein Satz, der in eine Zeile passt,
+     * wird trotzdem auf zwei verteilt.
+     */
+    const val MinRows = 2
+
+    /** Beim Verteilen auf zwei Zeilen trägt die erste etwa so viel — wie im Buch, wo die letzte Zeile kürzer ausläuft. */
+    const val FirstRowShare = 0.6f
 
     /** Länge je Buchstabe. Gewählt nach dem freigegebenen Entwurf (Board „Bilderbuch 1"). */
     const val DpPerCharDp = 12f
@@ -64,16 +77,35 @@ object SentenceBarSizing {
      * Bricht die Balken greedy in Zeilen um: ein Balken, der nicht mehr in die Zeile
      * passt, beginnt die nächste. Kein Balken ragt über [pageWidthDp]; ein einzelnes
      * Wort, das allein schon breiter wäre als die Seite, wird auf sie gekürzt.
+     *
+     * Passt alles in eine Zeile, wird auf [MinRows] Zeilen verteilt: die erste nimmt
+     * die Wörter, bis sie etwa [FirstRowShare] der Gesamtlänge trägt (mindestens eines),
+     * der Rest geht in die zweite. Ein Satz aus nur einem Wort bleibt eine Zeile — einen
+     * erfundenen Balken gibt es nicht, ein Balken ist immer ein Wort.
      */
     fun layout(sentence: String, pageWidthDp: Float): Layout {
         val words = words(sentence)
         if (words.isEmpty() || pageWidthDp <= 0f) return Layout(emptyList(), 0)
-        val bars = ArrayList<Bar>(words.size)
+        val widths = words.map { barWidthDp(it, pageWidthDp) }
+        val greedy = place(widths) { _, x, width -> x > 0f && x + width > pageWidthDp }
+        if (greedy.rows >= MinRows || widths.size < 2) return greedy
+        val total = widths.sum()
+        var firstRowWords = 1
+        var acc = widths[0]
+        while (firstRowWords < widths.size - 1 && acc + widths[firstRowWords] <= total * FirstRowShare) {
+            acc += widths[firstRowWords]
+            firstRowWords++
+        }
+        return place(widths) { index, _, _ -> index == firstRowWords }
+    }
+
+    /** Legt die Balken der Reihe nach; [breakBefore] entscheidet, wo eine neue Zeile beginnt. */
+    private inline fun place(widths: List<Float>, breakBefore: (index: Int, x: Float, width: Float) -> Boolean): Layout {
+        val bars = ArrayList<Bar>(widths.size)
         var row = 0
         var x = 0f
-        words.forEach { word ->
-            val width = barWidthDp(word, pageWidthDp)
-            if (x > 0f && x + width > pageWidthDp) {
+        widths.forEachIndexed { index, width ->
+            if (index > 0 && breakBefore(index, x, width)) {
                 row += 1
                 x = 0f
             }

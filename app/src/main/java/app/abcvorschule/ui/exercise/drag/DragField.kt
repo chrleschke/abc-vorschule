@@ -148,6 +148,12 @@ internal fun DragFieldState.renderOffset(key: String, flyBack: Offset): Offset =
 /**
  * A draggable answer tile with a mandatory tap-to-place alternative (R15).
  * [onDropped] receives the resolved zone key, or null when the tile snapped back.
+ *
+ * [settlesOn]: gibt der Trainer für die getroffene Zone `true` zurück, fliegt die Karte
+ * **nicht** heim — er übernimmt sie ab dem Loslass-Punkt (`releasedAt`, Versatz zur
+ * Ruhelage) selbst und lässt sie dort einrasten. Der Satz-Versteher braucht das: die
+ * richtige Karte, ins Buch gezogen, soll im Rahmen landen, nicht erst zurück auf den
+ * Tisch und dann ein zweites Mal hinauf. Vorbelegung: nie, also der bisherige Rückflug.
  */
 @Composable
 fun DragCard(
@@ -159,12 +165,13 @@ fun DragCard(
     /** False während der Aufgaben-Sperre — weder Tap noch Drag lösen dann etwas
      * aus (design doc). */
     enabled: Boolean = true,
+    settlesOn: (zoneKey: String, releasedAt: Offset) -> Boolean = { _, _ -> false },
     content: @Composable BoxScope.() -> Unit,
 ) {
     // Gekeyt auf die Karte: rückt an diese Stelle der Reihe eine andere Karte, beginnt
     // sie ohne Lift und ohne Rückflug der vorigen (Tray-Nachrücken nach einem Treffer).
     androidx.compose.runtime.key(state, key) {
-        DragCardBody(state, key, onTap, onDropped, modifier, enabled, content)
+        DragCardBody(state, key, onTap, onDropped, modifier, enabled, settlesOn, content)
     }
 }
 
@@ -176,6 +183,7 @@ private fun DragCardBody(
     onDropped: (zoneKey: String?) -> Unit,
     modifier: Modifier,
     enabled: Boolean,
+    settlesOn: (zoneKey: String, releasedAt: Offset) -> Boolean,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val dragging = state.draggingKey == key
@@ -247,16 +255,20 @@ private fun DragCardBody(
                                 if (owns) {
                                     val releasedAt = state.dragOffset
                                     val zone = state.endDrag(key)
-                                    // Immer vom Loslass-Punkt heim fliegen: ein Treffer
-                                    // entfernt die Karte aus dem Tray (dann ist der Flug
-                                    // unsichtbar), ein falscher Slot lässt sie liegen —
-                                    // dann soll sie sichtbar zurück, nicht teleportieren.
-                                    releaseFrom(releasedAt)
-                                    // Nirgends gelandet: hörbar zurückfedern. Einen
-                                    // falschen Slot vertont der Trainer selbst, er
-                                    // allein weiß, ob der Slot falsch war.
-                                    if (zone == null && releasedAt.getDistance() > AudibleReturnPx) {
-                                        AbcSfx.play(Sfx.Boing)
+                                    // Rastet die Karte dort ein, wo sie losgelassen wurde
+                                    // (settlesOn), übernimmt der Trainer — kein Rückflug.
+                                    if (zone == null || !settlesOn(zone, releasedAt)) {
+                                        // Vom Loslass-Punkt heim fliegen: ein Treffer
+                                        // entfernt die Karte aus dem Tray (dann ist der Flug
+                                        // unsichtbar), ein falscher Slot lässt sie liegen —
+                                        // dann soll sie sichtbar zurück, nicht teleportieren.
+                                        releaseFrom(releasedAt)
+                                        // Nirgends gelandet: hörbar zurückfedern. Einen
+                                        // falschen Slot vertont der Trainer selbst, er
+                                        // allein weiß, ob der Slot falsch war.
+                                        if (zone == null && releasedAt.getDistance() > AudibleReturnPx) {
+                                            AbcSfx.play(Sfx.Boing)
+                                        }
                                     }
                                     onDropped(zone)
                                 }

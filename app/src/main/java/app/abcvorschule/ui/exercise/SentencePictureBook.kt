@@ -98,7 +98,7 @@ internal fun ReadingBook(
             // Aufgabenblock — der Falz sitzt nah am linken Rand, damit vom linken
             // Blatt nur ein Streifen bleibt, und der Einband endet knapp vor dem rechten.
             .bleed(start = BleedStartDp.dp, end = BleedEndDp.dp)
-            .padding(top = CoverMarginDp.dp, bottom = CoverMarginDp.dp + BookBottomGapDp.dp)
+            .padding(top = BookTopGapDp.dp + CoverMarginDp.dp, bottom = CoverMarginDp.dp + BookBottomGapDp.dp)
             .drawBehind { drawBookBinding() },
     ) {
         BookPage(
@@ -193,7 +193,9 @@ private fun BookPage(
                 .weight(1f)
                 .then(
                     if (onFrameBounds != null) {
-                        Modifier.onGloballyPositioned { onFrameBounds(it.boundsInRoot()) }
+                        Modifier
+                            .onGloballyPositioned { onFrameBounds(it.boundsInRoot()) }
+                            .testTag("sentence_picture_frame")
                     } else {
                         Modifier
                     },
@@ -423,6 +425,13 @@ private fun Modifier.bleed(start: Dp, end: Dp): Modifier = layout { measurable, 
 private const val BleedStartDp = 6f
 private const val BleedEndDp = 12f
 
+/**
+ * Luft zwischen Lautsprecher und Oberkante des Einbands. Ohne sie klebte das Buch am
+ * Lautsprecher (Nutzer-Feedback Oktober 2026), mit dem Leuchtring des Nacht-Chromes
+ * wirkte der Knopf wie aufs Buch gelegt.
+ */
+private const val BookTopGapDp = 14f
+
 /** Einband über und unter der Seite. */
 private const val CoverMarginDp = 8f
 
@@ -435,10 +444,13 @@ private const val BookBottomGapDp = 22f
 /** Die Tischkante liegt so weit über der Oberkante der Kartenreihe. */
 private const val TableAboveCardsDp = 16f
 
-private const val PagePadStartDp = 34f
-private const val PagePadEndDp = 26f
-private const val PagePadVerticalDp = 20f
-private const val FrameToBarsDp = 18f
+// Innenränder der Seite und Luft zwischen Rahmen und Balken. Großzügiger als im ersten
+// Wurf (34/26/20/18): mit zwei Zeilen Balken soll die Seite wie eine Buchseite mit Rand
+// lesen, nicht wie ein bis an die Kanten gefülltes Formular.
+private const val PagePadStartDp = 38f
+private const val PagePadEndDp = 30f
+private const val PagePadVerticalDp = 26f
+private const val FrameToBarsDp = 28f
 private const val FrameCornerDp = 16f
 private const val FramePictureInsetDp = 14f
 
