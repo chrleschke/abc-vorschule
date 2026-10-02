@@ -126,6 +126,15 @@ val SunCoral = Color(0xFFD25B2D)
 val ClayRed = Color(0xFFB0402C)
 
 /**
+ * Rostrot für das Graphem in der Wortzeile der Spur-Belohnung („**A** wie Ampel").
+ * Fett allein trug die Hervorhebung nicht: `headlineMedium` ist schon fett, das
+ * Graphem sah aus wie der Rest der Zeile. Es ist Lerninhalt, also gilt die
+ * Lernschrift-Grenze ≥ 7:1 (§10): 8.0:1 auf Cream. SunCoral (3.8:1) und
+ * ClayRed (5.5:1) reichen dafür nicht.
+ */
+val GraphemeRust = Color(0xFF8A2E12)
+
+/**
  * Die Abendlandschaft des Pfad-Screens (PRODUCT_PRINCIPLES §5/§10, „Nachtwelten"). Keine
  * UI-Rollen, sondern Landschaftsflächen — deshalb ein eigener Block und keine Aufnahme
  * ins ColorScheme.

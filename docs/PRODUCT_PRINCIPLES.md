@@ -45,7 +45,7 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
   in die i-Straße und der Startpunkt sitzt am Fuß des i statt an seinem Kopf. Nach dem letzten
   Stern hält der fertige Buchstabe eine halbe
   Sekunde, dann folgt die Belohnungsseite: Bild groß, darunter die Wortzeile („**T** wie Tomate")
-  mit fettem Graphem. Kein zusätzlicher Buchstaben-Text unter dem Pfad.
+  mit rostrot eingefärbtem Graphem (`GraphemeRust`, 8:1 auf Cream — die Zeile ist ohnehin fett, Fett allein hob es nicht ab). Kein zusätzlicher Buchstaben-Text unter dem Pfad.
   **Der Merksatz muss halten, was er behauptet.** „X wie Y" heißt: Y fängt mit X an.
   „M wie Schneemann" tut das nicht — ein Kind, das gerade M lernt, hört am Wortanfang ein
   Sch. Zwei Regeln, von `LessonCoverageTest.everyMerksatzNamesAWordThatReallyStartsWithItsGrapheme`

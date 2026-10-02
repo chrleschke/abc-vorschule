@@ -48,7 +48,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -70,6 +69,7 @@ import app.abcvorschule.ui.theme.CreamElevated
 import app.abcvorschule.ui.theme.SilboEmoji
 import app.abcvorschule.ui.theme.StarGold
 import app.abcvorschule.ui.theme.StarGoldDeep
+import app.abcvorschule.ui.theme.GraphemeRust
 import app.abcvorschule.ui.theme.WarmInk
 import app.abcvorschule.ui.world.rememberReduceMotion
 import app.abcvorschule.ui.world.rememberWorldSeconds
@@ -306,7 +306,7 @@ fun LetterTraceTrainer(
 
 /**
  * Reward page for a finished glyph: the object the letter stands for, and under it the
- * letter-word link the trainer is actually teaching — graphem in bold so the eye lands
+ * letter-word link the trainer is actually teaching — graphem in its own color so the eye lands
  * on it first.
  *
  * Passt die Karte nicht in [maxWidth] × [maxHeight], gilt die Rangfolge aus
@@ -327,7 +327,8 @@ private fun TraceRewardCard(
             // shown rather than swallowed.
             append(round.rewardTts)
         } else {
-            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append(round.glyph) }
+            // Farbe statt Fett: die Zeile ist schon fett gesetzt.
+            withStyle(SpanStyle(color = GraphemeRust)) { append(round.glyph) }
             append(" wie $word")
         }
     }
