@@ -6,13 +6,13 @@ Source: whole-branch review + scoped fix re-review (2026-08-01)
 
 | Severity | Area | Note |
 |----------|------|------|
-| P1 | Layout | Umgebrochenes Wort passt auf der 640dp-Höhenklasse nicht ins Höhenbudget — Details unten |
-| P2 | Testing | Kein Compose-Testrunner im Projekt; Flug-Geometrie und vertikale Passung nur durch Codelesen geprüft, nie auf einem Gerät |
+| ~~P1~~ | Layout | ~~Umgebrochenes Wort passt auf der 640dp-Höhenklasse nicht ins Höhenbudget~~ — erledigt 2026-10-02 (Sternenhimmel): kein Umbruch nach Segmentanzahl mehr, kein „Zeig mir", und Symbol/Wort/Silhouetten passen sich als Gruppe der Höhe an (`WordDetectiveLayout.verticalFit`, Standbild `WordDetectiveShotTest.shortPhoneFitsTheBrokenWord`). Details unten bleiben als Geschichte |
+| ~~P2~~ | Testing | ~~Flug-Geometrie und vertikale Passung nie auf einem Gerät geprüft~~ — seit 2026-10-02 Standbilder auf dem Testgerät (`WordDetectiveShotTest`) |
 | P3 | Derivation | `PromptSyllableMany` („Finde alle Silben …") ist mit dem aktuellen Content unerreichbar und untested — korrekt für künftigen Content, kein toter Code |
 | P3 | Derivation | Silben-Treffer werden über `atomId` gematcht; ein Wort mit zwei gleich benannten Silben-Atomen und abweichenden Block-Displays könnte ein unehrliches Label erzeugen. Latent — der Invarianten-Test schlägt laut fehl, falls solcher Content entsteht |
-| P3 | Trainer | Zwei richtige Tipps innerhalb von 350ms lassen den ersten Glyphen in der Luft verschwinden; Endzustand bleibt korrekt |
+| P3 | Trainer | Zwei richtige Tipps innerhalb eines Flugs (seit 2026-10-02 450ms, Stern statt Glyph) lassen den ersten Stern in der Luft verschwinden; seine Silhouette füllt sich trotzdem, nur ohne Landungs-Aufleuchten |
 | P3 | Trainer | Animationswerte werden in der Composition gelesen (~21 Recompositions pro Treffer) statt in Layout/Draw. Gleiches Muster wie im Geschwister-Trainer |
-| P3 | Trainer | Während des letzten 350ms-Flugs pulsiert auf `Beginner`-Stufe die Silhouette des noch leeren Strichs mit |
+| ~~P3~~ | Trainer | ~~Während des letzten Flugs pulsiert die Silhouette des leeren Strichs mit~~ — entfallen mit den Strichen (2026-10-02): nur gefüllte Stern-Silhouetten pulsieren |
 | P3 | Testing | Test-Hygiene-Reste, alle im Whole-Branch-Review als akzeptabel eingestuft — Details unten |
 
 ## P3 im Detail — Test-Hygiene-Reste
