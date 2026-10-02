@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Nur Debug: die leere Test-Activity aus ui-test-manifest, in der die Compose-Tests
+  (Standbilder, Drag-Tests) laufen, steht hochkant wie die App selbst (MainActivity ist
+  portrait). Ohne das folgt sie dem Lagesensor: am auf dem Tisch liegenden Testgerät lief
+  ein Lauf quer, das Buch des Satz-Verstehers fiel auf null Höhe, und der Drag-Test
+  meldete Fehler, die es hochkant gar nicht gibt.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name="androidx.activity.ComponentActivity"
+            android:screenOrientation="portrait" />
+    </application>
+</manifest>

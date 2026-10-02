@@ -44,8 +44,8 @@ enum class AnswerAnchor {
  * `weight(1f)`, denn Compose misst die *ungewichteten* Kinder einer Column zuerst
  * gegen die volle Höhe — nur so kann der Antwortblock nie zusammengedrückt werden.
  * Die Untergrenze ist dann das, was seine Oberkante knapp unter die Mitte setzt:
- * passt der Inhalt in die verbleibenden 48 %, beginnt der Block exakt bei 52 %;
- * braucht er mehr (hohe Emoji-Karten, „Zeig mir", font_scale über 1.0, kurzes
+ * passt der Inhalt in die verbleibenden 42 %, beginnt der Block exakt bei 58 %;
+ * braucht er mehr (hohe Emoji-Karten, font_scale über 1.0, kurzes
  * Gerät), wächst er nach *oben* weiter statt seine letzten Kinder auf 0dp zu
  * quetschen.
  *
@@ -54,8 +54,14 @@ enum class AnswerAnchor {
  * Antwortblock bekam 48 % als *Maximum*. Auf 360×640dp reichte das nicht für
  * Karte + Lücke + `AbcResolveButton`, der Auflösen-Knopf wurde auf wenige dp
  * gemessen und war nach zwei Fehltipps nicht mehr tippbar.
+ *
+ * 58 % statt bis Oktober 2026 52 %: seit dem Bilderbuch trägt der Aufgabenblock das
+ * Buch mit Rahmen und zwei Zeilen Wort-Balken, und der Antwortblock nur noch die zwei
+ * Karten (kein „Zeig mir" mehr). Bei 52 % blieb unter den Karten ein leerer Tisch,
+ * während der Rahmen im Buch zu flach wurde. Die Karten stehen weiter klar über dem
+ * unteren Rand, wo die tippende Hand sie verdecken würde.
  */
-private const val PromptHeightFraction = 0.52f
+private const val PromptHeightFraction = 0.58f
 
 /**
  * Bühne einer Übung: Speaker-Kopfzeile ganz oben, darunter der Aufgabenblock,

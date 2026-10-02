@@ -74,10 +74,16 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
   das neue Wort der Runde.
 6. **Satz-Versteher** — „Ordne das richtige Bild zu": ein Satz mit bewusst
   schwieriger Grammatik (Plural, Partizip II, Präteritum — auch kombiniert) wird
-  vorgelesen, das Kind tippt eine von zwei Bildkarten (Emoji-Reihen, 1–3 Bilder;
+  vorgelesen, das Kind wählt eine von zwei Bildkarten (Emoji-Reihen, 1–3 Bilder;
   Wiederholung desselben Bildes drückt Menge aus). Die Instruktion kommt **einmal**
-  vor Runde 1, danach trägt jeder Satz die Aufgabe allein. Tippen ist die Antwort;
-  ein Miss liest den Satz erneut vor, nach 2 Misses gibt es „Zeig mir". Die Sätze
+  vor Runde 1, danach trägt jeder Satz die Aufgabe allein. Antwort ist **Tippen oder
+  Ziehen** der Karte in den leeren Bildrahmen des Buchs (seit Oktober 2026, beides
+  gleichwertig): die richtige Karte dort losgelassen rastet im Rahmen ein, die falsche
+  dort zählt genau wie ein Tipp auf sie (zurückfedern, wackeln, Satz erneut), Loslassen
+  anderswo ist nur ein Zurückfedern und zählt nicht (§2). Ein Miss liest den Satz
+  erneut vor. **Kein „Zeig mir"** mehr (seit Oktober 2026): bei zwei Karten ist die
+  andere Karte die Auflösung, wie beim Laut-Fresser — der Knopf war nur eine dritte,
+  schwächere Antwort. Die Sätze
   leben im Task selbst (nicht in `sentences.json`) und dürfen wie die Finale-Sätze
   flektierte Formen und freie Verben nutzen — nur die Karten-Nomen sind Atome mit
   Emoji. Die Instruktion ist über alle Lektionen **wortgleich** (Validator prüft das),
@@ -121,10 +127,10 @@ die verbliebenen Nummern bleiben, wie Code und Design-Dokumente sie nennen:
     Bildschirmmitte, und die Emoji-Reihe füllt die Karte so weit die Breite es
     zulässt. Ein Fehltipp wird **bewegt** quittiert, nicht gefärbt: die getippte
     Karte wackelt (`SentencePictureCardShake`), dazu `nudge`-Haptik und der Satz
-    erneut — kein Rot, §8 und §10 gelten unverändert. Ein Treffer zieht die
-    richtige Karte groß in die Bildschirmmitte und hält sie dort, solange der Satz
-    wiederholt wird; die andere Karte blendet aus. **Auflösen („Zeig mir")
-    markiert nur, es feiert nicht.**
+    erneut — kein Rot, §8 und §10 gelten unverändert. Ein Treffer bringt die
+    richtige Karte ins Buch: getippt fliegt sie im Bogen in den Bildrahmen, gezogen
+    rastet sie dort ein, wo sie losgelassen wurde; die andere Karte blendet aus, und
+    der Satz wird wiederholt (§10, „Leseecke").
 7. **Rechnen** — reine Arithmetik mit Zahlentürmen in *jeder* Lektion (Abschnitt 8).
   **Keine Wörter zum Lesen oder Schreiben**, keine Bilder. Seit September 2026 gibt es keine
   Sachaufgaben mehr: die Ansage fragt nur die Rechnung, die Antwort ist die Zahl. Die früheren
@@ -724,21 +730,29 @@ niemals mit einem stummen No-Op.
   den Test, nicht den Bildschirm. Einzige Stelle, an der der 56dp-Boden nachgibt:
   fünf Pegs passen auf einem 320dp-Gerät physikalisch nicht in eine Zeile, dann
   schrumpft die ganze Reihe gleichmäßig auf rund 48dp je Peg.
-- Ausnahme Satz-Versteher: der Antwortblock beginnt bei **52 % der Bühnenhöhe**
+- Ausnahme Satz-Versteher: der Antwortblock beginnt bei **58 % der Bühnenhöhe**
   statt am unteren Rand (`ExerciseStage(answerAnchor = AnswerAnchor.BelowCenter)`) —
   am unteren Rand verdeckt die tippende Hand genau die Bildkarten, die die ganze
   Aufgabe sind. Der Aufgabenblock darüber trägt das **Bilderbuch** (§10, „Leseecke"):
   rechte Seite mit leerem Bildrahmen und einem **Wort-Balken je Wort** des Satzes, ohne
   Buchstaben (`SentenceBarSizing`: Satzzeichen zählen nicht, Länge nach Wortlänge,
-  geklemmt 28–96 dp, links bündig umbrechend; alle ausgelieferten Sätze passen auf der
-  schmalsten Seite in drei Zeilen, `SentenceBarSizingTest`). Kein Titel, keine Kacheln,
+  geklemmt 28–96 dp, links bündig umbrechend; **mindestens zwei Zeilen** — ein Satz, der
+  in eine passt, wird etwa 60 : 40 auf zwei verteilt, weil eine einzelne Balkenreihe als
+  Leiste las, nicht als Text; nur ein Ein-Wort-Satz bleibt eine Zeile, denn ein Balken
+  ist immer ein Wort. Alle ausgelieferten Sätze passen auf der schmalsten Seite in drei
+  Zeilen, `SentenceBarSizingTest`). Kein Titel, keine Kacheln,
   kein lesbares Wort — **Ausnahme:** ohne deutsches TTS steht statt der Balken der Satz
   als Text auf der Seite, damit ein Erwachsener vorlesen kann — der visuelle Fallback
-  aus §7; er darf nicht als Verstoß gegen „kein Wort" gelöscht werden. Die 52 % sind
+  aus §7; er darf nicht als Verstoß gegen „kein Wort" gelöscht werden. Die 58 % sind
   eine **Untergrenze für den Antwortblock**, keine feste Höhe für den
   Aufgabenblock: der Antwortblock darf über die Marke hinaus nach oben wachsen,
-  wenn Karten, „Zeig mir" und Systemschriftgröße mehr Platz brauchen; das Buch nimmt,
-  was übrig bleibt, und der Rahmen schrumpft zuerst. Für alle
+  wenn Karten und Systemschriftgröße mehr Platz brauchen; das Buch nimmt,
+  was übrig bleibt, und der Rahmen schrumpft zuerst. Bis Oktober 2026 waren es 52 %:
+  seit „Zeig mir" entfallen ist und das Buch zwei Zeilen Balken, mehr Seitenrand und
+  Luft zum Lautsprecher bekommen hat (Nutzer-Feedback „etwas höher"), blieb dort unter
+  den Karten nur leerer Tisch, während der Rahmen zu flach wurde. Proportionen der
+  Seite: 14 dp Luft unter dem Lautsprecher, Innenrand 38/30 dp seitlich und 26 dp oben
+  und unten, 28 dp zwischen Rahmen und Balken, 38 dp Zeilenabstand der Balken. Für alle
   anderen Übungen bleibt `AnswerAnchor.Bottom` die Vorbelegung und damit die
   Grundform.
 
@@ -991,10 +1005,15 @@ niemals mit einem stummen No-Op.
     `speaking`), und eine erfundene Wort-für-Wort-Synchronisation wäre falsch. In Runde 1
     glimmen sie deshalb auch während der Instruktion davor. Die zwei Bildkarten sind
     **gerahmte Bilder** (helle Fläche, Holzrahmen, richtig = `LeafGreen`) und liegen auf
-    dem Tisch. **Richtig** (auch nach „Zeig mir"): die Karte fliegt im Bogen in den Rahmen
+    dem Tisch. **Richtig getippt:** die Karte fliegt im Bogen in den Rahmen
     (600 ms, erst nach außen, dann zur Mitte, leicht gekippt) und landet in der Größe, in
     der der Rahmen das Bild zeigt; dort geht sie auf, der Rahmen wird durchgezogen
-    `LeafGreen`, die falsche Karte blendet aus. **Nächste Runde:** die Seite blättert um den
+    `LeafGreen`, die falsche Karte blendet aus. **Richtig gezogen:** der Rahmen ist die
+    einzige Ablage (`DragCard`/`DragFieldState` wie im Wort-Bauer); die Karte fliegt nicht
+    erst heim und dann hinauf, sondern rastet vom Loslass-Punkt aus gerade im Rahmen ein
+    (360 ms, `DragCard(settlesOn = …)`), danach dieselbe Landung. Die falsche Karte auf dem
+    Rahmen federt heim und wackelt wie nach einem Tipp; anderswo losgelassen federt jede
+    Karte nur heim. Prüfung: `SentencePictureDragTest` (instrumentiert). **Nächste Runde:** die Seite blättert um den
     Falz nach links (600 ms, langsam los — die sichtbare Hälfte bekommt die meiste Zeit),
     darunter die neue Seite mit leerem Rahmen; die neuen Karten erscheinen, wenn das Blatt
     fast liegt, und sind bis dahin nicht tippbar. Geblättert wird nur einen Schritt
@@ -1002,7 +1021,9 @@ niemals mit einem stummen No-Op.
     Seite einfach. „Bewegung reduzieren": Überblenden statt Flug und Umblättern.
     Vorher stand hier ein **Puppentheater** mit Vorhang und Bühnenbrettern; ein Tester
     wollte die Karten auf die Bühne legen — sie versprach eine Ablagefläche, die es nicht
-    gab. Standbilder: `NightWorldShotTest.bookInTheReadingNook`/`bookWithoutGermanVoice`.
+    gab. Standbilder: `NightWorldShotTest.bookInTheReadingNook`/`bookWithoutGermanVoice`/
+    `bookDragIntoFrame`. Die Test-Activity steht im Debug-Manifest hochkant, wie die App —
+    sonst lief ein Lauf am liegenden Testgerät quer und das Buch fiel auf null Höhe.
   - **Pilzhöhle** (Laut-Fresser): `world_cave.webp` (30 KB), vom Nutzer generiert, abgedunkelt
     und mit beruhigter Mitte eingebacken. Die zwei Fresser sind **neu gezeichnet**
     (`FeederCreature`, `FeederShape`): **Pilli** (links, blau) rund mit zwei Öhrchen, **Kora**

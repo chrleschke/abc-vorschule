@@ -65,13 +65,40 @@ class SentenceBarSizingTest {
     }
 
     @Test
-    fun wrapsIntoRowsWhenThePageIsNarrow() {
+    fun wrapsIntoMoreRowsWhenThePageIsNarrow() {
         val sentence = "Mateo und Lennard sind ins Baumhaus geklettert."
         val wide = SentenceBarSizing.layout(sentence, 1000f)
-        val narrow = SentenceBarSizing.layout(sentence, 200f)
-        assertEquals(1, wide.rows)
-        assertTrue(narrow.rows > 1)
+        val narrow = SentenceBarSizing.layout(sentence, 160f)
+        assertTrue(narrow.rows > wide.rows)
         assertEquals(narrow.rows * SentenceBarSizing.BarHeightDp + (narrow.rows - 1) * SentenceBarSizing.RowGapDp, narrow.heightDp, 0f)
+    }
+
+    /** Eine Balkenreihe liest sich als Leiste; Text hat mindestens zwei Zeilen. */
+    @Test
+    fun aSentenceThatFitsInOneRowStillGetsTwo() {
+        val sentence = "Oma hat Mama gerufen."
+        val layout = SentenceBarSizing.layout(sentence, 1000f)
+        assertEquals(2, layout.rows)
+        assertEquals(4, layout.bars.size)
+        // Die erste Zeile ist die längere, wie bei auslaufendem Text.
+        val byRow = layout.bars.groupBy { it.row }.mapValues { (_, bars) -> bars.sumOf { it.widthDp.toDouble() } }
+        assertTrue(byRow.getValue(0) >= byRow.getValue(1))
+        // Jede Zeile beginnt links.
+        assertEquals(listOf(0f, 0f), layout.bars.groupBy { it.row }.values.map { it.first().xDp })
+    }
+
+    @Test
+    fun everyShippedSentenceHasAtLeastTwoRowsOnAWidePage() {
+        shippedSentences().forEach { sentence ->
+            assertTrue("„$sentence“", SentenceBarSizing.layout(sentence, 1000f).rows >= SentenceBarSizing.MinRows)
+        }
+    }
+
+    @Test
+    fun aSingleWordStaysOneBar() {
+        val layout = SentenceBarSizing.layout("Regenbogen.", 300f)
+        assertEquals(1, layout.rows)
+        assertEquals(1, layout.bars.size)
     }
 
     /**

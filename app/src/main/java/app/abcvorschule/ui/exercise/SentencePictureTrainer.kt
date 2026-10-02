@@ -5,7 +5,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -27,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.GraphicsLayerScope
@@ -41,7 +41,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import app.abcvorschule.content.ContentPack
 import app.abcvorschule.content.SentencePictureRound
-import app.abcvorschule.ui.components.AbcResolveButton
+import app.abcvorschule.ui.exercise.drag.DragCard
+import app.abcvorschule.ui.exercise.drag.DragFieldState
+import app.abcvorschule.ui.exercise.drag.rememberDragFieldState
 import app.abcvorschule.ui.rewards.LocalAbcHaptics
 import app.abcvorschule.ui.theme.AbcDimens
 import app.abcvorschule.ui.theme.AbcMotion
@@ -78,8 +80,6 @@ fun SentencePictureTrainer(
     modifier: Modifier = Modifier,
 ) {
     val roundKey = "$roundIndex-${round.promptTts}"
-    var misses by remember(roundKey) { mutableIntStateOf(0) }
-    var resolved by remember(roundKey) { mutableStateOf(false) }
     var solvedCorrect by remember(roundKey) { mutableStateOf(false) }
     // Welche Karte zuletzt falsch getippt wurde und wie oft überhaupt schon
     // falsch getippt wurde. Der Zähler ist der Auslöser der Schüttel-Animation:
@@ -95,7 +95,9 @@ fun SentencePictureTrainer(
     // Ruhen statt dimmen (PromptRest): kaum gedämpft, die Ansage-Sperre hält die Taps.
     val interactionOpacity = rememberRestOpacity()
     val still = rememberReduceMotion()
-    val answered = solvedCorrect || resolved
+    // Kein „Zeig mir": bei zwei Karten ist die andere Karte die Auflösung (wie beim
+    // Laut-Fresser). Beantwortet ist die Runde also erst, wenn die richtige Karte im Buch liegt.
+    val answered = solvedCorrect
     val page = remember(roundKey) {
         BookPageContent(
             sentence = round.promptTts,
@@ -126,9 +128,16 @@ fun SentencePictureTrainer(
         cardsIn.animateTo(1f, tween(AbcMotion.ShortMs, easing = AbcMotion.Enter))
     }
 
-    // Der Flug der richtigen Karte in den Rahmen (auch nach „Zeig mir"), danach geht sie
-    // im Rahmen auf. Gekeyt wie alles hier: ein ungekeytes Animatable stünde in der neuen
-    // Runde auf 1 und die Karte wäre von Anfang an im Rahmen verschwunden.
+    // Ziehen: der Bildrahmen ist die eine Ablage. Die richtige Karte, dort losgelassen,
+    // rastet ab dem Loslass-Punkt ein ([dropFrom], Versatz zur Ruhelage) — kein zweiter
+    // Flug. Die falsche zählt dort wie ein Tipp auf sie, überall sonst ist Loslassen nur
+    // ein Zurückfedern (PRODUCT_PRINCIPLES §2: committet nur bei echtem Treffer).
+    val dragState = rememberDragFieldState(roundKey)
+    var dropFrom by remember(roundKey) { mutableStateOf<Offset?>(null) }
+
+    // Der Flug der richtigen Karte in den Rahmen, danach geht sie im Rahmen auf. Gekeyt
+    // wie alles hier: ein ungekeytes Animatable stünde in der neuen Runde auf 1 und die
+    // Karte wäre von Anfang an im Rahmen verschwunden.
     val flight = remember(roundKey) { Animatable(0f) }
     val land = remember(roundKey) { Animatable(0f) }
     LaunchedEffect(roundKey, answered) {
@@ -137,12 +146,18 @@ fun SentencePictureTrainer(
             // Bewegung reduziert: kein Flug, die Karte blendet in den Rahmen über.
             flight.animateTo(1f, tween(AbcMotion.LongMs, easing = AbcMotion.Linger))
         } else {
-            flight.animateTo(1f, tween(FlightMs, easing = AbcMotion.Enter))
+            // Gezogen ist der Weg kurz und gerade — die Karte rastet nur noch ein.
+            val ms = if (dropFrom != null) AbcMotion.StandardMs else FlightMs
+            flight.animateTo(1f, tween(ms, easing = AbcMotion.Enter))
             land.animateTo(1f, tween(AbcMotion.ShortMs, easing = AbcMotion.Linger))
         }
     }
     val landed: () -> Float = { if (still) flight.value else land.value }
     val targets = remember { FlightTargets() }
+    // Die Zone in den Zustand dieser Runde: rememberDragFieldState(roundKey) ist je Runde
+    // neu, der Rahmen aber bewegt sich beim Rundenwechsel nicht, meldet seine Lage also
+    // nicht von selbst noch einmal.
+    SideEffect { if (!targets.frame.isEmpty) dragState.putZone(FrameZone, targets.frame) }
 
     // Vorlesen: ohne Clip-Dauer im Audio-Layer keine Wort-für-Wort-Synchronisation, die
     // ganze Balkengruppe glimmt ruhig, solange gesprochen wird (Ansage, Miss-Wiederholung,
@@ -159,13 +174,12 @@ fun SentencePictureTrainer(
     }
 
     fun choose(correct: Boolean, tappedLeft: Boolean) {
-        if (resolved || solvedCorrect) return
+        if (solvedCorrect) return
         if (correct) {
             solvedCorrect = true
             haptics.success()
             onResult(true, false, scoredIds)
         } else {
-            misses += 1
             wrongOnLeft = tappedLeft
             wrongTick += 1
             haptics.nudge()
@@ -198,7 +212,10 @@ fun SentencePictureTrainer(
                 ttsAvailable = ttsAvailable,
                 landed = landed,
                 glow = glow,
-                onFrameBounds = { targets.frame = it },
+                onFrameBounds = {
+                    targets.frame = it
+                    dragState.putZone(FrameZone, it)
+                },
                 onPictureSp = { targets.frameSp = it },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -219,11 +236,23 @@ fun SentencePictureTrainer(
                 listOf(true, false).forEach { isLeft ->
                     val isCorrect = isLeft == correctOnLeft
                     val side = if (isLeft) -1f else 1f
+                    val dragKey = if (isLeft) "left" else "right"
                     PictureCard(
                         atomIds = if (isCorrect) round.correctAtomIds else round.wrongAtomIds,
                         pack = pack,
                         highlight = answered && isCorrect,
                         enabled = enabled,
+                        dragState = dragState,
+                        dragKey = dragKey,
+                        settlesOn = { zone, releasedAt ->
+                            // Nur die richtige Karte bleibt im Buch; die falsche fliegt heim.
+                            val settles = zone == FrameZone && isCorrect && !solvedCorrect
+                            if (settles) dropFrom = releasedAt
+                            settles
+                        },
+                        onDropped = { zone ->
+                            if (zone == FrameZone) choose(isCorrect, tappedLeft = isLeft)
+                        },
                         opacity = interactionOpacity,
                         shakeTick = if (wrongOnLeft == isLeft) wrongTick else 0,
                         onPlaced = { if (isLeft) targets.left = it else targets.right = it },
@@ -235,7 +264,14 @@ fun SentencePictureTrainer(
                             val p = flight.value
                             if (isCorrect) {
                                 val from = if (isLeft) targets.left else targets.right
-                                if (!still) flyInto(p, from, targets, side)
+                                val drop = dropFrom
+                                if (!still) {
+                                    flyInto(p, from, targets, side, drop)
+                                } else if (drop != null) {
+                                    // Bewegung reduziert: sie blendet dort aus, wo sie losgelassen wurde.
+                                    translationX += drop.x
+                                    translationY += drop.y
+                                }
                                 alpha *= 1f - landed()
                             } else {
                                 // Die falsche Karte blendet aus, während die richtige abhebt.
@@ -244,20 +280,18 @@ fun SentencePictureTrainer(
                         },
                         onTap = { choose(isCorrect, tappedLeft = isLeft) },
                         testTag = if (isCorrect) "sentence_picture_card_correct" else "sentence_picture_card_wrong",
-                        // Die fliegende Karte liegt über ihrer Nachbarin.
+                        // Die fliegende oder gezogene Karte liegt über ihrer Nachbarin.
                         modifier = Modifier
                             .weight(1f)
-                            .zIndex(if (isCorrect) 1f else 0f),
+                            .zIndex(
+                                when {
+                                    dragState.draggingKey == dragKey -> 2f
+                                    isCorrect -> 1f
+                                    else -> 0f
+                                },
+                            ),
                     )
                 }
-            }
-            if (misses >= 2 && !answered) {
-                AbcResolveButton(
-                    onClick = {
-                        resolved = true
-                        onResult(false, true, scoredIds)
-                    },
-                )
             }
         },
     )
@@ -302,22 +336,24 @@ private class FlightTargets {
  * Die Karte fliegt in einem Bogen in den Rahmen: erst nach außen und hoch, dann zur
  * Mitte, dabei leicht gekippt, und schrumpft auf Rahmengröße. Quadratische Kurve mit dem
  * Kontrollpunkt neben der Karte, auf ihrer Außenseite ([side] −1 links, +1 rechts).
+ * Wurde sie ins Buch gezogen ([drop], Versatz beim Loslassen), führt der Weg gerade
+ * von dort in den Rahmen, ohne Bogen und ohne Kippen — sie rastet nur noch ein.
  *
  * Sie landet in der Größe, in der der Rahmen das Bild zeigt: ihre Emojis sind dann so
  * groß wie die des Rahmens, und das Aufgehen im Rahmen ist eine Überblendung zwischen
  * zwei deckungsgleichen Bildern statt eines Größensprungs. Größer als der Rahmen wird
  * sie dabei nie.
  */
-private fun GraphicsLayerScope.flyInto(p: Float, from: Rect, targets: FlightTargets, side: Float) {
+private fun GraphicsLayerScope.flyInto(p: Float, from: Rect, targets: FlightTargets, side: Float, drop: Offset?) {
     val to = targets.frame
-    if (from.isEmpty || to.isEmpty || p <= 0f) return
-    val dx = to.center.x - from.center.x
-    val dy = to.center.y - from.center.y
-    val cx = side * FlightBowDp.dp.toPx()
-    val cy = dy * 0.6f
+    if (from.isEmpty || to.isEmpty) return
+    val start = drop ?: Offset.Zero
+    val end = Offset(to.center.x - from.center.x, to.center.y - from.center.y)
+    val control = if (drop != null) (start + end) / 2f else Offset(side * FlightBowDp.dp.toPx(), end.y * 0.6f)
     val u = 1f - p
-    translationX += 2f * u * p * cx + p * p * dx
-    translationY += 2f * u * p * cy + p * p * dy
+    translationX += u * u * start.x + 2f * u * p * control.x + p * p * end.x
+    translationY += u * u * start.y + 2f * u * p * control.y + p * p * end.y
+    if (p <= 0f) return
     val inset = 2 * FlightLandInsetDp.dp.toPx()
     val fit = minOf((to.width - inset) / from.width, (to.height - inset) / from.height)
     val match = if (targets.cardSp > 0f && targets.frameSp > 0f) targets.frameSp / targets.cardSp else fit
@@ -325,8 +361,11 @@ private fun GraphicsLayerScope.flyInto(p: Float, from: Rect, targets: FlightTarg
     val s = 1f + (target - 1f) * p
     scaleX = s
     scaleY = s
-    rotationZ = side * FlightTiltDeg * sin(p * PI.toFloat())
+    if (drop == null) rotationZ = side * FlightTiltDeg * sin(p * PI.toFloat())
 }
+
+/** Die eine Ablage beim Ziehen: der Bildrahmen im Buch. */
+private const val FrameZone = "frame"
 
 /** Ein Flug in den Rahmen; die Dauerstufe „Feiern", denn er *ist* die Feier der Runde. */
 private const val FlightMs = AbcMotion.CelebrateMs
@@ -375,6 +414,10 @@ private fun PictureCard(
     pack: ContentPack,
     highlight: Boolean,
     enabled: Boolean,
+    dragState: DragFieldState,
+    dragKey: String,
+    settlesOn: (zoneKey: String, releasedAt: Offset) -> Boolean,
+    onDropped: (zoneKey: String?) -> Unit,
     opacity: Float,
     shakeTick: Int,
     onPlaced: (Rect) -> Unit,
@@ -407,7 +450,9 @@ private fun PictureCard(
     // festen Staffelung: sonst überläuft die Reihe auf schmalen Geräten (siehe
     // SentencePictureCardSizing). BoxWithConstraints außen, Padding innen, damit
     // maxWidth die volle Kartenbreite ist und der Abzug hier sichtbar bleibt.
-    BoxWithConstraints(modifier = modifier) {
+    // Vor dem Ziehen gemessen, am Platz der Karte in der Reihe: von dort startet der
+    // Flug, und dorthin bezieht sich der Versatz beim Loslassen.
+    BoxWithConstraints(modifier = modifier.onGloballyPositioned { onPlaced(it.boundsInRoot()) }) {
         val contentWidthDp = (maxWidth.value - 2 * CardPaddingHorizontalDp).coerceAtLeast(1f)
         val emojiSp = SentencePictureCardSizing.emojiSp(
             atomCount = atomIds.size,
@@ -415,14 +460,20 @@ private fun PictureCard(
             fontScale = fontScale,
         )
         SideEffect { onEmojiSp(emojiSp) }
-        Box(
-            contentAlignment = Alignment.Center,
+        // Antippen oder ins Buch ziehen — beides ist die Antwort. DragCard bringt Tipp,
+        // Ziehen, Anheben und den Rückflug mit (dieselbe Mechanik wie Wort-Bauer und
+        // Laut-Fresser); Tipp- und Ziehfläche sind die ganze Karte, das Padding liegt
+        // deshalb innen am Inhalt, nicht in dieser Kette.
+        DragCard(
+            state = dragState,
+            key = dragKey,
+            onTap = onTap,
+            onDropped = onDropped,
+            enabled = enabled,
+            settlesOn = settlesOn,
             modifier = Modifier
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = AbcDimens.kidTouch * 2)
-                // Vor dem graphicsLayer gemessen: die Lage der Karte im Layout, nicht
-                // die gerade geflogene — von dort startet der Flug.
-                .onGloballyPositioned { onPlaced(it.boundsInRoot()) }
                 // graphicsLayer statt offset: eine reine Zeichenoperation, die
                 // kein Neu-Layout der Reihe auslöst und die Nachbarkarte
                 // deshalb nicht mitverschiebt. Schütteln, Erscheinen und Flug lesen
@@ -444,8 +495,6 @@ private fun PictureCard(
                     color = if (highlight) LeafGreen else FrameWood,
                     shape = RoundedCornerShape(22.dp),
                 )
-                .clickable(enabled = enabled, onClick = onTap)
-                .padding(horizontal = CardPaddingHorizontalDp.dp, vertical = 18.dp)
                 .testTag(testTag),
         ) {
             Text(
@@ -460,6 +509,7 @@ private fun PictureCard(
                 // das letzte Emoji wäre unsichtbar, und die beiden Karten sähen bei
                 // 16 der 72 Runden identisch aus. Angeschnitten ist harmloser.
                 softWrap = false,
+                modifier = Modifier.padding(horizontal = CardPaddingHorizontalDp.dp, vertical = 18.dp),
             )
         }
     }

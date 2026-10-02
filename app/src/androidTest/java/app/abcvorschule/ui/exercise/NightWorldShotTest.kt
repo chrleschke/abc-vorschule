@@ -16,6 +16,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -217,6 +218,46 @@ class NightWorldShotTest {
         save("$name-turn-3.png")
         rule.mainClock.advanceTimeBy(1_500)
         save("$name-next.png")
+    }
+
+    /** Die richtige Karte ins Buch gezogen: unterwegs, losgelassen über dem Rahmen, eingerastet. */
+    @Test
+    fun bookDragIntoFrame() {
+        val real = ContentRepository.fromContext(InstrumentationRegistry.getInstrumentation().targetContext).load()
+        val spec = real.tasks.getValue("l01-sp1") as app.abcvorschule.content.SentencePictureSpec
+        rule.mainClock.autoAdvance = false
+        rule.setContent {
+            InWorld(TrainerWorld.ReadingNook) {
+                Box(Modifier.padding(bottom = AbcDimens.screenBottomExtra)) {
+                    SentencePictureTrainer(
+                        round = spec.rounds[0], roundIndex = 0, pack = real,
+                        ttsAvailable = true, speaking = false,
+                        onSpeakPrompt = {}, onResult = { _, _, _ -> },
+                    )
+                }
+            }
+        }
+        rule.mainClock.advanceTimeBy(1_000)
+        val frame = rule.onNodeWithTag("sentence_picture_frame").fetchSemanticsNode().boundsInRoot.center
+        val card = rule.onNodeWithTag("sentence_picture_card_correct").fetchSemanticsNode().boundsInRoot.center
+        val delta = frame - card
+        rule.onNodeWithTag("sentence_picture_card_correct").performTouchInput {
+            down(center)
+            repeat(6) { moveBy(delta / 12f) }
+        }
+        rule.mainClock.advanceTimeBy(300)
+        save("nook-drag-half.png")
+        rule.onNodeWithTag("sentence_picture_card_correct").performTouchInput {
+            // Etwas schräg über dem Rahmen loslassen, wie ein Kind es tut.
+            repeat(6) { moveBy(delta / 12f + androidx.compose.ui.geometry.Offset(4f, -3f)) }
+        }
+        rule.mainClock.advanceTimeBy(200)
+        save("nook-drag-over.png")
+        rule.onNodeWithTag("sentence_picture_card_correct").performTouchInput { up() }
+        rule.mainClock.advanceTimeBy(150)
+        save("nook-drag-settle.png")
+        rule.mainClock.advanceTimeBy(1_200)
+        save("nook-drag-landed.png")
     }
 
     /** Der End-Screen der ersten Lektion: Sternbild „M" über dem Finale-Satz. */
