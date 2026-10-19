@@ -122,6 +122,12 @@ data class SessionUiState(
      * laufen.
      */
     val pathAdvanceFromLessonId: String? = null,
+    /**
+     * Ob [pathAdvanceFromLessonId] zu Ende gespielt wurde (zurück über den End-Screen)
+     * statt abgebrochen. Nur dann feiert der Pfad das alte Schild, bevor der Pfeil
+     * zum nächsten hüpft.
+     */
+    val pathAdvanceFinished: Boolean = false,
     /** Spoken-only miss/hint text — never rendered as chrome. */
     val speakCue: String? = null,
     val successPhase: SuccessPhase = SuccessPhase.Idle,

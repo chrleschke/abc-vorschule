@@ -58,8 +58,13 @@ object PathGeometry {
      * some 25dp, well inside the same margin. Asserted in PathGeometryTest. (196
      * with plank, post and the "you are here" pin above the sign; 168 while every
      * sign was a 116dp board.)
+     *
+     * Since October 2026 the current sign carries the hopping arrow
+     * (`PathArrowMotion`) above its badges: 4dp gap + 48dp arrow + 12dp bounce on
+     * top of those 121dp = 185dp, hence 188 — on a fresh install the arrow stands
+     * over the very first sign, and it must not slide under the header.
      */
-    const val DefaultMargin = 124f
+    const val DefaultMargin = 188f
 
     /**
      * Horizontal inset: how far the swing's outer edge stays from each screen

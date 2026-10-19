@@ -177,6 +177,48 @@ class LessonGatingTest {
     }
 
     @Test
+    fun aLessonFinishedWithHelpHandsTheHighlightOn() {
+        // Durchgespielt mit „Zeig mir" bleibt das Schild „angefangen" — der Pfad
+        // darf deshalb trotzdem nicht dort stehen bleiben, sonst tippt das Kind die
+        // gerade beendete Lektion gleich noch einmal an.
+        val second = pack.authoredLessons.getOrNull(1) ?: return
+        val playable = pack.tasksOf(pack.lesson(first.id)).map { it.id }
+        val progress = LearnerProgress(
+            taskStats = playable.associateWith { SkillStats(attempts = 1, resolves = 1) },
+        )
+        assertEquals(second.id, LessonGating.nextPlayable(pack, progress)?.id)
+    }
+
+    @Test
+    fun afterAFinishedLessonTheHighlightMovesToTheOneAfterIt() {
+        // Hin- und Herspringen: zuletzt beendet wurde die zweite Lektion außer der
+        // Reihe, also zeigt der Pfad auf die dritte — nicht zurück auf die erste.
+        val second = pack.authoredLessons.getOrNull(1) ?: return
+        val third = pack.authoredLessons.getOrNull(2) ?: return
+        val progress = mastering(second.id).copy(unlockAllLessons = true, lastFinishedLessonId = second.id)
+        assertEquals(third.id, LessonGating.nextPlayable(pack, progress)?.id)
+    }
+
+    @Test
+    fun replayingAnEarlyLessonPointsAtTheFirstOpenOneAfterIt() {
+        val second = pack.authoredLessons.getOrNull(1) ?: return
+        val third = pack.authoredLessons.getOrNull(2) ?: return
+        val progress = LearnerProgress(
+            taskStats = (pack.lesson(first.id).taskIds + pack.lesson(second.id).taskIds)
+                .associateWith { SkillStats(attempts = 1, correct = 1) },
+            lastFinishedLessonId = first.id,
+        )
+        assertEquals(third.id, LessonGating.nextPlayable(pack, progress)?.id)
+    }
+
+    @Test
+    fun withNothingOpenAfterTheFinishedLessonTheFirstOpenOneLeads() {
+        val last = pack.authoredLessons.last()
+        val progress = mastering(last.id).copy(unlockAllLessons = true, lastFinishedLessonId = last.id)
+        assertEquals(first.id, LessonGating.nextPlayable(pack, progress)?.id)
+    }
+
+    @Test
     fun statesCoverEveryLesson() {
         val states = LessonGating.states(pack, LearnerProgress())
         assertEquals(pack.lessons.size, states.size)

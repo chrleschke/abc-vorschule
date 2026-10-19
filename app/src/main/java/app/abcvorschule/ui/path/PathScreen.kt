@@ -2,6 +2,7 @@ package app.abcvorschule.ui.path
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
@@ -30,6 +31,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -76,6 +80,10 @@ import kotlin.math.roundToInt
  * finished this one, that one is next" readable without a word of text.
  * [onAdvanceAnimated] hands the flag back so the move plays once and not again on
  * the next recomposition.
+ *
+ * @param advanceFinished Whether that lesson was played to the end (back via the end
+ * screen) rather than left midway. Then the old sign celebrates first — it jumps and
+ * throws a ring of stars — and only after that does the arrow hop on to the next sign.
  */
 @Composable
 fun PathScreen(
@@ -85,6 +93,7 @@ fun PathScreen(
     signsByLessonId: Map<String, LessonSign>,
     highlightedLessonId: String?,
     advanceFromLessonId: String?,
+    advanceFinished: Boolean,
     points: Int,
     onOpenLesson: (String) -> Unit,
     onLockedTap: () -> Unit,
@@ -220,6 +229,29 @@ fun PathScreen(
                         ).coerceAtLeast(0)
                     }
                     val markerIndex = remember { Animatable(markerStartIndex.toFloat()) }
+                    // Captured once, like markerStartIndex: the flags are cleared as soon
+                    // as the path has picked them up.
+                    val celebrateIndex = remember {
+                        if (advanceFinished) PathFocus.indexOf(lessons, advanceFromLessonId) ?: -1 else -1
+                    }
+                    val hopDelayMillis = remember { PathFocus.hopStartDelayMillis(finished = celebrateIndex >= 0) }
+
+                    // Der Nebelring unter dem aktuellen Schild ersetzt die Stecknadel. Eine
+                    // Uhr für alle Ringe und den Pfeil; gelesen wird sie nur in der Zeichenphase.
+                    val ringStill = rememberReduceMotion()
+                    val ringSeconds = rememberWorldSeconds(ringStill)
+                    // Where on the clock the arrow last touched down, so its bounce starts
+                    // from the ground after a hop instead of mid-air.
+                    var bounceOrigin by remember { mutableFloatStateOf(0f) }
+                    val celebration = remember { Animatable(0f) }
+                    LaunchedEffect(Unit) {
+                        if (celebrateIndex < 0 || ringStill) return@LaunchedEffect
+                        delay(PathCelebration.DelayMillis)
+                        celebration.animateTo(
+                            1f,
+                            tween(durationMillis = PathCelebration.DurationMillis, easing = LinearEasing),
+                        )
+                    }
                     // The sign the ring leaves while markerIndex walks to the head.
                     var ringFrom by remember { mutableIntStateOf(markerStartIndex) }
                     LaunchedEffect(headIndex) {
@@ -227,7 +259,7 @@ fun PathScreen(
                         val target = headIndex.toFloat()
                         if (markerIndex.value == target) return@LaunchedEffect
                         ringFrom = markerIndex.value.roundToInt()
-                        delay(PathFocus.HopStartDelayMillis)
+                        delay(hopDelayMillis)
                         markerIndex.animateTo(
                             targetValue = target,
                             animationSpec = tween(
@@ -235,6 +267,7 @@ fun PathScreen(
                                 easing = FastOutSlowInEasing,
                             ),
                         )
+                        bounceOrigin = ringSeconds.value
                     }
                     // Consumed as soon as the marker has taken its start position: the
                     // hop above is driven by the Animatable from here on, so clearing
@@ -246,7 +279,7 @@ fun PathScreen(
                     val blockCounts = remember(lessons, signsByLessonId) {
                         lessons.map { signsByLessonId[it.id]?.blocks?.size ?: 0 }
                     }
-                    AutoScrollToHead(scrollState, nodePoints, contentTopPx, headIndex, markerStartIndex, blockCounts)
+                    AutoScrollToHead(scrollState, nodePoints, contentTopPx, headIndex, markerStartIndex, blockCounts, hopDelayMillis)
 
                     // Walked footprints are warm gold and nearly opaque, the ones
                     // still ahead are a faint warm grey — on a light landscape the
@@ -271,11 +304,6 @@ fun PathScreen(
                             )
                         }
                     }
-
-                    // Der Nebelring unter dem aktuellen Schild ersetzt die Stecknadel. Eine
-                    // Uhr für alle Ringe; gelesen wird sie nur in der Zeichenphase.
-                    val ringStill = rememberReduceMotion()
-                    val ringSeconds = rememberWorldSeconds(ringStill)
 
                     val canTurn = remember(lessons, states, signsByLessonId) {
                         lessons.map { lesson ->
@@ -315,6 +343,7 @@ fun PathScreen(
                         points = nodePoints,
                         onOpenLesson = onOpenLesson,
                         onLockedTap = onLockedTap,
+                        lift = { index -> if (index == celebrateIndex) PathCelebration.signLift(celebration.value) else 0f },
                         ringFor = { index ->
                             if (headIndex < 0 || (index != headIndex && index != ringFrom)) {
                                 null
@@ -328,6 +357,47 @@ fun PathScreen(
                             }
                         },
                     )
+
+                    if (celebrateIndex >= 0) {
+                        val center = nodePoints.getOrNull(celebrateIndex)?.let { node ->
+                            val tower = with(density) { PathSignDimens.height(blockCounts[celebrateIndex]).toPx() }
+                            Offset(node.x, node.y - tower / 2f)
+                        }
+                        if (center != null) {
+                            Canvas(Modifier.fillMaxSize()) {
+                                drawCelebration(center, celebration.value)
+                            }
+                        }
+                    }
+
+                    if (headIndex >= 0) {
+                        val arrowTips = remember(nodePoints, blockCounts, density) {
+                            with(density) {
+                                val above = PathSignDimens.Headroom.toPx() + PathArrowMotion.GapDp.dp.toPx()
+                                nodePoints.mapIndexed { i, node ->
+                                    Offset(node.x, node.y - PathSignDimens.height(blockCounts[i]).toPx() - above)
+                                }
+                            }
+                        }
+                        val arcPx = with(density) { PathArrowMotion.HopArcDp.dp.toPx() }
+                        val headLesson = lessons[headIndex]
+                        val headPlayable = LessonGating.isPlayable(
+                            states[headLesson.id] ?: LessonState.Locked,
+                            unlockAllLessons,
+                        )
+                        // Still in the air while waiting for, or doing, the hop.
+                        val grounded = { !markerIndex.isRunning && markerIndex.value == headIndex.toFloat() }
+                        PathArrow(
+                            tip = { PathArrowMotion.tip(markerIndex.value, arrowTips, arcPx) },
+                            lift = {
+                                if (ringStill || !grounded()) 0f else PathArrowMotion.bounce(ringSeconds.value - bounceOrigin)
+                            },
+                            squash = {
+                                if (ringStill || !grounded()) 0f else PathArrowMotion.squash(ringSeconds.value - bounceOrigin)
+                            },
+                            onClick = { if (headPlayable) onOpenLesson(headLesson.id) else onLockedTap() },
+                        )
+                    }
                 }
                 // Das letzte Schild muss sich über die Nav-Bar schieben lassen;
                 // die Landschaft läuft darunter weiter durch.
@@ -387,6 +457,7 @@ private fun AutoScrollToHead(
     headIndex: Int,
     hopStartIndex: Int,
     blockCounts: List<Int>,
+    hopDelayMillis: Long,
 ) {
     // Everything that has to be on screen above the hop's start node: the sign
     // standing on it (one row of blocks or two) plus its badges.
@@ -419,7 +490,7 @@ private fun AutoScrollToHead(
                 )
                 scrollState.scrollTo(entry)
                 if (entry != target) {
-                    delay(PathFocus.HopStartDelayMillis)
+                    delay(hopDelayMillis)
                     scrollState.animateScrollTo(
                         target,
                         tween(
@@ -455,6 +526,7 @@ private fun PathSigns(
     points: List<PathPoint>,
     onOpenLesson: (String) -> Unit,
     onLockedTap: () -> Unit,
+    lift: (Int) -> Float,
     ringFor: (Int) -> FogRing?,
 ) {
     val density = LocalDensity.current
@@ -478,10 +550,19 @@ private fun PathSigns(
             turnDelayMs = turnDelayMs,
             index = index,
             ring = ringFor(index),
-            modifier = Modifier.offset(
-                x = with(density) { (point.x - halfWidth).toDp() },
-                y = with(density) { (point.y - fullHeight).toDp() },
-            ),
+            modifier = Modifier
+                .offset(
+                    x = with(density) { (point.x - halfWidth).toDp() },
+                    y = with(density) { (point.y - fullHeight).toDp() },
+                )
+                // Read in the layer, so the jump repaints without recomposing the path.
+                .graphicsLayer {
+                    val l = lift(index)
+                    translationY = -l * PathCelebration.SignJumpDp.dp.toPx()
+                    scaleX = 1f + 0.06f * l
+                    scaleY = 1f + 0.06f * l
+                    transformOrigin = TransformOrigin(0.5f, 1f)
+                },
             onClick = {
                 if (playable) onOpenLesson(lesson.id) else onLockedTap()
             },

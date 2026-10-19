@@ -91,9 +91,11 @@ class PathGeometryTest {
         // content, and the sign it carries is drawn *above* it, its badges riding
         // over the top row. Too small a margin silently clips the first sign's star
         // or lock off the top of the path.
-        val needed = PathSignDimens.MaxHeight.value + PathSignDimens.Headroom.value
+        // Over the current sign the hopping arrow stands on top of the badges.
+        val needed = PathSignDimens.MaxHeight.value + PathSignDimens.Headroom.value +
+            PathArrowMotion.GapDp + PathArrowMotion.ArrowHeightDp + PathArrowMotion.BounceDp
         assertTrue(
-            "DefaultMargin ${PathGeometry.DefaultMargin} must cover sign + badges ($needed dp)",
+            "DefaultMargin ${PathGeometry.DefaultMargin} must cover sign + badges + arrow ($needed dp)",
             PathGeometry.DefaultMargin >= needed,
         )
     }
