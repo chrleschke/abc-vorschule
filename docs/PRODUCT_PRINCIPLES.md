@@ -384,10 +384,28 @@ niemals mit einem stummen No-Op.
   Planetenring, punktiger Staubring, Fortschrittsring mit Segmenten, Ringe unter allen
   Schildern, Play-Knopf über dem Schild, zeigende Hand. Der Pfad scrollt beim Öffnen
   automatisch zu diesem Schild; wer selbst weiterscrollt, wird nicht zurückgerissen.
-- **Nach dem Abschluss animiert der Fortschritt**: der Ring verblasst am gerade geschafften
-  Schild und wächst am nächsten auf, und die Trittspuren dazwischen werden dabei warm. Woher
-  das Kind kam und was jetzt dran ist, wird also gezeigt statt geschrieben. Der Wechsel läuft
-  genau einmal pro Rückkehr auf den Pfad.
+- **Über dem aktuellen Schild hüpft ein goldener Pfeil** (`PathArrow`, seit Oktober 2026): der
+  Ring allein sagte auf dem Startbildschirm nicht, was man tun soll. Der Pfeil (46 × 48 dp, Gold
+  mit dunklem Saum und Schein) steht über den Abzeichen, zeigt auf die Klötze und springt wie ein
+  Ball (Periode 1,1 s, 12 dp hoch, beim Aufsetzen gestaucht). Ein Tipp auf ihn öffnet die
+  Lektion wie das Schild. Für TalkBack ist er Dekoration; bei „Bewegung reduzieren" steht er still.
+  Der Pfad hat oben deshalb 188 dp Rand (`PathGeometry.DefaultMargin`), damit der Pfeil über dem
+  ersten Schild nicht unter die Kopfzeile rutscht.
+- **Welches Schild aktuell ist** (`LessonGating.nextPlayable`): die erste **offene** Lektion
+  (erreicht und noch nicht durchgespielt) **hinter der zuletzt zu Ende gespielten**
+  (`LearnerProgress.lastFinishedLessonId`); gibt es dahinter keine, die erste offene überhaupt.
+  Durchgespielt zählt, nicht gemeistert: eine mit „Zeig mir" beendete Lektion bleibt
+  „angefangen", der Pfad zieht trotzdem weiter. Bis Oktober 2026 blieb er dort (und nach einem
+  Abstecher an der ersten Lücke) stehen, und die Kinder spielten dieselbe Lektion noch einmal,
+  weil sie einfach das markierte Schild antippten. Ein Abbruch mitten in der Lektion bewegt nichts.
+- **Nach dem Abschluss animiert der Fortschritt**, egal ob allein gelöst, mit Hilfe oder als
+  Wiederholung: das gerade geschaffte Schild springt einmal hoch und wirft einen Kranz aus zehn
+  Glühsternen samt Lichtring ab (`PathCelebration`, 1,1 s, ab 0,25 s). Danach (ab 1,15 s) hüpft
+  der Pfeil im Bogen von Schild zu Schild zum nächsten, der Ring verblasst am alten Schild und
+  wächst am neuen auf, die Trittspuren dazwischen werden warm, und die Ansicht scrollt mit.
+  Woher das Kind kam und was jetzt dran ist, wird also gezeigt statt geschrieben. Der Wechsel
+  läuft genau einmal pro Rückkehr auf den Pfad; nach einem Abbruch hüpft nur der Pfeil (falls
+  sich das Ziel geändert hat), ohne Feier. Frames: `PathAdvanceShotTest`.
 - Mit der Eltern-Freigabe der Reihenfolge bleiben **noch nicht erreichte** gesperrte Schilder
   abgedunkelt und behalten ihre Silhouetten, verlieren aber Schloss und „später“-Hinweis und sind
   antippbar. Noch nicht autorierte Lektionen bleiben in jedem Fall gesperrt — sie haben keinen Inhalt.
@@ -395,9 +413,9 @@ niemals mit einem stummen No-Op.
   ist die stärkere Aussage. Eine frei gespielte Lektion zeigt danach ihren echten Zustand
   (angefangen bzw. geschafft mit Stern), bleibt antippbar und schaltet die folgende Lektion frei —
   auch wenn die Eltern-Freigabe später wieder ausgeht. „Gesperrt“ heißt damit: in der
-  Fibel-Reihenfolge noch nicht erreicht **und** hier noch nichts getan. Der Nebelring folgt trotzdem
-  weiter der Fibel-Reihenfolge (erste nicht gemeisterte Lektion) und springt nicht zum Ausflug
-  voraus.
+  Fibel-Reihenfolge noch nicht erreicht **und** hier noch nichts getan. Ring und Pfeil folgen dabei
+  der zuletzt zu Ende gespielten Lektion: wer außer der Reihe eine Lektion beendet, bekommt das
+  Schild dahinter markiert, nicht die erste Lücke weiter vorn (die bleibt antippbar).
 - **Freischalten heißt durchgespielt, nicht fehlerfrei.** Die nächste Lektion öffnet, sobald in
   der vorherigen jeder spielbare Trainer zu Ende gebracht wurde — allein gelöst **oder** über
   „Zeig mir" aufgelöst (`LessonGating.isCompleted`). Der Stern am Schild (`Mastered`) verlangt
@@ -859,7 +877,9 @@ niemals mit einem stummen No-Op.
   vom Nutzer ausdrücklich gewählt; sie ersetzt den Atem-Ring dort, statt eine Schleife
   hinzuzufügen. Zweite benannte Ausnahme: der Nebelring unter dem aktuellen Schild
   (`FogRingMotion`, eigene Perioden 3,2 s / 24–44 s), ebenfalls vom Nutzer gewählt; er
-  ersetzt die wippende Stecknadel.
+  ersetzt die wippende Stecknadel. Dritte benannte Ausnahme: der hüpfende Pfeil über dem
+  aktuellen Schild (`PathArrowMotion`, Periode 1,1 s), vom Nutzer ausdrücklich gewünscht, weil
+  ohne ihn auf dem Startbildschirm nicht klar war, was zu tun ist.
 - **Der Erfolgs-Stern fliegt in den Punktestand** (`StarFlight`, `SuccessBurst`, gezeichnet
   mit `drawGlowStar`). Seit September 2026 ein Stern mit Licht statt eines flachen Sterns
   mit dunkler Kontur: gerundete Spitzen, innen hell und außen bernstein, Glanzpunkt, weicher

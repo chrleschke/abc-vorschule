@@ -29,6 +29,15 @@ internal object PathFocus {
     const val HopStartDelayMillis = 400L
 
     /**
+     * After a lesson played to the end the old sign celebrates first
+     * ([PathCelebration]); the hop waits until its stars are on their way out.
+     */
+    const val FinishedHopStartDelayMillis = 1150L
+
+    fun hopStartDelayMillis(finished: Boolean): Long =
+        if (finished) FinishedHopStartDelayMillis else HopStartDelayMillis
+
+    /**
      * Where in the viewport the focused node is parked, as a fraction of its height.
      * Above the middle, because the trail runs downwards: the sign the child is
      * walking *towards* is always the one below, and it has to come into view with

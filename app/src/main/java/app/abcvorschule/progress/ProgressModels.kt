@@ -64,6 +64,14 @@ data class LearnerProgress(
     /** Per-trainer stats drive lesson state on the path. */
     val taskStats: Map<String, SkillStats> = emptyMap(),
     val unfinishedSession: SessionSnapshot? = null,
+    /**
+     * Die zuletzt bis zum Ende gespielte Lektion, egal ob allein gelöst, mit „Zeig mir"
+     * oder als Wiederholung. Der Pfad zeigt danach auf die nächste offene Lektion
+     * *hinter* ihr ([app.abcvorschule.progress.LessonGating.nextPlayable]) — sonst
+     * sprang er nach einem Abstecher zur ersten offenen zurück, und das Kind spielte
+     * dieselbe Lektion noch einmal, weil es einfach das markierte Schild antippte.
+     */
+    val lastFinishedLessonId: String? = null,
 )
 
 sealed interface AttemptOutcome {

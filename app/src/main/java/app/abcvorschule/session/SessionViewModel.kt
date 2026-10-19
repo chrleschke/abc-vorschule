@@ -141,7 +141,11 @@ class SessionViewModel(
      */
     fun onPathAdvanceAnimated() {
         _ui.update {
-            if (it.pathAdvanceFromLessonId == null) it else it.copy(pathAdvanceFromLessonId = null)
+            if (it.pathAdvanceFromLessonId == null) {
+                it
+            } else {
+                it.copy(pathAdvanceFromLessonId = null, pathAdvanceFinished = false)
+            }
         }
     }
 
@@ -216,6 +220,9 @@ class SessionViewModel(
                     // itself decides whether that is a move at all — the marker only
                     // hops if the highlight has actually left this lesson.
                     pathAdvanceFromLessonId = it.lessonId,
+                    // Nur über den End-Screen kommt man von einer zu Ende gespielten
+                    // Lektion zurück; ein Abbruch mitten drin feiert nichts.
+                    pathAdvanceFinished = it.screen == AppScreen.RewardSummary,
                     lessonId = null,
                     trainers = emptyList(),
                     trainerIndex = 0,
@@ -615,7 +622,13 @@ class SessionViewModel(
                     )
                 }
             }
-            if (entered) progressRepository.saveSession(null)
+            if (entered) {
+                // Ein Schreibvorgang für beides: ohne Snapshot und mit der beendeten
+                // Lektion als Ausgangspunkt für das nächste Ziel auf dem Pfad.
+                progress = progressRepository.update {
+                    it.copy(unfinishedSession = null, lastFinishedLessonId = state.lessonId)
+                }
+            }
             return
         }
         _ui.update {

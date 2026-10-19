@@ -199,6 +199,7 @@ fun TaskShell(
                     signsByLessonId = viewModel.lessonSigns(),
                     highlightedLessonId = viewModel.highlightedLessonId(),
                     advanceFromLessonId = state.pathAdvanceFromLessonId,
+                    advanceFinished = state.pathAdvanceFinished,
                     points = state.points,
                     onOpenLesson = { viewModel.openLesson(it) },
                     onLockedTap = {

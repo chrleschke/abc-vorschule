@@ -115,11 +115,34 @@ object LessonGating {
         }
     }
 
-    /** The lesson the path should highlight: first authored lesson not yet mastered. */
+    /**
+     * The lesson the path should highlight: the first **open** authored lesson — playable
+     * in the Fibel order and not yet [isCompleted] — after the one the child finished
+     * last ([LearnerProgress.lastFinishedLessonId]); without one, or with nothing open
+     * after it, the first open lesson overall.
+     *
+     * Completed, not mastered: a lesson played to the end with „Zeig mir" stays
+     * [LessonState.InProgress], and as long as the highlight waited for mastery it
+     * stood still on exactly the lesson the child had just finished. Children tap the
+     * marked sign, so they played it again and again.
+     *
+     * The parent's unlock switch does not widen the candidates (a locked lesson is
+     * never "next"), but a lesson the child finished out of order moves the highlight
+     * on from there — the child hopped ahead, and pointing back to the first gap
+     * would read as being sent back.
+     */
     fun nextPlayable(pack: ContentPack, progress: LearnerProgress): Lesson? {
         val states = states(pack, progress)
-        return pack.authoredLessons.firstOrNull {
-            states[it.id] == LessonState.Available || states[it.id] == LessonState.InProgress
-        } ?: pack.authoredLessons.lastOrNull { isPlayable(states.getValue(it.id)) }
+        val lessons = pack.authoredLessons
+        val open = lessons.indices.filter { i ->
+            val state = states.getValue(lessons[i].id)
+            (state == LessonState.Available || state == LessonState.InProgress) &&
+                // Ohne spielbaren Trainer (alle pausiert) gibt es dort nichts zu tun.
+                pack.tasksOf(lessons[i]).isNotEmpty() &&
+                !isCompleted(pack, lessons[i], progress)
+        }
+        val finishedAt = lessons.indexOfFirst { it.id == progress.lastFinishedLessonId }
+        val index = open.firstOrNull { finishedAt >= 0 && it > finishedAt } ?: open.firstOrNull()
+        return index?.let(lessons::get) ?: lessons.lastOrNull { isPlayable(states.getValue(it.id)) }
     }
 }
