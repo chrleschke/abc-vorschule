@@ -1,5 +1,3 @@
-• Startbildschirm: Das nächste Schild steht jetzt im leuchtenden Nebelring
-• Satz-Versteher als Bilderbuch – das Bild darf man auch ins Buch ziehen
-• Wort-Detektiv sucht Buchstaben unter dem Sternenhimmel
-• Viele neue und verbesserte Sprachaufnahmen
-• Buchstaben-Jagd und Belohnungskarten aufgeräumt
+• Wörter bauen: Das erste Wort passt jetzt zur Silbe, die gerade verschmolzen wurde
+• Startbildschirm: Ein hüpfender Pfeil zeigt das nächste Schild
+• Nach einer Lektion geht der Pfad zur nächsten weiter
