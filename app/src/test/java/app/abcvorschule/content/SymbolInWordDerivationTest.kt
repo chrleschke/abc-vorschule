@@ -152,7 +152,7 @@ class SymbolInWordDerivationTest {
         // "Pepe" would give `Pe·pe` with the target `pe` in syllable mode — every
         // segment a hit, so unfailable and rejected (see the all-hits guard tests
         // below). The letter round it falls back to has two hits in four segments.
-        val pepe = rounds("l07").last()
+        val pepe = rounds("l07").first()
         assertEquals(SymbolInWordMode.letter, pepe.mode)
         assertEquals("letter-e", pepe.targetAtomId)
         assertEquals(listOf("P", "e", "p", "e"), pepe.segments)
@@ -162,10 +162,12 @@ class SymbolInWordDerivationTest {
 
     @Test
     fun aSingleHitUsesTheSingularPrompt() {
-        val oma = rounds("l02").first()
-        assertEquals(listOf("O", "m", "a"), oma.segments)
-        assertEquals(listOf(0), oma.targetIndices)
-        assertEquals("Finde den Buchstaben - O - im Wort - Oma.", oma.promptTts)
+        // Seit November 2026 steht "Mia" vor "Oma": der erste Wort-Bauer greift die
+        // gerade verschmolzene Silbe `mi` auf.
+        val mia = rounds("l02").first()
+        assertEquals(listOf("M", "i", "a"), mia.segments)
+        assertEquals(listOf(1), mia.targetIndices)
+        assertEquals("Finde den Buchstaben - I - im Wort - Mia.", mia.promptTts)
     }
 
     @Test
@@ -243,7 +245,7 @@ class SymbolInWordDerivationTest {
         val derived = SymbolInWordDerivation.buildRounds(synthetic, lesson)
         assertTrue("Ei must not become a round", derived.none { it.wordAtomId == "ei" })
         assertEquals(rounds("l22").map { it.targetAtomId }, derived.map { it.targetAtomId })
-        assertEquals(listOf("letter-ei", "bau", "letter-au"), derived.map { it.targetAtomId })
+        assertEquals(listOf("letter-au", "to", "letter-ei"), derived.map { it.targetAtomId })
     }
 
     @Test
@@ -263,22 +265,22 @@ class SymbolInWordDerivationTest {
 
     @Test
     fun anAllHitsSyllableRoundFallsBackToLetterMode() {
-        // l07's fourth word is "Pepe": the syllable candidate `Pe·pe` / `pe` is two
-        // hits in two segments and is dropped, exactly like the block-display
-        // mismatch in l17. The letter round that replaces it hunts the lesson's own
-        // focus grapheme E and can be failed. "Helm" stands before it, not after
-        // "Nest": in the second slot it would have taken Rose's syllable round `se`.
+        // l07's first word is "Pepe": the syllable candidate `Pe·pe` / `pe` would be
+        // two hits in two segments and is dropped, exactly like the block-display
+        // mismatch in l17 — so Pepe takes the first (letter) slot, where it costs
+        // nothing, and "Rose" stands second and keeps the syllable round `se`. Both
+        // come before "Nest" and "Helm": the first Wort-Bauer after the
+        // Silben-Verschmelzer must pick up a syllable the child has just merged.
         val l07 = rounds("l07")
         assertEquals(
             listOf(SymbolInWordMode.letter, SymbolInWordMode.syllable, SymbolInWordMode.letter, SymbolInWordMode.letter),
             l07.map { it.mode },
         )
-        assertEquals(listOf("letter-s", "se", "letter-e", "letter-e"), l07.map { it.targetAtomId })
-        // Die Wiederholungslektion leitet aus denselben Wörtern ab und muss folgen —
-        // l20 hängt nur sein eigenes drittes Wort hinten an.
-        val l02 = rounds("l02")
-        assertEquals(listOf("letter-o", "mi"), l02.map { it.targetAtomId })
-        assertEquals(l02.map { it.targetAtomId }, rounds("l20").map { it.targetAtomId }.take(2))
+        assertEquals(listOf("letter-e", "se", "letter-s", "letter-e"), l07.map { it.targetAtomId })
+        // l02 baut "Mia" zuerst (greift `mi` auf); die Silbenrunde fällt damit auf
+        // "Oma" und jagt `ma`. l20 hat mit "Milch" ein zweites `Mi`-Wort.
+        assertEquals(listOf("letter-i", "ma"), rounds("l02").map { it.targetAtomId })
+        assertEquals(listOf("letter-i", "mi", "letter-o"), rounds("l20").map { it.targetAtomId })
     }
 
     @Test
@@ -423,7 +425,7 @@ class SymbolInWordDerivationTest {
         // L13 has a single focus grapheme, so the rotation has nothing to rotate to.
         // Not a bug — the lesson is literally called "Sch (Der Dreifachlaut)".
         assertEquals(
-            listOf("letter-sch", "letter-sch", "letter-sch", "schu"),
+            listOf("letter-sch", "schu", "letter-sch", "letter-sch"),
             rounds("l13").map { it.targetAtomId },
         )
     }

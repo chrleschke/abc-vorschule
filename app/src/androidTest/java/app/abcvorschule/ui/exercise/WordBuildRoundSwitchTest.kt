@@ -35,7 +35,7 @@ import org.junit.runner.RunWith
 
 /**
  * Der gemeldete Fehler: kommt der Wort-Bauer nach einem **abgeschlossenen**
- * Wort-Bauer (im ausgelieferten Pack 36×, z. B. `l02-t7` → `l02-t8`), sieht das
+ * Wort-Bauer (im ausgelieferten Pack 36×, z. B. `l02-t8` → `l02-t7`), sieht das
  * Kind die leeren Rahmen erst entstehen. Über den Weiter-Chevron passiert das
  * nicht — dort wird die Runde verlassen, bevor sie fertig ist.
  *

@@ -206,6 +206,15 @@ Reihenfolge-Regeln, die Content und Validator erzwingen:
   eine Trennregel), und `pf` bildet mit keinem Vokal eine offene Silbe, die in einem
   Fibel-Wort vorkommt. Deshalb hat l16 seit September 2026 **keinen Verschmelzer** — wie
   l12 nie einen hatte. Ein Trainer, der nichts Echtes zu zeigen hat, fällt aus.
+- **Der erste Wort-Bauer nach dem Silben-Verschmelzer greift eine gerade verschmolzene
+  Silbe auf.** Es genügt, dass ihre Buchstabenfolge im Wort steht (`ro` in `r + o + t`);
+  ein eigener Silbenblock ist nicht nötig. Falsch ist ein Wort, das mit den Silben nichts
+  zu tun hat: l07 verschmolz bis November 2026 `se` und `pe` und ließ dann „Nest" bauen.
+  Seither stehen die Silbenwörter vorn (l07: Pepe, Rose, dann Nest und Helm). Der
+  Wort-Detektiv hängt an derselben Reihenfolge — sein zweiter Platz ist der Silbenplatz,
+  ein Wort mit Rundum-Treffer (`Pe·pe`) gehört deshalb auf den ersten. Offen, weil
+  Umsortieren nicht reicht: `mo` (l02, l20), `ho` (l04), `fu` (l05), `na` (l06) und `mei`
+  (l09, l22) stehen in keinem Bauwort ihrer Lektion.
 - Satzrunden (Satz-Architekt) nutzen nur gebaute Wörter, kleingeschriebene Funktionswörter oder ausdrücklich als `holisticAtomIds` markierte Ganzwort-Bilder (so führt die Fibel z. B. „Tor" vor dem R ein). Der **Satz-Versteher ist davon ausgenommen** — wie die Finale-Sätze lebt er von grammatischer Freiheit (Hör-Trainer, keine Bauen-Anforderung).
 - Gemeisterte Lektionen bleiben zum Wiederholen antippbar.
 
